@@ -38,7 +38,7 @@ namespace CasADi{
   \author Joel Andersson 
   \date 2010
 */
-class SXFunctionInternal : public XFunctionInternal{
+class SXFunctionInternal : public XFunctionInternalCommon<SXFunctionInternal,Matrix<SX>,SXNode>{
   friend class SXFunction;
   
   protected:
@@ -139,10 +139,16 @@ class SXFunctionInternal : public XFunctionInternal{
   virtual std::vector<SXMatrix> symbolicInputSX() const{ return inputv_;}
 
   /// Propagate the sparsity seeds
-  virtual void spProp(bool fwd);
+  void spProp(bool fwd);
   
   /// Get the forward/adjoint sparsity seed
-  virtual bvec_t& spGet(bool get_input, int ind, int sdir);
+  inline bvec_t& spGet(bool get_input, int ind, int sdir){
+    if(get_input){
+      return iwork_[input_ind_[ind][sdir]];
+    } else {
+      return iwork_[output_ind_[ind][sdir]];
+    }
+  }
 
   /// Work vector for sparsity detection
   bvec_t *iwork_;

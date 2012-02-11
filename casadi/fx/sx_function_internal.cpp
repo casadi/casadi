@@ -286,7 +286,7 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
 }
 
 vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblocks, bool compact, const vector<bool>& symmetric_block){
-  return jacGen<Matrix<SX> >(jblocks,compact,inputv_,outputv_,symmetric_block);
+  return jacGen(jblocks,compact,inputv_,outputv_,symmetric_block);
 }
 
 bool SXFunctionInternal::isSmooth() const{
@@ -1253,14 +1253,6 @@ void SXFunctionInternal::spProp(bool fwd){
       iwork_[it->ch[0]] |= seed;
       iwork_[it->ch[1]] |= seed;
     }
-  }
-}
-
-bvec_t& SXFunctionInternal::spGet(bool get_input, int ind, int sdir){
-  if(get_input){
-    return iwork_[input_ind_[ind][sdir]];
-  } else {
-    return iwork_[output_ind_[ind][sdir]];
   }
 }
 

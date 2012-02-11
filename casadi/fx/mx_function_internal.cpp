@@ -544,14 +544,6 @@ void MXFunctionInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject
   }
 }
 
-bvec_t& MXFunctionInternal::spGet(bool get_input, int ind, int sdir){
-  if(get_input){
-    return iwork_in_[sdir];
-  } else {
-    return iwork_out_[sdir];
-  }
-}
-
 void MXFunctionInternal::spProp(bool fwd){
   if(fwd){
     for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++){
@@ -644,7 +636,7 @@ FX MXFunctionInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks)
 }
 
 vector<MX> MXFunctionInternal::jac(const vector<pair<int,int> >& jblocks, bool compact, const std::vector<bool>& symmetric_block){
-  return jacGen<MX>(jblocks,compact,inputv_,outputv_,symmetric_block);
+  return jacGen(jblocks,compact,inputv_,outputv_,symmetric_block);
 }
 
 std::vector<MX> MXFunctionInternal::jac(int ider){

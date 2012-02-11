@@ -27,13 +27,15 @@
 #include <map>
 #include <stack>
 #include "fx_internal.hpp"
+#include "../matrix/sparsity_tools.hpp"
 
 namespace CasADi{
 
-/** \brief  Internal node class for XFunction
+/** \brief  Internal node class for XFunction (type independent)
     \author Joel Andersson 
     \date 2011
 */
+
 class XFunctionInternal : public FXInternal{
   friend class XFunction;
   public:
@@ -43,19 +45,7 @@ class XFunctionInternal : public FXInternal{
     
     /** \brief  Destructor */
     virtual ~XFunctionInternal();
-  
-    /** \brief  Topological sorting of the nodes based on Depth-First Search (DFS) */
-    template<typename Node>
-    static void sort_depth_first(std::stack<Node*>& s, std::vector<Node*>& nodes);
-
-    /** \brief  Topological (re)sorting of the nodes based on Breadth-First Search (BFS) (Kahn 1962) */
-    template<typename Node>
-    static void resort_breadth_first(std::vector<Node*>& algnodes);
-
-    /** \brief  Topological (re)sorting of the nodes with the purpose of postponing every calculation as much as possible, as long as it does not influence a dependent node */
-    template<typename Node>
-    static void resort_postpone(std::vector<Node*>& algnodes, std::vector<int>& lind);
-  
+    
     /** \brief  Evaluate symbolically, SX type */
     virtual void evalSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
                         const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
@@ -80,31 +70,55 @@ class XFunctionInternal : public FXInternal{
               const std::vector<std::vector<MX> >& adjSeed, std::vector<std::vector<MX> >& adjSens,
               bool output_given, bool eliminate_constants);
 
+};
+
+/** \brief  Internal node class for XFunction (type specific)
+    The design of the class uses the curiously recurring template pattern (CRTP) idiom
+    \author Joel Andersson 
+    \date 2011
+*/
+template<typename DerivedType, typename MatType, typename NodeType>
+class XFunctionInternalCommon : public XFunctionInternal{
+  public:
+    
+    /** \brief  Constructor  */
+    XFunctionInternalCommon(){}
+    
+    /** \brief  Destructor */
+    virtual ~XFunctionInternalCommon(){}
+
+    /** \brief  Topological sorting of the nodes based on Depth-First Search (DFS) */
+    static void sort_depth_first(std::stack<NodeType*>& s, std::vector<NodeType*>& nodes);
+
+    /** \brief  Topological (re)sorting of the nodes based on Breadth-First Search (BFS) (Kahn 1962) */
+    static void resort_breadth_first(std::vector<NodeType*>& algnodes);
+
+    /** \brief  Topological (re)sorting of the nodes with the purpose of postponing every calculation as much as possible, as long as it does not influence a dependent node */
+    static void resort_postpone(std::vector<NodeType*>& algnodes, std::vector<int>& lind);
+             
     /** \brief  Construct a complete Jacobian by compression */
-    template<typename M>
-    std::vector<M> jacGen(const std::vector<std::pair<int,int> >& jblocks, bool compact, 
-                          const std::vector<M>& inputv, std::vector<M>& outputv,
+    std::vector<MatType> jacGen(const std::vector<std::pair<int,int> >& jblocks, bool compact, 
+                          const std::vector<MatType>& inputv, std::vector<MatType>& outputv,
                           const std::vector<bool>& symmetric_block);
-                          
-    /// Propagate the sparsity seeds
-    virtual void spProp(bool fwd) = 0;
 
-    /// Get the forward/adjoint sparsity seed
-    virtual bvec_t& spGet(bool get_input, int ind, int sdir) = 0;
-
-    /// Detect sparsity pattern
+    /** \brief  Detect sparsity pattern  */
     CRSSparsity spDetect(int iind, int oind);
 };
 
+
+
+
+
+
 // Template implementations
 
-template<typename Node>
-void XFunctionInternal::sort_depth_first(std::stack<Node*>& s, std::vector<Node*>& nodes){
+template<typename DerivedType, typename MatType, typename NodeType>
+void XFunctionInternalCommon<DerivedType,MatType,NodeType>::sort_depth_first(std::stack<NodeType*>& s, std::vector<NodeType*>& nodes){
 
     while(!s.empty()){
       
       // Get the topmost element
-      Node* t = s.top();
+      NodeType* t = s.top();
       
       // If the last element on the stack has not yet been added
       if (t && !t->temp){
@@ -117,9 +131,9 @@ void XFunctionInternal::sort_depth_first(std::stack<Node*>& s, std::vector<Node*
     
         // Add dependent nodes if not already added
         for(int i=0; i<t->ndep(); ++i){
-          if(t->dep(i).get() !=0 && static_cast<Node*>(t->dep(i).get())->temp == 0) {
+          if(t->dep(i).get() !=0 && static_cast<NodeType*>(t->dep(i).get())->temp == 0) {
             // if the first child has not yet been added
-            s.push(static_cast<Node*>(t->dep(i).get()));
+            s.push(static_cast<NodeType*>(t->dep(i).get()));
             added_dep=true;
             break;
           }
@@ -143,13 +157,13 @@ void XFunctionInternal::sort_depth_first(std::stack<Node*>& s, std::vector<Node*
     }
 
   // Reset the node counters
-  for(typename std::vector<Node*>::iterator it=nodes.begin(); it!=nodes.end(); ++it){
+  for(typename std::vector<NodeType*>::iterator it=nodes.begin(); it!=nodes.end(); ++it){
     (**it).temp = 0;
   }
 }
 
-template<typename Node>
-void XFunctionInternal::resort_postpone(std::vector<Node*>& algnodes, std::vector<int>& lind){
+template<typename DerivedType, typename MatType, typename NodeType>
+void XFunctionInternalCommon<DerivedType,MatType,NodeType>::resort_postpone(std::vector<NodeType*>& algnodes, std::vector<int>& lind){
 
   // Number of levels
   int nlevels = lind.size()-1;
@@ -168,7 +182,7 @@ void XFunctionInternal::resort_postpone(std::vector<Node*>& algnodes, std::vecto
   std::vector<int> numref(algnodes.size(),0);
   for(int i=0; i<algnodes.size(); ++i){
     for(int c=0; c<algnodes[i]->ndep(); ++c){ // for both children
-      Node* child = static_cast<Node*>(algnodes[i]->dep(c).get());
+      NodeType* child = static_cast<NodeType*>(algnodes[i]->dep(c).get());
       if(child && child->hasDep())
         numref[child->temp]++;
     }
@@ -205,7 +219,7 @@ void XFunctionInternal::resort_postpone(std::vector<Node*>& algnodes, std::vecto
       // for both children
       for(int c=0; c<algnodes[el]->ndep(); ++c){
 
-        Node* child = static_cast<Node*>(algnodes[el]->dep(c).get());
+        NodeType* child = static_cast<NodeType*>(algnodes[el]->dep(c).get());
 
         if(child && child->hasDep()){
           // Decrease the reference count of the children
@@ -244,7 +258,7 @@ void XFunctionInternal::resort_postpone(std::vector<Node*>& algnodes, std::vecto
     newind[i] = runind[level[algnodes[i]->temp]]++;
 
   // Resort the algorithm and reset the temporary
-  std::vector<Node*> oldalgnodes = algnodes;
+  std::vector<NodeType*> oldalgnodes = algnodes;
   for(int i=0; i<algnodes.size(); ++i){
     algnodes[newind[i]] = oldalgnodes[i];
     oldalgnodes[i]->temp = 0;
@@ -252,8 +266,8 @@ void XFunctionInternal::resort_postpone(std::vector<Node*>& algnodes, std::vecto
 
 }
 
-template<typename Node>
-void XFunctionInternal::resort_breadth_first(std::vector<Node*>& algnodes){
+template<typename DerivedType, typename MatType, typename NodeType>
+void XFunctionInternalCommon<DerivedType,MatType,NodeType>::resort_breadth_first(std::vector<NodeType*>& algnodes){
 
   // We shall assign a "level" to each element of the algorithm. A node which does not depend on other binary nodes are assigned level 0 and for nodes that depend on other nodes of the algorithm, the level will be the maximum level of any of the children plus 1. Note that all nodes of a level can be evaluated in parallel. The level will be saved in the temporary variable
 
@@ -261,11 +275,11 @@ void XFunctionInternal::resort_breadth_first(std::vector<Node*>& algnodes){
   int nlevels = 0;  
 
   // Get the earliest posible level
-  for(typename std::vector<Node*>::iterator it=algnodes.begin(); it!=algnodes.end(); ++it){
+  for(typename std::vector<NodeType*>::iterator it=algnodes.begin(); it!=algnodes.end(); ++it){
     // maximum level of any of the children
     int maxlevel = -1;
     for(int c=0; c<(*it)->ndep(); ++c){    // Loop over the children
-      Node* child = static_cast<Node*>((*it)->dep(c).get());
+      NodeType* child = static_cast<NodeType*>((*it)->dep(c).get());
       if(child->hasDep() && child->temp > maxlevel)
         maxlevel = child->temp;
     }
@@ -298,7 +312,7 @@ void XFunctionInternal::resort_breadth_first(std::vector<Node*>& algnodes){
     newind[i] = runind[algnodes[i]->temp]++;
 
   // Resort the algorithm accordingly and reset the temporary
-  std::vector<Node*> oldalgnodes = algnodes;
+  std::vector<NodeType*> oldalgnodes = algnodes;
   for(int i=0; i<algnodes.size(); ++i){
     algnodes[newind[i]] = oldalgnodes[i];
     oldalgnodes[i]->temp = 0;
@@ -309,11 +323,11 @@ void XFunctionInternal::resort_breadth_first(std::vector<Node*>& algnodes){
  int maxl=-1;
   for(int i=0; i<lind.size()-1; ++i){
     int l = (lind[i+1] - lind[i]);
-//if(l>10)    cout << "#level " << i << ": " << l << endl;
-  cout << l << ",";
+//if(l>10)    std::cout << "#level " << i << ": " << l << std::endl;
+  std::cout << l << ",";
     if(l>maxl) maxl= l;
   }
-    cout << endl << "maxl = " << maxl << endl;
+    std::cout << std::endl << "maxl = " << maxl << std::endl;
 
   for(int i=0; i<algnodes.size(); ++i){
     algnodes[i]->temp = i;
@@ -323,15 +337,15 @@ void XFunctionInternal::resort_breadth_first(std::vector<Node*>& algnodes){
   maxl=-1;
   for(int i=0; i<lind.size()-1; ++i){
     int l = (lind[i+1] - lind[i]);
-    cout << endl << "#level " << i << ": " << l << endl;
+    std::cout << std::endl << "#level " << i << ": " << l << std::endl;
 
 int ii = 0;
 
     for(int j=lind[i]; j<lind[i+1]; ++j){
 
-  std::vector<Node*>::const_iterator it = algnodes.begin() + j;
+  std::vector<NodeType*>::const_iterator it = algnodes.begin() + j;
 
-cout << "  "<< ii++ << ": ";
+std::cout << "  "<< ii++ << ": ";
 
     int op = (*it)->op;
     stringstream s,s0,s1;
@@ -345,19 +359,19 @@ cout << "  "<< ii++ << ": ";
     if((*it)->child[1]->hasDep())  s1 << "i_" << i1;
     else                             s1 << (*it)->child[1];
 
-    cout << s.str() << " = ";
-    print_c[op](cout,s0.str(),s1.str());
-    cout << ";" << endl;
+    std::cout << s.str() << " = ";
+    print_c[op](std::cout,s0.str(),s1.str());
+    std::cout << ";" << std::endl;
 
 
 
 
     }
 
-  cout << l << ",";
+  std::cout << l << ",";
     if(l>maxl) maxl= l;
   }
-    cout << endl << "maxl (before) = " << maxl << endl;
+    std::cout << std::endl << "maxl (before) = " << maxl << std::endl;
 
 
   for(int i=0; i<algnodes.size(); ++i){
@@ -382,15 +396,15 @@ cout << "  "<< ii++ << ": ";
   maxl=-1;
   for(int i=0; i<lind.size()-1; ++i){
     int l = (lind[i+1] - lind[i]);
-    cout << endl << "#level " << i << ": " << l << endl;
+    std::cout << std::endl << "#level " << i << ": " << l << std::endl;
 
 int ii = 0;
 
     for(int j=lind[i]; j<lind[i+1]; ++j){
 
-  std::vector<Node*>::const_iterator it = algnodes.begin() + j;
+  std::vector<NodeType*>::const_iterator it = algnodes.begin() + j;
 
-cout << "  "<< ii++ << ": ";
+std::cout << "  "<< ii++ << ": ";
 
     int op = (*it)->op;
     stringstream s,s0,s1;
@@ -404,19 +418,19 @@ cout << "  "<< ii++ << ": ";
     if((*it)->child[1]->hasDep())  s1 << "i_" << i1;
     else                             s1 << (*it)->child[1];
 
-    cout << s.str() << " = ";
-    print_c[op](cout,s0.str(),s1.str());
-    cout << ";" << endl;
+    std::cout << s.str() << " = ";
+    print_c[op](std::cout,s0.str(),s1.str());
+    std::cout << ";" << std::endl;
 
 
 
 
     }
 
-  cout << l << ",";
+  std::cout << l << ",";
     if(l>maxl) maxl= l;
   }
-    cout << endl << "maxl = " << maxl << endl;
+    std::cout << std::endl << "maxl = " << maxl << std::endl;
 
 
 //  return;
@@ -435,20 +449,20 @@ cout << "  "<< ii++ << ": ";
 
 }
 
-template<typename M>
-std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >& jblocks, bool compact, 
-                                         const std::vector<M>& inputv, std::vector<M>& outputv, 
-                                         const std::vector<bool>& symmetric_block){
+template<typename DerivedType, typename MatType, typename NodeType>
+std::vector<MatType> XFunctionInternalCommon<DerivedType,MatType,NodeType>::jacGen(
+    const std::vector<std::pair<int,int> >& jblocks, bool compact,
+    const std::vector<MatType>& inputv, std::vector<MatType>& outputv,const std::vector<bool>& symmetric_block){
   using namespace std;
-  if(verbose()) cout << "XFunctionInternal::jacGen begin" << endl;
+  if(verbose()) std::cout << "XFunctionInternal::jacGen begin" << std::endl;
   
   // Create return object
-  vector<M> ret(jblocks.size());
+  std::vector<MatType> ret(jblocks.size());
   
   // Which blocks are involved in the Jacobian
-  vector<pair<int,int> > jblocks_no_f;
-  vector<bool> symmetric_block_no_f;
-  vector<int> jblock_ind;
+  std::vector<std::pair<int,int> > jblocks_no_f;
+  std::vector<bool> symmetric_block_no_f;
+  std::vector<int> jblock_ind;
   
   // Add the information we already know
   for(int i=0; i<ret.size(); ++i){
@@ -468,51 +482,51 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
 /*      symmetric_block_no_f.push_back(false);*/
       
       // Save sparsity
-      ret[i] = M(jacSparsity(iind,oind,compact));
+      ret[i] = MatType(jacSparsity(iind,oind,compact));
       if(verbose()){
-        cout << "XFunctionInternal::jac Block " << i << " has " << ret[i].size() << " nonzeros out of " << ret[i].numel() << " elements" << endl;
+        std::cout << "XFunctionInternal::jac Block " << i << " has " << ret[i].size() << " nonzeros out of " << ret[i].numel() << " elements" << std::endl;
       }
     }
   }
 
-  if(verbose()) cout << "XFunctionInternal::jac allocated return value" << endl;
+  if(verbose()) std::cout << "XFunctionInternal::jac allocated return value" << std::endl;
   
   // Quick return if no jacobians to be calculated
   if(jblocks_no_f.empty()){
-    if(verbose()) cout << "XFunctionInternal::jac end 1" << endl;
+    if(verbose()) std::cout << "XFunctionInternal::jac end 1" << std::endl;
     return ret;
   }
   
   // Get a bidirectional partition
-  vector<CRSSparsity> D1(jblocks_no_f.size()), D2(jblocks_no_f.size());
+  std::vector<CRSSparsity> D1(jblocks_no_f.size()), D2(jblocks_no_f.size());
   getPartition(jblocks_no_f,D1,D2,true,symmetric_block_no_f);
-  if(verbose()) cout << "XFunctionInternal::jac graph coloring completed" << endl;
+  if(verbose()) std::cout << "XFunctionInternal::jac graph coloring completed" << std::endl;
 
   // Get the number of forward and adjoint sweeps
   int nfwd = D1.front().isNull() ? 0 : D1.front().size1();
   int nadj = D2.front().isNull() ? 0 : D2.front().size1();
 
   if(false)  { // commented out: too verbose
-    cout << "XFunctionInternal::jac partitioning" << endl;
+    std::cout << "XFunctionInternal::jac partitioning" << std::endl;
     for (int i=0;i<jblocks_no_f.size();++i) {
-      cout << "   jblocks_no_f[" << i << "] " << jblocks_no_f[i] << endl;
-      cout << "             D1[" << i << "] " << D1[i] << endl;
+      std::cout << "   jblocks_no_f[" << i << "] " << jblocks_no_f[i] << std::endl;
+      std::cout << "             D1[" << i << "] " << D1[i] << std::endl;
       if (!D1[i].isNull()) {
-        cout << "                  col        " << D1[i].col() << endl;
-        cout << "                  rowind     " << D1[i].rowind() << endl;
-        cout << "                  spy        " << DMatrix(D1[i],1) << endl;
+        std::cout << "                  col        " << D1[i].col() << std::endl;
+        std::cout << "                  rowind     " << D1[i].rowind() << std::endl;
+        std::cout << "                  spy        " << DMatrix(D1[i],1) << std::endl;
       }
-      cout << "             D2[" << i << "] " << D2[i] << endl;
+      std::cout << "             D2[" << i << "] " << D2[i] << std::endl;
     }
   }
   
   // Forward seeds
-  vector<vector<M> > fseed(nfwd);
+  std::vector<std::vector<MatType> > fseed(nfwd);
   for(int dir=0; dir<nfwd; ++dir){
     // initialize to zero
     fseed[dir].resize(getNumInputs());
     for(int iind=0; iind<fseed[dir].size(); ++iind){
-      fseed[dir][iind] = M(input(iind).sparsity(),0);
+      fseed[dir][iind] = MatType(input(iind).sparsity(),0);
     }
     
     // Pass seeds
@@ -534,12 +548,12 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
   }
   
   // Adjoint seeds
-  vector<vector<M> > aseed(nadj);
+  std::vector<std::vector<MatType> > aseed(nadj);
   for(int dir=0; dir<nadj; ++dir){
     //initialize to zero
     aseed[dir].resize(getNumOutputs());
     for(int oind=0; oind<aseed[dir].size(); ++oind){
-      aseed[dir][oind] = M(output(oind).sparsity(),0);
+      aseed[dir][oind] = MatType(output(oind).sparsity(),0);
     }
     
     // Pass seeds
@@ -561,22 +575,22 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
   }
 
   // Forward sensitivities
-  vector<vector<M> > fsens(nfwd);
+  std::vector<std::vector<MatType> > fsens(nfwd);
   for(int dir=0; dir<nfwd; ++dir){
     // initialize to zero
     fsens[dir].resize(getNumOutputs());
     for(int oind=0; oind<fsens[dir].size(); ++oind){
-      fsens[dir][oind] = M(output(oind).sparsity(),0);
+      fsens[dir][oind] = MatType(output(oind).sparsity(),0);
     }
   }
 
   // Adjoint sensitivities
-  vector<vector<M> > asens(nadj);
+  std::vector<std::vector<MatType> > asens(nadj);
   for(int dir=0; dir<nadj; ++dir){
     // initialize to zero
     asens[dir].resize(getNumInputs());
     for(int iind=0; iind<asens[dir].size(); ++iind){
-      asens[dir][iind] = M(input(iind).sparsity(),0);
+      asens[dir][iind] = MatType(input(iind).sparsity(),0);
     }
   }
   
@@ -584,9 +598,9 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
   eval(inputv,outputv,fseed,fsens,aseed,asens,true,false);
 
   // Get transposes and mappings for all jacobian sparsity patterns if we are using forward mode
-  if(verbose())   cout << "XFunctionInternal::jac transposes and mapping" << endl;
-  vector<vector<int> > mapping;
-  vector<CRSSparsity> sp_trans;
+  if(verbose())   std::cout << "XFunctionInternal::jac transposes and mapping" << std::endl;
+  std::vector<std::vector<int> > mapping;
+  std::vector<CRSSparsity> sp_trans;
   if(nfwd>0){
     mapping.resize(jblock_ind.size());
     sp_trans.resize(jblock_ind.size());
@@ -595,19 +609,19 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
       int iind = jblocks_no_f[i].second;
       sp_trans[i] = jacSparsity(iind,oind,true).transpose(mapping[i]);
       if(false)  { // commented out, not interesting
-        cout << "   mapping[" << i << "] " << mapping[i] << endl;
-        cout << "   sp_trans[" << i << "] " << DMatrix(sp_trans[i],1) << endl;
-        cout << "   sp_trans[" << i << "].col() " << sp_trans[i].col() << endl;
-        cout << "   sp_trans[" << i << "].rowind() " << sp_trans[i].rowind() << endl;
+        std::cout << "   mapping[" << i << "] " << mapping[i] << std::endl;
+        std::cout << "   sp_trans[" << i << "] " << DMatrix(sp_trans[i],1) << std::endl;
+        std::cout << "   sp_trans[" << i << "].col() " << sp_trans[i].col() << std::endl;
+        std::cout << "   sp_trans[" << i << "].rowind() " << sp_trans[i].rowind() << std::endl;
       }
     }
   }
 
   // The nonzeros of the sensitivity matrix
-  vector<int> nzmap, nzmap2;
+  std::vector<int> nzmap, nzmap2;
   
   // A vector used to resolve collitions between directions
-  vector<int> hits;
+  std::vector<int> hits;
   
   // Carry out the forward sweeps
   bool symmetric2=false;
@@ -632,8 +646,8 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
         
         // Get the sparsity of the Jacobian block
         const CRSSparsity& jsp = jacSparsity(iind,oind,true);
-        const vector<int>& jsp_rowind = jsp.rowind();
-        const vector<int>& jsp_col = jsp.col();
+        const std::vector<int>& jsp_rowind = jsp.rowind();
+        const std::vector<int>& jsp_col = jsp.col();
 
         // "Multiply" Jacobian sparsity by seed vector
         for(int el = D1[v].rowind(dir); el<D1[v].rowind(dir+1); ++el){
@@ -736,7 +750,119 @@ std::vector<M> XFunctionInternal::jacGen(const std::vector<std::pair<int,int> >&
   }
   
   // Return
-  if(verbose()) cout << "XFunctionInternal::jac end" << endl;
+  if(verbose()) std::cout << "XFunctionInternal::jac end" << std::endl;
+  return ret;
+}
+
+template<typename DerivedType, typename MatType, typename NodeType>
+CRSSparsity XFunctionInternalCommon<DerivedType,MatType,NodeType>::spDetect(int iind, int oind){
+  
+  // Number of nonzero inputs
+  int nz_in = input(iind).size();
+  
+  // Number of nonzero outputs
+  int nz_out = output(oind).size();
+
+  // Number of forward sweeps we must make
+  int nsweep_fwd = nz_in/bvec_size;
+  if(nz_in%bvec_size>0) nsweep_fwd++;
+  
+  // Number of adjoint sweeps we must make
+  int nsweep_adj = nz_out/bvec_size;
+  if(nz_out%bvec_size>0) nsweep_adj++;
+  
+  // Use forward mode?
+  bool use_fwd = nsweep_fwd <= nsweep_adj;
+  
+  // Number of sweeps needed
+  int nsweep = use_fwd ? nsweep_fwd : nsweep_adj;
+  
+  // The number of zeros in the seed and sensitivity directions
+  int nz_seed = use_fwd ? nz_in  : nz_out;
+  int nz_sens = use_fwd ? nz_out : nz_in;
+
+  // Input/output index
+  int ind_seed = use_fwd ? iind : oind;
+  int ind_sens = use_fwd ? oind : iind;
+
+  // Print
+  if(verbose()){
+    std::cout << "XFunctionInternal::spDetect: using " << (use_fwd ? "forward" : "adjoint") << " mode: ";
+    std::cout << nsweep << " sweeps needed for " << nz_seed << " directions" << std::endl;
+  }
+  
+  // Progress
+  int progress = -10;
+
+  // Temporary vectors
+  std::vector<int> jrow, jcol;
+  
+  // Loop over the variables, ndir variables at a time
+  for(int s=0; s<nsweep; ++s){
+    // Print progress
+    if(verbose()){
+      int progress_new = (s*100)/nsweep;
+      // Print when entering a new decade
+      if(progress_new / 10 > progress / 10){
+        progress = progress_new;
+        std::cout << progress << " %"  << std::endl;
+      }
+    }
+    
+    // Nonzero offset
+    int offset = s*bvec_size;
+
+    // Number of local seed directions
+    int ndir_local = std::min(bvec_size,nz_seed-offset);
+    
+    // Give seeds to a set of directions
+    for(int i=0; i<ndir_local; ++i){
+      static_cast<DerivedType*>(this)->spGet(use_fwd,ind_seed,offset+i) |= bvec_t(1)<<i;
+    }
+    
+    // Propagate the dependencies
+    static_cast<DerivedType*>(this)->spProp(use_fwd);
+          
+    // Loop over the nonzeros of the output
+    for(int el=0; el<nz_sens; ++el){
+
+      // Get the sparsity sensitivity
+      bvec_t spsens = static_cast<DerivedType*>(this)->spGet(!use_fwd,ind_sens,el);
+
+      // Clear the seeds for the next sweep
+      if(!use_fwd){
+        static_cast<DerivedType*>(this)->spGet(true,iind,el) = 0; 
+      }
+      
+      // If there is a dependency in any of the directions
+      if(0!=spsens){
+        
+        // Loop over seed directions
+        for(int i=0; i<ndir_local; ++i){
+          
+          // If dependents on the variable
+          if((bvec_t(1) << i) & spsens){
+            // Add to pattern
+            jrow.push_back(el);
+            jcol.push_back(i+offset);
+          }
+        }
+      }
+    }
+    
+    // Remove the seeds
+    if(use_fwd){
+      for(int i=0; i<bvec_size && offset+i<nz_in; ++i){
+        static_cast<DerivedType*>(this)->spGet(true,iind,offset+i) = 0;
+      }
+    }
+  }
+
+  // Construct sparsity pattern
+  CRSSparsity ret = sp_triplet(nz_out, nz_in,use_fwd ? jrow : jcol, use_fwd ? jcol : jrow);
+  
+  // Return sparsity pattern
+  if(verbose()) std::cout << "XFunctionInternal::spDetect end " << std::endl;
   return ret;
 }
 
