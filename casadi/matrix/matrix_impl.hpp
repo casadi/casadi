@@ -314,42 +314,6 @@ void Matrix<T>::setNZ(const Matrix<int>& kk, const Matrix<T>& m){
 }
 
 template<class T>
-int Matrix<T>::size() const{
-  return data().size();
-}
-
-template<class T>
-int Matrix<T>::sizeU() const{
-  return sparsity_.sizeU();
-}
-
-template<class T>
-int Matrix<T>::sizeL() const{
-  return sparsity_.sizeL();
-}
-
-template<class T>
-int Matrix<T>::size1() const{
-  return sparsity_.size1();
-}
-
-template<class T>
-int Matrix<T>::size2() const{
-  return sparsity_.size2();
-}
-
-template<class T>
-int Matrix<T>::numel() const{
-  return size1()*size2();
-}
-
-template<class T>
-std::pair<int,int> Matrix<T>::shape() const{
-  return sparsity_.shape();
-}
-
-        
-template<class T>
 void Matrix<T>::makeDense(int n, int m, const T& val){
   // Quick return if already dense
   if(n*m == size())
@@ -385,23 +349,8 @@ void Matrix<T>::makeDense(int n, int m, const T& val){
 }
 
 template<class T>
-bool Matrix<T>::empty() const{
-  return numel()==0;
-}
-
-template<class T>
-bool Matrix<T>::scalar() const{
-  return numel()==1;
-}
-
-template<class T>
 bool Matrix<T>::vector() const{
   return size2()==1;
-}
-
-template<class T>
-bool Matrix<T>::dense() const{
-  return size()==numel();
 }
 
 template<class T>
@@ -946,26 +895,6 @@ void Matrix<T>::getArray(T* val) const{
 template<class T>
 void Matrix<T>::setArray(const T* val){
   setArray(val,size(),SPARSE);
-}
-
-
-
-
-
-
-template<class T>
-int Matrix<T>::size(Sparsity sp) const{
-  if(sp==SPARSE){
-    return size();
-  } else if(sp==SPARSESYM){
-    return sizeL();
-  } else if(sp==DENSE){
-    return numel();
-  } else if(sp==DENSESYM){
-    return (numel()+size1())/2;
-  } else {
-      throw CasadiException("Matrix<T>::size(Sparsity): unknown sparsity");
-  }
 }
 
 template<class T>

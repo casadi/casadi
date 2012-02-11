@@ -335,26 +335,6 @@ NonZeros<MX,int> MX::at(int k) {
   return NonZeros<MX,int>(*this,k);
 }
 
-int MX::size() const{
-  return sparsity().size();
-}
-
-int MX::size1() const{
-  return sparsity().size1();
-}
-
-int MX::numel() const{
-  return sparsity().numel();
-}
-
-int MX::size2() const{
-  return sparsity().size2();
-}
-
-std::pair<int,int> MX::shape() const{
-  return sparsity().shape();
-}
-
 MX operator+(const MX &x, const MX &y){
   bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
   if((samedim || x.scalar()) && isZero(x)){
@@ -503,18 +483,6 @@ MX& MX::operator*=(const MX &y){
 
 MX& MX::operator/=(const MX &y){
   return *this = *this / y;
-}
-
-bool MX::empty() const{
-  return numel()==0;
-}
-
-bool MX::dense() const{
-  return numel()==size();
-}
-
-bool MX::scalar() const{
-  return numel()==1;
 }
 
 MX MX::repmat(const MX& x, const std::pair<int, int> &nm){

@@ -1,0 +1,199 @@
+/*
+ *    This file is part of CasADi.
+ *
+ *    CasADi -- A symbolic framework for dynamic optimization.
+ *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *
+ *    CasADi is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    CasADi is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with CasADi; if not, write to the Free Software
+ *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+
+#ifndef GENERIC_MATRIX_HPP
+#define GENERIC_MATRIX_HPP
+
+#include "slice.hpp"
+#include "submatrix.hpp"
+#include "nonzeros.hpp"
+#include "crs_sparsity.hpp"
+#include "../casadi_math.hpp"
+
+namespace CasADi{
+
+  /** Sparsity format for getting and setting inputs and outputs */
+  enum Sparsity{SPARSE,SPARSESYM,DENSE,DENSESYM};
+
+  /** \brief Matrix base class
+  This is a common base class for MX and Matrix<>, introducing a uniform syntax and implementing
+  common functionality using the curiously recurring template pattern (CRTP) idiom.\n
+  
+  The class is designed with the idea that "everything is a matrix", that is, also scalars and vectors.\n
+  This philosophy makes it easy to use and to interface in particularily with Python and Matlab/Octave.\n
+  
+  The syntax tries to stay as close as possible to the ublas syntax  when it comes to vector/matrix operations.\n
+
+  Index starts with 0.\n
+  Index flatten happens as follows: (i,j) -> k = j+i*size2()\n
+  Vectors are considered to be column vectors.\n
+  
+  The storage format is a (modified) compressed row storage (CRS) format. This way, a vector element can always be accessed in constant time.\n
+  
+  The sparsity can be accessed with CRSSparsity& sparsity()\n
+  
+  \author Joel Andersson 
+  \date 2012    
+*/
+template<typename MatType>
+class GenericMatrix{
+  public:
+    
+    /** \brief Get the number of (structural) non-zero elements */
+    int size() const;
+
+    /** \brief Get the number of non-zeros in the lower triangular half */
+    int sizeL() const;
+
+    /** \brief Get get the number of non-zeros in the upper triangular half */
+    int sizeU() const;
+
+    /** \brief Get the number of elements */
+    int numel() const;
+
+    /** \brief Get the first dimension (i.e. n for a n-by-m matrix) */
+    int size1() const;
+    
+    /** \brief Get the first dimension (i.e. m for a n-by-m matrix) */
+    int size2() const;
+
+    /** \brief Get the number if non-zeros for a given sparsity pattern */
+    int size(Sparsity sp) const;
+    
+    #ifndef SWIG  
+    /** \brief  Get the shape */
+    std::pair<int,int> shape() const;
+    #endif
+
+    /** \brief  Check if the matrix expression is empty */
+    bool empty() const;
+    
+    /** \brief  Check if the matrix expression is dense */
+    bool dense() const;
+    
+    /** \brief  Check if the matrix expression is scalar */
+    bool scalar() const;
+
+    /** \brief Get the sparsity pattern */
+    const CRSSparsity& sparsity() const;
+
+    /** \brief Access the sparsity, make a copy if there are multiple references to it */
+    CRSSparsity& sparsityRef();
+
+    #ifndef SWIG
+    /** \brief  Get vector nonzero or slice of nonzeros */
+    template<typename K>
+    const MatType operator[](const K& k) const{ return static_cast<const MatType*>(this)->getNZ(k); }
+
+    /** \brief  Access vector nonzero or slice of nonzeros */
+    template<typename K>
+    NonZeros<MatType,K> operator[](const K& k){ return NonZeros<MatType,K>(static_cast<MatType&>(*this),k); }
+    #endif // SWIG
+
+};
+
+#ifndef SWIG
+// Implementations
+
+template<typename MatType>
+const CRSSparsity& GenericMatrix<MatType>::sparsity() const{
+  return static_cast<const MatType*>(this)->sparsity();
+}
+
+template<typename MatType>
+CRSSparsity& GenericMatrix<MatType>::sparsityRef(){
+  return static_cast<MatType*>(this)->sparsityRef();
+}
+
+template<typename MatType>
+int GenericMatrix<MatType>::size() const{
+  return sparsity().size();
+}
+
+template<typename MatType>
+int GenericMatrix<MatType>::sizeU() const{
+  return sparsity().sizeU();
+}
+
+template<typename MatType>
+int GenericMatrix<MatType>::sizeL() const{
+  return sparsity().sizeL();
+}
+
+template<typename MatType>
+int GenericMatrix<MatType>::numel() const{
+  return sparsity().numel();
+}
+
+template<typename MatType>
+int GenericMatrix<MatType>::size1() const{
+  return sparsity().size1();
+}
+
+template<typename MatType>
+int GenericMatrix<MatType>::size2() const{
+  return sparsity().size2();
+}
+
+template<typename MatType>
+std::pair<int,int> GenericMatrix<MatType>::shape() const{
+  return sparsity().shape();
+}
+
+template<typename MatType>
+bool GenericMatrix<MatType>::empty() const{
+  return numel()==0;
+}
+
+template<typename MatType>
+bool GenericMatrix<MatType>::dense() const{
+  return numel()==size();
+}
+
+template<typename MatType>
+bool GenericMatrix<MatType>::scalar() const{
+  return numel()==1;
+}
+
+template<typename MatType>
+int GenericMatrix<MatType>::size(Sparsity sp) const{
+  if(sp==SPARSE){
+    return size();
+  } else if(sp==SPARSESYM){
+    return sizeL();
+  } else if(sp==DENSE){
+    return numel();
+  } else if(sp==DENSESYM){
+    return (numel()+size1())/2;
+  } else {
+      throw CasadiException("Matrix<T>::size(Sparsity): unknown sparsity");
+  }
+}
+
+
+#endif // SWIG
+
+
+} // namespace CasADi
+
+#endif // GENERIC_MATRIX_HPP
+

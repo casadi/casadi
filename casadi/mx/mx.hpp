@@ -48,7 +48,7 @@ class FX;
   \author Joel Andersson 
   \date 2010-2011
 */
-class MX : public SharedObject{
+class MX : public GenericMatrix<MX>, public SharedObject{
   public:
   
     /** \brief  Default constructor */
@@ -90,14 +90,6 @@ class MX : public SharedObject{
 #ifndef SWIG
    /** \brief  Create from node */
     static MX create(MXNode* node);
-
-    /** \brief  Get vector nonzero or slice of nonzeros */
-    template<typename K>
-    const MX operator[](const K& k) const{ return getNZ(k); }
-
-    /** \brief  Access vector nonzero or slice of nonzeros */
-    template<typename K>
-    NonZeros<MX,K> operator[](const K& k){ return NonZeros<MX,K>(*this,k); }
 
     /** \brief  Get vector element or slice */
     template<typename I>
@@ -211,23 +203,6 @@ class MX : public SharedObject{
     /// Scalar type
     typedef MX ScalarType;
 
-    /** \brief  Get the number of (structural) non-zero elements */
-    int size() const;
-
-    /** \brief  Get the number of elements */
-    int numel() const;
-
-    /** \brief get the first dimension (i.e. n for a n-by-m matrix) */
-    int size1() const;
-    
-    /** \brief get the first dimension (i.e. m for a n-by-m matrix) */
-    int size2() const;
-
-    #ifndef SWIG  
-    /** \brief  Get the shape */
-    std::pair<int,int> shape() const;
-    #endif
-
     /** \brief Get the sparsity pattern */
     const CRSSparsity& sparsity() const;
 
@@ -262,15 +237,6 @@ class MX : public SharedObject{
   #endif // SWIG
   
   MX operator-() const;
-
-  /** \brief  Check if the matrix expression is empty */
-  bool empty() const;
-  
-  /** \brief  Check if the matrix expression is dense */
-  bool dense() const;
-  
-  /** \brief  Check if the matrix expression is scalar */
-  bool scalar() const;
   
   //@{
   /** \brief  Access a member of the node */

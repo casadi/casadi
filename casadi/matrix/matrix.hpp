@@ -29,17 +29,10 @@
 #include "../printable_object.hpp"
 #include "../casadi_limits.hpp"
 #include "../stl_vector_tools.hpp"
-#include "slice.hpp"
-#include "submatrix.hpp"
-#include "nonzeros.hpp"
-#include "crs_sparsity.hpp"
-#include "../casadi_math.hpp"
+#include "generic_matrix.hpp"
 
 namespace CasADi{
-  
-  /** Sparsity format for getting and setting inputs and outputs */
-  enum Sparsity{SPARSE,SPARSESYM,DENSE,DENSESYM};
-  
+    
   //@{
   /** \brief Get typename */
   template <typename T> inline const char* typeName() { return typeid(T).name(); }
@@ -68,8 +61,7 @@ namespace CasADi{
   \date 2010	
 */
 template<class T>
-class Matrix : public PrintableObject{
-
+class Matrix : public GenericMatrix<Matrix<T> >, public PrintableObject{
   public:
     
     /** \brief  constructors */
@@ -129,6 +121,21 @@ class Matrix : public PrintableObject{
     typedef T ScalarType;
     
 #ifndef SWIG
+    /// Base class
+    typedef GenericMatrix<Matrix<T> > B;
+
+    /// Expose base class functions
+    using B::size;
+    using B::sizeL;
+    using B::sizeU;
+    using B::numel;
+    using B::size1;
+    using B::size2;
+    using B::shape;
+    using B::empty;
+    using B::scalar;
+    using B::dense;
+
     /// Expose iterators
     typedef typename std::vector<T>::iterator iterator;
     typedef typename std::vector<T>::const_iterator const_iterator;
@@ -199,35 +206,9 @@ class Matrix : public PrintableObject{
 #endif // HAVE_UBLAS
 #endif // SWIG
 
-    /// get the number of non-zeros
-    int size() const;
-
-    /// get the number of non-zeros in the lower triangular half
-    int sizeL() const;
-
-    /// get the number of non-zeros in the upper triangular half
-    int sizeU() const;
-
-    /// get the number of elements
-    int numel() const;
-
-    /// get the first dimension
-    int size1() const;       
-    
-    /// get the second dimension
-    int size2() const;
-
-    #ifndef SWIG
-    /// Get the shape
-    std::pair<int,int> shape() const;
-    #endif
-
     //@{
     /// Check type of matrix
-    bool empty() const; // is the matrix empty
-    bool scalar() const; // is the matrix scalar
     bool vector() const; // is the matrix a vector
-    bool dense() const; // is the matrix dense
     //@}
 
 
@@ -315,14 +296,6 @@ class Matrix : public PrintableObject{
     void append(const Matrix<T>& y);
 
 #ifndef SWIG 
-    /** \brief  Get vector nonzero or slice of nonzeros */
-    template<typename K>
-    const Matrix<T> operator[](const K& k) const{ return getNZ(k); }
-
-    /** \brief  Access vector nonzero or slice of nonzeros */
-    template<typename K>
-    NonZeros<Matrix<T>,K> operator[](const K& k){ return NonZeros<Matrix<T>,K>(*this,k); }
-
     /** \brief  Get vector element or slice */
     template<typename I>
     const Matrix<T> operator()(const I& i) const{ return getSub(i,0);}
@@ -347,11 +320,11 @@ class Matrix : public PrintableObject{
     //@{
     /// Indexing for interfaced languages
     /// get a non-zero
-    const Matrix<T> indexed_one_based(int k) const{ return operator[](k-1);}
-    const Matrix<T> indexed_zero_based(int k) const{ return operator[](k);}
-    const Matrix<T> indexed_one_based(const Matrix<int>& k) const{ return operator[](k-1);}
-    const Matrix<T> indexed_zero_based(const Matrix<int>& k) const{ return operator[](k);}
-    const Matrix<T> indexed(const Slice &k) const{ return (*this)[k];}
+    const Matrix<T> indexed_one_based(int k) const{ return this->operator[](k-1);}
+    const Matrix<T> indexed_zero_based(int k) const{ return this->operator[](k);}
+    const Matrix<T> indexed_one_based(const Matrix<int>& k) const{ return this->operator[](k-1);}
+    const Matrix<T> indexed_zero_based(const Matrix<int>& k) const{ return this->operator[](k);}
+    const Matrix<T> indexed(const Slice &k) const{ return this->operator[](k);}
     const Matrix<T> indexed(const IndexList &k) const{
       return (*this)[k.getAll(size())];
     }
@@ -625,9 +598,6 @@ class Matrix : public PrintableObject{
     ldres: The leading dimension in res 
     res:   The number of superdiagonals */
     void getBand(int kl, int ku, int ldres, T *res) const;
-
-    // get the number if non-zeros for a given sparsity pattern
-    int size(Sparsity sp) const;
     
     //@{
     /** \brief  create a sparse matrix with all zeros */
