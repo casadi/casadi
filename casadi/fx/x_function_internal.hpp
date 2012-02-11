@@ -82,7 +82,7 @@ class XFunctionInternalCommon : public XFunctionInternal{
   public:
     
     /** \brief  Constructor  */
-    XFunctionInternalCommon(){}
+    XFunctionInternalCommon(const std::vector<MatType>& inputv, const std::vector<MatType>& outputv);
     
     /** \brief  Destructor */
     virtual ~XFunctionInternalCommon(){}
@@ -98,19 +98,46 @@ class XFunctionInternalCommon : public XFunctionInternal{
              
     /** \brief  Construct a complete Jacobian by compression */
     std::vector<MatType> jacGen(const std::vector<std::pair<int,int> >& jblocks, bool compact, 
-                          const std::vector<MatType>& inputv, std::vector<MatType>& outputv,
                           const std::vector<bool>& symmetric_block);
 
-    /** \brief  Detect sparsity pattern  */
-    CRSSparsity spDetect(int iind, int oind);
+    /** \brief  Generate the sparsity of a Jacobian block */
+    virtual CRSSparsity getJacSparsity(int iind, int oind);
+
+    // Data members (all public)
+    
+    /** \brief  Inputs of the function (needed for symbolic calculations) */
+    std::vector<MatType> inputv_;
+
+    /** \brief  Outputs of the function (needed for symbolic calculations) */
+    std::vector<MatType> outputv_;
 };
 
-
-
-
-
-
 // Template implementations
+
+template<typename DerivedType, typename MatType, typename NodeType>
+XFunctionInternalCommon<DerivedType,MatType,NodeType>::XFunctionInternalCommon(
+    const std::vector<MatType>& inputv, const std::vector<MatType>& outputv) : inputv_(inputv),  outputv_(outputv){
+  
+  // Make sure that inputs are symbolic
+  for(int i=0; i<inputv.size(); ++i){
+    if (inputv[i].isNull()) {
+      casadi_error("XFunctionInternal::XFunctionInternal: Xfunction input arguments cannot be null." << std::endl << "Argument #" << i << " is null.");
+    } else if(!isSymbolicSparse(inputv[i])){
+      casadi_error("XFunctionInternal::XFunctionInternal: Xfunction input arguments must be purely symbolic." << std::endl << "Argument #" << i << " is not symbolic.");
+    }
+  }
+      
+  // Allocate space for inputs
+  setNumInputs(inputv_.size());
+  for(int i=0; i<input_.size(); ++i)
+    input(i) = DMatrix(inputv_[i].sparsity());
+
+  // Allocate space for outputs
+  setNumOutputs(outputv_.size());
+  for(int i=0; i<output_.size(); ++i)
+    output(i) = DMatrix(outputv_[i].sparsity());
+}
+
 
 template<typename DerivedType, typename MatType, typename NodeType>
 void XFunctionInternalCommon<DerivedType,MatType,NodeType>::sort_depth_first(std::stack<NodeType*>& s, std::vector<NodeType*>& nodes){
@@ -451,8 +478,7 @@ std::cout << "  "<< ii++ << ": ";
 
 template<typename DerivedType, typename MatType, typename NodeType>
 std::vector<MatType> XFunctionInternalCommon<DerivedType,MatType,NodeType>::jacGen(
-    const std::vector<std::pair<int,int> >& jblocks, bool compact,
-    const std::vector<MatType>& inputv, std::vector<MatType>& outputv,const std::vector<bool>& symmetric_block){
+    const std::vector<std::pair<int,int> >& jblocks, bool compact, const std::vector<bool>& symmetric_block){
   using namespace std;
   if(verbose()) std::cout << "XFunctionInternal::jacGen begin" << std::endl;
   
@@ -473,7 +499,7 @@ std::vector<MatType> XFunctionInternalCommon<DerivedType,MatType,NodeType>::jacG
     // Check if nondifferentiated variable
     if(iind<0){
       // Save to output
-      ret[i] = outputv.at(oind);
+      ret[i] = outputv_.at(oind);
     } else { // Jacobian block
       // Mark block for evaluation
       jblocks_no_f.push_back(jblocks[i]);
@@ -595,7 +621,7 @@ std::vector<MatType> XFunctionInternalCommon<DerivedType,MatType,NodeType>::jacG
   }
   
   // Evaluate symbolically
-  eval(inputv,outputv,fseed,fsens,aseed,asens,true,false);
+  eval(inputv_,outputv_,fseed,fsens,aseed,asens,true,false);
 
   // Get transposes and mappings for all jacobian sparsity patterns if we are using forward mode
   if(verbose())   std::cout << "XFunctionInternal::jac transposes and mapping" << std::endl;
@@ -755,7 +781,11 @@ std::vector<MatType> XFunctionInternalCommon<DerivedType,MatType,NodeType>::jacG
 }
 
 template<typename DerivedType, typename MatType, typename NodeType>
-CRSSparsity XFunctionInternalCommon<DerivedType,MatType,NodeType>::spDetect(int iind, int oind){
+CRSSparsity XFunctionInternalCommon<DerivedType,MatType,NodeType>::getJacSparsity(int iind, int oind){
+  if(verbose()) std::cout << "XFunctionInternal::getJacSparsity begin (iind == " << iind <<", oind == " << oind << ")" << std::endl;
+  
+  // Reset the virtual machine
+  static_cast<DerivedType*>(this)->spReset(iind,oind);
   
   // Number of nonzero inputs
   int nz_in = input(iind).size();
@@ -787,7 +817,7 @@ CRSSparsity XFunctionInternalCommon<DerivedType,MatType,NodeType>::spDetect(int 
 
   // Print
   if(verbose()){
-    std::cout << "XFunctionInternal::spDetect: using " << (use_fwd ? "forward" : "adjoint") << " mode: ";
+    std::cout << "XFunctionInternal::getJacSparsity: using " << (use_fwd ? "forward" : "adjoint") << " mode: ";
     std::cout << nsweep << " sweeps needed for " << nz_seed << " directions" << std::endl;
   }
   
@@ -862,7 +892,7 @@ CRSSparsity XFunctionInternalCommon<DerivedType,MatType,NodeType>::spDetect(int 
   CRSSparsity ret = sp_triplet(nz_out, nz_in,use_fwd ? jrow : jcol, use_fwd ? jcol : jrow);
   
   // Return sparsity pattern
-  if(verbose()) std::cout << "XFunctionInternal::spDetect end " << std::endl;
+  if(verbose()) std::cout << "XFunctionInternal::getJacSparsity end " << std::endl;
   return ret;
 }
 

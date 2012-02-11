@@ -668,6 +668,9 @@ class Matrix : public PrintableObject{
     /** \brief  create an n-by-n identity matrix */
     static Matrix<T> eye(int nrow);
 
+    /** \brief  The following function is used to ensure similarity to MX, which is reference counted */
+    bool isNull() const{ return false;}
+    
   private:
     /// Sparsity of the matrix in a compressed row storage (CRS) format
     CRSSparsity sparsity_;

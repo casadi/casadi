@@ -120,23 +120,14 @@ class SXFunctionInternal : public XFunctionInternalCommon<SXFunctionInternal,Mat
   /** \brief  Print to a c file */
   void generateCode(const std::string& filename);
       
-  /** \brief  Inputs of the function (needed for symbolic calculations) */
-  std::vector<Matrix<SX> > inputv_;
-
-  /** \brief  Outputs of the function (needed for symbolic calculations) */
-  std::vector<Matrix<SX> > outputv_;
-  
   // Evaluate with inplace operations (experimental)
   bool evaluate_inplace_;
   
   /** \brief Clear the function from its symbolic representation, to free up memory, no symbolic evaluations are possible after this */
   void clearSymbolic();
 
-  /// Generate the sparsity of a Jacobian block
-  virtual CRSSparsity getJacSparsity(int iind, int oind);
-
-  /// Get a vector of symbolic variables with the same dimensions as the inputs
-  virtual std::vector<SXMatrix> symbolicInputSX() const{ return inputv_;}
+  /// Reset the virtual machine for sparsity calculations
+  void spReset(int iind, int oind);
 
   /// Propagate the sparsity seeds
   void spProp(bool fwd);

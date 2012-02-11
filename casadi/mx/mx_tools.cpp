@@ -326,6 +326,10 @@ bool isSymbolic(const MX& ex){
   return ex->isSymbolic();
 }
 
+bool isSymbolicSparse(const MX& ex){
+  return isSymbolic(ex);
+}
+
 MX trace(const MX& A){
   casadi_assert_message(A.size1() == A.size2(), "trace: must be square");
   MX res(0);

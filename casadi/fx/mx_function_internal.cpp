@@ -37,31 +37,15 @@ using namespace std;
 
 namespace CasADi{
 
-MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv, const std::vector<MX>& outputv) : inputv_(inputv), outputv_(outputv){
+MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv, const std::vector<MX>& outputv) :
+  XFunctionInternalCommon<MXFunctionInternal,MX,MXNode>(inputv,outputv) {
+  
   setOption("name", "unnamed_mx_function");
   setOption("topological_sorting","depth-first"); // breadth-first not working
   setOption("numeric_jacobian", true);
 
   liftfun_ = 0;
   liftfun_ud_ = 0;
-
-  for(int i=0; i<inputv.size(); ++i) {
-    if (inputv[i].isNull()) {
-      casadi_error("MXFunctionInternal::MXFunctionInternal: MXfunction input arguments cannot be null." << endl << "Argument #" << i << " is null.");
-    } else if (!inputv[i]->isSymbolic()) {
-      casadi_error("MXFunctionInternal::MXFunctionInternal: MXfunction input arguments must be purely symbolic." << endl << "Argument #" << i << " is not symbolic.");
-    }
-  }
-  
-  // Allocate space for inputs
-  setNumInputs(inputv_.size());
-  for(int i=0; i<input_.size(); ++i)
-    input(i) = DMatrix(inputv_[i].sparsity());
-
-  // Allocate space for outputs
-  setNumOutputs(outputv_.size());
-  for(int i=0; i<output_.size(); ++i)
-    output(i) = DMatrix(outputv_[i].sparsity());
 }
 
 
@@ -577,7 +561,7 @@ void MXFunctionInternal::spProp(bool fwd){
   }
 }
 
-CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
+void MXFunctionInternal::spReset(int iind, int oind){
   
   // Start by setting all elements of the work vector to zero
   for(vector<FunctionIO>::iterator it=work.begin(); it!=work.end(); ++it){
@@ -593,9 +577,6 @@ CRSSparsity MXFunctionInternal::getJacSparsity(int iind, int oind){
   // Pointer to the data vector for the output
   int el_out = output_ind_[oind];
   iwork_out_ = get_bvec_t(work[el_out].data.data());
-
-  // Call the base class routine (common with SXFunction)
-  return spDetect(iind,oind);
 }
 
 FX MXFunctionInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks){
@@ -636,7 +617,7 @@ FX MXFunctionInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks)
 }
 
 vector<MX> MXFunctionInternal::jac(const vector<pair<int,int> >& jblocks, bool compact, const std::vector<bool>& symmetric_block){
-  return jacGen(jblocks,compact,inputv_,outputv_,symmetric_block);
+  return jacGen(jblocks,compact,symmetric_block);
 }
 
 std::vector<MX> MXFunctionInternal::jac(int ider){

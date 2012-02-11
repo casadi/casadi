@@ -98,11 +98,9 @@ class MXFunctionInternal : public XFunctionInternalCommon<MXFunctionInternal,MX,
     std::vector<FunctionIO> work;
     
     /** \brief  Dependent expressions */
-    std::vector<MX> inputv_;
     std::vector<int> input_ind_;
 
     /** \brief  Matrix expressions that are to be evaluated */
-    std::vector<MX> outputv_;
     std::vector<int> output_ind_;
     
     // Lifting function
@@ -126,9 +124,6 @@ class MXFunctionInternal : public XFunctionInternalCommon<MXFunctionInternal,MX,
 
     /** \brief Expand the matrix valued graph into a scalar valued graph */
     SXFunction expand(const std::vector<SXMatrix>& inputv );
-
-    /// Generate the sparsity of a Jacobian block
-    virtual CRSSparsity getJacSparsity(int iind, int oind);
     
     // Update pointers to a particular element
     void updatePointers(const AlgEl& el, int nfwd, int nadj);
@@ -143,6 +138,9 @@ class MXFunctionInternal : public XFunctionInternalCommon<MXFunctionInternal,MX,
 
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<MX> symbolicInput() const{ return inputv_;}
+
+    /// Reset the virtual machine for sparsity calculations
+    void spReset(int iind, int oind);
 
     /// Propagate the sparsity seeds
     void spProp(bool fwd);

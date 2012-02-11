@@ -39,36 +39,13 @@ namespace CasADi{
 using namespace std;
 
 
-SXFunctionInternal::SXFunctionInternal(const vector<Matrix<SX> >& inputv, const vector<Matrix<SX> >& outputv) : inputv_(inputv),  outputv_(outputv) {
+SXFunctionInternal::SXFunctionInternal(const vector<Matrix<SX> >& inputv, const vector<Matrix<SX> >& outputv) : 
+  XFunctionInternalCommon<SXFunctionInternal,Matrix<SX>,SXNode>(inputv,outputv) {
   setOption("name","unnamed_sx_function");
   addOption("live_variables",OT_BOOLEAN,false,"Reuse variables in the work vector");
   addOption("inplace",OT_BOOLEAN,false,"Evaluate with inplace operations (experimental)");
 
   casadi_assert(!outputv_.empty());
-
-  // Check that inputs are symbolic
-  for(int i=0; i<inputv.size(); ++i) {
-    casadi_assert_message(isSymbolicSparse(inputv[i]), 
-      "SXFunctionInternal::SXFunctionInternal: SXfunction input arguments must be purely symbolic." << endl <<
-      "Input argument #" << i << " is not symbolic." << endl
-    );
-  }
-  
-  // Input dimensions
-  input_.resize(inputv_.size());
-  for(int i=0; i<inputv_.size(); ++i){
-    // References
-    const Matrix<SX>& ip = inputv_[i];
-    input(i) = Matrix<double>(ip.sparsity());
-  }
-
-  // Output dimensions
-  output_.resize(outputv_.size());
-  for(int i=0; i<outputv_.size(); ++i){
-    // References
-    const Matrix<SX>& op = outputv_[i];
-    output(i) = Matrix<double>(op.size1(),op.size2(),op.col(),op.rowind());
-  }
 }
 
 SXFunctionInternal::~SXFunctionInternal(){
@@ -286,7 +263,7 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
 }
 
 vector<Matrix<SX> > SXFunctionInternal::jac(const vector<pair<int,int> >& jblocks, bool compact, const vector<bool>& symmetric_block){
-  return jacGen(jblocks,compact,inputv_,outputv_,symmetric_block);
+  return jacGen(jblocks,compact,symmetric_block);
 }
 
 bool SXFunctionInternal::isSmooth() const{
@@ -1256,9 +1233,7 @@ void SXFunctionInternal::spProp(bool fwd){
   }
 }
 
-CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
-  if(verbose()) cout << "SXFunctionInternal::getJacSparsity begin (iind == " << iind <<", oind == " << oind << ")" << endl;
-
+void SXFunctionInternal::spReset(int iind, int oind){
   // Make sure that dwork_, which we will now use, has been allocated
   if(dwork_.size() < worksize_) dwork_.resize(worksize_);
   
@@ -1266,9 +1241,6 @@ CRSSparsity SXFunctionInternal::getJacSparsity(int iind, int oind){
   // we can save overhead by reusing the double array
   iwork_ = get_bvec_t(dwork_);
   fill_n(iwork_,dwork_.size(),0);
-
-  // Call the base class routine (common with MXFunction)
-  return spDetect(iind,oind);
 }
 
 } // namespace CasADi

@@ -165,6 +165,9 @@ MX unite(const MX& A, const MX& B);
 /** \brief  check if symbolic */
 bool isSymbolic(const MX& ex);
 
+/** \brief  check if all nonzeros are symbolic (this function is currently identical to isSymbolic) */
+bool isSymbolicSparse(const MX& ex);
+
 /** \brief  check if identity */
 bool isIdentity(const MX& ex);
 
