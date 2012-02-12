@@ -58,6 +58,9 @@ class casadi_math{
     /** \brief Is a function commutative? */
     static bool isCommutative(unsigned char op);
     
+    /** \brief Is a function smooth? */
+    static bool isSmooth(unsigned char op);
+    
     /** \brief Print */
     static void print(unsigned char op, std::ostream &stream, const std::string& x, const std::string& y);
     static void printPre(unsigned char op, std::ostream &stream);
@@ -292,49 +295,53 @@ inline void casadi_math<T>::derF(unsigned char op, const T& x, const T& y, T& f,
 template<typename T>
 inline bool casadi_math<T>::f00_is_zero(unsigned char op){
   switch(op){
-    case ADD:       return true;
-    case SUB:       return true;
-    case MUL:       return true;
-    case NEG:       return true;
-    case SQRT:      return true;
-    case SIN:       return true;
-    case TAN:       return true;
-    case ASIN:      return true;
-    case ATAN:      return true;
-    case FLOOR:     return true;
-    case CEIL:      return true;
-    case FMIN:      return true;
-    case FMAX:      return true;
-    case FABS:      return true;
-    case SIGN:      return true;
-    case ERF:       return true;
-    case SINH:      return true;
-    case TANH:      return true;
-    case ERFINV:    return true;
-    default:        return false;
+    case ADD:
+    case SUB:
+    case MUL:
+    case NEG:
+    case SQRT:
+    case SIN:
+    case TAN:
+    case ASIN:
+    case ATAN:
+    case FLOOR:
+    case CEIL:
+    case FMIN:
+    case FMAX:
+    case FABS:
+    case SIGN:
+    case ERF:
+    case SINH:
+    case TANH:
+    case ERFINV:
+      return true;
+    default:
+      return false;
   }
 }
 
 template<typename T>
 inline bool casadi_math<T>::f0x_is_zero(unsigned char op){
   switch(op){
-    case MUL:       return true;
-    case DIV:       return true;
-    case NEG:       return true;
-    case SQRT:      return true;
-    case SIN:       return true;
-    case TAN:       return true;
-    case ASIN:      return true;
-    case ATAN:      return true;
-    case FLOOR:     return true;
-    case CEIL:      return true;
-    case FABS:      return true;
-    case SIGN:      return true;
-    case ERF:       return true;
-    case SINH:      return true;
-    case TANH:      return true;
-    case ERFINV:    return true;
-    default:        return false;
+    case MUL:
+    case DIV:
+    case NEG:
+    case SQRT:
+    case SIN:
+    case TAN:
+    case ASIN:
+    case ATAN:
+    case FLOOR:
+    case CEIL:
+    case FABS:
+    case SIGN:
+    case ERF:
+    case SINH:
+    case TANH:
+    case ERFINV:
+      return true;
+    default:
+      return false;
   }
 }
     
@@ -349,30 +356,34 @@ inline bool casadi_math<T>::fx0_is_zero(unsigned char op){
 template<typename T>
 inline bool casadi_math<T>::isCommutative(unsigned char op){
   switch(op){
-    case SUB:       return false;
-    case DIV:       return false;
-    case POW:       return false;
-    case CONSTPOW:  return false;
-    case EQUALITY:  return false;
-    case PRINTME:   return false;
-    default:        return true;
+    case SUB:
+    case DIV:
+    case POW:
+    case CONSTPOW:
+    case EQUALITY:
+    case PRINTME:
+      return false;
+    default:
+      return true;
   }
 }
 
 template<typename T>
 inline int casadi_math<T>::ndeps(unsigned char op){
   switch(op){
-    case ADD:       return 2;
-    case SUB:       return 2;
-    case MUL:       return 2;
-    case DIV:       return 2;
-    case POW:       return 2;
-    case CONSTPOW:  return 2;
-    case EQUALITY:  return 2;
-    case FMIN:      return 2;
-    case FMAX:      return 2;
-    case PRINTME:   return 2;
-    default:        return 1;
+    case ADD:
+    case SUB:
+    case MUL:
+    case DIV:
+    case POW:
+    case CONSTPOW:
+    case EQUALITY:
+    case FMIN:
+    case FMAX:
+    case PRINTME:
+      return 2;
+    default:
+      return 1;
   }
 }
 
@@ -445,6 +456,20 @@ inline void casadi_math<T>::printPost(unsigned char op, std::ostream &stream){
   switch(op){
     case STEP:      stream << ">=0)";     break;
     default:        stream << ")";        break;
+  }
+}
+
+template<typename T>
+inline bool casadi_math<T>::isSmooth(unsigned char op){
+  switch(op){
+    case STEP:
+    case FLOOR:
+    case CEIL:
+    case EQUALITY:
+    case SIGN:
+      return false;
+    default:
+      return true;
   }
 }
 

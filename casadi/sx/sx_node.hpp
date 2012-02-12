@@ -47,6 +47,7 @@ SXNode();
 
 /** \brief  destructor  */
 virtual ~SXNode();
+
 //@{
 /** \brief  check properties of a node */
 virtual bool isConstant() const; // check if constant

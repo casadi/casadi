@@ -36,6 +36,62 @@ MXNode::MXNode(){
 }
 
 MXNode::~MXNode(){
+
+  // Start destruction method if any of the dependencies has dependencies
+  for(vector<MX>::iterator cc=dep_.begin(); cc!=dep_.end(); ++cc){
+    // Skip if null
+    if(cc->isNull()) continue;
+    
+    // Check if there are other "owners" of the node
+    if(cc->getCount()!= 1){
+      
+      // Replace with a null pointer
+      *cc = MX();
+      
+    } else {
+      // Stack of experssions to be deleted
+      std::stack<MX> deletion_stack;
+        
+      // Move the child to the deletion stack
+      deletion_stack.push(*cc);
+      *cc = MX();
+      
+      // Process stack
+      while(!deletion_stack.empty()){
+        
+        // Top element
+        MX t = deletion_stack.top();
+          
+        // Check if the top element has dependencies with dependencies
+        bool found_dep = false;
+        
+        // Start destruction method if any of the dependencies has dependencies
+        for(vector<MX>::iterator ii=t->dep_.begin(); ii!=t->dep_.end(); ++ii){
+          
+          // Skip if null
+          if(ii->isNull()) continue;
+          
+          // Check if this is the only reference to the element
+          if(ii->getCount()==1){
+            
+            // Remove and add to stack
+            deletion_stack.push(*ii);
+            *ii = MX();
+            found_dep = true;
+            break;
+          } else {
+            // Replace with an element without dependencies
+            *ii = MX();
+          }
+        }
+        
+        // Pop from stack if no dependencies found
+        if(!found_dep){
+          deletion_stack.pop();
+        }
+      }
+    }
+  }
 }
 
 const string& MXNode::getName() const{

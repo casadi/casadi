@@ -270,6 +270,9 @@ class SX{
     /** \brief Get the maximum number of calls to the printing function when printing an expression */
     static long getMaxNumCallsInPrint();
     
+    /** \brief Assign the node to something, without invoking the deletion of the node, if the count reaches 0 */
+    SXNode* assignNoDelete(const SX& scalar);
+    
 #ifndef SWIG
   private:
     // Maximum number of calls

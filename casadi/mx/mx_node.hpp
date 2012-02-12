@@ -27,6 +27,7 @@
 #include "../sx/sx.hpp"
 #include "../casadi_math.hpp"
 #include <vector>
+#include <stack>
 
 namespace CasADi{
   //@{

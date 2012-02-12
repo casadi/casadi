@@ -87,6 +87,24 @@ SX& SX::operator=(const SX &scalar){
   return *this;
 }
 
+SXNode* SX::assignNoDelete(const SX& scalar){
+  // Return value
+  SXNode* ret = node;
+
+  // quick return if the old and new pointers point to the same object
+  if(node == scalar.node) return ret;
+
+  // decrease the counter but do not delete if this was the last pointer
+  --node->count;
+
+  // save the new pointer
+  node = scalar.node;
+  node->count++;
+  
+  // Return a pointer to the old node
+  return ret;
+}
+
 SX& SX::operator=(double scalar){
   return *this = SX(scalar);
 }
@@ -482,6 +500,7 @@ int SX::getIntValue() const{
 }
 
 SX SX::getDep(int ch) const{
+  casadi_assert(ch==0 || ch==1;)
   return node->dep(ch);
 }
 
