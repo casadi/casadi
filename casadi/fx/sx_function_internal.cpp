@@ -53,6 +53,9 @@ SXFunctionInternal::~SXFunctionInternal(){
 
 
 void SXFunctionInternal::evaluate(int nfdir, int nadir){
+  // NOTE: The implementation of this function is very delicate. Small changes in the class structure
+  // can cause large performance losses. For this reason, the preprocessor macros are used below
+  
   if (!free_vars_.empty()) {
     std::stringstream ss;
     repr(ss);
@@ -65,113 +68,44 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
       work_[input_ind_[ind][i]] = arg.data()[i];
     }
   }
-  
+
+  // Shorthands
+  #define x work_[it->ch[0]]
+  #define y work_[it->ch[1]]
+  #define f work_[it->ind]
+
   // Evaluate the algorithm
-  if(nfdir==0 && nadir==0){
-    #define x work_[it->ch[0]]
-    #define y work_[it->ch[1]]
-    #define f work_[it->ind]
-    if(evaluate_inplace_){
+  if(nfdir==0 && nadir==0){ // without taping
+    if(evaluate_inplace_){ // allow inplace operations
       
-      #define FCASES(C,OFF) \
-      case ADD+OFF:       C<ADD>::fcn(x,y,f);           break;\
-      case SUB+OFF:       C<SUB>::fcn(x,y,f);           break;\
-      case MUL+OFF:       C<MUL>::fcn(x,y,f);           break;\
-      case DIV+OFF:       C<DIV>::fcn(x,y,f);           break;\
-      case NEG+OFF:       C<NEG>::fcn(x,y,f);           break;\
-      case EXP+OFF:       C<EXP>::fcn(x,y,f);           break;\
-      case LOG+OFF:       C<LOG>::fcn(x,y,f);           break;\
-      case POW+OFF:       C<POW>::fcn(x,y,f);           break;\
-      case CONSTPOW+OFF:  C<CONSTPOW>::fcn(x,y,f);      break;\
-      case SQRT+OFF:      C<SQRT>::fcn(x,y,f);          break;\
-      case SIN+OFF:       C<SIN>::fcn(x,y,f);           break;\
-      case COS+OFF:       C<COS>::fcn(x,y,f);           break;\
-      case TAN+OFF:       C<TAN>::fcn(x,y,f);           break;\
-      case ASIN+OFF:      C<ASIN>::fcn(x,y,f);          break;\
-      case ACOS+OFF:      C<ACOS>::fcn(x,y,f);          break;\
-      case ATAN+OFF:      C<ATAN>::fcn(x,y,f);          break;\
-      case STEP+OFF:      C<STEP>::fcn(x,y,f);          break;\
-      case FLOOR+OFF:     C<FLOOR>::fcn(x,y,f);         break;\
-      case CEIL+OFF:      C<CEIL>::fcn(x,y,f);          break;\
-      case EQUALITY+OFF:  C<EQUALITY>::fcn(x,y,f);      break;\
-      case FABS+OFF:      C<FABS>::fcn(x,y,f);          break;\
-      case SIGN+OFF:      C<SIGN>::fcn(x,y,f);          break;\
-      case ERF+OFF:       C<ERF>::fcn(x,y,f);           break;\
-      case FMIN+OFF:      C<FMIN>::fcn(x,y,f);          break;\
-      case FMAX+OFF:      C<FMAX>::fcn(x,y,f);          break;\
-      case INV+OFF:       C<INV>::fcn(x,y,f);           break;\
-      case SINH+OFF:      C<SINH>::fcn(x,y,f);          break;\
-      case COSH+OFF:      C<COSH>::fcn(x,y,f);          break;\
-      case TANH+OFF:      C<TANH>::fcn(x,y,f);          break;\
-      case ERFINV+OFF:    C<ERFINV>::fcn(x,y,f);        break;\
-      case PRINTME+OFF:   C<PRINTME>::fcn(x,y,f);       break;
-      
-      for(vector<AlgEl>::iterator it=algorithm_.begin(); it<algorithm_.end(); ++it){
-        switch(it->op){
-          FCASES(BinaryOperation,0)
-          FCASES(AddBinaryOperation,NUM_BUILT_IN_OPS)
-          FCASES(SubBinaryOperation,2*NUM_BUILT_IN_OPS)
-          FCASES(MulBinaryOperation,3*NUM_BUILT_IN_OPS)
-          FCASES(DivBinaryOperation,4*NUM_BUILT_IN_OPS)
-        }
+      for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
+        // NOTE: This is equivalent to casadi_math<double>::inplacefun(it->op,x,y,f);
+        // but forces the function to be inlined, which is important for speed here
+        CASADI_MATH_INPLACEFUN(double,it->op,x,y,f)
       }
-      #undef FCASES
-      
-    } else {
+    } else { // no inplace operations
     
-    // without taping
-    for(vector<AlgEl>::iterator it=algorithm_.begin(); it<algorithm_.end(); ++it){
-      // The following is slightly faster than the function below, which is strange, since the below function should be inlined anyway
-      #if 1
-      switch(it->op){
-        case ADD:       BinaryOperation<ADD>::fcn(x,y,f);           break;
-        case SUB:       BinaryOperation<SUB>::fcn(x,y,f);           break;
-        case MUL:       BinaryOperation<MUL>::fcn(x,y,f);           break;
-        case DIV:       BinaryOperation<DIV>::fcn(x,y,f);           break;
-        case NEG:       BinaryOperation<NEG>::fcn(x,y,f);           break;
-        case EXP:       BinaryOperation<EXP>::fcn(x,y,f);           break;
-        case LOG:       BinaryOperation<LOG>::fcn(x,y,f);           break;
-        case POW:       BinaryOperation<POW>::fcn(x,y,f);           break;
-        case CONSTPOW:  BinaryOperation<CONSTPOW>::fcn(x,y,f);      break;
-        case SQRT:      BinaryOperation<SQRT>::fcn(x,y,f);          break;
-        case SIN:       BinaryOperation<SIN>::fcn(x,y,f);           break;
-        case COS:       BinaryOperation<COS>::fcn(x,y,f);           break;
-        case TAN:       BinaryOperation<TAN>::fcn(x,y,f);           break;
-        case ASIN:      BinaryOperation<ASIN>::fcn(x,y,f);          break;
-        case ACOS:      BinaryOperation<ACOS>::fcn(x,y,f);          break;
-        case ATAN:      BinaryOperation<ATAN>::fcn(x,y,f);          break;
-        case STEP:      BinaryOperation<STEP>::fcn(x,y,f);          break;
-        case FLOOR:     BinaryOperation<FLOOR>::fcn(x,y,f);         break;
-        case CEIL:      BinaryOperation<CEIL>::fcn(x,y,f);          break;
-        case EQUALITY:  BinaryOperation<EQUALITY>::fcn(x,y,f);      break;
-        case FABS:      BinaryOperation<FABS>::fcn(x,y,f);           break;
-        case SIGN:      BinaryOperation<SIGN>::fcn(x,y,f);           break;
-        case ERF:       BinaryOperation<ERF>::fcn(x,y,f);           break;
-        case FMIN:      BinaryOperation<FMIN>::fcn(x,y,f);          break;
-        case FMAX:      BinaryOperation<FMAX>::fcn(x,y,f);          break;
-        case INV:       BinaryOperation<INV>::fcn(x,y,f);          break;
-        case SINH:      BinaryOperation<SINH>::fcn(x,y,f);           break;
-        case COSH:      BinaryOperation<COSH>::fcn(x,y,f);           break;
-        case TANH:      BinaryOperation<TANH>::fcn(x,y,f);           break;
-        case ERFINV:    BinaryOperation<ERFINV>::fcn(x,y,f);           break;
-        case PRINTME:   BinaryOperation<PRINTME>::fcn(x,y,f);           break;
+      for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
+        // NOTE: This is equivalent to casadi_math<double>::fun(it->op,x,y,f);
+        // but forces the function to be inlined, which is important for speed here
+        CASADI_MATH_FUN(double,it->op,x,y,f)
       }
-      #else
-      casadi_math<double>::fun(it->op,x,y,f);
-      #endif
     }
+  } else { // with taping
+    
+    vector<AlgEl>::iterator it = algorithm_.begin();
+    vector<AlgElData>::iterator it1 = pder_.begin();
+    for(; it!=algorithm_.end(); ++it, ++it1){
+      // NOTE: This is equivalent to casadi_math<double>::derF(it->op,x,y,f,it1->d);
+      // but forces the function to be inlined, which is important for speed here
+      CASADI_MATH_DERF(double,it->op,x,y,f,it1->d)
     }
+  }
+  
+  // Undefine shorthands
   #undef x
   #undef y
   #undef f
-  } else {
-    // with taping
-    vector<AlgEl>::iterator it = algorithm_.begin();
-    vector<AlgElData>::iterator it1 = pder_.begin();
-    for(; it<algorithm_.end(); ++it, ++it1){
-      casadi_math<double>::derF(it->op,work_[it->ch[0]],work_[it->ch[1]],work_[it->ind],it1->d);
-    }
-  }
 
   // Get the results
   for(int ind=0; ind<getNumOutputs(); ++ind){
@@ -281,13 +215,25 @@ void SXFunctionInternal::print(ostream &stream) const{
  
  for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
     int op = it->op;
+    int ip = op/NUM_BUILT_IN_OPS;
+    op -= NUM_BUILT_IN_OPS*ip;
+    
     stringstream s,s0,s1;
     s << "a" << it->ind;
 
     int i0 = it->ch[0], i1 = it->ch[1];
     s0 << "a" << i0;
     s1 << "a" << i1;
-    stream << s.str() << " = ";
+    
+    stream << s.str();
+    switch(ip){
+      case 0:  stream << " = "; break;
+      case 1:  stream << " += "; break;
+      case 2:  stream << " -= "; break;
+      case 3:  stream << " *= "; break;
+      case 4:  stream << " /= "; break;
+    }
+    
     casadi_math<double>::print(op,stream,s0.str(),s1.str());
     stream << ";" << endl;
   }
@@ -708,6 +654,12 @@ void SXFunctionInternal::init(){
   // Number of inplace functions
   int num_inplace=0;
   
+  // Index currently assigned to a node
+  vector<int> curr_assign;
+  if(evaluate_inplace_){
+    curr_assign.resize(worksize_,-1);
+  }
+  
   // Add the binary operations
   algorithm_.clear();
   algorithm_.resize(binops_.size());
@@ -721,6 +673,13 @@ void SXFunctionInternal::init(){
     // Save the indices of the children
     it->ch[0] = place[binops_[i]->dep(0).get()->temp];
     it->ch[1] = place[binops_[i]->dep(1).get()->temp];
+    
+    // Make sure that the first argument is equal to the index, if possible
+//     if(it->ch[1]==it->ind && 
+//       casadi_math<double>::isCommutative(it->op) && 
+//       ndeps==2){
+//       std::swap(it->ch[0],it->ch[1]);
+//     }
 
     // Operation
     it->op = binops_[i]->getOp();
@@ -748,19 +707,37 @@ void SXFunctionInternal::init(){
           bool dep_is_binary = c.isBinary();
           if(dep_is_binary){
 
+            // Get the indices of the children of the child
+            int c_temp = c.get()->temp;
+            int c_temp0 = c->dep(0).get()->temp;
+            int c_temp1 = c->dep(1).get()->temp;
+            
+            // Index currently assigned to the storage location
+            int c_curr = curr_assign[place[c_temp]];
+            int c_curr0 = curr_assign[place[c_temp0]];
+            int c_curr1 = curr_assign[place[c_temp1]];
+            
+            // Number of dependencies
+            int c_ndeps = casadi_math<double>::ndeps(c.getOp());
+            
             // Check if the node is used exactly one time
-            bool used_one_time = refcount_copy.at(c.get()->temp)==1;
-            if(used_one_time){
+            bool ok_replace = refcount_copy.at(c_temp)==1;
+            
+            // Check if the values of the children are still available in the work vector or was assigned during the child operation
+            ok_replace = ok_replace && (c_curr0<0 || c_curr0==c_temp0 || c_curr0==c_curr);
+            ok_replace = ok_replace && (c_ndeps<2 ||  c_curr1<1 || c_curr1==c_temp1 || c_curr1==c_curr);
+            
+            if(ok_replace){
               
               // Mark the node negative so that we can remove it later
               refcount_copy.at(c.get()->temp) = -1;
               
               // Save the indices of the children
-              it->ch[0] = place[c->dep(0).get()->temp];
-              it->ch[1] = place[c->dep(1).get()->temp];
+              it->ch[0] = place[c_temp0];
+              it->ch[1] = place[c_temp1];
 
-              // Operation
-              it->op = c->getOp() + ip * NUM_BUILT_IN_OPS;
+              // Replace operation with an inplace operation
+              it->op = ip*NUM_BUILT_IN_OPS + c->getOp();
               
               // Increase the inplace counter
               num_inplace++;
@@ -768,6 +745,8 @@ void SXFunctionInternal::init(){
           }
         }
       }
+      // Save index
+      curr_assign[it->ind] = binops_[i]->temp;
     }
   }
   
