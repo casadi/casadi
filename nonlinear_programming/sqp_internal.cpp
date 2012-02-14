@@ -47,6 +47,7 @@ SQPInternal::SQPInternal(const FX& F, const FX& G, const FX& H, const FX& J) : N
   addOption("mu_safety",         OT_REAL   ,    1.1,           "Safety factor for linesearch mu");
   addOption("eta",               OT_REAL   ,    0.0001,        "Linesearch parameter: See Nocedal 3.4");
   addOption("tau",               OT_REAL   ,    0.2,           "Linesearch parameter");
+  addOption("hessian_approximation", OT_STRING, "BFGS",        "BFGS|exact");
   
   // Monitors
   addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp", true);
@@ -76,7 +77,7 @@ void SQPInternal::init(){
   
   // Allocate a QP solver
   CRSSparsity H_sparsity = sp_dense(n,n);
-  CRSSparsity A_sparsity = J_.output().sparsity();
+  CRSSparsity A_sparsity = J_.isNull() ? CRSSparsity(0,n,false) : J_.output().sparsity();
 
   QPSolverCreator qp_solver_creator = getOption("qp_solver");
   qp_solver_ = qp_solver_creator(H_sparsity,A_sparsity);
@@ -138,7 +139,9 @@ void SQPInternal::init(){
   SXFunction z(z_in,lgrad);
   lfcn.init();*/
   
-  
+  if (getOption("hessian_approximation")=="exact" && H_.isNull()) {
+    casadi_error("SQPInternal::evaluate: you set option 'hessian_approximation' to 'exact', but no hessian was supplied. Suggest using 'generate_hessian' option.");
+  }
   
 }
 
@@ -165,7 +168,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   double merit_mu = 0;  
 
   // Get dimensions
-  int m = G_.output().size(); // Number of equality constraints
+  int m = G_.isNull() ? 0 : G_.output().size(); // Number of equality constraints
   int n = x.size();  // Number of variables
 
   // Initial guess for the lagrange multipliers
@@ -175,6 +178,18 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   // Initial guess for the Hessian
   DMatrix Bk = DMatrix::eye(n);
   makeDense(Bk);
+  
+  if (getOption("hessian_approximation")=="exact") {
+    int n_hess_in = H_.getNumInputs() - (parametric_ ? 1 : 0);
+    H_.setInput(x);
+    if(n_hess_in>1){
+      H_.setInput(lambda_k, n_hess_in==4? 2 : 1);
+      H_.setInput(1, n_hess_in==4? 3 : 2);
+    }
+    H_.evaluate();
+    DMatrix Bk = H_.output();
+    
+  }
 
   if (monitored("eval_h")) {
     cout << "(pre) B = " << endl;
@@ -191,26 +206,31 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   int k = 0;
 
   while(true){
-    // Evaluate the constraint function
-    G_.setInput(x);
-    G_.evaluate();
-    DMatrix gk = G_.output();
+    DMatrix gk;
+    DMatrix Jgk = DMatrix::zeros(0,n);
     
-    if (monitored("eval_g")) {
-      cout << "(main loop) x = " << G_.input().data() << endl;
-      cout << "(main loop) G = " << endl;
-      G_.output().printSparse();
-    }
-    
-    // Evaluate the Jacobian
-    J_.setInput(x);
-    J_.evaluate();
-    DMatrix Jgk = J_.output();
+    if (!G_.isNull()) {
+      // Evaluate the constraint function
+      G_.setInput(x);
+      G_.evaluate();
+      gk = G_.output();
+      
+      if (monitored("eval_g")) {
+        cout << "(main loop) x = " << G_.input().data() << endl;
+        cout << "(main loop) G = " << endl;
+        G_.output().printSparse();
+      }
+      
+      // Evaluate the Jacobian
+      J_.setInput(x);
+      J_.evaluate();
+      Jgk = J_.output();
 
-    if (monitored("eval_jac_g")) {
-      cout << "(main loop) x = " << J_.input().data() << endl;
-      cout << "(main loop) J = " << endl;
-      J_.output().printSparse();
+      if (monitored("eval_jac_g")) {
+        cout << "(main loop) x = " << J_.input().data() << endl;
+        cout << "(main loop) J = " << endl;
+        J_.output().printSparse();
+      }
     }
     
     // Evaluate the gradient of the objective function
@@ -235,10 +255,13 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     
     // Pass data to QP solver
     qp_solver_.setInput(Bk,QP_H);
-    qp_solver_.setInput(Jgk,QP_A);
     qp_solver_.setInput(gfk,QP_G);
-    qp_solver_.setInput(-gk+input(NLP_LBG),QP_LBA);
-    qp_solver_.setInput(-gk+input(NLP_UBG),QP_UBA);
+    qp_solver_.setInput(Jgk,QP_A);
+      
+    if (!G_.isNull()) {
+      qp_solver_.setInput(-gk+input(NLP_LBG),QP_LBA);
+      qp_solver_.setInput(-gk+input(NLP_UBG),QP_UBA);
+    }
 
     qp_solver_.setInput(-x+input(NLP_LBX),QP_LBX);
     qp_solver_.setInput(-x+input(NLP_UBX),QP_UBX);
@@ -273,7 +296,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     DMatrix lambda_x_hat = qp_solver_.output(QP_DUAL_X);
     
     // Get the gradient of the Lagrangian
-    DMatrix gradL = F_.adjSens() - mul(trans(Jgk),lambda_hat) - lambda_x_hat;
+    DMatrix gradL = F_.adjSens() - (G_.isNull() ? 0 : mul(trans(Jgk),lambda_hat)) - lambda_x_hat;
     
     // Pass adjoint seeds to g
     //gfcn.setAdjSeed(lambda_hat);
@@ -283,7 +306,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     double mu = merit_mu;
     
     // 1-norm of the feasability violations
-    double feasviol = sumRows(fabs(gk)).at(0);
+    double feasviol = G_.isNull() ? 0 : sumRows(fabs(gk)).at(0);
 
     // Use a quadratic model of T1 to get a lower bound on mu (eq. 18.36 in Nocedal)
     double mu_lb = ((inner_prod(gfk,p) + sigma_/2.0*mul(trans(p),mul(Bk,p)))/(1.-rho_)/feasviol).at(0);
@@ -297,7 +320,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     double T1 = fk + mu*feasviol;
 
     // Calculate the directional derivative of T1 at x (cf. 18.29 in Nocedal)
-    double DT1 = (inner_prod(gfk,p) - mu*sumRows(fabs(gk))).at(0);
+    double DT1 = (inner_prod(gfk,p) - (G_.isNull() ? 0 : mu*sumRows(fabs(gk)))).at(0);
     
     int lsiter = 0;
     double alpha = 1;
@@ -314,20 +337,24 @@ void SQPInternal::evaluate(int nfdir, int nadir){
         F_.output().printSparse();
       }
     
-      // Evaluate gk, hk and get 1-norm of the feasability violations
-      G_.setInput(x_new);
-      G_.evaluate();
-      DMatrix gk_new = G_.output();
-      DMatrix feasviol_new = sumRows(fabs(gk_new));
+      DMatrix feasviol_new;
+        
+      if (!G_.isNull()) {
+        // Evaluate gk, hk and get 1-norm of the feasability violations
+        G_.setInput(x_new);
+        G_.evaluate();
+        DMatrix gk_new = G_.output();
+        feasviol_new = sumRows(fabs(gk_new));
 
-      if (monitored("eval_g")) {
-        cout << "(armillo loop) x = " << G_.input().data() << endl;
-        cout << "(armillo loop) G = " << endl;
-        G_.output().printSparse();
+        if (monitored("eval_g")) {
+          cout << "(armillo loop) x = " << G_.input().data() << endl;
+          cout << "(armillo loop) G = " << endl;
+          G_.output().printSparse();
+        }
       }
     
       // New T1 function
-      DMatrix T1_new = fk_new + mu*feasviol_new;
+      DMatrix T1_new = fk_new + ( G_.isNull() ? 0 : mu*feasviol_new );
 
       // Check Armijo condition, SQP version (18.28 in Nocedal)
       if(T1_new.at(0) <= (T1 + eta_*alpha*DT1)){
@@ -346,8 +373,6 @@ void SQPInternal::evaluate(int nfdir, int nadir){
 
     // Step size
     double tk = alpha;
-    
-    std::cout << "p " << p << std::endl;
 
     // Calculate the new step
     DMatrix dx = p*tk;
@@ -359,7 +384,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     // Gather and print iteration information
     double normdx = norm_2(dx).at(0); // step size
     double normgradL = norm_2(gradL).at(0); // size of the Lagrangian gradient
-    double eq_viol = sumRows(fabs(gk)).at(0); // constraint violation
+    double eq_viol = G_.isNull() ? 0 : sumRows(fabs(gk)).at(0); // constraint violation
     string ineq_viol = "nan"; // sumRows(max(0,-hk)); % inequality constraint violation
 
     if (!callback_.isNull()) {
@@ -388,26 +413,28 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       break;
     }
       
-    // Evaluate the constraint function
-    G_.setInput(x);
-    G_.evaluate();
-    gk = G_.output();
+    if (!G_.isNull()) {
+      // Evaluate the constraint function
+      G_.setInput(x);
+      G_.evaluate();
+      gk = G_.output();
 
-    if (monitored("eval_g")) {
-      cout << "(main loop-post) x = " << G_.input().data() << endl;
-      cout << "(main loop-post) G = " << endl;
-      G_.output().printSparse();
-    }
-    
-    // Evaluate the Jacobian
-    J_.setInput(x);
-    J_.evaluate();
-    Jgk = J_.output();
+      if (monitored("eval_g")) {
+        cout << "(main loop-post) x = " << G_.input().data() << endl;
+        cout << "(main loop-post) G = " << endl;
+        G_.output().printSparse();
+      }
+      
+      // Evaluate the Jacobian
+      J_.setInput(x);
+      J_.evaluate();
+      Jgk = J_.output();
 
-    if (monitored("eval_jac_g")) {
-      cout << "(main loop-post) x = " << J_.input().data() << endl;
-      cout << "(main loop-post) J = " << endl;
-      J_.output().printSparse();
+      if (monitored("eval_jac_g")) {
+        cout << "(main loop-post) x = " << J_.input().data() << endl;
+        cout << "(main loop-post) J = " << endl;
+        J_.output().printSparse();
+      }
     }
     
     // Evaluate the gradient of the objective function
@@ -434,22 +461,35 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       cout << "Maximum number of SQP iterations reached!" << endl;
       break;
     }
-
-    // Complete the damped BFGS update (Procedure 18.2 in Nocedal)
-    DMatrix gradL_new = gfk - mul(trans(Jgk),lambda_k) - lambda_x_k;
-    DMatrix yk = gradL_new - gradL;
-    DMatrix Bdx = mul(Bk,dx);
-    DMatrix dxBdx = mul(trans(dx),Bdx);
-    DMatrix ydx = inner_prod(dx,yk);
-    DMatrix thetak;
-    if(ydx.at(0) >= 0.2*dxBdx.at(0)){
-      thetak = 1.;
-    } else {
-      thetak = 0.8*dxBdx/(dxBdx - ydx);
+    
+    if (getOption("hessian_approximation")=="exact") {
+      int n_hess_in = H_.getNumInputs() - (parametric_ ? 1 : 0);
+      H_.setInput(x);
+      if(n_hess_in>1){
+        H_.setInput(lambda_k, n_hess_in==4? 2 : 1);
+        H_.setInput(1, n_hess_in==4? 3 : 2);
+      }
+      H_.evaluate();
+      Bk = H_.output();
     }
-    DMatrix rk = thetak*dx + (1-thetak)*Bdx; // rk replaces yk to assure Bk pos.def.
-    Bk = Bk - outer_prod(Bdx,Bdx)/dxBdx + outer_prod(rk,rk)/ inner_prod(rk,dx);
 
+    if (getOption("hessian_approximation")=="BFGS") {
+      // Complete the damped BFGS update (Procedure 18.2 in Nocedal)
+      DMatrix gradL_new = gfk - ( G_.isNull() ? 0 : mul(trans(Jgk),lambda_k) ) - lambda_x_k;
+      DMatrix yk = gradL_new - gradL;
+      DMatrix Bdx = mul(Bk,dx);
+      DMatrix dxBdx = mul(trans(dx),Bdx);
+      DMatrix ydx = inner_prod(dx,yk);
+      DMatrix thetak;
+      if(ydx.at(0) >= 0.2*dxBdx.at(0)){
+        thetak = 1.;
+      } else {
+        thetak = 0.8*dxBdx/(dxBdx - ydx);
+      }
+      DMatrix rk = thetak*dx + (1-thetak)*Bdx; // rk replaces yk to assure Bk pos.def.
+      Bk = Bk - outer_prod(Bdx,Bdx)/dxBdx + outer_prod(rk,rk)/ inner_prod(rk,dx);
+    }
+    
     if (monitored("eval_h")) {
       cout << "(main loop-post) B = " << endl;
       Bk.printSparse();
