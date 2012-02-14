@@ -11,6 +11,7 @@ from pylab import *
 t = SX("t")
 
 x1,x2 = x  = ssym("x",2)
+dx = ssym("dx",2)
 
 w0 = SX("w0")
 a3 = SX("a3")
@@ -21,11 +22,12 @@ f = SX("f")
 
 tf = 4
 
-params = [f,w0,a3,a5,mu1,mu3]
+params = [w0,a3,a5,mu1,mu3,f]
 rhs    = [x2,-(-w0**2 *x1 + a3*x1**3 + a5*x1**5) - (2 *mu1 *x2 + mu3 * x2**3)]
 
-f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_Y: x, DAE_P: params},[rhs])
+f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_Y: x, DAE_P: params, DAE_YDOT: dx},[rhs])
 f.init()
+
 
 integrator = CVodesIntegrator(f)
 integrator.setOption("tf",tf)
@@ -37,11 +39,10 @@ integrator.init()
 ts = linspace(0,tf,500)
 
 sim = Simulator(integrator,ts)
-sim.setOption("number_of_fwd_dir",2)
 sim.init()
 
 w0_ = 5.278
-params_ = [ 0, w0_, -1.402*w0_**2,  0.271*w0_**2,0,0 ]
+params_ = [ w0_, -1.402*w0_**2,  0.271*w0_**2,0,0,0 ]
 
 sim.input(INTEGRATOR_P).set(params_)
 
@@ -81,6 +82,7 @@ jacsim.setOption("ad_mode","forward")
 jacsim.init()
 
 jacsim.input(INTEGRATOR_X0).set(x0)
+jacsim.input(INTEGRATOR_P).set(params_)
 jacsim.evaluate()
 
 #! For each of the 500 intervals, we have a 2-by-2 matrix as output
@@ -95,9 +97,31 @@ Js = jacsim.output()[-2:,:]
 assert(sqrt(sumAll((Js - Ji)**2)) < 1e-6)
 
 #! Monodromy matrix at various instances - Jacobian of ControlSimulator
-#! =============================================================
+#! ====================================================================
 
+csim = ControlSimulator(f,linspace(0,tf,50))
+csim.setOption("np",5)
+csim.setOption("nf",10)
+csim.setOption("integrator",CVodesIntegrator)
+csim.setOption("integrator_options",{"reltol":1e-12,"abstol":1e-12})
+csim.init()
 
+jaccsim = Jacobian(csim,CONTROLSIMULATOR_X0,0)
+jaccsim.init()
+jaccsim.input(CONTROLSIMULATOR_P).set(params_[:-1])
+jaccsim.input(CONTROLSIMULATOR_X0).set(x0)
+jaccsim.input(CONTROLSIMULATOR_V).setAll(0)
+jaccsim.evaluate()
+
+#! For each of the 500 intervals, we have a 2-by-2 matrix as output
+print "jaccsim.output().shape = ", jaccsim.output().shape
+
+#! Show only the last 3 intervals.
+print jaccsim.output()[-3*2:,:]
+Jcs = jaccsim.output()[-2:,:]
+
+# Assert that the two methods yield identical results
+assert(sqrt(sumAll((Jcs - Js)**2)) < 1e-6)
 
 show()
 

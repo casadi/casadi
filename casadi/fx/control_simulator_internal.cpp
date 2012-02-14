@@ -35,7 +35,7 @@ namespace CasADi{
 
   
 ControlSimulatorInternal::ControlSimulatorInternal(const FX& dae, const FX& output_fcn, const vector<double>& gridc) : dae_(dae), output_fcn_(output_fcn), gridc_(gridc){
-  setOption("name","unnamed piecewise simulator");
+  setOption("name","unnamed controlimulator");
   addOption("np",OT_INTEGER,GenericType(),"The number of parameters. If this option is not set, all of input(INTEGRATOR_P) is considered static parameters. The remainder of nv = input(INTEGRATOR_P) is considered to be varying parameters.");
   addOption("nf",OT_INTEGER,1,"Number of fine grained integration steps.");
   addOption("integrator",               OT_INTEGRATOR, GenericType(), "An integrator creator function");
@@ -101,6 +101,7 @@ void ControlSimulatorInternal::init(){
   
   // Generate an output function if there is none (returns the whole state)
   if(output_fcn_.isNull()){
+    
     SXMatrix t = ssym("t");
     SXMatrix x = ssym("x",dae_.input(DAE_Y).sparsity());
     SXMatrix xdot = ssym("xp",dae_.input(DAE_YDOT).sparsity());
@@ -118,6 +119,7 @@ void ControlSimulatorInternal::init(){
 
     // Create the output function
     output_fcn_ = SXFunction(arg,out);
+    output_fcn_.setOption("name","output function");
   }
 
   // Initialize the output function
@@ -132,6 +134,7 @@ void ControlSimulatorInternal::init(){
   output_fcn_out_[1] = output_fcn_in_[DAE_YDOT];
   
   vector<MX> output_fcn_call_ = output_fcn_.call(output_fcn_in_);
+    
   copy(output_fcn_call_.begin(),output_fcn_call_.end(),output_fcn_out_.begin()+2);
   
   output_fcn_ = MXFunction(output_fcn_in_,output_fcn_out_);
@@ -225,6 +228,8 @@ void ControlSimulatorInternal::init(){
   all_output_ = MXFunction(all_output_in,all_output_out);
   all_output_.init();
   
+  ControlSimulatorInternal::updateNumSens(false);
+  
 }
 
 void ControlSimulatorInternal::evaluate(int nfdir, int nadir){
@@ -293,6 +298,16 @@ void ControlSimulatorInternal::updateNumSens(bool recursive){
   if (!integrator_.isNull()) {
     integrator_.setOption("number_of_fwd_dir",getOption("number_of_fwd_dir"));
     integrator_.updateNumSens();
+  }
+  
+  if (!simulator_.isNull()) {
+    simulator_.setOption("number_of_fwd_dir",getOption("number_of_fwd_dir"));
+    simulator_.updateNumSens();
+  }
+  
+  if (!all_output_.isNull()) {
+    all_output_.setOption("number_of_fwd_dir",getOption("number_of_fwd_dir"));
+    all_output_.updateNumSens();
   }
   
 }
