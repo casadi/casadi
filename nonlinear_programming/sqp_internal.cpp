@@ -47,6 +47,9 @@ SQPInternal::SQPInternal(const FX& F, const FX& G, const FX& H, const FX& J) : N
   addOption("mu_safety",         OT_REAL   ,    1.1,           "Safety factor for linesearch mu");
   addOption("eta",               OT_REAL   ,    0.0001,        "Linesearch parameter: See Nocedal 3.4");
   addOption("tau",               OT_REAL   ,    0.2,           "Linesearch parameter");
+  
+  // Monitors
+  addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp", true);
 }
 
 
@@ -173,6 +176,11 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   DMatrix Bk = DMatrix::eye(n);
   makeDense(Bk);
 
+  if (monitored("eval_h")) {
+    cout << "(pre) B = " << endl;
+    Bk.printSparse();
+  }
+    
   // No bounds on the control
   double inf = numeric_limits<double>::infinity();
   qp_solver_.input(QP_LBX).setAll(-inf);
@@ -188,10 +196,22 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     G_.evaluate();
     DMatrix gk = G_.output();
     
+    if (monitored("eval_g")) {
+      cout << "(main loop) x = " << G_.input().data() << endl;
+      cout << "(main loop) G = " << endl;
+      G_.output().printSparse();
+    }
+    
     // Evaluate the Jacobian
     J_.setInput(x);
     J_.evaluate();
     DMatrix Jgk = J_.output();
+
+    if (monitored("eval_jac_g")) {
+      cout << "(main loop) x = " << J_.input().data() << endl;
+      cout << "(main loop) J = " << endl;
+      J_.output().printSparse();
+    }
     
     // Evaluate the gradient of the objective function
     F_.setInput(x);
@@ -200,14 +220,45 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     fk = F_.output().at(0);
     DMatrix gfk = F_.adjSens();
     
+    
+    if (monitored("eval_f")) {
+      cout << "(main loop) x = " << F_.input().data() << endl;
+      cout << "(main loop) F = " << endl;
+      F_.output().printSparse();
+    }
+    
+    if (monitored("eval_grad_f")) {
+      cout << "(main loop) x = " << F_.input().data() << endl;
+      cout << "(main loop) gradF = " << endl;
+      gfk.printSparse();
+    }
+    
     // Pass data to QP solver
     qp_solver_.setInput(Bk,QP_H);
     qp_solver_.setInput(Jgk,QP_A);
     qp_solver_.setInput(gfk,QP_G);
-    qp_solver_.setInput(-gk,QP_LBA);
-    qp_solver_.setInput(-gk,QP_UBA);
-//     qp_solver_.setInput(input(NLP_LBX),QP_LBX);
-//     qp_solver_.setInput(input(NLP_UBX),QP_UBX);
+    qp_solver_.setInput(-gk+input(NLP_LBG),QP_LBA);
+    qp_solver_.setInput(-gk+input(NLP_UBG),QP_UBA);
+
+    qp_solver_.setInput(-x+input(NLP_LBX),QP_LBX);
+    qp_solver_.setInput(-x+input(NLP_UBX),QP_UBX);
+    
+    if (monitored("qp")) {
+      cout << "(main loop) QP_H = " << endl;
+      qp_solver_.input(QP_H).printDense();
+      cout << "(main loop) QP_A = " << endl;
+      qp_solver_.input(QP_A).printDense();
+      cout << "(main loop) QP_G = " << endl;
+      qp_solver_.input(QP_G).printDense();
+      cout << "(main loop) QP_LBA = " << endl;
+      qp_solver_.input(QP_LBA).printDense();
+      cout << "(main loop) QP_UBA = " << endl;
+      qp_solver_.input(QP_UBA).printDense();
+      cout << "(main loop) QP_LBX = " << endl;
+      qp_solver_.input(QP_LBX).printDense();
+      cout << "(main loop) QP_UBX = " << endl;
+      qp_solver_.input(QP_UBX).printDense();
+    }
 
     // Solve the QP subproblem
     qp_solver_.evaluate();
@@ -257,12 +308,24 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       F_.evaluate();
       DMatrix fk_new = DMatrix(F_.output());
 
+      if (monitored("eval_f")) {
+        cout << "(armillo loop) x = " << F_.input().data() << endl;
+        cout << "(armillo loop) F = " << endl;
+        F_.output().printSparse();
+      }
+    
       // Evaluate gk, hk and get 1-norm of the feasability violations
       G_.setInput(x_new);
       G_.evaluate();
       DMatrix gk_new = G_.output();
       DMatrix feasviol_new = sumRows(fabs(gk_new));
 
+      if (monitored("eval_g")) {
+        cout << "(armillo loop) x = " << G_.input().data() << endl;
+        cout << "(armillo loop) G = " << endl;
+        G_.output().printSparse();
+      }
+    
       // New T1 function
       DMatrix T1_new = fk_new + mu*feasviol_new;
 
@@ -283,6 +346,8 @@ void SQPInternal::evaluate(int nfdir, int nadir){
 
     // Step size
     double tk = alpha;
+    
+    std::cout << "p " << p << std::endl;
 
     // Calculate the new step
     DMatrix dx = p*tk;
@@ -327,12 +392,24 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     G_.setInput(x);
     G_.evaluate();
     gk = G_.output();
+
+    if (monitored("eval_g")) {
+      cout << "(main loop-post) x = " << G_.input().data() << endl;
+      cout << "(main loop-post) G = " << endl;
+      G_.output().printSparse();
+    }
     
     // Evaluate the Jacobian
     J_.setInput(x);
     J_.evaluate();
     Jgk = J_.output();
-      
+
+    if (monitored("eval_jac_g")) {
+      cout << "(main loop-post) x = " << J_.input().data() << endl;
+      cout << "(main loop-post) J = " << endl;
+      J_.output().printSparse();
+    }
+    
     // Evaluate the gradient of the objective function
     F_.setInput(x);
     F_.setAdjSeed(1.0);
@@ -340,6 +417,18 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     fk = DMatrix(F_.output()).at(0);
     gfk = F_.adjSens();
 
+    if (monitored("eval_f")) {
+      cout << "(main loop-post) x = " << F_.input().data() << endl;
+      cout << "(main loop-post) F = " << endl;
+      F_.output().printSparse();
+    }
+    
+    if (monitored("eval_grad_f")) {
+      cout << "(main loop-post) x = " << F_.input().data() << endl;
+      cout << "(main loop-post) gradF = " << endl;
+      gfk.printSparse();
+    }
+    
     // Check if maximum number of iterations reached
     if(k >= maxiter_){
       cout << "Maximum number of SQP iterations reached!" << endl;
@@ -360,6 +449,12 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     }
     DMatrix rk = thetak*dx + (1-thetak)*Bdx; // rk replaces yk to assure Bk pos.def.
     Bk = Bk - outer_prod(Bdx,Bdx)/dxBdx + outer_prod(rk,rk)/ inner_prod(rk,dx);
+
+    if (monitored("eval_h")) {
+      cout << "(main loop-post) B = " << endl;
+      Bk.printSparse();
+    }
+    
   }
   cout << "SQP algorithm terminated after " << (k-1) << " iterations" << endl;
   
