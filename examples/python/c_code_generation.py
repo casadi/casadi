@@ -85,7 +85,7 @@ for f in [gfcn,gfcn_live,gfcn_inplace,efcn_no_opt,efcn_O3_opt,efcn_Os_opt]:
   dt = (t2-t1)/nrep
   print "time = ", dt*1e3, " ms"
   
-  num_op = len(gfcn.algorithm())
+  num_op = gfcn.getAlgorithmSize()
   print "number of elementary operations: ", num_op
   print "time per elementary operations: ", dt/num_op*1e9, " ns"
   
