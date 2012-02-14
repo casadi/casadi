@@ -484,9 +484,10 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       if(ydx.at(0) >= 0.2*dxBdx.at(0)){
         thetak = 1.;
       } else {
-        thetak = 0.8*dxBdx/(dxBdx - ydx);
+        thetak = 1 - 0.8*dxBdx/(dxBdx - ydx);
       }
-      DMatrix rk = thetak*dx + (1-thetak)*Bdx; // rk replaces yk to assure Bk pos.def.
+      DMatrix rk = thetak*yk + (1-thetak)*Bdx; // rk replaces yk to assure Bk pos.def.
+      
       Bk = Bk - outer_prod(Bdx,Bdx)/dxBdx + outer_prod(rk,rk)/ inner_prod(rk,dx);
     }
     
