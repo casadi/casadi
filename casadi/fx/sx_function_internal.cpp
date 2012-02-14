@@ -76,20 +76,10 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
 
   // Evaluate the algorithm
   if(nfdir==0 && nadir==0){ // without taping
-    if(evaluate_inplace_){ // allow inplace operations
-      
-      for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-        // NOTE: This is equivalent to casadi_math<double>::inplacefun(it->op,x,y,f);
-        // but forces the function to be inlined, which is important for speed here
-        CASADI_MATH_INPLACEFUN(double,it->op,x,y,f)
-      }
-    } else { // no inplace operations
-    
-      for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-        // NOTE: This is equivalent to casadi_math<double>::fun(it->op,x,y,f);
-        // but forces the function to be inlined, which is important for speed here
-        CASADI_MATH_FUN(double,it->op,x,y,f)
-      }
+    for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
+      // NOTE: This is equivalent to casadi_math<double>::inplacefun(it->op,x,y,f);
+      // but forces the function to be inlined, which is important for speed here
+      CASADI_MATH_FUN(double,it->op,x,y,f)
     }
   } else { // with taping
     

@@ -34,9 +34,6 @@ class casadi_math{
     /** \brief Evaluate a built in function */
     static inline void fun(unsigned char op, const T& x, const T& y, T& f);
     
-    /** \brief Evaluate inplace a built in function (experimental) */
-    static inline void inplacefun(unsigned char op, const T& x, const T& y, T& f);
-    
     /** \brief Evaluate a built in derivative function */
     static inline void der(unsigned char op, const T& x, const T& y, const T& f, T* d);
 
@@ -78,13 +75,6 @@ class casadi_math<int>{
     static inline void fun(unsigned char op, const int& x, const int& y, int& f){
       double f_real(f);
       casadi_math<double>::fun(op,double(x),double(y),f_real);
-      f = int(f_real);
-    }
-    
-    /** \brief Evaluate inplace a built in function (experimental) */
-    static inline void inplacefun(unsigned char op, const int& x, const int& y, int& f){
-      double f_real(f);
-      casadi_math<double>::inplacefun(op,double(x),double(y),f_real);
       f = int(f_real);
     }
     
@@ -133,49 +123,7 @@ class casadi_math<int>{
 template<typename T>
 inline void casadi_math<T>::fun(unsigned char op, const T& x, const T& y, T& f){
 // NOTE: We define the implementation in a preprocessor macro to be able to force inlining
-#define CASADI_MATH_FUN(TYPE,OP,X,Y,F) \
-  switch(OP){\
-    case ASSIGN:    BinaryOperation<ASSIGN>::fcn(X,Y,F);        break;\
-    case ADD:       BinaryOperation<ADD>::fcn(X,Y,F);           break;\
-    case SUB:       BinaryOperation<SUB>::fcn(X,Y,F);           break;\
-    case MUL:       BinaryOperation<MUL>::fcn(X,Y,F);           break;\
-    case DIV:       BinaryOperation<DIV>::fcn(X,Y,F);           break;\
-    case NEG:       BinaryOperation<NEG>::fcn(X,Y,F);           break;\
-    case EXP:       BinaryOperation<EXP>::fcn(X,Y,F);           break;\
-    case LOG:       BinaryOperation<LOG>::fcn(X,Y,F);           break;\
-    case POW:       BinaryOperation<POW>::fcn(X,Y,F);           break;\
-    case CONSTPOW:  BinaryOperation<CONSTPOW>::fcn(X,Y,F);      break;\
-    case SQRT:      BinaryOperation<SQRT>::fcn(X,Y,F);          break;\
-    case SIN:       BinaryOperation<SIN>::fcn(X,Y,F);           break;\
-    case COS:       BinaryOperation<COS>::fcn(X,Y,F);           break;\
-    case TAN:       BinaryOperation<TAN>::fcn(X,Y,F);           break;\
-    case ASIN:      BinaryOperation<ASIN>::fcn(X,Y,F);          break;\
-    case ACOS:      BinaryOperation<ACOS>::fcn(X,Y,F);          break;\
-    case ATAN:      BinaryOperation<ATAN>::fcn(X,Y,F);          break;\
-    case STEP:      BinaryOperation<STEP>::fcn(X,Y,F);          break;\
-    case FLOOR:     BinaryOperation<FLOOR>::fcn(X,Y,F);         break;\
-    case CEIL:      BinaryOperation<CEIL>::fcn(X,Y,F);          break;\
-    case EQUALITY:  BinaryOperation<EQUALITY>::fcn(X,Y,F);      break;\
-    case FABS:      BinaryOperation<FABS>::fcn(X,Y,F);          break;\
-    case SIGN:      BinaryOperation<SIGN>::fcn(X,Y,F);          break;\
-    case ERF:       BinaryOperation<ERF>::fcn(X,Y,F);           break;\
-    case FMIN:      BinaryOperation<FMIN>::fcn(X,Y,F);          break;\
-    case FMAX:      BinaryOperation<FMAX>::fcn(X,Y,F);          break;\
-    case INV:       BinaryOperation<INV>::fcn(X,Y,F);           break;\
-    case SINH:      BinaryOperation<SINH>::fcn(X,Y,F);          break;\
-    case COSH:      BinaryOperation<COSH>::fcn(X,Y,F);          break;\
-    case TANH:      BinaryOperation<TANH>::fcn(X,Y,F);          break;\
-    case ERFINV:    BinaryOperation<ERFINV>::fcn(X,Y,F);        break;\
-    case PRINTME:   BinaryOperation<PRINTME>::fcn(X,Y,F);       break;\
-  }
-
-  CASADI_MATH_FUN(T,op,x,y,f);
-}
-
-template<typename T>
-inline void casadi_math<T>::inplacefun(unsigned char op, const T& x, const T& y, T& f){
-// NOTE: We define the implementation in a preprocessor macro to be able to force inlining
-#define CASADI_MATH_INPLACEFUN_CASES(X,Y,F,C,OFF) \
+#define CASADI_MATH_FUN_CASES(X,Y,F,C,OFF) \
     case ASSIGN+OFF:    C<ASSIGN>::fcn(X,Y,F);        break;\
     case ADD+OFF:       C<ADD>::fcn(X,Y,F);           break;\
     case SUB+OFF:       C<SUB>::fcn(X,Y,F);           break;\
@@ -209,16 +157,16 @@ inline void casadi_math<T>::inplacefun(unsigned char op, const T& x, const T& y,
     case ERFINV+OFF:    C<ERFINV>::fcn(X,Y,F);        break;\
     case PRINTME+OFF:   C<PRINTME>::fcn(X,Y,F);       break;
   
-  #define CASADI_MATH_INPLACEFUN(TYPE,OP,X,Y,F) \
+  #define CASADI_MATH_FUN(TYPE,OP,X,Y,F) \
   switch(OP){ \
-    CASADI_MATH_INPLACEFUN_CASES(X,Y,F,BinaryOperation,0)\
-    CASADI_MATH_INPLACEFUN_CASES(X,Y,F,AddBinaryOperation,NUM_BUILT_IN_OPS)\
-    CASADI_MATH_INPLACEFUN_CASES(X,Y,F,SubBinaryOperation,2*NUM_BUILT_IN_OPS)\
-    CASADI_MATH_INPLACEFUN_CASES(X,Y,F,MulBinaryOperation,3*NUM_BUILT_IN_OPS)\
-    CASADI_MATH_INPLACEFUN_CASES(X,Y,F,DivBinaryOperation,4*NUM_BUILT_IN_OPS)\
+    CASADI_MATH_FUN_CASES(X,Y,F,BinaryOperation,0)\
+    CASADI_MATH_FUN_CASES(X,Y,F,AddBinaryOperation,NUM_BUILT_IN_OPS)\
+    CASADI_MATH_FUN_CASES(X,Y,F,SubBinaryOperation,2*NUM_BUILT_IN_OPS)\
+    CASADI_MATH_FUN_CASES(X,Y,F,MulBinaryOperation,3*NUM_BUILT_IN_OPS)\
+    CASADI_MATH_FUN_CASES(X,Y,F,DivBinaryOperation,4*NUM_BUILT_IN_OPS)\
   }
   
-  CASADI_MATH_INPLACEFUN(T,op,x,y,f)
+  CASADI_MATH_FUN(T,op,x,y,f)
 }
 
 template<typename T>
@@ -268,46 +216,41 @@ template<typename T>
 inline void casadi_math<T>::derF(unsigned char op, const T& x, const T& y, T& f, T* d){
 // NOTE: We define the implementation in a preprocessor macro to be able to force inlining
 #define CASADI_MATH_DERF(TYPE,OP,X,Y,F,D) \
-  \
-  /* Copy result to temp since it might get overwritten if y or x have the same address as f */ \
-  TYPE ff;\
-  \
   /* A lookup table */ \
   switch(OP){\
-    case ASSIGN:    BinaryOperation<ASSIGN>::fcn(X,Y,ff);   BinaryOperation<ASSIGN>::der(X,Y,ff,D);        break;\
-    case ADD:       BinaryOperation<ADD>::fcn(X,Y,ff);   BinaryOperation<ADD>::der(X,Y,ff,D);        break;\
-    case SUB:       BinaryOperation<SUB>::fcn(X,Y,ff);   BinaryOperation<SUB>::der(X,Y,ff,D);        break;\
-    case MUL:       BinaryOperation<MUL>::fcn(X,Y,ff);   BinaryOperation<MUL>::der(X,Y,ff,D);        break;\
-    case DIV:       BinaryOperation<DIV>::fcn(X,Y,ff);   BinaryOperation<DIV>::der(X,Y,ff,D);        break;\
-    case NEG:       BinaryOperation<NEG>::fcn(X,Y,ff);   BinaryOperation<NEG>::der(X,Y,ff,D);        break;\
-    case EXP:       BinaryOperation<EXP>::fcn(X,Y,ff);   BinaryOperation<EXP>::der(X,Y,ff,D);        break;\
-    case LOG:       BinaryOperation<LOG>::fcn(X,Y,ff);   BinaryOperation<LOG>::der(X,Y,ff,D);        break;\
-    case POW:       BinaryOperation<POW>::fcn(X,Y,ff);   BinaryOperation<POW>::der(X,Y,ff,D);        break;\
-    case CONSTPOW:  BinaryOperation<CONSTPOW>::fcn(X,Y,ff);   BinaryOperation<CONSTPOW>::der(X,Y,ff,D);   break;\
-    case SQRT:      BinaryOperation<SQRT>::fcn(X,Y,ff);   BinaryOperation<SQRT>::der(X,Y,ff,D);       break;\
-    case SIN:       BinaryOperation<SIN>::fcn(X,Y,ff);   BinaryOperation<SIN>::der(X,Y,ff,D);        break;\
-    case COS:       BinaryOperation<COS>::fcn(X,Y,ff);   BinaryOperation<COS>::der(X,Y,ff,D);        break;\
-    case TAN:       BinaryOperation<TAN>::fcn(X,Y,ff);   BinaryOperation<TAN>::der(X,Y,ff,D);        break;\
-    case ASIN:      BinaryOperation<ASIN>::fcn(X,Y,ff);   BinaryOperation<ASIN>::der(X,Y,ff,D);       break;\
-    case ACOS:      BinaryOperation<ACOS>::fcn(X,Y,ff);   BinaryOperation<ACOS>::der(X,Y,ff,D);       break;\
-    case ATAN:      BinaryOperation<ATAN>::fcn(X,Y,ff);   BinaryOperation<ATAN>::der(X,Y,ff,D);       break;\
-    case STEP:      BinaryOperation<STEP>::fcn(X,Y,ff);   BinaryOperation<STEP>::der(X,Y,ff,D);       break;\
-    case FLOOR:     BinaryOperation<FLOOR>::fcn(X,Y,ff);   BinaryOperation<FLOOR>::der(X,Y,ff,D);      break;\
-    case CEIL:      BinaryOperation<CEIL>::fcn(X,Y,ff);   BinaryOperation<CEIL>::der(X,Y,ff,D);       break;\
-    case EQUALITY:  BinaryOperation<EQUALITY>::fcn(X,Y,ff);   BinaryOperation<EQUALITY>::der(X,Y,ff,D);   break;\
-    case FABS:      BinaryOperation<FABS>::fcn(X,Y,ff);   BinaryOperation<FABS>::der(X,Y,ff,D);        break;\
-    case SIGN:      BinaryOperation<FABS>::fcn(X,Y,ff);   BinaryOperation<SIGN>::der(X,Y,ff,D);        break;\
-    case ERF:       BinaryOperation<ERF>::fcn(X,Y,ff);   BinaryOperation<ERF>::der(X,Y,ff,D);        break;\
-    case FMIN:      BinaryOperation<FMIN>::fcn(X,Y,ff);   BinaryOperation<FMIN>::der(X,Y,ff,D);       break;\
-    case FMAX:      BinaryOperation<FMAX>::fcn(X,Y,ff);   BinaryOperation<FMAX>::der(X,Y,ff,D);       break;\
-    case INV:       BinaryOperation<INV>::fcn(X,Y,ff);   BinaryOperation<INV>::der(X,Y,ff,D);         break;\
-    case SINH:      BinaryOperation<SINH>::fcn(X,Y,ff);   BinaryOperation<SINH>::der(X,Y,ff,D);        break;\
-    case COSH:      BinaryOperation<COSH>::fcn(X,Y,ff);   BinaryOperation<COSH>::der(X,Y,ff,D);        break;\
-    case TANH:      BinaryOperation<TANH>::fcn(X,Y,ff);   BinaryOperation<TANH>::der(X,Y,ff,D);        break;\
-    case ERFINV:    BinaryOperation<ERFINV>::fcn(X,Y,ff);   BinaryOperation<ERFINV>::der(X,Y,ff,D);        break;\
-    case PRINTME:   BinaryOperation<PRINTME>::fcn(X,Y,ff);   BinaryOperation<PRINTME>::der(X,Y,ff,D);     break;\
-  }\
-  F = ff;
+    case ASSIGN:    DerBinaryOpertion<ASSIGN>::derf(X,Y,f,D);        break;\
+    case ADD:       DerBinaryOpertion<ADD>::derf(X,Y,f,D);        break;\
+    case SUB:       DerBinaryOpertion<SUB>::derf(X,Y,f,D);        break;\
+    case MUL:       DerBinaryOpertion<MUL>::derf(X,Y,f,D);        break;\
+    case DIV:       DerBinaryOpertion<DIV>::derf(X,Y,f,D);        break;\
+    case NEG:       DerBinaryOpertion<NEG>::derf(X,Y,f,D);        break;\
+    case EXP:       DerBinaryOpertion<EXP>::derf(X,Y,f,D);        break;\
+    case LOG:       DerBinaryOpertion<LOG>::derf(X,Y,f,D);        break;\
+    case POW:       DerBinaryOpertion<POW>::derf(X,Y,f,D);        break;\
+    case CONSTPOW:  DerBinaryOpertion<CONSTPOW>::derf(X,Y,f,D);   break;\
+    case SQRT:      DerBinaryOpertion<SQRT>::derf(X,Y,f,D);       break;\
+    case SIN:       DerBinaryOpertion<SIN>::derf(X,Y,f,D);        break;\
+    case COS:       DerBinaryOpertion<COS>::derf(X,Y,f,D);        break;\
+    case TAN:       DerBinaryOpertion<TAN>::derf(X,Y,f,D);        break;\
+    case ASIN:      DerBinaryOpertion<ASIN>::derf(X,Y,f,D);       break;\
+    case ACOS:      DerBinaryOpertion<ACOS>::derf(X,Y,f,D);       break;\
+    case ATAN:      DerBinaryOpertion<ATAN>::derf(X,Y,f,D);       break;\
+    case STEP:      DerBinaryOpertion<STEP>::derf(X,Y,f,D);       break;\
+    case FLOOR:     DerBinaryOpertion<FLOOR>::derf(X,Y,f,D);      break;\
+    case CEIL:      DerBinaryOpertion<CEIL>::derf(X,Y,f,D);       break;\
+    case EQUALITY:  DerBinaryOpertion<EQUALITY>::derf(X,Y,f,D);   break;\
+    case FABS:      DerBinaryOpertion<FABS>::derf(X,Y,f,D);        break;\
+    case SIGN:      DerBinaryOpertion<SIGN>::derf(X,Y,f,D);        break;\
+    case ERF:       DerBinaryOpertion<ERF>::derf(X,Y,f,D);        break;\
+    case FMIN:      DerBinaryOpertion<FMIN>::derf(X,Y,f,D);       break;\
+    case FMAX:      DerBinaryOpertion<FMAX>::derf(X,Y,f,D);       break;\
+    case INV:       DerBinaryOpertion<INV>::derf(X,Y,f,D);         break;\
+    case SINH:      DerBinaryOpertion<SINH>::derf(X,Y,f,D);        break;\
+    case COSH:      DerBinaryOpertion<COSH>::derf(X,Y,f,D);        break;\
+    case TANH:      DerBinaryOpertion<TANH>::derf(X,Y,f,D);        break;\
+    case ERFINV:    DerBinaryOpertion<ERFINV>::derf(X,Y,f,D);        break;\
+    case PRINTME:   DerBinaryOpertion<PRINTME>::derf(X,Y,f,D);     break;\
+  }
   
   CASADI_MATH_DERF(T,op,x,y,f,d)
 }
