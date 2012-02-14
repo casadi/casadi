@@ -142,6 +142,16 @@ void SQPInternal::init(){
 void SQPInternal::evaluate(int nfdir, int nadir){
   casadi_assert(nfdir==0 && nadir==0);
   
+  checkInitialBounds();
+    
+  // Set the static parameter
+  if (parametric_) {
+    if (!F_.isNull()) F_.setInput(input(NLP_P),F_.getNumInputs()-1);
+    if (!G_.isNull()) G_.setInput(input(NLP_P),G_.getNumInputs()-1);
+    if (!H_.isNull()) H_.setInput(input(NLP_P),H_.getNumInputs()-1);
+    if (!J_.isNull()) J_.setInput(input(NLP_P),J_.getNumInputs()-1);
+  }
+  
   // Initial guess
   DMatrix x = input(NLP_X_INIT);
 
