@@ -264,7 +264,7 @@ int meta< CasADi::GenericType >::as(PyObject * p,CasADi::GenericType &s) {
 
 template <>
 bool meta< CasADi::GenericType >::couldbe(PyObject * p) {
-  return meta< CasADi::GenericType >::isa(p) || PyBool_Check(p) ||  PyInt_Check(p) || PyFloat_Check(p) || PyString_Check(p) || meta< std::vector<double> >::couldbe(p) || meta< CasADi::FX >::couldbe(p) || meta< std::vector<std::string> >::couldbe(p) || ( PyType_Check(p) && PyObject_HasAttrString(p,"creator")) || PyType_Check(p) || meta< CasADi::GenericType::Dictionary >::couldbe(p);
+  return meta< CasADi::GenericType >::isa(p) || PyBool_Check(p) ||  PyInt_Check(p) || PyFloat_Check(p) || PyString_Check(p) || meta< std::vector<double> >::couldbe(p) || meta< CasADi::FX >::couldbe(p) || meta< std::vector<std::string> >::couldbe(p) || PyType_Check(p) || meta< CasADi::GenericType::Dictionary >::couldbe(p);
 
   
   }
