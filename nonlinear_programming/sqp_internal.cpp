@@ -75,8 +75,13 @@ void SQPInternal::init(){
   // QP solver
   int n = input(NLP_X_INIT).size();
   
+  
+  if (getOption("hessian_approximation")=="exact" && H_.isNull()) {
+    casadi_error("SQPInternal::evaluate: you set option 'hessian_approximation' to 'exact', but no hessian was supplied. Suggest using 'generate_hessian' option.");
+  }
+  
   // Allocate a QP solver
-  CRSSparsity H_sparsity = sp_dense(n,n);
+  CRSSparsity H_sparsity = getOption("hessian_approximation")=="exact"? H_.output().sparsity() : sp_dense(n,n);
   CRSSparsity A_sparsity = J_.isNull() ? CRSSparsity(0,n,false) : J_.output().sparsity();
 
   QPSolverCreator qp_solver_creator = getOption("qp_solver");
@@ -138,10 +143,7 @@ void SQPInternal::init(){
   
   SXFunction z(z_in,lgrad);
   lfcn.init();*/
-  
-  if (getOption("hessian_approximation")=="exact" && H_.isNull()) {
-    casadi_error("SQPInternal::evaluate: you set option 'hessian_approximation' to 'exact', but no hessian was supplied. Suggest using 'generate_hessian' option.");
-  }
+
   
 }
 
@@ -296,7 +298,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     DMatrix lambda_x_hat = qp_solver_.output(QP_DUAL_X);
     
     // Get the gradient of the Lagrangian
-    DMatrix gradL = F_.adjSens() - (G_.isNull() ? 0 : mul(trans(Jgk),lambda_hat)) - lambda_x_hat;
+    DMatrix gradL = gfk - (G_.isNull() ? 0 : mul(trans(Jgk),lambda_hat)) - lambda_x_hat;
     
     // Pass adjoint seeds to g
     //gfcn.setAdjSeed(lambda_hat);
@@ -475,7 +477,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
 
     if (getOption("hessian_approximation")=="BFGS") {
       // Complete the damped BFGS update (Procedure 18.2 in Nocedal)
-      DMatrix gradL_new = gfk - ( G_.isNull() ? 0 : mul(trans(Jgk),lambda_k) ) - lambda_x_k;
+      DMatrix gradL_new = gfk - ( G_.isNull() ? 0 : mul(trans(Jgk),lambda_hat) ) - lambda_x_hat;
       DMatrix yk = gradL_new - gradL;
       DMatrix Bdx = mul(Bk,dx);
       DMatrix dxBdx = mul(trans(dx),Bdx);
