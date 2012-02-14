@@ -214,8 +214,8 @@ void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, std::vector<Matrix
   
   // Now filter out the variables from the algorithm
   for(vector<SXAlgEl>::iterator it=algorithm.begin(); it!=algorithm.end(); ++it){
-    it->ch[0] = filter[it->ch[0]];
-    it->ch[1] = filter[it->ch[1]];
+    it->arg.i[0] = filter[it->arg.i[0]];
+    it->arg.i[1] = filter[it->arg.i[1]];
   }
   
   // Filter the variables from the dependent expressions

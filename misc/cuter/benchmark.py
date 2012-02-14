@@ -8,7 +8,7 @@ os.system('rm cuter_results/*.out')
 os.system('rm cuter_results/*.err')
 
 # For all the problems
-for fullname in glob.glob('cuter_nl2' + '/*.nl'):
+for fullname in glob.glob('cuter_nl' + '/*.nl'):
 
   # Filename
   nlfile = os.path.basename(fullname)

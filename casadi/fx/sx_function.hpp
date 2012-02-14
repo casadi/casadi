@@ -27,23 +27,29 @@
 
 namespace CasADi{
 
-/** \brief  An elemenent of the algorithm, namely a binary operation */
+#ifndef SWIG
+
+/** \brief  An atomic operation for the SX virtual machine */
 struct SXAlgEl{
-  /// operator
-  unsigned char op; 
-  /// index of the result
-  int ind; 
-  /// indices of the arguments
-  int ch[2]; 
+  /// Operator index
+  int op; 
+  
+  /// Output argument (typically the index of the result)
+  int res;
+  
+  /// Input argument
+  union{
+    
+    /// Floating point constant
+    double d;
+  
+    /// Integer constant (typically the indices of the arguments)
+    int i[2]; 
+
+  } arg;
 };
 
-} // namespace CasADi
-
-#ifdef SWIG
-%template(SXAlgElVector) std::vector<CasADi::SXAlgEl>;
 #endif // SWIG
-
-namespace CasADi{
 
 /// Forward declaration of internal class
 class SXFunctionInternal;
@@ -140,9 +146,26 @@ public:
   /** \brief Generate C code for the function */
   void generateCode(const std::string& filename);
   
-  /** \brief Access the algorithm */
+#ifndef SWIG
+  /** \brief Access the algorithm directly */
   const std::vector<SXAlgEl>& algorithm() const;
+#endif // SWIG
   
+  /** \brief Get the number of atomic operations */
+  int getAlgorithmSize() const{ return algorithm().size();}
+
+  /** \brief Get an atomic operation operator index */
+  int getAtomicOperation(int k) const{ return algorithm().at(k).op;}
+
+  /** \brief Get the (integer) input arguments of an atomic operation */
+  std::pair<int,int> getAtomicInput(int k) const{ const int* i = algorithm().at(k).arg.i; return std::pair<int,int>(i[0],i[1]);}
+
+  /** \brief Get the floating point output argument of an atomic operation */
+  double getAtomicInputReal(int k) const{ return algorithm().at(k).arg.d;}
+
+  /** \brief Get the (integer) output argument of an atomic operation */
+  int getAtomicOutput(int k) const{ return algorithm().at(k).res;}
+
   /** \brief Number of nodes in the algorithm */
   int countNodes() const;
   

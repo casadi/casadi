@@ -70,9 +70,9 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   }
 
   // Shorthands
-  #define x work_[it->ch[0]]
-  #define y work_[it->ch[1]]
-  #define f work_[it->ind]
+  #define x work_[it->arg.i[0]]
+  #define y work_[it->arg.i[1]]
+  #define f work_[it->res]
 
   // Evaluate the algorithm
   if(nfdir==0 && nadir==0){ // without taping
@@ -133,7 +133,7 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
     vector<AlgEl>::const_iterator it = algorithm_.begin();
     vector<AlgElData>::const_iterator it2 = pder_.begin();
     for(; it!=algorithm_.end(); ++it, ++it2){
-      dwork_[it->ind] = it2->d[0] * dwork_[it->ch[0]] + it2->d[1] * dwork_[it->ch[1]];
+      dwork_[it->res] = it2->d[0] * dwork_[it->arg.i[0]] + it2->d[1] * dwork_[it->arg.i[1]];
     }
   
     // Get the forward sensitivities
@@ -167,8 +167,8 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
 
     for(; it!=algorithm_.rend(); ++it, ++it2){
       // copy the seed and clear the cache entry
-      double seed = dwork_[it->ind];
-      dwork_[it->ind] = 0;
+      double seed = dwork_[it->res];
+      dwork_[it->res] = 0;
       dwork_[it->ch[0]] += it2->d[0] * seed;
       dwork_[it->ch[1]] += it2->d[1] * seed;
     }
@@ -178,11 +178,11 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
       const AlgElData& aed = pder_[i];
       
       // copy the seed and clear the cache entry
-      double seed = dwork_[ae.ind];
-      dwork_[ae.ind] = 0;
+      double seed = dwork_[ae.res];
+      dwork_[ae.res] = 0;
 
-      dwork_[ae.ch[0]] += aed.d[0] * seed;
-      dwork_[ae.ch[1]] += aed.d[1] * seed;
+      dwork_[ae.arg.i[0]] += aed.d[0] * seed;
+      dwork_[ae.arg.i[1]] += aed.d[1] * seed;
     }
     #endif
     // Collect the adjoint sensitivities
@@ -219,9 +219,9 @@ void SXFunctionInternal::print(ostream &stream) const{
     op -= NUM_BUILT_IN_OPS*ip;
     
     stringstream s,s0,s1;
-    s << "a" << it->ind;
+    s << "a" << it->res;
 
-    int i0 = it->ch[0], i1 = it->ch[1];
+    int i0 = it->arg.i[0], i1 = it->arg.i[1];
     s0 << "a" << i0;
     s1 << "a" << i1;
     
@@ -265,7 +265,7 @@ void SXFunctionInternal::printOperation(std::ostream &stream, int i) const{
     } else if(f->dep(c)->hasDep() && refcount_[f->dep(c)->temp-1]==1) {
       printOperation(stream,f->dep(c)->temp-1);
     } else {
-      stream << "a" << ae.ch[c];
+      stream << "a" << ae.arg.i[c];
     }
   }
   casadi_math<double>::printPost(ae.op,stream);
@@ -427,11 +427,11 @@ void SXFunctionInternal::generateCode(const string& src_name){
    // Get a pointer to the expression
    const SX& f = *f_it;
    
-    if(!declared[it->ind]){
+    if(!declared[it->res]){
       cfile << "d ";
-      declared[it->ind]=true;
+      declared[it->res]=true;
     }
-    cfile << "a" << it->ind << "=";
+    cfile << "a" << it->res << "=";
     printOperation(cfile,ii);
     cfile  << ";" << endl;
   }
@@ -448,7 +448,7 @@ void SXFunctionInternal::generateCode(const string& src_name){
       if(i==0){ // constant
         cfile << f->getValue();
       } else if(i>0){ // binary node
-        cfile << "a" << algorithm_[i-1].ind;
+        cfile << "a" << algorithm_[i-1].res;
       } else { // input feedthrough
         cfile << "a" << (-i-1);
       }
@@ -668,14 +668,14 @@ void SXFunctionInternal::init(){
   for(int i=0; i<algorithm_.size(); ++i, ++it){
 
     // Save the node index
-    it->ind = place[binops_[i]->temp];
+    it->res = place[binops_[i]->temp];
     
     // Save the indices of the children
-    it->ch[0] = place[binops_[i]->dep(0).get()->temp];
-    it->ch[1] = place[binops_[i]->dep(1).get()->temp];
+    it->arg.i[0] = place[binops_[i]->dep(0).get()->temp];
+    it->arg.i[1] = place[binops_[i]->dep(1).get()->temp];
     
     // Make sure that the first argument is equal to the index, if possible
-//     if(it->ch[1]==it->ind && 
+//     if(it->ch[1]==it->res && 
 //       casadi_math<double>::isCommutative(it->op) && 
 //       ndeps==2){
 //       std::swap(it->ch[0],it->ch[1]);
@@ -687,7 +687,7 @@ void SXFunctionInternal::init(){
     // Replace inplace operations
     if(evaluate_inplace_){
       // Check if the operation can be performed inplace
-      if(it->ch[0]==it->ind){
+      if(it->arg.i[0]==it->res){
         int ip;
         switch(it->op){
           case ADD: ip=1; break;
@@ -733,8 +733,8 @@ void SXFunctionInternal::init(){
               refcount_copy.at(c.get()->temp) = -1;
               
               // Save the indices of the children
-              it->ch[0] = place[c_temp0];
-              it->ch[1] = place[c_temp1];
+              it->arg.i[0] = place[c_temp0];
+              it->arg.i[1] = place[c_temp1];
 
               // Replace operation with an inplace operation
               it->op = ip*NUM_BUILT_IN_OPS + c->getOp();
@@ -746,13 +746,13 @@ void SXFunctionInternal::init(){
         }
       }
       // Save index
-      curr_assign[it->ind] = binops_[i]->temp;
+      curr_assign[it->res] = binops_[i]->temp;
     }
   }
   
   if(num_inplace>0){
     if(verbose()){
-      cout << "SXFunctionInternal::init Located " << num_inplace << " inplace operators" << endl;
+      cout << "SXFunctionInternal::init Replacing " << num_inplace << " inplace operators" << endl;
     }
     
     vector<AlgEl> algorithm_new;
@@ -984,7 +984,7 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
     
     // Assign to the symbolic work vector
     for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it, ++f_it){
-      swork_[it->ind] = *f_it;
+      swork_[it->res] = *f_it;
     }
     
   } else {
@@ -1000,15 +1000,15 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
     for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it<algorithm_.end(); ++it){
 
       // Get the arguments
-      SX x = swork_[it->ch[0]];
-      SX y = swork_[it->ch[1]];
+      SX x = swork_[it->arg.i[0]];
+      SX y = swork_[it->arg.i[1]];
       if(eliminate_constants && x.isConstant() && y.isConstant()){
         // Check if both arguments are constants
         double temp;
         casadi_math<double>::fun(it->op,x.getValue(),y.getValue(),temp);
-        swork_[it->ind] = temp;
+        swork_[it->res] = temp;
       } else {
-        casadi_math<SX>::fun(it->op,x,y,swork_[it->ind]);
+        casadi_math<SX>::fun(it->op,x,y,swork_[it->res]);
       }
     }
 
@@ -1040,7 +1040,7 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
   der2.reserve(algorithm_.size());
   SX tmp[2];
   for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
-      const SX& f = swork_[it->ind];
+      const SX& f = swork_[it->res];
       const SX& x = f->dep(0);
       const SX& y = f->dep(1);
       casadi_math<SX>::der(it->op,x,y,f,tmp);
@@ -1078,13 +1078,13 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
       const AlgEl& ae = algorithm_[k];
       
       // First argument
-      if(!g[ae.ch[0]]->isZero() &&  !der1[k]->isZero()){
-        g[ae.ind] += der1[k] * g[ae.ch[0]];
+      if(!g[ae.arg.i[0]]->isZero() &&  !der1[k]->isZero()){
+        g[ae.res] += der1[k] * g[ae.arg.i[0]];
       }
       
       // Second argument
-      if(!g[ae.ch[1]]->isZero() &&  !der2[k]->isZero()){
-        g[ae.ind] += der2[k] * g[ae.ch[1]];
+      if(!g[ae.arg.i[1]]->isZero() &&  !der2[k]->isZero()){
+        g[ae.res] += der2[k] * g[ae.arg.i[1]];
       }
     }
     
@@ -1124,17 +1124,17 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
       const AlgEl& ae = algorithm_[k];
 
       // Get the seed
-      SX seed = g[ae.ind];
+      SX seed = g[ae.res];
       
       // Clear the seed
-      g[ae.ind] = 0;
+      g[ae.res] = 0;
 
       // Propagate if the seed is not zero
       if(!seed->isZero()){
         if(!der1[k]->isZero())
-          g[ae.ch[0]] += der1[k] * seed;
+          g[ae.arg.i[0]] += der1[k] * seed;
         if(!der2[k]->isZero())
-          g[ae.ch[1]] += der2[k] * seed;
+          g[ae.arg.i[1]] += der2[k] * seed;
       }
     }
     
@@ -1191,7 +1191,7 @@ FX SXFunctionInternal::jacobian(const vector<pair<int,int> >& jblocks){
 void SXFunctionInternal::spProp(bool fwd){
   if(fwd){
     for(std::vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-      iwork_[it->ind] = iwork_[it->ch[0]] | iwork_[it->ch[1]];
+      iwork_[it->res] = iwork_[it->arg.i[0]] | iwork_[it->arg.i[1]];
     }
   } else {
     // The following is commented out due to bug(?) in Mac using old gcc
@@ -1200,14 +1200,14 @@ void SXFunctionInternal::spProp(bool fwd){
       AlgEl *it = &algorithm_[i];
       
       // Get the seed
-      bvec_t seed = iwork_[it->ind];
+      bvec_t seed = iwork_[it->res];
       
       // Clear the seed
-      iwork_[it->ind] = 0;
+      iwork_[it->res] = 0;
       
       // Propagate seeds
-      iwork_[it->ch[0]] |= seed;
-      iwork_[it->ch[1]] |= seed;
+      iwork_[it->arg.i[0]] |= seed;
+      iwork_[it->arg.i[1]] |= seed;
     }
   }
 }
