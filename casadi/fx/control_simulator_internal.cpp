@@ -279,6 +279,24 @@ Matrix<double> ControlSimulatorInternal::getVFine() const {
 std::vector< int > ControlSimulatorInternal::getCoarseIndex() const {
    return range(0,grid_.size(),nf_);
 }
+
+void ControlSimulatorInternal::updateNumSens(bool recursive){
+  if (recursive) {
+    FXInternal::updateNumSens(recursive);
+  }
+  
+  if (!output_fcn_.isNull()) {
+    output_fcn_.setOption("number_of_fwd_dir",getOption("number_of_fwd_dir"));
+    output_fcn_.updateNumSens();
+  }
+  
+  if (!integrator_.isNull()) {
+    integrator_.setOption("number_of_fwd_dir",getOption("number_of_fwd_dir"));
+    integrator_.updateNumSens();
+  }
+  
+}
+
  	
 
 } // namespace CasADi

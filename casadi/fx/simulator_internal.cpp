@@ -67,6 +67,8 @@ void SimulatorInternal::init(){
     output_fcn_ = SXFunction(arg,out);
   }
   
+  SimulatorInternal::updateNumSens(false);
+  
   // Initialize the output function
   output_fcn_.init();
   
@@ -193,6 +195,23 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
     
   }
 
+}
+
+void SimulatorInternal::updateNumSens(bool recursive){
+
+  if (recursive) {
+    FXInternal::updateNumSens(recursive);
+  }
+  
+  if (!output_fcn_.isNull()) {
+    output_fcn_.setOption("number_of_fwd_dir",getOption("number_of_fwd_dir"));
+    output_fcn_.updateNumSens();
+  }
+    
+  if (!integrator_.isNull()) {
+    integrator_.setOption("number_of_fwd_dir",getOption("number_of_fwd_dir"));
+    integrator_.updateNumSens();
+  }
 }
 
 } // namespace CasADi
