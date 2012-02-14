@@ -134,8 +134,13 @@ XFunctionInternalCommon<DerivedType,MatType,NodeType>::XFunctionInternalCommon(
 
   // Allocate space for outputs
   setNumOutputs(outputv_.size());
-  for(int i=0; i<output_.size(); ++i)
-    output(i) = DMatrix(outputv_[i].sparsity());
+  for(int i=0; i<output_.size(); ++i) {
+    if (outputv_[i].isNull()) { // Output arguments can be null
+      output(i) = DMatrix();
+    } else {
+      output(i) = DMatrix(outputv_[i].sparsity());
+    }
+  }
 }
 
 
