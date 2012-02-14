@@ -66,11 +66,11 @@ void SimulatorInternal::init(){
     // Create the output function
     output_fcn_ = SXFunction(arg,out);
   }
-  
-  SimulatorInternal::updateNumSens(false);
-  
+
   // Initialize the output function
   output_fcn_.init();
+  
+  SimulatorInternal::updateNumSens(false);
   
   // Check if the output function accepts correct inputs
   for (int i=0;i<INTEGRATOR_NUM_IN;++i) {
