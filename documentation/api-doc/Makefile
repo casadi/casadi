@@ -27,7 +27,8 @@ swig:
 full: doxpublish
 	cd ../examples && make
 	cd ../tutorials/python && python make_tutorials.py
-	cd ../tutorials/cpp && make
+	#cd ../tutorials/cpp && make
+	cd ../users_guide && make
 	cd ../cheatsheet && make
 	python extra/generate_options_doc.py
 	python extra/fetch_examples_pdf.py

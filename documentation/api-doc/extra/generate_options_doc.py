@@ -69,7 +69,11 @@ for c in classes:
   if not(temp is None):
     meta['file']=temp.attrib["file"]
 
-
+for v in metadata.values(): # Remove templating if not in index.xml
+  for i,vv in enumerate(v['parents']):
+    if not(vv in metadata):
+      v['parents'][i] = vv.split("<")[0]
+      
 # Get the parents of a class
 def parents(name):
   return metadata[name]['parents'] + sum(map(parents,metadata[name]['parents']),[])
@@ -141,6 +145,11 @@ parse_match = Literal("addOption(") + parse_quoted_string.setResultsName("name")
 # Inspect anything that has FXInternal as Base Class
 for name,meta in metadata.items():
   if not('CasADi::OptionsFunctionalityNode' in meta['hierarchy']) and not(name=='CasADi::OptionsFunctionalityNode'):
+    continue
+  if not('file' in meta):
+    meta['options']={}
+    meta['stats']={}
+    meta['monitors']={}
     continue
   source = re.sub(r'\.hpp$',r'.cpp',meta['file'])
   meta['options']={}

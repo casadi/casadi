@@ -1,11 +1,32 @@
 \documentclass[a4paper,8pt,twocolumn]{article}
 
 \usepackage{fullpage}
+\usepackage{multirow}
 
 \begin{document}
 \title{CasADi Python cheatsheet}
 \date{}
 \maketitle
+
+\begin{center}
+\begin{table}
+\begin{tabular}{ll|lll}
+ & & scalar & dense & sparse \\
+\hline
+\multirow{2}{*}{SX} & sym & \verb|SX("x")| & \verb|ssym("x",n,m)|  &  \\ 
+    & num & \verb|SX(d)|  & \verb|SXMatrix(d)|  & \verb|SXMatrix(sp,d)| \\
+\hline
+\multirow{2}{*}{MX} & sym & - & \verb|msym("x",n,m)|  & \verb|msym("x",sp)|\\
+    & num & - & \verb|MX(d)| &  \verb|MX(DMatrix(sp,d))| \\
+\hline
+    & DMatrix & -  & \verb|DMatrix(d)|  & \verb|DMatrix(sp,d)| \\
+\end{tabular}
+\caption{\texttt{d} is a real number, \texttt{n} and \texttt{m} are integers }
+\label{tab:constr}
+\end{table}
+\end{center}
+
+
 
 \paragraph{Header}
 \begin{verbatim}

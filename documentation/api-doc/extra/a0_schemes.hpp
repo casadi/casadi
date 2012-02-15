@@ -49,7 +49,7 @@
 <tr><td>NLP_LBG</td><td>Constraints lower bound (m x 1), default -inf.</td></tr>
 <tr><td>NLP_UBG</td><td>Constraints upper bound (m x 1), default +inf.</td></tr>
 <tr><td>NLP_LAMBDA_INIT</td><td>Lagrange multipliers associated with G, initial guess (m x 1)</td></tr>
-<tr><td>NLP_P</td><td>Static parameters on which the objective and constraints might depend.</td></tr>
+<tr><td>NLP_P</td><td>Only for parametric NLP - static parameters on which the objective and constraints might depend.</td></tr>
 </table>
 */
 /** \defgroup scheme_DAEInput
@@ -388,20 +388,6 @@
 <br/>
 @copydoc scheme_IntegratorOutput
 */
-/** \class CasADi::CplexInternal
-\n
-\par
-@copydoc scheme_NLPInput
-<br/>
-@copydoc scheme_NLPOutput
-*/
-/** \class CasADi::CplexSolver
-\n
-\par
-@copydoc scheme_NLPInput
-<br/>
-@copydoc scheme_NLPOutput
-*/
 /** \class CasADi::Sundials::IdasInternal
 \n
 \par
@@ -467,6 +453,20 @@
 \n
 \par
 @copydoc scheme_ControlSimulatorInput
+*/
+/** \class CasADi::CplexInternal
+\n
+\par
+@copydoc scheme_NLPInput
+<br/>
+@copydoc scheme_NLPOutput
+*/
+/** \class CasADi::CplexSolver
+\n
+\par
+@copydoc scheme_NLPInput
+<br/>
+@copydoc scheme_NLPOutput
 */
 /** \class CasADi::GSL::GslInternal
 \n

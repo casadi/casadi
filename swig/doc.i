@@ -166,7 +166,7 @@ Joel Andersson
 |              |              |              | equal to     |              |
 |              |              |              | abstol]      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| fsens_err_co | OT_INTEGER   | false        | include the  | CasADi::Inte |
+| fsens_err_co | OT_BOOLEAN   | false        | include the  | CasADi::Inte |
 | n            |              |              | forward sens | gratorIntern |
 |              |              |              | itivities in | al           |
 |              |              |              | all error    |              |
@@ -639,6 +639,11 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::AcadoIntegrator::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
 %feature("docstring")  CasADi::AcadoIntegrator::evaluate_old "
 
 Evaluate (old style) ";
@@ -1042,7 +1047,7 @@ thus x := [xd,xa]
 |              |              |              | equal to     |              |
 |              |              |              | abstol]      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| fsens_err_co | OT_INTEGER   | false        | include the  | CasADi::Inte |
+| fsens_err_co | OT_BOOLEAN   | false        | include the  | CasADi::Inte |
 | n            |              |              | forward sens | gratorIntern |
 |              |              |              | itivities in | al           |
 |              |              |              | all error    |              |
@@ -1414,6 +1419,11 @@ Set final time. ";
 
 Evaluate switch. ";
 
+%feature("docstring")  CasADi::AcadoIntegratorInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
 %feature("docstring")  CasADi::AcadoIntegratorInternal::jacobian_switch "
 
 Switch between numeric and symbolic jacobian. ";
@@ -1449,12 +1459,6 @@ Print. ";
 %feature("docstring")  CasADi::AcadoIntegratorInternal::repr "
 
 Print. ";
-
-%feature("docstring")
-CasADi::AcadoIntegratorInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::AcadoIntegratorInternal::getPartition "
 
@@ -1994,6 +1998,11 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::AcadoOCP::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
 %feature("docstring")  CasADi::AcadoOCP::evaluate_old "
 
 Evaluate (old style) ";
@@ -2431,6 +2440,11 @@ Solve the problem. ";
 
 Evaluate switch. ";
 
+%feature("docstring")  CasADi::AcadoOCPInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
 %feature("docstring")  CasADi::AcadoOCPInternal::jacobian "
 
 Calculate the jacobian of a number of function outputs with respect to a
@@ -2471,11 +2485,6 @@ Print. ";
 %feature("docstring")  CasADi::AcadoOCPInternal::repr "
 
 Print. ";
-
-%feature("docstring")  CasADi::AcadoOCPInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::AcadoOCPInternal::getPartition "
 
@@ -2680,9 +2689,9 @@ Check if the object has been initialized. ";
 Assert that the object has been initialized. ";
 
 
-// File: classCasADi_1_1AddBinaryOperation.xml
+// File: structCasADi_1_1AddBinaryOperation.xml
 %feature("docstring") CasADi::AddBinaryOperation "C++ includes:
-casadi_math.hpp ";
+casadi_calculus.hpp ";
 
 
 // File: structCasADi_1_1AlgElData.xml
@@ -2739,11 +2748,11 @@ Print a description. ";
 
 Print expression (make sure number of calls is not exceeded) ";
 
-%feature("docstring")  CasADi::BinaryOp::evaluate "
+%feature("docstring")  CasADi::BinaryOp::evaluateD "
 
 Evaluate the function. ";
 
-%feature("docstring")  CasADi::BinaryOp::evaluate "
+%feature("docstring")  CasADi::BinaryOp::evaluateD "
 
 Evaluate the function, no derivatives. ";
 
@@ -2865,17 +2874,13 @@ Set multiple dependencies. ";
 
 Add a dependency. ";
 
-%feature("docstring")  CasADi::BinaryOp::addDependency "
+%feature("docstring")  CasADi::BinaryOp::assign "
 
-Add a dependency (index given) ";
+Assign nonzeros (mapping matrix) ";
 
-%feature("docstring")  CasADi::BinaryOp::addDependency "
+%feature("docstring")  CasADi::BinaryOp::assign "
 
-Add a dependency (mapping matrix) ";
-
-%feature("docstring")  CasADi::BinaryOp::addDependency "
-
-Add a dependency (mapping matrix) ";
+Assign nonzeros (mapping matrix), output indices sequential. ";
 
 %feature("docstring")  CasADi::BinaryOp::numel "
 
@@ -2910,96 +2915,94 @@ Check if the object has been initialized. ";
 Assert that the object has been initialized. ";
 
 
-// File: classCasADi_1_1BinaryOperation.xml
+// File: structCasADi_1_1BinaryOperation.xml
 %feature("docstring") CasADi::BinaryOperation "C++ includes:
-casadi_math.hpp ";
+casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1BinaryOperation_3_01ADD_01_4.xml
+// File: structCasADi_1_1BinaryOperation_3_01ADD_01_4.xml
 %feature("docstring") CasADi::BinaryOperation< ADD > "
 
 Addition.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1BinaryOperation_3_01CONSTPOW_01_4.xml
+// File: structCasADi_1_1BinaryOperation_3_01CONSTPOW_01_4.xml
 %feature("docstring") CasADi::BinaryOperation< CONSTPOW > "
 
 Power, defined only for y constant.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1BinaryOperation_3_01DIV_01_4.xml
+// File: structCasADi_1_1BinaryOperation_3_01DIV_01_4.xml
 %feature("docstring") CasADi::BinaryOperation< DIV > "
 
 Division.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1BinaryOperation_3_01EQUALITY_01_4.xml
+// File: structCasADi_1_1BinaryOperation_3_01EQUALITY_01_4.xml
 %feature("docstring") CasADi::BinaryOperation< EQUALITY > "
 
 Equality.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1BinaryOperation_3_01FMAX_01_4.xml
+// File: structCasADi_1_1BinaryOperation_3_01FMAX_01_4.xml
 %feature("docstring") CasADi::BinaryOperation< FMAX > "
 
 Maximum.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1BinaryOperation_3_01FMIN_01_4.xml
+// File: structCasADi_1_1BinaryOperation_3_01FMIN_01_4.xml
 %feature("docstring") CasADi::BinaryOperation< FMIN > "
 
 Minimum.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1BinaryOperation_3_01MUL_01_4.xml
+// File: structCasADi_1_1BinaryOperation_3_01MUL_01_4.xml
 %feature("docstring") CasADi::BinaryOperation< MUL > "
 
 Multiplication.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1BinaryOperation_3_01POW_01_4.xml
+// File: structCasADi_1_1BinaryOperation_3_01POW_01_4.xml
 %feature("docstring") CasADi::BinaryOperation< POW > "
 
 Power, defined only for x>=0.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1BinaryOperation_3_01PRINTME_01_4.xml
+// File: structCasADi_1_1BinaryOperation_3_01PRINTME_01_4.xml
 %feature("docstring") CasADi::BinaryOperation< PRINTME > "
 
 Identity operator with the side effect of printing.
 
-C++ includes: casadi_math.hpp ";
-
-%feature("docstring")  CasADi::BinaryOperation< PRINTME >::fcn " ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1BinaryOperation_3_01SUB_01_4.xml
+// File: structCasADi_1_1BinaryOperation_3_01SUB_01_4.xml
 %feature("docstring") CasADi::BinaryOperation< SUB > "
 
 Subtraction.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1BinaryOperationE.xml
+// File: structCasADi_1_1BinaryOperationE.xml
 %feature("docstring") CasADi::BinaryOperationE "C++ includes:
-casadi_math.hpp ";
+casadi_calculus.hpp ";
 
 
 // File: classCasADi_1_1BinarySXNode.xml
@@ -3039,14 +3042,16 @@ Get value of a constant node. ";
 
 %feature("docstring")  CasADi::BinarySXNode::BinarySXNode "
 
-Constructors. ";
+Constructor, unary operation. ";
 
-%feature("docstring")  CasADi::BinarySXNode::BinarySXNode "";
+%feature("docstring")  CasADi::BinarySXNode::BinarySXNode "
+
+Constructor, binary operation. ";
 
 %feature("docstring")  CasADi::BinarySXNode::~BinarySXNode "
 
-This is a rather complex destructor which is necessary since the default
-destructor can cause stack overflow due to recursive calling. ";
+Destructor This is a rather complex destructor which is necessary since the
+default destructor can cause stack overflow due to recursive calling. ";
 
 %feature("docstring")  CasADi::BinarySXNode::isSmooth "
 
@@ -3072,7 +3077,7 @@ Get the operation. ";
 
 %feature("docstring")  CasADi::BinarySXNode::print "
 
-print ";
+Print the expression (recursively with a maximum number of levels) ";
 
 %feature("docstring")  CasADi::BinarySXNode::getName "";
 
@@ -3083,6 +3088,11 @@ comparison ";
 %feature("docstring")  CasADi::BinarySXNode::isEqual "
 
 comparison ";
+
+%feature("docstring")  CasADi::BinarySXNode::init "
+
+Initialize the node (currently used only to give a similar interface to
+MXNode) ";
 
 %feature("docstring")  CasADi::BinarySXNode::print "
 
@@ -3106,14 +3116,12 @@ Easy access to all the functions for a particular type.
 C++ includes: casadi_math.hpp ";
 
 
-// File: classCasADi_1_1casadi__operators.xml
-%feature("docstring") CasADi::casadi_operators "C++ includes:
-casadi_operators.hpp ";
+// File: classCasADi_1_1casadi__math_3_01int_01_4.xml
+%feature("docstring") CasADi::casadi_math< int > "
 
+Specialize the class so that it can be used with integer type.
 
-// File: classCasADi_1_1casadi__operators_3_01SX_01_4.xml
-%feature("docstring") CasADi::casadi_operators< SX > " C++ includes: sx.hpp
-";
+C++ includes: casadi_math.hpp ";
 
 
 // File: classCasADi_1_1CasadiException.xml
@@ -3437,6 +3445,11 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::CFunction::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::CFunction::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
 
 %feature("docstring")  CasADi::CFunction::evaluate_old "
 
@@ -3821,6 +3834,11 @@ Initialize. ";
 
 Evaluate switch. ";
 
+%feature("docstring")  CasADi::CFunctionInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
 %feature("docstring")  CasADi::CFunctionInternal::jacobian "
 
 Calculate the jacobian of a number of function outputs with respect to a
@@ -3861,11 +3879,6 @@ Print. ";
 %feature("docstring")  CasADi::CFunctionInternal::repr "
 
 Print. ";
-
-%feature("docstring")  CasADi::CFunctionInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::CFunctionInternal::getPartition "
 
@@ -4223,7 +4236,7 @@ Joel Andersson
 |              |              |              | equal to     |              |
 |              |              |              | abstol]      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| fsens_err_co | OT_INTEGER   | false        | include the  | CasADi::Inte |
+| fsens_err_co | OT_BOOLEAN   | false        | include the  | CasADi::Inte |
 | n            |              |              | forward sens | gratorIntern |
 |              |              |              | itivities in | al           |
 |              |              |              | all error    |              |
@@ -4748,6 +4761,11 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::CollocationIntegrator::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
 %feature("docstring")  CasADi::CollocationIntegrator::evaluate_old "
 
 Evaluate (old style) ";
@@ -5109,7 +5127,7 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | equal to     |              |
 |              |              |              | abstol]      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| fsens_err_co | OT_INTEGER   | false        | include the  | CasADi::Inte |
+| fsens_err_co | OT_BOOLEAN   | false        | include the  | CasADi::Inte |
 | n            |              |              | forward sens | gratorIntern |
 |              |              |              | itivities in | al           |
 |              |              |              | all error    |              |
@@ -5515,6 +5533,12 @@ CasADi::CollocationIntegratorInternal::evaluate_switch "
 
 Evaluate switch. ";
 
+%feature("docstring")  CasADi::CollocationIntegratorInternal::updateNumSens
+"
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
 %feature("docstring")
 CasADi::CollocationIntegratorInternal::jacobian_switch "
 
@@ -5552,12 +5576,6 @@ Print. ";
 %feature("docstring")  CasADi::CollocationIntegratorInternal::repr "
 
 Print. ";
-
-%feature("docstring")
-CasADi::CollocationIntegratorInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::CollocationIntegratorInternal::getPartition "
 
@@ -5831,6 +5849,11 @@ get the reference of a child ";
 %feature("docstring")  CasADi::ConstantSXNode::dep "
 
 get the reference of a child ";
+
+%feature("docstring")  CasADi::ConstantSXNode::init "
+
+Initialize the node (currently used only to give a similar interface to
+MXNode) ";
 
 %feature("docstring")  CasADi::ConstantSXNode::isSmooth "
 
@@ -6282,6 +6305,11 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::ControlSimulator::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
 %feature("docstring")  CasADi::ControlSimulator::evaluate_old "
 
 Evaluate (old style) ";
@@ -6719,6 +6747,11 @@ initialize ";
 
 Integrate. ";
 
+%feature("docstring")  CasADi::ControlSimulatorInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization.
+";
+
 %feature("docstring")  CasADi::ControlSimulatorInternal::getVFine "
 
 Get the parameters that change on a coarse time scale, sampled on the fine
@@ -6772,12 +6805,6 @@ Print. ";
 %feature("docstring")  CasADi::ControlSimulatorInternal::repr "
 
 Print. ";
-
-%feature("docstring")
-CasADi::ControlSimulatorInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::ControlSimulatorInternal::getPartition "
 
@@ -7008,12 +7035,12 @@ Assert that the object has been initialized. ";
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Static parameters on which the     |
-|                                    | objective and constraints might    |
-|                                    | depend.                            |
+| NLP_P                              | Only for parametric NLP - static   |
+|                                    | parameters on which the objective  |
+|                                    | and constraints might depend.      |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 4)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
@@ -7030,6 +7057,9 @@ Assert that the object has been initialized. ";
 |                                    | with bounds on X at the solution   |
 |                                    | (n x 1) When in warmstart mode,    |
 |                                    | this output may be used as input ( |
++------------------------------------+------------------------------------+
+| NLP_G                              | The constraints evaluated at the   |
+|                                    | optimal solution (m x 1)           |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -7181,6 +7211,18 @@ Assert that the object has been initialized. ";
 |              |              |              | (CPX_MIN or  |              |
 |              |              |              | CPX_MAX)     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| parametric   | OT_BOOLEAN   | false        | Expect F, G, | CasADi::NLPS |
+|              |              |              | H, J to have | olverInterna |
+|              |              |              | an           | l            |
+|              |              |              | additional   |              |
+|              |              |              | input        |              |
+|              |              |              | argument     |              |
+|              |              |              | appended at  |              |
+|              |              |              | the end,     |              |
+|              |              |              | denoting     |              |
+|              |              |              | fixed        |              |
+|              |              |              | parameters.  |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -7222,6 +7264,12 @@ Assert that the object has been initialized. ";
 |              |              |              | -- for       |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
+| _bounds      |              |              | initial      | olverInterna |
+|              |              |              | guess does   | l            |
+|              |              |              | not satisfy  |              |
+|              |              |              | LBX and UBX  |              |
++--------------+--------------+--------------+--------------+--------------+
 
 C++ includes: cplex_internal.hpp ";
 
@@ -7239,20 +7287,33 @@ Make a deep copy of the instance. ";
 
 %feature("docstring")  CasADi::CplexInternal::init "
 
-Initialize and make the object ready for setting arguments and evaluation.
-This method is typically called after setting options but before evaluating.
-If passed to another class (in the constructor), this class should invoke
-this function when initialized. ";
+Initialize Initialize and make the object ready for setting arguments and
+evaluation. This method is typically called after setting options but before
+evaluating. If passed to another class (in the constructor), this class
+should invoke this function when initialized. ";
 
 %feature("docstring")  CasADi::CplexInternal::evaluate "
 
 Evaluate. ";
 
-%feature("docstring")  CasADi::CplexInternal::reportConstraints "";
+%feature("docstring")  CasADi::CplexInternal::reportConstraints "
+
+Prints out a human readable report about possible constraint violations -
+all constraints. ";
+
+%feature("docstring")  CasADi::CplexInternal::checkInitialBounds "
+
+Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
+";
 
 %feature("docstring")  CasADi::CplexInternal::evaluate_switch "
 
 Evaluate switch. ";
+
+%feature("docstring")  CasADi::CplexInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
 %feature("docstring")  CasADi::CplexInternal::jacobian "
 
@@ -7294,11 +7355,6 @@ Print. ";
 %feature("docstring")  CasADi::CplexInternal::repr "
 
 Print. ";
-
-%feature("docstring")  CasADi::CplexInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::CplexInternal::getPartition "
 
@@ -7573,12 +7629,12 @@ Carlo Savorgnan
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Static parameters on which the     |
-|                                    | objective and constraints might    |
-|                                    | depend.                            |
+| NLP_P                              | Only for parametric NLP - static   |
+|                                    | parameters on which the objective  |
+|                                    | and constraints might depend.      |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 4)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
@@ -7595,6 +7651,9 @@ Carlo Savorgnan
 |                                    | with bounds on X at the solution   |
 |                                    | (n x 1) When in warmstart mode,    |
 |                                    | this output may be used as input ( |
++------------------------------------+------------------------------------+
+| NLP_G                              | The constraints evaluated at the   |
+|                                    | optimal solution (m x 1)           |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -7746,6 +7805,18 @@ Carlo Savorgnan
 |              |              |              | (CPX_MIN or  |              |
 |              |              |              | CPX_MAX)     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| parametric   | OT_BOOLEAN   | false        | Expect F, G, | CasADi::NLPS |
+|              |              |              | H, J to have | olverInterna |
+|              |              |              | an           | l            |
+|              |              |              | additional   |              |
+|              |              |              | input        |              |
+|              |              |              | argument     |              |
+|              |              |              | appended at  |              |
+|              |              |              | the end,     |              |
+|              |              |              | denoting     |              |
+|              |              |              | fixed        |              |
+|              |              |              | parameters.  |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -7786,6 +7857,12 @@ Carlo Savorgnan
 |              |              |              | evaluation   | ternal       |
 |              |              |              | -- for       |              |
 |              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+| warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
+| _bounds      |              |              | initial      | olverInterna |
+|              |              |              | guess does   | l            |
+|              |              |              | not satisfy  |              |
+|              |              |              | LBX and UBX  |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 C++ includes: cplex_solver.hpp ";
@@ -7960,6 +8037,11 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::CplexSolver::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::CplexSolver::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
 
 %feature("docstring")  CasADi::CplexSolver::evaluate_old "
 
@@ -8211,7 +8293,7 @@ reduces to standard dense row major format, which allows access to an
 arbitrary element in constant time.
 
 Since the object is reference counted (it inherits from SharedObject),
-severl matrices are allowed to share the same sparsity pattern.
+several matrices are allowed to share the same sparsity pattern.
 
 The implementations of some methods of this class has been taken from the
 CSparse package and modified to use STL and CasADi data structures.
@@ -8268,8 +8350,7 @@ point to this new object. ";
 
 %feature("docstring")  CasADi::CRSSparsity::CRSSparsity "
 
-Default constructor, optional int argument which must be zero to allows
-implicit type conversion. ";
+Default constructor. ";
 
 %feature("docstring")  CasADi::CRSSparsity::CRSSparsity "
 
@@ -8359,9 +8440,19 @@ Returns true if the pattern has a non-zero at location i,j. ";
 
 Get a set of non-zero element return -1 if the element does not exists. ";
 
+%feature("docstring")  CasADi::CRSSparsity::getNZInplace "
+
+Get the nonzero index for a set of elements The index vector is used both
+for input and outputs and must be sorted by increasing nonzero index, i.e.
+row-wise. Elements not found in the sparsity pattern are set to -1. ";
+
 %feature("docstring")  CasADi::CRSSparsity::getSparsityCRS "
 
 Get the sparsity in CRS format. ";
+
+%feature("docstring")  CasADi::CRSSparsity::getSparsityCCS "
+
+Get the sparsity in CCS format. ";
 
 %feature("docstring")  CasADi::CRSSparsity::getSparsity "
 
@@ -8370,6 +8461,11 @@ Get the sparsity in sparse triplet format. ";
 %feature("docstring")  CasADi::CRSSparsity::getSub "
 
 Get a submatrix. ";
+
+%feature("docstring")  CasADi::CRSSparsity::transpose "
+
+Transpose the matrix and get the reordering of the non-zero entries, i.e.
+the non-zeros of the original matrix for each non-zero of the new matrix. ";
 
 %feature("docstring")  CasADi::CRSSparsity::transpose "
 
@@ -8478,9 +8574,35 @@ for Sparse Linear Systems by Davis (2006). ";
 Compute the Dulmage-Mendelsohn decomposition See Direct Methods for Sparse
 Linear Systems by Davis (2006). ";
 
-%feature("docstring")  CasADi::CRSSparsity::getElementMapping "
+%feature("docstring")  CasADi::CRSSparsity::getElements "
 
-Get element index for each nonzero. ";
+Get the location of all nonzero elements. ";
+
+%feature("docstring")  CasADi::CRSSparsity::getElements "
+
+Get the location of all nonzero elements (inplace version) ";
+
+%feature("docstring")  CasADi::CRSSparsity::unidirectionalColoring "
+
+Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
+(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
+
+%feature("docstring")  CasADi::CRSSparsity::starColoring "
+
+Perform a star coloring of a symmetric matrix: A greedy distance-2 coloring
+algorithm (Algorithm 4.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) Ordering
+options: None (0), largest first (1) ";
+
+%feature("docstring")  CasADi::CRSSparsity::largestFirstOrdering "
+
+Order the rows by decreasing degree. ";
+
+%feature("docstring")  CasADi::CRSSparsity::pmult "
+
+Permute rows and/or columns Multiply the sparsity with a permutation matrix
+from the left and/or from the right P * A * trans(P), A * trans(P) or A *
+trans(P) with P defined by an index vector containing the column for each
+row. As an alternative, P can be transposed (inverted). ";
 
 %feature("docstring")  CasADi::CRSSparsity::dimString "";
 
@@ -8723,7 +8845,7 @@ Make a patten dense. ";
 
 %feature("docstring")  CasADi::CRSSparsityInternal::erase "
 
-Erase rows and/or columns. ";
+Erase rows and/or columns - does bounds checking. ";
 
 %feature("docstring")  CasADi::CRSSparsityInternal::append "
 
@@ -8735,7 +8857,7 @@ Reserve space. ";
 
 %feature("docstring")  CasADi::CRSSparsityInternal::getSub "
 
-Get a submatrix. ";
+Get a submatrix - does bounds checking. ";
 
 %feature("docstring")  CasADi::CRSSparsityInternal::getNZ "
 
@@ -8743,7 +8865,12 @@ Get the index of an existing non-zero element. ";
 
 %feature("docstring")  CasADi::CRSSparsityInternal::getNZ "
 
-Get a set of non-zero element. ";
+Get a set of non-zero element - does bounds checking. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::getNZInplace "
+
+Get the nonzero index for a set of elements (see descripion in public class)
+";
 
 %feature("docstring")  CasADi::CRSSparsityInternal::columnsSequential "
 
@@ -8754,7 +8881,7 @@ Does the columns appear sequentially on each row. ";
 Remove duplicate entries: The same indices will be removed from the mapping
 vector, which must have the same length as the number of nonzeros. ";
 
-%feature("docstring")  CasADi::CRSSparsityInternal::getElementMapping "
+%feature("docstring")  CasADi::CRSSparsityInternal::getElements "
 
 Get element index for each nonzero. ";
 
@@ -8769,6 +8896,24 @@ Print representation. ";
 %feature("docstring")  CasADi::CRSSparsityInternal::print "
 
 Print description. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::unidirectionalColoring "
+
+Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
+(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::starColoring "
+
+Perform a star coloring of a symmetric matrix: A greedy distance-2 coloring
+algorithm (Algorithm 4.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::largestFirstOrdering "
+
+Order the rows by decreasing degree. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::pmult "
+
+Permute rows and/or columns. ";
 
 %feature("docstring")  CasADi::CRSSparsityInternal::deepCopyMembers "
 
@@ -9115,6 +9260,11 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::Interfaces::CSparse::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::Interfaces::CSparse::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
 
 %feature("docstring")  CasADi::Interfaces::CSparse::evaluate_old "
 
@@ -9484,10 +9634,10 @@ C++ includes: csparse_internal.hpp ";
 
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::init "
 
-Initialize and make the object ready for setting arguments and evaluation.
-This method is typically called after setting options but before evaluating.
-If passed to another class (in the constructor), this class should invoke
-this function when initialized. ";
+Initialize Initialize and make the object ready for setting arguments and
+evaluation. This method is typically called after setting options but before
+evaluating. If passed to another class (in the constructor), this class
+should invoke this function when initialized. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::prepare "";
 
@@ -9517,6 +9667,11 @@ Evaluate. ";
 "
 
 Evaluate switch. ";
+
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::jacobian "
 
@@ -9560,12 +9715,6 @@ Print. ";
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::repr "
 
 Print. ";
-
-%feature("docstring")
-CasADi::Interfaces::CSparseInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::getPartition "
 
@@ -9935,7 +10084,7 @@ times t_i.
 |              |              |              | equations at |              |
 |              |              |              | once         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| fsens_err_co | OT_INTEGER   | false        | include the  | CasADi::Inte |
+| fsens_err_co | OT_BOOLEAN   | false        | include the  | CasADi::Inte |
 | n            |              |              | forward sens | gratorIntern |
 |              |              |              | itivities in | al           |
 |              |              |              | all error    |              |
@@ -10434,6 +10583,11 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::Sundials::CVodesIntegrator::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::evaluate_old "
 
 Evaluate (old style) ";
@@ -10806,7 +10960,7 @@ x0;
 |              |              |              | equations at |              |
 |              |              |              | once         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| fsens_err_co | OT_INTEGER   | false        | include the  | CasADi::Inte |
+| fsens_err_co | OT_BOOLEAN   | false        | include the  | CasADi::Inte |
 | n            |              |              | forward sens | gratorIntern |
 |              |              |              | itivities in | al           |
 |              |              |              | all error    |              |
@@ -11099,9 +11253,18 @@ Create a new integrator. ";
 
 Destructor. ";
 
+%feature("docstring")  CasADi::Sundials::CVodesInternal::freeCVodes "
+
+Free all CVodes memory. ";
+
 %feature("docstring")  CasADi::Sundials::CVodesInternal::init "
 
 Initialize stage. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization.
+";
 
 %feature("docstring")  CasADi::Sundials::CVodesInternal::initAdj "
 
@@ -11204,12 +11367,6 @@ Print. ";
 %feature("docstring")  CasADi::Sundials::CVodesInternal::repr "
 
 Print. ";
-
-%feature("docstring")
-CasADi::Sundials::CVodesInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::Sundials::CVodesInternal::getPartition "
 
@@ -11432,7 +11589,7 @@ Clone function. ";
 
 Print a part of the expression. ";
 
-%feature("docstring")  CasADi::Densification::evaluate "
+%feature("docstring")  CasADi::Densification::evaluateD "
 
 Evaluate the function numerically. ";
 
@@ -11464,7 +11621,7 @@ Print a description. ";
 
 Print expression (make sure number of calls is not exceeded) ";
 
-%feature("docstring")  CasADi::Densification::evaluate "
+%feature("docstring")  CasADi::Densification::evaluateD "
 
 Evaluate the function, no derivatives. ";
 
@@ -11578,17 +11735,13 @@ Set multiple dependencies. ";
 
 Add a dependency. ";
 
-%feature("docstring")  CasADi::Densification::addDependency "
+%feature("docstring")  CasADi::Densification::assign "
 
-Add a dependency (index given) ";
+Assign nonzeros (mapping matrix) ";
 
-%feature("docstring")  CasADi::Densification::addDependency "
+%feature("docstring")  CasADi::Densification::assign "
 
-Add a dependency (mapping matrix) ";
-
-%feature("docstring")  CasADi::Densification::addDependency "
-
-Add a dependency (mapping matrix) ";
+Assign nonzeros (mapping matrix), output indices sequential. ";
 
 %feature("docstring")  CasADi::Densification::isOperation "
 
@@ -11627,9 +11780,17 @@ Check if the object has been initialized. ";
 Assert that the object has been initialized. ";
 
 
-// File: classCasADi_1_1DivBinaryOperation.xml
+// File: structCasADi_1_1DerBinaryOpertion.xml
+%feature("docstring") CasADi::DerBinaryOpertion "
+
+Calculate function and derivative.
+
+C++ includes: casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1DivBinaryOperation.xml
 %feature("docstring") CasADi::DivBinaryOperation "C++ includes:
-casadi_math.hpp ";
+casadi_calculus.hpp ";
 
 
 // File: classCasADi_1_1OptimalControl_1_1EquationSorter.xml
@@ -11679,7 +11840,7 @@ Clone function. ";
 
 Print a part of the expression. ";
 
-%feature("docstring")  CasADi::Evaluation::evaluate "
+%feature("docstring")  CasADi::Evaluation::evaluateD "
 
 Evaluate the function numerically. ";
 
@@ -11743,7 +11904,7 @@ Print a description. ";
 
 Print expression (make sure number of calls is not exceeded) ";
 
-%feature("docstring")  CasADi::Evaluation::evaluate "
+%feature("docstring")  CasADi::Evaluation::evaluateD "
 
 Evaluate the function, no derivatives. ";
 
@@ -11825,17 +11986,13 @@ Set multiple dependencies. ";
 
 Add a dependency. ";
 
-%feature("docstring")  CasADi::Evaluation::addDependency "
+%feature("docstring")  CasADi::Evaluation::assign "
 
-Add a dependency (index given) ";
+Assign nonzeros (mapping matrix) ";
 
-%feature("docstring")  CasADi::Evaluation::addDependency "
+%feature("docstring")  CasADi::Evaluation::assign "
 
-Add a dependency (mapping matrix) ";
-
-%feature("docstring")  CasADi::Evaluation::addDependency "
-
-Add a dependency (mapping matrix) ";
+Assign nonzeros (mapping matrix), output indices sequential. ";
 
 %feature("docstring")  CasADi::Evaluation::isOperation "
 
@@ -12158,6 +12315,11 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::ExternalFunction::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::ExternalFunction::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
 
 %feature("docstring")  CasADi::ExternalFunction::evaluate_old "
 
@@ -12540,6 +12702,11 @@ Initialize. ";
 
 Evaluate switch. ";
 
+%feature("docstring")  CasADi::ExternalFunctionInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
 %feature("docstring")  CasADi::ExternalFunctionInternal::jacobian "
 
 Calculate the jacobian of a number of function outputs with respect to a
@@ -12580,12 +12747,6 @@ Print. ";
 %feature("docstring")  CasADi::ExternalFunctionInternal::repr "
 
 Print. ";
-
-%feature("docstring")
-CasADi::ExternalFunctionInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::ExternalFunctionInternal::getPartition "
 
@@ -13757,7 +13918,7 @@ Constructor. ";
 Print. ";
 
 
-// File: classCasADi_1_1FunctionIO.xml
+// File: structCasADi_1_1FunctionIO.xml
 %feature("docstring") CasADi::FunctionIO "
 
 Structure that contains the numerical values for the inputs or outputs of a
@@ -13765,15 +13926,7 @@ function.
 
 Joel Andersson
 
-C++ includes: function_io.hpp ";
-
-%feature("docstring")  CasADi::FunctionIO::FunctionIO "
-
-Constructor. ";
-
-%feature("docstring")  CasADi::FunctionIO::init "
-
-(Re)allocate the data ";
+C++ includes: fx.hpp ";
 
 
 // File: classCasADi_1_1FX.xml
@@ -14100,6 +14253,11 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::FX::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::FX::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
 
 %feature("docstring")  CasADi::FX::evaluate_old "
 
@@ -14478,10 +14636,15 @@ Evaluate. ";
 
 %feature("docstring")  CasADi::FXInternal::init "
 
-Initialize and make the object ready for setting arguments and evaluation.
-This method is typically called after setting options but before evaluating.
-If passed to another class (in the constructor), this class should invoke
-this function when initialized. ";
+Initialize Initialize and make the object ready for setting arguments and
+evaluation. This method is typically called after setting options but before
+evaluating. If passed to another class (in the constructor), this class
+should invoke this function when initialized. ";
+
+%feature("docstring")  CasADi::FXInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
 %feature("docstring")  CasADi::FXInternal::jacobian "
 
@@ -14523,11 +14686,6 @@ Print. ";
 %feature("docstring")  CasADi::FXInternal::repr "
 
 Print. ";
-
-%feature("docstring")  CasADi::FXInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::FXInternal::getPartition "
 
@@ -14734,6 +14892,85 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::FXInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+
+// File: classCasADi_1_1GenericMatrix.xml
+%feature("docstring") CasADi::GenericMatrix "
+
+Matrix base class This is a common base class for MX and Matrix<>,
+introducing a uniform syntax and implementing common functionality using the
+curiously recurring template pattern (CRTP) idiom. .
+
+The class is designed with the idea that \"everything is a matrix\", that
+is, also scalars and vectors.  This philosophy makes it easy to use and to
+interface in particularily with Python and Matlab/Octave.
+
+The syntax tries to stay as close as possible to the ublas syntax when it
+comes to vector/matrix operations.
+
+Index starts with 0.  Index flatten happens as follows: (i,j) -> k =
+j+i*size2()  Vectors are considered to be column vectors.
+
+The storage format is a (modified) compressed row storage (CRS) format. This
+way, a vector element can always be accessed in constant time.
+
+The sparsity can be accessed with CRSSparsity& sparsity()
+
+Joel Andersson
+
+C++ includes: generic_matrix.hpp ";
+
+%feature("docstring")  CasADi::GenericMatrix::size "
+
+Get the number of (structural) non-zero elements. ";
+
+%feature("docstring")  CasADi::GenericMatrix::sizeL "
+
+Get the number of non-zeros in the lower triangular half. ";
+
+%feature("docstring")  CasADi::GenericMatrix::sizeU "
+
+Get get the number of non-zeros in the upper triangular half. ";
+
+%feature("docstring")  CasADi::GenericMatrix::numel "
+
+Get the number of elements. ";
+
+%feature("docstring")  CasADi::GenericMatrix::size1 "
+
+Get the first dimension (i.e. n for a n-by-m matrix) ";
+
+%feature("docstring")  CasADi::GenericMatrix::size2 "
+
+Get the first dimension (i.e. m for a n-by-m matrix) ";
+
+%feature("docstring")  CasADi::GenericMatrix::size "
+
+Get the number if non-zeros for a given sparsity pattern. ";
+
+%feature("docstring")  CasADi::GenericMatrix::shape "
+
+Get the shape. ";
+
+%feature("docstring")  CasADi::GenericMatrix::empty "
+
+Check if the matrix expression is empty. ";
+
+%feature("docstring")  CasADi::GenericMatrix::dense "
+
+Check if the matrix expression is dense. ";
+
+%feature("docstring")  CasADi::GenericMatrix::scalar "
+
+Check if the matrix expression is scalar. ";
+
+%feature("docstring")  CasADi::GenericMatrix::sparsity "
+
+Get the sparsity pattern. ";
+
+%feature("docstring")  CasADi::GenericMatrix::sparsityRef "
+
+Access the sparsity, make a copy if there are multiple references to it. ";
 
 
 // File: classCasADi_1_1GenericType.xml
@@ -15141,7 +15378,7 @@ times t_i.
 |              |              |              | equal to     |              |
 |              |              |              | abstol]      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| fsens_err_co | OT_INTEGER   | false        | include the  | CasADi::Inte |
+| fsens_err_co | OT_BOOLEAN   | false        | include the  | CasADi::Inte |
 | n            |              |              | forward sens | gratorIntern |
 |              |              |              | itivities in | al           |
 |              |              |              | all error    |              |
@@ -15597,6 +15834,11 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::GSL::GslIntegrator::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
 %feature("docstring")  CasADi::GSL::GslIntegrator::evaluate_old "
 
 Evaluate (old style) ";
@@ -15947,7 +16189,7 @@ x0;
 |              |              |              | equal to     |              |
 |              |              |              | abstol]      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| fsens_err_co | OT_INTEGER   | false        | include the  | CasADi::Inte |
+| fsens_err_co | OT_BOOLEAN   | false        | include the  | CasADi::Inte |
 | n            |              |              | forward sens | gratorIntern |
 |              |              |              | itivities in | al           |
 |              |              |              | all error    |              |
@@ -16291,6 +16533,11 @@ Set final time. ";
 
 Evaluate switch. ";
 
+%feature("docstring")  CasADi::GSL::GslInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
 %feature("docstring")  CasADi::GSL::GslInternal::jacobian_switch "
 
 Switch between numeric and symbolic jacobian. ";
@@ -16326,11 +16573,6 @@ Print. ";
 %feature("docstring")  CasADi::GSL::GslInternal::repr "
 
 Print. ";
-
-%feature("docstring")  CasADi::GSL::GslInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::GSL::GslInternal::getPartition "
 
@@ -16721,7 +16963,7 @@ Joel Andersson
 | v            | R            |              |              | ials::IdasIn |
 |              |              |              |              | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
-| fsens_err_co | OT_INTEGER   | false        | include the  | CasADi::Inte |
+| fsens_err_co | OT_BOOLEAN   | false        | include the  | CasADi::Inte |
 | n            |              |              | forward sens | gratorIntern |
 |              |              |              | itivities in | al           |
 |              |              |              | all error    |              |
@@ -17223,6 +17465,11 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::Sundials::IdasIntegrator::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::evaluate_old "
 
 Evaluate (old style) ";
@@ -17629,7 +17876,7 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 | v            | R            |              |              | ials::IdasIn |
 |              |              |              |              | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
-| fsens_err_co | OT_INTEGER   | false        | include the  | CasADi::Inte |
+| fsens_err_co | OT_BOOLEAN   | false        | include the  | CasADi::Inte |
 | n            |              |              | forward sens | gratorIntern |
 |              |              |              | itivities in | al           |
 |              |              |              | all error    |              |
@@ -17920,9 +18167,18 @@ Deep copy data members. ";
 
 Destructor. ";
 
+%feature("docstring")  CasADi::Sundials::IdasInternal::freeIDAS "
+
+Free all IDAS memory. ";
+
 %feature("docstring")  CasADi::Sundials::IdasInternal::init "
 
 Initialize. ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization.
+";
 
 %feature("docstring")  CasADi::Sundials::IdasInternal::initTaping "
 
@@ -18062,12 +18318,6 @@ Print. ";
 %feature("docstring")  CasADi::Sundials::IdasInternal::repr "
 
 Print. ";
-
-%feature("docstring")
-CasADi::Sundials::IdasInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::Sundials::IdasInternal::getPartition "
 
@@ -18290,7 +18540,7 @@ Clone function. ";
 
 Print a part of the expression. ";
 
-%feature("docstring")  CasADi::IfNode::evaluate "
+%feature("docstring")  CasADi::IfNode::evaluateD "
 
 Evaluate the function numerically. ";
 
@@ -18322,7 +18572,7 @@ Print a description. ";
 
 Print expression (make sure number of calls is not exceeded) ";
 
-%feature("docstring")  CasADi::IfNode::evaluate "
+%feature("docstring")  CasADi::IfNode::evaluateD "
 
 Evaluate the function, no derivatives. ";
 
@@ -18436,17 +18686,13 @@ Set multiple dependencies. ";
 
 Add a dependency. ";
 
-%feature("docstring")  CasADi::IfNode::addDependency "
+%feature("docstring")  CasADi::IfNode::assign "
 
-Add a dependency (index given) ";
+Assign nonzeros (mapping matrix) ";
 
-%feature("docstring")  CasADi::IfNode::addDependency "
+%feature("docstring")  CasADi::IfNode::assign "
 
-Add a dependency (mapping matrix) ";
-
-%feature("docstring")  CasADi::IfNode::addDependency "
-
-Add a dependency (mapping matrix) ";
+Assign nonzeros (mapping matrix), output indices sequential. ";
 
 %feature("docstring")  CasADi::IfNode::isOperation "
 
@@ -18777,6 +19023,11 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::ImplicitFunction::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::ImplicitFunction::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
 
 %feature("docstring")  CasADi::ImplicitFunction::evaluate_old "
 
@@ -19166,6 +19417,11 @@ Solve the system of equations. ";
 
 Evaluate switch. ";
 
+%feature("docstring")  CasADi::ImplicitFunctionInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
 %feature("docstring")  CasADi::ImplicitFunctionInternal::jacobian "
 
 Calculate the jacobian of a number of function outputs with respect to a
@@ -19206,12 +19462,6 @@ Print. ";
 %feature("docstring")  CasADi::ImplicitFunctionInternal::repr "
 
 Print. ";
-
-%feature("docstring")
-CasADi::ImplicitFunctionInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::getPartition "
 
@@ -19536,6 +19786,11 @@ get the reference of a child ";
 
 get the reference of a child ";
 
+%feature("docstring")  CasADi::InfSXNode::init "
+
+Initialize the node (currently used only to give a similar interface to
+MXNode) ";
+
 %feature("docstring")  CasADi::InfSXNode::isSmooth "
 
 Check if smooth. ";
@@ -19613,6 +19868,11 @@ get the reference of a child ";
 %feature("docstring")  CasADi::IntegerSXNode::dep "
 
 get the reference of a child ";
+
+%feature("docstring")  CasADi::IntegerSXNode::init "
+
+Initialize the node (currently used only to give a similar interface to
+MXNode) ";
 
 %feature("docstring")  CasADi::IntegerSXNode::isSmooth "
 
@@ -19766,7 +20026,7 @@ Joel Andersson
 |              |              |              | equal to     |              |
 |              |              |              | abstol]      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| fsens_err_co | OT_INTEGER   | false        | include the  | CasADi::Inte |
+| fsens_err_co | OT_BOOLEAN   | false        | include the  | CasADi::Inte |
 | n            |              |              | forward sens | gratorIntern |
 |              |              |              | itivities in | al           |
 |              |              |              | all error    |              |
@@ -20203,6 +20463,11 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::Integrator::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
 %feature("docstring")  CasADi::Integrator::evaluate_old "
 
 Evaluate (old style) ";
@@ -20556,7 +20821,7 @@ Joel Andersson
 |              |              |              | equal to     |              |
 |              |              |              | abstol]      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| fsens_err_co | OT_INTEGER   | false        | include the  | CasADi::Inte |
+| fsens_err_co | OT_BOOLEAN   | false        | include the  | CasADi::Inte |
 | n            |              |              | forward sens | gratorIntern |
 |              |              |              | itivities in | al           |
 |              |              |              | all error    |              |
@@ -20895,6 +21160,11 @@ Set final time. ";
 
 Evaluate switch. ";
 
+%feature("docstring")  CasADi::IntegratorInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
 %feature("docstring")  CasADi::IntegratorInternal::jacobian_switch "
 
 Switch between numeric and symbolic jacobian. ";
@@ -20930,11 +21200,6 @@ Print. ";
 %feature("docstring")  CasADi::IntegratorInternal::repr "
 
 Print. ";
-
-%feature("docstring")  CasADi::IntegratorInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::IntegratorInternal::getPartition "
 
@@ -21131,226 +21396,6 @@ Check if the object has been initialized. ";
 Assert that the object has been initialized. ";
 
 
-// File: classCasADi_1_1InverseMapping.xml
-%feature("docstring") CasADi::InverseMapping "
-
-Maps non-zero elements.
-
-Joel Andersson
-
-C++ includes: inverse_mapping.hpp ";
-
-%feature("docstring")  CasADi::InverseMapping::InverseMapping "
-
-Constructor. ";
-
-%feature("docstring")  CasADi::InverseMapping::clone "
-
-Clone function. ";
-
-%feature("docstring")  CasADi::InverseMapping::~InverseMapping "
-
-Destructor. ";
-
-%feature("docstring")  CasADi::InverseMapping::evaluate "
-
-Evaluate the function numerically. ";
-
-%feature("docstring")  CasADi::InverseMapping::evaluateSX "
-
-Evaluate the function symbolically ( SX) ";
-
-%feature("docstring")  CasADi::InverseMapping::evaluateMX "
-
-Evaluate the function symbolically ( MX) ";
-
-%feature("docstring")  CasADi::InverseMapping::propagateSparsity "
-
-Propagate sparsity. ";
-
-%feature("docstring")  CasADi::InverseMapping::getNumOutputs "
-
-Number of outputs. ";
-
-%feature("docstring")  CasADi::InverseMapping::sparsity "
-
-Get the sparsity of output oind. ";
-
-%feature("docstring")  CasADi::InverseMapping::printPart "
-
-Print a part of the expression */. ";
-
-%feature("docstring")  CasADi::InverseMapping::sparsity "
-
-Get the sparsity. ";
-
-%feature("docstring")  CasADi::InverseMapping::isMultipleOutput "
-
-Check if a multiple output node. ";
-
-%feature("docstring")  CasADi::InverseMapping::deepCopyMembers "
-
-Deep copy data members. ";
-
-%feature("docstring")  CasADi::InverseMapping::repr "
-
-Print a representation. ";
-
-%feature("docstring")  CasADi::InverseMapping::print "
-
-Print a description. ";
-
-%feature("docstring")  CasADi::InverseMapping::print "
-
-Print expression (make sure number of calls is not exceeded) ";
-
-%feature("docstring")  CasADi::InverseMapping::evaluate "
-
-Evaluate the function, no derivatives. ";
-
-%feature("docstring")  CasADi::InverseMapping::evaluateSX "
-
-Evaluate symbolically ( SX), no derivatives. ";
-
-%feature("docstring")  CasADi::InverseMapping::evaluateMX "
-
-Evaluate symbolically ( MX), no derivatives. ";
-
-%feature("docstring")  CasADi::InverseMapping::getName "
-
-Get the name. ";
-
-%feature("docstring")  CasADi::InverseMapping::isSymbolic "
-
-Check if symbolic. ";
-
-%feature("docstring")  CasADi::InverseMapping::isConstant "
-
-Check if constant. ";
-
-%feature("docstring")  CasADi::InverseMapping::isMapping "
-
-Check if mapping. ";
-
-%feature("docstring")  CasADi::InverseMapping::isEvaluation "
-
-Check if evaluation. ";
-
-%feature("docstring")  CasADi::InverseMapping::isOutputNode "
-
-Check if evaluation output. ";
-
-%feature("docstring")  CasADi::InverseMapping::isJacobian "
-
-Check if jacobian reference. ";
-
-%feature("docstring")  CasADi::InverseMapping::isMultiplication "
-
-Check if matrix multiplication. ";
-
-%feature("docstring")  CasADi::InverseMapping::getFunction "
-
-Get function reference. ";
-
-%feature("docstring")  CasADi::InverseMapping::getFunctionInput "
-
-Get function input. ";
-
-%feature("docstring")  CasADi::InverseMapping::getFunctionOutput "
-
-Get function output. ";
-
-%feature("docstring")  CasADi::InverseMapping::dep "
-
-dependencies - functions that have to be evaluated before this one ";
-
-%feature("docstring")  CasADi::InverseMapping::dep "";
-
-%feature("docstring")  CasADi::InverseMapping::ndep "
-
-Number of dependencies. ";
-
-%feature("docstring")  CasADi::InverseMapping::hasDep "
-
-Does the node depend on other nodes. ";
-
-%feature("docstring")  CasADi::InverseMapping::isNonLinear "
-
-Is the node nonlinear. ";
-
-%feature("docstring")  CasADi::InverseMapping::setSparsity "
-
-Set the sparsity. ";
-
-%feature("docstring")  CasADi::InverseMapping::setDependencies "
-
-Set unary dependency. ";
-
-%feature("docstring")  CasADi::InverseMapping::setDependencies "
-
-Set binary dependencies. ";
-
-%feature("docstring")  CasADi::InverseMapping::setDependencies "
-
-Set ternary dependencies. ";
-
-%feature("docstring")  CasADi::InverseMapping::setDependencies "
-
-Set multiple dependencies. ";
-
-%feature("docstring")  CasADi::InverseMapping::addDependency "
-
-Add a dependency. ";
-
-%feature("docstring")  CasADi::InverseMapping::addDependency "
-
-Add a dependency (index given) ";
-
-%feature("docstring")  CasADi::InverseMapping::addDependency "
-
-Add a dependency (mapping matrix) ";
-
-%feature("docstring")  CasADi::InverseMapping::addDependency "
-
-Add a dependency (mapping matrix) ";
-
-%feature("docstring")  CasADi::InverseMapping::isOperation "
-
-Is it a certain operation. ";
-
-%feature("docstring")  CasADi::InverseMapping::numel "
-
-Number of elements. ";
-
-%feature("docstring")  CasADi::InverseMapping::size "
-
-Get size. ";
-
-%feature("docstring")  CasADi::InverseMapping::size1 "
-
-Get size. ";
-
-%feature("docstring")  CasADi::InverseMapping::size2 "
-
-Get size. ";
-
-%feature("docstring")  CasADi::InverseMapping::getCount "
-
-Get the reference count. ";
-
-%feature("docstring")  CasADi::InverseMapping::init "
-
-Initialize the object. ";
-
-%feature("docstring")  CasADi::InverseMapping::isInit "
-
-Check if the object has been initialized. ";
-
-%feature("docstring")  CasADi::InverseMapping::assertInit "
-
-Assert that the object has been initialized. ";
-
-
 // File: classCasADi_1_1IpoptInternal.xml
 %feature("docstring") CasADi::IpoptInternal "
 
@@ -21381,12 +21426,12 @@ number of constraints (A)
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Static parameters on which the     |
-|                                    | objective and constraints might    |
-|                                    | depend.                            |
+| NLP_P                              | Only for parametric NLP - static   |
+|                                    | parameters on which the objective  |
+|                                    | and constraints might depend.      |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 4)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
@@ -21403,6 +21448,9 @@ number of constraints (A)
 |                                    | with bounds on X at the solution   |
 |                                    | (n x 1) When in warmstart mode,    |
 |                                    | this output may be used as input ( |
++------------------------------------+------------------------------------+
+| NLP_G                              | The constraints evaluated at the   |
+|                                    | optimal solution (m x 1)           |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -23168,6 +23216,18 @@ number of constraints (A)
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
+| parametric   | OT_BOOLEAN   | False        | Expect F, G, | CasADi::Ipop |
+|              |              |              | H, J to have | tInternal    |
+|              |              |              | an           |              |
+|              |              |              | additional   |              |
+|              |              |              | input        |              |
+|              |              |              | argument     |              |
+|              |              |              | appended at  |              |
+|              |              |              | the end,     |              |
+|              |              |              | denoting     |              |
+|              |              |              | fixed        |              |
+|              |              |              | parameters.  |              |
++--------------+--------------+--------------+--------------+--------------+
 | pardiso_iter | OT_INTEGER   | 5000         | Maximum Size | CasADi::Ipop |
 | _coarse_size |              |              | of Coarse    | tInternal    |
 |              |              |              | Grid Matrix  |              |
@@ -24026,6 +24086,12 @@ number of constraints (A)
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
+| warn_initial | OT_BOOLEAN   | False        | Warn if the  | CasADi::Ipop |
+| _bounds      |              |              | initial      | tInternal    |
+|              |              |              | guess does   |              |
+|              |              |              | not satisfy  |              |
+|              |              |              | LBX and UBX  |              |
++--------------+--------------+--------------+--------------+--------------+
 | watchdog_sho | OT_INTEGER   | 10           | Number of    | CasADi::Ipop |
 | rtened_iter_ |              |              | shortened    | tInternal    |
 | trigger      |              |              | iterations   |              |
@@ -24102,20 +24168,33 @@ Make a deep copy of the instance. ";
 
 %feature("docstring")  CasADi::IpoptInternal::init "
 
-Initialize and make the object ready for setting arguments and evaluation.
-This method is typically called after setting options but before evaluating.
-If passed to another class (in the constructor), this class should invoke
-this function when initialized. ";
+Initialize Initialize and make the object ready for setting arguments and
+evaluation. This method is typically called after setting options but before
+evaluating. If passed to another class (in the constructor), this class
+should invoke this function when initialized. ";
 
 %feature("docstring")  CasADi::IpoptInternal::evaluate "
 
 Evaluate. ";
 
-%feature("docstring")  CasADi::IpoptInternal::reportConstraints "";
+%feature("docstring")  CasADi::IpoptInternal::reportConstraints "
+
+Prints out a human readable report about possible constraint violations -
+all constraints. ";
+
+%feature("docstring")  CasADi::IpoptInternal::checkInitialBounds "
+
+Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
+";
 
 %feature("docstring")  CasADi::IpoptInternal::evaluate_switch "
 
 Evaluate switch. ";
+
+%feature("docstring")  CasADi::IpoptInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
 %feature("docstring")  CasADi::IpoptInternal::jacobian "
 
@@ -24157,11 +24236,6 @@ Print. ";
 %feature("docstring")  CasADi::IpoptInternal::repr "
 
 Print. ";
-
-%feature("docstring")  CasADi::IpoptInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::IpoptInternal::getPartition "
 
@@ -25062,6 +25136,11 @@ Evaluate. ";
 
 Evaluate switch. ";
 
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::jacobian "
 
 Calculate the jacobian of a number of function outputs with respect to a
@@ -25104,12 +25183,6 @@ Print. ";
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::repr "
 
 Print. ";
-
-%feature("docstring")
-CasADi::Interfaces::IpoptQPInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::getPartition "
 
@@ -26125,6 +26198,11 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::Interfaces::IpoptQPSolver::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::evaluate_old "
 
 Evaluate (old style) ";
@@ -26359,6 +26437,10 @@ x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
 <= UBX                      n: number of decision variables (x)       m:
 number of constraints (A)
 
+NOTE: Even when max_iter == 0, it is not guaranteed that input(NLP_X_INIT)
+== output(NLP_X_OPT). Indeed if bounds on X or constraints are unmet, they
+will differ.
+
 >Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
@@ -26381,12 +26463,12 @@ number of constraints (A)
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Static parameters on which the     |
-|                                    | objective and constraints might    |
-|                                    | depend.                            |
+| NLP_P                              | Only for parametric NLP - static   |
+|                                    | parameters on which the objective  |
+|                                    | and constraints might depend.      |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 4)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
@@ -26403,6 +26485,9 @@ number of constraints (A)
 |                                    | with bounds on X at the solution   |
 |                                    | (n x 1) When in warmstart mode,    |
 |                                    | this output may be used as input ( |
++------------------------------------+------------------------------------+
+| NLP_G                              | The constraints evaluated at the   |
+|                                    | optimal solution (m x 1)           |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -28168,6 +28253,18 @@ number of constraints (A)
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
+| parametric   | OT_BOOLEAN   | False        | Expect F, G, | CasADi::Ipop |
+|              |              |              | H, J to have | tInternal    |
+|              |              |              | an           |              |
+|              |              |              | additional   |              |
+|              |              |              | input        |              |
+|              |              |              | argument     |              |
+|              |              |              | appended at  |              |
+|              |              |              | the end,     |              |
+|              |              |              | denoting     |              |
+|              |              |              | fixed        |              |
+|              |              |              | parameters.  |              |
++--------------+--------------+--------------+--------------+--------------+
 | pardiso_iter | OT_INTEGER   | 5000         | Maximum Size | CasADi::Ipop |
 | _coarse_size |              |              | of Coarse    | tInternal    |
 |              |              |              | Grid Matrix  |              |
@@ -29026,6 +29123,12 @@ number of constraints (A)
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
+| warn_initial | OT_BOOLEAN   | False        | Warn if the  | CasADi::Ipop |
+| _bounds      |              |              | initial      | tInternal    |
+|              |              |              | guess does   |              |
+|              |              |              | not satisfy  |              |
+|              |              |              | LBX and UBX  |              |
++--------------+--------------+--------------+--------------+--------------+
 | watchdog_sho | OT_INTEGER   | 10           | Number of    | CasADi::Ipop |
 | rtened_iter_ |              |              | shortened    | tInternal    |
 | trigger      |              |              | iterations   |              |
@@ -29254,6 +29357,11 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::IpoptSolver::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::IpoptSolver::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
 
 %feature("docstring")  CasADi::IpoptSolver::evaluate_old "
 
@@ -29817,6 +29925,11 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::Jacobian::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
 %feature("docstring")  CasADi::Jacobian::evaluate_old "
 
 Evaluate (old style) ";
@@ -30191,6 +30304,11 @@ Initialize. ";
 
 Evaluate switch. ";
 
+%feature("docstring")  CasADi::JacobianInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
 %feature("docstring")  CasADi::JacobianInternal::jacobian "
 
 Calculate the jacobian of a number of function outputs with respect to a
@@ -30231,11 +30349,6 @@ Print. ";
 %feature("docstring")  CasADi::JacobianInternal::repr "
 
 Print. ";
-
-%feature("docstring")  CasADi::JacobianInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::JacobianInternal::getPartition "
 
@@ -30457,7 +30570,7 @@ Clone function. ";
 
 Destructor. ";
 
-%feature("docstring")  CasADi::JacobianReference::evaluate "
+%feature("docstring")  CasADi::JacobianReference::evaluateD "
 
 Evaluate the function numerically. ";
 
@@ -30509,7 +30622,7 @@ Print a description. ";
 
 Print expression (make sure number of calls is not exceeded) ";
 
-%feature("docstring")  CasADi::JacobianReference::evaluate "
+%feature("docstring")  CasADi::JacobianReference::evaluateD "
 
 Evaluate the function, no derivatives. ";
 
@@ -30607,17 +30720,13 @@ Set multiple dependencies. ";
 
 Add a dependency. ";
 
-%feature("docstring")  CasADi::JacobianReference::addDependency "
+%feature("docstring")  CasADi::JacobianReference::assign "
 
-Add a dependency (index given) ";
+Assign nonzeros (mapping matrix) ";
 
-%feature("docstring")  CasADi::JacobianReference::addDependency "
+%feature("docstring")  CasADi::JacobianReference::assign "
 
-Add a dependency (mapping matrix) ";
-
-%feature("docstring")  CasADi::JacobianReference::addDependency "
-
-Add a dependency (mapping matrix) ";
+Assign nonzeros (mapping matrix), output indices sequential. ";
 
 %feature("docstring")  CasADi::JacobianReference::isOperation "
 
@@ -30943,6 +31052,11 @@ Residual. ";
 
 Evaluate switch. ";
 
+%feature("docstring")  CasADi::Sundials::KinsolInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
 %feature("docstring")  CasADi::Sundials::KinsolInternal::jacobian "
 
 Calculate the jacobian of a number of function outputs with respect to a
@@ -30983,12 +31097,6 @@ Print. ";
 %feature("docstring")  CasADi::Sundials::KinsolInternal::repr "
 
 Print. ";
-
-%feature("docstring")
-CasADi::Sundials::KinsolInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::Sundials::KinsolInternal::getPartition "
 
@@ -31592,6 +31700,11 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::Sundials::KinsolSolver::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
 %feature("docstring")  CasADi::Sundials::KinsolSolver::evaluate_old "
 
 Evaluate (old style) ";
@@ -31964,12 +32077,12 @@ number of constraints (A)
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Static parameters on which the     |
-|                                    | objective and constraints might    |
-|                                    | depend.                            |
+| NLP_P                              | Only for parametric NLP - static   |
+|                                    | parameters on which the objective  |
+|                                    | and constraints might depend.      |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 4)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
@@ -31986,6 +32099,9 @@ number of constraints (A)
 |                                    | with bounds on X at the solution   |
 |                                    | (n x 1) When in warmstart mode,    |
 |                                    | this output may be used as input ( |
++------------------------------------+------------------------------------+
+| NLP_G                              | The constraints evaluated at the   |
+|                                    | optimal solution (m x 1)           |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -32013,6 +32129,109 @@ number of constraints (A)
 |              |              |              | (forward|rev |              |
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| algorithm    | OT_STRING    | GenericType( | Which        | CasADi::Knit |
+|              |              | )            | algorithm to | roInternal   |
+|              |              |              | use. See     |              |
+|              |              |              | KNITRO docum |              |
+|              |              |              | entation. (a |              |
+|              |              |              | uto|direct|c |              |
+|              |              |              | g|active)    |              |
++--------------+--------------+--------------+--------------+--------------+
+| bar_directin | OT_INTEGER   | GenericType( | When using   | CasADi::Knit |
+| terval       |              | )            | the Interior | roInternal   |
+|              |              |              | /Direct      |              |
+|              |              |              | algorithm,   |              |
+|              |              |              | this         |              |
+|              |              |              | parameter    |              |
+|              |              |              | controls the |              |
+|              |              |              | maximum      |              |
+|              |              |              | number of    |              |
+|              |              |              | consecutive  |              |
+|              |              |              | CG steps     |              |
+|              |              |              | before       |              |
+|              |              |              | trying to    |              |
+|              |              |              | force the    |              |
+|              |              |              | algorithm to |              |
+|              |              |              | take a       |              |
+|              |              |              | direct step  |              |
+|              |              |              | again. See   |              |
+|              |              |              | KNITRO docum |              |
+|              |              |              | entation.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| bar_feasible | OT_STRING    | GenericType( | Whether      | CasADi::Knit |
+|              |              | )            | feasibility  | roInternal   |
+|              |              |              | is given     |              |
+|              |              |              | special      |              |
+|              |              |              | emphasis.    |              |
+|              |              |              | See KNITRO d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | . (no|stay|g |              |
+|              |              |              | et|get_stay) |              |
++--------------+--------------+--------------+--------------+--------------+
+| bar_feasmode | OT_REAL      | GenericType( | Specifies    | CasADi::Knit |
+| tol          |              | )            | the          | roInternal   |
+|              |              |              | tolerance    |              |
+|              |              |              | for entering |              |
+|              |              |              | the stay     |              |
+|              |              |              | feasible     |              |
+|              |              |              | mode See     |              |
+|              |              |              | KNITRO docum |              |
+|              |              |              | entation.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| bar_initmu   | OT_INTEGER   | GenericType( | Initial      | CasADi::Knit |
+|              |              | )            | value for    | roInternal   |
+|              |              |              | the barrier  |              |
+|              |              |              | parameter.   |              |
+|              |              |              | See KNITRO d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | .            |              |
++--------------+--------------+--------------+--------------+--------------+
+| bar_initpt   | OT_STRING    | GenericType( | Whether to   | CasADi::Knit |
+|              |              | )            | use the      | roInternal   |
+|              |              |              | initial      |              |
+|              |              |              | point        |              |
+|              |              |              | strategy     |              |
+|              |              |              | with barrier |              |
+|              |              |              | algorithms.  |              |
+|              |              |              | See KNITRO d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | . (auto|yes| |              |
+|              |              |              | no)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| bar_maxbackt | OT_INTEGER   | GenericType( | Maximum      | CasADi::Knit |
+| rack         |              | )            | allowable    | roInternal   |
+|              |              |              | number of    |              |
+|              |              |              | backtracks   |              |
+|              |              |              | during the   |              |
+|              |              |              | linesearch   |              |
+|              |              |              | of the       |              |
+|              |              |              | Interior     |              |
+|              |              |              | Direct       |              |
+|              |              |              | algorithm    |              |
+|              |              |              | before       |              |
+|              |              |              | reverting to |              |
+|              |              |              | a CG step.   |              |
+|              |              |              | See KNITRO d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | .            |              |
++--------------+--------------+--------------+--------------+--------------+
+| bar_maxrefac | OT_INTEGER   | GenericType( | Maximum      | CasADi::Knit |
+| tor          |              | )            | number of re | roInternal   |
+|              |              |              | factorizatio |              |
+|              |              |              | ns of the    |              |
+|              |              |              | KKT system   |              |
+|              |              |              | per          |              |
+|              |              |              | iteration of |              |
+|              |              |              | the Interior |              |
+|              |              |              | Direct       |              |
+|              |              |              | algorithm    |              |
+|              |              |              | before       |              |
+|              |              |              | reverting to |              |
+|              |              |              | a CG step.   |              |
+|              |              |              | See KNITRO d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | .            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | contype      | OT_INTEGERVE |              |              | CasADi::Knit |
 |              | CTOR         |              |              | roInternal   |
@@ -32136,6 +32355,18 @@ number of constraints (A)
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| parametric   | OT_BOOLEAN   | false        | Expect F, G, | CasADi::NLPS |
+|              |              |              | H, J to have | olverInterna |
+|              |              |              | an           | l            |
+|              |              |              | additional   |              |
+|              |              |              | input        |              |
+|              |              |              | argument     |              |
+|              |              |              | appended at  |              |
+|              |              |              | the end,     |              |
+|              |              |              | denoting     |              |
+|              |              |              | fixed        |              |
+|              |              |              | parameters.  |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -32177,6 +32408,12 @@ number of constraints (A)
 |              |              |              | -- for       |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
+| _bounds      |              |              | initial      | olverInterna |
+|              |              |              | guess does   | l            |
+|              |              |              | not satisfy  |              |
+|              |              |              | LBX and UBX  |              |
++--------------+--------------+--------------+--------------+--------------+
 
 C++ includes: knitro_internal.hpp ";
 
@@ -32190,10 +32427,10 @@ Make a deep copy of the instance. ";
 
 %feature("docstring")  CasADi::KnitroInternal::init "
 
-Initialize and make the object ready for setting arguments and evaluation.
-This method is typically called after setting options but before evaluating.
-If passed to another class (in the constructor), this class should invoke
-this function when initialized. ";
+Initialize Initialize and make the object ready for setting arguments and
+evaluation. This method is typically called after setting options but before
+evaluating. If passed to another class (in the constructor), this class
+should invoke this function when initialized. ";
 
 %feature("docstring")  CasADi::KnitroInternal::evaluate "
 
@@ -32205,11 +32442,24 @@ Evaluate. ";
 
 %feature("docstring")  CasADi::KnitroInternal::evalh "";
 
-%feature("docstring")  CasADi::KnitroInternal::reportConstraints "";
+%feature("docstring")  CasADi::KnitroInternal::reportConstraints "
+
+Prints out a human readable report about possible constraint violations -
+all constraints. ";
+
+%feature("docstring")  CasADi::KnitroInternal::checkInitialBounds "
+
+Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
+";
 
 %feature("docstring")  CasADi::KnitroInternal::evaluate_switch "
 
 Evaluate switch. ";
+
+%feature("docstring")  CasADi::KnitroInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
 %feature("docstring")  CasADi::KnitroInternal::jacobian "
 
@@ -32251,11 +32501,6 @@ Print. ";
 %feature("docstring")  CasADi::KnitroInternal::repr "
 
 Print. ";
-
-%feature("docstring")  CasADi::KnitroInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::KnitroInternal::getPartition "
 
@@ -32490,12 +32735,12 @@ number of constraints (A)
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Static parameters on which the     |
-|                                    | objective and constraints might    |
-|                                    | depend.                            |
+| NLP_P                              | Only for parametric NLP - static   |
+|                                    | parameters on which the objective  |
+|                                    | and constraints might depend.      |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 4)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
@@ -32512,6 +32757,9 @@ number of constraints (A)
 |                                    | with bounds on X at the solution   |
 |                                    | (n x 1) When in warmstart mode,    |
 |                                    | this output may be used as input ( |
++------------------------------------+------------------------------------+
+| NLP_G                              | The constraints evaluated at the   |
+|                                    | optimal solution (m x 1)           |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -32539,6 +32787,109 @@ number of constraints (A)
 |              |              |              | (forward|rev |              |
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| algorithm    | OT_STRING    | GenericType( | Which        | CasADi::Knit |
+|              |              | )            | algorithm to | roInternal   |
+|              |              |              | use. See     |              |
+|              |              |              | KNITRO docum |              |
+|              |              |              | entation. (a |              |
+|              |              |              | uto|direct|c |              |
+|              |              |              | g|active)    |              |
++--------------+--------------+--------------+--------------+--------------+
+| bar_directin | OT_INTEGER   | GenericType( | When using   | CasADi::Knit |
+| terval       |              | )            | the Interior | roInternal   |
+|              |              |              | /Direct      |              |
+|              |              |              | algorithm,   |              |
+|              |              |              | this         |              |
+|              |              |              | parameter    |              |
+|              |              |              | controls the |              |
+|              |              |              | maximum      |              |
+|              |              |              | number of    |              |
+|              |              |              | consecutive  |              |
+|              |              |              | CG steps     |              |
+|              |              |              | before       |              |
+|              |              |              | trying to    |              |
+|              |              |              | force the    |              |
+|              |              |              | algorithm to |              |
+|              |              |              | take a       |              |
+|              |              |              | direct step  |              |
+|              |              |              | again. See   |              |
+|              |              |              | KNITRO docum |              |
+|              |              |              | entation.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| bar_feasible | OT_STRING    | GenericType( | Whether      | CasADi::Knit |
+|              |              | )            | feasibility  | roInternal   |
+|              |              |              | is given     |              |
+|              |              |              | special      |              |
+|              |              |              | emphasis.    |              |
+|              |              |              | See KNITRO d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | . (no|stay|g |              |
+|              |              |              | et|get_stay) |              |
++--------------+--------------+--------------+--------------+--------------+
+| bar_feasmode | OT_REAL      | GenericType( | Specifies    | CasADi::Knit |
+| tol          |              | )            | the          | roInternal   |
+|              |              |              | tolerance    |              |
+|              |              |              | for entering |              |
+|              |              |              | the stay     |              |
+|              |              |              | feasible     |              |
+|              |              |              | mode See     |              |
+|              |              |              | KNITRO docum |              |
+|              |              |              | entation.    |              |
++--------------+--------------+--------------+--------------+--------------+
+| bar_initmu   | OT_INTEGER   | GenericType( | Initial      | CasADi::Knit |
+|              |              | )            | value for    | roInternal   |
+|              |              |              | the barrier  |              |
+|              |              |              | parameter.   |              |
+|              |              |              | See KNITRO d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | .            |              |
++--------------+--------------+--------------+--------------+--------------+
+| bar_initpt   | OT_STRING    | GenericType( | Whether to   | CasADi::Knit |
+|              |              | )            | use the      | roInternal   |
+|              |              |              | initial      |              |
+|              |              |              | point        |              |
+|              |              |              | strategy     |              |
+|              |              |              | with barrier |              |
+|              |              |              | algorithms.  |              |
+|              |              |              | See KNITRO d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | . (auto|yes| |              |
+|              |              |              | no)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| bar_maxbackt | OT_INTEGER   | GenericType( | Maximum      | CasADi::Knit |
+| rack         |              | )            | allowable    | roInternal   |
+|              |              |              | number of    |              |
+|              |              |              | backtracks   |              |
+|              |              |              | during the   |              |
+|              |              |              | linesearch   |              |
+|              |              |              | of the       |              |
+|              |              |              | Interior     |              |
+|              |              |              | Direct       |              |
+|              |              |              | algorithm    |              |
+|              |              |              | before       |              |
+|              |              |              | reverting to |              |
+|              |              |              | a CG step.   |              |
+|              |              |              | See KNITRO d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | .            |              |
++--------------+--------------+--------------+--------------+--------------+
+| bar_maxrefac | OT_INTEGER   | GenericType( | Maximum      | CasADi::Knit |
+| tor          |              | )            | number of re | roInternal   |
+|              |              |              | factorizatio |              |
+|              |              |              | ns of the    |              |
+|              |              |              | KKT system   |              |
+|              |              |              | per          |              |
+|              |              |              | iteration of |              |
+|              |              |              | the Interior |              |
+|              |              |              | Direct       |              |
+|              |              |              | algorithm    |              |
+|              |              |              | before       |              |
+|              |              |              | reverting to |              |
+|              |              |              | a CG step.   |              |
+|              |              |              | See KNITRO d |              |
+|              |              |              | ocumentation |              |
+|              |              |              | .            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | contype      | OT_INTEGERVE |              |              | CasADi::Knit |
 |              | CTOR         |              |              | roInternal   |
@@ -32662,6 +33013,18 @@ number of constraints (A)
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| parametric   | OT_BOOLEAN   | false        | Expect F, G, | CasADi::NLPS |
+|              |              |              | H, J to have | olverInterna |
+|              |              |              | an           | l            |
+|              |              |              | additional   |              |
+|              |              |              | input        |              |
+|              |              |              | argument     |              |
+|              |              |              | appended at  |              |
+|              |              |              | the end,     |              |
+|              |              |              | denoting     |              |
+|              |              |              | fixed        |              |
+|              |              |              | parameters.  |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -32702,6 +33065,12 @@ number of constraints (A)
 |              |              |              | evaluation   | ternal       |
 |              |              |              | -- for       |              |
 |              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+| warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
+| _bounds      |              |              | initial      | olverInterna |
+|              |              |              | guess does   | l            |
+|              |              |              | not satisfy  |              |
+|              |              |              | LBX and UBX  |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 C++ includes: knitro_solver.hpp ";
@@ -32837,6 +33206,10 @@ Set KNITRO integer parameters. ";
 
 Set KNITRO double parameters. ";
 
+%feature("docstring")  CasADi::KnitroSolver::setStringParam "
+
+Set KNITRO string parameters. ";
+
 %feature("docstring")  CasADi::KnitroSolver::checkNode "
 
 Check if the node is pointing to the right type of object. ";
@@ -32876,6 +33249,11 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::KnitroSolver::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::KnitroSolver::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
 
 %feature("docstring")  CasADi::KnitroSolver::evaluate_old "
 
@@ -33433,6 +33811,11 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::Interfaces::LapackLUDense::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::evaluate_old "
 
 Evaluate (old style) ";
@@ -33818,10 +34201,10 @@ CasADi::Interfaces::LapackLUDenseInternal::~LapackLUDenseInternal "";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::init "
 
-Initialize and make the object ready for setting arguments and evaluation.
-This method is typically called after setting options but before evaluating.
-If passed to another class (in the constructor), this class should invoke
-this function when initialized. ";
+Initialize Initialize and make the object ready for setting arguments and
+evaluation. This method is typically called after setting options but before
+evaluating. If passed to another class (in the constructor), this class
+should invoke this function when initialized. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::prepare "";
 
@@ -33847,6 +34230,12 @@ Evaluate. ";
 CasADi::Interfaces::LapackLUDenseInternal::evaluate_switch "
 
 Evaluate switch. ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackLUDenseInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::jacobian "
 
@@ -33894,12 +34283,6 @@ Print. ";
 %feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::repr "
 
 Print. ";
-
-%feature("docstring")
-CasADi::Interfaces::LapackLUDenseInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")
 CasADi::Interfaces::LapackLUDenseInternal::getPartition "
@@ -34462,6 +34845,11 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::Interfaces::LapackQRDense::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::evaluate_old "
 
 Evaluate (old style) ";
@@ -34837,10 +35225,10 @@ CasADi::Interfaces::LapackQRDenseInternal::~LapackQRDenseInternal "";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::init "
 
-Initialize and make the object ready for setting arguments and evaluation.
-This method is typically called after setting options but before evaluating.
-If passed to another class (in the constructor), this class should invoke
-this function when initialized. ";
+Initialize Initialize and make the object ready for setting arguments and
+evaluation. This method is typically called after setting options but before
+evaluating. If passed to another class (in the constructor), this class
+should invoke this function when initialized. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::prepare "";
 
@@ -34866,6 +35254,12 @@ Evaluate. ";
 CasADi::Interfaces::LapackQRDenseInternal::evaluate_switch "
 
 Evaluate switch. ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackQRDenseInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::jacobian "
 
@@ -34913,12 +35307,6 @@ Print. ";
 %feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::repr "
 
 Print. ";
-
-%feature("docstring")
-CasADi::Interfaces::LapackQRDenseInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")
 CasADi::Interfaces::LapackQRDenseInternal::getPartition "
@@ -35183,12 +35571,12 @@ number of constraints (A)
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Static parameters on which the     |
-|                                    | objective and constraints might    |
-|                                    | depend.                            |
+| NLP_P                              | Only for parametric NLP - static   |
+|                                    | parameters on which the objective  |
+|                                    | and constraints might depend.      |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 4)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
@@ -35205,6 +35593,9 @@ number of constraints (A)
 |                                    | with bounds on X at the solution   |
 |                                    | (n x 1) When in warmstart mode,    |
 |                                    | this output may be used as input ( |
++------------------------------------+------------------------------------+
+| NLP_G                              | The constraints evaluated at the   |
+|                                    | optimal solution (m x 1)           |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -35360,6 +35751,18 @@ number of constraints (A)
 |              |              |              |              | rfaces::Lift |
 |              |              |              |              | optInternal  |
 +--------------+--------------+--------------+--------------+--------------+
+| parametric   | OT_BOOLEAN   | false        | Expect F, G, | CasADi::NLPS |
+|              |              |              | H, J to have | olverInterna |
+|              |              |              | an           | l            |
+|              |              |              | additional   |              |
+|              |              |              | input        |              |
+|              |              |              | argument     |              |
+|              |              |              | appended at  |              |
+|              |              |              | the end,     |              |
+|              |              |              | denoting     |              |
+|              |              |              | fixed        |              |
+|              |              |              | parameters.  |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -35401,6 +35804,12 @@ number of constraints (A)
 |              |              |              | -- for       |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
+| _bounds      |              |              | initial      | olverInterna |
+|              |              |              | guess does   | l            |
+|              |              |              | not satisfy  |              |
+|              |              |              | LBX and UBX  |              |
++--------------+--------------+--------------+--------------+--------------+
 
 C++ includes: liftopt_internal.hpp ";
 
@@ -35416,22 +35825,36 @@ Make a deep copy of the instance. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::init "
 
-Initialize and make the object ready for setting arguments and evaluation.
-This method is typically called after setting options but before evaluating.
-If passed to another class (in the constructor), this class should invoke
-this function when initialized. ";
+Initialize Initialize and make the object ready for setting arguments and
+evaluation. This method is typically called after setting options but before
+evaluating. If passed to another class (in the constructor), this class
+should invoke this function when initialized. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::evaluate "
 
 Evaluate. ";
 
 %feature("docstring")
-CasADi::Interfaces::LiftoptInternal::reportConstraints "";
+CasADi::Interfaces::LiftoptInternal::reportConstraints "
+
+Prints out a human readable report about possible constraint violations -
+all constraints. ";
+
+%feature("docstring")
+CasADi::Interfaces::LiftoptInternal::checkInitialBounds "
+
+Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
+";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::evaluate_switch
 "
 
 Evaluate switch. ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::jacobian "
 
@@ -35475,12 +35898,6 @@ Print. ";
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::repr "
 
 Print. ";
-
-%feature("docstring")
-CasADi::Interfaces::LiftoptInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::getPartition "
 
@@ -35722,12 +36139,12 @@ number of constraints (A)
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Static parameters on which the     |
-|                                    | objective and constraints might    |
-|                                    | depend.                            |
+| NLP_P                              | Only for parametric NLP - static   |
+|                                    | parameters on which the objective  |
+|                                    | and constraints might depend.      |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 4)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
@@ -35744,6 +36161,9 @@ number of constraints (A)
 |                                    | with bounds on X at the solution   |
 |                                    | (n x 1) When in warmstart mode,    |
 |                                    | this output may be used as input ( |
++------------------------------------+------------------------------------+
+| NLP_G                              | The constraints evaluated at the   |
+|                                    | optimal solution (m x 1)           |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -35899,6 +36319,18 @@ number of constraints (A)
 |              |              |              |              | rfaces::Lift |
 |              |              |              |              | optInternal  |
 +--------------+--------------+--------------+--------------+--------------+
+| parametric   | OT_BOOLEAN   | false        | Expect F, G, | CasADi::NLPS |
+|              |              |              | H, J to have | olverInterna |
+|              |              |              | an           | l            |
+|              |              |              | additional   |              |
+|              |              |              | input        |              |
+|              |              |              | argument     |              |
+|              |              |              | appended at  |              |
+|              |              |              | the end,     |              |
+|              |              |              | denoting     |              |
+|              |              |              | fixed        |              |
+|              |              |              | parameters.  |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -35939,6 +36371,12 @@ number of constraints (A)
 |              |              |              | evaluation   | ternal       |
 |              |              |              | -- for       |              |
 |              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+| warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
+| _bounds      |              |              | initial      | olverInterna |
+|              |              |              | guess does   | l            |
+|              |              |              | not satisfy  |              |
+|              |              |              | LBX and UBX  |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 C++ includes: liftopt_solver.hpp ";
@@ -36116,6 +36554,11 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptSolver::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::evaluate_old "
 
@@ -36641,6 +37084,11 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::LinearSolver::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
 %feature("docstring")  CasADi::LinearSolver::evaluate_old "
 
 Evaluate (old style) ";
@@ -37004,10 +37452,10 @@ C++ includes: linear_solver_internal.hpp ";
 
 %feature("docstring")  CasADi::LinearSolverInternal::init "
 
-Initialize and make the object ready for setting arguments and evaluation.
-This method is typically called after setting options but before evaluating.
-If passed to another class (in the constructor), this class should invoke
-this function when initialized. ";
+Initialize Initialize and make the object ready for setting arguments and
+evaluation. This method is typically called after setting options but before
+evaluating. If passed to another class (in the constructor), this class
+should invoke this function when initialized. ";
 
 %feature("docstring")  CasADi::LinearSolverInternal::evaluate "
 
@@ -37032,6 +37480,11 @@ Evaluate. ";
 %feature("docstring")  CasADi::LinearSolverInternal::evaluate_switch "
 
 Evaluate switch. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
 %feature("docstring")  CasADi::LinearSolverInternal::jacobian "
 
@@ -37073,12 +37526,6 @@ Print. ";
 %feature("docstring")  CasADi::LinearSolverInternal::repr "
 
 Print. ";
-
-%feature("docstring")  CasADi::LinearSolverInternal::unidirectionalColoring
-"
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::LinearSolverInternal::getPartition "
 
@@ -37308,7 +37755,7 @@ Clone function. ";
 
 Destructor. ";
 
-%feature("docstring")  CasADi::Mapping::evaluate "
+%feature("docstring")  CasADi::Mapping::evaluateD "
 
 Evaluate the function numerically. ";
 
@@ -37332,21 +37779,35 @@ Print a part of the expression */. ";
 
 Is a mapping matrix. ";
 
-%feature("docstring")  CasADi::Mapping::addDependency "
+%feature("docstring")  CasADi::Mapping::assign "
 
-Add a dependency (index given) ";
+Assign/add nonzeros. ";
 
-%feature("docstring")  CasADi::Mapping::addDependency "
+%feature("docstring")  CasADi::Mapping::assign "
 
-Add a dependency. ";
+Assign/add nonzeros, outputs sequential. ";
 
-%feature("docstring")  CasADi::Mapping::addDependency "
+%feature("docstring")  CasADi::Mapping::init "
 
-Add a dependency. ";
+Initialize. ";
 
-%feature("docstring")  CasADi::Mapping::isReady "
+%feature("docstring")  CasADi::Mapping::evaluateBlock "
 
-Check if the mapping is ready. ";
+Evaluate a block given the data vectors. ";
+
+%feature("docstring")  CasADi::Mapping::evaluateGen "
+
+Evaluate the function (template) ";
+
+%feature("docstring")  CasADi::Mapping::mapping "
+
+Construct the IMatrix that maps from the iind'th input to the output. ";
+
+%feature("docstring")  CasADi::Mapping::getDepInd "
+
+Get mapping from the output non-zero index of the dependency index. ";
+
+%feature("docstring")  CasADi::Mapping::evaluateBlock "";
 
 %feature("docstring")  CasADi::Mapping::deepCopyMembers "
 
@@ -37364,7 +37825,7 @@ Print a description. ";
 
 Print expression (make sure number of calls is not exceeded) ";
 
-%feature("docstring")  CasADi::Mapping::evaluate "
+%feature("docstring")  CasADi::Mapping::evaluateD "
 
 Evaluate the function, no derivatives. ";
 
@@ -37498,10 +37959,6 @@ Get size. ";
 
 Get the reference count. ";
 
-%feature("docstring")  CasADi::Mapping::init "
-
-Initialize the object. ";
-
 %feature("docstring")  CasADi::Mapping::isInit "
 
 Check if the object has been initialized. ";
@@ -37517,7 +37974,7 @@ Assert that the object has been initialized. ";
 General sparse matrix class General sparse matrix class that is designed
 with the idea that \"everything is a matrix\", that is, also scalars and
 vectors.  This philosophy makes it easy to use and to interface in
-particularily with Matlab and Python. .
+particularily with Python and Matlab/Octave. .
 
 The syntax tries to stay as close as possible to the ublas syntax when it
 comes to vector/matrix operations.
@@ -37536,15 +37993,11 @@ Joel Andersson
 
 C++ includes: matrix.hpp ";
 
-%feature("docstring")  CasADi::Matrix::empty "
+%feature("docstring")  CasADi::Matrix::vector "
 
-Check type of matrix. ";
+ublas vector
 
-%feature("docstring")  CasADi::Matrix::scalar "";
-
-%feature("docstring")  CasADi::Matrix::vector "";
-
-%feature("docstring")  CasADi::Matrix::dense "";
+Check type of matrix ";
 
 %feature("docstring")  CasADi::Matrix::getSub "
 
@@ -37572,9 +38025,13 @@ Get a submatrix. ";
 
 %feature("docstring")  CasADi::Matrix::getSub "";
 
+%feature("docstring")  CasADi::Matrix::getSub "";
+
 %feature("docstring")  CasADi::Matrix::setSub "
 
 Set a submatrix. ";
+
+%feature("docstring")  CasADi::Matrix::setSub "";
 
 %feature("docstring")  CasADi::Matrix::setSub "";
 
@@ -37648,6 +38105,8 @@ get a matrix element ";
 
 %feature("docstring")  CasADi::Matrix::indexed "";
 
+%feature("docstring")  CasADi::Matrix::indexed "";
+
 %feature("docstring")  CasADi::Matrix::indexed_one_based_assignment "
 
 set a non-zero ";
@@ -37667,6 +38126,8 @@ set a non-zero ";
 set a matrix element ";
 
 %feature("docstring")  CasADi::Matrix::indexed_zero_based_assignment "";
+
+%feature("docstring")  CasADi::Matrix::indexed_assignment "";
 
 %feature("docstring")  CasADi::Matrix::indexed_assignment "";
 
@@ -37742,6 +38203,8 @@ compatibility. ";
 %feature("docstring")  CasADi::Matrix::fabs "";
 
 %feature("docstring")  CasADi::Matrix::sign "";
+
+%feature("docstring")  CasADi::Matrix::erfinv "";
 
 %feature("docstring")  CasADi::Matrix::fmin "";
 
@@ -37921,36 +38384,6 @@ Create an expression from an stl vector. ";
 
 Create a non-vector expression from an stl vector. ";
 
-%feature("docstring")  CasADi::Matrix::size "
-
-ublas vector
-
-get the number of non-zeros ";
-
-%feature("docstring")  CasADi::Matrix::sizeL "
-
-get the number of non-zeros in the lower triangular half ";
-
-%feature("docstring")  CasADi::Matrix::sizeU "
-
-get the number of non-zeros in the upper triangular half ";
-
-%feature("docstring")  CasADi::Matrix::numel "
-
-get the number of elements ";
-
-%feature("docstring")  CasADi::Matrix::size1 "
-
-get the first dimension ";
-
-%feature("docstring")  CasADi::Matrix::size2 "
-
-get the second dimension ";
-
-%feature("docstring")  CasADi::Matrix::shape "
-
-Get the shape. ";
-
 %feature("docstring")  CasADi::Matrix::at "
 
 Get a non-zero element. ";
@@ -37994,22 +38427,6 @@ Make the matrix an dense n-by-m matrix. ";
 %feature("docstring")  CasADi::Matrix::makeEmpty "
 
 Make the matrix an empty n-by-m matrix. ";
-
-%feature("docstring")  CasADi::Matrix::unary_old "
-
-Unary function. ";
-
-%feature("docstring")  CasADi::Matrix::binary_old "";
-
-%feature("docstring")  CasADi::Matrix::unary_old "";
-
-%feature("docstring")  CasADi::Matrix::binary_old "";
-
-%feature("docstring")  CasADi::Matrix::matrix_matrix_old "";
-
-%feature("docstring")  CasADi::Matrix::matrix_scalar_old "";
-
-%feature("docstring")  CasADi::Matrix::scalar_matrix_old "";
 
 %feature("docstring")  CasADi::Matrix::mul "
 
@@ -38125,7 +38542,54 @@ Save the result to the LAPACK banded format -- see LAPACK documentation kl:
 The number of subdiagonals in res ku: The number of superdiagonals in res
 ldres: The leading dimension in res res: The number of superdiagonals. ";
 
-%feature("docstring")  CasADi::Matrix::size "";
+%feature("docstring")  CasADi::Matrix::isNull "
+
+The following function is used to ensure similarity to MX, which is
+reference counted. ";
+
+%feature("docstring")  CasADi::Matrix::size "
+
+Get the number of (structural) non-zero elements. ";
+
+%feature("docstring")  CasADi::Matrix::size "
+
+Get the number if non-zeros for a given sparsity pattern. ";
+
+%feature("docstring")  CasADi::Matrix::sizeL "
+
+Get the number of non-zeros in the lower triangular half. ";
+
+%feature("docstring")  CasADi::Matrix::sizeU "
+
+Get get the number of non-zeros in the upper triangular half. ";
+
+%feature("docstring")  CasADi::Matrix::numel "
+
+Get the number of elements. ";
+
+%feature("docstring")  CasADi::Matrix::size1 "
+
+Get the first dimension (i.e. n for a n-by-m matrix) ";
+
+%feature("docstring")  CasADi::Matrix::size2 "
+
+Get the first dimension (i.e. m for a n-by-m matrix) ";
+
+%feature("docstring")  CasADi::Matrix::shape "
+
+Get the shape. ";
+
+%feature("docstring")  CasADi::Matrix::empty "
+
+Check if the matrix expression is empty. ";
+
+%feature("docstring")  CasADi::Matrix::dense "
+
+Check if the matrix expression is dense. ";
+
+%feature("docstring")  CasADi::Matrix::scalar "
+
+Check if the matrix expression is scalar. ";
 
 %feature("docstring")  CasADi::Matrix::getRepresentation "
 
@@ -38209,6 +38673,11 @@ get the reference of a child ";
 
 get the reference of a child ";
 
+%feature("docstring")  CasADi::MinusInfSXNode::init "
+
+Initialize the node (currently used only to give a similar interface to
+MXNode) ";
+
 %feature("docstring")  CasADi::MinusInfSXNode::isSmooth "
 
 Check if smooth. ";
@@ -38287,6 +38756,11 @@ get the reference of a child ";
 
 get the reference of a child ";
 
+%feature("docstring")  CasADi::MinusOneSXNode::init "
+
+Initialize the node (currently used only to give a similar interface to
+MXNode) ";
+
 %feature("docstring")  CasADi::MinusOneSXNode::isSmooth "
 
 Check if smooth. ";
@@ -38331,9 +38805,9 @@ initialize the state ";
 %feature("docstring")  KINEMATICS::ModelSimulator::test "";
 
 
-// File: classCasADi_1_1MulBinaryOperation.xml
+// File: structCasADi_1_1MulBinaryOperation.xml
 %feature("docstring") CasADi::MulBinaryOperation "C++ includes:
-casadi_math.hpp ";
+casadi_calculus.hpp ";
 
 
 // File: classCasADi_1_1MultipleOutput.xml
@@ -38387,11 +38861,11 @@ Print expression (make sure number of calls is not exceeded) ";
 
 Print a part of the expression. ";
 
-%feature("docstring")  CasADi::MultipleOutput::evaluate "
+%feature("docstring")  CasADi::MultipleOutput::evaluateD "
 
 Evaluate the function. ";
 
-%feature("docstring")  CasADi::MultipleOutput::evaluate "
+%feature("docstring")  CasADi::MultipleOutput::evaluateD "
 
 Evaluate the function, no derivatives. ";
 
@@ -38505,17 +38979,13 @@ Set multiple dependencies. ";
 
 Add a dependency. ";
 
-%feature("docstring")  CasADi::MultipleOutput::addDependency "
+%feature("docstring")  CasADi::MultipleOutput::assign "
 
-Add a dependency (index given) ";
+Assign nonzeros (mapping matrix) ";
 
-%feature("docstring")  CasADi::MultipleOutput::addDependency "
+%feature("docstring")  CasADi::MultipleOutput::assign "
 
-Add a dependency (mapping matrix) ";
-
-%feature("docstring")  CasADi::MultipleOutput::addDependency "
-
-Add a dependency (mapping matrix) ";
+Assign nonzeros (mapping matrix), output indices sequential. ";
 
 %feature("docstring")  CasADi::MultipleOutput::isOperation "
 
@@ -39064,6 +39534,12 @@ CasADi::OptimalControl::MultipleShooting::setNumOutputs "
 Set number of outputs (normally invoked internally) ";
 
 %feature("docstring")
+CasADi::OptimalControl::MultipleShooting::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
+%feature("docstring")
 CasADi::OptimalControl::MultipleShooting::evaluate_old "
 
 Evaluate (old style) ";
@@ -39580,6 +40056,12 @@ CasADi::OptimalControl::MultipleShootingInternal::evaluate_switch "
 Evaluate switch. ";
 
 %feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
+%feature("docstring")
 CasADi::OptimalControl::MultipleShootingInternal::jacobian "
 
 Calculate the jacobian of a number of function outputs with respect to a
@@ -39629,12 +40111,6 @@ Print. ";
 CasADi::OptimalControl::MultipleShootingInternal::repr "
 
 Print. ";
-
-%feature("docstring")
-CasADi::OptimalControl::MultipleShootingInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")
 CasADi::OptimalControl::MultipleShootingInternal::getPartition "
@@ -39914,7 +40390,7 @@ Clone function. ";
 
 Print a part of the expression. ";
 
-%feature("docstring")  CasADi::Multiplication::evaluate "
+%feature("docstring")  CasADi::Multiplication::evaluateD "
 
 Evaluate the function numerically. ";
 
@@ -39950,7 +40426,7 @@ Print a description. ";
 
 Print expression (make sure number of calls is not exceeded) ";
 
-%feature("docstring")  CasADi::Multiplication::evaluate "
+%feature("docstring")  CasADi::Multiplication::evaluateD "
 
 Evaluate the function, no derivatives. ";
 
@@ -40060,17 +40536,13 @@ Set multiple dependencies. ";
 
 Add a dependency. ";
 
-%feature("docstring")  CasADi::Multiplication::addDependency "
+%feature("docstring")  CasADi::Multiplication::assign "
 
-Add a dependency (index given) ";
+Assign nonzeros (mapping matrix) ";
 
-%feature("docstring")  CasADi::Multiplication::addDependency "
+%feature("docstring")  CasADi::Multiplication::assign "
 
-Add a dependency (mapping matrix) ";
-
-%feature("docstring")  CasADi::Multiplication::addDependency "
-
-Add a dependency (mapping matrix) ";
+Assign nonzeros (mapping matrix), output indices sequential. ";
 
 %feature("docstring")  CasADi::Multiplication::isOperation "
 
@@ -40642,6 +41114,8 @@ get a matrix element ";
 
 %feature("docstring")  CasADi::MX::indexed "";
 
+%feature("docstring")  CasADi::MX::indexed "";
+
 %feature("docstring")  CasADi::MX::indexed_one_based_assignment "
 
 set a non-zero ";
@@ -40657,6 +41131,8 @@ set a non-zero ";
 set a matrix element ";
 
 %feature("docstring")  CasADi::MX::indexed_zero_based_assignment "";
+
+%feature("docstring")  CasADi::MX::indexed_assignment "";
 
 %feature("docstring")  CasADi::MX::indexed_assignment "";
 
@@ -40769,35 +41245,13 @@ Destructor. ";
 
 %feature("docstring")  CasADi::MX::at "
 
-Access Matrix element or slice.
-
-Get a non-zero element, with bounds checking ";
+Get a non-zero element, with bounds checking. ";
 
 %feature("docstring")  CasADi::MX::at "
 
 Access a non-zero element, with bounds checking.
 
 Access a non-zero element. ";
-
-%feature("docstring")  CasADi::MX::size "
-
-Get the number of (structural) non-zero elements. ";
-
-%feature("docstring")  CasADi::MX::numel "
-
-Get the number of elements. ";
-
-%feature("docstring")  CasADi::MX::size1 "
-
-get the first dimension (i.e. n for a n-by-m matrix) ";
-
-%feature("docstring")  CasADi::MX::size2 "
-
-get the first dimension (i.e. m for a n-by-m matrix) ";
-
-%feature("docstring")  CasADi::MX::shape "
-
-Get the shape. ";
 
 %feature("docstring")  CasADi::MX::sparsity "
 
@@ -40815,18 +41269,6 @@ Erase a submatrix. ";
 
 Enlarge matrix Make the matrix larger by inserting empty rows and columns,
 keeping the existing non-zeros. ";
-
-%feature("docstring")  CasADi::MX::empty "
-
-Check if the matrix expression is empty. ";
-
-%feature("docstring")  CasADi::MX::dense "
-
-Check if the matrix expression is dense. ";
-
-%feature("docstring")  CasADi::MX::scalar "
-
-Check if the matrix expression is scalar. ";
 
 %feature("docstring")  CasADi::MX::getDep "
 
@@ -40901,16 +41343,6 @@ Check if norm. ";
 
 Get function. ";
 
-%feature("docstring")  CasADi::MX::getNZMap "
-
-When MX is a mapping, get the output non-zero to the dependency nonzero
-index. ";
-
-%feature("docstring")  CasADi::MX::getDepInd "
-
-When MX is a mapping, get the mapping from the output non-zero index of the
-dependency index. ";
-
 %feature("docstring")  CasADi::MX::isBinary "
 
 Is binary operation. ";
@@ -40927,6 +41359,8 @@ Get operation type. ";
 
 Returns a number that is unique for a given MXNode. If the MX does not point
 to any node, 0 is returned. ";
+
+%feature("docstring")  CasADi::MX::getSub "";
 
 %feature("docstring")  CasADi::MX::getSub "";
 
@@ -41035,6 +41469,8 @@ Get string representation of dimensions. The representation is (nrow x ncol
 
 %feature("docstring")  CasADi::MX::sign "";
 
+%feature("docstring")  CasADi::MX::erfinv "";
+
 %feature("docstring")  CasADi::MX::erf "";
 
 %feature("docstring")  CasADi::MX::sinh "";
@@ -41046,6 +41482,54 @@ Get string representation of dimensions. The representation is (nrow x ncol
 %feature("docstring")  CasADi::MX::mapping "
 
 Returns the IMatrix that represents the mapping of a Mapping node. ";
+
+%feature("docstring")  CasADi::MX::getDepInd "
+
+Get mapping from the output non-zero index of the dependency index. ";
+
+%feature("docstring")  CasADi::MX::size "
+
+Get the number of (structural) non-zero elements. ";
+
+%feature("docstring")  CasADi::MX::size "
+
+Get the number if non-zeros for a given sparsity pattern. ";
+
+%feature("docstring")  CasADi::MX::sizeL "
+
+Get the number of non-zeros in the lower triangular half. ";
+
+%feature("docstring")  CasADi::MX::sizeU "
+
+Get get the number of non-zeros in the upper triangular half. ";
+
+%feature("docstring")  CasADi::MX::numel "
+
+Get the number of elements. ";
+
+%feature("docstring")  CasADi::MX::size1 "
+
+Get the first dimension (i.e. n for a n-by-m matrix) ";
+
+%feature("docstring")  CasADi::MX::size2 "
+
+Get the first dimension (i.e. m for a n-by-m matrix) ";
+
+%feature("docstring")  CasADi::MX::shape "
+
+Get the shape. ";
+
+%feature("docstring")  CasADi::MX::empty "
+
+Check if the matrix expression is empty. ";
+
+%feature("docstring")  CasADi::MX::dense "
+
+Check if the matrix expression is dense. ";
+
+%feature("docstring")  CasADi::MX::scalar "
+
+Check if the matrix expression is scalar. ";
 
 %feature("docstring")  CasADi::MX::clone "
 
@@ -41145,7 +41629,7 @@ Clone function. ";
 
 Print a part of the expression. ";
 
-%feature("docstring")  CasADi::MXConstant::evaluate "
+%feature("docstring")  CasADi::MXConstant::evaluateD "
 
 Evaluate the function numerically. ";
 
@@ -41185,7 +41669,7 @@ Print a description. ";
 
 Print expression (make sure number of calls is not exceeded) ";
 
-%feature("docstring")  CasADi::MXConstant::evaluate "
+%feature("docstring")  CasADi::MXConstant::evaluateD "
 
 Evaluate the function, no derivatives. ";
 
@@ -41295,17 +41779,13 @@ Set multiple dependencies. ";
 
 Add a dependency. ";
 
-%feature("docstring")  CasADi::MXConstant::addDependency "
+%feature("docstring")  CasADi::MXConstant::assign "
 
-Add a dependency (index given) ";
+Assign nonzeros (mapping matrix) ";
 
-%feature("docstring")  CasADi::MXConstant::addDependency "
+%feature("docstring")  CasADi::MXConstant::assign "
 
-Add a dependency (mapping matrix) ";
-
-%feature("docstring")  CasADi::MXConstant::addDependency "
-
-Add a dependency (mapping matrix) ";
+Assign nonzeros (mapping matrix), output indices sequential. ";
 
 %feature("docstring")  CasADi::MXConstant::isOperation "
 
@@ -41666,17 +42146,28 @@ Jacobian via source code transformation. ";
 
 Gradient via source code transformation. ";
 
+%feature("docstring")  CasADi::MXFunction::jac "
+
+Jacobian via source code transformation (new, experimental implementation)
+Calculate the expression for the jacobian of a number of function outputs
+with respect to a number of function inputs, optionally include the function
+outputs. ";
+
 %feature("docstring")  CasADi::MXFunction::expand "
 
 Expand the matrix valued graph into a scalar valued graph. ";
 
 %feature("docstring")  CasADi::MXFunction::eval "
 
-evaluate symbolically ";
+evaluate symbolically, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::MXFunction::eval "
 
-evaluate symbolically (pass and get non-zero entries) ";
+evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::MXFunction::eval "
+
+evaluate symbolically (pass and get non-zero entries) LEGACY - REMOVE ";
 
 %feature("docstring")  CasADi::MXFunction::eval "
 
@@ -41685,7 +42176,15 @@ evaluate symbolically, single input, single output ";
 %feature("docstring")  CasADi::MXFunction::eval "
 
 evaluate symbolically, single input, single output (pass and get non- zero
-entries) ";
+entries) LEGACY - REMOVE ";
+
+%feature("docstring")  CasADi::MXFunction::evalMX "
+
+evaluate symbolically, MX type (unambiguous) ";
+
+%feature("docstring")  CasADi::MXFunction::evalSX "
+
+evaluate symbolically, SX type (unambiguous) ";
 
 %feature("docstring")  CasADi::MXFunction::getNumInputs "
 
@@ -41702,6 +42201,11 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::MXFunction::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::MXFunction::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
 
 %feature("docstring")  CasADi::MXFunction::evaluate_old "
 
@@ -42098,6 +42602,11 @@ Print description. ";
 
 Initialize. ";
 
+%feature("docstring")  CasADi::MXFunctionInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization.
+";
+
 %feature("docstring")  CasADi::MXFunctionInternal::setLiftingFunction "
 
 Set the lifting function. ";
@@ -42106,6 +42615,12 @@ Set the lifting function. ";
 
 Jacobian via source code transformation (identity matrix seed in a
 particular direction) ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::jac "
+
+Calculate the expression for the jacobian of a number of function outputs
+with respect to a number of function inputs, optionally include the function
+outputs. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::jacobian "
 
@@ -42128,17 +42643,17 @@ Adjoint mode AD using source code transformation. ";
 
 Hessian of output oind with respect to input iind. ";
 
-%feature("docstring")  CasADi::MXFunctionInternal::evaluateSX "
+%feature("docstring")  CasADi::MXFunctionInternal::evalSX "
 
-evaluate symbolically, inlining ";
+Evaluate symbolically, SX type. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::evalMX "
+
+Evaluate symbolically, MX type. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::expand "
 
 Expand the matrix valued graph into a scalar valued graph. ";
-
-%feature("docstring")  CasADi::MXFunctionInternal::getJacSparsity "
-
-Generate the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::updatePointers "";
 
@@ -42146,6 +42661,10 @@ Generate the sparsity of a Jacobian block. ";
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::spReset "
+
+Reset the virtual machine for sparsity calculations. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::spProp "
 
@@ -42155,9 +42674,21 @@ Propagate the sparsity seeds. ";
 
 Get the forward/adjoint sparsity seed. ";
 
-%feature("docstring")  CasADi::MXFunctionInternal::spDetect "
+%feature("docstring")  CasADi::MXFunctionInternal::jacGen "
 
-Detect sparsity pattern. ";
+Construct a complete Jacobian by compression. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::getJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::eval "
+
+Evaluate symbolically, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::eval "
+
+Evaluate symbolically, MX type (overloaded) ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::evaluate_switch "
 
@@ -42190,11 +42721,6 @@ Const access an output. ";
 %feature("docstring")  CasADi::MXFunctionInternal::repr "
 
 Print. ";
-
-%feature("docstring")  CasADi::MXFunctionInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::getPartition "
 
@@ -42427,11 +42953,11 @@ Print expression (make sure number of calls is not exceeded) ";
 
 Print a part of the expression. ";
 
-%feature("docstring")  CasADi::MXNode::evaluate "
+%feature("docstring")  CasADi::MXNode::evaluateD "
 
 Evaluate the function. ";
 
-%feature("docstring")  CasADi::MXNode::evaluate "
+%feature("docstring")  CasADi::MXNode::evaluateD "
 
 Evaluate the function, no derivatives. ";
 
@@ -42557,17 +43083,13 @@ Set multiple dependencies. ";
 
 Add a dependency. ";
 
-%feature("docstring")  CasADi::MXNode::addDependency "
+%feature("docstring")  CasADi::MXNode::assign "
 
-Add a dependency (index given) ";
+Assign nonzeros (mapping matrix) ";
 
-%feature("docstring")  CasADi::MXNode::addDependency "
+%feature("docstring")  CasADi::MXNode::assign "
 
-Add a dependency (mapping matrix) ";
-
-%feature("docstring")  CasADi::MXNode::addDependency "
-
-Add a dependency (mapping matrix) ";
+Assign nonzeros (mapping matrix), output indices sequential. ";
 
 %feature("docstring")  CasADi::MXNode::isOperation "
 
@@ -42686,6 +43208,11 @@ get the reference of a child ";
 
 get the reference of a child ";
 
+%feature("docstring")  CasADi::NanSXNode::init "
+
+Initialize the node (currently used only to give a similar interface to
+MXNode) ";
+
 %feature("docstring")  CasADi::NanSXNode::isSmooth "
 
 Check if smooth. ";
@@ -42725,12 +43252,12 @@ Joel Andersson
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Static parameters on which the     |
-|                                    | objective and constraints might    |
-|                                    | depend.                            |
+| NLP_P                              | Only for parametric NLP - static   |
+|                                    | parameters on which the objective  |
+|                                    | and constraints might depend.      |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 4)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
@@ -42747,6 +43274,9 @@ Joel Andersson
 |                                    | with bounds on X at the solution   |
 |                                    | (n x 1) When in warmstart mode,    |
 |                                    | this output may be used as input ( |
++------------------------------------+------------------------------------+
+| NLP_G                              | The constraints evaluated at the   |
+|                                    | optimal solution (m x 1)           |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -42894,6 +43424,18 @@ Joel Andersson
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| parametric   | OT_BOOLEAN   | false        | Expect F, G, | CasADi::NLPS |
+|              |              |              | H, J to have | olverInterna |
+|              |              |              | an           | l            |
+|              |              |              | additional   |              |
+|              |              |              | input        |              |
+|              |              |              | argument     |              |
+|              |              |              | appended at  |              |
+|              |              |              | the end,     |              |
+|              |              |              | denoting     |              |
+|              |              |              | fixed        |              |
+|              |              |              | parameters.  |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -42934,6 +43476,12 @@ Joel Andersson
 |              |              |              | evaluation   | ternal       |
 |              |              |              | -- for       |              |
 |              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+| warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
+| _bounds      |              |              | initial      | olverInterna |
+|              |              |              | guess does   | l            |
+|              |              |              | not satisfy  |              |
+|              |              |              | LBX and UBX  |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 C++ includes: nlp_solver.hpp ";
@@ -43095,6 +43643,11 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::NLPSolver::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::NLPSolver::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
 
 %feature("docstring")  CasADi::NLPSolver::evaluate_old "
 
@@ -43348,12 +43901,12 @@ Joel Andersson
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Static parameters on which the     |
-|                                    | objective and constraints might    |
-|                                    | depend.                            |
+| NLP_P                              | Only for parametric NLP - static   |
+|                                    | parameters on which the objective  |
+|                                    | and constraints might depend.      |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 4)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
@@ -43370,6 +43923,9 @@ Joel Andersson
 |                                    | with bounds on X at the solution   |
 |                                    | (n x 1) When in warmstart mode,    |
 |                                    | this output may be used as input ( |
++------------------------------------+------------------------------------+
+| NLP_G                              | The constraints evaluated at the   |
+|                                    | optimal solution (m x 1)           |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -43517,6 +44073,18 @@ Joel Andersson
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| parametric   | OT_BOOLEAN   | false        | Expect F, G, | CasADi::NLPS |
+|              |              |              | H, J to have | olverInterna |
+|              |              |              | an           | l            |
+|              |              |              | additional   |              |
+|              |              |              | input        |              |
+|              |              |              | argument     |              |
+|              |              |              | appended at  |              |
+|              |              |              | the end,     |              |
+|              |              |              | denoting     |              |
+|              |              |              | fixed        |              |
+|              |              |              | parameters.  |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -43558,6 +44126,12 @@ Joel Andersson
 |              |              |              | -- for       |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
+| _bounds      |              |              | initial      | olverInterna |
+|              |              |              | guess does   | l            |
+|              |              |              | not satisfy  |              |
+|              |              |              | LBX and UBX  |              |
++--------------+--------------+--------------+--------------+--------------+
 
 C++ includes: nlp_solver_internal.hpp ";
 
@@ -43567,12 +44141,20 @@ C++ includes: nlp_solver_internal.hpp ";
 
 %feature("docstring")  CasADi::NLPSolverInternal::init "
 
-Initialize and make the object ready for setting arguments and evaluation.
-This method is typically called after setting options but before evaluating.
-If passed to another class (in the constructor), this class should invoke
-this function when initialized. ";
+Initialize Initialize and make the object ready for setting arguments and
+evaluation. This method is typically called after setting options but before
+evaluating. If passed to another class (in the constructor), this class
+should invoke this function when initialized. ";
 
-%feature("docstring")  CasADi::NLPSolverInternal::reportConstraints "";
+%feature("docstring")  CasADi::NLPSolverInternal::reportConstraints "
+
+Prints out a human readable report about possible constraint violations -
+all constraints. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::checkInitialBounds "
+
+Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
+";
 
 %feature("docstring")  CasADi::NLPSolverInternal::evaluate_switch "
 
@@ -43581,6 +44163,11 @@ Evaluate switch. ";
 %feature("docstring")  CasADi::NLPSolverInternal::evaluate "
 
 Evaluate. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
 %feature("docstring")  CasADi::NLPSolverInternal::jacobian "
 
@@ -43622,11 +44209,6 @@ Print. ";
 %feature("docstring")  CasADi::NLPSolverInternal::repr "
 
 Print. ";
-
-%feature("docstring")  CasADi::NLPSolverInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::NLPSolverInternal::getPartition "
 
@@ -43870,7 +44452,7 @@ Destructor. ";
 
 Clone function. ";
 
-%feature("docstring")  CasADi::NonzerosNonzerosOp::evaluate "
+%feature("docstring")  CasADi::NonzerosNonzerosOp::evaluateD "
 
 Evaluate the function numerically. ";
 
@@ -43918,7 +44500,7 @@ Print a description. ";
 
 Print expression (make sure number of calls is not exceeded) ";
 
-%feature("docstring")  CasADi::NonzerosNonzerosOp::evaluate "
+%feature("docstring")  CasADi::NonzerosNonzerosOp::evaluateD "
 
 Evaluate the function, no derivatives. ";
 
@@ -44028,17 +44610,13 @@ Set multiple dependencies. ";
 
 Add a dependency. ";
 
-%feature("docstring")  CasADi::NonzerosNonzerosOp::addDependency "
+%feature("docstring")  CasADi::NonzerosNonzerosOp::assign "
 
-Add a dependency (index given) ";
+Assign nonzeros (mapping matrix) ";
 
-%feature("docstring")  CasADi::NonzerosNonzerosOp::addDependency "
+%feature("docstring")  CasADi::NonzerosNonzerosOp::assign "
 
-Add a dependency (mapping matrix) ";
-
-%feature("docstring")  CasADi::NonzerosNonzerosOp::addDependency "
-
-Add a dependency (mapping matrix) ";
+Assign nonzeros (mapping matrix), output indices sequential. ";
 
 %feature("docstring")  CasADi::NonzerosNonzerosOp::numel "
 
@@ -44093,7 +44671,7 @@ Destructor. ";
 
 Clone function. ";
 
-%feature("docstring")  CasADi::NonzerosScalarOp::evaluate "
+%feature("docstring")  CasADi::NonzerosScalarOp::evaluateD "
 
 Evaluate the function numerically. ";
 
@@ -44141,7 +44719,7 @@ Print a description. ";
 
 Print expression (make sure number of calls is not exceeded) ";
 
-%feature("docstring")  CasADi::NonzerosScalarOp::evaluate "
+%feature("docstring")  CasADi::NonzerosScalarOp::evaluateD "
 
 Evaluate the function, no derivatives. ";
 
@@ -44251,17 +44829,13 @@ Set multiple dependencies. ";
 
 Add a dependency. ";
 
-%feature("docstring")  CasADi::NonzerosScalarOp::addDependency "
+%feature("docstring")  CasADi::NonzerosScalarOp::assign "
 
-Add a dependency (index given) ";
+Assign nonzeros (mapping matrix) ";
 
-%feature("docstring")  CasADi::NonzerosScalarOp::addDependency "
+%feature("docstring")  CasADi::NonzerosScalarOp::assign "
 
-Add a dependency (mapping matrix) ";
-
-%feature("docstring")  CasADi::NonzerosScalarOp::addDependency "
-
-Add a dependency (mapping matrix) ";
+Assign nonzeros (mapping matrix), output indices sequential. ";
 
 %feature("docstring")  CasADi::NonzerosScalarOp::numel "
 
@@ -44314,7 +44888,7 @@ C++ includes: norm.hpp ";
 
 Constructor. ";
 
-%feature("docstring")  CasADi::Norm::evaluate "
+%feature("docstring")  CasADi::Norm::evaluateD "
 
 Evaluate the function numerically. ";
 
@@ -44354,7 +44928,7 @@ Print expression (make sure number of calls is not exceeded) ";
 
 Print a part of the expression. ";
 
-%feature("docstring")  CasADi::Norm::evaluate "
+%feature("docstring")  CasADi::Norm::evaluateD "
 
 Evaluate the function, no derivatives. ";
 
@@ -44468,17 +45042,13 @@ Set multiple dependencies. ";
 
 Add a dependency. ";
 
-%feature("docstring")  CasADi::Norm::addDependency "
+%feature("docstring")  CasADi::Norm::assign "
 
-Add a dependency (index given) ";
+Assign nonzeros (mapping matrix) ";
 
-%feature("docstring")  CasADi::Norm::addDependency "
+%feature("docstring")  CasADi::Norm::assign "
 
-Add a dependency (mapping matrix) ";
-
-%feature("docstring")  CasADi::Norm::addDependency "
-
-Add a dependency (mapping matrix) ";
+Assign nonzeros (mapping matrix), output indices sequential. ";
 
 %feature("docstring")  CasADi::Norm::isOperation "
 
@@ -44542,11 +45112,11 @@ Clone function. ";
 
 Print a part of the expression. ";
 
-%feature("docstring")  CasADi::Norm1::evaluate "
+%feature("docstring")  CasADi::Norm1::evaluateD "
 
 Evaluate the function numerically. ";
 
-%feature("docstring")  CasADi::Norm1::evaluate "
+%feature("docstring")  CasADi::Norm1::evaluateD "
 
 Evaluate the function, no derivatives. ";
 
@@ -44688,17 +45258,13 @@ Set multiple dependencies. ";
 
 Add a dependency. ";
 
-%feature("docstring")  CasADi::Norm1::addDependency "
+%feature("docstring")  CasADi::Norm1::assign "
 
-Add a dependency (index given) ";
+Assign nonzeros (mapping matrix) ";
 
-%feature("docstring")  CasADi::Norm1::addDependency "
+%feature("docstring")  CasADi::Norm1::assign "
 
-Add a dependency (mapping matrix) ";
-
-%feature("docstring")  CasADi::Norm1::addDependency "
-
-Add a dependency (mapping matrix) ";
+Assign nonzeros (mapping matrix), output indices sequential. ";
 
 %feature("docstring")  CasADi::Norm1::isOperation "
 
@@ -44762,11 +45328,11 @@ Clone function. ";
 
 Print a part of the expression. ";
 
-%feature("docstring")  CasADi::Norm2::evaluate "
+%feature("docstring")  CasADi::Norm2::evaluateD "
 
 Evaluate the function numerically. ";
 
-%feature("docstring")  CasADi::Norm2::evaluate "
+%feature("docstring")  CasADi::Norm2::evaluateD "
 
 Evaluate the function, no derivatives. ";
 
@@ -44908,17 +45474,13 @@ Set multiple dependencies. ";
 
 Add a dependency. ";
 
-%feature("docstring")  CasADi::Norm2::addDependency "
+%feature("docstring")  CasADi::Norm2::assign "
 
-Add a dependency (index given) ";
+Assign nonzeros (mapping matrix) ";
 
-%feature("docstring")  CasADi::Norm2::addDependency "
+%feature("docstring")  CasADi::Norm2::assign "
 
-Add a dependency (mapping matrix) ";
-
-%feature("docstring")  CasADi::Norm2::addDependency "
-
-Add a dependency (mapping matrix) ";
+Assign nonzeros (mapping matrix), output indices sequential. ";
 
 %feature("docstring")  CasADi::Norm2::isOperation "
 
@@ -44982,11 +45544,11 @@ Clone function. ";
 
 Print a part of the expression. ";
 
-%feature("docstring")  CasADi::NormF::evaluate "
+%feature("docstring")  CasADi::NormF::evaluateD "
 
 Evaluate the function numerically. ";
 
-%feature("docstring")  CasADi::NormF::evaluate "
+%feature("docstring")  CasADi::NormF::evaluateD "
 
 Evaluate the function, no derivatives. ";
 
@@ -45128,17 +45690,13 @@ Set multiple dependencies. ";
 
 Add a dependency. ";
 
-%feature("docstring")  CasADi::NormF::addDependency "
+%feature("docstring")  CasADi::NormF::assign "
 
-Add a dependency (index given) ";
+Assign nonzeros (mapping matrix) ";
 
-%feature("docstring")  CasADi::NormF::addDependency "
+%feature("docstring")  CasADi::NormF::assign "
 
-Add a dependency (mapping matrix) ";
-
-%feature("docstring")  CasADi::NormF::addDependency "
-
-Add a dependency (mapping matrix) ";
+Assign nonzeros (mapping matrix), output indices sequential. ";
 
 %feature("docstring")  CasADi::NormF::isOperation "
 
@@ -45202,11 +45760,11 @@ Clone function. ";
 
 Print a part of the expression. ";
 
-%feature("docstring")  CasADi::NormInf::evaluate "
+%feature("docstring")  CasADi::NormInf::evaluateD "
 
 Evaluate the function numerically. ";
 
-%feature("docstring")  CasADi::NormInf::evaluate "
+%feature("docstring")  CasADi::NormInf::evaluateD "
 
 Evaluate the function, no derivatives. ";
 
@@ -45348,17 +45906,13 @@ Set multiple dependencies. ";
 
 Add a dependency. ";
 
-%feature("docstring")  CasADi::NormInf::addDependency "
+%feature("docstring")  CasADi::NormInf::assign "
 
-Add a dependency (index given) ";
+Assign nonzeros (mapping matrix) ";
 
-%feature("docstring")  CasADi::NormInf::addDependency "
+%feature("docstring")  CasADi::NormInf::assign "
 
-Add a dependency (mapping matrix) ";
-
-%feature("docstring")  CasADi::NormInf::addDependency "
-
-Add a dependency (mapping matrix) ";
+Assign nonzeros (mapping matrix), output indices sequential. ";
 
 %feature("docstring")  CasADi::NormInf::isOperation "
 
@@ -45756,6 +46310,11 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::OCPSolver::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::OCPSolver::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
 
 %feature("docstring")  CasADi::OCPSolver::evaluate_old "
 
@@ -46235,6 +46794,11 @@ Evaluate switch. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::OCPSolverInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
 %feature("docstring")  CasADi::OCPSolverInternal::jacobian "
 
 Calculate the jacobian of a number of function outputs with respect to a
@@ -46275,11 +46839,6 @@ Print. ";
 %feature("docstring")  CasADi::OCPSolverInternal::repr "
 
 Print. ";
-
-%feature("docstring")  CasADi::OCPSolverInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::OCPSolverInternal::getPartition "
 
@@ -46561,6 +47120,11 @@ get the reference of a child ";
 
 get the reference of a child ";
 
+%feature("docstring")  CasADi::OneSXNode::init "
+
+Initialize the node (currently used only to give a similar interface to
+MXNode) ";
+
 %feature("docstring")  CasADi::OneSXNode::isSmooth "
 
 Check if smooth. ";
@@ -46814,6 +47378,11 @@ Evaluate. ";
 
 Evaluate switch. ";
 
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::jacobian "
 
 Calculate the jacobian of a number of function outputs with respect to a
@@ -46854,12 +47423,6 @@ Print. ";
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::repr "
 
 Print. ";
-
-%feature("docstring")
-CasADi::Interfaces::OOQPInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::getPartition "
 
@@ -47437,6 +48000,11 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::Interfaces::OOQPSolver::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::evaluate_old "
 
 Evaluate (old style) ";
@@ -47972,7 +48540,7 @@ Destructor. ";
 
 Clone function. ";
 
-%feature("docstring")  CasADi::OutputNode::evaluate "
+%feature("docstring")  CasADi::OutputNode::evaluateD "
 
 Evaluate the function numerically. ";
 
@@ -48029,7 +48597,7 @@ Print a description. ";
 
 Print expression (make sure number of calls is not exceeded) ";
 
-%feature("docstring")  CasADi::OutputNode::evaluate "
+%feature("docstring")  CasADi::OutputNode::evaluateD "
 
 Evaluate the function, no derivatives. ";
 
@@ -48127,17 +48695,13 @@ Set multiple dependencies. ";
 
 Add a dependency. ";
 
-%feature("docstring")  CasADi::OutputNode::addDependency "
+%feature("docstring")  CasADi::OutputNode::assign "
 
-Add a dependency (index given) ";
+Assign nonzeros (mapping matrix) ";
 
-%feature("docstring")  CasADi::OutputNode::addDependency "
+%feature("docstring")  CasADi::OutputNode::assign "
 
-Add a dependency (mapping matrix) ";
-
-%feature("docstring")  CasADi::OutputNode::addDependency "
-
-Add a dependency (mapping matrix) ";
+Assign nonzeros (mapping matrix), output indices sequential. ";
 
 %feature("docstring")  CasADi::OutputNode::isOperation "
 
@@ -48174,6 +48738,14 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::OutputNode::assertInit "
 
 Assert that the object has been initialized. ";
+
+
+// File: structCasADi_1_1Mapping_1_1OutputNZ.xml
+%feature("docstring") CasADi::Mapping::OutputNZ "
+
+Input nonzero and dependency index.
+
+C++ includes: mapping.hpp ";
 
 
 // File: classCasADi_1_1Parallelizer.xml
@@ -48481,6 +49053,11 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::Parallelizer::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::Parallelizer::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
 
 %feature("docstring")  CasADi::Parallelizer::evaluate_old "
 
@@ -48909,6 +49486,11 @@ Deep copy data members. ";
 
 Evaluate switch. ";
 
+%feature("docstring")  CasADi::ParallelizerInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
 %feature("docstring")  CasADi::ParallelizerInternal::jacobian_switch "
 
 Switch between numeric and symbolic jacobian. ";
@@ -48944,12 +49526,6 @@ Print. ";
 %feature("docstring")  CasADi::ParallelizerInternal::repr "
 
 Print. ";
-
-%feature("docstring")  CasADi::ParallelizerInternal::unidirectionalColoring
-"
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::ParallelizerInternal::getPartition "
 
@@ -49230,7 +49806,11 @@ Print a description. ";
 
 Print expression (make sure number of calls is not exceeded) ";
 
-%feature("docstring")  CasADi::Printme::evaluate "
+%feature("docstring")  CasADi::Printme::evaluateD "
+
+Evaluate the function. ";
+
+%feature("docstring")  CasADi::Printme::evaluateD "
 
 Evaluate the function, no derivatives. ";
 
@@ -49348,17 +49928,13 @@ Set multiple dependencies. ";
 
 Add a dependency. ";
 
-%feature("docstring")  CasADi::Printme::addDependency "
+%feature("docstring")  CasADi::Printme::assign "
 
-Add a dependency (index given) ";
+Assign nonzeros (mapping matrix) ";
 
-%feature("docstring")  CasADi::Printme::addDependency "
+%feature("docstring")  CasADi::Printme::assign "
 
-Add a dependency (mapping matrix) ";
-
-%feature("docstring")  CasADi::Printme::addDependency "
-
-Add a dependency (mapping matrix) ";
+Assign nonzeros (mapping matrix), output indices sequential. ";
 
 %feature("docstring")  CasADi::Printme::isOperation "
 
@@ -49660,6 +50236,11 @@ Evaluate. ";
 
 Evaluate switch. ";
 
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::jacobian "
 
 Calculate the jacobian of a number of function outputs with respect to a
@@ -49702,12 +50283,6 @@ Print. ";
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::repr "
 
 Print. ";
-
-%feature("docstring")
-CasADi::Interfaces::QPOasesInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::getPartition "
 
@@ -50290,6 +50865,11 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::Interfaces::QPOasesSolver::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::evaluate_old "
 
 Evaluate (old style) ";
@@ -50848,6 +51428,11 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::QPSolver::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
 %feature("docstring")  CasADi::QPSolver::evaluate_old "
 
 Evaluate (old style) ";
@@ -51262,10 +51847,10 @@ C++ includes: qp_solver_internal.hpp ";
 
 %feature("docstring")  CasADi::QPSolverInternal::init "
 
-Initialize and make the object ready for setting arguments and evaluation.
-This method is typically called after setting options but before evaluating.
-If passed to another class (in the constructor), this class should invoke
-this function when initialized. ";
+Initialize Initialize and make the object ready for setting arguments and
+evaluation. This method is typically called after setting options but before
+evaluating. If passed to another class (in the constructor), this class
+should invoke this function when initialized. ";
 
 %feature("docstring")  CasADi::QPSolverInternal::evaluate "
 
@@ -51276,6 +51861,11 @@ Evaluate. ";
 %feature("docstring")  CasADi::QPSolverInternal::evaluate_switch "
 
 Evaluate switch. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
 %feature("docstring")  CasADi::QPSolverInternal::jacobian "
 
@@ -51317,11 +51907,6 @@ Print. ";
 %feature("docstring")  CasADi::QPSolverInternal::repr "
 
 Print. ";
-
-%feature("docstring")  CasADi::QPSolverInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::QPSolverInternal::getPartition "
 
@@ -51601,6 +52186,11 @@ get the reference of a child ";
 
 get the reference of a child ";
 
+%feature("docstring")  CasADi::RealtypeSXNode::init "
+
+Initialize the node (currently used only to give a similar interface to
+MXNode) ";
+
 %feature("docstring")  CasADi::RealtypeSXNode::isSmooth "
 
 Check if smooth. ";
@@ -51763,7 +52353,7 @@ Joel Andersson
 |              |              |              | equal to     |              |
 |              |              |              | abstol]      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| fsens_err_co | OT_INTEGER   | false        | include the  | CasADi::Inte |
+| fsens_err_co | OT_BOOLEAN   | false        | include the  | CasADi::Inte |
 | n            |              |              | forward sens | gratorIntern |
 |              |              |              | itivities in | al           |
 |              |              |              | all error    |              |
@@ -52243,6 +52833,11 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::RKIntegrator::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
 %feature("docstring")  CasADi::RKIntegrator::evaluate_old "
 
 Evaluate (old style) ";
@@ -52599,7 +53194,7 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | equal to     |              |
 |              |              |              | abstol]      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| fsens_err_co | OT_INTEGER   | false        | include the  | CasADi::Inte |
+| fsens_err_co | OT_BOOLEAN   | false        | include the  | CasADi::Inte |
 | n            |              |              | forward sens | gratorIntern |
 |              |              |              | itivities in | al           |
 |              |              |              | all error    |              |
@@ -52952,6 +53547,11 @@ Set final time. ";
 
 Evaluate switch. ";
 
+%feature("docstring")  CasADi::RKIntegratorInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
 %feature("docstring")  CasADi::RKIntegratorInternal::jacobian_switch "
 
 Switch between numeric and symbolic jacobian. ";
@@ -52987,12 +53587,6 @@ Print. ";
 %feature("docstring")  CasADi::RKIntegratorInternal::repr "
 
 Print. ";
-
-%feature("docstring")  CasADi::RKIntegratorInternal::unidirectionalColoring
-"
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::RKIntegratorInternal::getPartition "
 
@@ -53209,7 +53803,7 @@ Destructor. ";
 
 Clone function. ";
 
-%feature("docstring")  CasADi::ScalarNonzerosOp::evaluate "
+%feature("docstring")  CasADi::ScalarNonzerosOp::evaluateD "
 
 Evaluate the function numerically. ";
 
@@ -53257,7 +53851,7 @@ Print a description. ";
 
 Print expression (make sure number of calls is not exceeded) ";
 
-%feature("docstring")  CasADi::ScalarNonzerosOp::evaluate "
+%feature("docstring")  CasADi::ScalarNonzerosOp::evaluateD "
 
 Evaluate the function, no derivatives. ";
 
@@ -53367,17 +53961,13 @@ Set multiple dependencies. ";
 
 Add a dependency. ";
 
-%feature("docstring")  CasADi::ScalarNonzerosOp::addDependency "
+%feature("docstring")  CasADi::ScalarNonzerosOp::assign "
 
-Add a dependency (index given) ";
+Assign nonzeros (mapping matrix) ";
 
-%feature("docstring")  CasADi::ScalarNonzerosOp::addDependency "
+%feature("docstring")  CasADi::ScalarNonzerosOp::assign "
 
-Add a dependency (mapping matrix) ";
-
-%feature("docstring")  CasADi::ScalarNonzerosOp::addDependency "
-
-Add a dependency (mapping matrix) ";
+Assign nonzeros (mapping matrix), output indices sequential. ";
 
 %feature("docstring")  CasADi::ScalarNonzerosOp::numel "
 
@@ -53925,6 +54515,11 @@ Set number of inputs (normally invoked internally) ";
 
 Set number of outputs (normally invoked internally) ";
 
+%feature("docstring")  CasADi::Simulator::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
 %feature("docstring")  CasADi::Simulator::evaluate_old "
 
 Evaluate (old style) ";
@@ -54320,6 +54915,11 @@ initialize ";
 
 Integrate. ";
 
+%feature("docstring")  CasADi::SimulatorInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization.
+";
+
 %feature("docstring")  CasADi::SimulatorInternal::evaluate_switch "
 
 Evaluate switch. ";
@@ -54364,11 +54964,6 @@ Print. ";
 %feature("docstring")  CasADi::SimulatorInternal::repr "
 
 Print. ";
-
-%feature("docstring")  CasADi::SimulatorInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::SimulatorInternal::getPartition "
 
@@ -54616,7 +55211,7 @@ Destructor. ";
 
 Clone function. ";
 
-%feature("docstring")  CasADi::SparseSparseOp::evaluate "
+%feature("docstring")  CasADi::SparseSparseOp::evaluateD "
 
 Evaluate the function numerically. ";
 
@@ -54660,7 +55255,7 @@ Print a description. ";
 
 Print expression (make sure number of calls is not exceeded) ";
 
-%feature("docstring")  CasADi::SparseSparseOp::evaluate "
+%feature("docstring")  CasADi::SparseSparseOp::evaluateD "
 
 Evaluate the function, no derivatives. ";
 
@@ -54770,17 +55365,13 @@ Set multiple dependencies. ";
 
 Add a dependency. ";
 
-%feature("docstring")  CasADi::SparseSparseOp::addDependency "
+%feature("docstring")  CasADi::SparseSparseOp::assign "
 
-Add a dependency (index given) ";
+Assign nonzeros (mapping matrix) ";
 
-%feature("docstring")  CasADi::SparseSparseOp::addDependency "
+%feature("docstring")  CasADi::SparseSparseOp::assign "
 
-Add a dependency (mapping matrix) ";
-
-%feature("docstring")  CasADi::SparseSparseOp::addDependency "
-
-Add a dependency (mapping matrix) ";
+Assign nonzeros (mapping matrix), output indices sequential. ";
 
 %feature("docstring")  CasADi::SparseSparseOp::numel "
 
@@ -54840,12 +55431,12 @@ Assert that the object has been initialized. ";
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Static parameters on which the     |
-|                                    | objective and constraints might    |
-|                                    | depend.                            |
+| NLP_P                              | Only for parametric NLP - static   |
+|                                    | parameters on which the objective  |
+|                                    | and constraints might depend.      |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 4)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
@@ -54862,6 +55453,9 @@ Assert that the object has been initialized. ";
 |                                    | with bounds on X at the solution   |
 |                                    | (n x 1) When in warmstart mode,    |
 |                                    | this output may be used as input ( |
++------------------------------------+------------------------------------+
+| NLP_G                              | The constraints evaluated at the   |
+|                                    | optimal solution (m x 1)           |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -54916,6 +55510,9 @@ Assert that the object has been initialized. ";
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
++--------------+--------------+--------------+--------------+--------------+
+| hessian_appr | OT_STRING    | \"BFGS\"       | BFGS|exact   | CasADi::SQPI |
+| oximation    |              |              |              | nternal      |
 +--------------+--------------+--------------+--------------+--------------+
 | ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
 | _vec         |              |              | true, the    | olverInterna |
@@ -54982,7 +55579,11 @@ Assert that the object has been initialized. ";
 |              |              |              | iterations   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
-|              | TOR          | )            | be activated | ternal       |
+|              | TOR          | )            | be activated | ternal   Cas |
+|              |              |              | (eval_f|eval | ADi::SQPInte |
+|              |              |              | _g|eval_jac_ | rnal         |
+|              |              |              | g|eval_grad_ |              |
+|              |              |              | f|eval_h|qp) |              |
 +--------------+--------------+--------------+--------------+--------------+
 | mu_safety    | OT_REAL      | 1.1          | Safety       | CasADi::SQPI |
 |              |              |              | factor for   | nternal      |
@@ -55028,6 +55629,18 @@ Assert that the object has been initialized. ";
 |              |              |              | with the     |              |
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| parametric   | OT_BOOLEAN   | false        | Expect F, G, | CasADi::NLPS |
+|              |              |              | H, J to have | olverInterna |
+|              |              |              | an           | l            |
+|              |              |              | additional   |              |
+|              |              |              | input        |              |
+|              |              |              | argument     |              |
+|              |              |              | appended at  |              |
+|              |              |              | the end,     |              |
+|              |              |              | denoting     |              |
+|              |              |              | fixed        |              |
+|              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | qp_solver    | OT_QPSOLVER  | GenericType( | The QP       | CasADi::SQPI |
 |              |              | )            | solver to be | nternal      |
@@ -55100,6 +55713,29 @@ Assert that the object has been initialized. ";
 |              |              |              | -- for       |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
+| _bounds      |              |              | initial      | olverInterna |
+|              |              |              | guess does   | l            |
+|              |              |              | not satisfy  |              |
+|              |              |              | LBX and UBX  |              |
++--------------+--------------+--------------+--------------+--------------+
+
+>List of available monitors
++-------------+---------------------+
+|     Id      |       Used in       |
++=============+=====================+
+| eval_f      | CasADi::SQPInternal |
++-------------+---------------------+
+| eval_g      | CasADi::SQPInternal |
++-------------+---------------------+
+| eval_grad_f | CasADi::SQPInternal |
++-------------+---------------------+
+| eval_h      | CasADi::SQPInternal |
++-------------+---------------------+
+| eval_jac_g  | CasADi::SQPInternal |
++-------------+---------------------+
+| qp          | CasADi::SQPInternal |
++-------------+---------------------+
 
 >List of available stats
 +-----------+---------------------+
@@ -55128,20 +55764,33 @@ Make a deep copy of the instance. ";
 
 %feature("docstring")  CasADi::SQPInternal::init "
 
-Initialize and make the object ready for setting arguments and evaluation.
-This method is typically called after setting options but before evaluating.
-If passed to another class (in the constructor), this class should invoke
-this function when initialized. ";
+Initialize Initialize and make the object ready for setting arguments and
+evaluation. This method is typically called after setting options but before
+evaluating. If passed to another class (in the constructor), this class
+should invoke this function when initialized. ";
 
 %feature("docstring")  CasADi::SQPInternal::evaluate "
 
 Evaluate. ";
 
-%feature("docstring")  CasADi::SQPInternal::reportConstraints "";
+%feature("docstring")  CasADi::SQPInternal::reportConstraints "
+
+Prints out a human readable report about possible constraint violations -
+all constraints. ";
+
+%feature("docstring")  CasADi::SQPInternal::checkInitialBounds "
+
+Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
+";
 
 %feature("docstring")  CasADi::SQPInternal::evaluate_switch "
 
 Evaluate switch. ";
+
+%feature("docstring")  CasADi::SQPInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
 %feature("docstring")  CasADi::SQPInternal::jacobian "
 
@@ -55183,11 +55832,6 @@ Print. ";
 %feature("docstring")  CasADi::SQPInternal::repr "
 
 Print. ";
-
-%feature("docstring")  CasADi::SQPInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::SQPInternal::getPartition "
 
@@ -55401,6 +56045,16 @@ Hessian approximation. Line search is carried out via backtracking until
 with the Armijo condition applied to the T1 (in Nocedal phi1) merit function
 is satisfied.
 
+The method solved can be written in the form:   min          F(x1,x2)
+x1,x2      subject to             LBG1 <= G1(x1,x2) <= UBG1               x2
+== G2(x1,x2)             LBX1 <= x1    <= UBX1             LBX2 <=     x2
+<= UBX2
+
+We thus assume that the variable vector x can be divided into two parts,
+where the second part is given recursively by the equations x2 == G2(x1,x2).
+That is x2 is given recursively means that we assume that the Jacobian of G2
+with respect to x2 is lower triangular with zeros along the diagonal.
+
 The method is still under development
 
 Joel Andersson
@@ -55427,12 +56081,12 @@ Joel Andersson
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Static parameters on which the     |
-|                                    | objective and constraints might    |
-|                                    | depend.                            |
+| NLP_P                              | Only for parametric NLP - static   |
+|                                    | parameters on which the objective  |
+|                                    | and constraints might depend.      |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 4)
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
@@ -55449,6 +56103,9 @@ Joel Andersson
 |                                    | with bounds on X at the solution   |
 |                                    | (n x 1) When in warmstart mode,    |
 |                                    | this output may be used as input ( |
++------------------------------------+------------------------------------+
+| NLP_G                              | The constraints evaluated at the   |
+|                                    | optimal solution (m x 1)           |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -55503,6 +56160,9 @@ Joel Andersson
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
++--------------+--------------+--------------+--------------+--------------+
+| hessian_appr | OT_STRING    | \"BFGS\"       | BFGS|exact   | CasADi::SQPI |
+| oximation    |              |              |              | nternal      |
 +--------------+--------------+--------------+--------------+--------------+
 | ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
 | _vec         |              |              | true, the    | olverInterna |
@@ -55569,7 +56229,11 @@ Joel Andersson
 |              |              |              | iterations   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
-|              | TOR          | )            | be activated | ternal       |
+|              | TOR          | )            | be activated | ternal   Cas |
+|              |              |              | (eval_f|eval | ADi::SQPInte |
+|              |              |              | _g|eval_jac_ | rnal         |
+|              |              |              | g|eval_grad_ |              |
+|              |              |              | f|eval_h|qp) |              |
 +--------------+--------------+--------------+--------------+--------------+
 | mu_safety    | OT_REAL      | 1.1          | Safety       | CasADi::SQPI |
 |              |              |              | factor for   | nternal      |
@@ -55615,6 +56279,18 @@ Joel Andersson
 |              |              |              | with the     |              |
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| parametric   | OT_BOOLEAN   | false        | Expect F, G, | CasADi::NLPS |
+|              |              |              | H, J to have | olverInterna |
+|              |              |              | an           | l            |
+|              |              |              | additional   |              |
+|              |              |              | input        |              |
+|              |              |              | argument     |              |
+|              |              |              | appended at  |              |
+|              |              |              | the end,     |              |
+|              |              |              | denoting     |              |
+|              |              |              | fixed        |              |
+|              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | qp_solver    | OT_QPSOLVER  | GenericType( | The QP       | CasADi::SQPI |
 |              |              | )            | solver to be | nternal      |
@@ -55687,6 +56363,29 @@ Joel Andersson
 |              |              |              | -- for       |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
+| _bounds      |              |              | initial      | olverInterna |
+|              |              |              | guess does   | l            |
+|              |              |              | not satisfy  |              |
+|              |              |              | LBX and UBX  |              |
++--------------+--------------+--------------+--------------+--------------+
+
+>List of available monitors
++-------------+---------------------+
+|     Id      |       Used in       |
++=============+=====================+
+| eval_f      | CasADi::SQPInternal |
++-------------+---------------------+
+| eval_g      | CasADi::SQPInternal |
++-------------+---------------------+
+| eval_grad_f | CasADi::SQPInternal |
++-------------+---------------------+
+| eval_h      | CasADi::SQPInternal |
++-------------+---------------------+
+| eval_jac_g  | CasADi::SQPInternal |
++-------------+---------------------+
+| qp          | CasADi::SQPInternal |
++-------------+---------------------+
 
 >List of available stats
 +-----------+---------------------+
@@ -55867,6 +56566,11 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::SQPMethod::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::SQPMethod::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
 
 %feature("docstring")  CasADi::SQPMethod::evaluate_old "
 
@@ -56093,9 +56797,9 @@ xml_arg.hpp ";
 %feature("docstring")  CasADi::OptimalControl::StrArg::StrArg "";
 
 
-// File: classCasADi_1_1SubBinaryOperation.xml
+// File: structCasADi_1_1SubBinaryOperation.xml
 %feature("docstring") CasADi::SubBinaryOperation "C++ includes:
-casadi_math.hpp ";
+casadi_calculus.hpp ";
 
 
 // File: classCasADi_1_1SubMatrix.xml
@@ -56484,6 +57188,11 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::SuperLU::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::SuperLU::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
 
 %feature("docstring")  CasADi::SuperLU::evaluate_old "
 
@@ -56893,10 +57602,10 @@ C++ includes: superlu_internal.hpp ";
 
 %feature("docstring")  CasADi::SuperLUInternal::init "
 
-Initialize and make the object ready for setting arguments and evaluation.
-This method is typically called after setting options but before evaluating.
-If passed to another class (in the constructor), this class should invoke
-this function when initialized. ";
+Initialize Initialize and make the object ready for setting arguments and
+evaluation. This method is typically called after setting options but before
+evaluating. If passed to another class (in the constructor), this class
+should invoke this function when initialized. ";
 
 %feature("docstring")  CasADi::SuperLUInternal::prepare "";
 
@@ -56925,6 +57634,11 @@ Evaluate. ";
 %feature("docstring")  CasADi::SuperLUInternal::evaluate_switch "
 
 Evaluate switch. ";
+
+%feature("docstring")  CasADi::SuperLUInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
 %feature("docstring")  CasADi::SuperLUInternal::jacobian "
 
@@ -56966,11 +57680,6 @@ Print. ";
 %feature("docstring")  CasADi::SuperLUInternal::repr "
 
 Print. ";
-
-%feature("docstring")  CasADi::SuperLUInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::SuperLUInternal::getPartition "
 
@@ -57362,6 +58071,8 @@ allow unambigous access. ";
 
 %feature("docstring")  CasADi::SX::erf "";
 
+%feature("docstring")  CasADi::SX::erfinv "";
+
 %feature("docstring")  CasADi::SX::fabs "";
 
 %feature("docstring")  CasADi::SX::add "";
@@ -57410,11 +58121,16 @@ allow unambigous access. ";
 
 %feature("docstring")  CasADi::SX::setTemp "";
 
+%feature("docstring")  CasADi::SX::assignNoDelete "
+
+Assign the node to something, without invoking the deletion of the node, if
+the count reaches 0. ";
+
 
 // File: structCasADi_1_1SXAlgEl.xml
 %feature("docstring") CasADi::SXAlgEl "
 
-An elemenent of the algorithm, namely a binary operation.
+An atomic operation for the SX virtual machine.
 
 C++ includes: sx_function.hpp ";
 
@@ -57793,7 +58509,27 @@ Generate C code for the function. ";
 
 %feature("docstring")  CasADi::SXFunction::algorithm "
 
-Access the algorithm. ";
+Access the algorithm directly. ";
+
+%feature("docstring")  CasADi::SXFunction::getAlgorithmSize "
+
+Get the number of atomic operations. ";
+
+%feature("docstring")  CasADi::SXFunction::getAtomicOperation "
+
+Get an atomic operation operator index. ";
+
+%feature("docstring")  CasADi::SXFunction::getAtomicInput "
+
+Get the (integer) input arguments of an atomic operation. ";
+
+%feature("docstring")  CasADi::SXFunction::getAtomicInputReal "
+
+Get the floating point output argument of an atomic operation. ";
+
+%feature("docstring")  CasADi::SXFunction::getAtomicOutput "
+
+Get the (integer) output argument of an atomic operation. ";
 
 %feature("docstring")  CasADi::SXFunction::countNodes "
 
@@ -57810,11 +58546,15 @@ symbolic evaluations are possible after this. ";
 
 %feature("docstring")  CasADi::SXFunction::eval "
 
-evaluate symbolically ";
+evaluate symbolically, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::SXFunction::eval "
 
-evaluate symbolically (pass and get non-zero entries) ";
+evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::SXFunction::eval "
+
+evaluate symbolically (pass and get non-zero entries) LEGACY - REMOVE ";
 
 %feature("docstring")  CasADi::SXFunction::eval "
 
@@ -57823,7 +58563,15 @@ evaluate symbolically, single input, single output ";
 %feature("docstring")  CasADi::SXFunction::eval "
 
 evaluate symbolically, single input, single output (pass and get non- zero
-entries) ";
+entries) LEGACY - REMOVE ";
+
+%feature("docstring")  CasADi::SXFunction::evalMX "
+
+evaluate symbolically, MX type (unambiguous) ";
+
+%feature("docstring")  CasADi::SXFunction::evalSX "
+
+evaluate symbolically, SX type (unambiguous) ";
 
 %feature("docstring")  CasADi::SXFunction::getNumInputs "
 
@@ -57840,6 +58588,11 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::SXFunction::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::SXFunction::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
 
 %feature("docstring")  CasADi::SXFunction::evaluate_old "
 
@@ -58215,15 +58968,9 @@ Destructor. ";
 
 Evaluate the function numerically. ";
 
-%feature("docstring")  CasADi::SXFunctionInternal::evaluateSX "
+%feature("docstring")  CasADi::SXFunctionInternal::evalSX "
 
-evaluate symbolically, possibly evaluating constants (old, to be depricated
-implementation) ";
-
-%feature("docstring")  CasADi::SXFunctionInternal::evaluateSXNew "
-
-evaluate symbolically while also propagating directional derivatives (new,
-not yet finished implementation) ";
+evaluate symbolically while also propagating directional derivatives ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::isSmooth "
 
@@ -58252,6 +58999,11 @@ outputs. ";
 
 Initialize. ";
 
+%feature("docstring")  CasADi::SXFunctionInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization.
+";
+
 %feature("docstring")  CasADi::SXFunctionInternal::printOperation "
 
 Print operation i to a stream. ";
@@ -58265,14 +59017,9 @@ Print to a c file. ";
 Clear the function from its symbolic representation, to free up memory, no
 symbolic evaluations are possible after this. ";
 
-%feature("docstring")  CasADi::SXFunctionInternal::getJacSparsity "
+%feature("docstring")  CasADi::SXFunctionInternal::spReset "
 
-Generate the sparsity of a Jacobian block. ";
-
-%feature("docstring")  CasADi::SXFunctionInternal::symbolicInputSX "
-
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Reset the virtual machine for sparsity calculations. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::spProp "
 
@@ -58282,9 +59029,25 @@ Propagate the sparsity seeds. ";
 
 Get the forward/adjoint sparsity seed. ";
 
-%feature("docstring")  CasADi::SXFunctionInternal::spDetect "
+%feature("docstring")  CasADi::SXFunctionInternal::jacGen "
 
-Detect sparsity pattern. ";
+Construct a complete Jacobian by compression. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::getJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::evalMX "
+
+Evaluate symbolically, MX type. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::eval "
+
+Evaluate symbolically, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::eval "
+
+Evaluate symbolically, MX type (overloaded) ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::evaluate_switch "
 
@@ -58317,11 +59080,6 @@ Const access an output. ";
 %feature("docstring")  CasADi::SXFunctionInternal::repr "
 
 Print. ";
-
-%feature("docstring")  CasADi::SXFunctionInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::getPartition "
 
@@ -58416,6 +59174,11 @@ Generate the sparsity of a Jacobian block. ";
 Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::SXFunctionInternal::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
@@ -58588,6 +59351,11 @@ get the reference of a child ";
 
 get the reference of a child ";
 
+%feature("docstring")  CasADi::SXNode::init "
+
+Initialize the node (currently used only to give a similar interface to
+MXNode) ";
+
 %feature("docstring")  CasADi::SXNode::isSmooth "
 
 Check if smooth. ";
@@ -58626,7 +59394,7 @@ Clone function. ";
 
 Print a part of the expression. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::evaluate "
+%feature("docstring")  CasADi::SymbolicMatrix::evaluateD "
 
 Evaluate the function numerically. ";
 
@@ -58674,7 +59442,7 @@ Print a description. ";
 
 Print expression (make sure number of calls is not exceeded) ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::evaluate "
+%feature("docstring")  CasADi::SymbolicMatrix::evaluateD "
 
 Evaluate the function, no derivatives. ";
 
@@ -58780,17 +59548,13 @@ Set multiple dependencies. ";
 
 Add a dependency. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::addDependency "
+%feature("docstring")  CasADi::SymbolicMatrix::assign "
 
-Add a dependency (index given) ";
+Assign nonzeros (mapping matrix) ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::addDependency "
+%feature("docstring")  CasADi::SymbolicMatrix::assign "
 
-Add a dependency (mapping matrix) ";
-
-%feature("docstring")  CasADi::SymbolicMatrix::addDependency "
-
-Add a dependency (mapping matrix) ";
+Assign nonzeros (mapping matrix), output indices sequential. ";
 
 %feature("docstring")  CasADi::SymbolicMatrix::isOperation "
 
@@ -58896,6 +59660,11 @@ get the reference of a child ";
 
 get the reference of a child ";
 
+%feature("docstring")  CasADi::SymbolicSXNode::init "
+
+Initialize the node (currently used only to give a similar interface to
+MXNode) ";
+
 %feature("docstring")  CasADi::SymbolicSXNode::isSmooth "
 
 Check if smooth. ";
@@ -58930,7 +59699,7 @@ Clone function. ";
 
 Print a part of the expression. ";
 
-%feature("docstring")  CasADi::UnaryOp::evaluate "
+%feature("docstring")  CasADi::UnaryOp::evaluateD "
 
 Evaluate the function numerically. ";
 
@@ -58966,7 +59735,7 @@ Print a description. ";
 
 Print expression (make sure number of calls is not exceeded) ";
 
-%feature("docstring")  CasADi::UnaryOp::evaluate "
+%feature("docstring")  CasADi::UnaryOp::evaluateD "
 
 Evaluate the function, no derivatives. ";
 
@@ -59080,17 +59849,13 @@ Set multiple dependencies. ";
 
 Add a dependency. ";
 
-%feature("docstring")  CasADi::UnaryOp::addDependency "
+%feature("docstring")  CasADi::UnaryOp::assign "
 
-Add a dependency (index given) ";
+Assign nonzeros (mapping matrix) ";
 
-%feature("docstring")  CasADi::UnaryOp::addDependency "
+%feature("docstring")  CasADi::UnaryOp::assign "
 
-Add a dependency (mapping matrix) ";
-
-%feature("docstring")  CasADi::UnaryOp::addDependency "
-
-Add a dependency (mapping matrix) ";
+Assign nonzeros (mapping matrix), output indices sequential. ";
 
 %feature("docstring")  CasADi::UnaryOp::numel "
 
@@ -59125,169 +59890,185 @@ Check if the object has been initialized. ";
 Assert that the object has been initialized. ";
 
 
-// File: classCasADi_1_1UnaryOperation.xml
-%feature("docstring") CasADi::UnaryOperation "C++ includes: casadi_math.hpp
-";
+// File: structCasADi_1_1UnaryOperation.xml
+%feature("docstring") CasADi::UnaryOperation "C++ includes:
+casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1UnaryOperation_3_01ACOS_01_4.xml
+// File: structCasADi_1_1UnaryOperation_3_01ACOS_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< ACOS > "
 
 Arcus cosine.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1UnaryOperation_3_01ASIN_01_4.xml
+// File: structCasADi_1_1UnaryOperation_3_01ASIN_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< ASIN > "
 
 Arcus sine.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1UnaryOperation_3_01ATAN_01_4.xml
+// File: structCasADi_1_1UnaryOperation_3_01ASSIGN_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< ASSIGN > "
+
+Simple assignment.
+
+C++ includes: casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1UnaryOperation_3_01ATAN_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< ATAN > "
 
 Arcus tangent.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1UnaryOperation_3_01CEIL_01_4.xml
+// File: structCasADi_1_1UnaryOperation_3_01CEIL_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< CEIL > "
 
 Ceil function.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1UnaryOperation_3_01COS_01_4.xml
+// File: structCasADi_1_1UnaryOperation_3_01COS_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< COS > "
 
 Cosine.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1UnaryOperation_3_01COSH_01_4.xml
+// File: structCasADi_1_1UnaryOperation_3_01COSH_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< COSH > "
 
 Hyperbolic cosine.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1UnaryOperation_3_01ERF_01_4.xml
+// File: structCasADi_1_1UnaryOperation_3_01ERF_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< ERF > "
 
 Error function.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1UnaryOperation_3_01EXP_01_4.xml
+// File: structCasADi_1_1UnaryOperation_3_01ERFINV_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< ERFINV > "
+
+Inverse of error function.
+
+C++ includes: casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1UnaryOperation_3_01EXP_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< EXP > "
 
 Natural exponent.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1UnaryOperation_3_01FABS_01_4.xml
+// File: structCasADi_1_1UnaryOperation_3_01FABS_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< FABS > "
 
 Absolute value.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1UnaryOperation_3_01FLOOR_01_4.xml
+// File: structCasADi_1_1UnaryOperation_3_01FLOOR_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< FLOOR > "
 
 Floor function.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1UnaryOperation_3_01INV_01_4.xml
+// File: structCasADi_1_1UnaryOperation_3_01INV_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< INV > "
 
 Elementwise inverse.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1UnaryOperation_3_01LOG_01_4.xml
+// File: structCasADi_1_1UnaryOperation_3_01LOG_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< LOG > "
 
 Natural logarithm.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1UnaryOperation_3_01NEG_01_4.xml
+// File: structCasADi_1_1UnaryOperation_3_01NEG_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< NEG > "
 
 Negation.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1UnaryOperation_3_01SIGN_01_4.xml
+// File: structCasADi_1_1UnaryOperation_3_01SIGN_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< SIGN > "
 
 Sign.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1UnaryOperation_3_01SIN_01_4.xml
+// File: structCasADi_1_1UnaryOperation_3_01SIN_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< SIN > "
 
 Sine.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1UnaryOperation_3_01SINH_01_4.xml
+// File: structCasADi_1_1UnaryOperation_3_01SINH_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< SINH > "
 
 Hyperbolic sine.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1UnaryOperation_3_01SQRT_01_4.xml
+// File: structCasADi_1_1UnaryOperation_3_01SQRT_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< SQRT > "
 
 Square root.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1UnaryOperation_3_01STEP_01_4.xml
+// File: structCasADi_1_1UnaryOperation_3_01STEP_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< STEP > "
 
 Step function.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1UnaryOperation_3_01TAN_01_4.xml
+// File: structCasADi_1_1UnaryOperation_3_01TAN_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< TAN > "
 
 Tangent.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1UnaryOperation_3_01TANH_01_4.xml
+// File: structCasADi_1_1UnaryOperation_3_01TANH_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< TANH > "
 
 Hyperbolic tangent.
 
-C++ includes: casadi_math.hpp ";
+C++ includes: casadi_calculus.hpp ";
 
 
 // File: classCasADi_1_1OptimalControl_1_1Variable.xml
@@ -59596,59 +60377,989 @@ x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
 <= UBX                      n: number of decision variables (x)       m:
 number of constraints (A)
 
+>Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| NLP_X_INIT                         | Decision variables initial guess   |
+|                                    | (n x 1)                            |
++------------------------------------+------------------------------------+
+| NLP_LBX                            | Decision variables lower bound (n  |
+|                                    | x 1), default -inf.                |
++------------------------------------+------------------------------------+
+| NLP_UBX                            | Decision variables upper bound (n  |
+|                                    | x 1), default +inf.                |
++------------------------------------+------------------------------------+
+| NLP_LBG                            | Constraints lower bound (m x 1),   |
+|                                    | default -inf.                      |
++------------------------------------+------------------------------------+
+| NLP_UBG                            | Constraints upper bound (m x 1),   |
+|                                    | default +inf.                      |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
+|                                    | with G, initial guess (m x 1)      |
++------------------------------------+------------------------------------+
+| NLP_P                              | Only for parametric NLP - static   |
+|                                    | parameters on which the objective  |
+|                                    | and constraints might depend.      |
++------------------------------------+------------------------------------+
+
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| NLP_X_OPT                          | Decision variables for optimal     |
+|                                    | solution (n x 1)                   |
++------------------------------------+------------------------------------+
+| NLP_COST                           | Objective/cost function for        |
+|                                    | optimal solution (1 x 1)           |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_G                       | Lagrange multipliers associated    |
+|                                    | with G at the solution (m x 1)     |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_X                       | Lagrange multipliers associated    |
+|                                    | with bounds on X at the solution   |
+|                                    | (n x 1) When in warmstart mode,    |
+|                                    | this output may be used as input ( |
++------------------------------------+------------------------------------+
+| NLP_G                              | The constraints evaluated at the   |
+|                                    | optimal solution (m x 1)           |
++------------------------------------+------------------------------------+
+
+>List of available options
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| AcceptTolFea | OT_REAL      | 0.001        | Tolerance    | CasADi::Worh |
+| s            |              |              | for          | pInternal    |
+|              |              |              | acceptable   |              |
+|              |              |              | feasibility  |              |
++--------------+--------------+--------------+--------------+--------------+
+| AcceptTolOpt | OT_REAL      | 0.001        | Tolerance    | CasADi::Worh |
+| i            |              |              | for          | pInternal    |
+|              |              |              | acceptable   |              |
+|              |              |              | optimality   |              |
++--------------+--------------+--------------+--------------+--------------+
+| AlphaMinCons | OT_BOOLEAN   | False        | Use a        | CasADi::Worh |
+| t            |              |              | constant     | pInternal    |
+|              |              |              | lower bound  |              |
+|              |              |              | on Armijo    |              |
+|              |              |              | stepsize in  |              |
+|              |              |              | Filter       |              |
++--------------+--------------+--------------+--------------+--------------+
+| Ares         | OT_INTEGERVE | (42, 41, 42, | Armijo       | CasADi::Worh |
+|              | CTOR         | 45, 43, 46,  | recovery     | pInternal    |
+|              |              | 44)          | strategies.  |              |
+|              |              |              | Vector of    |              |
+|              |              |              | size 7       |              |
++--------------+--------------+--------------+--------------+--------------+
+| ArmijoBeta   | OT_REAL      | 0.712        | Trial        | CasADi::Worh |
+|              |              |              | stepsize     | pInternal    |
+|              |              |              | decrease     |              |
+|              |              |              | factor for   |              |
+|              |              |              | Armijo rule  |              |
++--------------+--------------+--------------+--------------+--------------+
+| ArmijoMaxAlp | OT_REAL      | 1.0          | Initial      | CasADi::Worh |
+| ha           |              |              | alpha for    | pInternal    |
+|              |              |              | Armijo rule  |              |
++--------------+--------------+--------------+--------------+--------------+
+| ArmijoMinAlp | OT_REAL      | 1e-06        | Lower bound  | CasADi::Worh |
+| ha           |              |              | on alpha for | pInternal    |
+|              |              |              | Armijo rule  |              |
++--------------+--------------+--------------+--------------+--------------+
+| ArmijoMinAlp | OT_REAL      | 1e-06        | Lower bound  | CasADi::Worh |
+| haRec        |              |              | on alpha for | pInternal    |
+|              |              |              | Armijo rule  |              |
+|              |              |              | during       |              |
+|              |              |              | recovery     |              |
++--------------+--------------+--------------+--------------+--------------+
+| ArmijoSigma  | OT_REAL      | 0.005        | Scale factor | CasADi::Worh |
+|              |              |              | for          | pInternal    |
+|              |              |              | linearised   |              |
+|              |              |              | descent      |              |
+|              |              |              | check in     |              |
+|              |              |              | Armijo rule  |              |
++--------------+--------------+--------------+--------------+--------------+
+| AutoQPRecove | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+| ry           |              |              | automatic QP | pInternal    |
+|              |              |              | recovery     |              |
++--------------+--------------+--------------+--------------+--------------+
+| BFGSmaxblock | OT_INTEGER   | 300          | Maximum BFGS | CasADi::Worh |
+| Size         |              |              | block size   | pInternal    |
+|              |              |              | (depends on  |              |
+|              |              |              | BFGS method) |              |
++--------------+--------------+--------------+--------------+--------------+
+| BFGSmethod   | OT_INTEGER   | 0            | Choose BFGS  | CasADi::Worh |
+|              |              |              | method       | pInternal    |
+|              |              |              | (dense,      |              |
+|              |              |              | block,       |              |
+|              |              |              | sparse)      |              |
++--------------+--------------+--------------+--------------+--------------+
+| BFGSminblock | OT_INTEGER   | 300          | Minimum BFGS | CasADi::Worh |
+| Size         |              |              | block size   | pInternal    |
+|              |              |              | (depends on  |              |
+|              |              |              | BFGS method) |              |
++--------------+--------------+--------------+--------------+--------------+
+| BFGSrestart  | OT_INTEGER   | 50           | Restart BFGS | CasADi::Worh |
+|              |              |              | update after | pInternal    |
+|              |              |              | this many    |              |
+|              |              |              | iterations   |              |
++--------------+--------------+--------------+--------------+--------------+
+| BettsFactor  | OT_REAL      | 2.1          | Update       | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
+|              |              |              | Betts'       |              |
+|              |              |              | Hessian regu |              |
+|              |              |              | larisation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| BettsPoint   | OT_REAL      | 1.0          | Smallest     | CasADi::Worh |
+|              |              |              | eigenvalue   | pInternal    |
+|              |              |              | of the       |              |
+|              |              |              | regularised  |              |
+|              |              |              | Hessian      |              |
++--------------+--------------+--------------+--------------+--------------+
+| BoundTolFac  | OT_REAL      | 1000.0       | Factor in    | CasADi::Worh |
+|              |              |              | determining  | pInternal    |
+|              |              |              | active       |              |
+|              |              |              | constraints  |              |
+|              |              |              | by KKT       |              |
++--------------+--------------+--------------+--------------+--------------+
+| CheckFJ      | OT_REAL      | 1e+12        | Upper bound  | CasADi::Worh |
+|              |              |              | used by      | pInternal    |
+|              |              |              | Fritz-John   |              |
+|              |              |              | heuristic    |              |
++--------------+--------------+--------------+--------------+--------------+
+| CheckStructu | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+| reDF         |              |              | structural   | pInternal    |
+|              |              |              | checking of  |              |
+|              |              |              | DF           |              |
++--------------+--------------+--------------+--------------+--------------+
+| CheckStructu | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+| reDG         |              |              | structural   | pInternal    |
+|              |              |              | checking of  |              |
+|              |              |              | DG           |              |
++--------------+--------------+--------------+--------------+--------------+
+| CheckStructu | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+| reHM         |              |              | structural   | pInternal    |
+|              |              |              | checking of  |              |
+|              |              |              | HM           |              |
++--------------+--------------+--------------+--------------+--------------+
+| CorStepBetts | OT_REAL      | 0.5          | (experimenta | CasADi::Worh |
+| Sum          |              |              | l)           | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| CorStepConSt | OT_REAL      | 1e-06        | (experimenta | CasADi::Worh |
+| op           |              |              | l)           | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| CorStepConvi | OT_REAL      | 1.0          | (experimenta | CasADi::Worh |
+| o            |              |              | l)           | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| CorStepMaxIt | OT_INTEGER   | 50           | (experimenta | CasADi::Worh |
+| er           |              |              | l)           | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| CorStepMetho | OT_INTEGER   | 0            | (experimenta | CasADi::Worh |
+| d            |              |              | l)           | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| CorStepMode  | OT_INTEGER   | 1            | (experimenta | CasADi::Worh |
+|              |              |              | l)           | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| CorStepPFact | OT_REAL      | 1.0          | (experimenta | CasADi::Worh |
+| or           |              |              | l)           | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| CorStepPMax  | OT_REAL      | 1000000.0    | (experimenta | CasADi::Worh |
+|              |              |              | l)           | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| CorStepRecov | OT_BOOLEAN   | False        | Enable       | CasADi::Worh |
+| eryDX        |              |              | structural   | pInternal    |
+|              |              |              | checking of  |              |
+|              |              |              | HM           |              |
++--------------+--------------+--------------+--------------+--------------+
+| CurvBCond    | OT_REAL      | 0.02         | Block BFGS   | CasADi::Worh |
+|              |              |              | curvature    | pInternal    |
+|              |              |              | condition    |              |
+|              |              |              | bound        |              |
++--------------+--------------+--------------+--------------+--------------+
+| CurvBFac     | OT_REAL      | 0.3          | Block BFGS   | CasADi::Worh |
+|              |              |              | curvature    | pInternal    |
+|              |              |              | condition re |              |
+|              |              |              | gularisation |              |
+|              |              |              | factor       |              |
++--------------+--------------+--------------+--------------+--------------+
+| CurvCond     | OT_REAL      | 0.02         | BFGS         | CasADi::Worh |
+|              |              |              | Curvature    | pInternal    |
+|              |              |              | condition    |              |
+|              |              |              | bound        |              |
++--------------+--------------+--------------+--------------+--------------+
+| CurvFac      | OT_REAL      | 0.3          | BFGS         | CasADi::Worh |
+|              |              |              | curvature    | pInternal    |
+|              |              |              | condition re |              |
+|              |              |              | gularisation |              |
+|              |              |              | factor       |              |
++--------------+--------------+--------------+--------------+--------------+
+| CutLength    | OT_REAL      | 0.001        | Scaling      | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
+|              |              |              | Cut recovery |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
+| DebugMarker0 | OT_INTEGER   | 42           | Debug        | CasADi::Worh |
+| 6            |              |              | marker, only | pInternal    |
+|              |              |              | needed for   |              |
+|              |              |              | ASTOS        |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
+| FGtogether   | OT_BOOLEAN   | False        | F and G      | CasADi::Worh |
+|              |              |              | cannot be    | pInternal    |
+|              |              |              | evaluated    |              |
+|              |              |              | separately   |              |
++--------------+--------------+--------------+--------------+--------------+
+| FJandND      | OT_BOOLEAN   | False        | Enable       | CasADi::Worh |
+|              |              |              | Fritz-John   | pInternal    |
+|              |              |              | and non-diff |              |
+|              |              |              | erentiable   |              |
+|              |              |              | check        |              |
+|              |              |              | heuristics   |              |
++--------------+--------------+--------------+--------------+--------------+
+| FeasibleDual | OT_BOOLEAN   | False        | Activate     | CasADi::Worh |
+|              |              |              | dual         | pInternal    |
+|              |              |              | feasibility  |              |
+|              |              |              | mode         |              |
++--------------+--------------+--------------+--------------+--------------+
+| FeasibleInit | OT_BOOLEAN   | False        | Activate     | CasADi::Worh |
+|              |              |              | initial      | pInternal    |
+|              |              |              | feasibility  |              |
+|              |              |              | mode         |              |
++--------------+--------------+--------------+--------------+--------------+
+| FeasibleInit | OT_REAL      | 0.001        | Feasibility  | CasADi::Worh |
+| Tol          |              |              | tolerance    | pInternal    |
+|              |              |              | for no-      |              |
+|              |              |              | objective    |              |
+|              |              |              | feasible     |              |
+|              |              |              | mode         |              |
++--------------+--------------+--------------+--------------+--------------+
+| FeasibleOnly | OT_BOOLEAN   | False        | Activate     | CasADi::Worh |
+|              |              |              | feasible-    | pInternal    |
+|              |              |              | only mode    |              |
++--------------+--------------+--------------+--------------+--------------+
+| FidifEps     | OT_REAL      | 1e-05        | Finite       | CasADi::Worh |
+|              |              |              | difference   | pInternal    |
+|              |              |              | perturbation |              |
++--------------+--------------+--------------+--------------+--------------+
+| FidifHM      | OT_BOOLEAN   | False        | Approximate  | CasADi::Worh |
+|              |              |              | Hessian by   | pInternal    |
+|              |              |              | finite       |              |
+|              |              |              | differences  |              |
+|              |              |              | (otherwise   |              |
+|              |              |              | BFGS)        |              |
++--------------+--------------+--------------+--------------+--------------+
+| FilterBisecA | OT_BOOLEAN   | True         | Filter       | CasADi::Worh |
+| lpha         |              |              | heuristic to | pInternal    |
+|              |              |              | save Armijo  |              |
+|              |              |              | iterations   |              |
++--------------+--------------+--------------+--------------+--------------+
+| FilterGammaC | OT_REAL      | 7.5e-06      | Constraint   | CasADi::Worh |
+| V            |              |              | violation    | pInternal    |
+|              |              |              | decrease     |              |
+|              |              |              | factor in    |              |
+|              |              |              | Filter       |              |
+|              |              |              | acceptance   |              |
+|              |              |              | check        |              |
++--------------+--------------+--------------+--------------+--------------+
+| FilterGammaF | OT_REAL      | 1.1e-05      | Objective    | CasADi::Worh |
+|              |              |              | decrease     | pInternal    |
+|              |              |              | factor in    |              |
+|              |              |              | Filter       |              |
+|              |              |              | acceptance   |              |
+|              |              |              | check        |              |
++--------------+--------------+--------------+--------------+--------------+
+| FilterInters | OT_BOOLEAN   | True         | Filter       | CasADi::Worh |
+| ecAlpha      |              |              | heuristic to | pInternal    |
+|              |              |              | save Armijo  |              |
+|              |              |              | iterations   |              |
++--------------+--------------+--------------+--------------+--------------+
+| FirstDifCent | OT_BOOLEAN   | True         | Use central  | CasADi::Worh |
+| ral          |              |              | finite       | pInternal    |
+|              |              |              | difference   |              |
+|              |              |              | quotient for |              |
+|              |              |              | first        |              |
+|              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
+| FocusOnFeas  | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+|              |              |              | Focus-on-    | pInternal    |
+|              |              |              | Feasibility  |              |
+|              |              |              | mode         |              |
++--------------+--------------+--------------+--------------+--------------+
+| FocusOnFeasF | OT_REAL      | 1.36         | Factor in    | CasADi::Worh |
+| actor        |              |              | Focus-on-    | pInternal    |
+|              |              |              | Feasibility  |              |
+|              |              |              | mode         |              |
++--------------+--------------+--------------+--------------+--------------+
+| GammaAlpha   | OT_REAL      | 0.05         | Safety       | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
+|              |              |              | alphamin     |              |
+|              |              |              | calculation  |              |
+|              |              |              | by Filter    |              |
++--------------+--------------+--------------+--------------+--------------+
+| GroupMethod  | OT_INTEGER   | 1            | Select       | CasADi::Worh |
+|              |              |              | method to    | pInternal    |
+|              |              |              | determine    |              |
+|              |              |              | graph        |              |
+|              |              |              | colouring    |              |
+|              |              |              | groups       |              |
++--------------+--------------+--------------+--------------+--------------+
+| IgnoreFilter | OT_BOOLEAN   | False        | Activate     | CasADi::Worh |
+| Crit         |              |              | accelerating | pInternal    |
+|              |              |              | heuristics   |              |
+|              |              |              | for Filter   |              |
++--------------+--------------+--------------+--------------+--------------+
+| IncBettsTau  | OT_REAL      | 2.0          | Increase     | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
+|              |              |              | Betts'       |              |
+|              |              |              | update       |              |
+|              |              |              | dampening    |              |
+|              |              |              | term         |              |
++--------------+--------------+--------------+--------------+--------------+
+| IncBettsTauM | OT_REAL      | 100.0        | Larger       | CasADi::Worh |
+| ore          |              |              | increase     | pInternal    |
+|              |              |              | factor for   |              |
+|              |              |              | Betts'       |              |
+|              |              |              | update       |              |
+|              |              |              | dampening    |              |
+|              |              |              | term         |              |
++--------------+--------------+--------------+--------------+--------------+
+| IncreaseIWS  | OT_REAL      | 1.0          | Increase     | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
+|              |              |              | estimated    |              |
+|              |              |              | integer      |              |
+|              |              |              | workspace    |              |
+|              |              |              | requirement  |              |
++--------------+--------------+--------------+--------------+--------------+
+| IncreaseRWS  | OT_REAL      | 1.0          | Increase     | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
+|              |              |              | estimated    |              |
+|              |              |              | real         |              |
+|              |              |              | workspace    |              |
+|              |              |              | requirement  |              |
++--------------+--------------+--------------+--------------+--------------+
+| Infty        | OT_REAL      | 1e+20        | Upper bound  | CasADi::Worh |
+|              |              |              | for numbers  | pInternal    |
+|              |              |              | to be        |              |
+|              |              |              | regarded as  |              |
+|              |              |              | finite       |              |
++--------------+--------------+--------------+--------------+--------------+
+| InftyUnbound | OT_REAL      | 1e+20        | Tolerance    | CasADi::Worh |
+| ed           |              |              | for unbounde | pInternal    |
+|              |              |              | dness        |              |
+|              |              |              | detection    |              |
+|              |              |              | heuristic    |              |
++--------------+--------------+--------------+--------------+--------------+
+| InitialLMest | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+|              |              |              | initial      | pInternal    |
+|              |              |              | Lagrange     |              |
+|              |              |              | multiplier   |              |
+|              |              |              | estimate     |              |
++--------------+--------------+--------------+--------------+--------------+
+| KeepAcceptab | OT_BOOLEAN   | True         | Save         | CasADi::Worh |
+| leSol        |              |              | acceptable   | pInternal    |
+|              |              |              | solutions as |              |
+|              |              |              | fallback     |              |
++--------------+--------------+--------------+--------------+--------------+
+| LMestQPipCom | OT_REAL      | 0.003        | IP complemen | CasADi::Worh |
+| Tol          |              |              | tarity       | pInternal    |
+|              |              |              | tolerance in |              |
+|              |              |              | initial      |              |
+|              |              |              | multiplier   |              |
+|              |              |              | estimate     |              |
++--------------+--------------+--------------+--------------+--------------+
+| LMestQPipRes | OT_REAL      | 1.0          | IP residual  | CasADi::Worh |
+| Tol          |              |              | tolerance in | pInternal    |
+|              |              |              | initial      |              |
+|              |              |              | multiplier   |              |
+|              |              |              | estimate     |              |
++--------------+--------------+--------------+--------------+--------------+
+| LinMult      | OT_BOOLEAN   | False        | Control      | CasADi::Worh |
+|              |              |              | Lagrange     | pInternal    |
+|              |              |              | multiplier   |              |
+|              |              |              | update       |              |
++--------------+--------------+--------------+--------------+--------------+
+| LogLevel     | OT_INTEGER   | 0            | Enable XML   | CasADi::Worh |
+|              |              |              | logfiles and | pInternal    |
+|              |              |              | writing      |              |
+|              |              |              | interval     |              |
++--------------+--------------+--------------+--------------+--------------+
+| LogResult    | OT_INTEGER   | 0            | Enable XML   | CasADi::Worh |
+|              |              |              | result       | pInternal    |
+|              |              |              | logging and  |              |
+|              |              |              | detail level |              |
++--------------+--------------+--------------+--------------+--------------+
+| LowPassAlpha | OT_REAL      | 0.95         | Lowpass-     | CasADi::Worh |
+| F            |              |              | filter       | pInternal    |
+|              |              |              | update       |              |
+|              |              |              | factor for   |              |
+|              |              |              | objective    |              |
+|              |              |              | values       |              |
++--------------+--------------+--------------+--------------+--------------+
+| LowPassAlpha | OT_REAL      | 0.95         | Lowpass-     | CasADi::Worh |
+| G            |              |              | filter       | pInternal    |
+|              |              |              | update       |              |
+|              |              |              | factor for   |              |
+|              |              |              | constraint   |              |
+|              |              |              | values       |              |
++--------------+--------------+--------------+--------------+--------------+
+| LowPassAlpha | OT_REAL      | 0.1          | Lowpass-     | CasADi::Worh |
+| Merit        |              |              | filter       | pInternal    |
+|              |              |              | update       |              |
+|              |              |              | factor for   |              |
+|              |              |              | merit        |              |
+|              |              |              | function     |              |
+|              |              |              | values       |              |
++--------------+--------------+--------------+--------------+--------------+
+| LowPassFilte | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+| r            |              |              | lowpass-     | pInternal    |
+|              |              |              | filter       |              |
+|              |              |              | termination  |              |
+|              |              |              | criterion    |              |
++--------------+--------------+--------------+--------------+--------------+
+| Ma57PivotThr | OT_REAL      | 1e-06        | Pivoting     | CasADi::Worh |
+| esh          |              |              | tolerance    | pInternal    |
+|              |              |              | for MA57 =   |              |
+|              |              |              | CNTL(1)      |              |
++--------------+--------------+--------------+--------------+--------------+
+| MatrixCC     | OT_BOOLEAN   | False        | Not to be    | CasADi::Worh |
+|              |              |              | included     | pInternal    |
+|              |              |              | into a       |              |
+|              |              |              | parameter    |              |
+|              |              |              | file!        |              |
++--------------+--------------+--------------+--------------+--------------+
+| MaxCalls     | OT_INTEGER   | 2147483647   | Upper bound  | CasADi::Worh |
+|              |              |              | to Reverse C | pInternal    |
+|              |              |              | ommunication |              |
+|              |              |              | calls        |              |
++--------------+--------------+--------------+--------------+--------------+
+| MaxForce     | OT_INTEGER   | 1000         | Maximum      | CasADi::Worh |
+|              |              |              | number of    | pInternal    |
+|              |              |              | Force        |              |
+|              |              |              | recovery     |              |
+|              |              |              | strategy     |              |
+|              |              |              | steps        |              |
++--------------+--------------+--------------+--------------+--------------+
+| MaxGPart     | OT_INTEGER   | 1            | (experimenta | CasADi::Worh |
+|              |              |              | l)           | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| MaxIter      | OT_INTEGER   | 500          | Upper bound  | CasADi::Worh |
+|              |              |              | on major     | pInternal    |
+|              |              |              | iterations   |              |
++--------------+--------------+--------------+--------------+--------------+
+| MaxLScounter | OT_INTEGER   | 3            | Control      | CasADi::Worh |
+|              |              |              | activation   | pInternal    |
+|              |              |              | of Filter    |              |
+|              |              |              | acceleration |              |
+|              |              |              | heuristics   |              |
++--------------+--------------+--------------+--------------+--------------+
+| MaxNorm      | OT_BOOLEAN   | True         | Select max-  | CasADi::Worh |
+|              |              |              | norm instead | pInternal    |
+|              |              |              | of 1-norm in |              |
+|              |              |              | Filter       |              |
++--------------+--------------+--------------+--------------+--------------+
+| MeritFunctio | OT_INTEGER   | 4            | Select merit | CasADi::Worh |
+| n            |              |              | function and | pInternal    |
+|              |              |              | penalty      |              |
+|              |              |              | update [0,   |              |
+|              |              |              | 3..5]        |              |
++--------------+--------------+--------------+--------------+--------------+
+| MeritGradTol | OT_REAL      | 2.2204460492 | Threshold of | CasADi::Worh |
+|              |              | 5e-16        | meritfunctio | pInternal    |
+|              |              |              | n gradient   |              |
+|              |              |              | for          |              |
+|              |              |              | increasing   |              |
+|              |              |              | Hessian regu |              |
+|              |              |              | larisation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| MinBettsTau  | OT_REAL      | 2.2204460492 | Lower bound  | CasADi::Worh |
+|              |              | 5e-16        | for Betts'   | pInternal    |
+|              |              |              | update       |              |
+|              |              |              | dampening    |              |
+|              |              |              | term         |              |
++--------------+--------------+--------------+--------------+--------------+
+| MoreRelax    | OT_BOOLEAN   | False        | Introduce    | CasADi::Worh |
+|              |              |              | one          | pInternal    |
+|              |              |              | relaxation   |              |
+|              |              |              | variable for |              |
+|              |              |              | every        |              |
+|              |              |              | constraint   |              |
++--------------+--------------+--------------+--------------+--------------+
+| NLPmethod    | OT_INTEGER   | 1            | Select (1) M | CasADi::Worh |
+|              |              |              | eritfunction | pInternal    |
+|              |              |              | or (3)       |              |
+|              |              |              | Filter globa |              |
+|              |              |              | lisation     |              |
++--------------+--------------+--------------+--------------+--------------+
+| NLPprint     | OT_INTEGER   | 2            | NLP print    | CasADi::Worh |
+|              |              |              | level        | pInternal    |
+|              |              |              | [-1..4]      |              |
++--------------+--------------+--------------+--------------+--------------+
+| PairMethod   | OT_INTEGER   | 1            | Select       | CasADi::Worh |
+|              |              |              | method to    | pInternal    |
+|              |              |              | determine    |              |
+|              |              |              | graph        |              |
+|              |              |              | colouring    |              |
+|              |              |              | pairgroups   |              |
++--------------+--------------+--------------+--------------+--------------+
+| PenUpdEpsBar | OT_REAL      | 0.9          | Penalty      | CasADi::Worh |
+|              |              |              | update       | pInternal    |
+|              |              |              | parameter    |              |
+|              |              |              | factor for M |              |
+|              |              |              | eritFunction |              |
+|              |              |              | = 3          |              |
++--------------+--------------+--------------+--------------+--------------+
+| PenUpdEpsKFa | OT_REAL      | 2.0          | Penalty      | CasADi::Worh |
+| c            |              |              | update       | pInternal    |
+|              |              |              | parameter    |              |
+|              |              |              | factor for M |              |
+|              |              |              | eritFunction |              |
+|              |              |              | = 4          |              |
++--------------+--------------+--------------+--------------+--------------+
+| PenUpdEpsKSe | OT_INTEGER   | 2            | Penalty      | CasADi::Worh |
+| quence       |              |              | update       | pInternal    |
+|              |              |              | parameter    |              |
++--------------+--------------+--------------+--------------+--------------+
+| PenUpdMaxDel | OT_REAL      | 11.0         | Max penalty  | CasADi::Worh |
+| taK          |              |              | for MeritFun | pInternal    |
+|              |              |              | ction = 4    |              |
++--------------+--------------+--------------+--------------+--------------+
+| PenUpdMaxFac | OT_REAL      | 100000000.0  | Max factor   | CasADi::Worh |
+|              |              |              | for          | pInternal    |
+|              |              |              | increasing   |              |
+|              |              |              | penalty for  |              |
+|              |              |              | MeritFunctio |              |
+|              |              |              | n = 4        |              |
++--------------+--------------+--------------+--------------+--------------+
+| PenUpdRBar   | OT_REAL      | 2.0          | Penalty      | CasADi::Worh |
+|              |              |              | update       | pInternal    |
+|              |              |              | parameter    |              |
+|              |              |              | for MeritFun |              |
+|              |              |              | ction = 3    |              |
++--------------+--------------+--------------+--------------+--------------+
+| PrecisionF   | OT_REAL      | 2.2204460492 | (currently   | CasADi::Worh |
+|              |              | 5e-16        | unused)      | pInternal    |
+|              |              |              | Relative     |              |
+|              |              |              | precision of |              |
+|              |              |              | objective    |              |
++--------------+--------------+--------------+--------------+--------------+
+| PrecisionG   | OT_REAL      | 2.2204460492 | (currently   | CasADi::Worh |
+|              |              | 5e-16        | unused)      | pInternal    |
+|              |              |              | Relative     |              |
+|              |              |              | precision of |              |
+|              |              |              | constraints  |              |
++--------------+--------------+--------------+--------------+--------------+
+| QPscaleParam | OT_REAL      | 0.0          | (currently   | CasADi::Worh |
+|              |              |              | unused)      | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| QuadraticPro | OT_BOOLEAN   | False        | Not to be    | CasADi::Worh |
+| blem         |              |              | included     | pInternal    |
+|              |              |              | into a       |              |
+|              |              |              | parameter    |              |
+|              |              |              | file!        |              |
++--------------+--------------+--------------+--------------+--------------+
+| ReduceBettsT | OT_REAL      | 0.3          | Decrease     | CasADi::Worh |
+| au           |              |              | factor for   | pInternal    |
+|              |              |              | Betts'       |              |
+|              |              |              | update       |              |
+|              |              |              | dampening    |              |
+|              |              |              | term         |              |
++--------------+--------------+--------------+--------------+--------------+
+| RegStrategy  | OT_INTEGER   | 1            | Select       | CasADi::Worh |
+|              |              |              | Hessian regu | pInternal    |
+|              |              |              | larisation   |              |
+|              |              |              | strategy in  |              |
+|              |              |              | Filter       |              |
++--------------+--------------+--------------+--------------+--------------+
+| ReinitFilter | OT_BOOLEAN   | False        | Enables      | CasADi::Worh |
+|              |              |              | Filter-reini | pInternal    |
+|              |              |              | tialisation  |              |
+|              |              |              | accelerating |              |
+|              |              |              | heuristic    |              |
++--------------+--------------+--------------+--------------+--------------+
+| RelaxMaxDelt | OT_REAL      | 0.92         | Upper bound  | CasADi::Worh |
+| a            |              |              | for          | pInternal    |
+|              |              |              | accepting    |              |
+|              |              |              | the          |              |
+|              |              |              | constraint   |              |
+|              |              |              | relaxation   |              |
+|              |              |              | variable     |              |
++--------------+--------------+--------------+--------------+--------------+
+| RelaxMaxPen  | OT_REAL      | 50000000.0   | Upper bound  | CasADi::Worh |
+|              |              |              | on the       | pInternal    |
+|              |              |              | constraint   |              |
+|              |              |              | relaxation   |              |
+|              |              |              | penalty      |              |
++--------------+--------------+--------------+--------------+--------------+
+| RelaxRho     | OT_REAL      | 6.0          | Update       | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
+|              |              |              | the          |              |
+|              |              |              | constraint   |              |
+|              |              |              | relaxation   |              |
+|              |              |              | penalty      |              |
++--------------+--------------+--------------+--------------+--------------+
+| RelaxStart   | OT_REAL      | 1.0          | Initial      | CasADi::Worh |
+|              |              |              | value of the | pInternal    |
+|              |              |              | constraint   |              |
+|              |              |              | relaxation   |              |
+|              |              |              | penalty      |              |
++--------------+--------------+--------------+--------------+--------------+
+| RestUntilFea | OT_BOOLEAN   | False        | Do           | CasADi::Worh |
+| s            |              |              | restoration  | pInternal    |
+|              |              |              | until a      |              |
+|              |              |              | feasible     |              |
+|              |              |              | solution is  |              |
+|              |              |              | found        |              |
++--------------+--------------+--------------+--------------+--------------+
+| ScaleConIter | OT_BOOLEAN   | False        | Scale        | CasADi::Worh |
+|              |              |              | constraints  | pInternal    |
+|              |              |              | in every     |              |
+|              |              |              | iteration    |              |
++--------------+--------------+--------------+--------------+--------------+
+| ScaleFacObj  | OT_REAL      | 10.0         | Value to     | CasADi::Worh |
+|              |              |              | scale large  | pInternal    |
+|              |              |              | objective    |              |
+|              |              |              | functions to |              |
++--------------+--------------+--------------+--------------+--------------+
+| ScaleFacQP   | OT_REAL      | 10.0         | Upper bound  | CasADi::Worh |
+|              |              |              | on resulting | pInternal    |
+|              |              |              | matrix norm  |              |
+|              |              |              | for QP       |              |
+|              |              |              | scaling      |              |
++--------------+--------------+--------------+--------------+--------------+
+| ScaledFD     | OT_BOOLEAN   | True         | Use a scaled | CasADi::Worh |
+|              |              |              | perturbation | pInternal    |
+|              |              |              | for finite   |              |
+|              |              |              | differences  |              |
++--------------+--------------+--------------+--------------+--------------+
+| ScaledKKT    | OT_BOOLEAN   | True         | Scale KKT    | CasADi::Worh |
+|              |              |              | conditions   | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| ScaledObj    | OT_BOOLEAN   | True         | Scale the    | CasADi::Worh |
+|              |              |              | objective    | pInternal    |
+|              |              |              | function     |              |
++--------------+--------------+--------------+--------------+--------------+
+| ScaledQP     | OT_BOOLEAN   | True         | Scale some   | CasADi::Worh |
+|              |              |              | matrices     | pInternal    |
+|              |              |              | handed to    |              |
+|              |              |              | the QP       |              |
++--------------+--------------+--------------+--------------+--------------+
+| StartBettsTa | OT_REAL      | 0.1          | Initial      | CasADi::Worh |
+| u            |              |              | value for    | pInternal    |
+|              |              |              | Betts'       |              |
+|              |              |              | update       |              |
+|              |              |              | dampening    |              |
+|              |              |              | term         |              |
++--------------+--------------+--------------+--------------+--------------+
+| SwitchingDel | OT_REAL      | 0.01         | Filter       | CasADi::Worh |
+| ta           |              |              | switching    | pInternal    |
+|              |              |              | condition    |              |
+|              |              |              | parameter    |              |
++--------------+--------------+--------------+--------------+--------------+
+| SwitchingSCV | OT_REAL      | 1.1          | Filter       | CasADi::Worh |
+|              |              |              | switching    | pInternal    |
+|              |              |              | condition    |              |
+|              |              |              | parameter    |              |
++--------------+--------------+--------------+--------------+--------------+
+| SwitchingSF  | OT_REAL      | 2.3          | Filter       | CasADi::Worh |
+|              |              |              | switching    | pInternal    |
+|              |              |              | condition    |              |
+|              |              |              | parameter    |              |
++--------------+--------------+--------------+--------------+--------------+
+| TakeQPSol    | OT_BOOLEAN   | False        | Evaluate QP  | CasADi::Worh |
+|              |              |              | search       | pInternal    |
+|              |              |              | direction    |              |
+|              |              |              | regardless   |              |
+|              |              |              | of           |              |
+|              |              |              | convergence  |              |
++--------------+--------------+--------------+--------------+--------------+
+| Timeout      | OT_REAL      | 300.0        | Timeout in   | CasADi::Worh |
+|              |              |              | seconds      | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| TolComp      | OT_REAL      | 0.001        | Complementar | CasADi::Worh |
+|              |              |              | ity          | pInternal    |
+|              |              |              | tolerance    |              |
++--------------+--------------+--------------+--------------+--------------+
+| TolFeas      | OT_REAL      | 1e-06        | Feasibility  | CasADi::Worh |
+|              |              |              | tolerance    | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| TolOpti      | OT_REAL      | 1e-06        | Optimality   | CasADi::Worh |
+|              |              |              | tolerance    | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| TolWeakActiv | OT_REAL      | 1.0          | (experimenta | CasADi::Worh |
+| e            |              |              | l)           | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| TooBig       | OT_BOOLEAN   | True         | Enable too-  | CasADi::Worh |
+|              |              |              | big          | pInternal    |
+|              |              |              | termination  |              |
+|              |              |              | heuristics   |              |
++--------------+--------------+--------------+--------------+--------------+
+| TooBigCV     | OT_REAL      | 1e+25        | Upper bound  | CasADi::Worh |
+|              |              |              | on           | pInternal    |
+|              |              |              | constraint   |              |
+|              |              |              | violation    |              |
+|              |              |              | for too-big  |              |
+|              |              |              | heuristic    |              |
++--------------+--------------+--------------+--------------+--------------+
+| TooBigKKT    | OT_REAL      | 1e+30        | Upper bound  | CasADi::Worh |
+|              |              |              | on KKT       | pInternal    |
+|              |              |              | values for   |              |
+|              |              |              | too-big      |              |
+|              |              |              | heuristic    |              |
++--------------+--------------+--------------+--------------+--------------+
+| UserDF       | OT_BOOLEAN   | True         | Objective    | CasADi::Worh |
+|              |              |              | gradient     | pInternal    |
+|              |              |              | values       |              |
+|              |              |              | supplied by  |              |
+|              |              |              | caller       |              |
++--------------+--------------+--------------+--------------+--------------+
+| UserDG       | OT_BOOLEAN   | True         | Jacobian     | CasADi::Worh |
+|              |              |              | values       | pInternal    |
+|              |              |              | supplied by  |              |
+|              |              |              | caller       |              |
++--------------+--------------+--------------+--------------+--------------+
+| UserHM       | OT_BOOLEAN   | False        | Hessian      | CasADi::Worh |
+|              |              |              | values       | pInternal    |
+|              |              |              | supplied by  |              |
+|              |              |              | caller       |              |
++--------------+--------------+--------------+--------------+--------------+
+| UserHMstruct | OT_INTEGER   | 2            | Enable       | CasADi::Worh |
+| ure          |              |              | automatic    | pInternal    |
+|              |              |              | Hessian      |              |
+|              |              |              | structure    |              |
+|              |              |              | generation   |              |
+|              |              |              | or checking  |              |
++--------------+--------------+--------------+--------------+--------------+
+| WeakActiveSe | OT_BOOLEAN   | False        | (experimenta | CasADi::Worh |
+| t            |              |              | l)           | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| ad_mode      | OT_STRING    | automatic    | How to       | CasADi::Worh |
+|              |              |              | calculate    | pInternal    |
+|              |              |              | the          |              |
+|              |              |              | Jacobians:   |              |
+|              |              |              | \"forward\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | forward      |              |
+|              |              |              | mode)        |              |
+|              |              |              | \"reverse\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | adjoint      |              |
+|              |              |              | mode) or     |              |
+|              |              |              | \"automatic\"  |              |
+|              |              |              | (a heuristic |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| eps          | OT_REAL      | 2.2204460492 | Machine      | CasADi::Worh |
+|              |              | 5e-16        | epsilon      | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| expand_f     | OT_BOOLEAN   | False        | Expand the   | CasADi::Worh |
+|              |              |              | objective    | pInternal    |
+|              |              |              | function in  |              |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| expand_g     | OT_BOOLEAN   | False        | Expand the   | CasADi::Worh |
+|              |              |              | constraint   | pInternal    |
+|              |              |              | function in  |              |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_hes | OT_BOOLEAN   | False        | Generate an  | CasADi::Worh |
+| sian         |              |              | exact        | pInternal    |
+|              |              |              | Hessian of   |              |
+|              |              |              | the          |              |
+|              |              |              | Lagrangian   |              |
++--------------+--------------+--------------+--------------+--------------+
+| ignore_check | OT_BOOLEAN   | False        | If set to    | CasADi::Worh |
+| _vec         |              |              | true, the    | pInternal    |
+|              |              |              | input shape  |              |
+|              |              |              | of F will    |              |
+|              |              |              | not be       |              |
+|              |              |              | checked.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| initialised  | OT_BOOLEAN   | True         | Automaticall | CasADi::Worh |
+|              |              |              | y added init | pInternal    |
+|              |              |              | ialisation   |              |
+|              |              |              | flag.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_FX        |              | A function   | CasADi::Worh |
+| llback       |              |              | that will be | pInternal    |
+|              |              |              | called at    |              |
+|              |              |              | each         |              |
+|              |              |              | iteration.   |              |
+|              |              |              | Input scheme |              |
+|              |              |              | is the same  |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
+|              |              |              | scheme.      |              |
+|              |              |              | Output is    |              |
+|              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_BOOLEAN   | False        | If set to    | CasADi::Worh |
+| llback_ignor |              |              | true, errors | pInternal    |
+| e_errors     |              |              | thrown by it |              |
+|              |              |              | eration_call |              |
+|              |              |              | back will be |              |
+|              |              |              | ignored.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_INTEGER   | 1            | Only call    | CasADi::Worh |
+| llback_step  |              |              | the callback | pInternal    |
+|              |              |              | function     |              |
+|              |              |              | every few    |              |
+|              |              |              | iterations.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_for_sens | OT_BOOLEAN   | False        | Create the a | CasADi::Worh |
+|              |              |              | Jacobian     | pInternal    |
+|              |              |              | function and |              |
+|              |              |              | use this to  |              |
+|              |              |              | calculate    |              |
+|              |              |              | forward sens |              |
+|              |              |              | itivities    |              |
++--------------+--------------+--------------+--------------+--------------+
+| jacobian_gen | OT_JACOBIANG |              | Function     | CasADi::Worh |
+| erator       | ENERATOR     |              | pointer that | pInternal    |
+|              |              |              | returns a    |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | function     |              |
+|              |              |              | given a set  |              |
+|              |              |              | of desired   |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | blocks,      |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC |              | Monitors to  | CasADi::Worh |
+|              | TOR          |              | be activated | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | unnamed_shar | n/a          | CasADi::Worh |
+|              |              | ed_object    |              | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::Worh |
+| j_dir        |              |              | adjoint      | pInternal    |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::Worh |
+| d_dir        |              |              | forward      | pInternal    |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_hess | OT_BOOLEAN   | False        | Calculate    | CasADi::Worh |
+| ian          |              |              | Hessians     | pInternal    |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_jaco | OT_BOOLEAN   | False        | Calculate    | CasADi::Worh |
+| bian         |              |              | Jacobians    | pInternal    |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| parametric   | OT_BOOLEAN   | False        | Expect F, G, | CasADi::Worh |
+|              |              |              | H, J to have | pInternal    |
+|              |              |              | an           |              |
+|              |              |              | additional   |              |
+|              |              |              | input        |              |
+|              |              |              | argument     |              |
+|              |              |              | appended at  |              |
+|              |              |              | the end,     |              |
+|              |              |              | denoting     |              |
+|              |              |              | fixed        |              |
+|              |              |              | parameters.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| sparse       | OT_BOOLEAN   | True         | function is  | CasADi::Worh |
+|              |              |              | sparse       | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| sparsity_gen | OT_SPARSITYG |              | Function     | CasADi::Worh |
+| erator       | ENERATOR     |              | that         | pInternal    |
+|              |              |              | provides     |              |
+|              |              |              | sparsity for |              |
+|              |              |              | a given      |              |
+|              |              |              | input output |              |
+|              |              |              | block,       |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| store_jacobi | OT_BOOLEAN   | False        | keep         | CasADi::Worh |
+| ans          |              |              | references   | pInternal    |
+|              |              |              | to generated |              |
+|              |              |              | Jacobians in |              |
+|              |              |              | order to     |              |
+|              |              |              | avoid        |              |
+|              |              |              | generating   |              |
+|              |              |              | identical    |              |
+|              |              |              | Jacobians    |              |
+|              |              |              | multiple     |              |
+|              |              |              | times        |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_UNKNOWN   |              | A user-      | CasADi::Worh |
+|              |              |              | defined      | pInternal    |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | False        | verbose      | CasADi::Worh |
+|              |              |              | evaluation   | pInternal    |
+|              |              |              | -- for       |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+| warn_initial | OT_BOOLEAN   | False        | Warn if the  | CasADi::Worh |
+| _bounds      |              |              | initial      | pInternal    |
+|              |              |              | guess does   |              |
+|              |              |              | not satisfy  |              |
+|              |              |              | LBX and UBX  |              |
++--------------+--------------+--------------+--------------+--------------+
+
+>List of available monitors
++-------------+-----------------------+
+|     Id      |        Used in        |
++=============+=======================+
+| eval_f      | CasADi::WorhpInternal |
++-------------+-----------------------+
+| eval_g      | CasADi::WorhpInternal |
++-------------+-----------------------+
+| eval_grad_f | CasADi::WorhpInternal |
++-------------+-----------------------+
+| eval_h      | CasADi::WorhpInternal |
++-------------+-----------------------+
+| eval_jac_g  | CasADi::WorhpInternal |
++-------------+-----------------------+
+
 C++ includes: worhp_internal.hpp ";
 
 %feature("docstring")  CasADi::WorhpInternal::WorhpInternal "
 
-addOption(\"pass_nonlinear_variables\", OT_BOOLEAN, true);
-addOption(\"print_time\", OT_BOOLEAN, true, \"print information about
-execution time\");
+Autogenerated from C_worhp_aux.h with params.pl ";
 
-Monitors addOption(\"monitor\", OT_STRINGVECTOR, GenericType(), \"\",
-\"eval_f|eval_g|eval_jac_g|eval_grad_f\", true);
-
-Set pointers to zero app = 0; userclass = 0;
-
-Start the application app = new Worhp::WorhpApplication();
-
-Get all options available in WORHP map<string,
-Worhp::SmartPtr<Worhp::RegisteredOption> > regops =
-app->RegOptions()->RegisteredOptionsList(); for(map<string,
-Worhp::SmartPtr<Worhp::RegisteredOption> >::const_iterator
-it=regops.begin(); it!=regops.end(); ++it){ Option identifier string
-opt_name = it->first;
-
-Short description goes here, even though we do have a longer description
-string opt_desc = it->second->ShortDescription() + \" (see WORHP
-documentation)\";
-
-Get the type Worhp::RegisteredOptionType worhp_type = it->second->Type();
-opt_type casadi_type;
-
-Map Worhp option category to a CasADi options type switch(worhp_type){ case
-Worhp::OT_Number: casadi_type = OT_REAL; break; case Worhp::OT_Integer:
-casadi_type = OT_INTEGER; break; case Worhp::OT_String: casadi_type =
-OT_STRING; break; case Worhp::OT_Unknown: continue; // NOTE: No mechanism to
-handle OT_Unknown options default: continue; // NOTE: Unknown Worhp options
-category }
-
-addOption(opt_name, casadi_type, GenericType(), opt_desc);
-
-Set default values of WORHP options if (casadi_type == OT_REAL) {
-setDefault(opt_name,it->second->DefaultNumber()); } else if (casadi_type ==
-OT_INTEGER) { setDefault(opt_name,it->second->DefaultInteger()); } else if
-(casadi_type == OT_STRING) {
-setDefault(opt_name,it->second->DefaultString()); };
-
-Save to map containing WORHP specific options ops_[opt_name] = casadi_type;
-} ";
-
-%feature("docstring")  CasADi::WorhpInternal::~WorhpInternal "
-
-if(app) delete app;
-
-delete the smart pointer; if(userclass != 0){ Worhp::SmartPtr<Worhp::TNLP>
-*ucptr = (Worhp::SmartPtr<Worhp::TNLP>*)userclass; delete ucptr; } ";
+%feature("docstring")  CasADi::WorhpInternal::~WorhpInternal "";
 
 %feature("docstring")  CasADi::WorhpInternal::clone "
 
@@ -59656,26 +61367,35 @@ Make a deep copy of the instance. ";
 
 %feature("docstring")  CasADi::WorhpInternal::init "
 
-Initialize and make the object ready for setting arguments and evaluation.
-This method is typically called after setting options but before evaluating.
-If passed to another class (in the constructor), this class should invoke
-this function when initialized. ";
+Initialize Initialize and make the object ready for setting arguments and
+evaluation. This method is typically called after setting options but before
+evaluating. If passed to another class (in the constructor), this class
+should invoke this function when initialized.
+
+Autogenerated from C_worhp_aux.h with params.pl ";
 
 %feature("docstring")  CasADi::WorhpInternal::evaluate "
 
-Evaluate.
+Evaluate. ";
 
-if (worhp_w.HM.NeedStructure) { int nz=0; vector<int> rowind,col;
-trans(H_.output()).sparsity().getSparsityCRS(rowind,col); for(int r=0;
-r<rowind.size()-1; ++r) for(int el=rowind[r]; el<rowind[r+1]; ++el){
-if(col[el]<=r){ worhp_w.HM.col[nz] = r; worhp_w.HM.row[nz] = col[el]; nz++;
-} } } ";
+%feature("docstring")  CasADi::WorhpInternal::reportConstraints "
 
-%feature("docstring")  CasADi::WorhpInternal::reportConstraints "";
+Prints out a human readable report about possible constraint violations -
+all constraints. ";
+
+%feature("docstring")  CasADi::WorhpInternal::checkInitialBounds "
+
+Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
+";
 
 %feature("docstring")  CasADi::WorhpInternal::evaluate_switch "
 
 Evaluate switch. ";
+
+%feature("docstring")  CasADi::WorhpInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
 %feature("docstring")  CasADi::WorhpInternal::jacobian "
 
@@ -59717,11 +61437,6 @@ Print. ";
 %feature("docstring")  CasADi::WorhpInternal::repr "
 
 Print. ";
-
-%feature("docstring")  CasADi::WorhpInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::WorhpInternal::getPartition "
 
@@ -59931,10 +61646,993 @@ Assert that the object has been initialized. ";
 
 interface to WORHP NLP solver
 
+Worhp is less flexible then Ipopt: You may not set LBX and UBX to the same
+value, making parametric NLPs a must.
+
+You cannot have a degenerate (constant) objective value
+
+You cannot have both bounds LBG and UBG infinity
+
 Solves the following nonlinear optimization problem:   min          F(x,p)
 x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
 <= UBX                      n: number of decision variables (x)       m:
 number of constraints (A)
+
+>Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| NLP_X_INIT                         | Decision variables initial guess   |
+|                                    | (n x 1)                            |
++------------------------------------+------------------------------------+
+| NLP_LBX                            | Decision variables lower bound (n  |
+|                                    | x 1), default -inf.                |
++------------------------------------+------------------------------------+
+| NLP_UBX                            | Decision variables upper bound (n  |
+|                                    | x 1), default +inf.                |
++------------------------------------+------------------------------------+
+| NLP_LBG                            | Constraints lower bound (m x 1),   |
+|                                    | default -inf.                      |
++------------------------------------+------------------------------------+
+| NLP_UBG                            | Constraints upper bound (m x 1),   |
+|                                    | default +inf.                      |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
+|                                    | with G, initial guess (m x 1)      |
++------------------------------------+------------------------------------+
+| NLP_P                              | Only for parametric NLP - static   |
+|                                    | parameters on which the objective  |
+|                                    | and constraints might depend.      |
++------------------------------------+------------------------------------+
+
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| NLP_X_OPT                          | Decision variables for optimal     |
+|                                    | solution (n x 1)                   |
++------------------------------------+------------------------------------+
+| NLP_COST                           | Objective/cost function for        |
+|                                    | optimal solution (1 x 1)           |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_G                       | Lagrange multipliers associated    |
+|                                    | with G at the solution (m x 1)     |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_X                       | Lagrange multipliers associated    |
+|                                    | with bounds on X at the solution   |
+|                                    | (n x 1) When in warmstart mode,    |
+|                                    | this output may be used as input ( |
++------------------------------------+------------------------------------+
+| NLP_G                              | The constraints evaluated at the   |
+|                                    | optimal solution (m x 1)           |
++------------------------------------+------------------------------------+
+
+>List of available options
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| AcceptTolFea | OT_REAL      | 0.001        | Tolerance    | CasADi::Worh |
+| s            |              |              | for          | pInternal    |
+|              |              |              | acceptable   |              |
+|              |              |              | feasibility  |              |
++--------------+--------------+--------------+--------------+--------------+
+| AcceptTolOpt | OT_REAL      | 0.001        | Tolerance    | CasADi::Worh |
+| i            |              |              | for          | pInternal    |
+|              |              |              | acceptable   |              |
+|              |              |              | optimality   |              |
++--------------+--------------+--------------+--------------+--------------+
+| AlphaMinCons | OT_BOOLEAN   | False        | Use a        | CasADi::Worh |
+| t            |              |              | constant     | pInternal    |
+|              |              |              | lower bound  |              |
+|              |              |              | on Armijo    |              |
+|              |              |              | stepsize in  |              |
+|              |              |              | Filter       |              |
++--------------+--------------+--------------+--------------+--------------+
+| Ares         | OT_INTEGERVE | (42, 41, 42, | Armijo       | CasADi::Worh |
+|              | CTOR         | 45, 43, 46,  | recovery     | pInternal    |
+|              |              | 44)          | strategies.  |              |
+|              |              |              | Vector of    |              |
+|              |              |              | size 7       |              |
++--------------+--------------+--------------+--------------+--------------+
+| ArmijoBeta   | OT_REAL      | 0.712        | Trial        | CasADi::Worh |
+|              |              |              | stepsize     | pInternal    |
+|              |              |              | decrease     |              |
+|              |              |              | factor for   |              |
+|              |              |              | Armijo rule  |              |
++--------------+--------------+--------------+--------------+--------------+
+| ArmijoMaxAlp | OT_REAL      | 1.0          | Initial      | CasADi::Worh |
+| ha           |              |              | alpha for    | pInternal    |
+|              |              |              | Armijo rule  |              |
++--------------+--------------+--------------+--------------+--------------+
+| ArmijoMinAlp | OT_REAL      | 1e-06        | Lower bound  | CasADi::Worh |
+| ha           |              |              | on alpha for | pInternal    |
+|              |              |              | Armijo rule  |              |
++--------------+--------------+--------------+--------------+--------------+
+| ArmijoMinAlp | OT_REAL      | 1e-06        | Lower bound  | CasADi::Worh |
+| haRec        |              |              | on alpha for | pInternal    |
+|              |              |              | Armijo rule  |              |
+|              |              |              | during       |              |
+|              |              |              | recovery     |              |
++--------------+--------------+--------------+--------------+--------------+
+| ArmijoSigma  | OT_REAL      | 0.005        | Scale factor | CasADi::Worh |
+|              |              |              | for          | pInternal    |
+|              |              |              | linearised   |              |
+|              |              |              | descent      |              |
+|              |              |              | check in     |              |
+|              |              |              | Armijo rule  |              |
++--------------+--------------+--------------+--------------+--------------+
+| AutoQPRecove | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+| ry           |              |              | automatic QP | pInternal    |
+|              |              |              | recovery     |              |
++--------------+--------------+--------------+--------------+--------------+
+| BFGSmaxblock | OT_INTEGER   | 300          | Maximum BFGS | CasADi::Worh |
+| Size         |              |              | block size   | pInternal    |
+|              |              |              | (depends on  |              |
+|              |              |              | BFGS method) |              |
++--------------+--------------+--------------+--------------+--------------+
+| BFGSmethod   | OT_INTEGER   | 0            | Choose BFGS  | CasADi::Worh |
+|              |              |              | method       | pInternal    |
+|              |              |              | (dense,      |              |
+|              |              |              | block,       |              |
+|              |              |              | sparse)      |              |
++--------------+--------------+--------------+--------------+--------------+
+| BFGSminblock | OT_INTEGER   | 300          | Minimum BFGS | CasADi::Worh |
+| Size         |              |              | block size   | pInternal    |
+|              |              |              | (depends on  |              |
+|              |              |              | BFGS method) |              |
++--------------+--------------+--------------+--------------+--------------+
+| BFGSrestart  | OT_INTEGER   | 50           | Restart BFGS | CasADi::Worh |
+|              |              |              | update after | pInternal    |
+|              |              |              | this many    |              |
+|              |              |              | iterations   |              |
++--------------+--------------+--------------+--------------+--------------+
+| BettsFactor  | OT_REAL      | 2.1          | Update       | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
+|              |              |              | Betts'       |              |
+|              |              |              | Hessian regu |              |
+|              |              |              | larisation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| BettsPoint   | OT_REAL      | 1.0          | Smallest     | CasADi::Worh |
+|              |              |              | eigenvalue   | pInternal    |
+|              |              |              | of the       |              |
+|              |              |              | regularised  |              |
+|              |              |              | Hessian      |              |
++--------------+--------------+--------------+--------------+--------------+
+| BoundTolFac  | OT_REAL      | 1000.0       | Factor in    | CasADi::Worh |
+|              |              |              | determining  | pInternal    |
+|              |              |              | active       |              |
+|              |              |              | constraints  |              |
+|              |              |              | by KKT       |              |
++--------------+--------------+--------------+--------------+--------------+
+| CheckFJ      | OT_REAL      | 1e+12        | Upper bound  | CasADi::Worh |
+|              |              |              | used by      | pInternal    |
+|              |              |              | Fritz-John   |              |
+|              |              |              | heuristic    |              |
++--------------+--------------+--------------+--------------+--------------+
+| CheckStructu | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+| reDF         |              |              | structural   | pInternal    |
+|              |              |              | checking of  |              |
+|              |              |              | DF           |              |
++--------------+--------------+--------------+--------------+--------------+
+| CheckStructu | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+| reDG         |              |              | structural   | pInternal    |
+|              |              |              | checking of  |              |
+|              |              |              | DG           |              |
++--------------+--------------+--------------+--------------+--------------+
+| CheckStructu | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+| reHM         |              |              | structural   | pInternal    |
+|              |              |              | checking of  |              |
+|              |              |              | HM           |              |
++--------------+--------------+--------------+--------------+--------------+
+| CorStepBetts | OT_REAL      | 0.5          | (experimenta | CasADi::Worh |
+| Sum          |              |              | l)           | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| CorStepConSt | OT_REAL      | 1e-06        | (experimenta | CasADi::Worh |
+| op           |              |              | l)           | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| CorStepConvi | OT_REAL      | 1.0          | (experimenta | CasADi::Worh |
+| o            |              |              | l)           | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| CorStepMaxIt | OT_INTEGER   | 50           | (experimenta | CasADi::Worh |
+| er           |              |              | l)           | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| CorStepMetho | OT_INTEGER   | 0            | (experimenta | CasADi::Worh |
+| d            |              |              | l)           | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| CorStepMode  | OT_INTEGER   | 1            | (experimenta | CasADi::Worh |
+|              |              |              | l)           | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| CorStepPFact | OT_REAL      | 1.0          | (experimenta | CasADi::Worh |
+| or           |              |              | l)           | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| CorStepPMax  | OT_REAL      | 1000000.0    | (experimenta | CasADi::Worh |
+|              |              |              | l)           | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| CorStepRecov | OT_BOOLEAN   | False        | Enable       | CasADi::Worh |
+| eryDX        |              |              | structural   | pInternal    |
+|              |              |              | checking of  |              |
+|              |              |              | HM           |              |
++--------------+--------------+--------------+--------------+--------------+
+| CurvBCond    | OT_REAL      | 0.02         | Block BFGS   | CasADi::Worh |
+|              |              |              | curvature    | pInternal    |
+|              |              |              | condition    |              |
+|              |              |              | bound        |              |
++--------------+--------------+--------------+--------------+--------------+
+| CurvBFac     | OT_REAL      | 0.3          | Block BFGS   | CasADi::Worh |
+|              |              |              | curvature    | pInternal    |
+|              |              |              | condition re |              |
+|              |              |              | gularisation |              |
+|              |              |              | factor       |              |
++--------------+--------------+--------------+--------------+--------------+
+| CurvCond     | OT_REAL      | 0.02         | BFGS         | CasADi::Worh |
+|              |              |              | Curvature    | pInternal    |
+|              |              |              | condition    |              |
+|              |              |              | bound        |              |
++--------------+--------------+--------------+--------------+--------------+
+| CurvFac      | OT_REAL      | 0.3          | BFGS         | CasADi::Worh |
+|              |              |              | curvature    | pInternal    |
+|              |              |              | condition re |              |
+|              |              |              | gularisation |              |
+|              |              |              | factor       |              |
++--------------+--------------+--------------+--------------+--------------+
+| CutLength    | OT_REAL      | 0.001        | Scaling      | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
+|              |              |              | Cut recovery |              |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
+| DebugMarker0 | OT_INTEGER   | 42           | Debug        | CasADi::Worh |
+| 6            |              |              | marker, only | pInternal    |
+|              |              |              | needed for   |              |
+|              |              |              | ASTOS        |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
+| FGtogether   | OT_BOOLEAN   | False        | F and G      | CasADi::Worh |
+|              |              |              | cannot be    | pInternal    |
+|              |              |              | evaluated    |              |
+|              |              |              | separately   |              |
++--------------+--------------+--------------+--------------+--------------+
+| FJandND      | OT_BOOLEAN   | False        | Enable       | CasADi::Worh |
+|              |              |              | Fritz-John   | pInternal    |
+|              |              |              | and non-diff |              |
+|              |              |              | erentiable   |              |
+|              |              |              | check        |              |
+|              |              |              | heuristics   |              |
++--------------+--------------+--------------+--------------+--------------+
+| FeasibleDual | OT_BOOLEAN   | False        | Activate     | CasADi::Worh |
+|              |              |              | dual         | pInternal    |
+|              |              |              | feasibility  |              |
+|              |              |              | mode         |              |
++--------------+--------------+--------------+--------------+--------------+
+| FeasibleInit | OT_BOOLEAN   | False        | Activate     | CasADi::Worh |
+|              |              |              | initial      | pInternal    |
+|              |              |              | feasibility  |              |
+|              |              |              | mode         |              |
++--------------+--------------+--------------+--------------+--------------+
+| FeasibleInit | OT_REAL      | 0.001        | Feasibility  | CasADi::Worh |
+| Tol          |              |              | tolerance    | pInternal    |
+|              |              |              | for no-      |              |
+|              |              |              | objective    |              |
+|              |              |              | feasible     |              |
+|              |              |              | mode         |              |
++--------------+--------------+--------------+--------------+--------------+
+| FeasibleOnly | OT_BOOLEAN   | False        | Activate     | CasADi::Worh |
+|              |              |              | feasible-    | pInternal    |
+|              |              |              | only mode    |              |
++--------------+--------------+--------------+--------------+--------------+
+| FidifEps     | OT_REAL      | 1e-05        | Finite       | CasADi::Worh |
+|              |              |              | difference   | pInternal    |
+|              |              |              | perturbation |              |
++--------------+--------------+--------------+--------------+--------------+
+| FidifHM      | OT_BOOLEAN   | False        | Approximate  | CasADi::Worh |
+|              |              |              | Hessian by   | pInternal    |
+|              |              |              | finite       |              |
+|              |              |              | differences  |              |
+|              |              |              | (otherwise   |              |
+|              |              |              | BFGS)        |              |
++--------------+--------------+--------------+--------------+--------------+
+| FilterBisecA | OT_BOOLEAN   | True         | Filter       | CasADi::Worh |
+| lpha         |              |              | heuristic to | pInternal    |
+|              |              |              | save Armijo  |              |
+|              |              |              | iterations   |              |
++--------------+--------------+--------------+--------------+--------------+
+| FilterGammaC | OT_REAL      | 7.5e-06      | Constraint   | CasADi::Worh |
+| V            |              |              | violation    | pInternal    |
+|              |              |              | decrease     |              |
+|              |              |              | factor in    |              |
+|              |              |              | Filter       |              |
+|              |              |              | acceptance   |              |
+|              |              |              | check        |              |
++--------------+--------------+--------------+--------------+--------------+
+| FilterGammaF | OT_REAL      | 1.1e-05      | Objective    | CasADi::Worh |
+|              |              |              | decrease     | pInternal    |
+|              |              |              | factor in    |              |
+|              |              |              | Filter       |              |
+|              |              |              | acceptance   |              |
+|              |              |              | check        |              |
++--------------+--------------+--------------+--------------+--------------+
+| FilterInters | OT_BOOLEAN   | True         | Filter       | CasADi::Worh |
+| ecAlpha      |              |              | heuristic to | pInternal    |
+|              |              |              | save Armijo  |              |
+|              |              |              | iterations   |              |
++--------------+--------------+--------------+--------------+--------------+
+| FirstDifCent | OT_BOOLEAN   | True         | Use central  | CasADi::Worh |
+| ral          |              |              | finite       | pInternal    |
+|              |              |              | difference   |              |
+|              |              |              | quotient for |              |
+|              |              |              | first        |              |
+|              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
+| FocusOnFeas  | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+|              |              |              | Focus-on-    | pInternal    |
+|              |              |              | Feasibility  |              |
+|              |              |              | mode         |              |
++--------------+--------------+--------------+--------------+--------------+
+| FocusOnFeasF | OT_REAL      | 1.36         | Factor in    | CasADi::Worh |
+| actor        |              |              | Focus-on-    | pInternal    |
+|              |              |              | Feasibility  |              |
+|              |              |              | mode         |              |
++--------------+--------------+--------------+--------------+--------------+
+| GammaAlpha   | OT_REAL      | 0.05         | Safety       | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
+|              |              |              | alphamin     |              |
+|              |              |              | calculation  |              |
+|              |              |              | by Filter    |              |
++--------------+--------------+--------------+--------------+--------------+
+| GroupMethod  | OT_INTEGER   | 1            | Select       | CasADi::Worh |
+|              |              |              | method to    | pInternal    |
+|              |              |              | determine    |              |
+|              |              |              | graph        |              |
+|              |              |              | colouring    |              |
+|              |              |              | groups       |              |
++--------------+--------------+--------------+--------------+--------------+
+| IgnoreFilter | OT_BOOLEAN   | False        | Activate     | CasADi::Worh |
+| Crit         |              |              | accelerating | pInternal    |
+|              |              |              | heuristics   |              |
+|              |              |              | for Filter   |              |
++--------------+--------------+--------------+--------------+--------------+
+| IncBettsTau  | OT_REAL      | 2.0          | Increase     | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
+|              |              |              | Betts'       |              |
+|              |              |              | update       |              |
+|              |              |              | dampening    |              |
+|              |              |              | term         |              |
++--------------+--------------+--------------+--------------+--------------+
+| IncBettsTauM | OT_REAL      | 100.0        | Larger       | CasADi::Worh |
+| ore          |              |              | increase     | pInternal    |
+|              |              |              | factor for   |              |
+|              |              |              | Betts'       |              |
+|              |              |              | update       |              |
+|              |              |              | dampening    |              |
+|              |              |              | term         |              |
++--------------+--------------+--------------+--------------+--------------+
+| IncreaseIWS  | OT_REAL      | 1.0          | Increase     | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
+|              |              |              | estimated    |              |
+|              |              |              | integer      |              |
+|              |              |              | workspace    |              |
+|              |              |              | requirement  |              |
++--------------+--------------+--------------+--------------+--------------+
+| IncreaseRWS  | OT_REAL      | 1.0          | Increase     | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
+|              |              |              | estimated    |              |
+|              |              |              | real         |              |
+|              |              |              | workspace    |              |
+|              |              |              | requirement  |              |
++--------------+--------------+--------------+--------------+--------------+
+| Infty        | OT_REAL      | 1e+20        | Upper bound  | CasADi::Worh |
+|              |              |              | for numbers  | pInternal    |
+|              |              |              | to be        |              |
+|              |              |              | regarded as  |              |
+|              |              |              | finite       |              |
++--------------+--------------+--------------+--------------+--------------+
+| InftyUnbound | OT_REAL      | 1e+20        | Tolerance    | CasADi::Worh |
+| ed           |              |              | for unbounde | pInternal    |
+|              |              |              | dness        |              |
+|              |              |              | detection    |              |
+|              |              |              | heuristic    |              |
++--------------+--------------+--------------+--------------+--------------+
+| InitialLMest | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+|              |              |              | initial      | pInternal    |
+|              |              |              | Lagrange     |              |
+|              |              |              | multiplier   |              |
+|              |              |              | estimate     |              |
++--------------+--------------+--------------+--------------+--------------+
+| KeepAcceptab | OT_BOOLEAN   | True         | Save         | CasADi::Worh |
+| leSol        |              |              | acceptable   | pInternal    |
+|              |              |              | solutions as |              |
+|              |              |              | fallback     |              |
++--------------+--------------+--------------+--------------+--------------+
+| LMestQPipCom | OT_REAL      | 0.003        | IP complemen | CasADi::Worh |
+| Tol          |              |              | tarity       | pInternal    |
+|              |              |              | tolerance in |              |
+|              |              |              | initial      |              |
+|              |              |              | multiplier   |              |
+|              |              |              | estimate     |              |
++--------------+--------------+--------------+--------------+--------------+
+| LMestQPipRes | OT_REAL      | 1.0          | IP residual  | CasADi::Worh |
+| Tol          |              |              | tolerance in | pInternal    |
+|              |              |              | initial      |              |
+|              |              |              | multiplier   |              |
+|              |              |              | estimate     |              |
++--------------+--------------+--------------+--------------+--------------+
+| LinMult      | OT_BOOLEAN   | False        | Control      | CasADi::Worh |
+|              |              |              | Lagrange     | pInternal    |
+|              |              |              | multiplier   |              |
+|              |              |              | update       |              |
++--------------+--------------+--------------+--------------+--------------+
+| LogLevel     | OT_INTEGER   | 0            | Enable XML   | CasADi::Worh |
+|              |              |              | logfiles and | pInternal    |
+|              |              |              | writing      |              |
+|              |              |              | interval     |              |
++--------------+--------------+--------------+--------------+--------------+
+| LogResult    | OT_INTEGER   | 0            | Enable XML   | CasADi::Worh |
+|              |              |              | result       | pInternal    |
+|              |              |              | logging and  |              |
+|              |              |              | detail level |              |
++--------------+--------------+--------------+--------------+--------------+
+| LowPassAlpha | OT_REAL      | 0.95         | Lowpass-     | CasADi::Worh |
+| F            |              |              | filter       | pInternal    |
+|              |              |              | update       |              |
+|              |              |              | factor for   |              |
+|              |              |              | objective    |              |
+|              |              |              | values       |              |
++--------------+--------------+--------------+--------------+--------------+
+| LowPassAlpha | OT_REAL      | 0.95         | Lowpass-     | CasADi::Worh |
+| G            |              |              | filter       | pInternal    |
+|              |              |              | update       |              |
+|              |              |              | factor for   |              |
+|              |              |              | constraint   |              |
+|              |              |              | values       |              |
++--------------+--------------+--------------+--------------+--------------+
+| LowPassAlpha | OT_REAL      | 0.1          | Lowpass-     | CasADi::Worh |
+| Merit        |              |              | filter       | pInternal    |
+|              |              |              | update       |              |
+|              |              |              | factor for   |              |
+|              |              |              | merit        |              |
+|              |              |              | function     |              |
+|              |              |              | values       |              |
++--------------+--------------+--------------+--------------+--------------+
+| LowPassFilte | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+| r            |              |              | lowpass-     | pInternal    |
+|              |              |              | filter       |              |
+|              |              |              | termination  |              |
+|              |              |              | criterion    |              |
++--------------+--------------+--------------+--------------+--------------+
+| Ma57PivotThr | OT_REAL      | 1e-06        | Pivoting     | CasADi::Worh |
+| esh          |              |              | tolerance    | pInternal    |
+|              |              |              | for MA57 =   |              |
+|              |              |              | CNTL(1)      |              |
++--------------+--------------+--------------+--------------+--------------+
+| MatrixCC     | OT_BOOLEAN   | False        | Not to be    | CasADi::Worh |
+|              |              |              | included     | pInternal    |
+|              |              |              | into a       |              |
+|              |              |              | parameter    |              |
+|              |              |              | file!        |              |
++--------------+--------------+--------------+--------------+--------------+
+| MaxCalls     | OT_INTEGER   | 2147483647   | Upper bound  | CasADi::Worh |
+|              |              |              | to Reverse C | pInternal    |
+|              |              |              | ommunication |              |
+|              |              |              | calls        |              |
++--------------+--------------+--------------+--------------+--------------+
+| MaxForce     | OT_INTEGER   | 1000         | Maximum      | CasADi::Worh |
+|              |              |              | number of    | pInternal    |
+|              |              |              | Force        |              |
+|              |              |              | recovery     |              |
+|              |              |              | strategy     |              |
+|              |              |              | steps        |              |
++--------------+--------------+--------------+--------------+--------------+
+| MaxGPart     | OT_INTEGER   | 1            | (experimenta | CasADi::Worh |
+|              |              |              | l)           | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| MaxIter      | OT_INTEGER   | 500          | Upper bound  | CasADi::Worh |
+|              |              |              | on major     | pInternal    |
+|              |              |              | iterations   |              |
++--------------+--------------+--------------+--------------+--------------+
+| MaxLScounter | OT_INTEGER   | 3            | Control      | CasADi::Worh |
+|              |              |              | activation   | pInternal    |
+|              |              |              | of Filter    |              |
+|              |              |              | acceleration |              |
+|              |              |              | heuristics   |              |
++--------------+--------------+--------------+--------------+--------------+
+| MaxNorm      | OT_BOOLEAN   | True         | Select max-  | CasADi::Worh |
+|              |              |              | norm instead | pInternal    |
+|              |              |              | of 1-norm in |              |
+|              |              |              | Filter       |              |
++--------------+--------------+--------------+--------------+--------------+
+| MeritFunctio | OT_INTEGER   | 4            | Select merit | CasADi::Worh |
+| n            |              |              | function and | pInternal    |
+|              |              |              | penalty      |              |
+|              |              |              | update [0,   |              |
+|              |              |              | 3..5]        |              |
++--------------+--------------+--------------+--------------+--------------+
+| MeritGradTol | OT_REAL      | 2.2204460492 | Threshold of | CasADi::Worh |
+|              |              | 5e-16        | meritfunctio | pInternal    |
+|              |              |              | n gradient   |              |
+|              |              |              | for          |              |
+|              |              |              | increasing   |              |
+|              |              |              | Hessian regu |              |
+|              |              |              | larisation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| MinBettsTau  | OT_REAL      | 2.2204460492 | Lower bound  | CasADi::Worh |
+|              |              | 5e-16        | for Betts'   | pInternal    |
+|              |              |              | update       |              |
+|              |              |              | dampening    |              |
+|              |              |              | term         |              |
++--------------+--------------+--------------+--------------+--------------+
+| MoreRelax    | OT_BOOLEAN   | False        | Introduce    | CasADi::Worh |
+|              |              |              | one          | pInternal    |
+|              |              |              | relaxation   |              |
+|              |              |              | variable for |              |
+|              |              |              | every        |              |
+|              |              |              | constraint   |              |
++--------------+--------------+--------------+--------------+--------------+
+| NLPmethod    | OT_INTEGER   | 1            | Select (1) M | CasADi::Worh |
+|              |              |              | eritfunction | pInternal    |
+|              |              |              | or (3)       |              |
+|              |              |              | Filter globa |              |
+|              |              |              | lisation     |              |
++--------------+--------------+--------------+--------------+--------------+
+| NLPprint     | OT_INTEGER   | 2            | NLP print    | CasADi::Worh |
+|              |              |              | level        | pInternal    |
+|              |              |              | [-1..4]      |              |
++--------------+--------------+--------------+--------------+--------------+
+| PairMethod   | OT_INTEGER   | 1            | Select       | CasADi::Worh |
+|              |              |              | method to    | pInternal    |
+|              |              |              | determine    |              |
+|              |              |              | graph        |              |
+|              |              |              | colouring    |              |
+|              |              |              | pairgroups   |              |
++--------------+--------------+--------------+--------------+--------------+
+| PenUpdEpsBar | OT_REAL      | 0.9          | Penalty      | CasADi::Worh |
+|              |              |              | update       | pInternal    |
+|              |              |              | parameter    |              |
+|              |              |              | factor for M |              |
+|              |              |              | eritFunction |              |
+|              |              |              | = 3          |              |
++--------------+--------------+--------------+--------------+--------------+
+| PenUpdEpsKFa | OT_REAL      | 2.0          | Penalty      | CasADi::Worh |
+| c            |              |              | update       | pInternal    |
+|              |              |              | parameter    |              |
+|              |              |              | factor for M |              |
+|              |              |              | eritFunction |              |
+|              |              |              | = 4          |              |
++--------------+--------------+--------------+--------------+--------------+
+| PenUpdEpsKSe | OT_INTEGER   | 2            | Penalty      | CasADi::Worh |
+| quence       |              |              | update       | pInternal    |
+|              |              |              | parameter    |              |
++--------------+--------------+--------------+--------------+--------------+
+| PenUpdMaxDel | OT_REAL      | 11.0         | Max penalty  | CasADi::Worh |
+| taK          |              |              | for MeritFun | pInternal    |
+|              |              |              | ction = 4    |              |
++--------------+--------------+--------------+--------------+--------------+
+| PenUpdMaxFac | OT_REAL      | 100000000.0  | Max factor   | CasADi::Worh |
+|              |              |              | for          | pInternal    |
+|              |              |              | increasing   |              |
+|              |              |              | penalty for  |              |
+|              |              |              | MeritFunctio |              |
+|              |              |              | n = 4        |              |
++--------------+--------------+--------------+--------------+--------------+
+| PenUpdRBar   | OT_REAL      | 2.0          | Penalty      | CasADi::Worh |
+|              |              |              | update       | pInternal    |
+|              |              |              | parameter    |              |
+|              |              |              | for MeritFun |              |
+|              |              |              | ction = 3    |              |
++--------------+--------------+--------------+--------------+--------------+
+| PrecisionF   | OT_REAL      | 2.2204460492 | (currently   | CasADi::Worh |
+|              |              | 5e-16        | unused)      | pInternal    |
+|              |              |              | Relative     |              |
+|              |              |              | precision of |              |
+|              |              |              | objective    |              |
++--------------+--------------+--------------+--------------+--------------+
+| PrecisionG   | OT_REAL      | 2.2204460492 | (currently   | CasADi::Worh |
+|              |              | 5e-16        | unused)      | pInternal    |
+|              |              |              | Relative     |              |
+|              |              |              | precision of |              |
+|              |              |              | constraints  |              |
++--------------+--------------+--------------+--------------+--------------+
+| QPscaleParam | OT_REAL      | 0.0          | (currently   | CasADi::Worh |
+|              |              |              | unused)      | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| QuadraticPro | OT_BOOLEAN   | False        | Not to be    | CasADi::Worh |
+| blem         |              |              | included     | pInternal    |
+|              |              |              | into a       |              |
+|              |              |              | parameter    |              |
+|              |              |              | file!        |              |
++--------------+--------------+--------------+--------------+--------------+
+| ReduceBettsT | OT_REAL      | 0.3          | Decrease     | CasADi::Worh |
+| au           |              |              | factor for   | pInternal    |
+|              |              |              | Betts'       |              |
+|              |              |              | update       |              |
+|              |              |              | dampening    |              |
+|              |              |              | term         |              |
++--------------+--------------+--------------+--------------+--------------+
+| RegStrategy  | OT_INTEGER   | 1            | Select       | CasADi::Worh |
+|              |              |              | Hessian regu | pInternal    |
+|              |              |              | larisation   |              |
+|              |              |              | strategy in  |              |
+|              |              |              | Filter       |              |
++--------------+--------------+--------------+--------------+--------------+
+| ReinitFilter | OT_BOOLEAN   | False        | Enables      | CasADi::Worh |
+|              |              |              | Filter-reini | pInternal    |
+|              |              |              | tialisation  |              |
+|              |              |              | accelerating |              |
+|              |              |              | heuristic    |              |
++--------------+--------------+--------------+--------------+--------------+
+| RelaxMaxDelt | OT_REAL      | 0.92         | Upper bound  | CasADi::Worh |
+| a            |              |              | for          | pInternal    |
+|              |              |              | accepting    |              |
+|              |              |              | the          |              |
+|              |              |              | constraint   |              |
+|              |              |              | relaxation   |              |
+|              |              |              | variable     |              |
++--------------+--------------+--------------+--------------+--------------+
+| RelaxMaxPen  | OT_REAL      | 50000000.0   | Upper bound  | CasADi::Worh |
+|              |              |              | on the       | pInternal    |
+|              |              |              | constraint   |              |
+|              |              |              | relaxation   |              |
+|              |              |              | penalty      |              |
++--------------+--------------+--------------+--------------+--------------+
+| RelaxRho     | OT_REAL      | 6.0          | Update       | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
+|              |              |              | the          |              |
+|              |              |              | constraint   |              |
+|              |              |              | relaxation   |              |
+|              |              |              | penalty      |              |
++--------------+--------------+--------------+--------------+--------------+
+| RelaxStart   | OT_REAL      | 1.0          | Initial      | CasADi::Worh |
+|              |              |              | value of the | pInternal    |
+|              |              |              | constraint   |              |
+|              |              |              | relaxation   |              |
+|              |              |              | penalty      |              |
++--------------+--------------+--------------+--------------+--------------+
+| RestUntilFea | OT_BOOLEAN   | False        | Do           | CasADi::Worh |
+| s            |              |              | restoration  | pInternal    |
+|              |              |              | until a      |              |
+|              |              |              | feasible     |              |
+|              |              |              | solution is  |              |
+|              |              |              | found        |              |
++--------------+--------------+--------------+--------------+--------------+
+| ScaleConIter | OT_BOOLEAN   | False        | Scale        | CasADi::Worh |
+|              |              |              | constraints  | pInternal    |
+|              |              |              | in every     |              |
+|              |              |              | iteration    |              |
++--------------+--------------+--------------+--------------+--------------+
+| ScaleFacObj  | OT_REAL      | 10.0         | Value to     | CasADi::Worh |
+|              |              |              | scale large  | pInternal    |
+|              |              |              | objective    |              |
+|              |              |              | functions to |              |
++--------------+--------------+--------------+--------------+--------------+
+| ScaleFacQP   | OT_REAL      | 10.0         | Upper bound  | CasADi::Worh |
+|              |              |              | on resulting | pInternal    |
+|              |              |              | matrix norm  |              |
+|              |              |              | for QP       |              |
+|              |              |              | scaling      |              |
++--------------+--------------+--------------+--------------+--------------+
+| ScaledFD     | OT_BOOLEAN   | True         | Use a scaled | CasADi::Worh |
+|              |              |              | perturbation | pInternal    |
+|              |              |              | for finite   |              |
+|              |              |              | differences  |              |
++--------------+--------------+--------------+--------------+--------------+
+| ScaledKKT    | OT_BOOLEAN   | True         | Scale KKT    | CasADi::Worh |
+|              |              |              | conditions   | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| ScaledObj    | OT_BOOLEAN   | True         | Scale the    | CasADi::Worh |
+|              |              |              | objective    | pInternal    |
+|              |              |              | function     |              |
++--------------+--------------+--------------+--------------+--------------+
+| ScaledQP     | OT_BOOLEAN   | True         | Scale some   | CasADi::Worh |
+|              |              |              | matrices     | pInternal    |
+|              |              |              | handed to    |              |
+|              |              |              | the QP       |              |
++--------------+--------------+--------------+--------------+--------------+
+| StartBettsTa | OT_REAL      | 0.1          | Initial      | CasADi::Worh |
+| u            |              |              | value for    | pInternal    |
+|              |              |              | Betts'       |              |
+|              |              |              | update       |              |
+|              |              |              | dampening    |              |
+|              |              |              | term         |              |
++--------------+--------------+--------------+--------------+--------------+
+| SwitchingDel | OT_REAL      | 0.01         | Filter       | CasADi::Worh |
+| ta           |              |              | switching    | pInternal    |
+|              |              |              | condition    |              |
+|              |              |              | parameter    |              |
++--------------+--------------+--------------+--------------+--------------+
+| SwitchingSCV | OT_REAL      | 1.1          | Filter       | CasADi::Worh |
+|              |              |              | switching    | pInternal    |
+|              |              |              | condition    |              |
+|              |              |              | parameter    |              |
++--------------+--------------+--------------+--------------+--------------+
+| SwitchingSF  | OT_REAL      | 2.3          | Filter       | CasADi::Worh |
+|              |              |              | switching    | pInternal    |
+|              |              |              | condition    |              |
+|              |              |              | parameter    |              |
++--------------+--------------+--------------+--------------+--------------+
+| TakeQPSol    | OT_BOOLEAN   | False        | Evaluate QP  | CasADi::Worh |
+|              |              |              | search       | pInternal    |
+|              |              |              | direction    |              |
+|              |              |              | regardless   |              |
+|              |              |              | of           |              |
+|              |              |              | convergence  |              |
++--------------+--------------+--------------+--------------+--------------+
+| Timeout      | OT_REAL      | 300.0        | Timeout in   | CasADi::Worh |
+|              |              |              | seconds      | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| TolComp      | OT_REAL      | 0.001        | Complementar | CasADi::Worh |
+|              |              |              | ity          | pInternal    |
+|              |              |              | tolerance    |              |
++--------------+--------------+--------------+--------------+--------------+
+| TolFeas      | OT_REAL      | 1e-06        | Feasibility  | CasADi::Worh |
+|              |              |              | tolerance    | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| TolOpti      | OT_REAL      | 1e-06        | Optimality   | CasADi::Worh |
+|              |              |              | tolerance    | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| TolWeakActiv | OT_REAL      | 1.0          | (experimenta | CasADi::Worh |
+| e            |              |              | l)           | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| TooBig       | OT_BOOLEAN   | True         | Enable too-  | CasADi::Worh |
+|              |              |              | big          | pInternal    |
+|              |              |              | termination  |              |
+|              |              |              | heuristics   |              |
++--------------+--------------+--------------+--------------+--------------+
+| TooBigCV     | OT_REAL      | 1e+25        | Upper bound  | CasADi::Worh |
+|              |              |              | on           | pInternal    |
+|              |              |              | constraint   |              |
+|              |              |              | violation    |              |
+|              |              |              | for too-big  |              |
+|              |              |              | heuristic    |              |
++--------------+--------------+--------------+--------------+--------------+
+| TooBigKKT    | OT_REAL      | 1e+30        | Upper bound  | CasADi::Worh |
+|              |              |              | on KKT       | pInternal    |
+|              |              |              | values for   |              |
+|              |              |              | too-big      |              |
+|              |              |              | heuristic    |              |
++--------------+--------------+--------------+--------------+--------------+
+| UserDF       | OT_BOOLEAN   | True         | Objective    | CasADi::Worh |
+|              |              |              | gradient     | pInternal    |
+|              |              |              | values       |              |
+|              |              |              | supplied by  |              |
+|              |              |              | caller       |              |
++--------------+--------------+--------------+--------------+--------------+
+| UserDG       | OT_BOOLEAN   | True         | Jacobian     | CasADi::Worh |
+|              |              |              | values       | pInternal    |
+|              |              |              | supplied by  |              |
+|              |              |              | caller       |              |
++--------------+--------------+--------------+--------------+--------------+
+| UserHM       | OT_BOOLEAN   | False        | Hessian      | CasADi::Worh |
+|              |              |              | values       | pInternal    |
+|              |              |              | supplied by  |              |
+|              |              |              | caller       |              |
++--------------+--------------+--------------+--------------+--------------+
+| UserHMstruct | OT_INTEGER   | 2            | Enable       | CasADi::Worh |
+| ure          |              |              | automatic    | pInternal    |
+|              |              |              | Hessian      |              |
+|              |              |              | structure    |              |
+|              |              |              | generation   |              |
+|              |              |              | or checking  |              |
++--------------+--------------+--------------+--------------+--------------+
+| WeakActiveSe | OT_BOOLEAN   | False        | (experimenta | CasADi::Worh |
+| t            |              |              | l)           | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| ad_mode      | OT_STRING    | automatic    | How to       | CasADi::Worh |
+|              |              |              | calculate    | pInternal    |
+|              |              |              | the          |              |
+|              |              |              | Jacobians:   |              |
+|              |              |              | \"forward\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | forward      |              |
+|              |              |              | mode)        |              |
+|              |              |              | \"reverse\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | adjoint      |              |
+|              |              |              | mode) or     |              |
+|              |              |              | \"automatic\"  |              |
+|              |              |              | (a heuristic |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| eps          | OT_REAL      | 2.2204460492 | Machine      | CasADi::Worh |
+|              |              | 5e-16        | epsilon      | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| expand_f     | OT_BOOLEAN   | False        | Expand the   | CasADi::Worh |
+|              |              |              | objective    | pInternal    |
+|              |              |              | function in  |              |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| expand_g     | OT_BOOLEAN   | False        | Expand the   | CasADi::Worh |
+|              |              |              | constraint   | pInternal    |
+|              |              |              | function in  |              |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_hes | OT_BOOLEAN   | False        | Generate an  | CasADi::Worh |
+| sian         |              |              | exact        | pInternal    |
+|              |              |              | Hessian of   |              |
+|              |              |              | the          |              |
+|              |              |              | Lagrangian   |              |
++--------------+--------------+--------------+--------------+--------------+
+| ignore_check | OT_BOOLEAN   | False        | If set to    | CasADi::Worh |
+| _vec         |              |              | true, the    | pInternal    |
+|              |              |              | input shape  |              |
+|              |              |              | of F will    |              |
+|              |              |              | not be       |              |
+|              |              |              | checked.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| initialised  | OT_BOOLEAN   | True         | Automaticall | CasADi::Worh |
+|              |              |              | y added init | pInternal    |
+|              |              |              | ialisation   |              |
+|              |              |              | flag.        |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_FX        |              | A function   | CasADi::Worh |
+| llback       |              |              | that will be | pInternal    |
+|              |              |              | called at    |              |
+|              |              |              | each         |              |
+|              |              |              | iteration.   |              |
+|              |              |              | Input scheme |              |
+|              |              |              | is the same  |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
+|              |              |              | scheme.      |              |
+|              |              |              | Output is    |              |
+|              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_BOOLEAN   | False        | If set to    | CasADi::Worh |
+| llback_ignor |              |              | true, errors | pInternal    |
+| e_errors     |              |              | thrown by it |              |
+|              |              |              | eration_call |              |
+|              |              |              | back will be |              |
+|              |              |              | ignored.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_INTEGER   | 1            | Only call    | CasADi::Worh |
+| llback_step  |              |              | the callback | pInternal    |
+|              |              |              | function     |              |
+|              |              |              | every few    |              |
+|              |              |              | iterations.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_for_sens | OT_BOOLEAN   | False        | Create the a | CasADi::Worh |
+|              |              |              | Jacobian     | pInternal    |
+|              |              |              | function and |              |
+|              |              |              | use this to  |              |
+|              |              |              | calculate    |              |
+|              |              |              | forward sens |              |
+|              |              |              | itivities    |              |
++--------------+--------------+--------------+--------------+--------------+
+| jacobian_gen | OT_JACOBIANG |              | Function     | CasADi::Worh |
+| erator       | ENERATOR     |              | pointer that | pInternal    |
+|              |              |              | returns a    |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | function     |              |
+|              |              |              | given a set  |              |
+|              |              |              | of desired   |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | blocks,      |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC |              | Monitors to  | CasADi::Worh |
+|              | TOR          |              | be activated | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | unnamed_shar | n/a          | CasADi::Worh |
+|              |              | ed_object    |              | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::Worh |
+| j_dir        |              |              | adjoint      | pInternal    |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::Worh |
+| d_dir        |              |              | forward      | pInternal    |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_hess | OT_BOOLEAN   | False        | Calculate    | CasADi::Worh |
+| ian          |              |              | Hessians     | pInternal    |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_jaco | OT_BOOLEAN   | False        | Calculate    | CasADi::Worh |
+| bian         |              |              | Jacobians    | pInternal    |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| parametric   | OT_BOOLEAN   | False        | Expect F, G, | CasADi::Worh |
+|              |              |              | H, J to have | pInternal    |
+|              |              |              | an           |              |
+|              |              |              | additional   |              |
+|              |              |              | input        |              |
+|              |              |              | argument     |              |
+|              |              |              | appended at  |              |
+|              |              |              | the end,     |              |
+|              |              |              | denoting     |              |
+|              |              |              | fixed        |              |
+|              |              |              | parameters.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| sparse       | OT_BOOLEAN   | True         | function is  | CasADi::Worh |
+|              |              |              | sparse       | pInternal    |
++--------------+--------------+--------------+--------------+--------------+
+| sparsity_gen | OT_SPARSITYG |              | Function     | CasADi::Worh |
+| erator       | ENERATOR     |              | that         | pInternal    |
+|              |              |              | provides     |              |
+|              |              |              | sparsity for |              |
+|              |              |              | a given      |              |
+|              |              |              | input output |              |
+|              |              |              | block,       |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| store_jacobi | OT_BOOLEAN   | False        | keep         | CasADi::Worh |
+| ans          |              |              | references   | pInternal    |
+|              |              |              | to generated |              |
+|              |              |              | Jacobians in |              |
+|              |              |              | order to     |              |
+|              |              |              | avoid        |              |
+|              |              |              | generating   |              |
+|              |              |              | identical    |              |
+|              |              |              | Jacobians    |              |
+|              |              |              | multiple     |              |
+|              |              |              | times        |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_UNKNOWN   |              | A user-      | CasADi::Worh |
+|              |              |              | defined      | pInternal    |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | False        | verbose      | CasADi::Worh |
+|              |              |              | evaluation   | pInternal    |
+|              |              |              | -- for       |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+| warn_initial | OT_BOOLEAN   | False        | Warn if the  | CasADi::Worh |
+| _bounds      |              |              | initial      | pInternal    |
+|              |              |              | guess does   |              |
+|              |              |              | not satisfy  |              |
+|              |              |              | LBX and UBX  |              |
++--------------+--------------+--------------+--------------+--------------+
+
+>List of available monitors
++-------------+-----------------------+
+|     Id      |        Used in        |
++=============+=======================+
+| eval_f      | CasADi::WorhpInternal |
++-------------+-----------------------+
+| eval_g      | CasADi::WorhpInternal |
++-------------+-----------------------+
+| eval_grad_f | CasADi::WorhpInternal |
++-------------+-----------------------+
+| eval_h      | CasADi::WorhpInternal |
++-------------+-----------------------+
+| eval_jac_g  | CasADi::WorhpInternal |
++-------------+-----------------------+
 
 C++ includes: worhp_solver.hpp ";
 
@@ -60100,6 +62798,11 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::WorhpSolver::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::WorhpSolver::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
 
 %feature("docstring")  CasADi::WorhpSolver::evaluate_old "
 
@@ -60592,11 +63295,23 @@ Check if the node is pointing to the right type of object. ";
 
 %feature("docstring")  CasADi::XFunction::eval "
 
-evaluate symbolically ";
+evaluate symbolically, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::XFunction::eval "
 
-evaluate symbolically (pass and get non-zero entries) ";
+evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::XFunction::evalMX "
+
+evaluate symbolically, MX type (unambiguous) ";
+
+%feature("docstring")  CasADi::XFunction::evalSX "
+
+evaluate symbolically, SX type (unambiguous) ";
+
+%feature("docstring")  CasADi::XFunction::eval "
+
+evaluate symbolically (pass and get non-zero entries) LEGACY - REMOVE ";
 
 %feature("docstring")  CasADi::XFunction::eval "
 
@@ -60605,7 +63320,7 @@ evaluate symbolically, single input, single output ";
 %feature("docstring")  CasADi::XFunction::eval "
 
 evaluate symbolically, single input, single output (pass and get non- zero
-entries) ";
+entries) LEGACY - REMOVE ";
 
 %feature("docstring")  CasADi::XFunction::getNumInputs "
 
@@ -60622,6 +63337,11 @@ Set number of inputs (normally invoked internally) ";
 %feature("docstring")  CasADi::XFunction::setNumOutputs "
 
 Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::XFunction::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
 
 %feature("docstring")  CasADi::XFunction::evaluate_old "
 
@@ -60844,7 +63564,7 @@ Return a string with a destription (for SWIG) ";
 // File: classCasADi_1_1XFunctionInternal.xml
 %feature("docstring") CasADi::XFunctionInternal "
 
-Internal node class for XFunction.
+Internal node class for XFunction (type independent)
 
 Joel Andersson
 
@@ -60997,21 +63717,21 @@ Constructor. ";
 
 Destructor. ";
 
-%feature("docstring")  CasADi::XFunctionInternal::evaluateSX "
+%feature("docstring")  CasADi::XFunctionInternal::evalSX "
 
-evaluate symbolically ";
+Evaluate symbolically, SX type. ";
 
-%feature("docstring")  CasADi::XFunctionInternal::spProp "
+%feature("docstring")  CasADi::XFunctionInternal::evalMX "
 
-Propagate the sparsity seeds. ";
+Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::XFunctionInternal::spGet "
+%feature("docstring")  CasADi::XFunctionInternal::eval "
 
-Get the forward/adjoint sparsity seed. ";
+Evaluate symbolically, SX type (overloaded) ";
 
-%feature("docstring")  CasADi::XFunctionInternal::spDetect "
+%feature("docstring")  CasADi::XFunctionInternal::eval "
 
-Detect sparsity pattern. ";
+Evaluate symbolically, MX type (overloaded) ";
 
 %feature("docstring")  CasADi::XFunctionInternal::evaluate_switch "
 
@@ -61023,10 +63743,15 @@ Evaluate. ";
 
 %feature("docstring")  CasADi::XFunctionInternal::init "
 
-Initialize and make the object ready for setting arguments and evaluation.
-This method is typically called after setting options but before evaluating.
-If passed to another class (in the constructor), this class should invoke
-this function when initialized. ";
+Initialize Initialize and make the object ready for setting arguments and
+evaluation. This method is typically called after setting options but before
+evaluating. If passed to another class (in the constructor), this class
+should invoke this function when initialized. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
 %feature("docstring")  CasADi::XFunctionInternal::jacobian "
 
@@ -61068,11 +63793,6 @@ Print. ";
 %feature("docstring")  CasADi::XFunctionInternal::repr "
 
 Print. ";
-
-%feature("docstring")  CasADi::XFunctionInternal::unidirectionalColoring "
-
-Perform a unidirectional coloring: A greedy distance-2 coloring algorithm
-(Algorithm 3.1 in A. H. GEBREMEDHIN, F. MANNE, A. POTHEN) ";
 
 %feature("docstring")  CasADi::XFunctionInternal::getPartition "
 
@@ -61281,6 +64001,454 @@ Check if the object has been initialized. ";
 Assert that the object has been initialized. ";
 
 
+// File: classCasADi_1_1XFunctionInternalCommon.xml
+%feature("docstring") CasADi::XFunctionInternalCommon "
+
+Internal node class for XFunction (type specific) The design of the class
+uses the curiously recurring template pattern (CRTP) idiom.
+
+Joel Andersson
+
+>List of available options
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
+|              |              |              | calculate    | ternal       |
+|              |              |              | the          |              |
+|              |              |              | Jacobians:   |              |
+|              |              |              | \"forward\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | forward      |              |
+|              |              |              | mode)        |              |
+|              |              |              | \"reverse\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | adjoint      |              |
+|              |              |              | mode) or     |              |
+|              |              |              | \"automatic\"  |              |
+|              |              |              | (a heuristic |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
+|              |              |              | (forward|rev |              |
+|              |              |              | erse|automat |              |
+|              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
+|              |              |              | Jacobian     | ternal       |
+|              |              |              | function and |              |
+|              |              |              | use this to  |              |
+|              |              |              | calculate    |              |
+|              |              |              | forward sens |              |
+|              |              |              | itivities    |              |
++--------------+--------------+--------------+--------------+--------------+
+| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | pointer that | ternal       |
+|              |              |              | returns a    |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | function     |              |
+|              |              |              | given a set  |              |
+|              |              |              | of desired   |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | blocks,      |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| j_dir        |              |              | adjoint      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| d_dir        |              |              | forward      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| ian          |              |              | Hessians     | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| bian         |              |              | Jacobians    | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
+|              |              |              | sparse       | ternal       |
++--------------+--------------+--------------+--------------+--------------+
+| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | that         | ternal       |
+|              |              |              | provides     |              |
+|              |              |              | sparsity for |              |
+|              |              |              | a given      |              |
+|              |              |              | input output |              |
+|              |              |              | block,       |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
+| ans          |              |              | references   | ternal       |
+|              |              |              | to generated |              |
+|              |              |              | Jacobians in |              |
+|              |              |              | order to     |              |
+|              |              |              | avoid        |              |
+|              |              |              | generating   |              |
+|              |              |              | identical    |              |
+|              |              |              | Jacobians    |              |
+|              |              |              | multiple     |              |
+|              |              |              | times        |              |
++--------------+--------------+--------------+--------------+--------------+
+| topological_ | OT_STRING    | \"breadth-    | Topological  | CasADi::XFun |
+| sorting      |              | first\"       | sorting      | ctionInterna |
+|              |              |              | algorithm    | l            |
+|              |              |              | (depth-first |              |
+|              |              |              | |breadth-    |              |
+|              |              |              | first)       |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
+|              |              | )            | defined      | ternal       |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
+|              |              |              | evaluation   | ternal       |
+|              |              |              | -- for       |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+
+C++ includes: x_function_internal.hpp ";
+
+%feature("docstring")
+CasADi::XFunctionInternalCommon::XFunctionInternalCommon "
+
+Constructor. ";
+
+%feature("docstring")
+CasADi::XFunctionInternalCommon::~XFunctionInternalCommon "
+
+Destructor. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::jacGen "
+
+Construct a complete Jacobian by compression. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::getJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::evalSX "
+
+Evaluate symbolically, SX type. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::evalMX "
+
+Evaluate symbolically, MX type. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::eval "
+
+Evaluate symbolically, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::eval "
+
+Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::evaluate_switch "
+
+Evaluate switch. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::init "
+
+Initialize Initialize and make the object ready for setting arguments and
+evaluation. This method is typically called after setting options but before
+evaluating. If passed to another class (in the constructor), this class
+should invoke this function when initialized. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::jacobian "
+
+Calculate the jacobian of a number of function outputs with respect to a
+number of function inputs, optionally include the function outputs. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::jacobian_switch "
+
+Switch between numeric and symbolic jacobian. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::numeric_jacobian "
+
+Numeric Jacobian. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::hessian "
+
+Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::inputStruct "
+
+Access an input. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::inputStruct "
+
+Const access an input. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::outputStruct "
+
+Access an output. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::outputStruct "
+
+Const access an output. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::print "
+
+Print. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::repr "
+
+Print. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::getPartition "
+
+Get the unidirectional or bidirectional partition. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::verbose "
+
+Verbose mode? ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::monitored "
+
+Is function fcn being monitored. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::output "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::output "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::fwdSeed "
+
+Const access forward seed. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::fwdSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::adjSeed "
+
+Const access adjoint seed. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::adjSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::setNumInputs "
+
+Set the number of function inputs. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::setNumOutputs "
+
+Set the number of function outputs. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::getNumInputs "
+
+Get the number of function inputs. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::getNumOutputs "
+
+Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::getStat "
+
+Get single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::getFullJacobian "
+
+Get the Jacobian of all outputs with respect to all inputs. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::log "
+
+Log the status of the solver. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::log "
+
+Log the status of the solver, function given. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::setOption "
+
+set an option. The setOptions are in general only considered before the init
+function, if any. If properties changes, the init function should be called
+again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::setOption "
+
+set a set of options. The setOptions are in general only considered before
+the init function, if any. If properties changes, the init function should
+be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::getOptionDescription
+"
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::printOption "
+
+Print all information there is to know about a certain option. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::getBestMatches "
+
+Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::clone "
+
+Make a deep copy of the instance. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::deepCopyMembers "
+
+Deep copy data members. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::XFunctionInternalCommon::assertInit "
+
+Assert that the object has been initialized. ";
+
+
 // File: classCasADi_1_1OptimalControl_1_1XMLNode.xml
 %feature("docstring") CasADi::OptimalControl::XMLNode "C++ includes:
 xml_node.hpp ";
@@ -61411,6 +64579,11 @@ get the reference of a child ";
 
 get the reference of a child ";
 
+%feature("docstring")  CasADi::ZeroSXNode::init "
+
+Initialize the node (currently used only to give a similar interface to
+MXNode) ";
+
 %feature("docstring")  CasADi::ZeroSXNode::isSmooth "
 
 Check if smooth. ";
@@ -61423,13 +64596,95 @@ Check if smooth. ";
 
 
 // File: namespaceCasADi.xml
+%feature("docstring")  CasADi::GSL::sqrt "
+
+Pre-C99 elementary functions from the math.h (cmath) header. ";
+
+%feature("docstring")  CasADi::GSL::sin "";
+
+%feature("docstring")  CasADi::GSL::cos "";
+
+%feature("docstring")  CasADi::GSL::tan "";
+
+%feature("docstring")  CasADi::GSL::atan "";
+
+%feature("docstring")  CasADi::GSL::asin "";
+
+%feature("docstring")  CasADi::GSL::acos "";
+
+%feature("docstring")  CasADi::GSL::sinh "";
+
+%feature("docstring")  CasADi::GSL::cosh "";
+
+%feature("docstring")  CasADi::GSL::tanh "";
+
+%feature("docstring")  CasADi::GSL::exp "";
+
+%feature("docstring")  CasADi::GSL::log "";
+
+%feature("docstring")  CasADi::GSL::log10 "";
+
+%feature("docstring")  CasADi::GSL::pow "";
+
+%feature("docstring")  CasADi::GSL::pow "";
+
+%feature("docstring")  CasADi::GSL::pow "";
+
+%feature("docstring")  CasADi::GSL::abs "";
+
+%feature("docstring")  CasADi::GSL::fabs "";
+
+%feature("docstring")  CasADi::GSL::floor "";
+
+%feature("docstring")  CasADi::GSL::ceil "";
+
+%feature("docstring")  CasADi::GSL::erf "
+
+C99 elementary functions from the math.h header. ";
+
+%feature("docstring")  CasADi::GSL::erf "throw ()";
+
+%feature("docstring")  CasADi::GSL::fmin "";
+
+%feature("docstring")  CasADi::GSL::fmin "";
+
+%feature("docstring")  CasADi::GSL::fmin "";
+
+%feature("docstring")  CasADi::GSL::fmin "throw ()";
+
+%feature("docstring")  CasADi::GSL::fmax "";
+
+%feature("docstring")  CasADi::GSL::fmax "";
+
+%feature("docstring")  CasADi::GSL::fmax "";
+
+%feature("docstring")  CasADi::GSL::fmax "throw ()";
+
+%feature("docstring")  CasADi::GSL::isnan "throw ()";
+
+%feature("docstring")  CasADi::GSL::isinf "throw ()";
+
 %feature("docstring")  CasADi::GSL::constpow "
 
-CasADi additions to math.h. ";
+CasADi additions. ";
 
 %feature("docstring")  CasADi::GSL::printme "";
 
-%feature("docstring")  CasADi::GSL::sign "";
+%feature("docstring")  CasADi::GSL::printme "";
+
+%feature("docstring")  CasADi::GSL::sign "
+
+Sign function, note that sign(nan) == nan. ";
+
+%feature("docstring")  CasADi::GSL::sign "
+
+Sign function, note that sign(nan) == nan. ";
+
+%feature("docstring")  CasADi::GSL::erfinv "
+
+Inverse of the error function. ";
+
+%feature("docstring")  CasADi::GSL::erfinv "throw ()";
 
 %feature("docstring")  CasADi::GSL::vec "
 
@@ -61451,14 +64706,6 @@ Get typename. ";
 %feature("docstring")  CasADi::GSL::typeName< int > " ";
 
 %feature("docstring")  CasADi::GSL::typeName< long > " ";
-
-%feature("docstring")  CasADi::GSL::sign "
-
-CasADi additions to math.h. ";
-
-%feature("docstring")  CasADi::GSL::constpow "";
-
-%feature("docstring")  CasADi::GSL::printme "";
 
 %feature("docstring")  CasADi::GSL::ptrVec "
 
@@ -61491,14 +64738,6 @@ Make a deep copy of an object (Note: default is a shallow copy!) ";
 %feature("docstring")  CasADi::GSL::deepcopy "";
 
 %feature("docstring")  CasADi::GSL::deepcopy "";
-
-%feature("docstring")  CasADi::GSL::constpow "
-
-CasADi additions to math.h. ";
-
-%feature("docstring")  CasADi::GSL::printme "";
-
-%feature("docstring")  CasADi::GSL::sign "";
 
 %feature("docstring")  CasADi::GSL::ssym "
 
@@ -61645,7 +64884,8 @@ Matrix product of two matrices. ";
 
 %feature("docstring")  CasADi::GSL::isConstant "
 
-check if the matrix has certain properties ";
+check if the matrix is constant (note that false negative answers are
+possible) ";
 
 %feature("docstring")  CasADi::GSL::isDense "";
 
@@ -61685,14 +64925,27 @@ Check if a matrix is upper triangular (complexity ~ A.size1()) ";
 
 %feature("docstring")  CasADi::GSL::vec "
 
-make a vector Reshapes/flattens/vectorizes the Matrix<T> such that the shape
-becomes (expr.numel(),1). Columns are stacked on top of each other.
+make a vector Reshapes/vectorizes the Matrix<T> such that the shape becomes
+(expr.numel(),1). Columns are stacked on top of each other. Same as
+reshape(trans(expr), expr.numel(),1)
 
 a b c d
 
 turns into
 
 a c b d ";
+
+%feature("docstring")  CasADi::GSL::flatten "
+
+make a vector Flattens the Matrix<T> such that the shape becomes
+(expr.numel(),1). Transposed rows are stacked on top of each other. Same as
+reshape(expr, expr.numel(),1)
+
+a b c d
+
+turns into
+
+a b c d ";
 
 %feature("docstring")  CasADi::GSL::vecNZ "
 
@@ -61767,13 +65020,22 @@ blocks. ";
 
 Matlab's linspace function. ";
 
-%feature("docstring")  CasADi::GSL::isZero "";
+%feature("docstring")  CasADi::GSL::isZero "
 
-%feature("docstring")  CasADi::GSL::isOne "";
+check if the matrix is 0 (note that false negative answers are possible) ";
 
-%feature("docstring")  CasADi::GSL::isMinusOne "";
+%feature("docstring")  CasADi::GSL::isOne "
 
-%feature("docstring")  CasADi::GSL::isIdentity "";
+check if the matrix is 1 (note that false negative answers are possible) ";
+
+%feature("docstring")  CasADi::GSL::isMinusOne "
+
+check if the matrix is -1 (note that false negative answers are possible) ";
+
+%feature("docstring")  CasADi::GSL::isIdentity "
+
+check if the matrix is an identity matrix (note that false negative answers
+are possible) ";
 
 %feature("docstring")  CasADi::GSL::nnz "";
 
@@ -61870,7 +65132,9 @@ Create a sparse rectangular sparsity pattern. ";
 
 %feature("docstring")  CasADi::GSL::sp_tril "
 
-Create an upper triangular square sparsity pattern. ";
+Create a lower triangular square sparsity pattern.
+
+See:   lowerSparsity ";
 
 %feature("docstring")  CasADi::GSL::sp_diag "
 
@@ -61899,15 +65163,6 @@ matrix ";
 
 Construct a block sparsity pattern from (row,col) vectors. ";
 
-%feature("docstring")  CasADi::GSL::sp_NZ "
-
-Construct a sparsity pattern from (row,col) vectors.
-
-row and column must be of same length.
-
-If you can guarantee that row is montone, pass the extra argument as true.
-";
-
 %feature("docstring")  CasADi::GSL::getNZDense "
 
 Get the indices of all non-zero elements as they would appear in a Dense
@@ -61921,9 +65176,20 @@ B ";
 
 %feature("docstring")  CasADi::GSL::vec "";
 
+%feature("docstring")  CasADi::GSL::trans "
+
+\\\\ brief Return the transpose of the sparsity pattern ";
+
 %feature("docstring")  CasADi::GSL::lowerSparsity "
 
-Return the lower part of the sparsity pattern. ";
+Return the lower part of the sparsity pattern.
+
+Parameters:
+-----------
+
+includeDiagonal:  specify wether the diaginal must be part of the result
+
+See:   sp_tril ";
 
 %feature("docstring")  CasADi::GSL::lowerNZ "
 
@@ -61943,6 +65209,14 @@ already in increasing order for each row and without any duplicates. ";
 %feature("docstring")  CasADi::GSL::mul "
 
 Get the sparsity resulting from a matrix multiplication ";
+
+%feature("docstring")  CasADi::GSL::constpow "";
+
+%feature("docstring")  CasADi::GSL::sign "";
+
+%feature("docstring")  CasADi::GSL::erfinv "";
+
+%feature("docstring")  CasADi::GSL::printme "";
 
 %feature("docstring")  CasADi::GSL::vertcat "";
 
@@ -61982,15 +65256,15 @@ Take the matrix product of 2 MX objects. ";
 
 %feature("docstring")  CasADi::GSL::isZero "
 
-check if zero ";
+check if zero (note that false negative answers are possible) ";
 
 %feature("docstring")  CasADi::GSL::isOne "
 
-check if zero ";
+check if zero (note that false negative answers are possible) ";
 
 %feature("docstring")  CasADi::GSL::isMinusOne "
 
-check if zero ";
+check if zero (note that false negative answers are possible) ";
 
 %feature("docstring")  CasADi::GSL::isIdentity "
 
@@ -62030,6 +65304,17 @@ Reshape the MX. ";
 
 %feature("docstring")  CasADi::GSL::vec "
 
+Returns a vectorized version of the MX Vectorizing is an expensive
+operation, unlike flatten Same as reshape(trans(x), x.numel(),1)
+
+a b c d
+
+turns into
+
+a c b d ";
+
+%feature("docstring")  CasADi::GSL::flatten "
+
 Returns a flattened version of the MX Flattening is a cheap (non-copying)
 operation Same as reshape(x, x.numel(),1)
 
@@ -62037,7 +65322,7 @@ a b c d
 
 turns into
 
-a c b d ";
+a b c d ";
 
 %feature("docstring")  CasADi::GSL::vecNZ "
 
@@ -62058,6 +65343,11 @@ Unite two matrices no overlapping sparsity. ";
 %feature("docstring")  CasADi::GSL::isSymbolic "
 
 check if symbolic ";
+
+%feature("docstring")  CasADi::GSL::isSymbolicSparse "
+
+check if all nonzeros are symbolic (this function is currently identical to
+isSymbolic) ";
 
 %feature("docstring")  CasADi::GSL::trace "";
 
@@ -62080,8 +65370,8 @@ nzA.push_back(k); } else if(mapping[k]>0){ nzB.push_back(k); } else { throw
 CasadiException(\"Pattern intersection not empty\"); } }
 
 Create mapping MX ret; ret.assignNode(new Mapping(sp));
-ret->addDependency(A,range(nzA.size()),nzA);
-ret->addDependency(B,range(nzB.size()),nzB); return ret;
+ret->assign(A,range(nzA.size()),nzA); ret->assign(B,range(nzB.size()),nzB);
+return ret;
 
 } ";
 
@@ -62180,8 +65470,6 @@ Apply a function f to each element in a vector ";
 
 Apply a function f to each element in a vector ";
 
-%feature("docstring")  CasADi::GSL::sign "throw ()";
-
 %feature("docstring")  CasADi::GSL::shared_cast "
 
 Typecast a shared object to a base class to a shared object to a derived
@@ -62242,6 +65530,14 @@ Print representation. ";
 %feature("docstring")  CasADi::GSL::print "
 
 Print description. ";
+
+%feature("docstring")  CasADi::GSL::inBounds "
+
+Check if for each element of v holds: v_i < upper. ";
+
+%feature("docstring")  CasADi::GSL::inBounds "
+
+Check if for each element of v holds: lower <= v_i < upper. ";
 
 %feature("docstring")  CasADi::GSL::getRepresentation "
 
@@ -63122,9 +66418,6 @@ h:  internal expressions which the user may wish to inspect ";
 // File: binary__op_8hpp.xml
 
 
-// File: binary__sx__node_8cpp.xml
-
-
 // File: binary__sx__node_8hpp.xml
 
 
@@ -63153,6 +66446,9 @@ h:  internal expressions which the user may wish to inspect ";
 // File: casadi_8hpp.xml
 
 
+// File: casadi__calculus_8hpp.xml
+
+
 // File: casadi__exception_8hpp.xml
 
 
@@ -63166,54 +66462,6 @@ h:  internal expressions which the user may wish to inspect ";
 
 
 // File: casadi__math_8hpp.xml
-
-
-// File: casadi__operators_8hpp.xml
-%feature("docstring")  CasADi::sqrt "
-
-Pre-C99 elementary functions from the math.h (cmath) header. ";
-
-%feature("docstring")  CasADi::sin "";
-
-%feature("docstring")  CasADi::cos "";
-
-%feature("docstring")  CasADi::tan "";
-
-%feature("docstring")  CasADi::atan "";
-
-%feature("docstring")  CasADi::asin "";
-
-%feature("docstring")  CasADi::acos "";
-
-%feature("docstring")  CasADi::exp "";
-
-%feature("docstring")  CasADi::log "";
-
-%feature("docstring")  CasADi::log10 "";
-
-%feature("docstring")  CasADi::pow "";
-
-%feature("docstring")  CasADi::abs "";
-
-%feature("docstring")  CasADi::fabs "";
-
-%feature("docstring")  CasADi::floor "";
-
-%feature("docstring")  CasADi::ceil "";
-
-%feature("docstring")  CasADi::sinh "";
-
-%feature("docstring")  CasADi::cosh "";
-
-%feature("docstring")  CasADi::tanh "";
-
-%feature("docstring")  CasADi::erf "
-
-C99 elementary functions from the math.h header. ";
-
-%feature("docstring")  CasADi::fmin "";
-
-%feature("docstring")  CasADi::fmax "";
 
 
 // File: casadi__types_8cpp.xml
@@ -63375,12 +66623,6 @@ This file does absolutely nothing but including all headers ";
 // File: frame__node_8hpp.xml
 
 
-// File: function__io_8cpp.xml
-
-
-// File: function__io_8hpp.xml
-
-
 // File: fx_8cpp.xml
 
 
@@ -63400,6 +66642,9 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: generateCode_8hpp.xml
+
+
+// File: generic__matrix_8hpp.xml
 
 
 // File: generic__type_8cpp.xml
@@ -63473,12 +66718,6 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: integrator__internal_8hpp.xml
-
-
-// File: inverse__mapping_8cpp.xml
-
-
-// File: inverse__mapping_8hpp.xml
 
 
 // File: ipopt_8hpp.xml
@@ -63658,53 +66897,10 @@ This file does absolutely nothing but including all headers ";
 // File: documentation_2examples_2MX_2mapping_8hpp.xml
 
 
-// File: matrix_8cpp.xml
-
-
 // File: matrix_8hpp.xml
-%feature("docstring")  CasADi::sin "
 
-Pre-C99 elementary functions from the math.h (cmath) header. ";
 
-%feature("docstring")  CasADi::cos "";
-
-%feature("docstring")  CasADi::tan "";
-
-%feature("docstring")  CasADi::asin "";
-
-%feature("docstring")  CasADi::acos "";
-
-%feature("docstring")  CasADi::atan "";
-
-%feature("docstring")  CasADi::sinh "";
-
-%feature("docstring")  CasADi::cosh "";
-
-%feature("docstring")  CasADi::tanh "";
-
-%feature("docstring")  CasADi::exp "";
-
-%feature("docstring")  CasADi::log "";
-
-%feature("docstring")  CasADi::log10 "";
-
-%feature("docstring")  CasADi::sqrt "";
-
-%feature("docstring")  CasADi::floor "";
-
-%feature("docstring")  CasADi::ceil "";
-
-%feature("docstring")  CasADi::fabs "";
-
-%feature("docstring")  CasADi::pow "";
-
-%feature("docstring")  CasADi::fmin "
-
-C99 elementary functions from the math.h header. ";
-
-%feature("docstring")  CasADi::fmax "";
-
-%feature("docstring")  CasADi::erf "";
+// File: matrix__impl_8hpp.xml
 
 
 // File: matrix__tools_8cpp.xml
@@ -63914,78 +67110,6 @@ C99 elementary functions from the math.h header. ";
 // File: parallelizer__internal_8hpp.xml
 
 
-// File: pre__c99__support_8cpp.xml
-%feature("docstring")  CasADi::isnan "throw ()";
-
-%feature("docstring")  CasADi::isinf "throw ()";
-
-%feature("docstring")  CasADi::erf "throw ()";
-
-%feature("docstring")  CasADi::fmin "throw ()";
-
-%feature("docstring")  CasADi::fmax "throw ()";
-
-%feature("docstring")  CasADi::exp "throw ()";
-
-%feature("docstring")  CasADi::log "throw ()";
-
-%feature("docstring")  CasADi::sqrt "throw ()";
-
-%feature("docstring")  CasADi::pow "throw ()";
-
-%feature("docstring")  CasADi::sin "throw ()";
-
-%feature("docstring")  CasADi::cos "throw ()";
-
-%feature("docstring")  CasADi::tan "throw ()";
-
-%feature("docstring")  CasADi::asin "throw ()";
-
-%feature("docstring")  CasADi::acos "throw ()";
-
-%feature("docstring")  CasADi::atan "throw ()";
-
-%feature("docstring")  CasADi::floor "throw ()";
-
-%feature("docstring")  CasADi::ceil "throw ()";
-
-
-// File: pre__c99__support_8hpp.xml
-%feature("docstring")  CasADi::isnan "throw ()";
-
-%feature("docstring")  CasADi::isinf "throw ()";
-
-%feature("docstring")  CasADi::erf "throw ()";
-
-%feature("docstring")  CasADi::fmin "throw ()";
-
-%feature("docstring")  CasADi::fmax "throw ()";
-
-%feature("docstring")  CasADi::exp "throw ()";
-
-%feature("docstring")  CasADi::log "throw ()";
-
-%feature("docstring")  CasADi::sqrt "throw ()";
-
-%feature("docstring")  CasADi::pow "throw ()";
-
-%feature("docstring")  CasADi::sin "throw ()";
-
-%feature("docstring")  CasADi::cos "throw ()";
-
-%feature("docstring")  CasADi::tan "throw ()";
-
-%feature("docstring")  CasADi::asin "throw ()";
-
-%feature("docstring")  CasADi::acos "throw ()";
-
-%feature("docstring")  CasADi::atan "throw ()";
-
-%feature("docstring")  CasADi::floor "throw ()";
-
-%feature("docstring")  CasADi::ceil "throw ()";
-
-
 // File: printable__object_8cpp.xml
 
 
@@ -64127,49 +67251,6 @@ C99 elementary functions from the math.h header. ";
 
 
 // File: sx_8hpp.xml
-%feature("docstring")  CasADi::sqrt "
-
-Pre-C99 elementary functions from the math.h (cmath) header. ";
-
-%feature("docstring")  CasADi::sin "";
-
-%feature("docstring")  CasADi::cos "";
-
-%feature("docstring")  CasADi::tan "";
-
-%feature("docstring")  CasADi::atan "";
-
-%feature("docstring")  CasADi::asin "";
-
-%feature("docstring")  CasADi::acos "";
-
-%feature("docstring")  CasADi::sinh "";
-
-%feature("docstring")  CasADi::cosh "";
-
-%feature("docstring")  CasADi::tanh "";
-
-%feature("docstring")  CasADi::exp "";
-
-%feature("docstring")  CasADi::log "";
-
-%feature("docstring")  CasADi::pow "";
-
-%feature("docstring")  CasADi::abs "";
-
-%feature("docstring")  CasADi::fabs "";
-
-%feature("docstring")  CasADi::floor "";
-
-%feature("docstring")  CasADi::ceil "";
-
-%feature("docstring")  CasADi::erf "
-
-C99 elementary functions from the math.h header. ";
-
-%feature("docstring")  CasADi::fmin "";
-
-%feature("docstring")  CasADi::fmax "";
 
 
 // File: sx__function_8cpp.xml
