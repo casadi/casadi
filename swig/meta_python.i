@@ -242,6 +242,7 @@ int meta< CasADi::GenericType >::as(PyObject * p,CasADi::GenericType &s) {
     if (!pClass) { PyErr_Clear(); Py_DECREF(pObjectModule); Py_DECREF(pPyObjectModuleName); return false; }
     
     PyObject* args = PyTuple_New(1);
+    Py_INCREF(p); // Needed because PyTuple_SetItem steals the reference
     PyTuple_SetItem(args,0,p);
     
     PyObject* g = PyObject_CallObject(pClass,args);
