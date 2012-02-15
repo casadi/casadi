@@ -39,12 +39,20 @@ QPSolverInternal::QPSolverInternal(const CRSSparsity &H, const CRSSparsity &A){
   addOption("convex", OT_BOOLEAN, false, "Specify true if you can guarantee that H will always be positive definite");
 
   nx_ = H.size2();
-  nc_ = A.size1();
+  nc_ = A.isNull() ? 0 : A.size1();
   
-  casadi_assert_message(A.size2()==nx_ &&  H.size1()==H.size2(),
-    "Got incompatible dimensions.   min          x'Hx + G'x s.t.   LBA <= Ax <= UBA :" << std::endl <<
-    "H: " << H.dimString() << " - A: " << A.dimString() << std::endl <<
-    "We need: H.size2()==A.size2(), H square & symmetric" << std::endl
+  if (!A.isNull()) {
+    casadi_assert_message(A.size2()==nx_,
+      "Got incompatible dimensions.   min          x'Hx + G'x s.t.   LBA <= Ax <= UBA :" << std::endl <<
+      "H: " << H.dimString() << " - A: " << A.dimString() << std::endl <<
+      "We need: H.size2()==A.size2()" << std::endl
+    );
+  } 
+  
+  casadi_assert_message(H.size1()==H.size2(),
+    "Got incompatible dimensions.   min          x'Hx + G'x" << std::endl <<
+    "H: " << H.dimString() <<
+    "We need H square & symmetric" << std::endl
   );
 
   // Sparsity

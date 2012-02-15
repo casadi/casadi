@@ -341,6 +341,14 @@ void NLPSolverInternal::init(){
     }
     log("Jacobian function generated");
   }
+  
+  // Create an empty Jacobian if it does not already exists
+  //if ( G_.isNull() && J_.isNull() ) {
+  //  J_ = MXFunction(F_.symbolicInput(),MX(DMatrix::zeros(G_.output().size(),0)));
+    
+  //  log("Jacobian function generated");
+  //}
+  
   if(!J_.isNull() && !J_.isInit()){
     J_.init();
     log("Jacobian function initialized");
