@@ -40,6 +40,11 @@ std::vector<int> Slice::getAll(int len) const{
   if (start<0) start+=len;
   if (stop<0) stop+=len;
   if (stop==std::numeric_limits<int>::max()) stop = len;
+
+  casadi_assert_message(stop<=len,"Slice (start=" << start << ", stop=" << stop << ", step=" << step_ << ") out of bounds with supplied length of " << len);
+  casadi_assert_message(start>=0, "Slice (start=" << start << ", stop=" << stop << ", step=" << step_ << ") out of bounds with start<0.");
+  casadi_assert_message(stop>=start,"Slice (start=" << start << ", stop=" << stop << ", step=" << step_ << ") inconsistent. Expecting stop>= start.");
+  
   return range(start,stop,step_,len);
 }
 

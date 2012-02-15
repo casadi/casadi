@@ -2028,6 +2028,13 @@ std::pair<int,int> CRSSparsityInternal::shape() const{
 }
 
 vector<int> CRSSparsityInternal::erase(const vector<int>& ii, const vector<int>& jj){
+  if (!inBounds(ii,nrow_)) {
+    casadi_error("Slicing [ii,jj] out of bounds. Your ii contains " << *std::min_element(ii.begin(),ii.end()) << " up to " << *std::max_element(ii.begin(),ii.end()) << ", which is outside of the matrix shape " << dimString() << ".");
+  }
+  if (!inBounds(jj,ncol_)) {
+    casadi_error("Slicing [ii,jj] out of bounds. Your jj contains " << *std::min_element(jj.begin(),jj.end()) << " up to " << *std::max_element(jj.begin(),jj.end()) << ", which is outside of the matrix shape " << dimString() << ".");
+  }
+  
   // Mapping
   vector<int> mapping;
   
@@ -2106,6 +2113,14 @@ vector<int> CRSSparsityInternal::erase(const vector<int>& ii, const vector<int>&
 }
 
 vector<int> CRSSparsityInternal::getNZ(vector<int> ii, vector<int> jj) const{
+  if (!inBounds(ii,nrow_)) {
+    casadi_error("Slicing [ii,jj] out of bounds. Your ii contains " << *std::min_element(ii.begin(),ii.end()) << " up to " << *std::max_element(ii.begin(),ii.end()) << ", which is outside of the matrix shape " << dimString() << ".");
+  }
+  if (!inBounds(jj,ncol_)) {
+    casadi_error("Slicing [ii,jj] out of bounds. Your jj contains " << *std::min_element(jj.begin(),jj.end()) << " up to " << *std::max_element(jj.begin(),jj.end()) << ", which is outside of the matrix shape " << dimString() << ".");
+  }
+  
+  
   vector<int> ret;
   for(vector<int>::const_iterator it=ii.begin(); it!=ii.end(); ++it){
     int el=rowind_[*it];
@@ -2124,6 +2139,14 @@ vector<int> CRSSparsityInternal::getNZ(vector<int> ii, vector<int> jj) const{
 }
 
 CRSSparsity CRSSparsityInternal::getSub(const vector<int>& ii, const vector<int>& jj, vector<int>& mapping) const{
+  if (!inBounds(ii,nrow_)) {
+    casadi_error("Slicing [ii,jj] out of bounds. Your ii contains " << *std::min_element(ii.begin(),ii.end()) << " up to " << *std::max_element(ii.begin(),ii.end()) << ", which is outside of the matrix shape " << dimString() << ".");
+  }
+  if (!inBounds(jj,ncol_)) {
+    casadi_error("Slicing [ii,jj] out of bounds. Your jj contains " << *std::min_element(jj.begin(),jj.end()) << " up to " << *std::max_element(jj.begin(),jj.end()) << ", which is outside of the matrix shape " << dimString() << ".");
+  }
+  
+  
   // Get non-zeros
   vector<int> kk = getNZ(ii,jj);
 

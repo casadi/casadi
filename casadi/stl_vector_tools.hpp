@@ -32,6 +32,7 @@
 #include <iterator>
 #include <string>
 #include <limits>
+#include <algorithm>
 #include "casadi_exception.hpp"
 #include "casadi_types.hpp"
 
@@ -83,6 +84,14 @@ namespace CasADi{
   template<typename T>
   void print(const std::vector<T> &v, std::ostream &stream=std::cout);
 
+  /// Check if for each element of v holds: v_i < upper
+  template<typename T>
+  bool inBounds(const std::vector<T> &v, int upper);
+  
+  /// Check if for each element of v holds: lower <= v_i < upper
+  template<typename T>
+  bool inBounds(const std::vector<T> &v, int lower, int upper);
+  
   /// Print representation to string
   template<typename T>
   std::string getRepresentation(const std::vector<T> &v);
@@ -193,6 +202,20 @@ namespace CasADi{
       if(!v.empty()) stream << v.back();
       stream << ")";
     }
+  }
+  
+  template<typename T>
+  bool inBounds(const std::vector<T> &v, int upper) {
+    return inBounds(v,0,upper);
+  }
+
+  template<typename T>
+  bool inBounds(const std::vector<T> &v, int lower, int upper) {
+    if (v.size()==0) return true;
+    int max = *std::max_element(v.begin(),v.end());
+    if (max >= upper) return false;
+    int min = *std::min_element(v.begin(),v.end());
+    return (min >= lower);
   }
 
   template<typename T>

@@ -1592,6 +1592,51 @@ class MXtests(casadiTestCase):
     y = x[0:0]
     self.assertEqual(y.size(),0)
 
+  def test_indexingOutOfBounds(self):
+    self.message("Indexing out of bounds")
+    y = DMatrix.zeros(4, 5) 
+    self.assertRaises(RuntimeError,lambda : y[12,0] )
+    self.assertRaises(RuntimeError,lambda : y[12,12] )
+    self.assertRaises(RuntimeError,lambda : y[0,12] )
+    self.assertRaises(RuntimeError,lambda : y[12,:] )
+    self.assertRaises(RuntimeError,lambda : y[12:15,0] )
+    self.assertRaises(RuntimeError,lambda : y[:,12] )
+    self.assertRaises(RuntimeError,lambda : y[0,12:15] )
+    y[-1,2]
+    self.assertRaises(RuntimeError,lambda : y[-12,2] )
+    y[-3:-1,2]
+    self.assertRaises(RuntimeError,lambda : y[-12:-9,2] )
+    
+    def test():
+      y[12,0] = 0
+    self.assertRaises(RuntimeError,test)
+    def test():
+      y[12,12] = 0
+    self.assertRaises(RuntimeError,test)
+    def test():
+      y[0,12] = 0
+    self.assertRaises(RuntimeError,test)
+    def test():
+      y[12,:] = 0
+    self.assertRaises(RuntimeError,test)
+    def test():
+      y[12:15,0] = 0
+    self.assertRaises(RuntimeError,test)
+    def test():
+      y[:,12] = 0
+    self.assertRaises(RuntimeError,test)
+    def test():
+      y[0,12:15] = 0
+    self.assertRaises(RuntimeError,test)
+    y[-1,2] = 0
+    def test():
+      y[-12,2] = 0
+    self.assertRaises(RuntimeError,test)
+    y[-3:-1,2] = 0
+    def test():
+      y[-12:-9,2] = 0
+    self.assertRaises(RuntimeError,test)
+    
   def test_indexinglimits(self):
     self.message("Limits of indexing")
     y = casadi.MX("y", 3) 

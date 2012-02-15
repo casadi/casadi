@@ -179,7 +179,7 @@ class CRSSparsityInternal : public SharedObjectNode{
     /// Make a patten dense
     CRSSparsity makeDense(std::vector<int>& mapping) const;
 
-    /// Erase rows and/or columns
+    /// Erase rows and/or columns - does bounds checking
     std::vector<int> erase(const std::vector<int>& ii, const std::vector<int>& jj);
 
     /// Append another sparsity patten vertically
@@ -188,13 +188,13 @@ class CRSSparsityInternal : public SharedObjectNode{
     /// Reserve space
     void reserve(int nnz, int nrow);
     
-    /// Get a submatrix
+    /// Get a submatrix - does bounds checking
     CRSSparsity getSub(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
 
     /// Get the index of an existing non-zero element
     int getNZ(int i, int j) const;
     
-    /// Get a set of non-zero element
+    /// Get a set of non-zero element - does bounds checking
     std::vector<int> getNZ(std::vector<int> ii, std::vector<int> jj) const;
 
     /// Get the nonzero index for a set of elements (see descripion in public class)

@@ -57,7 +57,7 @@ const Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const std::vector<
   // Nonzero mapping from submatrix to full
   std::vector<int> mapping;
   
-  // Get the sparsity pattern
+  // Get the sparsity pattern - does bounds checking
   CRSSparsity sp = sparsity().getSub(ii,jj,mapping);
 
   // Create return object
@@ -75,6 +75,10 @@ template<class T>
 const Matrix<T> Matrix<T>::getSub(const std::vector<int>& ii, const Matrix<int>& k) const{
   std::vector< int > cols = range(size2());
   std::vector< Matrix<T> > temp;
+  
+  if (!inBounds(ii,size1())) {
+    casadi_error("Slicing [ii,k] out of bounds. Your ii contains " << *std::min_element(ii.begin(),ii.end()) << " up to " << *std::max_element(ii.begin(),ii.end()) << ", which is outside of the matrix shape " << dimString() << ".");
+  }
 
   for (int i=0;i<ii.size();++i) {
     Matrix<T> m = k;
@@ -92,6 +96,10 @@ const Matrix<T> Matrix<T>::getSub(const Matrix<int>& k, const std::vector<int>& 
   std::vector< int > rows = range(size1());
   std::vector< Matrix<T> > temp;
 
+  if (!inBounds(jj,size2())) {
+    casadi_error("Slicing [ii,k] out of bounds. Your jj contains " << *std::min_element(jj.begin(),jj.end()) << " up to " << *std::max_element(jj.begin(),jj.end()) << ", which is outside of the matrix shape " << dimString() << ".");
+  }
+  
   for (int j=0;j<jj.size();++j) {
     Matrix<T> m = k;
     for (int i=0;i<m.size();++i) {
@@ -149,6 +157,13 @@ void Matrix<T>::setSub(int i, int j, const Matrix<T>& el){
 template<class T>
 void Matrix<T>::setSub(const std::vector<int>& ii, const std::vector<int>& jj, const Matrix<T>& el){
   casadi_assert_message(el.numel()==1 || (ii.size() == el.size1() && jj.size() == el.size2()),"Dimension mismatch." << std::endl << "lhs is " << ii.size() << " x " << jj.size() << ", while rhs is " << el.dimString());
+
+  if (!inBounds(ii,size1())) {
+    casadi_error("setSub [ii,jj] out of bounds. Your ii contains " << *std::min_element(ii.begin(),ii.end()) << " up to " << *std::max_element(ii.begin(),ii.end()) << ", which is outside of the matrix shape " << dimString() << ".");
+  }
+  if (!inBounds(jj,size2())) {
+    casadi_error("setSub [ii,jj] out of bounds. Your jj contains " << *std::min_element(jj.begin(),jj.end()) << " up to " << *std::max_element(jj.begin(),jj.end()) << ", which is outside of the matrix shape " << dimString() << ".");
+  }
   
   // If m is scalar
   if(el.numel() != ii.size() * jj.size()){
@@ -185,6 +200,10 @@ void Matrix<T>::setSub(const Matrix<int>& i, const std::vector<int>& jj, const M
     setSub(i,jj,repmat(Matrix<T>(i.sparsity(),el.toScalar()),1,jj.size()));
     return;
   }
+
+  if (!inBounds(jj,size2())) {
+    casadi_error("setSub[i,jj] out of bounds. Your jj contains " << *std::min_element(jj.begin(),jj.end()) << " up to " << *std::max_element(jj.begin(),jj.end()) << ", which is outside of the matrix shape " << dimString() << ".");
+  }
   
   CRSSparsity result_sparsity = repmat(i,1,jj.size()).sparsity();
   
@@ -210,6 +229,10 @@ void Matrix<T>::setSub(const std::vector<int>& ii, const Matrix<int>& j, const M
   if(el.scalar() && (ii.size() > 1 || j.size() > 1)){
     setSub(ii,j,repmat(Matrix<T>(j.sparsity(),el.toScalar()),ii.size(),1));
     return;
+  }
+
+  if (!inBounds(ii,size1())) {
+    casadi_error("setSub[ii,j] out of bounds. Your ii contains " << *std::min_element(ii.begin(),ii.end()) << " up to " << *std::max_element(ii.begin(),ii.end()) << ", which is outside of the matrix shape " << dimString() << ".");
   }
   
   CRSSparsity result_sparsity = repmat(j,ii.size(),1).sparsity();
@@ -592,14 +615,14 @@ Matrix<T>::Matrix(const std::vector< std::vector<T> >& d){
 
 template<class T>
 Matrix<T>::Matrix(const CRSSparsity& sparsity, const T& val){
-  sparsity_ = sparsity;
+  sparsity_ = sparsity.isNull() ? CRSSparsity(0,0,false) : sparsity;
   data().resize(sparsity_.size(),val);
 }
 
 template<class T>
 Matrix<T>::Matrix(const CRSSparsity& sparsity, const std::vector<T>& d) : data_(d) {
   casadi_assert_message(sparsity.size()==d.size(),"Size mismatch." << std::endl << "You supplied a sparsity of " << sparsity.dimString() << ", but the supplied vector is of length " << d.size());
-  sparsity_ = sparsity;
+  sparsity_ = sparsity.isNull() ? CRSSparsity(0,0,false) : sparsity;
 }
 
 template<class T>

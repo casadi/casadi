@@ -94,7 +94,52 @@ class Matrixtests(casadiTestCase):
     self.assertEqual(C.size(),A.size()+B.size(),"veccat size")
     
     self.checkarray(tuple(C.data()),tuple(arange(1,7)),"numbers shape")
+
+  def test_indexingOutOfBounds(self):
+    self.message("Indexing out of bounds")
+    y = DMatrix.zeros(4, 5) 
+    self.assertRaises(RuntimeError,lambda : y[12,0] )
+    self.assertRaises(RuntimeError,lambda : y[12,12] )
+    self.assertRaises(RuntimeError,lambda : y[0,12] )
+    self.assertRaises(RuntimeError,lambda : y[12,:] )
+    self.assertRaises(RuntimeError,lambda : y[12:15,0] )
+    self.assertRaises(RuntimeError,lambda : y[:,12] )
+    self.assertRaises(RuntimeError,lambda : y[0,12:15] )
+    y[-1,2]
+    self.assertRaises(RuntimeError,lambda : y[-12,2] )
+    y[-3:-1,2]
+    self.assertRaises(RuntimeError,lambda : y[-12:-9,2] )
     
+    def test():
+      y[12,0] = 0
+    self.assertRaises(RuntimeError,test)
+    def test():
+      y[12,12] = 0
+    self.assertRaises(RuntimeError,test)
+    def test():
+      y[0,12] = 0
+    self.assertRaises(RuntimeError,test)
+    def test():
+      y[12,:] = 0
+    self.assertRaises(RuntimeError,test)
+    def test():
+      y[12:15,0] = 0
+    self.assertRaises(RuntimeError,test)
+    def test():
+      y[:,12] = 0
+    self.assertRaises(RuntimeError,test)
+    def test():
+      y[0,12:15] = 0
+    self.assertRaises(RuntimeError,test)
+    y[-1,2] = 0
+    def test():
+      y[-12,2] = 0
+    self.assertRaises(RuntimeError,test)
+    y[-3:-1,2] = 0
+    def test():
+      y[-12:-9,2] = 0
+    self.assertRaises(RuntimeError,test)
+
   def test_vecNZcat(self):
     self.message("vecNZcat")
     A = DMatrix(2,3)
