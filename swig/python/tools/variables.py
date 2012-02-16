@@ -1,5 +1,6 @@
 from casadi import *
 import copy
+from types import *
 
 def flatten(l):
   return [i for i in iter_flatten(l)]
@@ -93,6 +94,15 @@ class Variables(object):
         self._type = "SX"
         self._frozen = False
         
+    def unfrozencopy(self):
+      c = Variables()
+      c._offset = copy.copy(self._offset)
+      c._d = copy.copy(self._d)
+      c._d_ = copy.copy(self._d_)
+      c._type = copy.copy(self._type)
+      c._orderflag = copy.copy(self._orderflag)
+      return c
+        
     def freeze(self,parent=True):
       self._createParent = parent
       self._frozen = True
@@ -106,21 +116,25 @@ class Variables(object):
       self.buildlookuptable()
                 
     def buildlookuptable(self):
-      self._reverselookup = [None]*self.getSize()
+      self._reverselookup  = [None]*self.getSize()
+      self._reverselookup2 = [None]*self.getSize()
       for k in self._order:
           obj = self._d[k]
           offset = self.getOffset(k)
           size = self.getSize(obj)
           if isinstance(obj,Variables):
-            self._reverselookup[offset:offset+size] = [ (k,)+i for i in obj._reverselookup]
+            self._reverselookup[offset:offset+size]   = [ (k,)+i for i in obj._reverselookup]
+            self._reverselookup2[offset:offset+size] = [ (k,)+i for i in obj._reverselookup2]
           elif isinstance(obj,list):
             result = map_nested_list_hierarchical(lambda flati, hieri, item: (hieri, item ) ,self.getindex(k))
             for hierarchy, imatrix in iter_flatten_list(result):
               for i,j in enumerate(list(imatrix)):
                 self._reverselookup[j] = (k,)+ hierarchy + ((i,),)
+                self._reverselookup2[j] = (k,)+ hierarchy + ((i,),)
           else:
            for i,j in enumerate(list(self.getindex(k))):
-             self._reverselookup[j] = (k,(i,))
+             self._reverselookup[j]  = (k,(i,))
+             self._reverselookup2[j] = (k,(i,))
                 
                 
     def reverselookup(self,index):
@@ -164,14 +178,20 @@ class Variables(object):
       else:
         return self.lookup(rest,obj=obj.__getitem__(first)) 
       
-        
-      
-    def reverseNZindexRepr(self,index):
+    
+    def hierarchicalIndexRepr(self,index,matrixstyle=False):
       s = ""
-      for i in reverseNZindex(index):
+      for i in index:
         if isinstance(i,StringType):
-          s+="[i_%s]"
-      self._reverselookup[index]
+          s+=i
+        elif isinstance(i,TupleType):
+          s+=str(list(i))
+        elif isinstance(i,int):
+          s+="[%d]" % i
+      return s
+      
+    def getLabels(self):
+      return [self.hierarchicalIndexRepr(i) for i in self._reverselookup2]
       
     def __getattr__(self,name):
         """
@@ -195,7 +215,7 @@ class Variables(object):
         if name.startswith('i_') and len(name)>2:
             return self.getindex(name[2:])
         if name.startswith('iv_') and len(name)>2:
-            return list(self.getindex(name[2:]))
+            return list(self.getindex(name[3:]))
         if name.endswith('_'):
             if isinstance(self._d[name[:-1]],Variables):
                 raise Exception("Variable %s has no numerical value, because it is a Variables object itself." % name[:-1])
@@ -220,6 +240,8 @@ class Variables(object):
             return
         if self._frozen:
           raise Exception("This Variables instance is frozen. You cannot add more members ('%s' in this case). This is for your own protection." % name)
+        if isinstance(value,Variables):
+          value = copy.copy(value)
         self._d[name] = value
         if isinstance(value,MX) or self._type == "MX":
            self._type = "MX"
@@ -237,14 +259,20 @@ class Variables(object):
     def getindex(self,name):
         if not(name in self._d):
             raise Exception(("Variable %s not found. " % name)  + "\n" + "Available variables are: " + str(self._order))
+            
         if not(hasattr(self,'_indexCache')):
           self._indexCache={}
           
         if name in self._indexCache:
           return self._indexCache[name]
-        
+
         offsets = flatten(self.getOffset(name))
-        res = map_nested_list(lambda c,x: self.getIMatrix(x,offsets[c]),self._d[name])
+          
+        if isinstance(self._d[name],Variables):
+          res = IMatrix(range(offsets[0],offsets[0]+self._d[name].shape[0]))
+        else:
+          res = map_nested_list(lambda c,x: self.getIMatrix(x,offsets[c]),self._d[name])
+          
         
         self._indexCache[name] = res
         
@@ -399,12 +427,19 @@ class Variables(object):
         return self._numbers.veccat()
         
     def __str__(self):
-        keys = self._order
-        s=''
-        s+= "Container holding %d variables.\n" % len(keys)
-        for i,k in enumerate(keys):
-            s+= ("%2d. " % i ) + k + " = " +  str(self._d[k]) + "\n"
-        return s
+        if self._frozen:
+          keys = self._order
+          s=''
+          s+= "Frozen container holding %d variables.\n" % len(keys)
+          for i,k in enumerate(keys):
+              s+= ("%2d. " % i ) + k + " = " +  str(self._d[k]) + "\n"
+          return s
+        else:
+          s=''
+          s+= "Unfrozen container holding %d variables.\n" % len(keys)
+          for k in self._d.iterkeys():
+              s+= k + " = " +  str(self._d[k]) + "\n"
+          return s
    
     @property
     def shape(self):
