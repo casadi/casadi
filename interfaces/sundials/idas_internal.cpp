@@ -45,8 +45,8 @@ void IdasInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& alr
 
 IdasInternal::IdasInternal(const FX& f, const FX& q) : IntegratorInternal(f,q){
   addOption("suppress_algebraic",          OT_BOOLEAN, false, "supress algebraic variables in the error testing");
-  addOption("calc_ic",                     OT_BOOLEAN, true,  "use IDACalcIC to get consistent initial conditions");
-  addOption("calc_icB",                    OT_BOOLEAN, false, "use IDACalcIC to get consistent initial conditions");
+  addOption("calc_ic",                     OT_BOOLEAN, true,  "use IDACalcIC to get consistent initial conditions. This only works for semi-explicit index-one systems. Else, you must provide consistent initial conditions yourself.");
+  addOption("calc_icB",                    OT_BOOLEAN, false, "use IDACalcIC to get consistent initial conditions. This only works for semi-explicit index-one systems. Else, you must provide consistent initial conditions yourself.");
   addOption("abstolv",                     OT_REALVECTOR);
   addOption("fsens_abstolv",               OT_REALVECTOR); 
   addOption("max_step_size",               OT_REAL, 0, "maximim step size");
@@ -54,7 +54,7 @@ IdasInternal::IdasInternal(const FX& f, const FX& q) : IntegratorInternal(f,q){
   addOption("cj_scaling",                  OT_BOOLEAN, false, "IDAS scaling on cj for the user-defined linear solver module");
   addOption("extra_fsens_calc_ic",         OT_BOOLEAN, false, "Call calc ic an extra time, with fsens=0");
   addOption("disable_internal_warnings",   OT_BOOLEAN,false, "Disable IDAS internal warning messages");
-  addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "correctInitialConditions|res", true);
+  addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "correctInitialConditions|res|resS", true);
     
   mem_ = 0;
   
@@ -560,7 +560,8 @@ void IdasInternal::initAdj(){
 
 
 void IdasInternal::res(double t, const double* yz, const double* yp, double* r){
-
+  log("IdasInternal::res","begin");
+  
   // Get time
   time1 = clock();
   
@@ -575,6 +576,14 @@ void IdasInternal::res(double t, const double* yz, const double* yp, double* r){
   
   // Get results
   f_.getOutput(r);
+  
+  if(monitored("res")){
+    cout << "DAE_T    = " << t << endl;
+    cout << "DAE_Y    = " << f_.input(DAE_Y) << endl;
+    cout << "DAE_YDOT = " << f_.input(DAE_YDOT) << endl;
+    cout << "DAE_P    = " << f_.input(DAE_P) << endl;
+    cout << "residual = " << f_.output() << endl;
+  }
 
   // Check the result for consistency
   for(int i=0; i<ny_; ++i){
@@ -595,8 +604,10 @@ void IdasInternal::res(double t, const double* yz, const double* yp, double* r){
     }
   }
   
+  
   time2 = clock();
   t_res += double(time2-time1)/CLOCKS_PER_SEC;
+  log("IdasInternal::res","end");
 }
 
 int IdasInternal::res_wrapper(double t, N_Vector yz, N_Vector yp, N_Vector rr, void *user_data){
@@ -626,6 +637,7 @@ void IdasInternal::ehfun(int error_code, const char *module, const char *functio
 }
 
 void IdasInternal::jtimes(double t, const double *yz, const double *yp, const double *rr, const double *v, double *Jv, double cj, double *tmp1, double *tmp2){
+  log("IdasInternal::jtimes","begin");
   // Get time
   time1 = clock();
   
@@ -651,6 +663,7 @@ void IdasInternal::jtimes(double t, const double *yz, const double *yp, const do
   // Log time duration
   time2 = clock();
   t_jac += double(time2-time1)/CLOCKS_PER_SEC;
+  log("IdasInternal::jtimes","end");
 }
 
 int IdasInternal::jtimes_wrapper(double t, N_Vector yz, N_Vector yp, N_Vector rr, N_Vector v, N_Vector Jv, double cj, void *user_data, N_Vector tmp1, N_Vector tmp2){
@@ -665,6 +678,7 @@ int IdasInternal::jtimes_wrapper(double t, N_Vector yz, N_Vector yp, N_Vector rr
 }
 
 void IdasInternal::resS(int Ns, double t, const double* yz, const double* yp, const double *resval, N_Vector *yS, N_Vector* ypS, N_Vector *resvalS, double *tmp1, double *tmp2, double *tmp3){
+  log("IdasInternal::resS","begin");
   casadi_assert(Ns==nfdir_);
 
   // Record the current cpu time
@@ -701,6 +715,7 @@ void IdasInternal::resS(int Ns, double t, const double* yz, const double* yp, co
   // Record timings
   time2 = clock();
   t_fres += double(time2-time1)/CLOCKS_PER_SEC;
+  log("IdasInternal::resS","end");
 }
 
 int IdasInternal::resS_wrapper(int Ns, double t, N_Vector yz, N_Vector yp, N_Vector resval, N_Vector *yS, N_Vector *ypS, N_Vector *resvalS, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
@@ -1034,13 +1049,16 @@ void IdasInternal::idas_error(const string& module, int flag){
   
   // Heuristics
   if (
-    (module=="IDACalcIC" && (flag==IDA_CONV_FAIL || flag==IDA_NO_RECOVERY)) ||
+    (module=="IDACalcIC" && (flag==IDA_CONV_FAIL || flag==IDA_NO_RECOVERY || flag==IDA_LINESEARCH_FAIL )) ||
     (module=="IDASolve" && flag ==IDA_ERR_FAIL )
     ) {
     ss << "Some common causes for this error: " << std::endl;
     ss << "  - forgetting to set the 'is_differential' option. " << std::endl;
     ss << "  - providing an initial guess for which 0=g(y,z,t) is not invertible wrt y. " << std::endl;
     ss << "  - having a DAE-index higher than 1 such that 0=g(y,z,t) is not invertible wrt y over the whole domain." << std::endl;
+    ss << "  - having set abstol or reltol too small." << std::endl;
+    ss << "  - using 'calcic'=True for systems that are not semi-explicit index-one. You must provide consistent initial conditions yourself in this case. " << std::endl;
+    ss << "  - your problem is too hard for IDAcalcIC to solve. Provide consistent initial conditions yourself." << std::endl;
   }
   
   casadi_error(ss.str());
@@ -1058,6 +1076,7 @@ int IdasInternal::rhsQ_wrapper(double t, N_Vector yz, N_Vector yp, N_Vector rhsQ
 }
 
 void IdasInternal::rhsQ(double t, const double* yz, const double* yp, double* rhsQ){
+   log("IdasInternal::rhsQ","begin");
    // Pass input
    q_.setInput(t,DAE_T);
    q_.setInput(yz,DAE_Y);
@@ -1069,12 +1088,14 @@ void IdasInternal::rhsQ(double t, const double* yz, const double* yp, double* rh
     
     // Get results
    q_.getOutput(rhsQ);
+   log("IdasInternal::rhsQ","end");
 }
   
 void IdasInternal::rhsQS(int Ns, double t, N_Vector yz, N_Vector yp, N_Vector *yzS, N_Vector *ypS, N_Vector rrQ, N_Vector *rhsvalQS, 
                         N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
-  casadi_assert(Ns==nfdir_);
 
+  log("IdasInternal::rhsQS","enter");
+  casadi_assert(Ns==nfdir_);
   // Pass input
    q_.setInput(t,DAE_T);
    q_.setInput(NV_DATA_S(yz),DAE_Y);
@@ -1094,6 +1115,7 @@ void IdasInternal::rhsQS(int Ns, double t, N_Vector yz, N_Vector yp, N_Vector *y
     // Get the output seeds
     q_.getFwdSens(NV_DATA_S(rhsvalQS[i]));
   }
+  log("IdasInternal::rhsQS","end");
 }
 
 int IdasInternal::rhsQS_wrapper(int Ns, double t, N_Vector yz, N_Vector yp, N_Vector *yzS, N_Vector *ypS, N_Vector rrQ, N_Vector *rhsvalQS, void *user_data, 
@@ -1110,6 +1132,7 @@ int IdasInternal::rhsQS_wrapper(int Ns, double t, N_Vector yz, N_Vector yp, N_Ve
 }
 
 void IdasInternal::resB(double t, const double* yz, const double* yp, const double* yB, const double* ypB, double* resvalB){
+  log("IdasInternal::resB","begin");
   // Pass input
   f_.setInput(t,DAE_T);
   f_.setInput(yz,DAE_Y);
@@ -1155,6 +1178,7 @@ void IdasInternal::resB(double t, const double* yz, const double* yp, const doub
     for(int i=0; i<ny_; ++i)
       resvalB[i] += asens_y[i];
   }
+  log("IdasInternal::resB","end");
 }
 
 int IdasInternal::resB_wrapper(double t, N_Vector y, N_Vector yp, N_Vector yB, N_Vector ypB, N_Vector resvalB, void *user_dataB){
@@ -1169,6 +1193,7 @@ int IdasInternal::resB_wrapper(double t, N_Vector y, N_Vector yp, N_Vector yB, N
 }
   
 void IdasInternal::rhsQB(double t, const double* yz, const double* yp, const double* yB, const double* ypB, double *rhsvalBQ){
+  log("IdasInternal::rhsQB","begin");
   // Pass input
   f_.setInput(t,DAE_T);
   f_.setInput(yz,DAE_Y);
@@ -1210,6 +1235,8 @@ void IdasInternal::rhsQB(double t, const double* yz, const double* yp, const dou
   // Negate as we are integrating backwards
 /*  for(int i=0; i<np_; ++i)
     rhsvalBQ[i] *= -1;*/
+    
+  log("IdasInternal::rhsQB","end");
 }
 
 int IdasInternal::rhsQB_wrapper(double t, N_Vector y, N_Vector yp, N_Vector yB, N_Vector ypB, N_Vector rhsvalBQ, void *user_dataB){
@@ -1224,6 +1251,8 @@ int IdasInternal::rhsQB_wrapper(double t, N_Vector y, N_Vector yp, N_Vector yB, 
 }
 
 void IdasInternal::djac(int Neq, double t, double cj, N_Vector yz, N_Vector yp, N_Vector rr, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
+  log("IdasInternal::djac","begin");
+
   // Get time
   time1 = clock();
   
@@ -1261,6 +1290,7 @@ void IdasInternal::djac(int Neq, double t, double cj, N_Vector yz, N_Vector yp, 
   // Log time duration
   time2 = clock();
   t_jac += double(time2-time1)/CLOCKS_PER_SEC;
+  log("IdasInternal::djac","end");
 }
 
 int IdasInternal::djac_wrapper(int Neq, double t, double cj, N_Vector yz, N_Vector yp, N_Vector rr, DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
@@ -1275,6 +1305,7 @@ int IdasInternal::djac_wrapper(int Neq, double t, double cj, N_Vector yz, N_Vect
 }
 
 void IdasInternal::bjac(int Neq, int mupper, int mlower, double tt, double cj, N_Vector yz, N_Vector yp, N_Vector rr, DlsMat Jac, N_Vector tmp1, N_Vector tmp2,N_Vector tmp3){
+  log("IdasInternal::bjac","begin");
   // Get time
   time1 = clock();
 
@@ -1309,6 +1340,7 @@ void IdasInternal::bjac(int Neq, int mupper, int mlower, double tt, double cj, N
   // Log time duration
   time2 = clock();
   t_jac += double(time2-time1)/CLOCKS_PER_SEC;
+  log("IdasInternal::bjac","end");
 }
 
 int IdasInternal::bjac_wrapper(int Neq, int mupper, int mlower, double tt, double cj, N_Vector yz, N_Vector yp, N_Vector rr, DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2,N_Vector tmp3){
@@ -1353,6 +1385,8 @@ int IdasInternal::psetup_wrapper(double t, N_Vector yz, N_Vector yp, N_Vector rr
 }
 
 void IdasInternal::psolve(double t, N_Vector yz, N_Vector yp, N_Vector rr, N_Vector rvec, N_Vector zvec, double cj, double delta, N_Vector tmp){
+  log("IdasInternal::psolve","begin");
+  
   // Get time
   time1 = clock();
 
@@ -1368,10 +1402,12 @@ void IdasInternal::psolve(double t, N_Vector yz, N_Vector yp, N_Vector rr, N_Vec
   // Log time duration
   time2 = clock();
   t_lsolve += double(time2-time1)/CLOCKS_PER_SEC;
-
+  log("IdasInternal::psolve","end");
 }
 
 void IdasInternal::psetup(double t, N_Vector yz, N_Vector yp, N_Vector rr, double cj, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
+  log("IdasInternal::psetup","begin");
+  
   // Get time
   time1 = clock();
 
@@ -1399,6 +1435,8 @@ void IdasInternal::psetup(double t, N_Vector yz, N_Vector yp, N_Vector rr, doubl
   time1 = clock();
   t_lsetup_fac += double(time1-time2)/CLOCKS_PER_SEC;
 
+  log("IdasInternal::psetup","end");
+  
 }
 
 int IdasInternal::lsetup_wrapper(IDAMem IDA_mem, N_Vector yzp, N_Vector ypp, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3){
@@ -1429,6 +1467,8 @@ int IdasInternal::lsolve_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_
 }
 
 void IdasInternal::lsetup(IDAMem IDA_mem, N_Vector yzp, N_Vector ypp, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3){  
+  log("IdasInternal::lsetup","begin");
+  
   // Current time
   double t = IDA_mem->ida_tn;
 
@@ -1437,11 +1477,11 @@ void IdasInternal::lsetup(IDAMem IDA_mem, N_Vector yzp, N_Vector ypp, N_Vector r
 
   // Call the preconditioner setup function (which sets up the linear solver)
   psetup(t, yzp, ypp, 0, cj, vtemp1, vtemp1, vtemp3);
-  
+  log("IdasInternal::lsetup","end");
 }
 
 void IdasInternal::lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector ycur, N_Vector ypcur, N_Vector rescur){
-  
+  log("IdasInternal::lsolve","begin");
   // Current time
   double t = IDA_mem->ida_tn;
 
@@ -1459,6 +1499,7 @@ void IdasInternal::lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector 
     double cjratio = IDA_mem->ida_cjratio;
     if (cjratio != 1.0) N_VScale(2.0/(1.0 + cjratio), b, b);
   }
+  log("IdasInternal::lsolve","end");
 }
 
 void IdasInternal::initUserDefinedLinearSolver(){
