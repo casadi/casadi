@@ -111,6 +111,7 @@ csim.setOption("integrator_options",{"reltol":1e-12,"abstol":1e-12})
 csim.init()
 
 jaccsim = Jacobian(csim,CONTROLSIMULATOR_X0,0)
+jaccsim.setOption("ad_mode","forward")
 jaccsim.init()
 jaccsim.input(CONTROLSIMULATOR_P).set(params_[:-1])
 jaccsim.input(CONTROLSIMULATOR_X0).set(x0)
