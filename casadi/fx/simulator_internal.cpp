@@ -97,14 +97,14 @@ void SimulatorInternal::init(){
 
 void SimulatorInternal::evaluate(int nfdir, int nadir){
   // Pass the parameters and initial state
-  integrator_.setInput(input(INTEGRATOR_XF),INTEGRATOR_XF);
-  integrator_.setInput(input(INTEGRATOR_XPF),INTEGRATOR_XPF);
+  integrator_.setInput(input(INTEGRATOR_X0),INTEGRATOR_X0);
+  integrator_.setInput(input(INTEGRATOR_XP0),INTEGRATOR_XP0);
   integrator_.setInput(input(INTEGRATOR_P),INTEGRATOR_P);
     
   // Pass sensitivities if fsens
   for(int dir=0; dir<nfdir; ++dir){
-    integrator_.setFwdSeed(fwdSeed(INTEGRATOR_XF,dir),INTEGRATOR_XF,dir);
-    integrator_.setFwdSeed(fwdSeed(INTEGRATOR_XPF,dir),INTEGRATOR_XPF,dir);
+    integrator_.setFwdSeed(fwdSeed(INTEGRATOR_X0,dir),INTEGRATOR_X0,dir);
+    integrator_.setFwdSeed(fwdSeed(INTEGRATOR_XP0,dir),INTEGRATOR_XP0,dir);
     integrator_.setFwdSeed(fwdSeed(INTEGRATOR_P,dir),INTEGRATOR_P,dir);
   }
   
@@ -113,7 +113,7 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
   
   // Advance solution in time
   for(int k=0; k<grid_.size(); ++k){
-
+    
     // Integrate to the output time
     integrator_.integrate(grid_[k]);
     

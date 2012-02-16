@@ -31,6 +31,7 @@ class Integrationtests(casadiTestCase):
     integrator = CVodesIntegrator(f)
     integrator.setOption("reltol",1e-15)
     integrator.setOption("abstol",1e-15)
+    integrator.setOption("fsens_err_con", True)
     #integrator.setOption("verbose",True)
     integrator.setOption("t0",0)
     integrator.setOption("tf",2.3)
@@ -81,6 +82,73 @@ class Integrationtests(casadiTestCase):
 
     self.assertAlmostEqual(sim.output()[-1],q0*exp((tend**3-0.7**3)/(3*p)),9,"Evaluation output mismatch")
     
+    
+  def test_simulator_sensitivities(self):
+    t = SX("t")
+
+    x  = SX("x") 
+    dx = SX("dx") 
+    v  = SX("v") 
+    dv = SX("dv") 
+
+    u = SX("u") 
+
+    b = 0.1
+
+    rhs = vertcat([v - dx, ( -  b*v - x) - dv ])
+    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_YDOT: [dx,dv], DAE_Y: [x,v]},[rhs])
+    f.init()
+
+    # algebraic solution
+
+    D = b**2 - 4
+
+    R = -b/2
+    I = sqrt(-D)/2
+
+    sol = lambda t : exp(R*t)*(0.05/I*sin(I*t) + cos(I*t))
+
+    X0 = DMatrix([1,0])
+
+    for Integrator in [CVodesIntegrator, IdasIntegrator]:
+      integrator = Integrator(f)
+      #integrator.setOption("verbose",True)
+      #integrator.setOption("monitor",["integrate"])
+      integrator.setOption("fsens_abstol",1e-12)
+      integrator.setOption("fsens_reltol",1e-12)
+      integrator.setOption("fsens_err_con", True)
+      integrator.setOption("tf",50)
+      integrator.init()
+
+      integrator.input(INTEGRATOR_X0).set(X0)
+      integrator.fwdSeed(INTEGRATOR_X0).set([1,0])
+      integrator.evaluate(1,0)
+      
+      fwdSens_int = DMatrix(integrator.fwdSens(INTEGRATOR_XF))
+
+      ts = linspace(0,50,100)
+
+      sim=Simulator(integrator,ts)
+      sim.init()
+      sim.input(INTEGRATOR_X0).set(X0)
+      sim.fwdSeed(INTEGRATOR_X0).set([1,0])
+      sim.evaluate(1,0)
+
+      fwdSens_sim = DMatrix(sim.fwdSens(INTEGRATOR_XF)[-1,:])
+      
+      fwdSens_exact = sol(50)
+      
+      digits = 6
+      if (Integrator is IdasIntegrator):
+        digits = 2 
+
+      self.assertAlmostEqual(fwdSens_int[0],fwdSens_exact,digits,"Forward sensitivity")
+      self.assertAlmostEqual(fwdSens_sim[0],fwdSens_exact,digits,"Forward sensitivity")
+      self.assertAlmostEqual(fwdSens_int[1],fwdSens_sim[1],digits,"Forward sensitivity")
+
+
+        
+    
   def test_parameterize_time(self):
     self.message("parametrizeTime")
     num=self.num
@@ -91,6 +159,7 @@ class Integrationtests(casadiTestCase):
       integrator = intf(parameterizeTime(f))
       integrator.setOption("reltol",1e-15)
       integrator.setOption("abstol",1e-15)
+      integrator.setOption("fsens_err_con", True)
       #integrator.setOption("verbose",True)
       integrator.setOption("t0",0)
       integrator.setOption("tf",1)
@@ -165,6 +234,7 @@ class Integrationtests(casadiTestCase):
         integrator = IdasIntegrator(f_)
         integrator.setOption("reltol",1e-6)
         integrator.setOption("abstol",1e-6)
+        integrator.setOption("fsens_err_con", True)
         integrator.setOption("t0",0)
         integrator.setOption("tf",1)
         integrator.init()
@@ -226,6 +296,7 @@ class Integrationtests(casadiTestCase):
     y=SX("y")
     f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_Y: [x,y]},[[x,(1+1e-9)*x]])
     integrator = CVodesIntegrator(f)
+    integrator.setOption("fsens_err_con", True)
     integrator.setOption("t0",0)
     integrator.setOption("tf",1)
     integrator.init()
@@ -252,6 +323,7 @@ class Integrationtests(casadiTestCase):
     f.init()
 
     integrator = CVodesIntegrator(f)
+    integrator.setOption("fsens_err_con", True)
     integrator.setOption("reltol",1e-12)
     integrator.setOption("t0",0)
     integrator.setOption("tf",1)
@@ -286,6 +358,7 @@ class Integrationtests(casadiTestCase):
     self.message('CVodes integration: evaluation time offset')
     num=self.num
     integrator=Integrator(self.integrator)
+    integrator.setOption("fsens_err_con", True)
     integrator.setOption("t0",0.7)
     integrator.init()
 
@@ -347,6 +420,7 @@ class Integrationtests(casadiTestCase):
     integrator.setOption("reltol",1e-15)
     integrator.setOption("abstol",1e-15)
     integrator.setOption("verbose",True)
+    integrator.setOption("fsens_err_con", True)
     integrator.setOption("steps_per_checkpoint",10000)
     integrator.setOption("t0",0)
     integrator.setOption("tf",te)
@@ -374,6 +448,7 @@ class Integrationtests(casadiTestCase):
     integrator.setOption("abstol",1e-15)
     integrator.setOption("verbose",True)
     integrator.setOption("steps_per_checkpoint",10000)
+    integrator.setOption("fsens_err_con", True)
     integrator.setOption("t0",0)
     integrator.setOption("tf",te)
 
@@ -538,6 +613,7 @@ class Integrationtests(casadiTestCase):
     f=SXFunction(f_in,f_out)
     f.init()
     integrator = CVodesIntegrator(f)
+    integrator.setOption("fsens_err_con", True)
     integrator.setOption("steps_per_checkpoint",1000)
     integrator.setOption("t0",0)
     integrator.setOption("tf",te)
@@ -575,6 +651,7 @@ class Integrationtests(casadiTestCase):
     f.init()
 
     integrator = CVodesIntegrator(f)
+    integrator.setOption("fsens_err_con", True)
     integrator.setOption("reltol",1e-15)
     integrator.setOption("abstol",1e-15)
     integrator.setOption("verbose",True)
@@ -641,6 +718,7 @@ class Integrationtests(casadiTestCase):
     f.init()
     
     integrator = CVodesIntegrator(f)
+    integrator.setOption("fsens_err_con", True)
     integrator.setOption("reltol",1e-15)
     integrator.setOption("abstol",1e-15)
     integrator.setOption("verbose",True)
@@ -694,6 +772,7 @@ class Integrationtests(casadiTestCase):
     integrator.setOption("abstol",1e-15)
     integrator.setOption("verbose",True)
     integrator.setOption("steps_per_checkpoint",10000)
+    integrator.setOption("fsens_err_con", True)
     integrator.setOption("t0",0)
     integrator.setOption("tf",te)
 
@@ -825,8 +904,9 @@ class Integrationtests(casadiTestCase):
 
     ode = SXFunction({'NUM':DAE_NUM_IN, DAE_Y: x, DAE_P: vec(A)},[mul(A,x)])
     I = CVodesIntegrator(ode)
-    I.init()
+    I.setOption("fsens_err_con", True)
     I.setOption('reltol',1e-12)
+    I.init()
     I.input(INTEGRATOR_X0).set(x0_)
     I.input(INTEGRATOR_P).set(vec(A_))
     I.evaluate()

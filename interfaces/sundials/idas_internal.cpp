@@ -871,6 +871,7 @@ void IdasInternal::integrate(double t_out){
     }
     
     if(fsens_order_>0){
+      if (!getOption("fsens_err_con")) casadi_warning("IdasInternal::integrate: Forward sensitivities are calculated without error control. It is strongly advised to set the 'fsens_err_con' option to True to guarantee accurate results, especially on long time horizons.");
       // Get the sensitivities
       flag = IDAGetSens(mem_,&t_, getPtr(yS_));
       if(flag != IDA_SUCCESS) idas_error("IDAGetSens",flag);
