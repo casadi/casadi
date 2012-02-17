@@ -76,6 +76,7 @@
 <tr><th>Id</th><th>Used in</th></tr>
 <tr><td>correctInitialConditions</td><td>CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>res</td><td>CasADi::Sundials::IdasInternal</td></tr>
+<tr><td>resS</td><td>CasADi::Sundials::IdasInternal</td></tr>
 </table>
 */
 /** \class CasADi::Sundials::IdasIntegrator
@@ -86,6 +87,7 @@
 <tr><th>Id</th><th>Used in</th></tr>
 <tr><td>correctInitialConditions</td><td>CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>res</td><td>CasADi::Sundials::IdasInternal</td></tr>
+<tr><td>resS</td><td>CasADi::Sundials::IdasInternal</td></tr>
 </table>
 */
 /** \class CasADi::SQPInternal
