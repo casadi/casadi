@@ -46,7 +46,7 @@ vector<SXMatrix> XFunction::evalSX(const vector<SXMatrix>& arg){
   casadi_assert_message(isInit(),"Function has not been initialized");
   
   // Copy the arguments into a new vector with the right sparsity
-  casadi_assert(arg.size()==getNumInputs());
+  casadi_assert_message(arg.size()==getNumInputs(),"XFunction::evalSX: mismatch in number of arguments. Expecting " << getNumInputs() << ", but got " << arg.size() << " instead.");
   vector<SXMatrix> arg2 = arg;
   for(int iind=0; iind<arg.size(); ++iind){
     // If sparsities do not match, we need to map the nonzeros
@@ -55,8 +55,8 @@ vector<SXMatrix> XFunction::evalSX(const vector<SXMatrix>& arg){
       arg2[iind] = SXMatrix(input(iind).sparsity(),0);
 
       // Make sure that the dimensions match
-      casadi_assert(arg[iind].size1()==arg2[iind].size1());
-      casadi_assert(arg[iind].size2()==arg2[iind].size2());
+      casadi_assert_message(arg[iind].size1()==arg2[iind].size1(),"XFunction::evalSX: shape mismatch of argument #" << iind <<  ". Expecting " << arg2[iind].size1() << "-by-" << arg2[iind].size2() << ", but got " << arg[iind].size1() << "-by-" << arg[iind].size2() << " instead.");
+      casadi_assert_message(arg[iind].size2()==arg2[iind].size2(),"XFunction::evalSX: shape mismatch of argument #" << iind <<  ". Expecting " << arg2[iind].size1() << "-by-" << arg2[iind].size2() << ", but got " << arg[iind].size1() << "-by-" << arg[iind].size2() << " instead.");
 
       // Get the indices of the known supplied arguments
       vector<int> known_ind = arg[iind].sparsity().getElements(false);
@@ -102,7 +102,7 @@ SXMatrix XFunction::eval(const SXMatrix& arg){
 
 vector< vector<SX> > XFunction::eval(const vector< vector<SX> >& arg){
   // Convert input
-  casadi_assert(getNumInputs()==arg.size());
+  casadi_assert_message(getNumInputs()==arg.size(),"XFunction::eval: mismatch in number of arguments. Expecting " << getNumInputs() << ", but got " << arg.size() << " instead.");
   vector<SXMatrix> argv(getNumInputs());
   for(int i=0; i<arg.size(); ++i){
     casadi_assert(arg[i].size()==input(i).size());
