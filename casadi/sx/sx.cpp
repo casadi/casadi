@@ -29,6 +29,11 @@
 using namespace std;
 namespace CasADi{
 
+// Allocate storage for the caching
+#ifdef CACHING_CONSTANTS
+std::unordered_map<int,IntegerSXNode*> IntegerSXNode::cached_constants_;
+std::unordered_map<double,RealtypeSXNode*> RealtypeSXNode::cached_constants_;
+#endif // CASHING_CONSTANTS
 
 SX::SX(){
   node = casadi_limits<SX>::nan.node;
@@ -55,12 +60,12 @@ SX::SX(double val){
     else if(intval == 1)        node = casadi_limits<SX>::one.node;
     else if(intval == 2)        node = casadi_limits<SX>::two.node;
     else if(intval == -1)       node = casadi_limits<SX>::minus_one.node;
-    else                        node = new IntegerSXNode(intval);
+    else                        node = IntegerSXNode::create(intval);
     node->count++;
   } else {
     if(isnan(val))              node = casadi_limits<SX>::nan.node;
     else if(isinf(val))         node = val > 0 ? casadi_limits<SX>::inf.node : casadi_limits<SX>::minus_inf.node;
-    else                        node = new RealtypeSXNode(val);
+    else                        node = RealtypeSXNode::create(val);
     node->count++;
   }
 }
@@ -142,7 +147,7 @@ SX SX::operator-() const{
   else if(node->isOne())
     return -1;
   else
-   return SX::create(new BinarySXNode(NEG, *this));
+   return BinarySXNode::createT<NEG>( *this);
 }
 
 SX& operator*=(SX &ex, const SX &el){
@@ -157,11 +162,11 @@ SX SX::sign() const{
   if(isConstant())
     return CasADi::sign(getValue());
   else
-    return SX::create(new BinarySXNode(SIGN, *this));
+    return BinarySXNode::createT<SIGN>( *this);
 }
 
 SX SX::erfinv() const{
-  return SX::create(new BinarySXNode(ERFINV, *this));
+  return BinarySXNode::createT<ERFINV>( *this);
 }
 
 SX SX::add(const SX& y) const{
@@ -189,7 +194,7 @@ SX SX::add(const SX& y) const{
     return getDep(0);
     
   else // create a new branch
-    return SX::create(new BinarySXNode(ADD, *this, y));
+    return BinarySXNode::createT<ADD>( *this, y);
 }
 
 SX SX::sub(const SX& y) const{
@@ -204,13 +209,13 @@ SX SX::sub(const SX& y) const{
   else if(y.isBinary() && y.getOp()==NEG) // x - (-y) -> x + y
     return add(-y);
   else // create a new branch
-    return SX::create(new BinarySXNode(SUB, *this, y));
+    return BinarySXNode::createT<SUB>( *this, y);
 }
 
 SX SX::mul(const SX& y) const{
   // Only simplifications that do not result in extra nodes area allowed
   if(!isConstant() && y.isConstant())
-    return y.mul((*this));
+    return y.mul(*this);
   else if(node->isZero() || y->isZero()) // one of the terms is zero
     return 0;
   else if(node->isOne()) // term1 is one
@@ -231,10 +236,10 @@ SX SX::mul(const SX& y) const{
     return y.getDep(0);
   else if(isBinary() && getOp()==DIV && getDep(1).isEquivalent(y)) // ((2/x)*x)
     return getDep(0);
-  else if(y.isBinary() && y.getOp()==DIV && y.getDep(1).isEquivalent((*this))) // ((2/x)*x)
+  else if(y.isBinary() && y.getOp()==DIV && y.getDep(1).isEquivalent(*this)) // ((2/x)*x)
     return y.getDep(0);
   else     // create a new branch
-    return SX::create(new BinarySXNode(MUL,*this,y));
+    return BinarySXNode::createT<MUL>(*this,y);
 }
 
 bool SX::isDoubled() const{
@@ -282,8 +287,8 @@ SX SX::div(const SX& y) const{
     return node->dep(0) / y->dep(0);
   else if(y.isConstant() && isBinary() && getOp()==DIV && getDep(1).isConstant() && y.getValue()*getDep(1).getValue()==1) // (x/5)/0.2 
     return getDep(0);
-  else if(y.isBinary() && y.getOp()==MUL && y.getDep(1).isEquivalent((*this))) // x/(2*x) = 1/2
-    return SX::create(new BinarySXNode(DIV,1,y.getDep(0)));
+  else if(y.isBinary() && y.getOp()==MUL && y.getDep(1).isEquivalent(*this)) // x/(2*x) = 1/2
+    return BinarySXNode::createT<DIV>(1,y.getDep(0));
   else if(isBinary() && getOp()==NEG && getDep(0).isEquivalent(y))      // (-x)/x = -1
     return -1;
   else if(y.isBinary() && y.getOp()==NEG && y.getDep(0).isEquivalent(*this))      // x/(-x) = 1
@@ -291,14 +296,14 @@ SX SX::div(const SX& y) const{
   else if(y.isBinary() && y.getOp()==NEG && isBinary() && getOp()==NEG && getDep(0).isEquivalent(y.getDep(0)))      // (-x)/(-x) = 1
     return 1;
   else // create a new branch
-    return SX::create(new BinarySXNode(DIV,*this,y));
+    return BinarySXNode::createT<DIV>(*this,y);
 }
 
 SX SX::inv() const{
   if(node->hasDep() && node->getOp()==INV){
     return node->dep(0);
   } else {
-    return SX::create(new BinarySXNode(INV,*this));
+    return BinarySXNode::createT<INV>(*this);
   }
 }
 
@@ -353,7 +358,7 @@ SX operator>=(const SX &a, const SX &b){
   else if(x->isConstant())
     return x->getValue()>=0; // ok since the result will be either 0 or 1, i.e. no new nodes
   else
-    return SX::create(new BinarySXNode(STEP,x));
+    return BinarySXNode::createT<STEP>(x);
 }
 
 SX operator<(const SX &a, const SX &b){
@@ -378,7 +383,7 @@ SX operator==(const SX &x, const SX &y){
   else if(x.isConstant() && y.isConstant())
     return 0;
   else // create a new node
-    return SX::create(new BinarySXNode(EQUALITY,x,y));
+    return BinarySXNode::createT<EQUALITY>(x,y);
 }
 
 SX operator!=(const SX &a, const SX &b){
@@ -406,11 +411,11 @@ SX if_else(const SX& cond, const SX& if_true, const SX& if_false){
 }
 
 SX SX::binary(int op, const SX& x, const SX& y){
-  return SX::create(new BinarySXNode(Operation(op),x,y));    
+  return BinarySXNode::create(Operation(op),x,y);    
 }
 
 SX SX::unary(int op, const SX& x){
-  return SX::create(new BinarySXNode(Operation(op),x));  
+  return BinarySXNode::create(Operation(op),x);  
 }
 
 // SX::operator vector<SX>() const{
@@ -516,7 +521,7 @@ long SX::__hash__() const {
 
 const SX casadi_limits<SX>::zero(new ZeroSXNode(),false); // node corresponding to a constant 0
 const SX casadi_limits<SX>::one(new OneSXNode(),false); // node corresponding to a constant 1
-const SX casadi_limits<SX>::two(new IntegerSXNode(2),false); // node corresponding to a constant 2
+const SX casadi_limits<SX>::two(IntegerSXNode::create(2),false); // node corresponding to a constant 2
 const SX casadi_limits<SX>::minus_one(new MinusOneSXNode(),false); // node corresponding to a constant -1
 const SX casadi_limits<SX>::nan(new NanSXNode(),false);
 const SX casadi_limits<SX>::inf(new InfSXNode(),false);
@@ -555,11 +560,11 @@ bool casadi_limits<SX>::isNaN(const SX& val){
 }
 
 SX SX::exp() const{
-  return SX::create(new BinarySXNode(EXP,*this));
+  return BinarySXNode::createT<EXP>(*this);
 }
 
 SX SX::log() const{
-  return SX::create(new BinarySXNode(LOG,*this));
+  return BinarySXNode::createT<LOG>(*this);
 }
 
 SX SX::log10() const{
@@ -572,73 +577,73 @@ SX SX::sqrt() const{
   else if(isSquared())
     return node->dep(0).fabs();
   else
-    return SX::create(new BinarySXNode(SQRT,*this));
+    return BinarySXNode::createT<SQRT>(*this);
 }
 
 SX SX::sin() const{
   if(node->isZero())
     return 0;
   else
-    return SX::create(new BinarySXNode(SIN,*this));
+    return BinarySXNode::createT<SIN>(*this);
 }
 
 SX SX::cos() const{
   if(node->isZero())
     return 1;
   else
-    return SX::create(new BinarySXNode(COS,*this));
+    return BinarySXNode::createT<COS>(*this);
 }
 
 SX SX::tan() const{
   if(node->isZero())
     return 0;
   else
-    return SX::create(new BinarySXNode(TAN,*this));
+    return BinarySXNode::createT<TAN>(*this);
 }
 
 SX SX::arcsin() const{
-  return SX::create(new BinarySXNode(ASIN,*this));
+  return BinarySXNode::createT<ASIN>(*this);
 }
 
 SX SX::arccos() const{
-  return SX::create(new BinarySXNode(ACOS,*this));
+  return BinarySXNode::createT<ACOS>(*this);
 }
 
 SX SX::arctan() const{
-  return SX::create(new BinarySXNode(ATAN,*this));
+  return BinarySXNode::createT<ATAN>(*this);
 }
 
 SX SX::sinh() const{
   if(node->isZero())
     return 0;
   else
-    return SX::create(new BinarySXNode(SINH,*this));
+    return BinarySXNode::createT<SINH>(*this);
 }
 
 SX SX::cosh() const{
   if(node->isZero())
     return 1;
   else
-    return SX::create(new BinarySXNode(COSH,*this));
+    return BinarySXNode::createT<COSH>(*this);
 }
 
 SX SX::tanh() const{
   if(node->isZero())
     return 0;
   else
-    return SX::create(new BinarySXNode(TANH,*this));
+    return BinarySXNode::createT<TANH>(*this);
 }
 
 SX SX::floor() const{
-  return SX::create(new BinarySXNode(FLOOR,*this));
+  return BinarySXNode::createT<FLOOR>(*this);
 }
 
 SX SX::ceil() const{
-  return SX::create(new BinarySXNode(CEIL,*this));
+  return BinarySXNode::createT<CEIL>(*this);
 }
 
 SX SX::erf() const{
-  return SX::create(new BinarySXNode(ERF,*this));
+  return BinarySXNode::createT<ERF>(*this);
 }
 
 SX SX::fabs() const{
@@ -649,7 +654,7 @@ SX SX::fabs() const{
   else if(isSquared())
     return *this;
   else
-    return SX::create(new BinarySXNode(FABS,*this));
+    return BinarySXNode::createT<FABS>(*this);
 }
 
 SX::operator Matrix<SX>() const{
@@ -657,15 +662,15 @@ SX::operator Matrix<SX>() const{
 }
 
 SX SX::fmin(const SX &b) const{
-  return SX::create(new BinarySXNode(FMIN,*this,b));
+  return BinarySXNode::createT<FMIN>(*this,b);
 }
 
 SX SX::fmax(const SX &b) const{
-  return SX::create(new BinarySXNode(FMAX,*this,b));
+  return BinarySXNode::createT<FMAX>(*this,b);
 }
 
 SX SX::printme(const SX &b) const{
-  return SX::create(new BinarySXNode(OP_PRINTME,*this,b));
+  return BinarySXNode::createT<OP_PRINTME>(*this,b);
 }
 
 SX SX::__pow__(const SX& n) const{
@@ -675,7 +680,7 @@ SX SX::__pow__(const SX& n) const{
       if(nn == 0)
         return 1;
       else if(nn>100 || nn<-100) // maximum depth
-        return SX::create(new BinarySXNode(CONSTPOW,*this,nn));
+        return BinarySXNode::createT<CONSTPOW>(*this,nn);
       else if(nn<0) // negative power
         return 1/pow(*this,-nn);
       else if(nn%2 == 1) // odd power
@@ -687,19 +692,19 @@ SX SX::__pow__(const SX& n) const{
     } else if(n->getValue()==0.5){
       return sqrt();
     } else {
-      return SX::create(new BinarySXNode(CONSTPOW,*this,n));
+      return BinarySXNode::createT<CONSTPOW>(*this,n);
     }
   } else {
-    return SX::create(new BinarySXNode(POW,*this,n));
+    return BinarySXNode::createT<POW>(*this,n);
   }
 }
 
 SX SX::__constpow__(const SX& n) const{
-  return SX::create(new BinarySXNode(CONSTPOW,*this,n));
+  return BinarySXNode::createT<CONSTPOW>(*this,n);
 }
 
 SX SX::constpow(const SX& n) const{
-  return SX::create(new BinarySXNode(CONSTPOW,*this,n));
+  return BinarySXNode::createT<CONSTPOW>(*this,n);
 }
 
 int SX::getTemp() const{

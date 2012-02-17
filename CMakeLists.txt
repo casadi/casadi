@@ -15,6 +15,7 @@ option(WITH_OOQP "Enable OOQP interface" OFF)
 option(WITH_FORTRAN "Enable Fortran linking, if this is set to OFF, no Fortran linking will be invoked (should not be needed, CMakeDetermineFortranCompiler should do the job)" ON)
 option(WITH_SWIG_SPLIT "Split SWIG wrapper generation into multiple modules" OFF) 
 option(WITH_WORHP "Compile the WORHP interface" OFF) 
+option(CACHING_CONSTANTS "Cache numerical constants to avoid duplicates (requires C++11/C++0X support)" OFF)
 
 if(WITH_FORTRAN)
   # Enable Fortran linking (needed e.g. for LAPACK/BLAS), if Fortran is available
@@ -45,6 +46,14 @@ add_definitions(-DWITH_PRINTME)
 endif(WITH_PRINTME)
 
 include_directories(.)
+
+# Enable C++0X and set defines if CACHING_CONSTANTS is needed
+if(CACHING_CONSTANTS)
+  if(CMAKE_COMPILER_IS_GNUCXX)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+    add_definitions(-DCACHING_CONSTANTS)
+  endif(CMAKE_COMPILER_IS_GNUCXX)
+endif(CACHING_CONSTANTS)
 
 # set(CMAKE_VERBOSE_MAKEFILE 0)
 

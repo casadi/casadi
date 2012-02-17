@@ -33,20 +33,44 @@ namespace CasADi{
   \date 2010
 */
 class BinarySXNode : public SXNode{
-  public:
+  private:
     
-    /** \brief  Constructor, unary operation */
+    /** \brief  Constructor is private, use "create" below (unary version) */
     BinarySXNode(unsigned char op_, const SX& child1_){
       op = op_;
       child[0] = child1_;
       child[1] = casadi_limits<SX>::zero;
     }
     
-    /** \brief  Constructor, binary operation */
+    /** \brief  Constructor is private, use "create" below (binary version) */
     BinarySXNode(unsigned char op_, const SX& child1_, const SX& child2_){
       op = op_;
       child[0] = child1_;
       child[1] = child2_;
+    }
+    
+  public:
+    
+    /** \brief  Create a unary expression */
+    inline static SX create(unsigned char op_, const SX& child1_){
+      return SX::create(new BinarySXNode(op_,child1_));
+    }
+    
+    /** \brief  Create a binary expression */
+    inline static SX create(unsigned char op_, const SX& child1_, const SX& child2_){
+      return SX::create(new BinarySXNode(op_,child1_,child2_));
+    }
+    
+    /** \brief  Create a unary expression (templated version) */
+    template<int op_>
+    inline static SX createT(const SX& child1_){
+      return SX::create(new BinarySXNode(op_,child1_));
+    }
+    
+    /** \brief  Create a binary expression (templated version) */
+    template<int op_>
+    inline static SX createT(const SX& child1_, const SX& child2_){
+      return SX::create(new BinarySXNode(op_,child1_,child2_));
     }
     
     /** \brief Destructor

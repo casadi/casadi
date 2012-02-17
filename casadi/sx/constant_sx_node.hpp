@@ -24,14 +24,16 @@
 #define CONSTANT_NODE_HPP
 
 #include "sx_node.hpp"
+#include <cassert>
+
+// Cashing of constants relies on C++11 features such as std::unordered_map
+#ifdef CACHING_CONSTANTS
+#include <unordered_map>
+#endif // CACHING_CONSTANTS
 
 namespace CasADi{
 
-/** \brief  constants */
-const double double_inf = std::numeric_limits<double>::infinity();
-const double double_nan = std::numeric_limits<double>::quiet_NaN();
-
-/** \brief Reprsents a constant SX
+/** \brief Represents a constant SX
   \author Joel Andersson 
   \date 2010
 */
@@ -63,24 +65,58 @@ virtual void print(std::ostream &stream, long& remaining_calls) const{
   \date 2010
 */
 class RealtypeSXNode : public ConstantSXNode{
-public:
-
-// Destructor
-virtual ~RealtypeSXNode(){}
-
-explicit RealtypeSXNode(double value) : value(value){} 
-
-//@{
-/** \brief  Get the value */
-virtual double getValue() const{ return value;}
-virtual int getIntValue() const{ return int(value);}
-//@}
-
-protected:
-
-/** \brief  Data members */
-double value;
-
+  private:
+    /// Constructor is private, use "create" below
+    explicit RealtypeSXNode(double value) : value(value){} 
+  
+  public:
+    
+    /// Destructor
+    virtual ~RealtypeSXNode(){
+      #ifdef CACHING_CONSTANTS
+      size_t num_erased = cached_constants_.erase(value);
+      assert(num_erased==1);
+      #endif // CACHING_CONSTANTS
+    }
+    
+    /// Static creator function (use instead of constructor)
+    inline static RealtypeSXNode* create(double value){
+      #ifdef CACHING_CONSTANTS
+      // Try to find the constant
+      std::unordered_map<double,RealtypeSXNode*>::iterator it = cached_constants_.find(value);
+      
+      // If not found, add it,
+      if(it==cached_constants_.end()){
+        // Allocate a new object
+        RealtypeSXNode* n = new RealtypeSXNode(value);
+        
+        // Add to hash_table
+        cached_constants_.insert(it,std::make_pair(value,n));
+        
+        // Return it to caller
+        return n;
+      } else { // Else, returned the object
+        return it->second;
+      }
+      #else // CACHING_CONSTANTS
+      return new RealtypeSXNode(value);
+      #endif // CACHING_CONSTANTS
+    }
+    
+    //@{
+    /** \brief  Get the value */
+    virtual double getValue() const{ return value;}
+    virtual int getIntValue() const{ return int(value);}
+    //@}
+    
+  protected:
+    #ifdef CACHING_CONSTANTS
+    /** \brief Hash map of all constants currently allocated (storage is allocated for it in sx.cpp) */
+    static std::unordered_map<double,RealtypeSXNode*> cached_constants_;
+    #endif // CACHING_CONSTANTS
+    
+    /** \brief  Data members */
+    double value;
 };
 
 
@@ -89,11 +125,44 @@ double value;
   \date 2010
 */
 class IntegerSXNode : public ConstantSXNode{
+  private:
+    /// Constructor is private, use "create" below
+    explicit IntegerSXNode(int value) : value(value){}
+  
   public:
 
-    virtual ~IntegerSXNode(){}
-    explicit IntegerSXNode(int value) : value(value){}
-
+    /// Destructor
+    virtual ~IntegerSXNode(){
+      #ifdef CACHING_CONSTANTS
+      size_t num_erased = cached_constants_.erase(value);
+      assert(num_erased==1);
+      #endif // CACHING_CONSTANTS
+    }
+    
+    /// Static creator function (use instead of constructor)
+    inline static IntegerSXNode* create(int value){
+      #ifdef CACHING_CONSTANTS
+      // Try to find the constant
+      std::unordered_map<int,IntegerSXNode*>::iterator it = cached_constants_.find(value);
+      
+      // If not found, add it,
+      if(it==cached_constants_.end()){
+        // Allocate a new object
+        IntegerSXNode* n = new IntegerSXNode(value);
+        
+        // Add to hash_table
+        cached_constants_.insert(it,std::make_pair(value,n));
+        
+        // Return it to caller
+        return n;
+      } else { // Else, returned the object
+        return it->second;
+      }
+      #else // CACHING_CONSTANTS
+      return new IntegerSXNode(value);
+      #endif // CACHING_CONSTANTS
+    }
+    
     //@{
     /** \brief  evaluate function */
     virtual double getValue() const{  return value; }
@@ -105,10 +174,14 @@ class IntegerSXNode : public ConstantSXNode{
   
   protected:
 
+    #ifdef CACHING_CONSTANTS
+    /** \brief Hash map of all constants currently allocated (storage is allocated for it in sx.cpp) */
+    static std::unordered_map<int,IntegerSXNode*> cached_constants_;
+    #endif // CACHING_CONSTANTS
+    
     /** \brief  Data members */
     int value;
 };
-
 
 /** \brief  Represents a zero SX
   \author Joel Andersson 
@@ -191,7 +264,7 @@ public:
   virtual ~InfSXNode(){}
 
   /** \brief  Get the value */
-  virtual double getValue() const{ return double_inf;}
+  virtual double getValue() const{ return std::numeric_limits<double>::infinity();}
 
   /** \brief  Properties */
   virtual bool isInf() const{ return true; }
@@ -210,7 +283,7 @@ public:
   virtual ~MinusInfSXNode(){}
 
   /** \brief  Get the value */
-  virtual double getValue() const{ return -double_inf;}
+  virtual double getValue() const{ return -std::numeric_limits<double>::infinity();}
 
   /** \brief  Properties */
   virtual bool isMinusInf() const{ return true; }
@@ -229,7 +302,7 @@ public:
   virtual ~NanSXNode(){}
 
   /** \brief  Get the value */
-  virtual double getValue() const{ return double_nan;}
+  virtual double getValue() const{ return std::numeric_limits<double>::quiet_NaN();}
 
   /** \brief  Properties */
   virtual bool isNan() const{ return true; }

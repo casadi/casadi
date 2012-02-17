@@ -102,7 +102,7 @@ struct casadi_math<int>{
   
   /** \brief Evaluate a built in derivative function */
   static inline void der(unsigned char op, const int& x, const int& y, const int& f, int* d){
-    double d_real[2] = {d[0],d[1]};
+    double d_real[2] = {double(d[0]),double(d[1])};
     casadi_math<double>::der(op,double(x),double(y),double(f),d_real);
     d[0] = int(d_real[0]);
     d[1] = int(d_real[1]);
@@ -110,7 +110,7 @@ struct casadi_math<int>{
 
   /** \brief Evaluate the function and the derivative function */
   static inline void derF(unsigned char op, const int& x, const int& y, int& f, int* d){
-    double d_real[2] = {d[0],d[1]};
+    double d_real[2] = {double(d[0]),double(d[1])};
     double f_real(f);
     casadi_math<double>::derF(op,double(x),double(y),f_real,d_real);
     f = int(f_real);
