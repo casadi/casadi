@@ -117,7 +117,7 @@ class BinarySXNode : public SXNode{
       }
     }
     
-    virtual bool isSmooth() const{ return casadi_math<double>::isSmooth(op);}
+    virtual bool isSmooth() const{ return operation_checker<SmoothChecker>(op);}
     
     virtual bool hasDep() const{ return true; }
     

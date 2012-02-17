@@ -370,8 +370,8 @@ MX MX::binary(int op, const MX &x, const MX &y){
   casadi_assert_message((x.scalar() || y.scalar() || (x.size1()==y.size1() && x.size2()==y.size2())),"Dimension mismatch." << "lhs is " << x.dimString() << ", while rhs is " << y.dimString());
   
   // Quick return if zero
-  if((casadi_math<double>::f0x_is_zero(op) && isZero(x)) || 
-    (casadi_math<double>::fx0_is_zero(op) && isZero(y))){
+  if((operation_checker<F0XChecker>(op) && isZero(x)) || 
+    (operation_checker<FX0Checker>(op) && isZero(y))){
     return sparse(std::max(x.size1(),y.size1()),std::max(x.size2(),y.size2()));
   }
   
@@ -386,7 +386,7 @@ MX MX::binary(int op, const MX &x, const MX &y){
 
 MX MX::unary(int op, const MX &x){
   // Quick return if zero
-  if(casadi_math<double>::f0x_is_zero(op) && isZero(x)){
+  if(operation_checker<F0XChecker>(op) && isZero(x)){
     return sparse(x.size1(),x.size2());
   } else {
     return create(new UnaryOp(Operation(op),x));
@@ -399,7 +399,7 @@ MX MX::scalar_matrix(int op, const MX &x, const MX &y){
     return scalar_matrix(op,0,y);
   } else {
     // Check if it is ok to loop over nonzeros only
-    if(y.dense() || casadi_math<double>::fx0_is_zero(op)){
+    if(y.dense() || operation_checker<FX0Checker>(op)){
       // Loop over nonzeros
       return create(new ScalarNonzerosOp(Operation(op),x,y));
     } else {
@@ -415,7 +415,7 @@ MX MX::matrix_scalar(int op, const MX &x, const MX &y){
     return matrix_scalar(op,x,0);
   } else {
     // Check if it is ok to loop over nonzeros only
-    if(x.dense() || casadi_math<double>::f0x_is_zero(op)){
+    if(x.dense() || operation_checker<F0XChecker>(op)){
       // Loop over nonzeros
       return create(new NonzerosScalarOp(Operation(op),x,y));
     } else {
@@ -428,7 +428,7 @@ MX MX::matrix_scalar(int op, const MX &x, const MX &y){
 MX MX::matrix_matrix(int op, const MX &x, const MX &y){
   // Check if we can carry out the operation only on the nonzeros
   if((x.dense() && y.dense()) ||
-     (casadi_math<double>::f00_is_zero(op) && x.sparsity()==y.sparsity())){
+     (operation_checker<F00Checker>(op) && x.sparsity()==y.sparsity())){
     // Loop over nonzeros only
     return create(new NonzerosNonzerosOp(Operation(op),x,y)); 
   } else {
@@ -675,7 +675,7 @@ MX MX::fmax(const MX& b) const{
 }
 
 MX MX::printme(const MX& b) const{ 
-  return binary(PRINTME,*this,b);
+  return binary(OP_PRINTME,*this,b);
 }
 
 MX MX::exp() const{ 
@@ -826,7 +826,7 @@ int MX::getOp() const {
 bool MX::isCommutative() const {
   if (isUnary()) return true;
   casadi_assert_message(isBinary() || isUnary(),"MX::isCommutative: must be binary or unary operation");
-  return casadi_math<double>::isCommutative(getOp());
+  return operation_checker<CommChecker>(getOp());
 }
 
 long MX::__hash__() const {

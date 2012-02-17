@@ -252,7 +252,7 @@ bool SX::isEquivalent(const SX&y, int depth) const{
   
   if (isBinary() && y.isBinary() && getOp()==y.getOp()) {
     if (getDep(0).isEquivalent(y.getDep(0),depth-1)  && getDep(1).isEquivalent(y.getDep(1),depth-1)) return true;
-    return (casadi_math<SX>::isCommutative(getOp()) && getDep(0).isEquivalent(y.getDep(1),depth-1)  && getDep(1).isEquivalent(y.getDep(0),depth-1));
+    return (operation_checker<CommChecker>(getOp()) && getDep(0).isEquivalent(y.getDep(1),depth-1)  && getDep(1).isEquivalent(y.getDep(0),depth-1));
   }
   return false;
 }
@@ -432,7 +432,7 @@ bool SX::isLeaf() const {
 
 bool SX::isCommutative() const{
   if (!isBinary()) throw CasadiException("SX::isCommutative: must be binary");
-  return casadi_math<double>::isCommutative(getOp());
+  return operation_checker<CommChecker>(getOp());
 }
 
 bool SX::isConstant() const{
@@ -665,7 +665,7 @@ SX SX::fmax(const SX &b) const{
 }
 
 SX SX::printme(const SX &b) const{
-  return SX::create(new BinarySXNode(PRINTME,*this,b));
+  return SX::create(new BinarySXNode(OP_PRINTME,*this,b));
 }
 
 SX SX::__pow__(const SX& n) const{

@@ -650,7 +650,7 @@ Matrix<T> Matrix<T>::unary(int op, const Matrix<T> &x){
   }
 
   // Check the value of the structural zero-entries, if there are any
-  if(!x.dense() && !casadi_math<T>::f0x_is_zero(op)){
+  if(!x.dense() && !operation_checker<F0XChecker>(op)){
     // Get the value for the structural zeros
     T fcn_0;
     casadi_math<T>::fun(op,0,0,fcn_0);
@@ -1037,7 +1037,7 @@ Matrix<T> Matrix<T>::fmax(const Matrix<T>& y) const{
 
 template<class T>
 Matrix<T> Matrix<T>::printme(const Matrix<T>& y) const{
-  return binary(PRINTME,*this,y);
+  return binary(OP_PRINTME,*this,y);
 }
 
 template<class T>
@@ -1376,7 +1376,7 @@ Matrix<T> Matrix<T>::scalar_matrix(int op, const Matrix<T> &x, const Matrix<T> &
   }
 
   // Check the value of the structural zero-entries, if there are any
-  if(!y.dense() && !casadi_math<T>::fx0_is_zero(op)){
+  if(!y.dense() && !operation_checker<FX0Checker>(op)){
     // Get the value for the structural zeros
     T fcn_0;
     casadi_math<T>::fun(op,x_val,casadi_limits<T>::zero,fcn_0);
@@ -1405,7 +1405,7 @@ Matrix<T> Matrix<T>::matrix_scalar(int op, const Matrix<T> &x, const Matrix<T> &
   }
 
   // Check the value of the structural zero-entries, if there are any
-  if(!x.dense() && !casadi_math<T>::f0x_is_zero(op)){
+  if(!x.dense() && !operation_checker<F0XChecker>(op)){
     // Get the value for the structural zeros
     T fcn_0;
     casadi_math<T>::fun(op,casadi_limits<T>::zero,y_val,fcn_0);
@@ -1444,7 +1444,7 @@ Matrix<T> Matrix<T>::matrix_matrix(int op, const Matrix<T> &x, const Matrix<T> &
     }
     
     // Check the value of the structural zero-entries, if there are any
-    if(!x.dense() && !casadi_math<T>::f00_is_zero(op)){
+    if(!x.dense() && !operation_checker<F00Checker>(op)){
       // Get the value for the structural zeros
       T fcn_0;
       casadi_math<T>::fun(op,casadi_limits<T>::zero,casadi_limits<T>::zero,fcn_0);
@@ -1457,9 +1457,9 @@ Matrix<T> Matrix<T>::matrix_matrix(int op, const Matrix<T> &x, const Matrix<T> &
     // Get the sparsity pattern
     std::vector<unsigned char> mapping;
     CRSSparsity ret_sp = x_sp.patternUnion(y_sp,mapping,
-                                           casadi_math<T>::f00_is_zero(op),
-                                           casadi_math<T>::f0x_is_zero(op),
-                                           casadi_math<T>::fx0_is_zero(op));
+                                           operation_checker<F00Checker>(op),
+                                           operation_checker<F0XChecker>(op),
+                                           operation_checker<FX0Checker>(op));
     
     // Create return matrix
     Matrix<T> ret(ret_sp);

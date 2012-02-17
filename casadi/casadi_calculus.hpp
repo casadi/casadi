@@ -275,7 +275,7 @@ struct DerBinaryOpertion{
 
 /// Enum for quick access to any node
 enum Operation{
-  ASSIGN,
+  OP_ASSIGN,
   ADD,  SUB,  MUL,  DIV,
   NEG,  EXP,  LOG,  POW, CONSTPOW,
   SQRT,  SIN,  COS,  TAN,  
@@ -285,14 +285,88 @@ enum Operation{
   ERF,  FMIN,  FMAX,
   INV,
   SINH,  COSH,  TANH,
+  
+  OP_CONST,
+  
   ERFINV,
-  PRINTME,
+  OP_PRINTME,
   NUM_BUILT_IN_OPS
 };
 
+//@{
+  /// Smoothness (by default true)
+  template<int I> struct SmoothChecker{ static const bool check=true;};
+  template<>      struct SmoothChecker<STEP>{ static const bool check=false;};
+  template<>      struct SmoothChecker<FLOOR>{ static const bool check=false;};
+  template<>      struct SmoothChecker<CEIL>{ static const bool check=false;};
+  template<>      struct SmoothChecker<EQUALITY>{ static const bool check=false;};
+  template<>      struct SmoothChecker<SIGN>{ static const bool check=false;};
+//@}
+
+//@{
+  /// If evaluated with the first argument zero, is the result zero?
+  template<int I> struct F0XChecker{ static const bool check=false;};
+  template<>      struct F0XChecker<OP_ASSIGN>{ static const bool check=true;};
+  template<>      struct F0XChecker<MUL>{ static const bool check=true;};
+  template<>      struct F0XChecker<DIV>{ static const bool check=true;};
+  template<>      struct F0XChecker<NEG>{ static const bool check=true;};
+  template<>      struct F0XChecker<SQRT>{ static const bool check=true;};
+  template<>      struct F0XChecker<SIN>{ static const bool check=true;};
+  template<>      struct F0XChecker<TAN>{ static const bool check=true;};
+  template<>      struct F0XChecker<ASIN>{ static const bool check=true;};
+  template<>      struct F0XChecker<FLOOR>{ static const bool check=true;};
+  template<>      struct F0XChecker<CEIL>{ static const bool check=true;};
+  template<>      struct F0XChecker<FABS>{ static const bool check=true;};
+  template<>      struct F0XChecker<SIGN>{ static const bool check=true;};
+  template<>      struct F0XChecker<ERF>{ static const bool check=true;};
+  template<>      struct F0XChecker<SINH>{ static const bool check=true;};
+  template<>      struct F0XChecker<TANH>{ static const bool check=true;};
+  template<>      struct F0XChecker<ERFINV>{ static const bool check=true;};
+//@}
+
+//@{
+  /// If evaluated with the second argument zero, is the result zero?
+  template<int I> struct FX0Checker{ static const bool check=false;};
+  template<>      struct FX0Checker<MUL>{ static const bool check=true;};
+//@}
+
+//@{
+  /// If evaluated with both arguments zero, is the result zero?
+  template<int I> struct F00Checker{ static const bool check=F0XChecker<I>::check;};
+  template<>      struct F00Checker<ADD>{ static const bool check=true;};
+  template<>      struct F00Checker<SUB>{ static const bool check=true;};
+  template<>      struct F00Checker<FMIN>{ static const bool check=true;};
+  template<>      struct F00Checker<FMAX>{ static const bool check=true;};
+//@}
+
+//@{
+  /// Is commutative
+  template<int I> struct CommChecker{ static const bool check=true;};
+  template<>      struct CommChecker<SUB>{ static const bool check=false;};
+  template<>      struct CommChecker<DIV>{ static const bool check=false;};
+  template<>      struct CommChecker<POW>{ static const bool check=false;};
+  template<>      struct CommChecker<CONSTPOW>{ static const bool check=false;};
+  template<>      struct CommChecker<OP_PRINTME>{ static const bool check=false;};
+//@}
+
+//@{
+  /// Is the operation binary as opposed to unary
+  template<int I> struct BinaryChecker{ static const bool check=false;};
+  template<>      struct BinaryChecker<ADD>{ static const bool check=true;};
+  template<>      struct BinaryChecker<SUB>{ static const bool check=true;};
+  template<>      struct BinaryChecker<MUL>{ static const bool check=true;};
+  template<>      struct BinaryChecker<DIV>{ static const bool check=true;};
+  template<>      struct BinaryChecker<POW>{ static const bool check=true;};
+  template<>      struct BinaryChecker<CONSTPOW>{ static const bool check=true;};
+  template<>      struct BinaryChecker<EQUALITY>{ static const bool check=true;};
+  template<>      struct BinaryChecker<FMIN>{ static const bool check=true;};
+  template<>      struct BinaryChecker<FMAX>{ static const bool check=true;};
+  template<>      struct BinaryChecker<OP_PRINTME>{ static const bool check=true;};
+//@}
+
 /// Simple assignment
 template<>
-struct UnaryOperation<ASSIGN>{
+struct UnaryOperation<OP_ASSIGN>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f){ f = x;}
     template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0] = 1; }
@@ -530,7 +604,7 @@ struct UnaryOperation<ERFINV>{
 
 /// Identity operator with the side effect of printing
 template<>
-struct BinaryOperation<PRINTME>{
+struct BinaryOperation<OP_PRINTME>{
   template<typename T> static inline void fcn(const T& x, const T& y, T& f){f = printme(x,y); }
   template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ d[0]=1; d[1]=0;}
 };

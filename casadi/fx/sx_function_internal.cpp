@@ -69,17 +69,18 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
     }
   }
 
-  // Shorthands
-  #define x work_[it->arg.i[0]]
-  #define y work_[it->arg.i[1]]
-  #define f work_[it->res]
-
   // Evaluate the algorithm
   if(nfdir==0 && nadir==0){ // without taping
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
       // NOTE: This is equivalent to casadi_math<double>::inplacefun(it->op,x,y,f);
       // but forces the function to be inlined, which is important for speed here
-      CASADI_MATH_FUN(double,it->op,x,y,f)
+      switch(it->op){
+        // Start by adding all of the built operations
+        CASADI_MATH_FUN_ALL_BUILTIN(work_[it->arg.i[0]],work_[it->arg.i[1]],work_[it->res])
+        
+        // Now all other operations
+        case OP_CONST: work_[it->res] = it->arg.d; break;
+      }
     }
   } else { // with taping
     
@@ -88,14 +89,9 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
     for(; it!=algorithm_.end(); ++it, ++it1){
       // NOTE: This is equivalent to casadi_math<double>::derF(it->op,x,y,f,it1->d);
       // but forces the function to be inlined, which is important for speed here
-      CASADI_MATH_DERF(double,it->op,x,y,f,it1->d)
+      CASADI_MATH_DERF(double,it->op,work_[it->arg.i[0]],work_[it->arg.i[1]],work_[it->res],it1->d)
     }
   }
-  
-  // Undefine shorthands
-  #undef x
-  #undef y
-  #undef f
 
   // Get the results
   for(int ind=0; ind<getNumOutputs(); ++ind){

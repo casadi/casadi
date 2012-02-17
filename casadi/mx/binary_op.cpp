@@ -43,9 +43,9 @@ BinaryOp::~BinaryOp(){
 
 SparseSparseOp::SparseSparseOp(Operation op, const MX& x, const MX& y) : BinaryOp(op,x,y){
   // Get the sparsity pattern
-  bool f00_is_zero = casadi_math<double>::f00_is_zero(op_);
-  bool f0x_is_zero = casadi_math<double>::f0x_is_zero(op_);
-  bool fx0_is_zero = casadi_math<double>::fx0_is_zero(op_);
+  bool f00_is_zero = operation_checker<F00Checker>(op_);
+  bool f0x_is_zero = operation_checker<F0XChecker>(op_);
+  bool fx0_is_zero = operation_checker<FX0Checker>(op_);
   CRSSparsity sp = x->sparsity().patternUnion(y->sparsity(),mapping_,f00_is_zero,f0x_is_zero,fx0_is_zero);
   setSparsity(sp);
 }
