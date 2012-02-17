@@ -990,8 +990,26 @@ void IdasInternal::printStats(std::ostream &stream) const{
     int flag = IDAGetIntegratorStats(mem_, &nsteps, &nfevals, &nlinsetups,&netfails, &qlast, &qcur, &hinused,&hlast, &hcur, &tcur);
     if(flag!=IDA_SUCCESS) idas_error("IDAGetIntegratorStats",flag);
     
+    //long nfevalsS=0;
+    //if (nfdir_>0) {
+    //  flag = IDAGetNumResEvalsSens(mem_, &nfevalsS);
+    //  if(flag!=IDA_SUCCESS) idas_error("IDAGetNumResEvalsSens",flag);
+    //}
+    
+    long nrevalsLS_spils, nrevalsLS_dls;
+    
+    flag = IDASpilsGetNumResEvals(mem_, &nrevalsLS_spils);
+    if(flag!=IDA_SUCCESS) idas_error("IDASpilsGetNumResEvals",flag);
+    
+    
+    flag = IDADlsGetNumResEvals(mem_, &nrevalsLS_dls);
+    if(flag!=IDA_SUCCESS) idas_error("IDADlsGetNumResEvals",flag);
+    
     stream << "number of steps taken by IDAS: " << nsteps << std::endl;
-    stream << "number of calls to the user's f function: " << nfevals << std::endl;
+    stream << "number of calls to the user's res function: " << nfevals << std::endl;
+    //stream << "number of calls to the user's res function for finite difference of the sensitivity residuals: " << nfevalsS << std::endl;
+    stream << "number of calls to the user's res function for finite difference (SPILS linear solver): "<< nrevalsLS_spils << std::endl;
+    stream << "number of calls to the user's res function for finite difference (DLS linear solver): "<< nrevalsLS_dls << std::endl;
     stream << "number of calls made to the linear solver setup function: " << nlinsetups << std::endl;
     stream << "number of error test failures: " << netfails << std::endl;
     stream << "method order used on the last internal step: " << qlast << std::endl;
