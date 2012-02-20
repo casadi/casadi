@@ -87,8 +87,10 @@ void SimulatorInternal::init(){
 
   // Allocate outputs
   output_.resize(output_fcn_->output_.size());
-  for(int i=0; i<output_.size(); ++i)
+  for(int i=0; i<output_.size(); ++i) {
     output(i) = Matrix<double>(grid_.size(),output_fcn_.output(i).numel(),0);
+    casadi_assert_message(output_fcn_.output(i).size2()==1,"SimulatorInternal::init: Output function output #" << i << " has shape " << output_fcn_.output(i).dimString() << ", while a column-matrix shape is expected.");
+  }
 
   // Call base class method
   FXInternal::init();
