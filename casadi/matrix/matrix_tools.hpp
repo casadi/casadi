@@ -138,6 +138,8 @@ template<class T>
 Matrix<T> vecNZ(const Matrix<T>& a);
 
 
+template<class T>
+Matrix<T> blockcat(const std::vector< std::vector<Matrix<T> > > &v);
 
 template<class T>
 Matrix<T> vertcat(const std::vector<Matrix<T> > &v);
@@ -638,6 +640,14 @@ Matrix<T> flatten(const Matrix<T>& a){
 template<class T>
 Matrix<T> vecNZ(const Matrix<T>& a){
   return Matrix<T>(vec(a).data());
+}
+
+template<class T>
+Matrix<T> blockcat(const std::vector< std::vector<Matrix<T> > > &v) {
+  std::vector< Matrix<T> > ret;
+  for(int i=0; i<v.size(); ++i)
+    ret.push_back(horzcat(v[i]));
+  return vertcat(ret);
 }
 
 template<class T>
@@ -1239,6 +1249,7 @@ MTT_INST(T,reshape) \
 MTT_INST(T,vec) \
 MTT_INST(T,flatten) \
 MTT_INST(T,vecNZ) \
+MTT_INST(T,blockcat) \
 MTT_INST(T,horzcat) \
 MTT_INST(T,vertcat) \
 MTT_INST(T,inner_prod) \

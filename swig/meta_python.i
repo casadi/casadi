@@ -411,6 +411,7 @@ bool meta< CasADi::Matrix<int> >::couldbe(PyObject * p) {
 }
 
 meta_vector(CasADi::Matrix<int>)
+meta_vector(std::vector< CasADi::Matrix<int> >)
 
 /// CasADi::Matrix<double>
 template<> char meta< CasADi::Matrix<double> >::expected_message[] = "Expecting numpy.array2D, numpy.matrix, csr_matrix, DMatrix";
@@ -515,6 +516,7 @@ bool meta< CasADi::Matrix<double> >::couldbe(PyObject * p) {
 }
 
 meta_vector(CasADi::Matrix<double>)
+meta_vector(std::vector< CasADi::Matrix<double> >)
 
 /// CasADi::Matrix<CasADi::SX>
 template<> char meta< CasADi::Matrix<CasADi::SX> >::expected_message[] = "Expecting one of: numpy.ndarray(SX/number) , SXMatrix, SX, number, sequence(SX/number)";
@@ -656,6 +658,7 @@ bool meta< std::vector< CasADi::Matrix<CasADi::SX> > >::couldbe(PyObject * p) {
 
 meta_vector(std::vector<CasADi::SX>);
 meta_vector(CasADi::SX);
+meta_vector(std::vector< CasADi::Matrix< CasADi::SX > >);
 
 /// CasADi::MX
 template<> char meta< CasADi::MX >::expected_message[] = "Expecting (MX, numberarray)";

@@ -19,15 +19,18 @@
 
 #define PRECEDENCE_IMatrix 97
 #define PRECEDENCE_IMatrixVector 98
+#define PRECEDENCE_IMatrixVectorVector 98
 
 #define PRECEDENCE_DVector 99
 
 #define PRECEDENCE_DMatrix 100
 #define PRECEDENCE_DMatrixVector 101
+#define PRECEDENCE_DMatrixVectorVector 101
 
 #define PRECEDENCE_SXMatrix 103
 #define PRECEDENCE_SX 102
 #define PRECEDENCE_SXMatrixVector 103
+#define PRECEDENCE_SXMatrixVectorVector 103
 #define PRECEDENCE_SXVector 102
 #define PRECEDENCE_MX 104
 #define PRECEDENCE_MXVector 105
@@ -45,6 +48,7 @@
 %template(IMatrixVector) std::vector<CasADi::Matrix<int> > ;
 %template(DMatrixVector) std::vector<CasADi::Matrix<double> > ;
 %template(DMatrixVectorVector) std::vector< std::vector<CasADi::Matrix<double> > > ;
+%template(IMatrixVectorVector) std::vector< std::vector<CasADi::Matrix<int> > > ;
 %template(SXVectorVector)       std::vector<std::vector<CasADi::SX> > ;
 %template(SXVectorVectorVector) std::vector< std::vector<std::vector<CasADi::SX> > > ;
 #endif //SWIG_MAIN_MODULE
@@ -57,6 +61,7 @@
 %template() std::vector<CasADi::Matrix<int> > ;
 %template() std::vector<CasADi::Matrix<double> > ;
 %template() std::vector< std::vector<CasADi::Matrix<double> > > ;
+%template() std::vector< std::vector<CasADi::Matrix<int> > > ;
 %template() std::vector<std::vector<CasADi::SX> > ;
 %template() std::vector< std::vector<std::vector<CasADi::SX> > > ;
 #endif //SWIG_MAIN_MODULE
@@ -117,7 +122,7 @@ if (!ret) {
 %my_generic_const_typemap(PRECEDENCE_SXMatrix,CasADi::Matrix<CasADi::SX>);
 
 %my_generic_const_typemap(PRECEDENCE_SXMatrixVector,std::vector< CasADi::Matrix<CasADi::SX> >);
-
+%my_generic_const_typemap(PRECEDENCE_SXMatrixVectorVector,std::vector< std::vector< CasADi::Matrix<CasADi::SX> > >);
 
 
 %my_generic_const_typemap(PRECEDENCE_MX,CasADi::MX);
@@ -136,6 +141,8 @@ if (!ret) {
 %my_generic_const_typemap(PRECEDENCE_MXVectorVector,std::vector< std::vector< CasADi::MX > >);
 %my_generic_const_typemap(PRECEDENCE_DMatrixVector,std::vector< CasADi::Matrix<double> >);
 %my_generic_const_typemap(PRECEDENCE_IMatrixVector,std::vector< CasADi::Matrix<int> >);
+%my_generic_const_typemap(PRECEDENCE_DMatrixVectorVector,std::vector< std::vector< CasADi::Matrix<double> > >);
+%my_generic_const_typemap(PRECEDENCE_IMatrixVectorVector,std::vector< std::vector< CasADi::Matrix<int> > >);
 #endif // SWIGPYTHON
 
 
