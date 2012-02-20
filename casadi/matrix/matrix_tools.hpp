@@ -99,15 +99,15 @@ T trace(const Matrix<T>& a);
   Columns are stacked on top of each other.
   Same as reshape(trans(expr), expr.numel(),1)
   
-    a b
-    c d 
+    a b \n
+    c d \n
     
     turns into
     
-    a
-    c
-    b
-    d
+    a \n
+    c \n
+    b \n
+    d \n
     
  */
 template<class T>
@@ -118,15 +118,15 @@ Matrix<T> vec(const Matrix<T>& a);
   Transposed rows are stacked on top of each other.
   Same as reshape(expr, expr.numel(),1)
   
-    a b
-    c d 
+    a b \n
+    c d \n
     
     turns into
     
-    a
-    b
-    c
-    d
+    a \n
+    b \n
+    c \n
+    d \n
     
  */
 template<class T>
