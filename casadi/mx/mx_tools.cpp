@@ -135,6 +135,17 @@ MX mul(const MX &x, const MX &y){
   return x.mul(y);
 }
 
+MX mul(const std::vector< MX > &args){
+  casadi_assert_message(args.size()>=1,"mul(std::vector< MX > &args): supplied list must not be empty.");
+  if (args.size()==1) return args[0];
+  MX ret = args[0].mul(args[1]);
+  for (int i=2;i<args.size();++i) {
+    ret = ret.mul(args[i]);
+  }
+  return ret;
+}
+
+
 bool isZero(const MX& ex){
   if(ex.size()==0){
     return true;

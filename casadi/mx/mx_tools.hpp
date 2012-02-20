@@ -82,6 +82,9 @@ MX trans(const MX &x);
 /** \brief  Take the matrix product of 2 MX objects */
 MX mul(const MX &x, const MX &y);
 
+/** \brief  Take the matrix product of n MX objects */
+MX mul(const std::vector< MX > &x);
+
 /** \brief  Take the inner product of two vectors 
         Equals
         \code

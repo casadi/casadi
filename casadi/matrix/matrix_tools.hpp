@@ -36,6 +36,10 @@ Matrix<T> trans(const Matrix<T> &x);
 template<class T>
 Matrix<T> mul(const Matrix<T> &x, const Matrix<T> &y);
 
+/// Matrix product of n matrices
+template<class T>
+Matrix<T> mul(const std::vector< Matrix<T> > &args);
+
 /** \brief  check if the matrix is constant (note that false negative answers are possible)*/
 template<class T>
 bool isConstant(const Matrix<T>& ex);
@@ -365,6 +369,17 @@ Matrix<T> trans(const Matrix<T> &x){
 template<class T>
 Matrix<T> mul(const Matrix<T> &x, const Matrix<T> &y){
   return x.mul(y);
+}
+
+template<class T>
+Matrix<T> mul(const std::vector< Matrix<T> > &args){
+  casadi_assert_message(args.size()>=1,"mul(std::vector< Matrix<T> > &args): supplied list must not be empty.");
+  if (args.size()==1) return args[0];
+  Matrix<T> ret = args[0].mul(args[1]);
+  for (int i=2;i<args.size();++i) {
+    ret = ret.mul(args[i]);
+  }
+  return ret;
 }
 
 template<class T>

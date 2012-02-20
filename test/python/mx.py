@@ -1662,6 +1662,28 @@ class MXtests(casadiTestCase):
     self.assertTrue(len(str(x)) <  100)
 
     MX.setMaxNumCallsInPrint()
+
+  def test_mul(self):
+    A = MX(DMatrix.ones((4,3)))
+    B = MX(DMatrix.ones((3,8)))
+    C = MX(DMatrix.ones((8,7)))
+    
+    self.assertRaises(RuntimeError,lambda : mul([]))
+    
+    D = mul([A])
+    
+    self.assertEqual(D.shape[0],4)
+    self.assertEqual(D.shape[1],3)
+
+    D = mul([A,B])
+    
+    self.assertEqual(D.shape[0],4)
+    self.assertEqual(D.shape[1],8)
+    
+    D = mul([A,B,C])
+    
+    self.assertEqual(D.shape[0],4)
+    self.assertEqual(D.shape[1],7)
     
 if __name__ == '__main__':
     unittest.main()
