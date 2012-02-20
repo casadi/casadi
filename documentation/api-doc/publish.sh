@@ -12,3 +12,4 @@ rsync -avP -e ssh ../tutorials/cpp/ "$username,casadi@web.sourceforge.net:/home/
 rsync -avP -e ssh ../cheatsheet/*.pdf "$username,casadi@web.sourceforge.net:/home/groups/c/ca/casadi/htdocs/cheatsheets/"
 #rsync -avP -e ssh sphinx/_build/html "$username,casadi@web.sourceforge.net:/home/groups/c/ca/casadi/htdocs/api/python/"
 rsync -avP -e ssh ../users_guide/*.pdf "$username,casadi@web.sourceforge.net:/home/groups/c/ca/casadi/htdocs/users_guide"
+rsync -avP -e ssh ../users_guide/casadi-users_guide/* "$username,casadi@web.sourceforge.net:/home/groups/c/ca/casadi/htdocs/users_guide/html"
