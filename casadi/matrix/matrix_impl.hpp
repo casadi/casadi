@@ -330,6 +330,13 @@ void Matrix<T>::setNZ(const Matrix<int>& kk, const Matrix<T>& m){
       data().at(kk.at(k)) = m.data()[0];
     return;
   }
+  if (kk.dense() && !m.dense() && kk.size1()==m.size1() && kk.size2()==m.size2()) {
+    const std::vector<int> & col = m.sparsity().col();
+    std::vector<int> row = m.sparsity().getRow();
+    for(int k=0; k<m.size(); ++k)
+      data().at(kk.elem(row[k],col[k])) = m.data()[k];
+    return;
+  }
   casadi_assert_message(kk.sparsity()==m.sparsity(),"Matrix<T>::setNZ: sparsity of IMatrix index " << kk.dimString() << " " << std::endl << "must match sparsity of rhs " << m.dimString() << ".");
   
   for(int k=0; k<kk.size(); ++k)
