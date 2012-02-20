@@ -2318,7 +2318,7 @@ void CRSSparsityInternal::reserve(int nnz, int nrow){
 
 void CRSSparsityInternal::append(const CRSSparsity& sp){
   // Assert dimensions
-  casadi_assert_message(ncol_==sp.size2(),"Dimension mismatch");
+  casadi_assert_message(ncol_==sp.size2(),"CRSSparsityInternal::append: Dimension mismatch. You attempt to append a shape " << sp.dimString() << " to a shape " << dimString() << ". The number of columns must match.");
   
   // Get current number of non-zeros
   int sz = size();
