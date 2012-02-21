@@ -328,7 +328,6 @@ void NLPSolverInternal::init(){
   } // generate_hessian && H_.isNull()
   if(!H_.isNull() && !H_.isInit()) {
     H_.init();
-    H_.print();
     log("Hessian function initialized");
   }
 

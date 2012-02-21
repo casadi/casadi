@@ -178,9 +178,8 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   DMatrix lambda_x_k(n,1,0);
 
   // Initial guess for the Hessian
-  DMatrix Bk = DMatrix::eye(n);
-  makeDense(Bk);
-  
+  DMatrix Bk;
+
   if (getOption("hessian_approximation")=="exact") {
     int n_hess_in = H_.getNumInputs() - (parametric_ ? 1 : 0);
     H_.setInput(x);
@@ -189,8 +188,10 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       H_.setInput(1, n_hess_in==4? 3 : 2);
     }
     H_.evaluate();
-    DMatrix Bk = H_.output();
-    
+    Bk = H_.output();
+  } else {
+    Bk = DMatrix::eye(n);
+    makeDense(Bk);
   }
 
   if (monitored("eval_h")) {
