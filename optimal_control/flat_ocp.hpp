@@ -136,7 +136,7 @@ class FlatOCP : public OptionsFunctionality{
     std::vector<Variable> x_all() const;
     
     /// Quadrature states (length == quad().size())
-    std::vector<Variable>& q();
+    std::vector<Variable>& xq();
     
     /// Dependent variables (length == dep().size())
     std::vector<Variable>& y();
@@ -227,6 +227,12 @@ class FlatOCP : public OptionsFunctionality{
     /// Eliminate dependent equations, by default sparing the dependent variables with upper or lower bounds
     void eliminateDependent();
 
+    /// Eliminate Lagrange terms from the objective function and make them quadrature states
+    void eliminateLagrangeTerms();
+    
+    /// Eliminate quadrature states and turn them into ODE states
+    void eliminateQuadratureStates();
+    
     /// Sort the DAE equations and variables
     void sortDAE();
 
@@ -238,7 +244,7 @@ class FlatOCP : public OptionsFunctionality{
     
     /// Substitute the dependents from a set of expressions
     std::vector<SXMatrix> substituteDependents(const std::vector<SXMatrix>& x) const;
-    
+        
     /** \brief Get the ODE/DAE right hand side function
     * The returned FX has the following input/output scheme:
     * @copydoc scheme_DAEInput 

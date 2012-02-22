@@ -78,8 +78,8 @@ std::vector<Variable>& FlatOCP::xa(){
   return (*this)->xa_;
 }
 
-std::vector<Variable>& FlatOCP::q(){
-  return (*this)->q_;
+std::vector<Variable>& FlatOCP::xq(){
+  return (*this)->xq_;
 }
 
 std::vector<Variable>& FlatOCP::y(){
@@ -204,6 +204,14 @@ vector<SXMatrix> FlatOCP::substituteDependents(const vector<SXMatrix>& x) const{
 
 void FlatOCP::generateMuscodDatFile(const std::string& filename, const Dictionary& mc2_ops) const{
   (*this)->generateMuscodDatFile(filename, mc2_ops);
+}
+
+void FlatOCP::eliminateLagrangeTerms(){
+  (*this)->eliminateLagrangeTerms();
+}
+
+void FlatOCP::eliminateQuadratureStates(){
+  (*this)->eliminateQuadratureStates();
 }
 
 } // namespace OptimalControl

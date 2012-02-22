@@ -94,6 +94,12 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     /// Eliminate dependent equations
     void eliminateDependent();
 
+    /// Eliminate Lagrange terms from the objective function and make them quadrature states
+    void eliminateLagrangeTerms();
+
+    /// Eliminate quadrature states and turn them into ODE states
+    void eliminateQuadratureStates();
+
     /// Sort the DAE equations and variables
     void sortDAE();
     
@@ -149,7 +155,7 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     std::vector<Variable> xa_;
 
     /// Quadrature states
-    std::vector<Variable> q_;
+    std::vector<Variable> xq_;
 
     /// Controls
     std::vector<Variable> u_;

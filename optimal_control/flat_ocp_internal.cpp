@@ -153,7 +153,7 @@ void FlatOCPInternal::parse(){
   casadi_assert(x_.size()==dae_.size());
   casadi_assert(xd_.size()==ode_.size());
   casadi_assert(xa_.size()==alg_.size());
-  casadi_assert(q_.size()==quad_.size());
+  casadi_assert(xq_.size()==quad_.size());
   casadi_assert(y_.size()==dep_.size());
   
   // Return a reference to the created ocp
@@ -498,7 +498,7 @@ void FlatOCPInternal::print(ostream &stream) const{
   stream << "#s = " << x_.size() << ", ";
   stream << "#xd = " << xd_.size() << ", ";
   stream << "#z = " << xa_.size() << ", ";
-  stream << "#q = " << q_.size() << ", ";
+  stream << "#q = " << xq_.size() << ", ";
   stream << "#y = " << y_.size() << ", ";
   stream << "#p = " << p_.size() << ", ";
   stream << "#u = " << u_.size() << ", ";
@@ -513,7 +513,7 @@ void FlatOCPInternal::print(ostream &stream) const{
   stream << "  s =  " << x_ << endl;
   stream << "  xd = " << xd_ << endl;
   stream << "  z =  " << xa_ << endl;
-  stream << "  q =  " << q_ << endl;
+  stream << "  q =  " << xq_ << endl;
   stream << "  y =  " << y_ << endl;
   stream << "  p =  " << p_ << endl;
   stream << "  u =  " << u_ << endl;
@@ -539,8 +539,8 @@ void FlatOCPInternal::print(ostream &stream) const{
   stream << endl;
   
   stream << "Quadrature equations" << endl;
-  for(int k=0; k<q_.size(); ++k){
-    stream << q_[k].der() << " == " << quad_[k] << endl;
+  for(int k=0; k<xq_.size(); ++k){
+    stream << xq_[k].der() << " == " << quad_[k] << endl;
   }
   stream << endl;
 
@@ -629,6 +629,50 @@ void FlatOCPInternal::eliminateDependent(){
   double dt = double(time2-time1)/CLOCKS_PER_SEC;
   if(verbose_)
     cout << "... eliminateDependent complete after " << dt << " seconds." << endl;
+}
+
+void FlatOCPInternal::eliminateLagrangeTerms(){
+  // Index for the names
+  int ind = 0;
+  // For every integral term in the objective function
+  for(vector<SX>::iterator it=lterm_.begin(); it!=lterm_.end(); ++it){
+    
+    // Give a name to the quadrature state
+    stringstream q_name;
+    q_name << "q_" << ind++;
+    
+    // Create a new quadrature state
+    Variable qv(q_name.str());
+    qv.setVariability(CONTINUOUS);
+    qv.setCausality(INTERNAL);
+    qv.setStart(0.0);
+  
+    // Add to the list of variables
+    addVariable(q_name.str(),qv);
+    
+    // Add to the quadrature states
+    xq_.push_back(qv);
+
+    // Add the Lagrange term to the list of quadratures
+    quad_.push_back(*it);
+    
+    // Add to the list of Mayer terms
+    mterm_.push_back(qv.var());
+  }
+  
+  // Remove the Lagrange terms
+  lterm_.clear();
+}
+
+void FlatOCPInternal::eliminateQuadratureStates(){
+  
+  // Move all the quadratures to the list of differential states
+  xd_.insert(xd_.end(),xq_.begin(),xq_.end());
+  xq_.clear();
+  
+  // Move the equations to the list of ODEs
+  ode_.insert(ode_.end(),quad_.begin(),quad_.end());
+  quad_.clear();
 }
 
 void FlatOCPInternal::sortType(){
@@ -1036,7 +1080,7 @@ void FlatOCPInternal::makeAlgebraic(const Variable& v){
       xa_.push_back(v);
       alg_.push_back(ode_[k]);
       
-      // Remove from list of differential variables and the list of diffential equations
+      // Remove from list of differential variables and the list of differential equations
       xd_.erase(xd_.begin()+k);
       ode_.erase(ode_.begin()+k);
 
