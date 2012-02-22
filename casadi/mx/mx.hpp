@@ -429,6 +429,8 @@ class MX : public GenericMatrix<MX>, public SharedObject{
 
 //@{
 /// Some typedefs
+typedef std::vector<MX> MXVector;
+typedef std::vector< std::vector<MX> > MXVectorVector;
 typedef MX* MXPtr;
 typedef std::vector<MXPtr> MXPtrV;
 typedef std::vector<MXPtrV> MXPtrVV;

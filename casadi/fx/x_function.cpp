@@ -125,6 +125,35 @@ vector<SX> XFunction::eval(const vector<SX>& arg){
   return eval(vector< vector<SX> >(1,arg)).at(0);
 }
 
+void XFunction::evalSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
+		       const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
+		       const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
+		       bool output_given, bool eliminate_constants){
+  (*this)->evalSX(input,output,fwdSeed,fwdSens,adjSeed,adjSens,output_given,eliminate_constants);
+}
+
+void XFunction::evalMX(const std::vector<MX>& input, std::vector<MX>& output, 
+		       const std::vector<std::vector<MX> >& fwdSeed, std::vector<std::vector<MX> >& fwdSens, 
+		       const std::vector<std::vector<MX> >& adjSeed, std::vector<std::vector<MX> >& adjSens,
+		       bool output_given, bool eliminate_constants){
+  (*this)->evalMX(input,output,fwdSeed,fwdSens,adjSeed,adjSens,output_given,eliminate_constants);
+}
+                        
+void XFunction::eval(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
+		     const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
+		     const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
+		     bool output_given, bool eliminate_constants){
+  (*this)->eval(input,output,fwdSeed,fwdSens,adjSeed,adjSens,output_given,eliminate_constants);
+}
+
+void XFunction::eval(const std::vector<MX>& input, std::vector<MX>& output, 
+		     const std::vector<std::vector<MX> >& fwdSeed, std::vector<std::vector<MX> >& fwdSens, 
+		     const std::vector<std::vector<MX> >& adjSeed, std::vector<std::vector<MX> >& adjSens,
+		     bool output_given, bool eliminate_constants){
+  (*this)->eval(input,output,fwdSeed,fwdSens,adjSeed,adjSens,output_given,eliminate_constants);
+}
+
+
 
 } // namespace CasADi
 
