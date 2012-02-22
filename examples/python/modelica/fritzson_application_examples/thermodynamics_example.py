@@ -9,9 +9,9 @@ import time
 
 try:
   # JModelica
-  from jmodelica.jmi import compile_jmu
-  from jmodelica.jmi import JMUModel
-  import jmodelica
+  from pymodelica import compile_jmu
+  from pyjmi import JMUModel
+  import pymodelica
 except:
   print "This example requires a jmodelica insatllation"
   sys.exit(0)
