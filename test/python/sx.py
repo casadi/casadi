@@ -412,7 +412,7 @@ class SXtests(casadiTestCase):
     x = ssym("x",2,2)
     f = SXFunction([x], [x])
     f.init()
-    self.assertRaises(TypeError,lambda: f.evalSX(x))
+    self.assertRaises(NotImplementedError,lambda: f.evalSX(x))
 
   def test_SXconversion(self):
     self.message("Conversions from and to SXMatrix")
