@@ -125,7 +125,7 @@ void ControlSimulatorInternal::init(){
   // Generate an output function if there is none (returns the whole state)
   if(output_fcn_.isNull()){
     
-    SXMatrix t    = ssym("t");
+    SXMatrix t    = ssym("t",control_dae_.input(CONTROL_DAE_T).sparsity());
     SXMatrix x    = ssym("x",control_dae_.input(CONTROL_DAE_Y).sparsity());
     SXMatrix xdot = ssym("xp",control_dae_.input(CONTROL_DAE_YDOT).sparsity());
     SXMatrix p    = ssym("p",control_dae_.input(CONTROL_DAE_P).sparsity());
