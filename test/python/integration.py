@@ -93,22 +93,31 @@ class Integrationtests(casadiTestCase):
 
     u = SX("u") 
 
-    b = 0.1
+    b = SX("b")
+    b_ = 0.1
+    k = SX("k")
+    k_ = 1
+    
 
-    rhs = vertcat([v - dx, ( -  b*v - x) - dv ])
-    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_YDOT: [dx,dv], DAE_Y: [x,v]},[rhs])
+    rhs = vertcat([v - dx, ( -  b*v - k*x) - dv ])
+    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_YDOT: [dx,dv], DAE_Y: [x,v], DAE_P: [b,k]},[rhs])
     f.init()
 
-    # algebraic solution
+    x0 = SX("x0")
+    dx0 = SX("dx0")
 
-    D = b**2 - 4
-
-    R = -b/2
-    I = sqrt(-D)/2
-
-    sol = lambda t : exp(R*t)*(0.05/I*sin(I*t) + cos(I*t))
 
     X0 = DMatrix([1,0])
+    p_ = [b_,k_]
+
+    # algebraic solution
+    sole = exp(-(b*t)/2)*((sin((sqrt(4-b**2)*t)/2)*(2*(dx0+x0*b)-x0*b))/sqrt(4-b**2)+x0*cos((sqrt(4-b**2)*t)/2))
+    sol = SXFunction([[t],[x0,dx0],[b,k]],[vertcat([sole,jacobian(sole,t)])])
+    sol.init()
+    sol.input(0).set(50)
+    sol.input(1).set(X0)
+    sol.input(2).set(p_)
+
 
     for Integrator in [CVodesIntegrator, IdasIntegrator]:
       integrator = Integrator(f)
@@ -121,7 +130,9 @@ class Integrationtests(casadiTestCase):
       integrator.init()
 
       integrator.input(INTEGRATOR_X0).set(X0)
+      integrator.input(INTEGRATOR_P).set(p_)
       integrator.fwdSeed(INTEGRATOR_X0).set([1,0])
+      integrator.fwdSeed(INTEGRATOR_P).set([0,0])
       integrator.evaluate(1,0)
       
       fwdSens_int = DMatrix(integrator.fwdSens(INTEGRATOR_XF))
@@ -131,21 +142,52 @@ class Integrationtests(casadiTestCase):
       sim=Simulator(integrator,ts)
       sim.init()
       sim.input(INTEGRATOR_X0).set(X0)
+      sim.input(INTEGRATOR_P).set(p_)
       sim.fwdSeed(INTEGRATOR_X0).set([1,0])
+      sim.fwdSeed(INTEGRATOR_P).set([0,0])
       sim.evaluate(1,0)
 
       fwdSens_sim = DMatrix(sim.fwdSens(INTEGRATOR_XF)[-1,:])
       
-      fwdSens_exact = sol(50)
+      sol.fwdSeed(1).set([1,0])
+      sol.fwdSeed(2).set([0,0])
+      sol.evaluate(1,0)
+      fwdSens_exact = sol.fwdSens()
       
       digits = 6
       if (Integrator is IdasIntegrator):
         digits = 2 
 
-      self.assertAlmostEqual(fwdSens_int[0],fwdSens_exact,digits,"Forward sensitivity")
-      self.assertAlmostEqual(fwdSens_sim[0],fwdSens_exact,digits,"Forward sensitivity")
-      self.assertAlmostEqual(fwdSens_int[1],fwdSens_sim[1],digits,"Forward sensitivity")
+      self.assertAlmostEqual(fwdSens_int[0],fwdSens_exact[0],digits,"Forward sensitivity")
+      self.assertAlmostEqual(fwdSens_int[1],fwdSens_exact[1],digits,"Forward sensitivity")
+      self.assertAlmostEqual(fwdSens_sim[0],fwdSens_exact[0],digits,"Forward sensitivity")
+      self.assertAlmostEqual(fwdSens_sim[1],fwdSens_exact[1],digits,"Forward sensitivity")
 
+      integrator.fwdSeed(INTEGRATOR_X0).set([0,0])
+      integrator.fwdSeed(INTEGRATOR_P).set([1,0])
+      integrator.evaluate(1,0)
+      
+      fwdSens_int = DMatrix(integrator.fwdSens(INTEGRATOR_XF))
+      
+      sim.fwdSeed(INTEGRATOR_X0).set([0,0])
+      sim.fwdSeed(INTEGRATOR_P).set([1,0])
+      sim.evaluate(1,0)
+
+      fwdSens_sim = DMatrix(sim.fwdSens(INTEGRATOR_XF)[-1,:])
+      
+      sol.fwdSeed(1).set([0,0])
+      sol.fwdSeed(2).set([1,0])
+      sol.evaluate(1,0)
+      fwdSens_exact = sol.fwdSens()
+      
+      digits = 6
+      if (Integrator is IdasIntegrator):
+        digits = 2 
+
+      self.assertAlmostEqual(fwdSens_int[0],fwdSens_exact[0], digits,"Forward sensitivity")
+      self.assertAlmostEqual(fwdSens_int[1],fwdSens_exact[1], digits,"Forward sensitivity")
+      self.assertAlmostEqual(fwdSens_sim[0],fwdSens_exact[0], digits,"Forward sensitivity")
+      self.assertAlmostEqual(fwdSens_sim[1],fwdSens_exact[1], digits,"Forward sensitivity")
 
         
     
