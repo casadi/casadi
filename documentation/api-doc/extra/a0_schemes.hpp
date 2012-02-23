@@ -14,19 +14,16 @@
 <tr><td>MAYER_P</td><td>Problem parameters (np x 1)</td></tr>
 </table>
 */
-/** \defgroup scheme_QPInput
+/** \defgroup scheme_ControlledDAEInput
 <table>
-<caption>Input scheme: CasADi::QPInput  (QP_NUM_IN = 9) </caption>
+<caption>Input scheme: CasADi::ControlledDAEInput  (CONTROL_DAE_NUM_IN = 6) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>QP_H</td><td>The square matrix H: sparse, (nx x nx). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.</td></tr>
-<tr><td>QP_G</td><td>The column vector G: dense, (nx x 1)</td></tr>
-<tr><td>QP_A</td><td>The matrix A: sparse, (nc x nx) - product with x must be dense.</td></tr>
-<tr><td>QP_LBA</td><td>dense, (nc x 1)</td></tr>
-<tr><td>QP_UBA</td><td>dense, (nc x 1)</td></tr>
-<tr><td>QP_LBX</td><td>dense, (nx x 1)</td></tr>
-<tr><td>QP_UBX</td><td>dense, (nx x 1)</td></tr>
-<tr><td>QP_X_INIT</td><td>dense, (nx x 1)</td></tr>
-<tr><td>QP_LAMBDA_INIT</td><td></td></tr>
+<tr><td>CONTROL_DAE_T</td><td>Time. (1-by-1)</td></tr>
+<tr><td>CONTROL_DAE_Y</td><td>State vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES</td></tr>
+<tr><td>CONTROL_DAE_P</td><td>Parameter vector (dimension np-by-1).</td></tr>
+<tr><td>CONTROL_DAE_U</td><td>Control vector (dimension nu-by-1).</td></tr>
+<tr><td>CONTROL_DAE_YDOT</td><td>State derivative vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES</td></tr>
+<tr><td>CONTROL_DAE_Y_MAJOR</td><td>State vector (dimension nx-by-1) at the last major time-step</td></tr>
 </table>
 */
 /** \defgroup scheme_ControlSimulatorInput
@@ -35,7 +32,7 @@
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>CONTROLSIMULATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
 <tr><td>CONTROLSIMULATOR_P</td><td>Parameters that are fixed over the entire horizon (dimension np-by-1)</td></tr>
-<tr><td>CONTROLSIMULATOR_V</td><td>Parameters that change over the integration intervals (dimension (ns-1)-by-nv)</td></tr>
+<tr><td>CONTROLSIMULATOR_U</td><td>Parameters that change over the integration intervals (dimension (ns-1)-by-nu)</td></tr>
 <tr><td>CONTROLSIMULATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) Only relevant for implicit integrators.</td></tr>
 </table>
 */
@@ -80,6 +77,21 @@
 <tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
 <tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
 <tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) Only relevant for implicit intergators. This input may be changed during an IDASIntegrator::evaluate()</td></tr>
+</table>
+*/
+/** \defgroup scheme_QPInput
+<table>
+<caption>Input scheme: CasADi::QPInput  (QP_NUM_IN = 9) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>QP_H</td><td>The square matrix H: sparse, (nx x nx). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.</td></tr>
+<tr><td>QP_G</td><td>The column vector G: dense, (nx x 1)</td></tr>
+<tr><td>QP_A</td><td>The matrix A: sparse, (nc x nx) - product with x must be dense.</td></tr>
+<tr><td>QP_LBA</td><td>dense, (nc x 1)</td></tr>
+<tr><td>QP_UBA</td><td>dense, (nc x 1)</td></tr>
+<tr><td>QP_LBX</td><td>dense, (nx x 1)</td></tr>
+<tr><td>QP_UBX</td><td>dense, (nx x 1)</td></tr>
+<tr><td>QP_X_INIT</td><td>dense, (nx x 1)</td></tr>
+<tr><td>QP_LAMBDA_INIT</td><td></td></tr>
 </table>
 */
 /** \defgroup scheme_ACADO_Output

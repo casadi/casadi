@@ -2699,6 +2699,64 @@ casadi_calculus.hpp ";
 sx_function_internal.hpp ";
 
 
+// File: structCasADi_1_1BinaryChecker.xml
+%feature("docstring") CasADi::BinaryChecker "
+
+Is the operation binary as opposed to unary.
+
+C++ includes: casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1BinaryChecker_3_01ADD_01_4.xml
+%feature("docstring") CasADi::BinaryChecker< ADD > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1BinaryChecker_3_01CONSTPOW_01_4.xml
+%feature("docstring") CasADi::BinaryChecker< CONSTPOW > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1BinaryChecker_3_01DIV_01_4.xml
+%feature("docstring") CasADi::BinaryChecker< DIV > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1BinaryChecker_3_01EQUALITY_01_4.xml
+%feature("docstring") CasADi::BinaryChecker< EQUALITY > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1BinaryChecker_3_01FMAX_01_4.xml
+%feature("docstring") CasADi::BinaryChecker< FMAX > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1BinaryChecker_3_01FMIN_01_4.xml
+%feature("docstring") CasADi::BinaryChecker< FMIN > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1BinaryChecker_3_01MUL_01_4.xml
+%feature("docstring") CasADi::BinaryChecker< MUL > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1BinaryChecker_3_01OP__PRINTME_01_4.xml
+%feature("docstring") CasADi::BinaryChecker< OP_PRINTME > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1BinaryChecker_3_01POW_01_4.xml
+%feature("docstring") CasADi::BinaryChecker< POW > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1BinaryChecker_3_01SUB_01_4.xml
+%feature("docstring") CasADi::BinaryChecker< SUB > " C++ includes:
+casadi_calculus.hpp ";
+
+
 // File: classCasADi_1_1BinaryOp.xml
 %feature("docstring") CasADi::BinaryOp "
 
@@ -2976,18 +3034,18 @@ Multiplication.
 C++ includes: casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1BinaryOperation_3_01POW_01_4.xml
-%feature("docstring") CasADi::BinaryOperation< POW > "
+// File: structCasADi_1_1BinaryOperation_3_01OP__PRINTME_01_4.xml
+%feature("docstring") CasADi::BinaryOperation< OP_PRINTME > "
 
-Power, defined only for x>=0.
+Identity operator with the side effect of printing.
 
 C++ includes: casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1BinaryOperation_3_01PRINTME_01_4.xml
-%feature("docstring") CasADi::BinaryOperation< PRINTME > "
+// File: structCasADi_1_1BinaryOperation_3_01POW_01_4.xml
+%feature("docstring") CasADi::BinaryOperation< POW > "
 
-Identity operator with the side effect of printing.
+Power, defined only for x>=0.
 
 C++ includes: casadi_calculus.hpp ";
 
@@ -3039,14 +3097,6 @@ check properties of a node ";
 Get value of a constant node. ";
 
 %feature("docstring")  CasADi::BinarySXNode::getIntValue "";
-
-%feature("docstring")  CasADi::BinarySXNode::BinarySXNode "
-
-Constructor, unary operation. ";
-
-%feature("docstring")  CasADi::BinarySXNode::BinarySXNode "
-
-Constructor, binary operation. ";
 
 %feature("docstring")  CasADi::BinarySXNode::~BinarySXNode "
 
@@ -3108,7 +3158,7 @@ casadi_limits.hpp ";
 %feature("docstring") CasADi::casadi_limits< SX > " C++ includes: sx.hpp ";
 
 
-// File: classCasADi_1_1casadi__math.xml
+// File: structCasADi_1_1casadi__math.xml
 %feature("docstring") CasADi::casadi_math "
 
 Easy access to all the functions for a particular type.
@@ -3116,7 +3166,7 @@ Easy access to all the functions for a particular type.
 C++ includes: casadi_math.hpp ";
 
 
-// File: classCasADi_1_1casadi__math_3_01int_01_4.xml
+// File: structCasADi_1_1casadi__math_3_01int_01_4.xml
 %feature("docstring") CasADi::casadi_math< int > "
 
 Specialize the class so that it can be used with integer type.
@@ -5785,10 +5835,43 @@ Check if the object has been initialized. ";
 Assert that the object has been initialized. ";
 
 
+// File: structCasADi_1_1CommChecker.xml
+%feature("docstring") CasADi::CommChecker "
+
+Is commutative.
+
+C++ includes: casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1CommChecker_3_01CONSTPOW_01_4.xml
+%feature("docstring") CasADi::CommChecker< CONSTPOW > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1CommChecker_3_01DIV_01_4.xml
+%feature("docstring") CasADi::CommChecker< DIV > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1CommChecker_3_01OP__PRINTME_01_4.xml
+%feature("docstring") CasADi::CommChecker< OP_PRINTME > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1CommChecker_3_01POW_01_4.xml
+%feature("docstring") CasADi::CommChecker< POW > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1CommChecker_3_01SUB_01_4.xml
+%feature("docstring") CasADi::CommChecker< SUB > " C++ includes:
+casadi_calculus.hpp ";
+
+
 // File: classCasADi_1_1ConstantSXNode.xml
 %feature("docstring") CasADi::ConstantSXNode "
 
-Reprsents a constant SX.
+Represents a constant SX.
 
 Joel Andersson
 
@@ -5867,11 +5950,29 @@ print ";
 // File: classCasADi_1_1ControlSimulator.xml
 %feature("docstring") CasADi::ControlSimulator "
 
+Piecewise Simulation class A ControlSimulator can be seen as a chain of
+Simulators whereby some parameters change from one Simulator to the next.
+
 Piecewise Simulation class A \"piecewise simulator\" can be seen as a chain
 of Simulators whereby some parameters change from one Simulator to the next.
 
-These changing parameters can typically be intrepreted as \"controls\" in
+These changing parameters can typically be interpreted as \"controls\" in
 the context of dynamic optimization.
+
+We discriminate between the following time steps: Major time-steps. These
+are the time steps provided by the supplied grid. Controls are constant
+inbetween major time-steps  Minor time-steps. These are time steps linearly
+interpolated from one major time-step to the next. The option 'nf' regulates
+how many minor time-steps are taken.  Integration time-steps. Time steps
+that the supplied integrator might choose to integrate the continous
+dynamics. They are not important what ControlSimulator is concerned.
+
+np Number of parameters nu Number of controls ns The number of major grid
+points, as supplied in the constructor nf The number of minor grid points
+per coarse grid point interval
+
+Joris Gillis  These changing parameters can typically be intrepreted as
+\"controls\" in the context of dynamic optimization.
 
 The ControlSimulator starts from a suplied continuous dynamics function,
 dae.
@@ -6202,6 +6303,68 @@ If there are other references to the object, then make a deep copy of it and
 point to this new object. ";
 
 %feature("docstring")  CasADi::ControlSimulator::makeUnique "";
+
+%feature("docstring")  CasADi::ControlSimulator::ControlSimulator "
+
+Default constructor. ";
+
+%feature("docstring")  CasADi::ControlSimulator::ControlSimulator "
+
+Creates a piecewise simulator.
+
+Parameters:
+-----------
+
+ffcn:  Continuous time dynamics, an CasADi::FX with the folowing mapping:
+>Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 1)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| DAE_RES                            | Right hand side of ODE. Should     |
+|                                    | have same amount of non-zeros as   |
+|                                    | DAEInput:DAE_Y                     |
++------------------------------------+------------------------------------+
+
+output_fcn:  output function which maps ControlledDAEInput to n outputs.
+
+grid:  the major time grid >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| DAE_T                              | Time. (1-by-1)                     |
++------------------------------------+------------------------------------+
+| DAE_Y                              | State vector (matrix). Should have |
+|                                    | same amount of non-zeros as        |
+|                                    | DAEOutput:DAE_RES                  |
++------------------------------------+------------------------------------+
+| DAE_P                              | Parameter vector (matrix).         |
++------------------------------------+------------------------------------+
+| DAE_YDOT                           | State derivative vector (matrix).  |
+|                                    | Should have same amount of non-    |
+|                                    | zeros as DAEOutput:DAE_RES         |
++------------------------------------+------------------------------------+
+";
+
+%feature("docstring")  CasADi::ControlSimulator::ControlSimulator "
+
+Output function equal to the state. ";
+
+%feature("docstring")  CasADi::ControlSimulator::checkNode "
+
+Check if the node is pointing to the right type of object. ";
+
+%feature("docstring")  CasADi::ControlSimulator::getMinorT "
+
+Get the (minor) time grid The length is (ns-1)*nf + 1 ";
+
+%feature("docstring")  CasADi::ControlSimulator::getMinorU "
+
+Get the controls, sampled on the fine timescale. Number of rows is
+(ns-1)*nf. ";
+
+%feature("docstring")  CasADi::ControlSimulator::getMajorIndex "
+
+Get the index i such that gridminor[i] == gridmajor. ";
 
 %feature("docstring")  CasADi::ControlSimulator::ControlSimulator "
 
@@ -6724,6 +6887,42 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 
 C++ includes: control_simulator_internal.hpp ";
+
+%feature("docstring")
+CasADi::ControlSimulatorInternal::ControlSimulatorInternal "
+
+Constructor. ";
+
+%feature("docstring")
+CasADi::ControlSimulatorInternal::~ControlSimulatorInternal "
+
+Destructor. ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::clone "
+
+Clone. ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::init "
+
+initialize ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::evaluate "
+
+Integrate. ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization.
+";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::getVFine "
+
+Get the parameters that change on a coarse time scale, sampled on the fine
+timescale. ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::getCoarseIndex "
+
+Get the index i such that gridfine[i] == gridcoarse. ";
 
 %feature("docstring")
 CasADi::ControlSimulatorInternal::ControlSimulatorInternal "
@@ -12952,6 +13151,122 @@ Check if the object has been initialized. ";
 Assert that the object has been initialized. ";
 
 
+// File: structCasADi_1_1F00Checker.xml
+%feature("docstring") CasADi::F00Checker "
+
+If evaluated with both arguments zero, is the result zero?
+
+C++ includes: casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F00Checker_3_01ADD_01_4.xml
+%feature("docstring") CasADi::F00Checker< ADD > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F00Checker_3_01FMAX_01_4.xml
+%feature("docstring") CasADi::F00Checker< FMAX > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F00Checker_3_01FMIN_01_4.xml
+%feature("docstring") CasADi::F00Checker< FMIN > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F00Checker_3_01SUB_01_4.xml
+%feature("docstring") CasADi::F00Checker< SUB > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F0XChecker.xml
+%feature("docstring") CasADi::F0XChecker "
+
+If evaluated with the first argument zero, is the result zero?
+
+C++ includes: casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F0XChecker_3_01ASIN_01_4.xml
+%feature("docstring") CasADi::F0XChecker< ASIN > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F0XChecker_3_01CEIL_01_4.xml
+%feature("docstring") CasADi::F0XChecker< CEIL > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F0XChecker_3_01DIV_01_4.xml
+%feature("docstring") CasADi::F0XChecker< DIV > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F0XChecker_3_01ERF_01_4.xml
+%feature("docstring") CasADi::F0XChecker< ERF > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F0XChecker_3_01ERFINV_01_4.xml
+%feature("docstring") CasADi::F0XChecker< ERFINV > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F0XChecker_3_01FABS_01_4.xml
+%feature("docstring") CasADi::F0XChecker< FABS > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F0XChecker_3_01FLOOR_01_4.xml
+%feature("docstring") CasADi::F0XChecker< FLOOR > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F0XChecker_3_01MUL_01_4.xml
+%feature("docstring") CasADi::F0XChecker< MUL > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F0XChecker_3_01NEG_01_4.xml
+%feature("docstring") CasADi::F0XChecker< NEG > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F0XChecker_3_01OP__ASSIGN_01_4.xml
+%feature("docstring") CasADi::F0XChecker< OP_ASSIGN > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F0XChecker_3_01SIGN_01_4.xml
+%feature("docstring") CasADi::F0XChecker< SIGN > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F0XChecker_3_01SIN_01_4.xml
+%feature("docstring") CasADi::F0XChecker< SIN > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F0XChecker_3_01SINH_01_4.xml
+%feature("docstring") CasADi::F0XChecker< SINH > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F0XChecker_3_01SQRT_01_4.xml
+%feature("docstring") CasADi::F0XChecker< SQRT > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F0XChecker_3_01TAN_01_4.xml
+%feature("docstring") CasADi::F0XChecker< TAN > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F0XChecker_3_01TANH_01_4.xml
+%feature("docstring") CasADi::F0XChecker< TANH > " C++ includes:
+casadi_calculus.hpp ";
+
+
 // File: classCasADi_1_1OptimalControl_1_1FlatOCP.xml
 %feature("docstring") CasADi::OptimalControl::FlatOCP "
 
@@ -13150,7 +13465,7 @@ Algebraic states defined by an algebraic equation (length == alg().size())
 
 All states, differential and algebraic (includes x, xd and xa) ";
 
-%feature("docstring")  CasADi::OptimalControl::FlatOCP::q "
+%feature("docstring")  CasADi::OptimalControl::FlatOCP::xq "
 
 Quadrature states (length == quad().size()) ";
 
@@ -13270,6 +13585,17 @@ Eliminate interdependencies in the dependent equations. ";
 
 Eliminate dependent equations, by default sparing the dependent variables
 with upper or lower bounds. ";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCP::eliminateLagrangeTerms "
+
+Eliminate Lagrange terms from the objective function and make them
+quadrature states. ";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCP::eliminateQuadratureStates "
+
+Eliminate quadrature states and turn them into ODE states. ";
 
 %feature("docstring")  CasADi::OptimalControl::FlatOCP::sortDAE "
 
@@ -13605,6 +13931,17 @@ Eliminate interdependencies in the dependent equations. ";
 CasADi::OptimalControl::FlatOCPInternal::eliminateDependent "
 
 Eliminate dependent equations. ";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCPInternal::eliminateLagrangeTerms "
+
+Eliminate Lagrange terms from the objective function and make them
+quadrature states. ";
+
+%feature("docstring")
+CasADi::OptimalControl::FlatOCPInternal::eliminateQuadratureStates "
+
+Eliminate quadrature states and turn them into ODE states. ";
 
 %feature("docstring")  CasADi::OptimalControl::FlatOCPInternal::sortDAE "
 
@@ -14479,6 +14816,19 @@ Return a string with a representation (for SWIG) ";
 %feature("docstring")  CasADi::FX::getDescription "
 
 Return a string with a destription (for SWIG) ";
+
+
+// File: structCasADi_1_1FX0Checker.xml
+%feature("docstring") CasADi::FX0Checker "
+
+If evaluated with the second argument zero, is the result zero?
+
+C++ includes: casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1FX0Checker_3_01MUL_01_4.xml
+%feature("docstring") CasADi::FX0Checker< MUL > " C++ includes:
+casadi_calculus.hpp ";
 
 
 // File: classCasADi_1_1FXInternal.xml
@@ -16900,14 +17250,38 @@ Joel Andersson
 |              |              |              | get          | ternal       |
 |              |              |              | consistent   |              |
 |              |              |              | initial      |              |
+|              |              |              | conditions.  |              |
+|              |              |              | This only    |              |
+|              |              |              | works for    |              |
+|              |              |              | semi-        |              |
+|              |              |              | explicit     |              |
+|              |              |              | index-one    |              |
+|              |              |              | systems.     |              |
+|              |              |              | Else, you    |              |
+|              |              |              | must provide |              |
+|              |              |              | consistent   |              |
+|              |              |              | initial      |              |
 |              |              |              | conditions   |              |
+|              |              |              | yourself.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | calc_icB     | OT_BOOLEAN   | false        | use          | CasADi::Sund |
 |              |              |              | IDACalcIC to | ials::IdasIn |
 |              |              |              | get          | ternal       |
 |              |              |              | consistent   |              |
 |              |              |              | initial      |              |
+|              |              |              | conditions.  |              |
+|              |              |              | This only    |              |
+|              |              |              | works for    |              |
+|              |              |              | semi-        |              |
+|              |              |              | explicit     |              |
+|              |              |              | index-one    |              |
+|              |              |              | systems.     |              |
+|              |              |              | Else, you    |              |
+|              |              |              | must provide |              |
+|              |              |              | consistent   |              |
+|              |              |              | initial      |              |
 |              |              |              | conditions   |              |
+|              |              |              | yourself.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | cj_scaling   | OT_BOOLEAN   | false        | IDAS scaling | CasADi::Sund |
 |              |              |              | on cj for    | ials::IdasIn |
@@ -17079,7 +17453,7 @@ Joel Andersson
 |              | TOR          | )            | be activated | ternal   Cas |
 |              |              |              | (correctInit | ADi::Sundial |
 |              |              |              | ialCondition | s::IdasInter |
-|              |              |              | s|res)       | nal          |
+|              |              |              | s|res|resS)  | nal          |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -17228,6 +17602,8 @@ Joel Andersson
 | correctInitialConditions | CasADi::Sundials::IdasInternal |
 +--------------------------+--------------------------------+
 | res                      | CasADi::Sundials::IdasInternal |
++--------------------------+--------------------------------+
+| resS                     | CasADi::Sundials::IdasInternal |
 +--------------------------+--------------------------------+
 
 C++ includes: idas_integrator.hpp ";
@@ -17813,14 +18189,38 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 |              |              |              | get          | ternal       |
 |              |              |              | consistent   |              |
 |              |              |              | initial      |              |
+|              |              |              | conditions.  |              |
+|              |              |              | This only    |              |
+|              |              |              | works for    |              |
+|              |              |              | semi-        |              |
+|              |              |              | explicit     |              |
+|              |              |              | index-one    |              |
+|              |              |              | systems.     |              |
+|              |              |              | Else, you    |              |
+|              |              |              | must provide |              |
+|              |              |              | consistent   |              |
+|              |              |              | initial      |              |
 |              |              |              | conditions   |              |
+|              |              |              | yourself.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | calc_icB     | OT_BOOLEAN   | false        | use          | CasADi::Sund |
 |              |              |              | IDACalcIC to | ials::IdasIn |
 |              |              |              | get          | ternal       |
 |              |              |              | consistent   |              |
 |              |              |              | initial      |              |
+|              |              |              | conditions.  |              |
+|              |              |              | This only    |              |
+|              |              |              | works for    |              |
+|              |              |              | semi-        |              |
+|              |              |              | explicit     |              |
+|              |              |              | index-one    |              |
+|              |              |              | systems.     |              |
+|              |              |              | Else, you    |              |
+|              |              |              | must provide |              |
+|              |              |              | consistent   |              |
+|              |              |              | initial      |              |
 |              |              |              | conditions   |              |
+|              |              |              | yourself.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | cj_scaling   | OT_BOOLEAN   | false        | IDAS scaling | CasADi::Sund |
 |              |              |              | on cj for    | ials::IdasIn |
@@ -17992,7 +18392,7 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 |              | TOR          | )            | be activated | ternal   Cas |
 |              |              |              | (correctInit | ADi::Sundial |
 |              |              |              | ialCondition | s::IdasInter |
-|              |              |              | s|res)       | nal          |
+|              |              |              | s|res|resS)  | nal          |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -18141,6 +18541,8 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 | correctInitialConditions | CasADi::Sundials::IdasInternal |
 +--------------------------+--------------------------------+
 | res                      | CasADi::Sundials::IdasInternal |
++--------------------------+--------------------------------+
+| resS                     | CasADi::Sundials::IdasInternal |
 +--------------------------+--------------------------------+
 
 C++ includes: idas_internal.hpp ";
@@ -19827,9 +20229,9 @@ evaluate function ";
 
 %feature("docstring")  CasADi::IntegerSXNode::isMinusInf "";
 
-%feature("docstring")  CasADi::IntegerSXNode::~IntegerSXNode "";
+%feature("docstring")  CasADi::IntegerSXNode::~IntegerSXNode "
 
-%feature("docstring")  CasADi::IntegerSXNode::IntegerSXNode "";
+Destructor. ";
 
 %feature("docstring")  CasADi::IntegerSXNode::isInteger "
 
@@ -42167,6 +42569,36 @@ evaluate symbolically, MX type (overloaded) ";
 
 %feature("docstring")  CasADi::MXFunction::eval "
 
+Evaluate symbolically with with directional derivatives, SX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The first
+boolean argument allows the second argument to the functions to be used as
+an input instead of output, assuming it is already known and the second
+boolean arguments allows constants to be eliminated during the evaluations
+(as the treatment of constants in CasADi will get more efficient, this will
+become unnecessary). ";
+
+%feature("docstring")  CasADi::MXFunction::eval "
+
+Evaluate symbolically with with directional derivatives, MX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The first
+boolean argument allows the second argument to the functions to be used as
+an input instead of output, assuming it is already known and the second
+boolean arguments allows constants to be eliminated during the evaluations
+(as the treatment of constants in CasADi will get more efficient, this will
+become unnecessary). ";
+
+%feature("docstring")  CasADi::MXFunction::eval "
+
 evaluate symbolically (pass and get non-zero entries) LEGACY - REMOVE ";
 
 %feature("docstring")  CasADi::MXFunction::eval "
@@ -42182,9 +42614,39 @@ entries) LEGACY - REMOVE ";
 
 evaluate symbolically, MX type (unambiguous) ";
 
+%feature("docstring")  CasADi::MXFunction::evalMX "
+
+Evaluate symbolically with with directional derivatives, MX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The first
+boolean argument allows the second argument to the functions to be used as
+an input instead of output, assuming it is already known and the second
+boolean arguments allows constants to be eliminated during the evaluations
+(as the treatment of constants in CasADi will get more efficient, this will
+become unnecessary). ";
+
 %feature("docstring")  CasADi::MXFunction::evalSX "
 
 evaluate symbolically, SX type (unambiguous) ";
+
+%feature("docstring")  CasADi::MXFunction::evalSX "
+
+Evaluate symbolically with with directional derivatives, SX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The first
+boolean argument allows the second argument to the functions to be used as
+an input instead of output, assuming it is already known and the second
+boolean arguments allows constants to be eliminated during the evaluations
+(as the treatment of constants in CasADi will get more efficient, this will
+become unnecessary). ";
 
 %feature("docstring")  CasADi::MXFunction::getNumInputs "
 
@@ -52148,9 +52610,9 @@ Get the value. ";
 
 %feature("docstring")  CasADi::RealtypeSXNode::isMinusInf "";
 
-%feature("docstring")  CasADi::RealtypeSXNode::~RealtypeSXNode "";
+%feature("docstring")  CasADi::RealtypeSXNode::~RealtypeSXNode "
 
-%feature("docstring")  CasADi::RealtypeSXNode::RealtypeSXNode "";
+Destructor. ";
 
 %feature("docstring")  CasADi::RealtypeSXNode::isConstant "
 
@@ -55190,6 +55652,39 @@ A slice. ";
 %feature("docstring")  CasADi::Slice::getAll "
 
 Get a vector of indices. ";
+
+
+// File: structCasADi_1_1SmoothChecker.xml
+%feature("docstring") CasADi::SmoothChecker "
+
+Smoothness (by default true)
+
+C++ includes: casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1SmoothChecker_3_01CEIL_01_4.xml
+%feature("docstring") CasADi::SmoothChecker< CEIL > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1SmoothChecker_3_01EQUALITY_01_4.xml
+%feature("docstring") CasADi::SmoothChecker< EQUALITY > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1SmoothChecker_3_01FLOOR_01_4.xml
+%feature("docstring") CasADi::SmoothChecker< FLOOR > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1SmoothChecker_3_01SIGN_01_4.xml
+%feature("docstring") CasADi::SmoothChecker< SIGN > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1SmoothChecker_3_01STEP_01_4.xml
+%feature("docstring") CasADi::SmoothChecker< STEP > " C++ includes:
+casadi_calculus.hpp ";
 
 
 // File: classCasADi_1_1SparseSparseOp.xml
@@ -58554,6 +59049,36 @@ evaluate symbolically, MX type (overloaded) ";
 
 %feature("docstring")  CasADi::SXFunction::eval "
 
+Evaluate symbolically with with directional derivatives, SX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The first
+boolean argument allows the second argument to the functions to be used as
+an input instead of output, assuming it is already known and the second
+boolean arguments allows constants to be eliminated during the evaluations
+(as the treatment of constants in CasADi will get more efficient, this will
+become unnecessary). ";
+
+%feature("docstring")  CasADi::SXFunction::eval "
+
+Evaluate symbolically with with directional derivatives, MX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The first
+boolean argument allows the second argument to the functions to be used as
+an input instead of output, assuming it is already known and the second
+boolean arguments allows constants to be eliminated during the evaluations
+(as the treatment of constants in CasADi will get more efficient, this will
+become unnecessary). ";
+
+%feature("docstring")  CasADi::SXFunction::eval "
+
 evaluate symbolically (pass and get non-zero entries) LEGACY - REMOVE ";
 
 %feature("docstring")  CasADi::SXFunction::eval "
@@ -58569,9 +59094,39 @@ entries) LEGACY - REMOVE ";
 
 evaluate symbolically, MX type (unambiguous) ";
 
+%feature("docstring")  CasADi::SXFunction::evalMX "
+
+Evaluate symbolically with with directional derivatives, MX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The first
+boolean argument allows the second argument to the functions to be used as
+an input instead of output, assuming it is already known and the second
+boolean arguments allows constants to be eliminated during the evaluations
+(as the treatment of constants in CasADi will get more efficient, this will
+become unnecessary). ";
+
 %feature("docstring")  CasADi::SXFunction::evalSX "
 
 evaluate symbolically, SX type (unambiguous) ";
+
+%feature("docstring")  CasADi::SXFunction::evalSX "
+
+Evaluate symbolically with with directional derivatives, SX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The first
+boolean argument allows the second argument to the functions to be used as
+an input instead of output, assuming it is already known and the second
+boolean arguments allows constants to be eliminated during the evaluations
+(as the treatment of constants in CasADi will get more efficient, this will
+become unnecessary). ";
 
 %feature("docstring")  CasADi::SXFunction::getNumInputs "
 
@@ -59911,14 +60466,6 @@ Arcus sine.
 C++ includes: casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1UnaryOperation_3_01ASSIGN_01_4.xml
-%feature("docstring") CasADi::UnaryOperation< ASSIGN > "
-
-Simple assignment.
-
-C++ includes: casadi_calculus.hpp ";
-
-
 // File: structCasADi_1_1UnaryOperation_3_01ATAN_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< ATAN > "
 
@@ -60011,6 +60558,14 @@ C++ includes: casadi_calculus.hpp ";
 %feature("docstring") CasADi::UnaryOperation< NEG > "
 
 Negation.
+
+C++ includes: casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1UnaryOperation_3_01OP__ASSIGN_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< OP_ASSIGN > "
+
+Simple assignment.
 
 C++ includes: casadi_calculus.hpp ";
 
@@ -63309,6 +63864,66 @@ evaluate symbolically, MX type (unambiguous) ";
 
 evaluate symbolically, SX type (unambiguous) ";
 
+%feature("docstring")  CasADi::XFunction::evalSX "
+
+Evaluate symbolically with with directional derivatives, SX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The first
+boolean argument allows the second argument to the functions to be used as
+an input instead of output, assuming it is already known and the second
+boolean arguments allows constants to be eliminated during the evaluations
+(as the treatment of constants in CasADi will get more efficient, this will
+become unnecessary). ";
+
+%feature("docstring")  CasADi::XFunction::evalMX "
+
+Evaluate symbolically with with directional derivatives, MX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The first
+boolean argument allows the second argument to the functions to be used as
+an input instead of output, assuming it is already known and the second
+boolean arguments allows constants to be eliminated during the evaluations
+(as the treatment of constants in CasADi will get more efficient, this will
+become unnecessary). ";
+
+%feature("docstring")  CasADi::XFunction::eval "
+
+Evaluate symbolically with with directional derivatives, SX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The first
+boolean argument allows the second argument to the functions to be used as
+an input instead of output, assuming it is already known and the second
+boolean arguments allows constants to be eliminated during the evaluations
+(as the treatment of constants in CasADi will get more efficient, this will
+become unnecessary). ";
+
+%feature("docstring")  CasADi::XFunction::eval "
+
+Evaluate symbolically with with directional derivatives, MX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The first
+boolean argument allows the second argument to the functions to be used as
+an input instead of output, assuming it is already known and the second
+boolean arguments allows constants to be eliminated during the evaluations
+(as the treatment of constants in CasADi will get more efficient, this will
+become unnecessary). ";
+
 %feature("docstring")  CasADi::XFunction::eval "
 
 evaluate symbolically (pass and get non-zero entries) LEGACY - REMOVE ";
@@ -64792,6 +65407,8 @@ Uses CasADi::SXFunction::jac ";
 
 %feature("docstring")  CasADi::GSL::square "";
 
+%feature("docstring")  CasADi::GSL::operation_checker "";
+
 %feature("docstring")  CasADi::GSL::reportConstraints "
 
 Prints out a human readable report about possible constraint violations -
@@ -64882,6 +65499,10 @@ Transpose of a matrix. ";
 
 Matrix product of two matrices. ";
 
+%feature("docstring")  CasADi::GSL::mul "
+
+Matrix product of n matrices. ";
+
 %feature("docstring")  CasADi::GSL::isConstant "
 
 check if the matrix is constant (note that false negative answers are
@@ -64929,11 +65550,11 @@ make a vector Reshapes/vectorizes the Matrix<T> such that the shape becomes
 (expr.numel(),1). Columns are stacked on top of each other. Same as
 reshape(trans(expr), expr.numel(),1)
 
-a b c d
+a b  c d
 
 turns into
 
-a c b d ";
+a  c  b  d ";
 
 %feature("docstring")  CasADi::GSL::flatten "
 
@@ -64941,15 +65562,17 @@ make a vector Flattens the Matrix<T> such that the shape becomes
 (expr.numel(),1). Transposed rows are stacked on top of each other. Same as
 reshape(expr, expr.numel(),1)
 
-a b c d
+a b  c d
 
 turns into
 
-a b c d ";
+a  b  c  d ";
 
 %feature("docstring")  CasADi::GSL::vecNZ "
 
 Returns a flattened version of the Matrix, preserving only nonzeros. ";
+
+%feature("docstring")  CasADi::GSL::blockcat "";
 
 %feature("docstring")  CasADi::GSL::vertcat "";
 
@@ -65253,6 +65876,10 @@ Take the infinity-norm of a MX Internally represented by NormInf. ";
 %feature("docstring")  CasADi::GSL::mul "
 
 Take the matrix product of 2 MX objects. ";
+
+%feature("docstring")  CasADi::GSL::mul "
+
+Take the matrix product of n MX objects. ";
 
 %feature("docstring")  CasADi::GSL::isZero "
 
@@ -66495,6 +67122,18 @@ h:  internal expressions which the user may wish to inspect ";
 
 
 // File: control__simulator__internal_8hpp.xml
+
+
+// File: control__simulator__internal__new_8cpp.xml
+
+
+// File: control__simulator__internal__new_8hpp.xml
+
+
+// File: control__simulator__new_8cpp.xml
+
+
+// File: control__simulator__new_8hpp.xml
 
 
 // File: controlsimulator_8hpp.xml

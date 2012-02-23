@@ -3093,7 +3093,6 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>nf</td><td>OT_INTEGER</td><td>1</td><td>Number of fine grained integration steps.</td><td>CasADi::ControlSimulatorInternal</td></tr>
-<tr><td>np</td><td>OT_INTEGER</td><td>GenericType()</td><td>The number of parameters. If this option is not set, all of input(INTEGRATOR_P) is considered static parameters. The remainder of nv = input(INTEGRATOR_P) is considered to be varying parameters.</td><td>CasADi::ControlSimulatorInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
@@ -3119,7 +3118,6 @@
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>nf</td><td>OT_INTEGER</td><td>1</td><td>Number of fine grained integration steps.</td><td>CasADi::ControlSimulatorInternal</td></tr>
-<tr><td>np</td><td>OT_INTEGER</td><td>GenericType()</td><td>The number of parameters. If this option is not set, all of input(INTEGRATOR_P) is considered static parameters. The remainder of nv = input(INTEGRATOR_P) is considered to be varying parameters.</td><td>CasADi::ControlSimulatorInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
