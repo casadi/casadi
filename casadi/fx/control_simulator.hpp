@@ -27,14 +27,32 @@
 
 namespace CasADi{
 
+/// Input arguments of an ODE/DAE function
+enum ControlledDAEInput{
+  /** Time. (1-by-1) */
+  CONTROL_DAE_T,
+  /** State vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES */
+  CONTROL_DAE_Y,
+  /** Parameter vector (dimension np-by-1). */
+  CONTROL_DAE_P,
+  /** Control vector (dimension nu-by-1). */
+  CONTROL_DAE_U,
+  /** State derivative vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES */
+  CONTROL_DAE_YDOT,
+  /** State vector (dimension nx-by-1) at the last major time-step */
+  CONTROL_DAE_Y_MAJOR,
+  /** Number of arguments. */
+  CONTROL_DAE_NUM_IN
+};
+
 /// Input arguments of an integrator
 enum ControlSimulatorInput{
   /** Differential or algebraic state at t0  (dimension nx-by-1) */
   CONTROLSIMULATOR_X0, 
   /** Parameters that are fixed over the entire horizon  (dimension np-by-1) */
   CONTROLSIMULATOR_P, 
-  /** Parameters that change over the integration intervals (dimension (ns-1)-by-nv) */
-  CONTROLSIMULATOR_V, 
+  /** Parameters that change over the integration intervals (dimension (ns-1)-by-nu) */
+  CONTROLSIMULATOR_U, 
   /** State derivative at t0  (dimension nx-by-1)
   * Only relevant for implicit integrators.
   */
@@ -46,33 +64,20 @@ enum ControlSimulatorInput{
 class ControlSimulatorInternal;
 
 /** \brief Piecewise Simulation class
-  A "piecewise simulator" can be seen as a chain of Simulators whereby some parameters change from one Simulator to the next.
+  A ControlSimulator can be seen as a chain of Simulators whereby some parameters change from one Simulator to the next.
   
-  These changing parameters can typically be intrepreted as "controls" in the context of dynamic optimization.
+  These changing parameters can typically be interpreted as "controls" in the context of dynamic optimization.
   
-  The ControlSimulator starts from a suplied continuous dynamics function, dae.
   
-  We discriminate between the following tim steps:
-   * Coarse time-steps. These are the time steps provided by the supplied grid.
-   * Fine time-steps. These are time steps linearly interpolated from one coarse time-step to the next. The option 'nf' regulates how many fine time-steps are taken.
-   * Integration time-steps. Time steps that the supplied integrator might choose to integrate the continous dynamics. They are not important what ControlSimulator is concerned.
-  
-  We divide the set of parameters dae.input(DAE) into static and non-static, i.e. parameters that are fixed over the entire time horizon and parameters that change at each coarse time steps. This division is carried out by an integer scalar, option 'np', that denotes the number of static parameters.
-  
-  _______________________
-  |                     |
-  |  np static params   |
-  |_____________________|   ns in total
-  |                     |   
-  |  nv changing params |
-  |_____________________|
-  
+  We discriminate between the following time steps:
+   * Major time-steps. These are the time steps provided by the supplied grid. Controls are constant inbetween major time-steps\n
+   * Minor time-steps. These are time steps linearly interpolated from one major time-step to the next. The option 'nf' regulates how many minor time-steps are taken.\n
+   * Integration time-steps. Time steps that the supplied integrator might choose to integrate the continous dynamics. They are not important what ControlSimulator is concerned.\n
 
-  np  Number of parameters that do not change over the entire intergation time
-  nv  Number of parameters that change during the integration time, but not on a fine level
-  ns  The number of (coarse) grid points, as supplied in the constructor
-  nf  The number of fine grid points per coarse grid point interval
-  
+  np  Number of parameters
+  nu  Number of controls
+  ns  The number of major grid points, as supplied in the constructor
+  nf  The number of minor grid points per coarse grid point interval
   
   \author Joris Gillis 
   \date 2011
@@ -86,14 +91,12 @@ public:
   
     /** \brief Creates a piecewise simulator
     * \param ffcn Continuous time dynamics, an CasADi::FX with the folowing mapping:
-    * \copydoc scheme_DAEInput
+    * \copydoc scheme_ControlledDAEInput
     * \copydoc scheme_DAEOutput
-    * Important notes:
-    *  - In the above table, INTEGRATOR_P input is not really of shape (np x 1), but rather ( (np+nv) x 1 ).
-    *  - The first np entries of the INTEGRATOR_P input are interpreted as parameters that are fixed on the whole domain. The remainder are interpreted as parameters that change at each coarse time-step. 
     *
-    * \param output_fcn output function which maps to n outputs.
-    * \param grid  the coarse time grid
+    *
+    * \param output_fcn output function which maps ControlledDAEInput to n outputs.
+    * \param grid  the major time grid
     * \copydoc scheme_DAEInput
     * 
     */
@@ -111,20 +114,20 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
   
-  /** Get the (fine-scaled) time grid
+  /** Get the (minor) time grid
   *  The length is (ns-1)*nf + 1
   */
- 	std::vector<double> getGrid() const; 
+ 	std::vector<double> getMinorT() const; 
  	
-  /** \brief Get the parameters that change on a coarse time scale, sampled on the fine timescale.
+  /** \brief Get the controls, sampled on the fine timescale.
   * Number of rows is (ns-1)*nf
   */
- 	Matrix<double> getVFine() const; 
+ 	Matrix<double> getMinorU() const; 
  	
  	
- 	/** \brief Get the index i such that gridfine[i] == gridcoarse 
+ 	/** \brief Get the index i such that gridminor[i] == gridmajor 
   */
- 	std::vector< int > getCoarseIndex() const; 
+ 	std::vector< int > getMajorIndex() const; 
  	
 };
   

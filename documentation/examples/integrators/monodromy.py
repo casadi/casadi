@@ -18,21 +18,23 @@ a3 = SX("a3")
 a5 = SX("a5")
 mu1 = SX("mu1")
 mu3 = SX("mu3")
-f = SX("f")
+ff = SX("f")
 
 tf = 40
 
-params = [w0,a3,a5,mu1,mu3,f]
-rhs    = [x2,(-(-w0**2 *x1 + a3*x1**3 + a5*x1**5) - (2 *mu1 *x2 + mu3 * x2**3))/100]
+params = [w0,a3,a5,mu1,mu3,ff]
+rhs    = [x2,(-(-w0**2 *x1 + a3*x1**3 + a5*x1**5) - (2 *mu1 *x2 + mu3 * x2**3))/100+ff]
 
 f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_Y: x, DAE_P: params, DAE_YDOT: dx},[rhs])
 f.init()
-
+cf=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_T: t, CONTROL_DAE_Y: x, CONTROL_DAE_P: [w0,a3,a5,mu1,mu3], CONTROL_DAE_YDOT: dx, CONTROL_DAE_U: [ff]},[rhs])
+cf.init()
 
 integrator = CVodesIntegrator(f)
 integrator.setOption("tf",tf)
-integrator.setOption("reltol",1e-12)
-integrator.setOption("abstol",1e-12)
+integrator.setOption("reltol",1e-10)
+integrator.setOption("abstol",1e-10)
+integrator.setOption("fsens_err_con",True)
 integrator.init()
 
 N = 500
@@ -97,17 +99,19 @@ print jacsim.output()[-3*2:,:]
 
 Js = jacsim.output()[-2:,:]
 
+
+e = max(fabs(Js - Ji))/max(fabs(Js))
+
 # Assert that the two methods yield identical results
-assert(sqrt(sumAll((Js - Ji)**2)) < 1e-4)
+assert(e < 1e-6)
 
 #! Monodromy matrix at various instances - Jacobian of ControlSimulator
 #! ====================================================================
 
-csim = ControlSimulator(f,linspace(0,tf,50))
-csim.setOption("np",5)
+csim = ControlSimulator(cf,linspace(0,tf,50))
 csim.setOption("nf",10)
 csim.setOption("integrator",CVodesIntegrator)
-csim.setOption("integrator_options",{"reltol":1e-12,"abstol":1e-12})
+csim.setOption("integrator_options",{"reltol":1e-11,"abstol":1e-11, "fsens_err_con": True})
 csim.init()
 
 jaccsim = Jacobian(csim,CONTROLSIMULATOR_X0,0)
@@ -115,7 +119,7 @@ jaccsim.setOption("ad_mode","forward")
 jaccsim.init()
 jaccsim.input(CONTROLSIMULATOR_P).set(params_[:-1])
 jaccsim.input(CONTROLSIMULATOR_X0).set(x0)
-jaccsim.input(CONTROLSIMULATOR_V).setAll(0)
+jaccsim.input(CONTROLSIMULATOR_U).setAll(0)
 jaccsim.evaluate()
 
 #! For each of the 500 intervals, we have a 2-by-2 matrix as output
@@ -125,8 +129,10 @@ print "jaccsim.output().shape = ", jaccsim.output().shape
 print jaccsim.output()[-3*2:,:]
 Jcs = jaccsim.output()[-2:,:]
 
+e = max(fabs(Jcs - Js))/max(fabs(Js))
+
 # Assert that the two methods yield identical results
-assert(sqrt(sumAll((Jcs - Js)**2)) < 1e-4)
+assert(e < 1e-5)
 
 #! Intuitive interpretation
 #! ========================

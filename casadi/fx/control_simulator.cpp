@@ -49,16 +49,16 @@ bool ControlSimulator::checkNode() const{
   return dynamic_cast<const ControlSimulatorInternal*>(get())!=0;
 }
 
-std::vector<double> ControlSimulator::getGrid() const { 
+std::vector<double> ControlSimulator::getMinorT() const { 
  	  casadi_assert(checkNode()); 
  	  return dynamic_cast<const ControlSimulatorInternal*>(get())->grid_; 
 } 
 
-Matrix<double> ControlSimulator::getVFine() const {
+Matrix<double> ControlSimulator::getMinorU() const {
  	  return dynamic_cast<const ControlSimulatorInternal*>(get())->getVFine(); 
 }
 
-std::vector<int> ControlSimulator::getCoarseIndex() const {
+std::vector<int> ControlSimulator::getMajorIndex() const {
  	  return dynamic_cast<const ControlSimulatorInternal*>(get())->getCoarseIndex(); 
 }
 

@@ -102,6 +102,9 @@ class Integrationtests(casadiTestCase):
     rhs = vertcat([v - dx, ( -  b*v - k*x) - dv ])
     f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_YDOT: [dx,dv], DAE_Y: [x,v], DAE_P: [b,k]},[rhs])
     f.init()
+    
+    cf=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_T: t, CONTROL_DAE_YDOT: [dx,dv], CONTROL_DAE_Y: [x,v], CONTROL_DAE_P: [b,k]},[rhs])
+    cf.init()
 
     x0 = SX("x0")
     dx0 = SX("dx0")
@@ -149,6 +152,17 @@ class Integrationtests(casadiTestCase):
 
       fwdSens_sim = DMatrix(sim.fwdSens(INTEGRATOR_XF)[-1,:])
       
+      csim = ControlSimulator(cf,ts)
+      csim.setOption("integrator",Integrator)
+      csim.setOption("integrator_options",{"fsens_abstol": 1e-12, "fsens_reltol": 1e-12, "fsens_err_con": True})
+      csim.init()
+      csim.input(CONTROLSIMULATOR_X0).set(X0)
+      csim.input(CONTROLSIMULATOR_P).set(p_)
+      csim.fwdSeed(CONTROLSIMULATOR_X0).set([1,0])
+      csim.fwdSeed(CONTROLSIMULATOR_P).set([0,0])
+      csim.evaluate(1,0)
+      fwdSens_csim = DMatrix(sim.fwdSens(INTEGRATOR_XF)[-1,:])
+      
       sol.fwdSeed(1).set([1,0])
       sol.fwdSeed(2).set([0,0])
       sol.evaluate(1,0)
@@ -162,7 +176,9 @@ class Integrationtests(casadiTestCase):
       self.assertAlmostEqual(fwdSens_int[1],fwdSens_exact[1],digits,"Forward sensitivity")
       self.assertAlmostEqual(fwdSens_sim[0],fwdSens_exact[0],digits,"Forward sensitivity")
       self.assertAlmostEqual(fwdSens_sim[1],fwdSens_exact[1],digits,"Forward sensitivity")
-
+      self.assertAlmostEqual(fwdSens_csim[0],fwdSens_exact[0],digits,"Forward sensitivity")
+      self.assertAlmostEqual(fwdSens_csim[1],fwdSens_exact[1],digits,"Forward sensitivity")
+      
       integrator.fwdSeed(INTEGRATOR_X0).set([0,0])
       integrator.fwdSeed(INTEGRATOR_P).set([1,0])
       integrator.evaluate(1,0)
@@ -174,6 +190,11 @@ class Integrationtests(casadiTestCase):
       sim.evaluate(1,0)
 
       fwdSens_sim = DMatrix(sim.fwdSens(INTEGRATOR_XF)[-1,:])
+
+      csim.fwdSeed(CONTROLSIMULATOR_X0).set([0,0])
+      csim.fwdSeed(CONTROLSIMULATOR_P).set([1,0])
+      csim.evaluate(1,0)
+      fwdSens_csim = DMatrix(sim.fwdSens(INTEGRATOR_XF)[-1,:])
       
       sol.fwdSeed(1).set([0,0])
       sol.fwdSeed(2).set([1,0])
@@ -188,7 +209,8 @@ class Integrationtests(casadiTestCase):
       self.assertAlmostEqual(fwdSens_int[1],fwdSens_exact[1], digits,"Forward sensitivity")
       self.assertAlmostEqual(fwdSens_sim[0],fwdSens_exact[0], digits,"Forward sensitivity")
       self.assertAlmostEqual(fwdSens_sim[1],fwdSens_exact[1], digits,"Forward sensitivity")
-
+      self.assertAlmostEqual(fwdSens_csim[0],fwdSens_exact[0], digits,"Forward sensitivity")
+      self.assertAlmostEqual(fwdSens_csim[1],fwdSens_exact[1], digits,"Forward sensitivity")
         
     
   def test_parameterize_time(self):

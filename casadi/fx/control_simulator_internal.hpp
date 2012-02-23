@@ -64,6 +64,7 @@ public:
 
   Integrator integrator_;
   FX dae_;
+  FX control_dae_;
   Simulator simulator_;
   
   FX output_fcn_;
@@ -79,12 +80,15 @@ public:
   
   /** The local non-dimensional time grid */
   std::vector<double> gridlocal_;
+
+  /** \brief Number of states */
+  int ny_;
   
   /** \brief Number of static parameters */
   int np_;
   
   /** \brief Number of variable parameters */
-  int nv_;
+  int nu_;
   
   /** \brief Number of coarse time steps */
   int ns_;
