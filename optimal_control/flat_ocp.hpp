@@ -55,6 +55,12 @@ class FlatOCPInternal;
   initial equations:        0 = initial(t,x,\dot{x},xd,xa,u,p)
   \endverbatim 
 
+  <H3>Objective function terms:  </H3>
+  \verbatim
+  Mayer terms:          \sum{mterm_k}
+  Lagrange terms:       \sum{\integral{mterm}}
+  \endverbatim
+
   Note that when parsed, all dynamic states, differential and algebraic, end up in the category "x" 
   and all dynamic equations end up in the implicit category "dae". At a later state, the DAE can be
   reformulated, for example in semi-explicit form, possibly in addition to a set of quadrature states.
@@ -171,25 +177,9 @@ class FlatOCP : public OptionsFunctionality{
     std::vector<SX>& initial();
     //@}
 
-    /** @name Optimization
-    *  Formulate the dynamic optimization problem. Note that the variable bounds are located inside
-       the respective variable.
+    /** @name Time points
     */
     //@{
-    /// Mayer terms in the objective
-    std::vector<SX>& mterm();
-    
-    /// Lagrange terms in the objective
-    std::vector<SX>& lterm();
-
-    /// Path constraint functions
-    std::vector<SX>& path();
-    
-    /// Path constraint functions upper bounds
-    std::vector<double>& path_min();
-
-    /// Path constraint functions upper bounds
-    std::vector<double>& path_max();
 
     /// Interval start time
     double t0() const;
@@ -215,12 +205,36 @@ class FlatOCP : public OptionsFunctionality{
     /// Set interval final time as free or fixed
     void set_tf_free(bool free);
     //@}
+
+    /** @name Objective function terms
+    *  Terms in the objective function.
+    */
+    //@{
+    /// Mayer terms in the objective (point terms)
+    std::vector<SX>& mterm();
+    
+    /// Lagrange terms in the objective (integral terms)
+    std::vector<SX>& lterm();
+    //@}
+
+    /** @name Constraints of the optimal control problem
+    */
+    //@{
+
+    /// Path constraint functions
+    std::vector<SX>& path();
+    
+    /// Path constraint functions upper bounds
+    std::vector<double>& path_min();
+
+    /// Path constraint functions upper bounds
+    std::vector<double>& path_max();
+    //@}
     
     /** @name Manipulation
     *  Reformulate the dynamic optimization problem.
     */
     //@{
-    
     /// Eliminate interdependencies in the dependent equations
     void eliminateInterdependencies();
     
