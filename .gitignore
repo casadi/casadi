@@ -4,6 +4,8 @@ documentation/api-doc/XML
 documentation/api-doc/latex
 documentation/tutorials/cpp/casadi-doc
 documentation/tutorials/cpp/casadi-doc.pdf
+documentation/users_guide/casadi-users_guide
+documentation/examples/_temp*
 *.so
 octave-core
 *.edited
@@ -16,6 +18,7 @@ octave-core
 *.pdf
 *.xml
 *.out
+*.orig
 documentation/examples/ctemplate/compiler.sh
 documentation/examples/ctemplate/linker.sh
 
