@@ -45,7 +45,13 @@ std::vector<int> Slice::getAll(int len) const{
   casadi_assert_message(start>=0, "Slice (start=" << start << ", stop=" << stop << ", step=" << step_ << ") out of bounds with start<0.");
   casadi_assert_message(stop>=start,"Slice (start=" << start << ", stop=" << stop << ", step=" << step_ << ") inconsistent. Expecting stop>= start.");
   
-  return range(start,stop,step_,len);
+  
+  if (step_>0) {
+    return range(start,stop,step_,len);
+  } else { // Allow for pythonesque ::-1
+    return range(stop-1,start-1,step_,len);
+  }
+
 }
 
 IndexSet::IndexSet(int i) : v_(1,i){
