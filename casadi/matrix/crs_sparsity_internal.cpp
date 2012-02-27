@@ -2120,19 +2120,28 @@ vector<int> CRSSparsityInternal::getNZ(vector<int> ii, vector<int> jj) const{
     casadi_error("Slicing [ii,jj] out of bounds. Your jj contains " << *std::min_element(jj.begin(),jj.end()) << " up to " << *std::max_element(jj.begin(),jj.end()) << ", which is outside of the matrix shape " << dimString() << ".");
   }
   
+  std::vector<int> jj_sorted;
+  std::vector<int> jj_sorted_index;
   
-  vector<int> ret;
-  for(vector<int>::const_iterator it=ii.begin(); it!=ii.end(); ++it){
-    int el=rowind_[*it];
-    for(vector<int>::const_iterator jt=jj.begin(); jt!=jj.end(); ++jt){
+  sort(jj, jj_sorted, jj_sorted_index);
+  
+  vector<int> ret(ii.size()*jj.size());
+  
+  int stride = jj.size();
+  
+  for(int i=0;i<ii.size();++i){
+    int it = ii[i];
+    int el=rowind_[it];
+    for(int j=0;j<jj_sorted.size();++j){
+      int jt=jj_sorted[j];
       // Continue to the non-zero element
-      for(; el<rowind_[*it+1] && col_[el]<*jt; ++el){}
-      
+      for(; el<rowind_[it+1] && col_[el]<jt; ++el){}
       // Add the non-zero element, if there was an element in the location exists
-      if(el<rowind_[*it+1] && col_[el]== *jt)
-        ret.push_back(el);
+      if(el<rowind_[it+1] && col_[el]== jt) {
+        ret[i*stride+jj_sorted_index[j]] = el;
+      }
       else
-        ret.push_back(-1);
+        ret[i*stride+jj_sorted_index[j]] = -1;
     }
   }
   return ret;
@@ -2146,7 +2155,7 @@ CRSSparsity CRSSparsityInternal::getSub(const vector<int>& ii, const vector<int>
     casadi_error("Slicing [ii,jj] out of bounds. Your jj contains " << *std::min_element(jj.begin(),jj.end()) << " up to " << *std::max_element(jj.begin(),jj.end()) << ", which is outside of the matrix shape " << dimString() << ".");
   }
   
-  
+  // NOTE: can be made more memory-efficient by making getNZ an iterator
   // Get non-zeros
   vector<int> kk = getNZ(ii,jj);
 

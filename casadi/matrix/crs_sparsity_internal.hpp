@@ -188,7 +188,10 @@ class CRSSparsityInternal : public SharedObjectNode{
     /// Reserve space
     void reserve(int nnz, int nrow);
     
-    /// Get a submatrix - does bounds checking
+    /** \brief Get a submatrix
+    * Does bounds checking
+    * ii and jj are not required to be monotonous
+    */
     CRSSparsity getSub(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
 
     /// Get the index of an existing non-zero element

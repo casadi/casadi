@@ -140,6 +140,16 @@ class Matrixtests(casadiTestCase):
       y[-12:-9,2] = 0
     self.assertRaises(RuntimeError,test)
 
+  def test_nonmonotonous_indexing(self):
+    self.message("non-monotonous indexing")
+    # Regression test for #354
+    A = DMatrix([[1,2,3],[4,5,6],[7,8,9]])
+    B = A[[0,2,1],0]
+    self.checkarray(DMatrix([1,7,4]),B,"non-monotonous")
+    
+    B = A[0,[0,2,1]]
+    self.checkarray(DMatrix([1,3,2]).T,B,"non-monotonous")
+    
   def test_vecNZcat(self):
     self.message("vecNZcat")
     A = DMatrix(2,3)

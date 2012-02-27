@@ -146,6 +146,15 @@ namespace CasADi{
   template<typename T>
   const T* getPtr(const std::vector<T> &v);
   
+  /** \brief Sort the data in a vector
+  * 
+  * \param[in]  values the vector that needs sorting
+  * \param[out] sorted_values the sorted vector
+  * \param[out] indices The indices into 'values' that cast it into 'sorted_values'
+  **/
+  template<typename T>
+  void sort(const std::vector<T> &values,std::vector<T> &sorted_values,std::vector<int> &indices);
+  
 } // namespace CasADi
   
 // Implementations  
@@ -319,6 +328,30 @@ namespace CasADi{
       return 0;
     else
       return &v.front();
+  }
+  
+  template<typename T>
+  void sort(const std::vector<T> &values, std::vector<T> &sorted_values, std::vector<int> &indices) {
+  
+    // Create a list of (value,index) pairs
+    std::vector< std::pair<T,int> > pvalues(values.size());
+    
+    for (int i=0;i<values.size();++i) {
+      pvalues[i].first  = values[i];
+      pvalues[i].second = i;
+    }
+    
+    // Sort this list by the values
+    std::sort(pvalues.begin(),pvalues.end());
+    
+    // Read out the results
+    sorted_values.resize(values.size());
+    indices.resize(values.size());
+    for (int i=0;i<values.size();++i) {
+      sorted_values[i] = pvalues[i].first;
+      indices[i]       =  pvalues[i].second;
+    }
+    
   }
 
 } // namespace CasADi
