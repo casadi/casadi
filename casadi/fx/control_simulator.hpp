@@ -77,7 +77,7 @@ class ControlSimulatorInternal;
   np  Number of parameters
   nu  Number of controls
   ns  The number of major grid points, as supplied in the constructor
-  nf  The number of minor grid points per coarse grid point interval
+  nf  The number of minor grid points per major interval
   
   \author Joris Gillis 
   \date 2011
@@ -97,7 +97,7 @@ public:
     *
     * \param output_fcn output function which maps ControlledDAEInput to n outputs.
     * \param grid  the major time grid
-    * \copydoc scheme_DAEInput
+    * \copydoc scheme_ControlledDAEInput
     * 
     */
   ControlSimulator(const FX& dae, const FX& output_fcn, const std::vector<double>& grid);
