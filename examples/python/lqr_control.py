@@ -1,4 +1,5 @@
 from pylab import *
+from numpy import *
 from casadi import *
 from casadi.tools import Variables
 import scipy.linalg
