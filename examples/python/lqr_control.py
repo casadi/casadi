@@ -274,10 +274,10 @@ dae.init()
 integrator = CVodesIntegrator(dae)
 integrator.setOption("reltol",1e-16)
 integrator.init()
-integrator.reset(0,0)
 # Start from P = identity matrix
 u = DMatrix.eye(ns)
 makeDense(u)
+integrator.reset(0,0)
 integrator.setInput(flatten(u),INTEGRATOR_X0)
 integrator.integrate(0)
 
@@ -295,6 +295,11 @@ for i in range(1,40):
 P_ = integrator.output().reshape((ns,ns))
 print "P=", P_
 
+[D,V] = linalg.eig(P_)
+assert (min(real(D))>0)
+print "(positive definite)"
+
+
 # Check that it does indeed satisfy the ricatti equation
 dae.setInput(integrator.output(),DAE_Y)
 dae.evaluate()
@@ -308,6 +313,38 @@ print "feedback matrix= ", K
 # Inspect closed-loop eigenvalues
 [D,V] = linalg.eig(A-mul(B,K))
 print "Open-loop eigenvalues: ", D
+
+# Check what happens if we integrate the Riccati equation forward in time
+dae = SXFunction({'NUM':DAE_NUM_IN, DAE_Y: flatten(P)},[-ric])
+dae.init()
+
+integrator = CVodesIntegrator(dae)
+integrator.setOption("reltol",1e-16)
+integrator.init()
+integrator.setInput(flatten(P_),INTEGRATOR_X0)
+integrator.input(INTEGRATOR_X0)[0] += 1e-9 # Put a tiny perturbation
+integrator.reset(0,0)
+integrator.integrate(0)
+
+for i in range(1,10):
+  x0 = DMatrix(integrator.output())
+  integrator.integrate(0.4*i)
+  xe = DMatrix(integrator.output())
+  e = max(fabs(xe-x0))
+  print "Forward riccati simulation %d; error: %.2e" % (i, e)
+
+# We notice divergence. Why?
+stabric = SXFunction([P],[jacobian(-ric,P)])
+stabric.init()
+stabric.setInput(P_)
+stabric.evaluate()
+
+S = stabric.output()
+
+[D,V] = linalg.eig(S)
+
+print "Forward riccati eigenvalues = ", D
+
 
 # Simulation of the closed-loop system:
 #  continuous control action, various continuous references

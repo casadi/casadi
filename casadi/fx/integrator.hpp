@@ -109,7 +109,6 @@ class IntegratorInternal;
   The class does not specify how the function F above should be represented, nor the method used for the integration, but assumes that it steps forward in time 
   (ruling out collocation in particular). The actual form of the ODE/DAE is defined in the derived classes.
 
-
   \author Joel Andersson
   \date 2010
 */
@@ -133,7 +132,7 @@ public:
   /// Access functions of the node
   const IntegratorInternal* operator->() const;
   
-  /// Reset the solver and bring the time back to t0 
+  /// Reset the solver and bring the time back to t0 and state back to INTEGRATOR_X0
   void reset(int fsens_order=0, int asens_order=0);
 
   /// Integrate until a specified time point 
