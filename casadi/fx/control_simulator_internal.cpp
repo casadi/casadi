@@ -34,7 +34,7 @@ using namespace std;
 namespace CasADi{
 
   
-ControlSimulatorInternal::ControlSimulatorInternal(const FX& control_dae, const FX& output_fcn, const vector<double>& gridc) : control_dae_(control_dae), output_fcn_(output_fcn), gridc_(gridc){
+ControlSimulatorInternal::ControlSimulatorInternal(const FX& control_dae, const FX& output_fcn, const vector<double>& gridc) : control_dae_(control_dae), orig_output_fcn_(output_fcn), gridc_(gridc){
   setOption("name","unnamed controlsimulator");
   addOption("nf",OT_INTEGER,1,"Number of fine grained integration steps.");
   addOption("integrator",               OT_INTEGRATOR, GenericType(), "An integrator creator function");
@@ -123,7 +123,7 @@ void ControlSimulatorInternal::init(){
   integrator_.init();
   
   // Generate an output function if there is none (returns the whole state)
-  if(output_fcn_.isNull()){
+  if(orig_output_fcn_.isNull()){
     
     SXMatrix t    = ssym("t",control_dae_.input(CONTROL_DAE_T).sparsity());
     SXMatrix x    = ssym("x",control_dae_.input(CONTROL_DAE_Y).sparsity());
@@ -147,6 +147,8 @@ void ControlSimulatorInternal::init(){
     // Create the output function
     output_fcn_ = SXFunction(arg,out);
     output_fcn_.setOption("name","output function");
+  } else {
+    output_fcn_ = orig_output_fcn_;
   }
 
   // Initialize the output function

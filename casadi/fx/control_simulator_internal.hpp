@@ -67,6 +67,10 @@ public:
   FX control_dae_;
   Simulator simulator_;
   
+  // original output function
+  FX orig_output_fcn_;
+  
+  // adapted output function
   FX output_fcn_;
   
   /** \brief The hart of this class, a casadi of simulator calls */
