@@ -38,7 +38,10 @@ namespace CasADi{
 
 IntegratorInternal::IntegratorInternal(const FX& f, const FX& q) : f_(f), q_(q){
   // set default options
-  setOption("name","unnamed_integrator"); // name of the function  
+  setOption("name","unnamed_integrator"); // name of the function 
+  
+  addOption("print_stats",                 OT_BOOLEAN,  false, "Print out statistics after integration");
+  
   // IVP solution
   addOption("max_num_steps",               OT_INTEGER, 10000); // maximum number of steps
   addOption("reltol",                      OT_REAL,    1e-6); // relative tolerence for the IVP solution
@@ -128,7 +131,7 @@ void IntegratorInternal::evaluate(int nfdir, int nadir){
   }
   
   // Print statistics
-  if(verbose()) printStats(std::cout);
+  if(getOption("print_stats")) printStats(std::cout);
 }
 
 void IntegratorInternal::init(){

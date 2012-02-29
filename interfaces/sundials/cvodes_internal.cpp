@@ -45,7 +45,7 @@ CVodesInternal::CVodesInternal(const FX& f, const FX& q) : IntegratorInternal(f,
   addOption("nonlinear_solver_iteration",  OT_STRING,  "newton","","newton|functional");
   addOption("fsens_all_at_once",           OT_BOOLEAN,true); // calculate all right hand sides of the sensitivity equations at once
   addOption("disable_internal_warnings",   OT_BOOLEAN,false, "Disable CVodes internal warning messages");
-  addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "integrate|res|resB|resQB|reset", true);
+  addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "res|resB|resQB|reset", true);
     
   mem_ = 0;
 
@@ -224,6 +224,7 @@ void CVodesInternal::init(){
       // Pass to CVodes
       flag = CVDlsSetDenseJacFn(mem_, djac_wrapper);
       if(flag!=CV_SUCCESS) cvodes_error("CVDlsSetDenseJacFn",flag);
+      
     }
   } else if(getOption("linear_solver")=="banded") {
     // Banded jacobian
@@ -636,9 +637,10 @@ void CVodesInternal::integrate(double t_out){
     }
   }
 
-   if(monitored("integrate")){
-      this->printStats(cout);
-   }
+  
+  // Print statistics
+  if(getOption("print_stats")) printStats(std::cout);
+  
   log("CVODES::integrate end");
 }
 
@@ -696,8 +698,24 @@ void CVodesInternal::printStats(std::ostream &stream) const{
     flag = CVodeGetIntegratorStats(mem_, &nsteps, &nfevals,&nlinsetups, &netfails, &qlast, &qcur,&hinused, &hlast, &hcur, &tcur);
     if(flag!=CV_SUCCESS) cvodes_error("CVodeGetIntegratorStats",flag);
 
+
+    long nfevalsLS_spils=0, nfevalsLS_dls=0, nfevalsBP=0;
+    
+    flag = flag = CVSpilsGetNumRhsEvals(mem_, &nfevalsLS_spils);
+    if(flag!=CV_SUCCESS) cvodes_error("CVSpilsGetNumRhsEvals",flag);
+    
+    flag = CVDlsGetNumRhsEvals(mem_, &nfevalsLS_dls);
+    if(flag!=CV_SUCCESS) cvodes_error("CVDlsGetNumRhsEvals",flag);
+    
+    //flag = CVBandPrecGetNumRhsEvals(mem_, &nfevalsBP);
+    //if(flag!=CV_SUCCESS) cvodes_error("CVBandPrecGetNumRhsEvals",flag);
+    
     stream << "number of steps taken by CVODES: " << nsteps << std::endl;
-    stream << "number of calls to the user's f function: " << nfevals << std::endl;
+    stream << "number of calls to the user's f function: " << nfevals + nfevalsLS_spils + nfevalsLS_dls << std::endl;
+    stream << "   main solver                      : " << nfevals << std::endl;
+    stream << "   finite diff (SPILS linear solver): " << nfevalsLS_spils << std::endl;
+    stream << "   finite diff (DLS linear solver)  : " << nfevalsLS_dls << std::endl;
+    //stream << "   finite diff (preconditionar)     : " << nfevalsBP << std::endl;
     stream << "number of calls made to the linear solver setup function: " << nlinsetups << std::endl;
     stream << "number of error test failures: " << netfails << std::endl;
     stream << "method order used on the last internal step: " << qlast << std::endl;

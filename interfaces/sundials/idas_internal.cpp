@@ -906,6 +906,10 @@ void IdasInternal::integrate(double t_out){
       copyNV(yS_[i],yPS_[i],yQS_[i],fwdSens(INTEGRATOR_XF,i),fwdSens(INTEGRATOR_XPF,i));
     }
   }
+    
+  // Print statistics
+  if(getOption("print_stats")) printStats(std::cout);
+  
   log("IdasInternal::integrate","end");
 }
 
@@ -996,7 +1000,7 @@ void IdasInternal::printStats(std::ostream &stream) const{
     //  if(flag!=IDA_SUCCESS) idas_error("IDAGetNumResEvalsSens",flag);
     //}
     
-    long nrevalsLS_spils, nrevalsLS_dls;
+    long nrevalsLS_spils=0, nrevalsLS_dls=0;
     
     flag = IDASpilsGetNumResEvals(mem_, &nrevalsLS_spils);
     if(flag!=IDA_SUCCESS) idas_error("IDASpilsGetNumResEvals",flag);
@@ -1006,10 +1010,11 @@ void IdasInternal::printStats(std::ostream &stream) const{
     if(flag!=IDA_SUCCESS) idas_error("IDADlsGetNumResEvals",flag);
     
     stream << "number of steps taken by IDAS: " << nsteps << std::endl;
-    stream << "number of calls to the user's res function: " << nfevals << std::endl;
+    stream << "number of calls to the user's res function: " << nfevals + nrevalsLS_spils + nrevalsLS_dls << std::endl;
+    stream << "      main solver                      : " << nfevals << std::endl;
     //stream << "number of calls to the user's res function for finite difference of the sensitivity residuals: " << nfevalsS << std::endl;
-    stream << "number of calls to the user's res function for finite difference (SPILS linear solver): "<< nrevalsLS_spils << std::endl;
-    stream << "number of calls to the user's res function for finite difference (DLS linear solver): "<< nrevalsLS_dls << std::endl;
+    stream << "      finite diff (SPILS linear solver): " << nrevalsLS_spils << std::endl;
+    stream << "      finite diff (DLS linear solver)  : " << nrevalsLS_dls << std::endl;
     stream << "number of calls made to the linear solver setup function: " << nlinsetups << std::endl;
     stream << "number of error test failures: " << netfails << std::endl;
     stream << "method order used on the last internal step: " << qlast << std::endl;
