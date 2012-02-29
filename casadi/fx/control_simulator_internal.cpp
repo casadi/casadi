@@ -49,6 +49,8 @@ ControlSimulatorInternal::~ControlSimulatorInternal(){
 void ControlSimulatorInternal::init(){
   if (!control_dae_.isInit()) control_dae_.init();
   
+  casadi_assert_message(!gridc_.empty(),"The supplied time grid must not be empty.");
+    
   casadi_assert_message(isIncreasing(gridc_),"The supplied time grid must be strictly increasing. Notably, you cannot have a time instance repeating."); 
 
   if (control_dae_.getNumInputs()==DAE_NUM_IN) {
