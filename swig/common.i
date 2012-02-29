@@ -154,17 +154,44 @@ _object = _copyableObject
 %}
 #endif
 
+%{
+#include "casadi/casadi_options.hpp" 
+%}
+%include "casadi/casadi_options.hpp"
+
+%{
+#define START \
+  if (CasADi::CasadiOptions::catch_errors_python){ \
+  try {
+  
+#define STOP \
+  } catch (const std::exception& e) { \
+  SWIG_exception(SWIG_RuntimeError, e.what()); \
+  } catch (const char* e) { \
+    SWIG_exception(SWIG_RuntimeError, e); \
+  } \
+} else
+%}
+
 // Exceptions handling
 %include "exception.i"
 %exception {
-try {
-  $action
-  } catch (const std::exception& e) {
-  SWIG_exception(SWIG_RuntimeError, e.what());
-  } catch (const char* e) { // depreciated!!
-    SWIG_exception(SWIG_RuntimeError, e);
+  START $action STOP { $action }
+}
+
+// Python sometimes takes an approach to not check, but just try.
+// It expects a python error to be thrown.
+%exception __int__ {
+ try {
+    $action
+  } catch (const std::exception& e) { \
+  SWIG_exception(SWIG_RuntimeError, e.what()); \
+  } catch (const char* e) { \
+    SWIG_exception(SWIG_RuntimeError, e); \
   }
 }
+
+
 
 #ifdef SWIGPYTHON
 #ifndef WITH_NUMPY
@@ -190,6 +217,7 @@ import_array();
 %}
 #endif // WITH_NUMPY
 #endif // SWIGPYTHON
+
 
 #define memberbinopsr(Type,uname) \
 Type __r##uname##__(const Type& b) const{ return b.__##uname##__(*$self);}
