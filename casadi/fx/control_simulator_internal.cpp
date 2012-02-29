@@ -39,6 +39,7 @@ ControlSimulatorInternal::ControlSimulatorInternal(const FX& control_dae, const 
   addOption("nf",OT_INTEGER,1,"Number of minor grained integration steps per major interval. nf>0 must hold.");
   addOption("integrator",               OT_INTEGRATOR, GenericType(), "An integrator creator function");
   addOption("integrator_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the integrator");
+  addOption("simulator_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the simulator");
 }
   
 ControlSimulatorInternal::~ControlSimulatorInternal(){
@@ -48,6 +49,7 @@ ControlSimulatorInternal::~ControlSimulatorInternal(){
 void ControlSimulatorInternal::init(){
   if (!control_dae_.isInit()) control_dae_.init();
   
+  casadi_assert_message(isIncreasing(gridc_),"The supplied time grid must be strictly increasing. Notably, you cannot have a time instance repeating."); 
 
   if (control_dae_.getNumInputs()==DAE_NUM_IN) {
     vector<MX> control_dae_in_(CONTROL_DAE_NUM_IN);
@@ -195,6 +197,9 @@ void ControlSimulatorInternal::init(){
   
   // Create the simulator
   simulator_ = Simulator(integrator_,parameterizeTimeOutput(output_fcn_),gridlocal_);
+  if(hasSetOption("simulator_options")){
+    simulator_.setOption(getOption("simulator_options"));
+  }
   simulator_.init();
   
   // Allocate inputs

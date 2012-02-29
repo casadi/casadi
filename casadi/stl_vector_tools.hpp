@@ -43,6 +43,7 @@
 
 namespace std{
 
+#ifndef SWIG
   /// Enables flushing an STL vector to a stream (prints representation)
   template<typename T>
   ostream& operator<<(ostream &stream, const vector<T> &v);
@@ -50,6 +51,7 @@ namespace std{
   /// Enables flushing an STL pair to a stream (prints representation)
   template<typename T1, typename T2>
   ostream& operator<<(ostream &stream, const pair<T1,T2> &p);
+#endif //SWIG
   
 } // namespace std
 
@@ -74,7 +76,6 @@ namespace CasADi{
   * \return list [0,1,2...stop-1]
   */
   std::vector<int> range(int stop);
-  #endif // SWIG
   
   /// Print representation
   template<typename T>
@@ -83,7 +84,8 @@ namespace CasADi{
   /// Print description
   template<typename T>
   void print(const std::vector<T> &v, std::ostream &stream=std::cout);
-
+  #endif // SWIG
+  
   /// Check if for each element of v holds: v_i < upper
   template<typename T>
   bool inBounds(const std::vector<T> &v, int upper);
@@ -92,6 +94,31 @@ namespace CasADi{
   template<typename T>
   bool inBounds(const std::vector<T> &v, int lower, int upper);
   
+  /// Check if the vector is strictly increasing
+  template<typename T>
+  bool isIncreasing(const std::vector<T> &v);
+  
+  /// Check if the vector is strictly decreasing
+  template<typename T>
+  bool isDecreasing(const std::vector<T> &v);
+  
+  /// Check if the vector is non-increasing
+  template<typename T>
+  bool isNonIncreasing(const std::vector<T> &v);
+  
+  /// Check if the vector is non-decreasing
+  template<typename T>
+  bool isNonDecreasing(const std::vector<T> &v);
+  
+  /// Check if the vector is monotone
+  template<typename T>
+  bool isMonotone(const std::vector<T> &v);
+
+  /// Check if the vector is strictly monotone
+  template<typename T>
+  bool isStrictlyMonotone(const std::vector<T> &v);
+  
+#ifndef SWIG
   /// Print representation to string
   template<typename T>
   std::string getRepresentation(const std::vector<T> &v);
@@ -99,7 +126,8 @@ namespace CasADi{
   /// Print description to string
   template<typename T>
   std::string getDescription(const std::vector<T> &v);
-
+#endif //SWIG
+  
   /// Print vector, matlab style
   template<typename T>
   void write_matlab(std::ostream &stream, const std::vector<T> &v);
@@ -116,6 +144,7 @@ namespace CasADi{
   template<typename T>
   void read_matlab(std::ifstream &file, std::vector<std::vector<T> > &v);
 
+  #ifndef SWIG
   /// Matlab's linspace
   template<typename T, typename F, typename L>
   void linspace(std::vector<T> &v, const F& first, const L& last);
@@ -154,14 +183,12 @@ namespace CasADi{
   **/
   template<typename T>
   void sort(const std::vector<T> &values,std::vector<T> &sorted_values,std::vector<int> &indices);
+  #endif //SWIG
   
 } // namespace CasADi
-  
-// Implementations  
-  
 
-
-
+// Implementations
+#ifndef SWIG
 namespace std{
 
   /// Enables flushing an STL vector to a stream (prints representation)
@@ -176,7 +203,6 @@ namespace std{
     stream << "(" << p.first << "," << p.second << ")";
     return stream;
   }
-
   
 } // namespace std
 
@@ -225,6 +251,60 @@ namespace CasADi{
     if (max >= upper) return false;
     int min = *std::min_element(v.begin(),v.end());
     return (min >= lower);
+  }
+  
+  template<typename T>
+  bool isIncreasing(const std::vector<T> &v) {
+    if (v.size()==0) return true;
+    T el = v[0];
+    for (int i=1;i<v.size();++i) {
+      if (!(v[i] > el)) return false;
+      el = v[i];
+    }
+    return el==el; // nan -> false
+  }
+  
+  template<typename T>
+  bool isDecreasing(const std::vector<T> &v) {
+    if (v.size()==0) return true;
+    T el = v[0];
+    for (int i=1;i<v.size();++i) {
+      if (!(v[i] < el)) return false;
+      el = v[i];
+    }
+    return el==el; // nan -> false
+  }
+  
+  template<typename T>
+  bool isNonIncreasing(const std::vector<T> &v) {
+    if (v.size()==0) return true;
+    T el = v[0];
+    for (int i=1;i<v.size();++i) {
+      if (!(v[i] <= el)) return false;
+      el = v[i];
+    }
+    return el==el; // nan -> false
+  }
+  
+  template<typename T>
+  bool isNonDecreasing(const std::vector<T> &v) {
+    if (v.size()==0) return true;
+    T el = v[0];
+    for (int i=1;i<v.size();++i) {
+      if (!(v[i] >= el)) return false;
+      el = v[i];
+    }
+    return el==el; // nan -> false
+  }
+  
+  template<typename T>
+  bool isMonotone(const std::vector<T> &v) {
+    return isNonDecreasing(v) || isNonIncreasing(v);
+  }
+  
+  template<typename T>
+  bool isStrictlyMonotone(const std::vector<T> &v) {
+    return isDecreasing(v) || isIncreasing(v);
   }
 
   template<typename T>
@@ -356,6 +436,23 @@ namespace CasADi{
 
 } // namespace CasADi
 
+#endif // SWIG
 
+#ifdef SWIG
+
+// map the template name to the instantiated name
+#define VTT_INST(T,function_name) \
+%template(function_name) CasADi::function_name<T>;
+
+// Define template instanciations
+#define VECTOR_TOOLS_TEMPLATES(T) \
+VTT_INST(T,isIncreasing) \
+VTT_INST(T,isDecreasing) \
+VTT_INST(T,isNonIncreasing) \
+VTT_INST(T,isNonDecreasing) \
+VTT_INST(T,isMonotone) \
+VTT_INST(T,isStrictlyMonotone)
+
+#endif //SWIG
 
 #endif // STL_VECTOR_TOOLS_HPP

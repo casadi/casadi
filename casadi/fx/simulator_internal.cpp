@@ -34,6 +34,7 @@ namespace CasADi{
   
 SimulatorInternal::SimulatorInternal(const Integrator& integrator, const FX& output_fcn, const vector<double>& grid) : integrator_(integrator), output_fcn_(output_fcn), grid_(grid){
   setOption("name","unnamed simulator");
+  addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "initial|step", true);
 }
   
 SimulatorInternal::~SimulatorInternal(){
@@ -43,6 +44,8 @@ void SimulatorInternal::init(){
   // Let the integration time start from the first point of the time grid.
   if (!grid_.empty()) integrator_.setOption("t0",grid_[0]);
 
+  casadi_assert_message(isNonDecreasing(grid_),"The supplied time grid must be non-decreasing."); 
+  
   // Initialize the integrator
   integrator_.init();
   
@@ -102,6 +105,13 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
   integrator_.setInput(input(INTEGRATOR_X0),INTEGRATOR_X0);
   integrator_.setInput(input(INTEGRATOR_XP0),INTEGRATOR_XP0);
   integrator_.setInput(input(INTEGRATOR_P),INTEGRATOR_P);
+  
+  if (monitored("initial")) {
+    std::cout << "SimulatorInternal::evaluate: initial condition:" << std::endl;
+    std::cout << " y0     = "  << input(INTEGRATOR_X0) << std::endl;
+    std::cout << " dy0    = " << input(INTEGRATOR_XP0) << std::endl;
+    std::cout << " p      = "   << input(INTEGRATOR_P) << std::endl;
+  }
     
   // Pass sensitivities if fsens
   for(int dir=0; dir<nfdir; ++dir){
@@ -115,9 +125,21 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
   
   // Advance solution in time
   for(int k=0; k<grid_.size(); ++k){
-    
+
+    if (monitored("step")) {
+      std::cout << "SimulatorInternal::evaluate: integrating up to: " <<  grid_[k] << std::endl;
+      std::cout << " y0       = "  << integrator_.input(INTEGRATOR_X0) << std::endl;
+      std::cout << " dy0      = " << integrator_.input(INTEGRATOR_XP0) << std::endl;
+      std::cout << " p        = "   << integrator_.input(INTEGRATOR_P) << std::endl;
+    }
+  
     // Integrate to the output time
     integrator_.integrate(grid_[k]);
+
+    if (monitored("step")) {
+      std::cout << " y_final  = "  << integrator_.output(INTEGRATOR_XF) << std::endl;
+      std::cout << " dy_final = " << integrator_.output(INTEGRATOR_XPF) << std::endl;
+    }
     
     // Pass integrator output to the output function
     output_fcn_.setInput(grid_[k],DAE_T);

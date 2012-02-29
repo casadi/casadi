@@ -17,6 +17,11 @@ def _swig_repr(self):
     return self._swig_repr_default()
 %}
 #endif // SWIGPYTHON
+
+%include "casadi/stl_vector_tools.hpp"
+VECTOR_TOOLS_TEMPLATES(int)
+VECTOR_TOOLS_TEMPLATES(double)
+
 %include "casadi/printable_object.hpp"
 %include "casadi/shared_object.hpp"
 %include "casadi/casadi_types.hpp"
