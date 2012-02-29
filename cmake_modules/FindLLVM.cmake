@@ -3,24 +3,24 @@ find_program(LLVM_CONFIG NAMES llvm-config DOC "llvm-config executable")
 if (LLVM_CONFIG)
   message(STATUS "LLVM llvm-config found at: ${LLVM_CONFIG}")
 else (LLVM_CONFIG)
-  message(FATAL_ERROR "Could NOT find llvm-config executable")
+  message(STATUS "Could NOT find llvm-config executable")
 endif (LLVM_CONFIG)
 
 execute_process(
-  COMMAND ${LLVM_CONFIG} --includedir core
+  COMMAND ${LLVM_CONFIG} --includedir
   OUTPUT_VARIABLE LLVM_INCLUDE_DIR
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 string(REPLACE " " ";" LLVM_INCLUDE_DIR ${LLVM_INCLUDE_DIR})
 
 execute_process(
-  COMMAND ${LLVM_CONFIG} --cxxflags core
+  COMMAND ${LLVM_CONFIG} --cxxflags
   OUTPUT_VARIABLE LLVM_CXXFLAGS
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
 execute_process(
-  COMMAND ${LLVM_CONFIG} --libfiles core
+  COMMAND ${LLVM_CONFIG} --libfiles
   OUTPUT_VARIABLE LLVM_LIBRARIES
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
