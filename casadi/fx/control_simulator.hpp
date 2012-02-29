@@ -95,16 +95,18 @@ public:
     * \copydoc scheme_DAEOutput
     *
     *
-    * \param output_fcn output function which maps ControlledDAEInput to n outputs.
-    * \param grid  the major time grid
+    * \param output_fcn output function which maps ControlledDAEInput or DAEInput to n outputs.
+    * \copydoc scheme_DAEInput
     * \copydoc scheme_ControlledDAEInput
-    * 
+    * \param grid the major time grid
     */
   ControlSimulator(const FX& dae, const FX& output_fcn, const std::vector<double>& grid);
+  ControlSimulator(const FX& dae, const FX& output_fcn, const Matrix<double>& grid);
   
   /// Output function equal to the state
   ControlSimulator(const FX& dae, const std::vector<double>& grid);
-
+  ControlSimulator(const FX& dae, const Matrix<double>& grid);
+  
   /// Access functions of the node.
   ControlSimulatorInternal* operator->();
 
@@ -119,7 +121,7 @@ public:
   */
  	std::vector<double> getMinorT() const; 
  	
-  /** \brief Get the controls, sampled on the fine timescale.
+  /** \brief Get the controls, sampled on the minor timescale.
   * Number of rows is (ns-1)*nf
   */
  	Matrix<double> getMinorU() const; 

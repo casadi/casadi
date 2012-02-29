@@ -33,8 +33,20 @@ ControlSimulator::ControlSimulator(const FX& dae, const FX& output_fcn, const ve
   assignNode(new ControlSimulatorInternal(dae,output_fcn,grid));
 }
 
+ControlSimulator::ControlSimulator(const FX& dae, const FX& output_fcn, const Matrix<double>& grid){
+  casadi_assert_message(grid.size2()==1,"ControlSimulator::ControlSimulator: grid must be of a column matrix shape, but got " << grid.dimString());
+  casadi_assert_message(grid.dense(),"ControlSimulator::ControlSimulator: grid must be dense, but got " << grid.dimString());
+  assignNode(new ControlSimulatorInternal(dae,output_fcn,grid.data()));
+}
+
 ControlSimulator::ControlSimulator(const FX& dae, const vector<double>& grid){
   assignNode(new ControlSimulatorInternal(dae,FX(),grid));
+}
+
+ControlSimulator::ControlSimulator(const FX& dae, const Matrix<double>& grid){
+  casadi_assert_message(grid.size2()==1,"ControlSimulator::ControlSimulator: grid must be of a column matrix shape, but got " << grid.dimString());
+  casadi_assert_message(grid.dense(),"ControlSimulator::ControlSimulator: grid must be dense, but got " << grid.dimString());
+  assignNode(new ControlSimulatorInternal(dae,FX(),grid.data()));
 }
 
 ControlSimulatorInternal* ControlSimulator::operator->(){

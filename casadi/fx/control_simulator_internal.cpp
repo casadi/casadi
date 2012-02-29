@@ -36,7 +36,7 @@ namespace CasADi{
   
 ControlSimulatorInternal::ControlSimulatorInternal(const FX& control_dae, const FX& output_fcn, const vector<double>& gridc) : control_dae_(control_dae), orig_output_fcn_(output_fcn), gridc_(gridc){
   setOption("name","unnamed controlsimulator");
-  addOption("nf",OT_INTEGER,1,"Number of fine grained integration steps.");
+  addOption("nf",OT_INTEGER,1,"Number of minor grained integration steps per major interval. nf>0 must hold.");
   addOption("integrator",               OT_INTEGRATOR, GenericType(), "An integrator creator function");
   addOption("integrator_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the integrator");
 }
@@ -48,7 +48,18 @@ ControlSimulatorInternal::~ControlSimulatorInternal(){
 void ControlSimulatorInternal::init(){
   if (!control_dae_.isInit()) control_dae_.init();
   
-  casadi_assert_message(control_dae_.getNumInputs()==CONTROL_DAE_NUM_IN,"ControlSimulatorInternal::init: supplied control_dae does not conform to the CONTROL_DAE input scheme.");
+
+  if (control_dae_.getNumInputs()==DAE_NUM_IN) {
+    vector<MX> control_dae_in_(CONTROL_DAE_NUM_IN);
+    vector<MX> dae_in_ = control_dae_.symbolicInput();
+    control_dae_in_[CONTROL_DAE_T]    = dae_in_[DAE_T];
+    control_dae_in_[CONTROL_DAE_Y]    = dae_in_[DAE_Y];
+    control_dae_in_[CONTROL_DAE_YDOT] = dae_in_[DAE_YDOT];
+    control_dae_in_[CONTROL_DAE_P]    = dae_in_[DAE_P];
+    control_dae_ = MXFunction(control_dae_in_,control_dae_.call(dae_in_));
+    control_dae_.init();
+  }
+  casadi_assert_message(control_dae_.getNumInputs()==CONTROL_DAE_NUM_IN,"ControlSimulatorInternal::init: supplied control_dae does not conform to the CONTROL_DAE or DAE input scheme.");
   
   // Cast control_dae in a form that integrator can manage
   vector<MX> dae_in_(DAE_NUM_IN);
@@ -99,6 +110,8 @@ void ControlSimulatorInternal::init(){
     
   // Number of fine-grained steps
   nf_ = getOption("nf");
+  
+  casadi_assert_message(nf_>0,"Option 'nf' must be greater than zero.");
   
   // Populate the fine-grained grid_
   if (nf_==1) { 
