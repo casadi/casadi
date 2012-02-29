@@ -5,6 +5,7 @@ find_package(BLAS QUIET)
 find_package(LAPACK QUIET)
 find_package(LIFTOPT QUIET)
 find_package(OOQP QUIET)
+find_package(LLVM QUIET)
 
 IF(IPOPT_FOUND)
 include_directories(${IPOPT_INCLUDE_DIR})
@@ -93,5 +94,9 @@ add_executable(ticket_309 ticket_309.cpp )
 target_link_libraries(ticket_309 casadi ${CMAKE_DL_LIBS})
 
 add_subdirectory(ampl)
+
+if(LLVM_FOUND)
+add_subdirectory(llvm)
+endif(LLVM_FOUND)
 
 
