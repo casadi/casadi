@@ -7,22 +7,24 @@ else (LLVM_CONFIG)
 endif (LLVM_CONFIG)
 
 execute_process(
-  COMMAND ${LLVM_CONFIG} --includedir
+  COMMAND ${LLVM_CONFIG} --includedir core
   OUTPUT_VARIABLE LLVM_INCLUDE_DIR
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
+string(REPLACE " " ";" LLVM_INCLUDE_DIR ${LLVM_INCLUDE_DIR})
 
 execute_process(
-  COMMAND ${LLVM_CONFIG} --cppflags
+  COMMAND ${LLVM_CONFIG} --cppflags core
   OUTPUT_VARIABLE LLVM_CFLAGS
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
 execute_process(
-  COMMAND ${LLVM_CONFIG} --libfiles
+  COMMAND ${LLVM_CONFIG} --libfiles core
   OUTPUT_VARIABLE LLVM_LIBRARIES
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
+string(REPLACE " " ";" LLVM_LIBRARIES ${LLVM_LIBRARIES})
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(LLVM DEFAULT_MSG LLVM_LIBRARY LLVM_INCLUDE_DIR)
+find_package_handle_standard_args(LLVM DEFAULT_MSG LLVM_LIBRARIES LLVM_INCLUDE_DIR)
