@@ -265,7 +265,7 @@ void IpoptQPInternal::init(){
   // Jacobian of the constraints
   MXFunction QP_j(args,A_);
   
-  std:cout << (G_+mul(trans(H_),X)).dimString() << std::endl;
+/*  std:cout << (G_+mul(trans(H_),X)).dimString() << std::endl;*/
   // Gradient of the objective
   MXFunction QP_gf(args,G_+mul(H_,X));
   
@@ -280,7 +280,7 @@ void IpoptQPInternal::init(){
   // Hessian of the Lagrangian
   MXFunction QP_h(args,H_*sigma);
   
-  std::cout << "QP_h: " << QP_h << std::endl;
+//   std::cout << "QP_h: " << QP_h << std::endl;
 
   // Generate an IpoptSolver that uses this objective and constraint
   solver = IpoptSolver(QP_f,QP_g,QP_h,QP_j,QP_gf);
@@ -301,6 +301,7 @@ void IpoptQPInternal::init(){
   solver.setOption("jac_d_constant","yes");
   solver.setOption("hessian_constant","yes");
   solver.setOption("parametric",true);
+  solver.setOption("print_time",false);
   solver.init();
 
 }
