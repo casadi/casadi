@@ -127,7 +127,11 @@ class FlatOCP : public OptionsFunctionality{
     */
     //@{
     /// Time
+#ifdef NEW_FLAT_OCP
+    SXMatrix t() const;
+#else // NEW_FLAT_OCP
     SX t() const;
+#endif // NEW_FLAT_OCP
     
     /// Differential and algebraic states defined by a fully-implicit DAE (length == dae().size())
     std::vector<Variable>& x();
@@ -153,11 +157,33 @@ class FlatOCP : public OptionsFunctionality{
     /// Control signals
     std::vector<Variable>& u();
     //@}
-    
+
     /** @name Equations
     *  Get all equations of a particular type 
     */
     //@{
+      
+#ifdef NEW_FLAT_OCP
+    /// Fully implicit DAE (length == x().size())
+    SXMatrix dae() const;
+    
+    /// Explicit ODE  (length == xd().size())
+    SXMatrix ode() const;
+    
+    /// Algebraic equations (length == xa().size())
+    SXMatrix alg() const;
+    
+    /// Quadrature states (length == q().size())
+    SXMatrix quad() const;
+    
+    /// Dependent equations (length == y().size())
+    SXMatrix dep() const;
+    
+    /// Initial equations (remove?)
+    SXMatrix initial() const;
+
+#else  // NEW_FLAT_OCP
+    
     /// Fully implicit DAE (length == x().size())
     std::vector<SX>& dae();
     
@@ -175,6 +201,7 @@ class FlatOCP : public OptionsFunctionality{
     
     /// Initial equations (remove?)
     std::vector<SX>& initial();
+#endif // NEW_FLAT_OCP
     //@}
 
     /** @name Time points
@@ -210,11 +237,22 @@ class FlatOCP : public OptionsFunctionality{
     *  Terms in the objective function.
     */
     //@{
+#ifdef NEW_FLAT_OCP
+    /// Mayer terms in the objective (point terms)
+    SXMatrix mterm() const;
+    
+    /// Lagrange terms in the objective (integral terms)
+    SXMatrix lterm() const;
+
+#else // NEW_FLAT_OCP
+    
     /// Mayer terms in the objective (point terms)
     std::vector<SX>& mterm();
     
     /// Lagrange terms in the objective (integral terms)
     std::vector<SX>& lterm();
+
+#endif // NEW_FLAT_OCP
     //@}
 
     /** @name Constraints of the optimal control problem
@@ -222,13 +260,25 @@ class FlatOCP : public OptionsFunctionality{
     //@{
 
     /// Path constraint functions
+#ifdef NEW_FLAT_OCP
+    SXMatrix path() const;
+#else // NEW_FLAT_OCP
     std::vector<SX>& path();
+#endif // NEW_FLAT_OCP
     
     /// Path constraint functions upper bounds
+#ifdef NEW_FLAT_OCP
+    DMatrix path_min() const;
+#else // NEW_FLAT_OCP
     std::vector<double>& path_min();
+#endif // NEW_FLAT_OCP
 
     /// Path constraint functions upper bounds
+#ifdef NEW_FLAT_OCP
+    DMatrix path_max() const;
+#else // NEW_FLAT_OCP
     std::vector<double>& path_max();
+#endif // NEW_FLAT_OCP
     //@}
     
     /** @name Manipulation

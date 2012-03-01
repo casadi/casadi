@@ -16,6 +16,7 @@ option(WITH_FORTRAN "Enable Fortran linking, if this is set to OFF, no Fortran l
 option(WITH_SWIG_SPLIT "Split SWIG wrapper generation into multiple modules" OFF) 
 option(WITH_WORHP "Compile the WORHP interface" OFF) 
 option(CACHING_CONSTANTS "Cache numerical constants to avoid duplicates (requires C++11/C++0X support)" OFF)
+option(NEW_FLAT_OCP "Use the new FlatOCP implementation (will be removed when JModelica is in sync with CasADi)" OFF)
 
 if(WITH_FORTRAN)
   # Enable Fortran linking (needed e.g. for LAPACK/BLAS), if Fortran is available
@@ -44,6 +45,10 @@ endif(WITH_JIT)
 if(WITH_PRINTME)
 add_definitions(-DWITH_PRINTME)
 endif(WITH_PRINTME)
+
+if(NEW_FLAT_OCP)
+add_definitions(-DNEW_FLAT_OCP)
+endif(NEW_FLAT_OCP)
 
 include_directories(.)
 

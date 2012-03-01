@@ -13,7 +13,7 @@ try:
   from pyjmi import JMUModel
   import pymodelica
 except:
-  print "This example requires a jmodelica insatllation"
+  print "This example requires a jmodelica installation"
   sys.exit(0)
 
 # CasADi

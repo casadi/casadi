@@ -62,10 +62,6 @@ void FlatOCP::makeAlgebraic(const std::string& name){
   (*this)->makeAlgebraic(variable(name));
 }
 
-SX FlatOCP::t() const{
-  return (*this)->t_;
-}
-
 std::vector<Variable>& FlatOCP::x(){
   return (*this)->x_;
 }
@@ -93,6 +89,58 @@ std::vector<Variable>& FlatOCP::p(){
 std::vector<Variable>& FlatOCP::u(){
   return (*this)->u_;
 }
+
+#ifdef NEW_FLAT_OCP
+
+SXMatrix FlatOCP::dae() const{
+  return (*this)->dae_;
+}
+    
+SXMatrix FlatOCP::ode() const{
+  return (*this)->ode_;
+}
+    
+SXMatrix FlatOCP::alg() const{
+  return (*this)->alg_;
+}
+    
+SXMatrix FlatOCP::quad() const{
+  return (*this)->quad_;
+}
+    
+SXMatrix FlatOCP::dep() const{
+  return (*this)->dep_;
+}
+    
+SXMatrix FlatOCP::initial() const{
+  return (*this)->initial_;
+}
+
+SXMatrix FlatOCP::mterm() const{
+  return (*this)->mterm_;
+}
+
+SXMatrix FlatOCP::lterm() const{
+  return (*this)->lterm_;
+}
+
+SXMatrix FlatOCP::path() const{
+  return (*this)->path_;
+}
+
+DMatrix FlatOCP::path_min() const{
+  return (*this)->path_min_;
+}
+
+DMatrix FlatOCP::path_max() const{
+  return (*this)->path_max_;
+}
+
+SXMatrix FlatOCP::t() const{
+  return (*this)->t_;
+}
+
+#else // NEW_FLAT_OCP
 
 std::vector<SX>& FlatOCP::dae(){
   return (*this)->dae_;
@@ -129,7 +177,7 @@ std::vector<SX>& FlatOCP::lterm(){
 std::vector<SX>& FlatOCP::path(){
   return (*this)->path_;
 }
-
+  
 std::vector<double>& FlatOCP::path_min(){
   return (*this)->path_min_;
 }
@@ -137,6 +185,12 @@ std::vector<double>& FlatOCP::path_min(){
 std::vector<double>& FlatOCP::path_max(){
   return (*this)->path_max_;
 }
+
+SX FlatOCP::t() const{
+  return (*this)->t_;
+}
+
+#endif // NEW_FLAT_OCP
 
 double FlatOCP::t0() const{
   return (*this)->t0_;
