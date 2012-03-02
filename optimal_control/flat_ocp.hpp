@@ -303,12 +303,15 @@ class FlatOCP : public OptionsFunctionality{
     /// Transform the fully implicit DAE to a explicit or semi-explicit form
     void makeExplicit();
 
-    /// Get the DAE input arguments
+    /** \brief Get the ODE/DAE input arguments
+    * Returns a vector of inputs using the following scheme:
+    * @copydoc scheme_DAEInput 
+    */
     std::vector<SXMatrix> daeArg() const;
     
     /// Substitute the dependents from a set of expressions
     std::vector<SXMatrix> substituteDependents(const std::vector<SXMatrix>& x) const;
-        
+    
     /** \brief Get the ODE/DAE right hand side function
     * The returned FX has the following input/output scheme:
     * @copydoc scheme_DAEInput 
