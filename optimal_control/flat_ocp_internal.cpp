@@ -646,6 +646,7 @@ void FlatOCPInternal::eliminateLagrangeTerms(){
     qv.setVariability(CONTINUOUS);
     qv.setCausality(INTERNAL);
     qv.setStart(0.0);
+    if(tf_==tf_) qv.setNominal(tf_); // if not not-a-number
   
     // Add to the list of variables
     addVariable(q_name.str(),qv);
