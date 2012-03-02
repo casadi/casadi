@@ -63,10 +63,10 @@ IntegratorInternal::IntegratorInternal(const FX& f, const FX& q) : f_(f), q_(q){
   addOption("tf",                          OT_REAL, 1.0); // end of the integration
 
   // Quadratures
-  addOption("quad_err_con",                OT_BOOLEAN,false); // should the quadratures affect the step size control
+  addOption("quad_err_con",                OT_BOOLEAN,true); // should the quadratures affect the step size control
 
   // Forward sensitivity problem
-  addOption("fsens_err_con",               OT_BOOLEAN, false); // include the forward sensitivities in all error controls
+  addOption("fsens_err_con",               OT_BOOLEAN, true); // include the forward sensitivities in all error controls
   addOption("finite_difference_fsens",     OT_BOOLEAN, false); // use finite differences to approximate the forward sensitivity equations (if AD is not available)
   addOption("fsens_reltol",                OT_REAL); // relative tolerence for the forward sensitivity solution [default: equal to reltol]
   addOption("fsens_abstol",                OT_REAL); // absolute tolerence for the forward sensitivity solution [default: equal to abstol]
