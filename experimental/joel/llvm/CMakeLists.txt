@@ -1,7 +1,7 @@
 find_package(LLVM)
-find_package( Threads )
+find_package(Threads)
 
-if(NOT LLVM_FOUND )
+if(NOT LLVM_FOUND)
   message(FATAL_ERROR "LLVM package can't be found. Set CMAKE_PREFIX_PATH variable to LLVM's installation prefix.")
 endif()
 
