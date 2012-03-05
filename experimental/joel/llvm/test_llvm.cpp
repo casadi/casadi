@@ -57,17 +57,25 @@ int main() {
   // Two arguments
   std::vector<const llvm::Type*> binaryArg(2,llvm::Type::getDoubleTy(llvm::getGlobalContext()));
   
+  // Two arguments in and two references
+  std::vector<const llvm::Type*> genArg(4);
+  genArg[0] = genArg[1] = llvm::Type::getDoubleTy(llvm::getGlobalContext());
+  genArg[2] = genArg[3] = llvm::Type::getDoublePtrTy(llvm::getGlobalContext());
+  
   // Unary operation
   llvm::FunctionType *unaryFun = llvm::FunctionType::get(llvm::Type::getDoubleTy(llvm::getGlobalContext()),unaryArg, false);
 
   // Binary operation
   llvm::FunctionType *binaryFun = llvm::FunctionType::get(llvm::Type::getDoubleTy(llvm::getGlobalContext()),binaryArg, false);
 
+  // More generic operation, return by reference
+  llvm::FunctionType *genFun = llvm::FunctionType::get(llvm::Type::getVoidTy(llvm::getGlobalContext()),genArg, false);
+
   // Declare sin
   llvm::Function *sin_ = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "sin", TheModule);
   
   // Declare my function
-  llvm::Function *myfun = llvm::Function::Create(binaryFun, llvm::Function::ExternalLinkage, "myfcn", TheModule);
+  llvm::Function *myfun = llvm::Function::Create(genFun, llvm::Function::ExternalLinkage, "myfcn", TheModule);
 
   // Create a new basic block to start insertion into.
   llvm::BasicBlock *BB = llvm::BasicBlock::Create(llvm::getGlobalContext(), "entry", myfun);
@@ -75,11 +83,17 @@ int main() {
 
   // Set names for all arguments.
   llvm::Function::arg_iterator AI = myfun->arg_begin();
-  AI->setName("xx");
+  AI->setName("x1");
   llvm::Value *x1 = AI;
   AI++;
-  AI->setName("yy");
+  AI->setName("x2");
   llvm::Value *x2 = AI;
+  AI++;
+  AI->setName("r1");
+  llvm::Value *r1 = AI;
+  AI++;
+  AI->setName("r2");
+  llvm::Value *r2 = AI;
   
   llvm::Value *five = llvm::ConstantFP::get(llvm::getGlobalContext(), llvm::APFloat(5.0));
   llvm::Value *x1_plus_5 = Builder.CreateAdd(x1, five, "x1_plus_5");
@@ -88,8 +102,12 @@ int main() {
   std::vector<llvm::Value*> sinarg(1,x2);
   llvm::Value* sin_x2 = Builder.CreateCall(sin_, sinarg.begin(), sinarg.end(), "callsin");
   
+  // Set values
+  llvm::StoreInst *what_is_this1 = Builder.CreateStore(sin_x2,r1);
+  llvm::StoreInst *what_is_this2 = Builder.CreateStore(x1_plus_5,r2);
+
   // Finish off the function.
-  Builder.CreateRet(x1_plus_5);
+  Builder.CreateRetVoid();
 
   // Validate the generated code, checking for consistency.
   verifyFunction(*myfun);
@@ -97,15 +115,22 @@ int main() {
   // Optimize the function.
   TheFPM->run(*myfun);
 
-  // JIT the function, returning a function pointer.
-  void *FPtr = TheExecutionEngine->getPointerToFunction(myfun);
-      
-  // Cast it to the right type
-  double (*FP)(double,double) = (double (*)(double,double))(intptr_t)FPtr;
-  fprintf(stderr, "Evaluated to %f\n", FP(10.0,20.0));
-  
   // Print out all of the generated code.
   TheModule->dump();
+
+  // JIT the function
+  double x1_val = 10;
+  double x2_val = 20;
+  double r1_val = -1;
+  double r2_val = -1;
+  typedef void (*GenType)(double,double,double*,double*);
+  GenType FP = GenType(intptr_t(TheExecutionEngine->getPointerToFunction(myfun)));
+
+  FP(x1_val,x2_val,&r1_val,&r2_val);
+
+  printf("r1 = %g\n", r1_val);
+  printf("r2 = %g\n", r2_val);
+  
 
   return 0;
 }
