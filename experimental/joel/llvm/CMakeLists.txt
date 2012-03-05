@@ -6,7 +6,11 @@ if(NOT LLVM_FOUND)
 endif()
 
 include_directories( ${LLVM_INCLUDE_DIR} )
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${LLVM_CXXFLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${LLVM_CFLAGS}") # Note LLVM_CFLAGS, not LLVM_CXXFLAGS due to -fno_exceptions
+
+# Tutorial example
+add_executable(llvm_tutorial llvm_tutorial.cpp)
+target_link_libraries(llvm_tutorial ${LLVM_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS})
 
 # Simple example
 add_executable(test_llvm test_llvm.cpp)

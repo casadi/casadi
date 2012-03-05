@@ -758,10 +758,10 @@ MX MX::__add__(const MX& b) const{    return *this + b;}
 MX MX::__sub__(const MX& b) const{    return *this - b;}
 MX MX::__mul__(const MX& b) const{    return *this * b;}
 MX MX::__div__(const MX& b) const{    return *this / b;}
-MX MX::__constpow__(const MX& b) const {   return (*this).constpow(b);}
-MX MX::__mrdivide__  (const MX& b) const { if (MX(b).scalar()) return *this/b; throw CasadiException("mrdivide: Not implemented");}
-MX MX::__mldivide__   (const MX& b) const { if (MX(b).scalar()) return *this/b; throw CasadiException("mldivide: Not implemented");}
-MX MX::__mpower__(const MX& b) const  {   return pow(*this,b); throw CasadiException("mpower: Not implemented");}
+MX MX::__constpow__(const MX& b) const { return (*this).constpow(b);}
+MX MX::__mrdivide__(const MX& b) const { if (b.scalar()) return *this/b; throw CasadiException("mrdivide: Not implemented");}
+MX MX::__mldivide__(const MX& b) const { return b.__mrdivide__(*this);}
+MX MX::__mpower__(const MX& b) const   { return pow(*this,b); throw CasadiException("mpower: Not implemented");}
 
 void MX::append(const MX& y){
   *this = vertcat(*this,y);

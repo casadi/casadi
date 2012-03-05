@@ -215,7 +215,7 @@ class SX{
     SX __pow__(const SX& b) const;
     SX __constpow__(const SX& b) const;
     
-    SX __mldivide__(const SX& b) const{  throw *this / b;}
+    SX __mldivide__(const SX& b) const{  return b.__mrdivide__(*this);}
     SX __mrdivide__(const SX& b) const{  return *this / b;}
     SX __mpower__(const SX& b) const {return (*this).__pow__(b);}
     SX trans() const{ return *this;}
