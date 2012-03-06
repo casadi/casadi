@@ -29,7 +29,7 @@ namespace CasADi{
 
 /// Input arguments of an ODE/DAE function
 enum ControlledDAEInput{
-  /** Time. (1-by-1) */
+  /** Global physical time. (1-by-1) */
   CONTROL_DAE_T,
   /** State vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES */
   CONTROL_DAE_Y,
@@ -37,10 +37,16 @@ enum ControlledDAEInput{
   CONTROL_DAE_P,
   /** Control vector (dimension nu-by-1). */
   CONTROL_DAE_U,
+  /** Control vector, linearly interpolated (dimension nu-by-1). */
+  CONTROL_DAE_U_INTERP,
   /** State derivative vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES */
   CONTROL_DAE_YDOT,
   /** State vector (dimension nx-by-1) at the last major time-step */
   CONTROL_DAE_Y_MAJOR,
+  /** Time at start of control interval (1-by-1) */
+  CONTROL_DAE_T0,
+  /** Time at end of control interval (1-by-1) */
+  CONTROL_DAE_TF,
   /** Number of arguments. */
   CONTROL_DAE_NUM_IN
 };

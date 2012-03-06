@@ -64,6 +64,7 @@ legend(('x','u (coarse)','u (fine)'))
 
 show()
 
+
 #! Custom output function
 #! =======================
 
@@ -89,5 +90,44 @@ plot(tsf,array(sim.output(0)),'*')
 legend(('x','u (coarse)','u (fine)','u (output)','x0 (output)'),loc='lower left')
 show()
 
+#! Working with interpolation
+#! ===========================
 
+f=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_T: t, CONTROL_DAE_YDOT: [dx,dv], CONTROL_DAE_Y: [x,v], CONTROL_DAE_P: [k,c,m], CONTROL_DAE_U_INTERP: [u] ,CONTROL_DAE_Y_MAJOR: [x0,v0]},[rhs])
+f.init()
+
+ui = ssym("ui")
+
+h=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_T: t, CONTROL_DAE_YDOT: [dx,dv], CONTROL_DAE_Y: [x,v], CONTROL_DAE_P: [k,c,m], CONTROL_DAE_U_INTERP: [ui]  ,CONTROL_DAE_Y_MAJOR: [x0,v0]},[x,ui])
+h.init()
+
+sim=ControlSimulator(f,h,ts)
+sim.setOption("integrator",CVodesIntegrator)
+
+#! Each control interval will be subdived in 8
+sim.setOption("control_interpolation","linear")
+sim.setOption("control_endpoint",True)
+sim.setOption("nf",8) 
+sim.init()
+sim.input(CONTROLSIMULATOR_X0).set([0,0])
+sim.input(CONTROLSIMULATOR_P).set([1,0.1,1])
+#! CONTROLSIMULATOR_U is larger, it has a value at the end of the last control interval, such that interpolation can happen
+sim.input(CONTROLSIMULATOR_U).set([0,-0.2,0,0.5,0,0,0,0.2,-0.8,0]) 
+sim.evaluate()
+
+#! Obtain the fine time grid
+tsf = sim.getMinorT()
+
+figure(2)
+#! Plot the default output, i.e. the states
+plot(tsf,array(sim.output())[:,0])
+xlabel("t")
+ylabel("x")
+
+#! Plot the controls
+plot(ts,array(sim.input(CONTROLSIMULATOR_U))[:,0],'o') # Sampled on the coarse grid
+plot(tsf,sim.output(1),'-')           # Sampled on the fine grid 
+legend(('x','u (coarse)','u (fine)'))
+
+show()
 

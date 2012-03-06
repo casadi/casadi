@@ -91,8 +91,11 @@ public:
   /** \brief Number of static parameters */
   int np_;
   
-  /** \brief Number of variable parameters */
+  /** \brief Number of controls */
   int nu_;
+  
+  /** \brief Number of interpolated controls */
+  int nu_interp_;
   
   /** \brief Number of coarse time steps */
   int ns_;

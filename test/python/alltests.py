@@ -11,6 +11,7 @@ from qpsolver import *
 from misc import *
 from fx import *
 from tools import *
+from simulator import *
 
 if __name__ == '__main__':
     unittest.main()

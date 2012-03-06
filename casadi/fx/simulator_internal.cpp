@@ -92,7 +92,9 @@ void SimulatorInternal::init(){
   output_.resize(output_fcn_->output_.size());
   for(int i=0; i<output_.size(); ++i) {
     output(i) = Matrix<double>(grid_.size(),output_fcn_.output(i).numel(),0);
-    casadi_assert_message(output_fcn_.output(i).size2()==1,"SimulatorInternal::init: Output function output #" << i << " has shape " << output_fcn_.output(i).dimString() << ", while a column-matrix shape is expected.");
+    if (!output_fcn_.output(i).empty()) {
+      casadi_assert_message(output_fcn_.output(i).size2()==1,"SimulatorInternal::init: Output function output #" << i << " has shape " << output_fcn_.output(i).dimString() << ", while a column-matrix shape is expected.");
+    }
   }
 
   // Call base class method
@@ -142,11 +144,14 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
     }
     
     // Pass integrator output to the output function
-    output_fcn_.setInput(grid_[k],DAE_T);
-    output_fcn_.setInput(integrator_.output(INTEGRATOR_XF),DAE_Y);
+    if(output_fcn_.input(DAE_T).size()!=0)
+      output_fcn_.setInput(grid_[k],DAE_T);
+    if(output_fcn_.input(DAE_Y).size()!=0)
+      output_fcn_.setInput(integrator_.output(INTEGRATOR_XF),DAE_Y);
     if(output_fcn_.input(DAE_YDOT).size()!=0)
       output_fcn_.setInput(integrator_.output(INTEGRATOR_XPF),DAE_YDOT);
-    output_fcn_.setInput(input(INTEGRATOR_P),DAE_P);
+    if(output_fcn_.input(DAE_P).size()!=0)
+      output_fcn_.setInput(input(INTEGRATOR_P),DAE_P);
 
     for(int dir=0; dir<nfdir; ++dir){
       // Pass the forward seed to the output function
