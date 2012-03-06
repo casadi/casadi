@@ -74,10 +74,10 @@ if __name__ == '__main__':
     print run('find', shell = True)
 
 deprecated = re.compile("[dD]epr[ei]c[ie]?at[ei]")
-
+warning = re.compile("warning")
     
 class TestSuite:
-  def __init__(self,suffix=None,dirname=None,preRun=None,postRun=None,command=None,skipdirs=[],skipfiles=[],inputs={},workingdir = lambda x: x,allowable_returncodes=[],args=[],stderr_trigger=[],stdout_trigger=[],check_depreciation=True):
+  def __init__(self,suffix=None,dirname=None,preRun=None,postRun=None,command=None,skipdirs=[],skipfiles=[],inputs={},workingdir = lambda x: x,allowable_returncodes=[],args=[],stderr_trigger=[],stdout_trigger=[],check_depreciation=True,check_warning=False):
     """
     
     dirname: The directory that should be crawled for test problems.
@@ -102,6 +102,8 @@ class TestSuite:
     stdout_trigger: list of strings/regexes. If any string is found in std_out, it is considered an error, regardless of the return_code. A message may be attached to a trigger by packing the string/regex in a 2-tuple, with the second element the message.
     
     check_depreciation: raise an error if the output contains a depreciation warning
+    
+    check_warning: raise an error if the output contains a warning
     
     args: a list of command line options:
        -skipfiles="file1 file2"   get's added to skipfiles
@@ -133,6 +135,9 @@ class TestSuite:
     if check_depreciation:
       self.stderr_trigger.append((deprecated,"deprecated"))
       self.stdout_trigger.append((deprecated,"deprecated"))
+    if check_warning:
+      self.stderr_trigger.append((warning,"warning"))
+      self.stdout_trigger.append((warning,"warning"))
     self.args=args
     for arg in args:
       okay = False
