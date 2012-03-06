@@ -25,6 +25,8 @@
 
 #include "mx.hpp"
 
+#include "../matrix/generic_matrix_tools.hpp"
+
 namespace CasADi{
 
 /** \brief  concatenate vertically */
@@ -275,12 +277,21 @@ bool isEqual(const MX& ex1,const MX &ex2);
 /** \brief Get a string representation for a binary MX, using custom arguments */
 std::string getOperatorRepresentation(const MX& x, const std::vector<std::string>& args);
 
+#ifndef SWIG
+template<>
+inline void sym(MX& ret, const std::string& name, int n, int m) {
+  ret = msym(name,n,m);
+}
+#endif // SWIG
+
 } // namespace CasADi
 
 #ifdef SWIG
 // Template instantiations
 %template(Pair_MX_MXVector) std::pair<CasADi::MX, std::vector<CasADi::MX> >;
 #endif // SWIG
+
+
 
 
 #endif // MX_TOOLS_HPP

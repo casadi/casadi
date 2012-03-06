@@ -25,6 +25,7 @@
 
 #include "sx.hpp"
 #include "../matrix/matrix_tools.hpp"
+#include "../matrix/generic_matrix_tools.hpp"
 
 #ifdef WITH_UBLAS
 #include <boost/numeric/ublas/matrix_sparse.hpp>
@@ -236,6 +237,11 @@ Matrix<SX> blockmatrix(Matrix<SX> array[n]){
 
   return ret;
 }
+template<>
+inline void sym(Matrix<SX>& ret, const std::string& name, int n, int m) {
+  ret = ssym(name,n,m);
+}
+
 #endif
 
 /// Check dependency: very inefficient algorithm
