@@ -28,6 +28,7 @@
 #include <stack>
 #include "fx_internal.hpp"
 #include "../matrix/sparsity_tools.hpp"
+#include "../matrix/sparsity_tools.hpp"
 
 namespace CasADi{
 
@@ -120,8 +121,8 @@ XFunctionInternalCommon<DerivedType,MatType,NodeType>::XFunctionInternalCommon(
   
   // Make sure that inputs are symbolic
   for(int i=0; i<inputv.size(); ++i){
-    if (inputv[i].isNull()) {
-      casadi_error("XFunctionInternal::XFunctionInternal: Xfunction input arguments cannot be null." << std::endl << "Argument #" << i << " is null.");
+    if (inputv[i].isNull() || inputv[i].empty()) {
+      sym(inputv_[i],"empty",0,0);
     } else if(!isSymbolicSparse(inputv[i])){
       casadi_error("XFunctionInternal::XFunctionInternal: Xfunction input arguments must be purely symbolic." << std::endl << "Argument #" << i << " is not symbolic.");
     }
@@ -131,16 +132,18 @@ XFunctionInternalCommon<DerivedType,MatType,NodeType>::XFunctionInternalCommon(
   setNumInputs(inputv_.size());
   for(int i=0; i<input_.size(); ++i)
     input(i) = DMatrix(inputv_[i].sparsity());
+  
+  // Null output arguments become empty
+  for(int i=0; i<outputv_.size(); ++i) {
+    if (outputv_[i].isNull()) {
+      outputv_[i] = MatType(0,0);
+    }
+  }
 
   // Allocate space for outputs
   setNumOutputs(outputv_.size());
-  for(int i=0; i<output_.size(); ++i) {
-    if (outputv_[i].isNull()) { // Output arguments can be null
-      output(i) = DMatrix();
-    } else {
-      output(i) = DMatrix(outputv_[i].sparsity());
-    }
-  }
+  for(int i=0; i<output_.size(); ++i)
+    output(i) = DMatrix(outputv_[i].sparsity());
 }
 
 

@@ -633,7 +633,35 @@ class SXtests(casadiTestCase):
     f.evaluate()
     self.checkarray(f.output(),matrix([[x_*a_,a_],[1+a_*x_,0],[1,0]]),"taylor on dense matrices")
     
+  def test_null(self):
+    self.message("SXFunction null")
+    x = ssym("x")
 
+    f = SXFunction([x],[[x**2],[]])
+    f.init()
+
+
+    self.assertTrue(f.output(1).empty())
+    f.evaluate(1,1)
+    self.assertTrue(f.fwdSens(1).empty())
+    self.assertTrue(f.adjSeed(1).empty())
+    
+    f = SXFunction([x,[]],[[x**2],[]])
+    f.init()
+
+    self.assertTrue(f.output(1).empty())
+    f.evaluate(1,1)
+    self.assertTrue(f.fwdSens(1).empty())
+    self.assertTrue(f.adjSeed(1).empty())
+    
+    r = f.eval([[x],[]])
+    self.assertTrue(r[1].empty())
+
+    #r = f.eval([[],[]])
+    #self.assertTrue(r[1].empty())
+    
+    #r = f.call([x,x])
+    #self.assertTrue(r[1].isNull())
     
   def test_mtaylor(self):
     self.message("multivariate taylor expansions")

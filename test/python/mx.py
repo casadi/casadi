@@ -1586,6 +1586,42 @@ class MXtests(casadiTestCase):
     
     #self.checkarray(J.output(),matrix([1,-1,nan]),"Norm_1")
     
+  def test_null(self):
+    self.message("MXFunction null")
+    x = msym("x")
+
+    f = MXFunction([x],[x**2,MX()])
+    f.init()
+
+    self.assertEqual(f.output(1).shape[0],0)
+    self.assertEqual(f.output(1).shape[1],0)
+    f.evaluate(1,1)
+    self.assertEqual(f.fwdSens(1).shape[0],0)
+    self.assertEqual(f.fwdSens(1).shape[1],0)
+    self.assertEqual(f.adjSeed(1).shape[0],0)
+    self.assertEqual(f.adjSeed(1).shape[1],0)
+    
+    f = MXFunction([x,MX()],[x**2,MX()])
+    f.init()
+
+    self.assertEqual(f.output(1).shape[0],0)
+    self.assertEqual(f.output(1).shape[1],0)
+    f.evaluate(1,1)
+    self.assertEqual(f.fwdSens(1).shape[0],0)
+    self.assertEqual(f.fwdSens(1).shape[1],0)
+    self.assertEqual(f.adjSeed(1).shape[0],0)
+    self.assertEqual(f.adjSeed(1).shape[1],0)
+    
+    r = f.call([x,MX()])
+    self.assertTrue(r[1].isNull())
+
+    r = f.call([MX(),MX()])
+    self.assertTrue(r[1].isNull())
+    
+    #r = f.call([x,x])
+    #self.assertTrue(r[1].isNull())
+    
+    
   def test_issue184(self):
     self.message("Regression test issue #184")
     x = MX("x", 3)
