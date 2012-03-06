@@ -500,7 +500,11 @@ int meta< CasADi::Matrix<double> >::as(PyObject * p,CasADi::Matrix<double> &m) {
   } else if ( meta< double >::couldbe_sequence(p)) {
     std::vector <double> t;
     int res = meta< double >::as_vector(p,t);
-    m = CasADi::Matrix<double>(t,t.size(),1);
+    if (t.size()>0) {
+      m = CasADi::Matrix<double>(t,t.size(),1);
+    } else {
+      m = CasADi::Matrix<double>(t,t.size(),0);
+    }
     return res;
   } else {
     SWIG_Error(SWIG_TypeError, "asDMatrix: unrecognised type. Should have been caught by typemap(typecheck)");
