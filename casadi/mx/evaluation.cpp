@@ -38,7 +38,7 @@ Evaluation::Evaluation(const FX& fcn, const vector<MX>& dep) : fcn_(fcn) {
 
   // Assumes initialised
   for (int i=0;i<fcn.getNumInputs();i++) {
-     if (dep[i].isNull())
+     if (dep[i].isNull() || dep[i].empty())
        continue;
       casadi_assert_message(dep[i].size1()==fcn.input(i).size1() && dep[i].size2()==fcn.input(i).size2(),
         "Evaluation::shapes of passed-in dependencies should match shapes of inputs of function." << std::endl <<

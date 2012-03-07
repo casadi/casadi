@@ -54,9 +54,11 @@ vector<SXMatrix> XFunction::evalSX(const vector<SXMatrix>& arg){
       // The sparsity should be that of the inputs
       arg2[iind] = SXMatrix(input(iind).sparsity(),0);
 
-      // Make sure that the dimensions match
-      casadi_assert_message(arg[iind].size1()==arg2[iind].size1(),"XFunction::evalSX: shape mismatch of argument #" << iind <<  ". Expecting " << arg2[iind].size1() << "-by-" << arg2[iind].size2() << ", but got " << arg[iind].size1() << "-by-" << arg[iind].size2() << " instead.");
-      casadi_assert_message(arg[iind].size2()==arg2[iind].size2(),"XFunction::evalSX: shape mismatch of argument #" << iind <<  ". Expecting " << arg2[iind].size1() << "-by-" << arg2[iind].size2() << ", but got " << arg[iind].size1() << "-by-" << arg[iind].size2() << " instead.");
+      if (!arg2[iind].empty() || !arg[iind].empty()) {
+        // Make sure that the dimensions match
+        casadi_assert_message(arg[iind].size1()==arg2[iind].size1(),"XFunction::evalSX: shape mismatch of argument #" << iind <<  ". Expecting " << arg2[iind].size1() << "-by-" << arg2[iind].size2() << ", but got " << arg[iind].size1() << "-by-" << arg[iind].size2() << " instead.");
+        casadi_assert_message(arg[iind].size2()==arg2[iind].size2(),"XFunction::evalSX: shape mismatch of argument #" << iind <<  ". Expecting " << arg2[iind].size1() << "-by-" << arg2[iind].size2() << ", but got " << arg[iind].size1() << "-by-" << arg[iind].size2() << " instead.");
+      }
 
       // Get the indices of the known supplied arguments
       vector<int> known_ind = arg[iind].sparsity().getElements(false);

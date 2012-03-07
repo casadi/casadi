@@ -657,11 +657,17 @@ class SXtests(casadiTestCase):
     r = f.eval([[x],[]])
     self.assertTrue(r[1].empty())
 
-    #r = f.eval([[],[]])
-    #self.assertTrue(r[1].empty())
+    r = f.eval([[x],[]])
+    self.assertTrue(r[1].empty())
     
-    #r = f.call([x,x])
-    #self.assertTrue(r[1].isNull())
+    r = f.eval([x,SXMatrix(0,1)])
+    self.assertTrue(r[1].empty())
+
+    r = f.eval([x,SXMatrix(1,0)])
+    self.assertTrue(r[1].empty())
+    
+    self.assertRaises(Exception,lambda : f.eval([x,x]))
+    self.assertRaises(Exception,lambda : f.eval([[],[]]))
     
   def test_mtaylor(self):
     self.message("multivariate taylor expansions")
