@@ -87,6 +87,26 @@ SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake_modules)
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib/)
 
+# Core dependencies
+if(WITH_LLVM)
+  # Core depends on LLVM for Just-in-time compilation
+  find_package(LLVM REQUIRED)
+  find_package(Threads REQUIRED)
+  set(CASADI_DEPENDENCIES ${LLVM_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS})
+  add_definitions(-DWITH_LLVM)
+  include_directories( ${LLVM_INCLUDE_DIR} )
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${LLVM_CFLAGS}") # Note LLVM_CFLAGS, not LLVM_CXXFLAGS due to -fno_exceptions
+else(WITH_LLVM)
+  if(WITH_DL)
+    # Core needs support for dynamic linking
+    set(CASADI_DEPENDENCIES ${CMAKE_DL_LIBS})
+  else(WITH_DL)
+    # No dependencies
+    set(CASADI_DEPENDENCIES)
+  endif(WITH_DL)
+endif(WITH_LLVM)
+
+
 add_subdirectory(casadi)
 add_subdirectory(optimal_control)
 add_subdirectory(nonlinear_programming)

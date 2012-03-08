@@ -34,6 +34,20 @@
 #include "../casadi_types.hpp"
 #include "../matrix/crs_sparsity_internal.hpp"
 
+#ifdef WITH_LLVM
+#include "llvm/DerivedTypes.h"
+#include "llvm/ExecutionEngine/ExecutionEngine.h"
+#include "llvm/ExecutionEngine/JIT.h"
+#include "llvm/LLVMContext.h"
+#include "llvm/Module.h"
+#include "llvm/PassManager.h"
+#include "llvm/Analysis/Verifier.h"
+#include "llvm/Target/TargetData.h"
+#include "llvm/Target/TargetSelect.h"
+#include "llvm/Transforms/Scalar.h"
+#include "llvm/Support/IRBuilder.h"
+#endif // WITH_LLVM
+
 namespace CasADi{
 
 using namespace std;
@@ -44,6 +58,7 @@ SXFunctionInternal::SXFunctionInternal(const vector<Matrix<SX> >& inputv, const 
   setOption("name","unnamed_sx_function");
   addOption("live_variables",OT_BOOLEAN,false,"Reuse variables in the work vector");
   addOption("inplace",OT_BOOLEAN,false,"Evaluate with inplace operations (experimental)");
+  addOption("just_in_time",OT_BOOLEAN,false,"Just-in-time compilation for numeric evaluation (experimental)");
 
   casadi_assert(!outputv_.empty());
 }
