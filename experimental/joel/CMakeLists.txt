@@ -94,9 +94,9 @@ target_link_libraries(ticket_309 casadi ${CMAKE_DL_LIBS})
 
 add_subdirectory(ampl)
 
-if(WITH_JIT)
+if(WITH_LLVM)
   find_package(LLVM QUIET)
   if(LLVM_FOUND)
     add_subdirectory(llvm)
   endif(LLVM_FOUND)
-endif(WITH_JIT)
+endif(WITH_LLVM)

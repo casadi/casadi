@@ -28,16 +28,16 @@
 #include <sstream>
 
 // The following works for Linux, something simular is needed for Windows
-#ifdef WITH_JIT 
+#ifdef WITH_DL 
 #include <dlfcn.h>
-#endif // WITH_JIT 
+#endif // WITH_DL 
 
 namespace CasADi{
 
 using namespace std;
 
 ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) : bin_name_(bin_name){
-#ifdef WITH_JIT 
+#ifdef WITH_DL 
 
   // Load the dll
   handle_ = 0;
@@ -91,9 +91,9 @@ ExternalFunctionInternal::ExternalFunctionInternal(const std::string& bin_name) 
   evaluate_ = (evaluatePtr) dlsym(handle_, "evaluate");
   if(dlerror()) throw CasadiException("ExternalFunctionInternal: no \"evaluate\" found");
   
-#else // WITH_JIT 
-  throw CasadiException("WITH_JIT  not activated");
-#endif // WITH_JIT 
+#else // WITH_DL 
+  throw CasadiException("WITH_DL  not activated");
+#endif // WITH_DL 
   
 }
     
@@ -102,17 +102,17 @@ ExternalFunctionInternal* ExternalFunctionInternal::clone() const{
 }
 
 ExternalFunctionInternal::~ExternalFunctionInternal(){
-#ifdef WITH_JIT 
+#ifdef WITH_DL 
   // close the dll
   if(handle_) dlclose(handle_);
-#endif // WITH_JIT 
+#endif // WITH_DL 
 }
 
 void ExternalFunctionInternal::evaluate(int nfdir, int nadir){
-#ifdef WITH_JIT 
+#ifdef WITH_DL 
   int flag = evaluate_(getPtr(input_array_),getPtr(output_array_));
   if(flag) throw CasadiException("ExternalFunctionInternal: \"evaluate\" failed");
-#endif // WITH_JIT 
+#endif // WITH_DL 
 }
   
 void ExternalFunctionInternal::init(){
