@@ -106,8 +106,6 @@ def dot(self,*args):
      
   def __array__(self,*args,**kwargs):
     import numpy as n
-    if len(args)>0 and args[0]==n.dtype("object"):
-      raise Exception("It appears you are using numpy.dot to do matrix multiplication. Please use mul instead.")
     if len(args) > 1 and isinstance(args[1],tuple) and isinstance(args[1][0],n.ufunc):
       if len(args[1][1])==3:
         raise Exception("Error with %s. Looks like you are using an assignment operator, such as 'a+=b'. This is not supported when 'a' is a numpy type, and cannot be supported without changing numpy itself. Either upgrade a to a CasADi type first, or use 'a = a + b'. " % args[1][0].__name__)
