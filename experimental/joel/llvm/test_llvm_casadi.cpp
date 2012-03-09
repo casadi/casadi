@@ -1,6 +1,7 @@
 #include <casadi/casadi.hpp>
 
 using namespace CasADi;
+using namespace std;
 
 int main(){
   
