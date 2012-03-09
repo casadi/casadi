@@ -26,6 +26,14 @@
 #include "sx_function.hpp"
 #include "x_function_internal.hpp"
 
+#ifdef WITH_LLVM
+// Some forward declarations
+namespace llvm{
+  class Module;
+  class Function;
+} // namespace llvm
+#endif // WITH_LLVM
+
 namespace CasADi{
 
   struct AlgElData{
@@ -143,6 +151,14 @@ class SXFunctionInternal : public XFunctionInternalCommon<SXFunctionInternal,Mat
 
   /// Work vector for sparsity detection
   bvec_t *iwork_;
+  
+  /// With just-in-time compilation
+  bool just_in_time_;
+  
+  #ifdef WITH_LLVM
+  llvm::Module *jit_module_;
+  llvm::Function *jit_function_;
+  #endif // WITH_LLVM
 };
 
 

@@ -46,6 +46,8 @@
 #include "llvm/Target/TargetSelect.h"
 #include "llvm/Transforms/Scalar.h"
 #include "llvm/Support/IRBuilder.h"
+
+llvm::IRBuilder<> Builder(llvm::getGlobalContext());
 #endif // WITH_LLVM
 
 namespace CasADi{
@@ -860,6 +862,146 @@ void SXFunctionInternal::init(){
   // Get the full Jacobian already now
   if(jac_for_sens_){
     getFullJacobian();
+  }
+  
+  // Initialize just-in-time compilation
+  just_in_time_ = getOption("just_in_time");
+  if(just_in_time_){
+    #ifdef WITH_LLVM
+    llvm::InitializeNativeTarget();
+
+    // Function name
+    stringstream ss;
+    ss << "SXFunction: " << this;
+    
+    // Make the module, which holds all the code.
+    jit_module_ = new llvm::Module(ss.str(), llvm::getGlobalContext());
+
+    // Create the JIT.  This takes ownership of the module.
+    std::string ErrStr;
+    llvm::ExecutionEngine *TheExecutionEngine = llvm::EngineBuilder(jit_module_).setErrorStr(&ErrStr).create();
+    casadi_assert(TheExecutionEngine!=0);
+    llvm::FunctionPassManager OurFPM(jit_module_);
+
+    // Set up the optimizer pipeline.  Start with registering info about how the
+    // target lays out data structures.
+    OurFPM.add(new llvm::TargetData(*TheExecutionEngine->getTargetData()));
+    
+    // Do simple "peephole" optimizations and bit-twiddling optzns.
+    OurFPM.add(llvm::createInstructionCombiningPass());
+    
+    // Reassociate expressions.
+    OurFPM.add(llvm::createReassociatePass());
+    
+    // Eliminate Common SubExpressions.
+    OurFPM.add(llvm::createGVNPass());
+    
+    // Simplify the control flow graph (deleting unreachable blocks, etc).
+    OurFPM.add(llvm::createCFGSimplificationPass());
+    OurFPM.doInitialization();
+
+    // Set the global so the code gen can use this.
+    llvm::FunctionPassManager *TheFPM = &OurFPM;
+
+    // Single argument
+    std::vector<const llvm::Type*> unaryArg(1,llvm::Type::getDoubleTy(llvm::getGlobalContext()));
+
+    // Two arguments
+    std::vector<const llvm::Type*> binaryArg(2,llvm::Type::getDoubleTy(llvm::getGlobalContext()));
+    
+    // Two arguments in and two references
+    std::vector<const llvm::Type*> genArg(4);
+    genArg[0] = genArg[1] = llvm::Type::getDoubleTy(llvm::getGlobalContext());
+    genArg[2] = genArg[3] = llvm::Type::getDoublePtrTy(llvm::getGlobalContext());
+    
+    // Unary operation
+    llvm::FunctionType *unaryFun = llvm::FunctionType::get(llvm::Type::getDoubleTy(llvm::getGlobalContext()),unaryArg, false);
+
+    // Binary operation
+    llvm::FunctionType *binaryFun = llvm::FunctionType::get(llvm::Type::getDoubleTy(llvm::getGlobalContext()),binaryArg, false);
+
+    // Declare all the CasADi built-in functions
+    vector<llvm::Function*> builtins(NUM_BUILT_IN_OPS,0);
+    builtins[POW] = builtins[CONSTPOW] = llvm::Function::Create(binaryFun, llvm::Function::ExternalLinkage, "pow", jit_module_);
+    builtins[SQRT] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "sqrt", jit_module_);
+    builtins[SIN] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "sin", jit_module_);
+    builtins[COS] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "cos", jit_module_);
+    builtins[TAN] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "tan", jit_module_);
+    builtins[ASIN] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "asin", jit_module_);
+    builtins[ACOS] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "acos", jit_module_);
+    builtins[ATAN] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "atan", jit_module_);
+    builtins[FLOOR] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "floor", jit_module_);
+    builtins[CEIL] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "ceil", jit_module_);
+    builtins[FMIN] = llvm::Function::Create(binaryFun, llvm::Function::ExternalLinkage, "fmin", jit_module_);
+    builtins[FMAX] = llvm::Function::Create(binaryFun, llvm::Function::ExternalLinkage, "fmax", jit_module_);
+    builtins[SINH] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "sinh", jit_module_);
+    builtins[COSH] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "cosh", jit_module_);
+    builtins[TANH] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "tanh", jit_module_);
+    
+    // More generic operation, return by reference
+    llvm::FunctionType *genFun = llvm::FunctionType::get(llvm::Type::getVoidTy(llvm::getGlobalContext()),genArg, false);
+
+    // Declare my function
+    jit_function_ = llvm::Function::Create(genFun, llvm::Function::ExternalLinkage, ss.str(), jit_module_);
+
+    // Create a new basic block to start insertion into.
+    llvm::BasicBlock *BB = llvm::BasicBlock::Create(llvm::getGlobalContext(), "entry", jit_function_);
+    Builder.SetInsertPoint(BB);
+
+    // Set names for all arguments.
+    llvm::Function::arg_iterator AI = jit_function_->arg_begin();
+    AI->setName("x1");
+    llvm::Value *x1 = AI;
+    AI++;
+    AI->setName("x2");
+    llvm::Value *x2 = AI;
+    AI++;
+    AI->setName("r1");
+    llvm::Value *r1 = AI;
+    AI++;
+    AI->setName("r2");
+    llvm::Value *r2 = AI;
+    
+    llvm::Value *five = llvm::ConstantFP::get(llvm::getGlobalContext(), llvm::APFloat(5.0));
+    llvm::Value *x1_plus_5 = Builder.CreateFAdd(x1, five, "x1_plus_5");
+    
+    // Call the sine function
+    std::vector<llvm::Value*> sinarg(1,x2);
+    llvm::Value* sin_x2 = Builder.CreateCall(builtins[SIN], sinarg.begin(), sinarg.end(), "callsin");
+    
+    // Set values
+    llvm::StoreInst *what_is_this1 = Builder.CreateStore(sin_x2,r1);
+    llvm::StoreInst *what_is_this2 = Builder.CreateStore(x1_plus_5,r2);
+
+    // Finish off the function.
+    Builder.CreateRetVoid();
+
+    // Validate the generated code, checking for consistency.
+    verifyFunction(*jit_function_);
+
+    // Optimize the function.
+    TheFPM->run(*jit_function_);
+
+    // Print out all of the generated code.
+    jit_module_->dump();
+
+    // JIT the function
+    double x1_val = 10;
+    double x2_val = 20;
+    double r1_val = -1;
+    double r2_val = -1;
+    typedef void (*GenType)(double,double,double*,double*);
+    GenType FP = GenType(intptr_t(TheExecutionEngine->getPointerToFunction(jit_function_)));
+
+    FP(x1_val,x2_val,&r1_val,&r2_val);
+
+    printf("r1 = %g\n", r1_val);
+    printf("r2 = %g\n", r2_val);
+  
+    
+    #else // WITH_LLVM
+    casadi_error("Option \"just_in_time\" true requires CasADi to have been compiled with WITH_LLVM=ON");
+    #endif //WITH_LLVM
   }
   
   // Print

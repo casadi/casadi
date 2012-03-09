@@ -19,10 +19,9 @@ static llvm::IRBuilder<> Builder(llvm::getGlobalContext());
 
 int main() {
   llvm::InitializeNativeTarget();
-  llvm::LLVMContext &Context = llvm::getGlobalContext();
 
   // Make the module, which holds all the code.
-  llvm::Module *TheModule = new llvm::Module("my cool jit", Context);
+  llvm::Module *TheModule = new llvm::Module("my cool jit", llvm::getGlobalContext());
 
   // Create the JIT.  This takes ownership of the module.
   std::string ErrStr;
@@ -96,7 +95,7 @@ int main() {
   llvm::Value *r2 = AI;
   
   llvm::Value *five = llvm::ConstantFP::get(llvm::getGlobalContext(), llvm::APFloat(5.0));
-  llvm::Value *x1_plus_5 = Builder.CreateAdd(x1, five, "x1_plus_5");
+  llvm::Value *x1_plus_5 = Builder.CreateFAdd(x1, five, "x1_plus_5");
   
   // Call the sine function
   std::vector<llvm::Value*> sinarg(1,x2);
