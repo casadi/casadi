@@ -224,8 +224,17 @@ bool SXFunctionInternal::isSmooth() const{
 
 void SXFunctionInternal::print(ostream &stream) const{
  FXInternal::print(stream);
- 
- for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
+
+ // If JIT, dump LLVM IR
+  #ifdef WITH_LLVM
+  if(just_in_time_){
+    jit_module_->dump();
+    return;
+  }
+  #endif // WITH_LLVM
+  
+  // Normal, interpreted output
+  for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
     int op = it->op;
     int ip = op/NUM_BUILT_IN_OPS;
     op -= NUM_BUILT_IN_OPS*ip;
@@ -953,6 +962,9 @@ void SXFunctionInternal::init(){
 
     // Double pointer pointer type
     const llvm::Type* double_ptr_ptr_t = llvm::PointerType::getUnqual(double_ptr_t);
+
+    // A normal 32-bit integer
+    const llvm::IntegerType *int32Ty = llvm::IntegerType::get(llvm::getGlobalContext(), 32);
     
     // Two arguments in and two references
     std::vector<const llvm::Type*> genArg(2);
@@ -973,35 +985,67 @@ void SXFunctionInternal::init(){
     llvm::Function::arg_iterator AI = jit_function_->arg_begin();
     AI->setName("x");  llvm::Value *x_ptr = AI++;
     AI->setName("r");  llvm::Value *r_ptr = AI++;
-    
-    // Integers
-    const llvm::IntegerType *int8Ty = llvm::IntegerType::get(llvm::getGlobalContext(), 8);
-    llvm::Value *zero = llvm::ConstantInt::get(int8Ty, 0);
-    llvm::Value *one = llvm::ConstantInt::get(int8Ty, 1);
 
-    // Get (vector valued) arguments
-    llvm::Value *x0 = builder.CreateLoad(builder.CreateGEP(x_ptr,zero));
-    llvm::Value *x1 = builder.CreateLoad(builder.CreateGEP(x_ptr,one));
-    
-    // Get (scalar valued) arguments
-    llvm::Value *x00 = builder.CreateLoad(builder.CreateGEP(x0,zero));
-    llvm::Value *x10 = builder.CreateLoad(builder.CreateGEP(x1,zero));
-    
-    
-    
-    llvm::Value *five = llvm::ConstantFP::get(llvm::getGlobalContext(), llvm::APFloat(5.0));
-    llvm::Value *x00_plus_5 = builder.CreateFAdd(x00, five, "x00_plus_5");
-    std::vector<llvm::Value*> sinarg(1,x10);
-    llvm::Value* sin_x10 = builder.CreateCall(builtins[SIN], sinarg.begin(), sinarg.end(), "callsin");
+    // Allocate work vector
+    std::vector<llvm::Value*> jwork(work_.size());
 
-    // Get (vector valued) result
-    llvm::Value *r0 = builder.CreateLoad(builder.CreateGEP(r_ptr,zero));
-    llvm::Value *r1 = builder.CreateLoad(builder.CreateGEP(r_ptr,one));
+    // Add all constants to the work vector
+    for(int k=0; k<jwork.size(); ++k){
+      jwork[k] = llvm::ConstantFP::get(llvm::getGlobalContext(), llvm::APFloat(work_[k]));
+    }
     
-    // Save results
-    builder.CreateStore(sin_x10,builder.CreateGEP(r0,zero));
-    builder.CreateStore(x00_plus_5,builder.CreateGEP(r1,zero));
+    // Copy the arguments to the work vector
+    for(int ind=0; ind<input_ind_.size(); ++ind){
+      // Get the vector-valued argument first
+      llvm::Value *ind_v = llvm::ConstantInt::get(int32Ty, ind);
+      llvm::Value* x_arg_v = builder.CreateLoad(builder.CreateGEP(x_ptr,ind_v));
 
+      // Copy the scalar-valued arguments
+      for(int k=0; k<input_ind_[ind].size(); ++k){
+	llvm::Value *k_v = llvm::ConstantInt::get(int32Ty, k);
+	jwork[input_ind_[ind][k]] = builder.CreateLoad(builder.CreateGEP(x_arg_v,k_v));
+      }
+    }
+    
+    // Build up the LLVM expression graphs
+    for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
+      
+      // Argument of the operation
+      std::vector<llvm::Value*> oarg(casadi_math<double>::ndeps(it->op));
+      for(int d=0; d<oarg.size(); ++d){
+	oarg[d] = jwork[it->arg.i[d]];
+      }
+      
+      // Result
+      llvm::Value* res = 0;
+      
+      switch(it->op){
+	// Addition
+	case ADD: res = builder.CreateFAdd(oarg[0],oarg[1]); break;
+	
+	// Sine
+	default:
+	  casadi_assert(builtins[it->op]!=0);
+	  res = builder.CreateCall(builtins[it->op], oarg.begin(), oarg.end());
+      }
+      
+      // Save to work vector
+      jwork[it->res] = res;
+    }
+    
+    // Store the results from the work vector
+    for(int ind=0; ind<output_ind_.size(); ++ind){
+      // Get the vector-valued argument first
+      llvm::Value *ind_v = llvm::ConstantInt::get(int32Ty, ind);
+      llvm::Value* r_arg_v = builder.CreateLoad(builder.CreateGEP(r_ptr,ind_v));
+
+      // Store all scalar-valued arguments
+      for(int k=0; k<output_ind_[ind].size(); ++k){
+	llvm::Value *k_v = llvm::ConstantInt::get(int32Ty, k);
+	builder.CreateStore(jwork[output_ind_[ind][k]],builder.CreateGEP(r_arg_v,k_v));
+      }
+    }
+    
     // Finish off the function.
     builder.CreateRetVoid();
 
@@ -1011,9 +1055,6 @@ void SXFunctionInternal::init(){
     // Optimize the function.
     TheFPM->run(*jit_function_);
 
-    // Print out all of the generated code.
-    //jit_module_->dump();
-    
     // JIT the function
     jitfcn_ = evaluateFcn(intptr_t(TheExecutionEngine->getPointerToFunction(jit_function_)));
 

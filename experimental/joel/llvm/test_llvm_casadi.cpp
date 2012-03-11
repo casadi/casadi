@@ -40,6 +40,8 @@ int main(){
   cout << F.output(0) << endl;
   cout << F.output(1) << endl;
   
+  // Print the LLVM IR
+  F.print();
   
   return 0;
 } 
