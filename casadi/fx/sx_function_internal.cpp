@@ -918,9 +918,6 @@ void SXFunctionInternal::init(){
     OurFPM.add(llvm::createCFGSimplificationPass());
     OurFPM.doInitialization();
 
-    // Set the global so the code gen can use this.
-    llvm::FunctionPassManager *TheFPM = &OurFPM;
-
     // Single argument
     std::vector<const llvm::Type*> unaryArg(1,llvm::Type::getDoubleTy(llvm::getGlobalContext()));
 
@@ -1055,7 +1052,7 @@ void SXFunctionInternal::init(){
     verifyFunction(*jit_function_);
 
     // Optimize the function.
-    TheFPM->run(*jit_function_);
+    OurFPM.run(*jit_function_);
 
     // JIT the function
     jitfcn_ = evaluateFcn(intptr_t(TheExecutionEngine->getPointerToFunction(jit_function_)));
