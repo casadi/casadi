@@ -72,12 +72,21 @@ SXFunctionInternal::~SXFunctionInternal(){
 void SXFunctionInternal::evaluate(int nfdir, int nadir){
   // NOTE: The implementation of this function is very delicate. Small changes in the class structure
   // can cause large performance losses. For this reason, the preprocessor macros are used below
-  
   if (!free_vars_.empty()) {
     std::stringstream ss;
     repr(ss);
     casadi_error("Cannot evaluate \"" << ss.str() << "\" since variables " << free_vars_ << " are free.");
   }
+  
+  #ifdef WITH_LLVM
+  if(just_in_time_ && nfdir==0 && nadir==0){
+    // Evaluate the jitted function
+    jitfcn_(getPtr(input_ref_),getPtr(output_ref_));
+    return;
+  }
+  #endif // WITH_LLVM
+  
+  
   // Copy the function arguments to the work vector
   for(int ind=0; ind<getNumInputs(); ++ind){
     const Matrix<double> &arg = input(ind);
@@ -1003,25 +1012,22 @@ void SXFunctionInternal::init(){
     TheFPM->run(*jit_function_);
 
     // Print out all of the generated code.
-    jit_module_->dump();
-
-    // Input
-    double x_val[2] = {10,20};
-    double *x_val_ref[] = {&x_val[0],&x_val[1]};
-    
-    // Output
-    double r_val[2] = {-1,-1};
-    double *r_val_ref[] = {&r_val[0],&r_val[1]};
+    //jit_module_->dump();
     
     // JIT the function
-    typedef void (*GenType)(double**,double**);
-    GenType jitfcn = GenType(intptr_t(TheExecutionEngine->getPointerToFunction(jit_function_)));
+    jitfcn_ = evaluateFcn(intptr_t(TheExecutionEngine->getPointerToFunction(jit_function_)));
 
-    jitfcn(x_val_ref,r_val_ref);
-
-    printf("r1 = %g\n", r_val[0]);
-    printf("r2 = %g\n", r_val[1]);
-
+    // Allocate references to input nonzeros
+    input_ref_.resize(getNumInputs());
+    for(int ind=0; ind<input_ref_.size(); ++ind){
+      input_ref_[ind] = getPtr(input(ind).data());
+    }
+        
+    // Allocate references to output nonzeros
+    output_ref_.resize(getNumOutputs());
+    for(int ind=0; ind<output_ref_.size(); ++ind){
+      output_ref_[ind] = getPtr(output(ind).data());
+    }
     
     #else // WITH_LLVM
     casadi_error("Option \"just_in_time\" true requires CasADi to have been compiled with WITH_LLVM=ON");

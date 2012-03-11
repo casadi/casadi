@@ -158,6 +158,15 @@ class SXFunctionInternal : public XFunctionInternalCommon<SXFunctionInternal,Mat
   #ifdef WITH_LLVM
   llvm::Module *jit_module_;
   llvm::Function *jit_function_;
+
+  // Function pointer type to the JIT evaluate function
+  typedef void (*evaluateFcn)(double**,double**);
+  
+  // JIT function
+  evaluateFcn jitfcn_;
+
+  // References to input and output nonzeros
+  std::vector<double*> input_ref_, output_ref_;
   #endif // WITH_LLVM
 };
 

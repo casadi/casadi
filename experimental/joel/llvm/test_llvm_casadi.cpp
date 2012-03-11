@@ -29,5 +29,17 @@ int main(){
   // Generate C code
   F.generateCode("test.c");
   
+  // Pass inputs
+  F.setInput(10,0);
+  F.setInput(20,1);
+  
+  // Evaluate
+  F.evaluate();
+  
+  // Print results
+  cout << F.output(0) << endl;
+  cout << F.output(1) << endl;
+  
+  
   return 0;
 } 
