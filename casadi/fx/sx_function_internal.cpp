@@ -1020,12 +1020,14 @@ void SXFunctionInternal::init(){
       llvm::Value* res = 0;
       
       switch(it->op){
-	// Addition
 	case ADD: res = builder.CreateFAdd(oarg[0],oarg[1]); break;
-	
-	// Sine
+	case SUB: res = builder.CreateFSub(oarg[0],oarg[1]); break;
+	case MUL: res = builder.CreateFMul(oarg[0],oarg[1]); break;
+	case DIV: res = builder.CreateFDiv(oarg[0],oarg[1]); break;
+	case NEG: res = builder.CreateFNeg(oarg[0]);         break;
+
 	default:
-	  casadi_assert(builtins[it->op]!=0);
+	  casadi_assert_message(builtins[it->op]!=0, "No way to treat: " << it->op);
 	  res = builder.CreateCall(builtins[it->op], oarg.begin(), oarg.end());
       }
       
