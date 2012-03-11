@@ -47,7 +47,7 @@
 #include "llvm/Transforms/Scalar.h"
 #include "llvm/Support/IRBuilder.h"
 
-llvm::IRBuilder<> Builder(llvm::getGlobalContext());
+llvm::IRBuilder<> builder(llvm::getGlobalContext());
 #endif // WITH_LLVM
 
 namespace CasADi{
@@ -909,11 +909,6 @@ void SXFunctionInternal::init(){
     // Two arguments
     std::vector<const llvm::Type*> binaryArg(2,llvm::Type::getDoubleTy(llvm::getGlobalContext()));
     
-    // Two arguments in and two references
-    std::vector<const llvm::Type*> genArg(4);
-    genArg[0] = genArg[1] = llvm::Type::getDoubleTy(llvm::getGlobalContext());
-    genArg[2] = genArg[3] = llvm::Type::getDoublePtrTy(llvm::getGlobalContext());
-    
     // Unary operation
     llvm::FunctionType *unaryFun = llvm::FunctionType::get(llvm::Type::getDoubleTy(llvm::getGlobalContext()),unaryArg, false);
 
@@ -937,44 +932,63 @@ void SXFunctionInternal::init(){
     builtins[SINH] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "sinh", jit_module_);
     builtins[COSH] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "cosh", jit_module_);
     builtins[TANH] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "tanh", jit_module_);
+
+    // Void type
+    const llvm::Type* void_t = llvm::Type::getVoidTy(llvm::getGlobalContext());
+
+    // Double type
+    const llvm::Type* double_t = llvm::Type::getDoubleTy(llvm::getGlobalContext());
+    
+    // Double pointer type
+    const llvm::Type* double_ptr_t = llvm::Type::getDoublePtrTy(llvm::getGlobalContext());
+    
+    // Two arguments in and two references
+    std::vector<const llvm::Type*> genArg(2);
+    genArg[0] = double_ptr_t;
+    genArg[1] = double_ptr_t;
     
     // More generic operation, return by reference
-    llvm::FunctionType *genFun = llvm::FunctionType::get(llvm::Type::getVoidTy(llvm::getGlobalContext()),genArg, false);
+    llvm::FunctionType *genFun = llvm::FunctionType::get(void_t,genArg, false);
 
     // Declare my function
     jit_function_ = llvm::Function::Create(genFun, llvm::Function::ExternalLinkage, ss.str(), jit_module_);
 
     // Create a new basic block to start insertion into.
     llvm::BasicBlock *BB = llvm::BasicBlock::Create(llvm::getGlobalContext(), "entry", jit_function_);
-    Builder.SetInsertPoint(BB);
+    builder.SetInsertPoint(BB);
 
     // Set names for all arguments.
     llvm::Function::arg_iterator AI = jit_function_->arg_begin();
-    AI->setName("x1");
-    llvm::Value *x1 = AI;
-    AI++;
-    AI->setName("x2");
-    llvm::Value *x2 = AI;
-    AI++;
-    AI->setName("r1");
-    llvm::Value *r1 = AI;
-    AI++;
-    AI->setName("r2");
-    llvm::Value *r2 = AI;
+    AI->setName("x");  llvm::Value *x_ptr = AI++;
+    AI->setName("r");  llvm::Value *r_ptr = AI++;
+    
+    // Integers
+    const llvm::IntegerType *int8Ty = llvm::IntegerType::get(llvm::getGlobalContext(), 8);
+    llvm::Value *zero = llvm::ConstantInt::get(int8Ty, 0);
+    llvm::Value *one = llvm::ConstantInt::get(int8Ty, 1);
+
+    // Get arguments
+    llvm::Value *x1_ptr = builder.CreateGEP(x_ptr,zero);
+    llvm::Value *x2_ptr = builder.CreateGEP(x_ptr,one);
+    llvm::Value *x1 = builder.CreateLoad(x1_ptr);
+    llvm::Value *x2 = builder.CreateLoad(x2_ptr);
     
     llvm::Value *five = llvm::ConstantFP::get(llvm::getGlobalContext(), llvm::APFloat(5.0));
-    llvm::Value *x1_plus_5 = Builder.CreateFAdd(x1, five, "x1_plus_5");
+    llvm::Value *x1_plus_5 = builder.CreateFAdd(x1, five, "x1_plus_5");
     
     // Call the sine function
     std::vector<llvm::Value*> sinarg(1,x2);
-    llvm::Value* sin_x2 = Builder.CreateCall(builtins[SIN], sinarg.begin(), sinarg.end(), "callsin");
-    
-    // Set values
-    llvm::StoreInst *what_is_this1 = Builder.CreateStore(sin_x2,r1);
-    llvm::StoreInst *what_is_this2 = Builder.CreateStore(x1_plus_5,r2);
+    llvm::Value* sin_x2 = builder.CreateCall(builtins[SIN], sinarg.begin(), sinarg.end(), "callsin");
+
+    // Save results
+    llvm::Value *r1 = builder.CreateGEP(r_ptr,zero);
+    builder.CreateStore(sin_x2,r1);
+
+    llvm::Value *r2 = builder.CreateGEP(r_ptr,one);
+    builder.CreateStore(x1_plus_5,r2);
 
     // Finish off the function.
-    Builder.CreateRetVoid();
+    builder.CreateRetVoid();
 
     // Validate the generated code, checking for consistency.
     verifyFunction(*jit_function_);
@@ -985,19 +999,21 @@ void SXFunctionInternal::init(){
     // Print out all of the generated code.
     jit_module_->dump();
 
+    // Input
+    double x_val[2] = {10,20};
+    
+    // Output
+    double r_val[2] = {-1,-1};
+    
     // JIT the function
-    double x1_val = 10;
-    double x2_val = 20;
-    double r1_val = -1;
-    double r2_val = -1;
-    typedef void (*GenType)(double,double,double*,double*);
-    GenType FP = GenType(intptr_t(TheExecutionEngine->getPointerToFunction(jit_function_)));
+    typedef void (*GenType)(double*,double*);
+    GenType jitfcn = GenType(intptr_t(TheExecutionEngine->getPointerToFunction(jit_function_)));
 
-    FP(x1_val,x2_val,&r1_val,&r2_val);
+    jitfcn(x_val,r_val);
 
-    printf("r1 = %g\n", r1_val);
-    printf("r2 = %g\n", r2_val);
-  
+    printf("r1 = %g\n", r_val[0]);
+    printf("r2 = %g\n", r_val[1]);
+
     
     #else // WITH_LLVM
     casadi_error("Option \"just_in_time\" true requires CasADi to have been compiled with WITH_LLVM=ON");

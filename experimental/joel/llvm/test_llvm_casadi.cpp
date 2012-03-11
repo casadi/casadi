@@ -26,5 +26,8 @@ int main(){
   F.setOption("just_in_time",true);
   F.init();
 
+  // Generate C code
+  F.generateCode("test.c");
+  
   return 0;
 } 
