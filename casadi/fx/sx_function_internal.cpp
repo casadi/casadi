@@ -941,11 +941,14 @@ void SXFunctionInternal::init(){
     
     // Double pointer type
     const llvm::Type* double_ptr_t = llvm::Type::getDoublePtrTy(llvm::getGlobalContext());
+
+    // Double pointer pointer type
+    const llvm::Type* double_ptr_ptr_t = llvm::PointerType::getUnqual(double_ptr_t);
     
     // Two arguments in and two references
     std::vector<const llvm::Type*> genArg(2);
-    genArg[0] = double_ptr_t;
-    genArg[1] = double_ptr_t;
+    genArg[0] = double_ptr_ptr_t;
+    genArg[1] = double_ptr_ptr_t;
     
     // More generic operation, return by reference
     llvm::FunctionType *genFun = llvm::FunctionType::get(void_t,genArg, false);
@@ -967,25 +970,28 @@ void SXFunctionInternal::init(){
     llvm::Value *zero = llvm::ConstantInt::get(int8Ty, 0);
     llvm::Value *one = llvm::ConstantInt::get(int8Ty, 1);
 
-    // Get arguments
-    llvm::Value *x1_ptr = builder.CreateGEP(x_ptr,zero);
-    llvm::Value *x2_ptr = builder.CreateGEP(x_ptr,one);
-    llvm::Value *x1 = builder.CreateLoad(x1_ptr);
-    llvm::Value *x2 = builder.CreateLoad(x2_ptr);
+    // Get (vector valued) arguments
+    llvm::Value *x0 = builder.CreateLoad(builder.CreateGEP(x_ptr,zero));
+    llvm::Value *x1 = builder.CreateLoad(builder.CreateGEP(x_ptr,one));
+    
+    // Get (scalar valued) arguments
+    llvm::Value *x00 = builder.CreateLoad(builder.CreateGEP(x0,zero));
+    llvm::Value *x10 = builder.CreateLoad(builder.CreateGEP(x1,zero));
+    
+    
     
     llvm::Value *five = llvm::ConstantFP::get(llvm::getGlobalContext(), llvm::APFloat(5.0));
-    llvm::Value *x1_plus_5 = builder.CreateFAdd(x1, five, "x1_plus_5");
+    llvm::Value *x00_plus_5 = builder.CreateFAdd(x00, five, "x00_plus_5");
+    std::vector<llvm::Value*> sinarg(1,x10);
+    llvm::Value* sin_x10 = builder.CreateCall(builtins[SIN], sinarg.begin(), sinarg.end(), "callsin");
+
+    // Get (vector valued) result
+    llvm::Value *r0 = builder.CreateLoad(builder.CreateGEP(r_ptr,zero));
+    llvm::Value *r1 = builder.CreateLoad(builder.CreateGEP(r_ptr,one));
     
-    // Call the sine function
-    std::vector<llvm::Value*> sinarg(1,x2);
-    llvm::Value* sin_x2 = builder.CreateCall(builtins[SIN], sinarg.begin(), sinarg.end(), "callsin");
-
     // Save results
-    llvm::Value *r1 = builder.CreateGEP(r_ptr,zero);
-    builder.CreateStore(sin_x2,r1);
-
-    llvm::Value *r2 = builder.CreateGEP(r_ptr,one);
-    builder.CreateStore(x1_plus_5,r2);
+    builder.CreateStore(sin_x10,builder.CreateGEP(r0,zero));
+    builder.CreateStore(x00_plus_5,builder.CreateGEP(r1,zero));
 
     // Finish off the function.
     builder.CreateRetVoid();
@@ -1001,15 +1007,17 @@ void SXFunctionInternal::init(){
 
     // Input
     double x_val[2] = {10,20};
+    double *x_val_ref[] = {&x_val[0],&x_val[1]};
     
     // Output
     double r_val[2] = {-1,-1};
+    double *r_val_ref[] = {&r_val[0],&r_val[1]};
     
     // JIT the function
-    typedef void (*GenType)(double*,double*);
+    typedef void (*GenType)(double**,double**);
     GenType jitfcn = GenType(intptr_t(TheExecutionEngine->getPointerToFunction(jit_function_)));
 
-    jitfcn(x_val,r_val);
+    jitfcn(x_val_ref,r_val_ref);
 
     printf("r1 = %g\n", r_val[0]);
     printf("r2 = %g\n", r_val[1]);
