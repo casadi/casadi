@@ -369,6 +369,157 @@ An \texttt{MXFunction} which only contains built-in operations (e.g. +, *, linea
 
 This might speed up the calculations significantly, but might also cause extra memory overhead.
 
+\chapter{Working with CasADi's types}
+
+This chapter aims to give you an in-depth overview of available manipulations on the CasADi primitives, with a focus on the matrix types \texttt{MX} and \texttt{SXMatrix}.
+
+\section{Indexing and slicing}
+CasADi offers a variety of different ways to get or set specific elements or blocks of elements in matrix types. All slicing techniques fall into one of the following two categories:
+
+\begin{description}
+\item[nonzero access] aims at non-zeros, specified by their (single) index 
+\item[full access] aims at elements in general -- which may well be structural zeros --  specified by a (row, col) pair.
+\end{description}
+
+This section gives an exhaustive overview of the possibilities of indexing and slicing. The methods can be used both for setting and getting and they apply to all matrix types: \texttt{MX}, \texttt{SMatrix}, \texttt{DMatrix}, \texttt{IMatrix}.
+
+In python and C++ indexing starts from zero, while in octave indexing starts from 1.
+In python, it is customary to use negative indices to specify an index counted from the end of a list. CasADi supports this, too.
+
+\subsection{Scalar access}
+
+Use this to target individual elements. The \emph{nonzero access} flavour uses one number, the non-zero index, in rectangular brackets. The \emph{full access} flavour uses two.
+
+An example with a dense matrix:
+\begin{verbatim}
+ M = DMatrix([[3,7],[4,5]])
+ print M
+ print M[0]   # 3
+ print M[1]   # 7
+ print M[2]   # 4
+ print M[3]   # 5
+ print M[-1]  # 5
+ print M[-2]  # 4
+ print M[0,0] # 3
+ print M[0,1] # 7
+ print M[1,0] # 4
+ print M[1,1] # 5
+ print M[-1,-1] # 5
+\end{verbatim}
+
+An example with a sparse matrix:
+\begin{verbatim}
+ M = diag([3,4,5,6])
+ print M
+ print M[0]   # 3
+ print M[1]   # 7
+ print M[2]   # 5
+ print M[3]   # 6
+ print M[-1]  # 6
+ print M[-2]  # 5
+ print M[0,0] # 3
+ print M[0,1] # 0
+ print M[1,0] # 0
+ print M[1,1] # 4
+ print M[-1,-1] # 6
+\end{verbatim}
+
+\subsection{Slice access}
+
+Slices are the most common way to access a range of elements at once.
+The distinction between \emph{nonzero access} and \emph{full access} is given, again, by the use of either one or two items in the rectangular brackets.
+CasADi supports the full range of python slices.
+
+\begin{verbatim}
+ M = DMatrix([[3,7,8,9],[4,5,6,1]])
+ print M
+ print M[:]    # [3,7,8,9,4,5,6,1]
+ print M[1:]   # [  7,8,9,4,5,6,1]
+ print M[:-1]  # [3,7,8,9,4,5,6  ]
+ print M[1:4]  # [  7,8,9        ]
+ print M[::3]  # [3,    9,    6  ]
+ print M[1,:]  # [[4,  5,  6,  1 ]]
+ print M[:,0]  # [[3],[4]]
+ print M[0,1]  # 7
+ print M[:,1:] # [[7,8,9],[5,6,1]]
+\end{verbatim}
+
+\subsection{List access}
+
+Being similar to slices in effect, lists are a more flexible way to access a group of elements at once.
+
+\begin{verbatim}
+ M = DMatrix([[3,7,8,9],[4,5,6,1]])
+ print M
+ print M[[0,1,2]]      # [3,7,8]
+ print M[[6,1,3]]      # [6,7,9]
+ print M[0,[0,3]]      # [[3,  9]]
+ print M[[1,0],[0,3]]  # [[4,  1],[3,  9]]
+\end{verbatim}
+
+\subsection{Simple IMatrix access}
+
+This indexing type does repeated scalar access with a custom result shape. The user specifies \texttt{IMatrix}'es as item(s) in the rectangular brackets.  The result takes over the shape/sparsity of the supplied \texttt{IMatrix}.
+
+In the \emph{nonzero access} style, each number of the \texttt{IMatrix} supplied is used as non-zero index into the left hand side matrix. In the \emph{full access} style, both \texttt{IMatrix}'es must have the same sparsity. Common non-zeros of the Imatrix'es form (row,col) pairs to access the left hand side.
+
+\begin{verbatim}
+ M = DMatrix([[3,7,8,9],[4,5,6,1]])
+ k = IMatrix([0],[1])
+ print M[k]    # [[3],[7]]
+ k = IMatrix([0,1],[3,6])
+ print M[k]    # [[3,  7 ],[9,  6 ]]
+ k = diag(range(4))
+ print M[k]    # diag([3,7,8,9])
+\end{verbatim}
+
+\begin{verbatim}
+ M = DMatrix([[3,7,8,9],[4,5,6,1]])
+ i = IMatrix([[0],[1]])
+ j = IMatrix([[2],[3]])
+ print M[i,j]    # [[8,1]]
+ i = diag([0,0,1,1])
+ j = diag([0,1,2,3])
+ print M[i,j]    # diag([3,7,6,1])
+\end{verbatim}
+
+\subsection{Mixed \texttt{IMatrix} access}
+
+This last flavour deals with \emph{nonzero access} in a row or column wise fashion. Given a slice in the rows place and an \texttt{IMatrix} in the columns place, this flavour lets act \emph{simple \texttt{IMatrix} access} on each row individually. The results of all these \emph{simple \texttt{IMatrix} access} are concatenated vertically.
+
+A similar definition holds for an IMatrix in the columns place, and a slice in the rows place of the double element rectangular bracket.
+
+\begin{verbatim}
+ M = DMatrix([[3,7,8,9],[4,5,6,1]])
+ j = IMatrix([[0],[1]])
+ print M[0,j]    # [[3],[7]]
+ print M[1,j]    # [[4],[5]]
+ print M[:,j]    # [[3],[7],[4],[5]]
+ j = diag([0,2])
+ print M[:,j]    # [[3,  00 ],[00,  8 ],[4,  00 ],[00,  6 ]]
+ i = IMatrix([[0,1],[1,0]])
+ print M[i,:2]   # [[3,  4,  7,  5 ],[4,  3,  5,  7 ]]
+\end{verbatim}
+
+\section{Sparsity tools}
+
+\subsection{Sparsity constructors}
+There are several options to build sparse CasADi matrix types:
+
+\begin{itemize}
+ \item Start from an empty matrix and add elements by using indexing/slicing in a setting mode.
+ \item Use sparsity contructors
+ \item Convert from scipy sparse matrices
+\end{itemize}
+
+\begin{verbatim}
+ print DMatrix(sp_tril(3),1)          # [[1,  00,  00 ], [1,  1,  00 ], [1,  1,  1 ]]
+ print DMatrix(sp_tril(3),range(21))  # [[1,  00,  00 ], [2,  3,  00 ], [4,  5,  6 ]]
+\end{verbatim}
+
+
+
+
 \chapter{Automatic differentiation\label{chapter:ad}}
 The most important functionality of CasADi is \emph{automatic differentiation} or AD. CasADi contains a total of 8 different AD algorithms that are suitable in different situations.
 
@@ -387,7 +538,7 @@ Jacobian-transposed-times-vector products can be calculated in a similar way, us
  x_{\text{asens}} = \left(\frac{\partial f}{\partial x}\right)^{\text{T}} \, y_{\text{aseed}}
 \end{equation}
 
-In CasADi, forward/adjoint seeds are set together with the function inputs and forward/adjoint sensitivities (or directional derivatives) are collected together with the outputs. Multiple forward and/or adjoint derivative directions can be handled simultaneously, that is you can simultaneously multiply the Jacobian from the left or right with multiple vectors. The number of vectors are passed as arguemnts to \texttt{f.evaluate(num\_fwd\_sensitivities, num\_adj\_sensitivities)}. In this turorial we shall restrict ourselves to at most one forward and one adjoint derivative direction, meaning that \texttt{num\_fwd\_sensitivities} and \texttt{num\_adj\_sensitivities} will either be 0 or 1.
+In CasADi, forward/adjoint seeds are set together with the function inputs and forward/adjoint sensitivities (or directional derivatives) are collected together with the outputs. Multiple forward and/or adjoint derivative directions can be handled simultaneously, that is you can simultaneously multiply the Jacobian from the left or right with multiple vectors. The number of vectors are passed as arguemnts to \texttt{f.evaluate(num\_fwd\_sensitivities, num\_adj\_sensitivities)}. In this tutorial we shall restrict ourselves to at most one forward and one adjoint derivative direction, meaning that \texttt{num\_fwd\_sensitivities} and \texttt{num\_adj\_sensitivities} will either be 0 or 1.
 
 CasADi is also able to generate complete, \emph{sparse} Jacobians efficiently by calling the \texttt{jacobian} member function. The algorithm it will use for this depends on the particular class\footnote{For \emph{SXFunction}, the default algorithm is to first determine the sparsity pattern, then use a graph coloring algorithm to determine which rows or columns can be calculated simultaneously, performing the AD algorithm symbolically and then assemble a new \emph{SXFunction} corresponding the the Jacobian}.
 \begin{verbatim}
