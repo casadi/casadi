@@ -374,7 +374,7 @@ This might speed up the calculations significantly, but might also cause extra m
 This chapter aims to give you an in-depth overview of available manipulations on the CasADi primitives, with a focus on the matrix types \texttt{MX} and \texttt{SXMatrix}.
 
 \section{Indexing and slicing}
-CasADi offers a variety of different ways to get or set specific elements or blocks of elements in matrix types. All slicing techniques fall into one of the following two categories:
+CasADi offers a variety of different ways to get or set specific elements or blocks of elements in matrix types. Most slicing techniques fall into one of the following two categories:
 
 \begin{description}
 \item[nonzero access] aims at non-zeros, specified by their (single) index 
@@ -524,7 +524,27 @@ A similar definition holds for an IMatrix in the columns place, and a slice in t
  print M[i,:2]   # [[3,  4,  7,  5 ],[4,  3,  5,  7 ]]
 \end{verbatim}
 
+\paragraph{Sparsity access} involves slicing with a sparsity pattern o fthe same shape as the left hand side. For each non-zero in the slice item, the element of th eleft hand side with the same (row, col) pair is selected.
+\begin{verbatim}
+ M = DMatrix([[3,7,8],[4,5,6],[1,2,9]])
+ print M[sp_diag(3)]   # diag([3,5,9])
+\end{verbatim}
+
 \section{Sparsity tools}
+
+Sparsities are easily visualised with the \texttt{spy} command:
+
+\begin{verbatim}
+ sp_diag(3).spy()
+\end{verbatim}
+
+Output:
+\begin{verbatim}
+*..
+.*.
+..*
+\end{verbatim}
+
 
 \subsection{Sparsity constructors}
 There are several options to build sparse CasADi matrix types:
@@ -537,11 +557,84 @@ There are several options to build sparse CasADi matrix types:
 
 \begin{verbatim}
  print DMatrix(sp_tril(3),1)          # [[1,  00,  00 ], [1,  1,  00 ], [1,  1,  1 ]]
- print DMatrix(sp_tril(3),range(21))  # [[1,  00,  00 ], [2,  3,  00 ], [4,  5,  6 ]]
+ print DMatrix(sp_tril(3),range(6))  # [[0,  00,  00 ], [1,  2,  00 ], [3,  4,  5 ]]
 \end{verbatim}
 
 
+\begin{verbatim}
+ sp_diag(3).spy()
+\end{verbatim}
 
+\begin{verbatim}
+*..
+.*.
+..*
+\end{verbatim}
+
+\begin{verbatim}
+ sp_tril(3).spy()
+\end{verbatim}
+
+\begin{verbatim}
+*..
+**.
+***
+\end{verbatim}
+
+
+\begin{verbatim}
+ sp_band(3,1).spy()
+ sp_band(3,-1).spy()
+\end{verbatim}
+
+\begin{verbatim}
+.*.
+..*
+...
+
+...
+*..
+.*.
+\end{verbatim}
+
+
+\begin{verbatim}
+sp_rowcol([0,3],[1,2],4,4).spy()
+\end{verbatim}
+
+\begin{verbatim}
+.**.
+....
+....
+.**.
+\end{verbatim}
+
+\subsection{Sparsity operators}
+
+The \texttt{+} operator is overloaded for sparsity patterns to perform an \emph{or} operation:
+
+\begin{verbatim}
+(sp_diag(3)+sp_band(3,1)).spy()
+\end{verbatim}
+
+\begin{verbatim}
+**.
+.**
+..*
+\end{verbatim}
+
+The \texttt{*} operator is overloaded for sparsity patterns to perform an \emph{and} operation:
+
+\begin{verbatim}
+(sp_tril(4)*sp_rowcol([2,3],range(4),4,4)).spy()
+\end{verbatim}
+
+\begin{verbatim}
+....
+....
+***.
+****
+\end{verbatim}
 
 \chapter{Automatic differentiation\label{chapter:ad}}
 The most important functionality of CasADi is \emph{automatic differentiation} or AD. CasADi contains a total of 8 different AD algorithms that are suitable in different situations.

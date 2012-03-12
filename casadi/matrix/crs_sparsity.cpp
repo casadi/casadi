@@ -424,5 +424,14 @@ CRSSparsity CRSSparsity::pmult(const std::vector<int>& p, bool permute_rows, boo
   return (*this)->pmult(p,permute_rows,permute_columns,invert_permutation);
 }
 
+void CRSSparsity::spy(std::ostream &stream) const {
+  for (int i=0;i<size1();++i) {
+    for (int j=0;j<size2();++j) {
+      stream << (getNZ(i,j)==-1? "." : "*");
+    }
+    stream << std::endl;
+  }
+}
+
 
 } // namespace CasADi

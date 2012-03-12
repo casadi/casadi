@@ -340,6 +340,13 @@ class CRSSparsity : public SharedObject{
     CRSSparsity pmult(const std::vector<int>& p, bool permute_rows=true, bool permute_columns=true, bool invert_permutation=false) const;
       
     std::string dimString() 	const;
+    
+    
+      
+    /* \brief print a textual representation of sparsity
+    */
+    void spy(std::ostream &stream=std::cout) const;
+
 
 };
 

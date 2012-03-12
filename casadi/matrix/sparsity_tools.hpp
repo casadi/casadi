@@ -93,7 +93,7 @@ CRSSparsity trans(const CRSSparsity& a);
 /**
 * \brief Return the lower part of the sparsity pattern
 * 
-* \param includeDiagonal specify wether the diaginal must be part of the result
+* \param includeDiagonal specify wether the diagonal must be part of the result
 *
 * \see sp_tril
 */
@@ -116,11 +116,11 @@ std::vector<int> lowerNZ(const CRSSparsity& a);
   CRSSparsity sp_triplet(int n, int m, const std::vector<int>& row, const std::vector<int>& col);
 
 
-  /**
-  * Get the sparsity resulting from a matrix multiplication
+  /** \brief Get the sparsity resulting from a matrix multiplication
   */
   CRSSparsity mul(const  CRSSparsity& a, const  CRSSparsity &b);
-
+  
+  
 }
 
 #endif // SPARSITY_TOOLS_HPP
