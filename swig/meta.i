@@ -21,6 +21,7 @@
   if (meta< Type >::isa($input)) { // Type object get passed on as-is, and fast.
     Type* temp = static_cast< Type* >($1);
     int result = meta< Type >::get_ptr($input,temp);
+    $1 = temp;
     if (!result)
       SWIG_exception_fail(SWIG_TypeError,"Type cast failed");
   } else {
