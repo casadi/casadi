@@ -31,6 +31,29 @@
 
 namespace CasADi{
 
+
+/** \brief Matlab's linspace command
+*/
+template<typename T>
+T linspace(const GenericMatrix<T> &a, const GenericMatrix<T> &b, int nsteps);
+
+#ifndef SWIG
+template<typename T>
+T linspace(const GenericMatrix<T> &a_, const GenericMatrix<T> &b_, int nsteps){
+  const T& a = static_cast<const T&>(a_);
+  const T& b = static_cast<const T&>(b_);
+  std::vector<T> ret(nsteps);
+  ret[0] = a;
+  T step = (b-a)/(nsteps-1);
+
+  for(int i=1; i<nsteps-1; ++i)
+    ret[i] = ret[i-1] + step;
+  
+  ret[nsteps-1] = b;
+  return vertcat(ret);
+}
+#endif // SWIG
+
 #ifndef SWIG
 
 /** \brief  Construct a symbolic matrix
@@ -41,6 +64,20 @@ void sym(MatType& ret, const std::string& name, int n, int m);
 #endif // SWIG
 
 } // namespace CasADi
+
+#ifdef SWIG
+
+// map the template name to the instantiated name
+#define GMTT_INST(T,function_name) \
+%template(function_name) CasADi::function_name< T >;
+
+// Define template instanciations
+#define GENERIC_MATRIX_TOOLS_TEMPLATES(T) \
+GMTT_INST(T,linspace) \
+
+#endif //SWIG
+
+
 
 #endif // GENERIC_MATRIX_TOOLS_HPP
 

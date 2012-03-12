@@ -16,6 +16,26 @@
 #include "casadi/fx/fx.hpp"
 %}
 
+%define %my_genericmatrix_const_typemap(Precedence,Type...) 
+%typemap(in) const CasADi::GenericMatrix< Type > & (Type m) {
+  if (meta< Type >::isa($input)) { // Type object get passed on as-is, and fast.
+    Type* temp = static_cast< Type* >($1);
+    int result = meta< Type >::get_ptr($input,temp);
+    if (!result)
+      SWIG_exception_fail(SWIG_TypeError,"Type cast failed");
+  } else {
+    bool result=meta< Type >::as($input,m);
+    if (!result)
+      SWIG_exception_fail(SWIG_TypeError,meta< Type >::expected_message);
+    $1 = &m;
+  }
+}
+
+%typemap(typecheck,precedence=Precedence) const CasADi::GenericMatrix< Type > & { $1 = meta< Type >::isa($input) || meta< Type >::couldbe($input); }
+%typemap(freearg) const CasADi::GenericMatrix< Type >  & {}
+
+%enddef
+
 
 %inline %{
 template<> swig_type_info** meta< double >::name = &SWIGTYPE_p_double;

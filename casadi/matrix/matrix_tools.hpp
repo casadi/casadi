@@ -226,10 +226,6 @@ Note 2: When permuting the linear system, a BLT (block lower triangular) transfo
 template<class T>
 Matrix<T> solve(const Matrix<T>& A, const Matrix<T>& b);
 
-/** \brief  Matlab's linspace function */
-template<class T>
-Matrix<T> linspace(const Matrix<T> &a, const Matrix<T> &b, int nsteps);
-
 /** \brief  check if the matrix is 0 (note that false negative answers are possible)*/
 template<class T>
 bool isZero(const Matrix<T>& ex);
@@ -932,22 +928,6 @@ Matrix<T> solve(const Matrix<T>& A, const Matrix<T>& b){
 }
 
 template<class T>
-Matrix<T> linspace(const Matrix<T> &a_, const Matrix<T> &b_, int nsteps){
-  casadi_assert_message(isScalar(a_) && isScalar(b_), "linspace: a and b must be scalar");
-  T a = a_.toScalar();
-  T b = b_.toScalar();
-  Matrix<T> ret(nsteps,1);
-  ret(0) = a;
-  T step = (b-a)/(nsteps-1);
-
-  for(int i=1; i<nsteps-1; ++i)
-    ret(i) = ret(i-1) + step;
-  
-  ret(nsteps-1) = b;
-  return ret;
-}
-
-template<class T>
 bool isOne(const Matrix<T>& ex){  
   if(!ex.dense()){
     return false;
@@ -1226,7 +1206,7 @@ void addMultiple(const Matrix<T>& A, const std::vector<T>& v, std::vector<T>& re
 
 // map the template name to the instantiated name
 #define MTT_INST(T,function_name) \
-%template(function_name) CasADi::function_name<T>;
+%template(function_name) CasADi::function_name< T >;
 
 // Define template instanciations
 #define MATRIX_TOOLS_TEMPLATES(T) \
@@ -1257,7 +1237,6 @@ MTT_INST(T,outer_prod) \
 MTT_INST(T,norm_2) \
 MTT_INST(T,qr) \
 MTT_INST(T,solve) \
-MTT_INST(T,linspace) \
 MTT_INST(T,isZero) \
 MTT_INST(T,isOne) \
 MTT_INST(T,isMinusOne) \

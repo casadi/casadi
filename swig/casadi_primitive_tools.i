@@ -39,11 +39,17 @@ except:
 
 // Matrix tools
 %include "casadi/matrix/matrix_tools.hpp"
+%include "casadi/matrix/generic_matrix_tools.hpp"
 
 // Instantiate the functions
 MATRIX_TOOLS_TEMPLATES(int)
 MATRIX_TOOLS_TEMPLATES(double)
 MATRIX_TOOLS_TEMPLATES(CasADi::SX)
+
+GENERIC_MATRIX_TOOLS_TEMPLATES(CasADi::Matrix<int>)
+GENERIC_MATRIX_TOOLS_TEMPLATES(CasADi::Matrix<double>)
+GENERIC_MATRIX_TOOLS_TEMPLATES(CasADi::Matrix<CasADi::SX>)
+GENERIC_MATRIX_TOOLS_TEMPLATES(CasADi::MX)
 
 // Sparsity tools
 %{

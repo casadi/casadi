@@ -120,24 +120,26 @@ if (!ret) {
 %my_generic_const_typemap(PRECEDENCE_SXVector,std::vector< CasADi::SX >);
 
 %my_generic_const_typemap(PRECEDENCE_SXMatrix,CasADi::Matrix<CasADi::SX>);
+%my_genericmatrix_const_typemap(PRECEDENCE_SXMatrix,CasADi::Matrix<CasADi::SX>);
 
 %my_generic_const_typemap(PRECEDENCE_SXMatrixVector,std::vector< CasADi::Matrix<CasADi::SX> >);
 %my_generic_const_typemap(PRECEDENCE_SXMatrixVectorVector,std::vector< std::vector< CasADi::Matrix<CasADi::SX> > >);
 
 
 %my_generic_const_typemap(PRECEDENCE_MX,CasADi::MX);
-
+%my_genericmatrix_const_typemap(PRECEDENCE_MX,CasADi::MX);
 
 %my_generic_const_typemap(PRECEDENCE_MXVector,std::vector< CasADi::MX >);
 
 
 
 %my_generic_const_typemap(PRECEDENCE_DMatrix,CasADi::Matrix<double>);
-
+%my_genericmatrix_const_typemap(PRECEDENCE_DMatrix,CasADi::Matrix<double>);
 
 
 #ifdef SWIGPYTHON
 %my_generic_const_typemap(PRECEDENCE_IMatrix,CasADi::Matrix<int>);
+%my_genericmatrix_const_typemap(PRECEDENCE_IMatrix,CasADi::Matrix<int>);
 %my_generic_const_typemap(PRECEDENCE_MXVectorVector,std::vector< std::vector< CasADi::MX > >);
 %my_generic_const_typemap(PRECEDENCE_DMatrixVector,std::vector< CasADi::Matrix<double> >);
 %my_generic_const_typemap(PRECEDENCE_IMatrixVector,std::vector< CasADi::Matrix<int> >);
