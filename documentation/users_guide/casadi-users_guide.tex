@@ -386,9 +386,40 @@ This section gives an exhaustive overview of the possibilities of indexing and s
 In python and C++ indexing starts from zero, while in octave indexing starts from 1.
 In python, it is customary to use negative indices to specify an index counted from the end of a list. CasADi supports this, too.
 
-\subsection{Scalar access}
+\subsection{Getting and setting}
 
-Use this to target individual elements. The \emph{nonzero access} flavour uses one number, the non-zero index, in rectangular brackets. The \emph{full access} flavour uses two.
+Each type of slicing comes with a get or set variant.
+\begin{verbatim}
+ M = DMatrix([[3,7],[4,5]])
+ print M[0,:]  # Get variant: [3,7]
+ M[0,:] = 1    # Set variant
+ print M  # [[1,1],[4,5]]
+\end{verbatim}
+
+Unlike numpy, CasADi slices are not views into the data of the left hand side; rather, a slice access copies the data. As a result, the matrix $M$ is not changed in the following examples: 
+\begin{verbatim}
+ M = DMatrix([[3,7],[4,5]])
+ A = M[0,:]
+ A.set([1,1])
+ print A     # [1,1]
+ print M  # [[3,7],[4,5]]
+\end{verbatim}
+
+\begin{verbatim}
+ M = DMatrix([[3,7],[4,5]])
+ M[0,:].set([1,1])
+ print M  # [[3,7],[4,5]]
+\end{verbatim}
+
+\begin{verbatim}
+ M = DMatrix([[3,7],[4,5]])
+ M[0,:][0,0] = 1 
+ print M  # [[3,7],[4,5]]
+\end{verbatim}
+
+\subsection{Flavours of slices}
+
+\paragraph{Scalar access} is used to target individual elements. The \emph{nonzero access} flavour uses one number, the non-zero index, in rectangular brackets. The \emph{full access} flavour uses two.
 
 An example with a dense matrix:
 \begin{verbatim}
@@ -424,9 +455,7 @@ An example with a sparse matrix:
  print M[-1,-1] # 6
 \end{verbatim}
 
-\subsection{Slice access}
-
-Slices are the most common way to access a range of elements at once.
+\paragraph{Slice access} is the most common way to access a range of elements at once.
 The distinction between \emph{nonzero access} and \emph{full access} is given, again, by the use of either one or two items in the rectangular brackets.
 CasADi supports the full range of python slices.
 
@@ -444,9 +473,7 @@ CasADi supports the full range of python slices.
  print M[:,1:] # [[7,8,9],[5,6,1]]
 \end{verbatim}
 
-\subsection{List access}
-
-Being similar to slices in effect, lists are a more flexible way to access a group of elements at once.
+\paragraph{List access} are similar to slices in effect, but more flexible.
 
 \begin{verbatim}
  M = DMatrix([[3,7,8,9],[4,5,6,1]])
@@ -457,9 +484,7 @@ Being similar to slices in effect, lists are a more flexible way to access a gro
  print M[[1,0],[0,3]]  # [[4,  1],[3,  9]]
 \end{verbatim}
 
-\subsection{Simple IMatrix access}
-
-This indexing type does repeated scalar access with a custom result shape. The user specifies \texttt{IMatrix}'es as item(s) in the rectangular brackets.  The result takes over the shape/sparsity of the supplied \texttt{IMatrix}.
+\paragraph{Simple IMatrix access} does repeated scalar access with a custom result shape. The user specifies \texttt{IMatrix}'es as item(s) in the rectangular brackets.  The result takes over the shape/sparsity of the supplied \texttt{IMatrix}.
 
 In the \emph{nonzero access} style, each number of the \texttt{IMatrix} supplied is used as non-zero index into the left hand side matrix. In the \emph{full access} style, both \texttt{IMatrix}'es must have the same sparsity. Common non-zeros of the Imatrix'es form (row,col) pairs to access the left hand side.
 
@@ -483,9 +508,7 @@ In the \emph{nonzero access} style, each number of the \texttt{IMatrix} supplied
  print M[i,j]    # diag([3,7,6,1])
 \end{verbatim}
 
-\subsection{Mixed \texttt{IMatrix} access}
-
-This last flavour deals with \emph{nonzero access} in a row or column wise fashion. Given a slice in the rows place and an \texttt{IMatrix} in the columns place, this flavour lets act \emph{simple \texttt{IMatrix} access} on each row individually. The results of all these \emph{simple \texttt{IMatrix} access} are concatenated vertically.
+\paragraph{Mixed \texttt{IMatrix} access} deals with \emph{nonzero access} in a row or column wise fashion. Given a slice in the rows place and an \texttt{IMatrix} in the columns place, this flavour lets act \emph{simple \texttt{IMatrix} access} on each row individually. The results of all these \emph{simple \texttt{IMatrix} access} are concatenated vertically.
 
 A similar definition holds for an IMatrix in the columns place, and a slice in the rows place of the double element rectangular bracket.
 
