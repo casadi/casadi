@@ -160,14 +160,27 @@ class MX : public GenericMatrix<MX>, public SharedObject{
       (*this)(i.getAll(size1()),j.getAll(size2())) = m;
     }
     
-    void indexed_assignment(const Matrix<int>& k, const MX &m){
-      casadi_error("MX::operator()(Imatrix) not implemented yet");
-      //(*this)(k) = m;
+    void indexed_zero_based_assignment(const Matrix<int>& k, const MX &m){
+      (*this)[k] = m;
     }
     void indexed_assignment(const CRSSparsity& sp, const MX &m){
-      casadi_error("MX::operator()(CRSSparsity) not implemented yet");
-      //(*this)(sp) = m;
+      (*this)(sp) = m;
     }
+    void indexed_assignment(const Slice &i, const Matrix<int>& j, const MX& m){
+      (*this)(i.getAll(size1()),j) = m;
+    }
+    void indexed_assignment( const Matrix<int>& i, const Slice &j, const MX& m){
+      (*this)(i,j.getAll(size2())) = m;
+    }
+    void indexed_assignment(const IndexList &i, const Matrix<int>& j, const MX& m){
+      (*this)(i.getAll(size1()),j) = m;
+    }
+    void indexed_assignment( const Matrix<int>& i, const IndexList &j, const MX& m){
+      (*this)(i,j.getAll(size2())) = m;
+    } 
+    void indexed_assignment( const Matrix<int>& i, const Matrix<int>& j, const MX& m){
+      (*this)(i,j) = m;
+    } 
     //@}
     
     /// Scalar type
@@ -353,10 +366,21 @@ class MX : public GenericMatrix<MX>, public SharedObject{
   void setSub(const std::vector<int>& i, const std::vector<int>& j, const MX& el);
   void setSub(const Matrix<int>& k, const MX& el);
   
+  void setSub(const std::vector<int>& i, const Matrix<int>& k, const MX& m);
+  void setSub(const Matrix<int>& k, const std::vector<int>& j, const MX& m);
+  //void setSub(const Slice& i, const Matrix<int>& k, const MX& m) {return setSub(i.getAll(size1()),k,m);}
+  //void setSub(const Matrix<int>& k, const Slice& j, const MX& m) {return setSub(k,j.getAll(size2()),m);}
+  void setSub(const Matrix<int>& i, const Matrix<int>& j, const MX& m);
+  void setSub(const CRSSparsity& sp, int dummy, const MX& m);
+    
   MX getNZ(int k) const;
   MX getNZ(const std::vector<int>& k) const;
+  MX getNZ(const Slice& k) const{ return getNZ(k.getAll(size()));}
+  MX getNZ(const Matrix<int>& k) const;
   void setNZ(int k, const MX& el);
   void setNZ(const std::vector<int>& k, const MX& el);
+  void setNZ(const Slice& k, const MX& m){ setNZ(k.getAll(size()),m);}
+  void setNZ(const Matrix<int>& k, const MX& m);
 
   /** \brief Append a matrix to the end. */
   void append(const MX& y);

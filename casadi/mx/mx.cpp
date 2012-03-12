@@ -277,6 +277,84 @@ void MX::setSub(const vector<int>& ii, const vector<int>& jj, const MX& el){
   }
 }
 
+void MX::setSub(const Matrix<int>& i, const std::vector<int>& jj, const MX& el) {
+  // If el is scalar
+  if(el.scalar() && (jj.size() > 1 || i.size() > 1)){
+    setSub(i,jj,repmat(MX(i.sparsity(),el),1,jj.size()));
+    return;
+  }
+
+  if (!inBounds(jj,size2())) {
+    casadi_error("setSub[i,jj] out of bounds. Your jj contains " << *std::min_element(jj.begin(),jj.end()) << " up to " << *std::max_element(jj.begin(),jj.end()) << ", which is outside of the matrix shape " << dimString() << ".");
+  }
+  
+  //CRSSparsity result_sparsity = repmat(i,1,jj.size()).sparsity();
+  CRSSparsity result_sparsity = horzcat(std::vector< Matrix<int> >(jj.size(),i)).sparsity();
+  
+  casadi_assert_message(result_sparsity == el.sparsity(),"setSub(Imatrix" << i.dimString() << ",Ivector(length=" << jj.size() << "),Matrix<T>)::Dimension mismatch. The sparsity of repmat(Imatrix,1," << jj.size() << ") = " << result_sparsity.dimString()  << " must match the sparsity of MX = "  << el.dimString() << ".");
+
+  std::vector<int> slice_i = range(i.size1());
+  
+  for(int k=0; k<jj.size(); ++k) {
+     MX el_k = el(slice_i,range(k*i.size2(),(k+1)*i.size2()));
+     for (int j=0;j<i.size();++j) {
+       (*this)(i.at(j),jj[k])=el_k[j];
+     }
+  }
+  
+}
+
+
+
+void MX::setSub(const std::vector<int>& ii, const Matrix<int>& j, const MX& el) {
+  // If el is scalar
+  if(el.scalar() && (ii.size() > 1 || j.size() > 1)){
+    setSub(ii,j,repmat(MX(j.sparsity(),el),ii.size(),1));
+    return;
+  }
+
+  if (!inBounds(ii,size1())) {
+    casadi_error("setSub[ii,j] out of bounds. Your ii contains " << *std::min_element(ii.begin(),ii.end()) << " up to " << *std::max_element(ii.begin(),ii.end()) << ", which is outside of the matrix shape " << dimString() << ".");
+  }
+  
+  //CRSSparsity result_sparsity = repmat(j,ii.size(),1).sparsity();
+  CRSSparsity result_sparsity = vertcat(std::vector< Matrix<int> >(ii.size(),j)).sparsity();
+  
+  casadi_assert_message(result_sparsity == el.sparsity(),"setSub(Ivector(length=" << ii.size() << "),Imatrix" << j.dimString() << ",MX)::Dimension mismatch. The sparsity of repmat(Imatrix," << ii.size() << ",1) = " << result_sparsity.dimString() << " must match the sparsity of Matrix<T> = " << el.dimString() << ".");
+  
+  std::vector<int> slice_j = range(j.size2());
+  
+  for(int k=0; k<ii.size(); ++k) {
+     MX el_k = el(range(k*j.size1(),(k+1)*j.size1()),slice_j);
+     for (int i=0;i<j.size();++i) {
+       (*this)(ii[k],j.at(i))=el_k[i];
+     }
+  }
+  
+}
+
+
+void MX::setSub(const Matrix<int>& i, const Matrix<int>& j, const MX& el) {
+   casadi_assert_message(i.sparsity()==j.sparsity(),"setSub(Imatrix i, Imatrix j, Imatrix el): sparsities must match. Got " << i.dimString() << " for i and " << j.dimString() << " for j.");
+
+  // If el is scalar
+  if(el.scalar() && i.numel() > 1){
+    setSub(i,j,MX(i.sparsity(),el));
+    return;
+  }
+  
+  casadi_assert_message(el.sparsity()==i.sparsity(),"setSub(Imatrix i, Imatrix j, MX el): sparsities must match. Got " << el.dimString() << " for el and " << j.dimString() << " for i and j.");
+  
+  for(int k=0; k<i.size(); ++k) {
+     (*this)(i.at(k),j.at(k)) = el[k]; 
+  }
+}
+
+void MX::setSub(const CRSSparsity& sp, int dummy, const MX& el) {
+   casadi_assert_message(size1()==sp.size1() && size2()==sp.size2(),"getSub(CRSSparsity sp): shape mismatch. This matrix has shape " << size1() << " x " << size2() << ", but supplied sparsity index has shape " << sp.size1() << " x " << sp.size2() << "." );
+   casadi_error("Not implemented yet");
+}
+
 MX MX::getNZ(int k) const{
   if (k<0) k+=size();
   casadi_assert_message(k<size(),"MX::getNZ: requested at(" <<  k << "), but that is out of bounds:  " << dimString() << ".");
@@ -294,6 +372,16 @@ MX MX::getNZ(const vector<int>& k) const{
   ret.assignNode(new Mapping(sp));
   ret->assign(*this,k);
   //simplifyMapping(ret);
+  return ret;
+}
+
+MX MX::getNZ(const Matrix<int>& k) const{
+  CRSSparsity sp(k.size(),1,true);
+  MX ret;
+
+  ret.assignNode(new Mapping(sp));
+  ret->assign(*this,k.data());
+  
   return ret;
 }
 
@@ -324,6 +412,19 @@ void MX::setNZ(const vector<int>& k, const MX& el){
   }
   simplifyMapping(ret);
   *this = ret;
+}
+
+void MX::setNZ(const Matrix<int>& kk, const MX& m){
+  if (m.size()==1 && m.numel()==1) {
+    setNZ(kk.data(),m);
+    return;
+  }
+  setNZ(kk.data(),m);
+
+  casadi_assert_message(kk.sparsity()==m.sparsity(),"Matrix<T>::setNZ: sparsity of IMatrix index " << kk.dimString() << " " << std::endl << "must match sparsity of rhs " << m.dimString() << ".");
+
+  setNZ(kk.data(),m);
+
 }
 
 const MX MX::at(int k) const {

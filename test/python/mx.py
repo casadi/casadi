@@ -761,6 +761,16 @@ class MXtests(casadiTestCase):
     
     self.checkarray(f.output(),array([[1,3],[2,2],[4,4]]),"IMatrix indexing")
     
+    Y = X[:,:]
+    Y[IMatrix([[0,2]])] = DMatrix([[9,8]])
+    
+    f = MXFunction([X],[Y])
+    f.init()
+    f.input().set([1,2,3,4])
+    f.evaluate()
+    
+    self.checkarray(f.output(),array([[9,2],[8,4]]),"IMatrix indexing assignment")
+    
   
   def test_IMatrix_index_slice(self):
     self.message("IMatrix combined with slice")
@@ -800,7 +810,40 @@ class MXtests(casadiTestCase):
     
     self.checkarray(f.output(),DMatrix([[4,6],[4,5]]),"B[1,A]")
 
+    B = MX(DMatrix([[1,2,3],[4,5,6],[7,8,9],[10,11,12]]))
+    A = IMatrix([2,0])
     
+    B[1,A] = DMatrix([20,21])
+
+    f = MXFunction([],[B])
+    f.init()
+    f.evaluate()
+
+    self.checkarray(f.output(),DMatrix([[1,2,3],[21,5,20],[7,8,9],[10,11,12]]),"B[1,A] setter")
+
+
+    B = MX(DMatrix([[1,2,3],[4,5,6],[7,8,9],[10,11,12]]))
+    A = IMatrix([2,0])
+    
+    B[A,1] = DMatrix([20,21])
+
+    f = MXFunction([],[B])
+    f.init()
+    f.evaluate()
+
+    self.checkarray(f.output(),DMatrix([[1,21,3],[4,5,6],[7,20,9],[10,11,12]]),"B[A,:] setter")
+    
+    
+    B = MX(DMatrix([[1,2,3],[4,5,6],[7,8,9],[10,11,12]]))
+    A = IMatrix([2,0])
+    
+    B[A,:] = DMatrix([[20,21,22],[24,25,26]])
+
+    f = MXFunction([],[B])
+    f.init()
+    f.evaluate()
+
+    self.checkarray(f.output(),DMatrix([[24,25,26],[4,5,6],[20,21,22],[10,11,12]]),"B[A,:] setter")
     
   def test_IMatrix_IMatrix_index(self):
     self.message("IMatrix IMatrix index")
