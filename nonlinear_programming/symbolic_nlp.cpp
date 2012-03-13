@@ -370,50 +370,79 @@ SX SymbolicNLP::readExpressionNL(std::istream &stream){
       switch(i){
 	
 	// Unary operations, class 1 in Gay2005
-	case 13:  return floor(readExpressionNL(stream));
-	case 14:  return ceil(readExpressionNL(stream));
-	case 15:  return abs(readExpressionNL(stream));
-	case 16:  return -readExpressionNL(stream);
-	case 34:  return !readExpressionNL(stream);
-	case 37:  return tanh(readExpressionNL(stream));
-	case 38:  return tan(readExpressionNL(stream));
-	case 39:  return sqrt(readExpressionNL(stream));
-	case 40:  return sinh(readExpressionNL(stream));
-	case 41:  return sin(readExpressionNL(stream));
-	case 42:  return log10(readExpressionNL(stream));
-	case 43:  return log(readExpressionNL(stream));
-	case 44:  return exp(readExpressionNL(stream));
-	case 45:  return cosh(readExpressionNL(stream));
-	case 46:  return cos(readExpressionNL(stream));
-	// case 47:  return atanh(readExpressionNL(stream)); FIXME
-	case 49:  return atan(readExpressionNL(stream));
-	// case 50:  return asinh(readExpressionNL(stream)); FIXME
-	case 51:  return asin(readExpressionNL(stream));
-	// case 52:  return acosh(readExpressionNL(stream)); FIXME
-	case 53:  return acos(readExpressionNL(stream));
+	case 13:  case 14:  case 15:  case 16:  case 34:  case 37:  case 38:  case 39:  case 40:  case 41:  
+	case 43:  case 42:  case 44:  case 45:  case 46:  case 47:  case 49:  case 50:  case 51:  case 52:  case 53:
+	{
+	  // Read dependency
+	  SX x = readExpressionNL(stream);
+	  
+	  // Perform operation
+	  switch(i){
+	    case 13:  return floor(x);
+	    case 14:  return ceil(x);
+	    case 15:  return abs(x);
+	    case 16:  return -x;
+	    case 34:  return !x;
+	    case 37:  return tanh(x);
+	    case 38:  return tan(x);
+	    case 39:  return sqrt(x);
+	    case 40:  return sinh(x);
+	    case 41:  return sin(x);
+	    case 42:  return log10(x);
+	    case 43:  return log(x);
+	    case 44:  return exp(x);
+	    case 45:  return cosh(x);
+	    case 46:  return cos(x);
+	    // case 47:  return atanh(x); FIXME
+	    case 49:  return atan(x);
+	    // case 50:  return asinh(x); FIXME
+	    case 51:  return asin(x);
+	    // case 52:  return acosh(x); FIXME
+	    case 53:  return acos(x);
+	    
+	    default:
+	      msg << "Unknown unary operation: \"" << i << "\"";
+	  }
+	  break;
+	}
 	
 	// Binary operations, class 2 in Gay2005
-	case 0:   return readExpressionNL(stream) + readExpressionNL(stream);
-	case 1:   return readExpressionNL(stream) - readExpressionNL(stream);
-	case 2:   return readExpressionNL(stream) * readExpressionNL(stream);
-	case 3:   return readExpressionNL(stream) / readExpressionNL(stream);
-	// case 4:   return rem(readExpressionNL(stream),readExpressionNL(stream)); FIXME
-	case 5:   return pow(readExpressionNL(stream),readExpressionNL(stream));
-	// case 6:   return readExpressionNL(stream) < readExpressionNL(stream); TODO: Verify this, what is the difference to 'le' == 23 below?
-	case 20:  return readExpressionNL(stream) || readExpressionNL(stream);
-	case 21:  return readExpressionNL(stream) && readExpressionNL(stream);
-	case 22:  return readExpressionNL(stream) < readExpressionNL(stream);
-	case 23:  return readExpressionNL(stream) <= readExpressionNL(stream);
-	case 24:  return readExpressionNL(stream) == readExpressionNL(stream);
-	case 28:  return readExpressionNL(stream) >= readExpressionNL(stream);
-	case 29:  return readExpressionNL(stream) > readExpressionNL(stream);
-	case 30:  return readExpressionNL(stream) != readExpressionNL(stream);
-	// case 48:  return atan2(readExpressionNL(stream),readExpressionNL(stream)); // FIXME
-	// case 55:  return intdiv(readExpressionNL(stream),readExpressionNL(stream)); // FIXME
-	// case 56:  return precision(readExpressionNL(stream),readExpressionNL(stream)); // FIXME
-	// case 57:  return round(readExpressionNL(stream),readExpressionNL(stream)); // FIXME
-	// case 58:  return trunc(readExpressionNL(stream),readExpressionNL(stream)); // FIXME
-	// case 73:  return iff(readExpressionNL(stream),readExpressionNL(stream)); // FIXME
+	case 0:   case 1:   case 2:   case 3:   case 4:   case 5:   case 6:   case 20:  case 21:  case 22:  
+	case 23:  case 24:  case 28:  case 29:  case 30:  case 48:  case 55:  case 56:  case 57:  case 58:  case 73:
+	{
+	  // Read dependencies
+	  SX x = readExpressionNL(stream);
+	  SX y = readExpressionNL(stream);
+
+	  // Perform operation
+	  switch(i){
+	    case 0:   return x + y;
+	    case 1:   return x - y;
+	    case 2:   return x * y;
+	    case 3:   return x / y;
+	    // case 4:   return rem(x,readExpressionNL(stream)); FIXME
+	    case 5:   return pow(x,y);
+	    // case 6:   return x < y; TODO: Verify this, what is the difference to 'le' == 23 below?
+	    case 20:  return x || y;
+	    case 21:  return x && y;
+	    case 22:  return x < y;
+	    case 23:  return x <= y;
+	    case 24:  return x == y;
+	    case 28:  return x >= y;
+	    case 29:  return x > y;
+	    case 30:  return x != y;
+	    // case 48:  return atan2(x,y); // FIXME
+	    // case 55:  return intdiv(x,y); // FIXME
+	    // case 56:  return precision(x,y); // FIXME
+	    // case 57:  return round(x,y); // FIXME
+	    // case 58:  return trunc(x,y); // FIXME
+	    // case 73:  return iff(x,y); // FIXME
+
+	    default:
+	      msg << "Unknown binary operation: \"" << i << "\"";
+	  }
+	  break;
+	}
 	
 	// N-ary operator, classes 2,6 and 11 in Gay2005
 	case 11: case 12: case 54: case 59: case 60: case 61: case 70: case 71: case 74:
