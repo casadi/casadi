@@ -31,7 +31,6 @@ class TiXmlElement;
 class TiXmlNode;
 
 namespace CasADi{
-namespace OptimalControl{
 
 class FlatOCPInternal : public OptionsFunctionalityNode{
   public:
@@ -222,7 +221,6 @@ class FlatOCPInternal : public OptionsFunctionalityNode{
     
 };
 
-} // namespace OptimalControl
 } // namespace CasADi
 
 #endif //FLAT_OCP_INTERNAL_HPP

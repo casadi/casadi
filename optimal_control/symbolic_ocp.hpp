@@ -20,18 +20,18 @@
  *
  */
 
-#ifndef FLAT_OCP_HPP
-#define FLAT_OCP_HPP
+#ifndef SYMBOLIC_OCP_HPP
+#define SYMBOLIC_OCP_HPP
 
 #include "variable.hpp"
 
 namespace CasADi{
-
-// Forward declaration
-class FlatOCPInternal;
-
-/** \brief A flat OCP representation coupled to an XML file (CLASS TO BE REMOVED)
-  Note: This class has been replaced by the class "SymbolicOCP"
+  
+  // Forward declarations
+  class XMLNode;
+  
+  
+/** \brief A flat OCP representation coupled to an XML file
 
  <H3>Variables:  </H3>
   \verbatim
@@ -74,35 +74,127 @@ class FlatOCPInternal;
 
   <H3>Usage skeleton:</H3>
   
-  1. Call constructor with an FMI conformant XML file or pass an empty string ("") to build up the OCP from scratch <BR>
-  > FlatOCP ocp(xml_file_name)
+  1. Call default constructor 
+  > SymbolicOCP ocp;
   
-  2. Set options <BR>
-  > ocp.setOption(...,...)
-
-  3. Initialize and parse XML <BR>
-  > ocp.init()
-
-  4. Modify/add variables, equations, optimization <BR>
+  2. Parse an FMI conformant XML file <BR>
+  > ocp.parseFMI(xml_file_name)
+  
+  3. Modify/add variables, equations, optimization <BR>
   > ...
   
   When the optimal control problem is in a suitable form, it is possible to either generate functions
   for numeric/symbolic evaluation or exporting the OCP formulation into a new FMI conformant XML file.
   The latter functionality is not yet available.
 
-  \date 2011
+  \date 2012
   \author Joel Andersson
 */
-class FlatOCP : public OptionsFunctionality{
+class SymbolicOCP : public PrintableObject{
   public:
-    /// Default (empty) constructor
-    FlatOCP();
+
+    /// Default constructor
+    SymbolicOCP();
     
-    /// Create an FMI parser instance given the filename
-    FlatOCP(const std::string& filename);
+    /** @name Variables
+    *  Public data members
+    */
+    //@{
+    /// Time
+    SXMatrix t;
+    
+    /// Differential and algebraic states defined by a fully-implicit DAE (length == dae().size())
+    std::vector<Variable> x;
+    
+    /// Differential states defined by an explicit ODE (length == ode().size())
+    std::vector<Variable> xd;
+    
+    /// Algebraic states defined by an algebraic equation (length == alg().size())
+    std::vector<Variable> xa;
+    
+    /// Quadrature states (length == quad().size())
+    std::vector<Variable> xq;
+    
+    /// Dependent variables (length == dep().size())
+    std::vector<Variable> y;
+    
+    /// Independent parameters
+    std::vector<Variable> p;
+    
+    /// Control signals
+    std::vector<Variable> u;
+
+    //@}
+    
+    /** @name Equations
+    *  Get all equations of a particular type 
+    */
+    //@{
+      
+    /// Fully implicit DAE (length == x().size())
+    SXMatrix dae;
+    
+    /// Explicit ODE  (length == xd().size())
+    SXMatrix ode;
+    
+    /// Algebraic equations (length == xa().size())
+    SXMatrix alg;
+    
+    /// Quadrature states (length == q().size())
+    SXMatrix quad;
+    
+    /// Dependent equations (length == y().size())
+    SXMatrix dep;
+    
+    /// Initial equations (remove?)
+    SXMatrix initial;
+    //@}
+    
+    /** @name Time points
+    */
+    //@{
+
+    /// Interval start time
+    double t0;
+    
+    /// Interval final time
+    double tf;
+    
+    /// Interval start time is free
+    bool t0_free;
+    
+    /// Interval final time is free
+    bool tf_free;
+    //@}
+
+    /** @name Objective function terms
+    *  Terms in the objective function.
+    */
+    //@{
+      
+    /// Mayer terms in the objective (point terms)
+    SXMatrix mterm;
+    
+    /// Lagrange terms in the objective (integral terms)
+    SXMatrix lterm;
+    //@}
+
+    /** @name Constraints of the optimal control problem
+    */
+    //@{
+
+    /// Path constraint functions
+    SXMatrix path;
+    
+    /// Path constraint functions upper bounds
+    DMatrix path_min;
+
+    /// Path constraint functions upper bounds
+    DMatrix path_max;
+    //@}
 
     /// Parse from XML to C++ format
-    void parse();
+    void parseFMI(const std::string& filename, const Dictionary& options = Dictionary());
 
     /// Add a variable
     void addVariable(const std::string& name, const Variable& var);
@@ -111,128 +203,13 @@ class FlatOCP : public OptionsFunctionality{
     Variable& variable(const std::string& name);
 
     /// Make a differential state algebraic by replacing its time derivative by 0
+    void makeAlgebraic(const Variable& v);
+
+    /// Make a differential state algebraic by replacing its time derivative by 0
     void makeAlgebraic(const std::string& name);
-    
-    /// Access to the internal class
-    FlatOCPInternal* operator->();
-
-    /// Const access to the internal class
-    const FlatOCPInternal* operator->() const;
-
-    /// Check if the node is pointing to the right type of object
-    virtual bool checkNode() const;
-
-    /** @name Variables
-    *  Get all variables of a particular type 
-    */
-    //@{
-    /// Time
-    SX t() const;
-    
-    /// Differential and algebraic states defined by a fully-implicit DAE (length == dae().size())
-    std::vector<Variable>& x();
-    
-    /// Differential states defined by an explicit ODE (length == ode().size())
-    std::vector<Variable>& xd();
-    
-    /// Algebraic states defined by an algebraic equation (length == alg().size())
-    std::vector<Variable>& xa();
     
     /// All states, differential and algebraic (includes x, xd and xa)
     std::vector<Variable> x_all() const;
-    
-    /// Quadrature states (length == quad().size())
-    std::vector<Variable>& xq();
-    
-    /// Dependent variables (length == dep().size())
-    std::vector<Variable>& y();
-    
-    /// Independent parameters
-    std::vector<Variable>& p();
-    
-    /// Control signals
-    std::vector<Variable>& u();
-    //@}
-
-    /** @name Equations
-    *  Get all equations of a particular type 
-    */
-    //@{
-      
-    /// Fully implicit DAE (length == x().size())
-    std::vector<SX>& dae();
-    
-    /// Explicit ODE  (length == xd().size())
-    std::vector<SX>& ode();
-    
-    /// Algebraic equations (length == xa().size())
-    std::vector<SX>& alg();
-    
-    /// Quadrature states (length == q().size())
-    std::vector<SX>& quad();
-    
-    /// Dependent equations (length == y().size())
-    std::vector<SX>& dep();
-    
-    /// Initial equations (remove?)
-    std::vector<SX>& initial();
-    //@}
-
-    /** @name Time points
-    */
-    //@{
-
-    /// Interval start time
-    double t0() const;
-    
-    /// Interval final time
-    double tf() const;
-    
-    /// Interval start time is free
-    bool t0_free() const;
-    
-    /// Interval final time is free
-    bool tf_free() const;
-    
-    /// Set interval start time
-    void set_t0(double t);
-    
-    /// Set interval final time
-    void set_tf(double t);
-    
-    /// Set interval start time as free or fixed
-    void set_t0_free(bool free);
-    
-    /// Set interval final time as free or fixed
-    void set_tf_free(bool free);
-    //@}
-
-    /** @name Objective function terms
-    *  Terms in the objective function.
-    */
-    //@{
-    
-    /// Mayer terms in the objective (point terms)
-    std::vector<SX>& mterm();
-    
-    /// Lagrange terms in the objective (integral terms)
-    std::vector<SX>& lterm();
-
-    //@}
-
-    /** @name Constraints of the optimal control problem
-    */
-    //@{
-
-    /// Path constraint functions
-    std::vector<SX>& path();
-    
-    /// Path constraint functions upper bounds
-    std::vector<double>& path_min();
-
-    /// Path constraint functions upper bounds
-    std::vector<double>& path_max();
-    //@}
     
     /** @name Manipulation
     *  Reformulate the dynamic optimization problem.
@@ -242,7 +219,7 @@ class FlatOCP : public OptionsFunctionality{
     void eliminateInterdependencies();
     
     /// Eliminate dependent equations, by default sparing the dependent variables with upper or lower bounds
-    void eliminateDependent();
+    void eliminateDependent(bool eliminate_dependents_with_bounds=true);
 
     /// Eliminate Lagrange terms from the objective function and make them quadrature states
     void eliminateLagrangeTerms();
@@ -265,19 +242,42 @@ class FlatOCP : public OptionsFunctionality{
     /// Substitute the dependents from a set of expressions
     std::vector<SXMatrix> substituteDependents(const std::vector<SXMatrix>& x) const;
     
-    /** \brief Get the ODE/DAE right hand side function
-    * The returned FX has the following input/output scheme:
-    * @copydoc scheme_DAEInput 
-    * @copydoc scheme_DAEOutput
-    */
-    FX daeFcn() const;
-    
     /// Generate a MUSCOD-II compatible DAT file
     void generateMuscodDatFile(const std::string& filename, const Dictionary& mc2_ops=Dictionary()) const;
     
     //@}
+    
+    /// Get the qualified name
+    static std::string qualifiedName(const XMLNode& nn);
+    
+    /// Find of variable by name
+    std::map<std::string,Variable> varmap_;
+
+    /// Read an equation
+    SX readExpr(const XMLNode& odenode);
+
+    /// Read a variable
+    Variable& readVariable(const XMLNode& node);
+
+    /// Sort variables according to type
+    void sortType();
+    
+    /// Scale the variables
+    void scaleVariables();
+    
+    /// Scale the implicit equations
+    void scaleEquations();
+    
+    #ifndef SWIG
+    ///  Print representation
+    virtual void repr(std::ostream &stream=std::cout) const;
+
+    /// Print description 
+    virtual void print(std::ostream &stream=std::cout) const;
+    #endif // SWIG
+
 };
 
 } // namespace CasADi
 
-#endif //FLAT_OCP_HPP
+#endif //SYMBOLIC_OCP_HPP

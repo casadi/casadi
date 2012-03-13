@@ -25,7 +25,6 @@
 
 using namespace std;
 namespace CasADi{
-namespace OptimalControl{
   
 Variable::Variable(){
 }
@@ -215,5 +214,4 @@ void Variable::setFree(bool free){
 }
 
 
-} // namespace OptimalControl
 } // namespace CasADi

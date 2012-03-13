@@ -40,7 +40,6 @@
 
 using namespace std;
 namespace CasADi{
-namespace OptimalControl{
 
 FlatOCPInternal::FlatOCPInternal(const std::string& filename) : filename_(filename){
   addOption("scale_variables",          OT_BOOLEAN,      false, "Scale the variables so that they get unity order of magnitude");
@@ -1431,5 +1430,4 @@ void FlatOCPInternal::generateMuscodDatFile(const std::string& filename, const D
   datfile.close();
 }
 
-} // namespace OptimalControl
 } // namespace CasADi

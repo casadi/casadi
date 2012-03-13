@@ -28,7 +28,6 @@
 #include "../casadi/mx/mx.hpp"
 
 namespace CasADi{
-  namespace OptimalControl{
     
     /// Time variability of a variable (see Fritzon page 89)
     enum Variability{CONSTANT,PARAMETER,DISCRETE,CONTINUOUS};
@@ -184,12 +183,11 @@ namespace CasADi{
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
   };
-} // namespace OptimalControl
 } // namespace CasADi
 
 #ifdef SWIG
 // Template instantiations
-%template(VariableVector) std::vector<CasADi::OptimalControl::Variable>;
+%template(VariableVector) std::vector<CasADi::Variable>;
 #endif // SWIG  
 
 

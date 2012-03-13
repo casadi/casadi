@@ -25,7 +25,6 @@
 
 using namespace std;
 namespace CasADi{
-namespace OptimalControl{
 
 FlatOCP::FlatOCP(){
 }
@@ -268,5 +267,4 @@ void FlatOCP::eliminateQuadratureStates(){
   (*this)->eliminateQuadratureStates();
 }
 
-} // namespace OptimalControl
 } // namespace CasADi

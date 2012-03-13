@@ -33,7 +33,6 @@ class TiXmlElement;
 class TiXmlNode;
 
 namespace CasADi{
-namespace OptimalControl{
 
 class XMLNode{
 public:
@@ -96,7 +95,6 @@ public:
 
 };
 
-} // namespace OptimalControl
 } // namespace CasADi
 
 

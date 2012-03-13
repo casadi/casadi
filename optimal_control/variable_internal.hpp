@@ -26,7 +26,6 @@
 #include "variable.hpp"
 
 namespace CasADi{
-  namespace OptimalControl{
 
     /// Internal node class
   class VariableInternal : public SharedObjectNode{
@@ -86,7 +85,6 @@ namespace CasADi{
   };
   
   
-} // namespace OptimalControl
 } // namespace CasADi
 
 

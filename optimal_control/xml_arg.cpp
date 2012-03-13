@@ -23,7 +23,6 @@
 #include "xml_arg.hpp"
 
 namespace CasADi{
-namespace OptimalControl{
 
 StrArg::StrArg(const std::string& str) : str(str){
 }
@@ -50,6 +49,5 @@ std::ostream& operator<<(std::ostream &stream, const StrArg& arg){
   return stream << arg.str;
 }
 
-} // namespace OptimalControl
 } // namespace CasADi
 

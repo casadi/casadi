@@ -26,7 +26,7 @@
 #include "variable.hpp"
 
 namespace CasADi{
-namespace OptimalControl{
+  
   /// Get a vector of expressions from a vector of variables
   std::vector<SX> var(const std::vector<Variable> v);
 
@@ -56,7 +56,6 @@ namespace OptimalControl{
   /// Get a lower bounds
   std::vector<double> getMin(const std::vector<Variable> v, bool nominal=false);
 
-} // namespace OptimalControl
 } // namespace CasADi
 
 #endif // VARIABLE_TOOLS_HPP

@@ -25,7 +25,6 @@
 
 using namespace std;
 namespace CasADi{
-namespace OptimalControl{
   
 VariableInternal::VariableInternal(const string& name) : name_(name){
   // No expression by default
@@ -100,8 +99,5 @@ SX VariableInternal::atTime(double t, bool allocate){
   }
 }
 
-
-
-} // namespace OptimalControl
 } // namespace CasADi
 

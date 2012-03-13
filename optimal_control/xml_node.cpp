@@ -26,7 +26,6 @@
 
 using namespace std;
 namespace CasADi{
-namespace OptimalControl{
 
 XMLNode::XMLNode(){
 }
@@ -184,5 +183,4 @@ bool XMLNode::checkName(const string& str) const{
   return name.compare(str) == 0;
 }
 
-} // namespace OptimalControl
 } // namespace CasADi

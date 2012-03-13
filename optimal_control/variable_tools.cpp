@@ -24,7 +24,6 @@
 using namespace std;
 
 namespace CasADi{
-namespace OptimalControl{
 
 vector<SX> var(const vector<Variable> v){
   vector<SX> ret(v.size());
@@ -86,5 +85,4 @@ vector<double> getMax(const vector<Variable> v, bool nominal){
 }
 
     
-} // namespace OptimalControl
 } // namespace CasADi

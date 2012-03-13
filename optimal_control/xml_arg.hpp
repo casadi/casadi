@@ -27,7 +27,6 @@
 #include <sstream>
 
 namespace CasADi{
-namespace OptimalControl{
 
 class StrArg{
   public:
@@ -44,7 +43,6 @@ class StrArg{
   std::string str;
 };
 
-} // namespace OptimalControl
 } // namespace CasADi
 
 #endif //XML_ARG_HPP
