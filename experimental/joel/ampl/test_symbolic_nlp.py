@@ -11,4 +11,4 @@ nlp.parseNL("/home/janderss/Desktop/svanberg.nl",{"verbose":True})
 
 
 #print nlp.x_ub
-#print nlp.g_ub
+#print nlp.lambda_init

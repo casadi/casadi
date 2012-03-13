@@ -154,13 +154,45 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
       
       // Dual initial guess
       case 'd':
-	if(verbose) cerr << "Dual initial guess unsupported: ignored" << endl;
+      {
+	// Read the number of guesses supplied
+	int m;
+	nlfile >> m;
+	
+	// Process initial guess for the fual variables
+	for(int i=0; i<m; ++i){
+	  // Offset and value
+	  int offset;
+	  double d;
+	  nlfile >> offset >> d;
+	  
+	  // Save initial guess
+	  lambda_init.at(offset) = d;
+	}
+	
 	break;
+      }
       
       // Primal initial guess
       case 'x':
-	if(verbose) cerr << "Primal initial guess unsupported: ignored" << endl;
+      {
+	// Read the number of guesses supplied
+	int m;
+	nlfile >> m;
+	
+	// Process initial guess
+	for(int i=0; i<m; ++i){
+	  // Offset and value
+	  int offset;
+	  double d;
+	  nlfile >> offset >> d;
+	  
+	  // Save initial guess
+	  x_init.at(offset) = d;
+	}
+	
 	break;
+      }
       
       // Bounds on algebraic constraint bodies ("ranges")
       case 'r':
