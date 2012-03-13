@@ -1,9 +1,7 @@
 cmake_minimum_required(VERSION 2.0)
 SET(NONLINEAR_PROGRAMMING_SRCS
-  sqp_method.hpp
-  sqp_method.cpp
-  sqp_internal.hpp
-  sqp_internal.cpp
+  symbolic_nlp.hpp     symbolic_nlp.cpp
+  sqp_method.hpp	sqp_method.cpp		sqp_internal.hpp 		sqp_internal.cpp
 )
 
 if(ENABLE_STATIC)
