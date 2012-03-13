@@ -72,17 +72,108 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
   f = SXMatrix::nan(n_obj);
   c = SXMatrix::nan(n_ineq+n_eq);
   
-  // Read constraint expressions
-  for(int j=0; j<n_ineq+n_eq; ++j){
-    // Verify the that it is in fact the sought constraint expression
-    char e;
-    int e_n;
-    nlfile >> e >> e_n;
-    casadi_assert(e=='C');
-    casadi_assert(e_n==j);
+  // Process segments
+  while(true){
     
-    // Save to expression
-    c.at(j) = readExpressionNL(nlfile);
+    // Read segment key
+    char key;
+    nlfile >> key;
+  
+    // Break if end of file
+    if(nlfile.eof()) break;
+    
+    // Process segments
+    switch(key){
+      // Imported function description
+      case 'F':
+	if(verbose) cerr << "Imported function description unsupported: ignored" << endl;
+	break;
+	
+      // Suffix values
+      case 'S':
+	if(verbose) cerr << "Suffix values unsupported: ignored" << endl;
+	break;
+	
+      // Defined variable definition
+      case 'V':
+	if(verbose) cerr << "Defined variable definition unsupported: ignored" << endl;
+	break;
+      
+      // Algebraic constraint body
+      case 'C':
+      {
+	// Get the number
+	int i;
+	nlfile >> i;
+	
+	// Parse and save expression
+	c.at(i) = readExpressionNL(nlfile);
+	
+	break;
+      }
+      
+      // Logical constraint expression
+      case 'L':
+	if(verbose) cerr << "Logical constraint expression unsupported: ignored" << endl;
+	break;
+      
+      // Objective function
+      case 'O':
+      {
+	// Get the number
+	int i;
+	nlfile >> i;
+	
+	// Should the objective be maximized
+	int sigma;
+	nlfile >> sigma;
+	
+	// Parse and save expression
+	f.at(i) = readExpressionNL(nlfile);
+	
+	// Negate the expression if we maximize
+	if(sigma!=0){
+	  f.at(i) = -f.at(i);
+	}
+	
+	break;
+      }
+      
+      // Dual initial guess
+      case 'd':
+	if(verbose) cerr << "Dual initial guess unsupported: ignored" << endl;
+	break;
+      
+      // Primal initial guess
+      case 'x':
+	if(verbose) cerr << "Primal initial guess unsupported: ignored" << endl;
+	break;
+      
+      // Bounds on algebraic constraint bodies ("ranges")
+      case 'r':
+	if(verbose) cerr << "Ranges unsupported: ignored" << endl;
+	break;
+      
+      // Bounds on variable
+      case 'b':
+	if(verbose) cerr << "Bounds on variable unsupported: ignored" << endl;
+	break;
+      
+      // Jacobian colun counts
+      case 'k':
+	if(verbose) cerr << "Jacobian colun counts unsupported: ignored" << endl;
+	break;
+      
+      // Jacobian sparsity, linear terms
+      case 'J':
+	if(verbose) cerr << "Jacobian sparsity, linear terms unsupported: ignored" << endl;
+	break;
+      
+      // Gradient sparsity, linear terms
+      case 'G':
+	if(verbose) cerr << "Gradient sparsity, linear terms unsupported: ignored" << endl;
+	break;
+    }
   }
   
   // Close the NL file
@@ -237,12 +328,9 @@ SX SymbolicNLP::readExpressionNL(std::istream &stream){
   
 void SymbolicNLP::print(std::ostream &stream) const{
   stream << "NLP:" << endl;
-  stream << "x = ";
-  x.printDense(stream);
-  stream << "f = ";
-  f.printDense(stream);
-  stream << "c = ";
-  c.printDense(stream);
+  stream << "x = " << x << endl;
+  stream << "#f=" << f.size() << endl;
+  stream << "#c=" << c.size() << endl;
 }
 
 void SymbolicNLP::repr(std::ostream &stream) const{
