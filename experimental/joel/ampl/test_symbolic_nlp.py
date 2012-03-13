@@ -7,4 +7,8 @@ nlp = SymbolicNLP()
 nlp.parseNL("/home/janderss/Desktop/svanberg.nl",{"verbose":True})
 
 # Print the NLP
-print nlp
+#print nlp
+
+
+#print nlp.x_ub
+#print nlp.g_ub

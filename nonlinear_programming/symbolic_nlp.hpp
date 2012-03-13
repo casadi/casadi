@@ -49,7 +49,20 @@ class SymbolicNLP : public PrintableObject{
       SXMatrix f;
     
       /// Constraint functions
-      SXMatrix c;
+      SXMatrix g;
+      
+      /// Bounds on x
+      DMatrix x_lb, x_ub;
+      
+      /// Bounds on g
+      DMatrix g_lb, g_ub;
+      
+      /// Primal initial guess
+      DMatrix x_init;
+      
+      /// Dual initial guess
+      DMatrix lambda_init;
+      
     //@}
 
     /// Parse an AMPL och PyOmo NL-file

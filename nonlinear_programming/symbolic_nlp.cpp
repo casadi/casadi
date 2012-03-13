@@ -27,6 +27,8 @@ using namespace std;
 namespace CasADi{
 
 void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options){
+  // Note: The implementation of this function follows the "Writing .nl Files" paper by David M. Gay (2005)
+  
   // Default options
   bool verbose=false;
   
@@ -60,6 +62,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
   stringstream ss(header[1]);
   int n_var, n_ineq, n_obj, n_eq, n_lcon;
   ss >> n_var >> n_ineq >> n_obj >> n_eq >> n_lcon;
+  int n_con = n_ineq + n_eq;
   
   if(verbose){
     cout << "n_var = " << n_var << ", n_ineq  = " << n_ineq << ", n_obj = " << n_obj << ", n_eq = " << n_eq << ", n_lcon = " << n_lcon << endl;
@@ -70,7 +73,17 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
   
   // Allocate f and c
   f = SXMatrix::nan(n_obj);
-  c = SXMatrix::nan(n_ineq+n_eq);
+  g = SXMatrix::nan(n_con);
+  
+  // Allocate bounds for x and primal initial guess
+  x_lb = DMatrix(x.sparsity(),-numeric_limits<double>::infinity());
+  x_ub = DMatrix(x.sparsity(), numeric_limits<double>::infinity());
+  x_init = DMatrix(x.sparsity(), 0.0);
+  
+  // Allocate bounds for g and dual initial guess
+  g_lb = DMatrix(g.sparsity(),-numeric_limits<double>::infinity());
+  g_ub = DMatrix(g.sparsity(), numeric_limits<double>::infinity());
+  lambda_init = DMatrix(g.sparsity(), 0.0);
   
   // Process segments
   while(true){
@@ -107,7 +120,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
 	nlfile >> i;
 	
 	// Parse and save expression
-	c.at(i) = readExpressionNL(nlfile);
+	g.at(i) = readExpressionNL(nlfile);
 	
 	break;
       }
@@ -151,27 +164,131 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
       
       // Bounds on algebraic constraint bodies ("ranges")
       case 'r':
-	if(verbose) cerr << "Ranges unsupported: ignored" << endl;
+      {
+	// For all constraints
+	for(int i=0; i<n_con; ++i){
+	  
+	  // Read constraint type
+	  int c_type;
+	  nlfile >> c_type;
+	  
+	  // Temporary
+	  double c;
+	  
+	  switch(c_type){
+	    // Upper and lower bounds
+	    case 0:
+	      nlfile >> c;
+	      g_lb.at(i) = c;
+	      nlfile >> c;
+	      g_ub.at(i) = c;
+	      continue;
+	    
+	    // Only upper bounds
+	    case 1:
+	      nlfile >> c;
+	      g_ub.at(i) = c;
+	      continue;
+	    
+	   // Only lower bounds
+	   case 2:
+	      nlfile >> c;
+	      g_lb.at(i) = c;
+	      continue;
+
+	   // No bounds
+	   case 3:
+	      continue;
+	   
+	   // Equality constraints
+	   case 4:
+	      nlfile >> c;
+	      g_lb.at(i) = g_ub.at(i) = c;
+	      continue;
+	      
+	   // Complementary constraints
+	   case 5:
+	   {
+	     // Read the indices
+	     int ck, ci;
+	     nlfile >> ck >> ci;
+	     if(verbose) cerr << "Complementary constraints unsupported: ignored" << endl;
+	     continue;
+	   }
+	   
+	   default:
+	     throw CasadiException("Illegal constraint type");
+	  }
+	}
+	
 	break;
+      }
       
       // Bounds on variable
       case 'b':
-	if(verbose) cerr << "Bounds on variable unsupported: ignored" << endl;
+      {
+	// For all variable
+	for(int i=0; i<n_var; ++i){
+	  
+	  // Read constraint type
+	  int c_type;
+	  nlfile >> c_type;
+	  
+	  // Temporary
+	  double c;
+	  
+	  switch(c_type){
+	    // Upper and lower bounds
+	    case 0:
+	      nlfile >> c;
+	      x_lb.at(i) = c;
+	      nlfile >> c;
+	      x_ub.at(i) = c;
+	      continue;
+	    
+	    // Only upper bounds
+	    case 1:
+	      nlfile >> c;
+	      x_ub.at(i) = c;
+	      continue;
+	    
+	   // Only lower bounds
+	   case 2:
+	      nlfile >> c;
+	      x_lb.at(i) = c;
+	      continue;
+
+	   // No bounds
+	   case 3:
+	      continue;
+	   
+	   // Equality constraints
+	   case 4:
+	      nlfile >> c;
+	      x_lb.at(i) = x_ub.at(i) = c;
+	      continue;
+	      
+	   default:
+	     throw CasadiException("Illegal variable bound type");
+	  }
+	}
+	
 	break;
+      }
       
       // Jacobian colun counts
       case 'k':
-	if(verbose) cerr << "Jacobian colun counts unsupported: ignored" << endl;
+	// We don't need this since CasADi will calculate it for us
 	break;
       
       // Jacobian sparsity, linear terms
       case 'J':
-	if(verbose) cerr << "Jacobian sparsity, linear terms unsupported: ignored" << endl;
+	// We don't need this since CasADi will calculate it for us
 	break;
       
       // Gradient sparsity, linear terms
       case 'G':
-	if(verbose) cerr << "Gradient sparsity, linear terms unsupported: ignored" << endl;
+	// We don't need this since CasADi will calculate it for us
 	break;
     }
   }
@@ -330,11 +447,11 @@ void SymbolicNLP::print(std::ostream &stream) const{
   stream << "NLP:" << endl;
   stream << "x = " << x << endl;
   stream << "#f=" << f.size() << endl;
-  stream << "#c=" << c.size() << endl;
+  stream << "#g=" << g.size() << endl;
 }
 
 void SymbolicNLP::repr(std::ostream &stream) const{
-  stream << "NLP(#f=" << f.size() << ",#c="<< c.size() << ")";
+  stream << "NLP(#f=" << f.size() << ",#g="<< g.size() << ")";
 }
 
 
