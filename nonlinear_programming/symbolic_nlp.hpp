@@ -78,7 +78,7 @@ class SymbolicNLP : public PrintableObject{
   protected:
     
     /// Read an expression from an NL-file (Polish infix format)
-    SX readExpressionNL(std::istream &stream);
+    static SX readExpressionNL(std::istream &stream, const std::vector<SX>& v);
 
 #endif // SWIG 
 

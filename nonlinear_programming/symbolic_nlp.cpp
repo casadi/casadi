@@ -72,8 +72,8 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
   x = ssym("x",n_var);
   
   // Allocate f and c
-  f = SXMatrix::nan(n_obj);
-  g = SXMatrix::nan(n_con);
+  f = SXMatrix::zeros(n_obj);
+  g = SXMatrix::zeros(n_con);
   
   // Allocate bounds for x and primal initial guess
   x_lb = DMatrix(x.sparsity(),-numeric_limits<double>::infinity());
@@ -84,6 +84,9 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
   g_lb = DMatrix(g.sparsity(),-numeric_limits<double>::infinity());
   g_ub = DMatrix(g.sparsity(), numeric_limits<double>::infinity());
   lambda_init = DMatrix(g.sparsity(), 0.0);
+  
+  // All variables, including dependent
+  vector<SX> v = x.data();
   
   // Process segments
   while(true){
@@ -109,8 +112,36 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
 	
       // Defined variable definition
       case 'V':
-	if(verbose) cerr << "Defined variable definition unsupported: ignored" << endl;
+      {
+	// Read header
+	int i, j, k;
+	nlfile >> i >> j >> k;
+	
+	// Make sure that v is long enough
+	if(i >= v.size()){
+	  v.resize(i+1);
+	}
+	
+	// Initialize element to zero
+	v.at(i) = 0;
+	
+	// Add the linear terms
+	for(int jj=0; jj<j; ++jj){
+	  // Linear term
+	  int pl;
+	  double cl;
+	  nlfile >> pl >> cl;
+	  
+	  // Add to variable definition (assuming it has already been defined)
+	  casadi_assert_message(!v.at(pl).isNan(),"Circular dependencies not supported");
+	  v[i] += cl*v[pl];
+	}
+	
+	// Finally, add the nonlinear term
+	v[i] += readExpressionNL(nlfile,v);
+	
 	break;
+      }
       
       // Algebraic constraint body
       case 'C':
@@ -120,7 +151,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
 	nlfile >> i;
 	
 	// Parse and save expression
-	g.at(i) = readExpressionNL(nlfile);
+	g.at(i) = readExpressionNL(nlfile,v);
 	
 	break;
       }
@@ -142,7 +173,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
 	nlfile >> sigma;
 	
 	// Parse and save expression
-	f.at(i) = readExpressionNL(nlfile);
+	f.at(i) = readExpressionNL(nlfile,v);
 	
 	// Negate the expression if we maximize
 	if(sigma!=0){
@@ -308,20 +339,64 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
 	break;
       }
       
-      // Jacobian colun counts
+      // Jacobian column counts
       case 'k':
-	// We don't need this since CasADi will calculate it for us
+      {
+	// Get column offsets
+	vector<int> colind(n_var+1);
+	
+	// Get the number of offsets
+	int k;
+	nlfile >> k;
+	casadi_assert(k==n_var-1);
+	
+	// Get the column offsets
+	colind[0]=0;
+	for(int i=0; i<k; ++i){
+	  nlfile >> colind[i+1];
+	}
 	break;
+      }
       
-      // Jacobian sparsity, linear terms
+      // Linear terms in the constraint function
       case 'J':
-	// We don't need this since CasADi will calculate it for us
+      {
+	// Get constraint number and number of terms
+	int i,k;
+	nlfile >> i >> k;
+	
+	// Get terms
+	for(int kk=0; kk<k; ++kk){
+	  // Get the term
+	  int j;
+	  double c;
+	  nlfile >> j >> c;
+	  
+	  // Add to constraints
+	  g.at(i) += c*v.at(j);
+	}
 	break;
+      }
       
-      // Gradient sparsity, linear terms
+      // Linear terms in 
       case 'G':
-	// We don't need this since CasADi will calculate it for us
+      {
+	// Get objective number and number of terms
+	int i,k;
+	nlfile >> i >> k;
+	
+	// Get terms
+	for(int kk=0; kk<k; ++kk){
+	  // Get the term
+	  int j;
+	  double c;
+	  nlfile >> j >> c;
+	  
+	  // Add to objective
+	  f.at(i) += c*v.at(j);
+	}
 	break;
+      }
     }
   }
   
@@ -329,7 +404,7 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
   nlfile.close();
 }
 
-SX SymbolicNLP::readExpressionNL(std::istream &stream){
+SX SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<SX>& v){
   // Read the instruction
   char inst;
   stream >> inst;
@@ -349,7 +424,7 @@ SX SymbolicNLP::readExpressionNL(std::istream &stream){
       stream >> i;
       
       // Return the corresponding expression
-      return x.at(i);
+      return v.at(i);
     
     // Numeric expression
     case 'n':
@@ -374,7 +449,7 @@ SX SymbolicNLP::readExpressionNL(std::istream &stream){
 	case 43:  case 42:  case 44:  case 45:  case 46:  case 47:  case 49:  case 50:  case 51:  case 52:  case 53:
 	{
 	  // Read dependency
-	  SX x = readExpressionNL(stream);
+	  SX x = readExpressionNL(stream,v);
 	  
 	  // Perform operation
 	  switch(i){
@@ -411,8 +486,8 @@ SX SymbolicNLP::readExpressionNL(std::istream &stream){
 	case 23:  case 24:  case 28:  case 29:  case 30:  case 48:  case 55:  case 56:  case 57:  case 58:  case 73:
 	{
 	  // Read dependencies
-	  SX x = readExpressionNL(stream);
-	  SX y = readExpressionNL(stream);
+	  SX x = readExpressionNL(stream,v);
+	  SX y = readExpressionNL(stream,v);
 
 	  // Perform operation
 	  switch(i){
@@ -420,7 +495,7 @@ SX SymbolicNLP::readExpressionNL(std::istream &stream){
 	    case 1:   return x - y;
 	    case 2:   return x * y;
 	    case 3:   return x / y;
-	    // case 4:   return rem(x,readExpressionNL(stream)); FIXME
+	    // case 4:   return rem(x,y); FIXME
 	    case 5:   return pow(x,y);
 	    // case 6:   return x < y; TODO: Verify this, what is the difference to 'le' == 23 below?
 	    case 20:  return x || y;
@@ -454,7 +529,7 @@ SX SymbolicNLP::readExpressionNL(std::istream &stream){
 	  // Collect the arguments
 	  vector<SX> args(n);
 	  for(int k=0; k<n; ++k){
-	    args[k] = readExpressionNL(stream);
+	    args[k] = readExpressionNL(stream,v);
 	  }
 	  
 	  // Perform the operation
@@ -514,7 +589,5 @@ void SymbolicNLP::print(std::ostream &stream) const{
 void SymbolicNLP::repr(std::ostream &stream) const{
   stream << "NLP(#f=" << f.size() << ",#g="<< g.size() << ")";
 }
-
-
 
 } // namespace CasADi

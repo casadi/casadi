@@ -611,6 +611,11 @@ int main(int argc, char **argv){
   SXMatrix f = objs;
   SXMatrix g = cons;
   
+  
+  cout << x << endl;
+  cout << f << endl;
+  cout << g << endl;
+  
   // NLP functions
   SXFunction ffcn(x,f);
   SXFunction gfcn(x,g);
