@@ -1,18 +1,20 @@
 from casadi import *
 
+"""
+This example demonstrates how NL-files, which can be generated
+by AMPl or Pyomo, can be imported in CasADi and solved using
+e.g. the interface to AMPL
+
+Joel Andersson
+2012
+
+"""
+
 # Create an NLP instance
 nlp = SymbolicNLP()
 
 # Parse an NL-file
-nlp.parseNL("/home/janderss/Desktop/cuter/csfi1.nl",{"verbose":True})
-
-# Print the NLP
-#print nlp
-
-
-#print nlp.x_ub
-#print nlp.lambda_init
-
+nlp.parseNL("../nl_files/hs107.nl",{"verbose":False})
 
 # NLP functions
 ffcn = SXFunction([nlp.x],[nlp.f])

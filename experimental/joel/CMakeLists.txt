@@ -94,8 +94,6 @@ endif(IPOPT_FOUND)
 add_executable(ticket_309 ticket_309.cpp )
 target_link_libraries(ticket_309 casadi ${CASADI_DEPENDENCIES})
 
-add_subdirectory(ampl)
-
 if(WITH_LLVM)
 add_subdirectory(llvm)
 endif(WITH_LLVM)

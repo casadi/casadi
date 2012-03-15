@@ -28,11 +28,15 @@ IF(IPOPT_FOUND)
 
 # Rocket using Ipopt
 add_executable(rocket_ipopt rocket_ipopt.cpp)
-target_link_libraries(rocket_ipopt ipopt_interface casadi ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES} )
+target_link_libraries(rocket_ipopt ipopt_interface casadi ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES})
 
 # Rocket solved with MX + SX
 add_executable(rocket_mx_and_sx rocket_mx_and_sx.cpp)
-target_link_libraries(rocket_mx_and_sx ipopt_interface casadi ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES} )
+target_link_libraries(rocket_mx_and_sx ipopt_interface casadi ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES})
+
+# Parse AMPL models and solve with Ipopt
+add_executable(ipopt_nl ipopt_nl.cpp)
+target_link_libraries(ipopt_nl ipopt_interface nonlinear_programming casadi ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES})
 
 ENDIF(IPOPT_FOUND)
 
