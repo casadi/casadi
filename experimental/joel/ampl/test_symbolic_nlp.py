@@ -4,7 +4,7 @@ from casadi import *
 nlp = SymbolicNLP()
 
 # Parse an NL-file
-nlp.parseNL("/home/janderss/Desktop/cuter/hs107.nl",{"verbose":True})
+nlp.parseNL("/home/janderss/Desktop/cuter/csfi1.nl",{"verbose":True})
 
 # Print the NLP
 #print nlp

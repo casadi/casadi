@@ -60,12 +60,11 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
   
   // Get the number of objectives and constraints
   stringstream ss(header[1]);
-  int n_var, n_ineq, n_obj, n_eq, n_lcon;
-  ss >> n_var >> n_ineq >> n_obj >> n_eq >> n_lcon;
-  int n_con = n_ineq + n_eq;
+  int n_var, n_con, n_obj, n_eq, n_lcon;
+  ss >> n_var >> n_con >> n_obj >> n_eq >> n_lcon;
   
   if(verbose){
-    cout << "n_var = " << n_var << ", n_ineq  = " << n_ineq << ", n_obj = " << n_obj << ", n_eq = " << n_eq << ", n_lcon = " << n_lcon << endl;
+    cout << "n_var = " << n_var << ", n_con  = " << n_con << ", n_obj = " << n_obj << ", n_eq = " << n_eq << ", n_lcon = " << n_lcon << endl;
   }
   
   // Allocate variables
@@ -253,37 +252,36 @@ void SymbolicNLP::parseNL(const std::string& filename, const Dictionary& options
 	      g_ub.at(i) = c;
 	      continue;
 	    
-	   // Only lower bounds
-	   case 2:
+	    // Only lower bounds
+	    case 2:
 	      nlfile >> c;
 	      g_lb.at(i) = c;
 	      continue;
 
-	   // No bounds
-	   case 3:
+	    // No bounds
+	    case 3:
 	      continue;
 	   
-	   // Equality constraints
-	   case 4:
+	    // Equality constraints
+	    case 4:
 	      nlfile >> c;
 	      g_lb.at(i) = g_ub.at(i) = c;
 	      continue;
 	      
-	   // Complementary constraints
-	   case 5:
-	   {
-	     // Read the indices
-	     int ck, ci;
-	     nlfile >> ck >> ci;
-	     if(verbose) cerr << "Complementary constraints unsupported: ignored" << endl;
-	     continue;
-	   }
+	      // Complementary constraints
+	      case 5:
+	      {
+		// Read the indices
+		int ck, ci;
+		nlfile >> ck >> ci;
+		if(verbose) cerr << "Complementary constraints unsupported: ignored" << endl;
+		continue;
+	      }
 	   
-	   default:
-	     throw CasadiException("Illegal constraint type");
+	      default:
+		throw CasadiException("Illegal constraint type");
+	    }
 	  }
-	}
-	
 	break;
       }
       
