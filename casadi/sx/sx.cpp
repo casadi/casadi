@@ -295,6 +295,8 @@ SX SX::div(const SX& y) const{
     return -1;
   else if(y.isBinary() && y.getOp()==NEG && isBinary() && getOp()==NEG && getDep(0).isEquivalent(y.getDep(0)))      // (-x)/(-x) = 1
     return 1;
+  else if(isOp(DIV) && y.isEquivalent(node->dep(0)))
+    return node->dep(1).inv();
   else // create a new branch
     return BinarySXNode::createT<DIV>(*this,y);
 }
