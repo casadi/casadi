@@ -76,7 +76,7 @@ void JacobianInternal::init(){
     }
   }
   
-  // Only now, when we know the sparsity of the inputs and outputs, we are anle to call the init function of the base class
+  // Only now, when we know the sparsity of the inputs and outputs, we are able to call the init function of the base class
   FXInternal::init();
 
   // Quick hacks starting here!
@@ -101,12 +101,16 @@ void JacobianInternal::init(){
       int nadj = D2_.front().isNull() ? 0 : D2_.front().size1();
       int nfdir_fcn_old = fcn_.getOption("number_of_fwd_dir");
       int nadir_fcn_old = fcn_.getOption("number_of_adj_dir");
-      fcn_.setOption("number_of_fwd_dir",std::max(nfwd,nfdir_fcn_old));
-      fcn_.setOption("number_of_adj_dir",std::max(nadj,nadir_fcn_old));
+      
+      int nfwd_max = std::max(1, 1000000 / (fcn_.input(iind_).size()+fcn_.output(oind_).size()));
+      int nadj_max = std::max(1, 1000000 / (fcn_.input(iind_).size()+fcn_.output(oind_).size()));
+
+      fcn_.setOption("number_of_fwd_dir",std::min(std::max(nfwd,nfdir_fcn_old),nfwd_max));
+      fcn_.setOption("number_of_adj_dir",std::min(std::max(nadj,nadir_fcn_old),nadj_max));
       fcn_.updateNumSens();
       
       if(verbose()){
-        cout << "JacobianInternal::init: " << nfwd << " forward directions and " << nadj << " adjoint directions needed for the jacobian" << endl;
+        cout << "JacobianInternal::init: " << fcn_.getOption("number_of_fwd_dir") << " forward directions and " << fcn_.getOption("number_of_adj_dir") << " adjoint directions needed for the jacobian" << endl;
       }
     }
   }
