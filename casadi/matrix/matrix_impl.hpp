@@ -823,7 +823,7 @@ void Matrix<T>::get(T* val, Sparsity sp) const{
 template<class T>
 void Matrix<T>::getArray(T* val, int len, Sparsity sp) const{
   const std::vector<T> &v = data();
-  if(sp==SPARSE || (sp==DENSE && numel()==v.size())){
+  if(sp==SPARSE || (sp==DENSE && dense())){
     casadi_assert_message(len==size(),
           "Matrix<T>::getArray: Dimension mismatch." << std::endl <<
           "I am a matrix of shape " << size1() << " x " << size2() << " = " << numel() << " ready to fill something up with " << size() << " non-zero elements," << std::endl <<
