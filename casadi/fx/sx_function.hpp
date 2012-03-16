@@ -143,7 +143,7 @@ public:
   /** \brief get function outputs */
   const std::vector<SXMatrix> & outputsSX() const;
   
-  /** \brief Generate C code for the function */
+  /** \brief Export / Generate C code for the function */
   void generateCode(const std::string& filename);
   
 #ifndef SWIG
