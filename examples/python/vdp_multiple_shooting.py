@@ -92,7 +92,7 @@ for k in range(nk):
 # Objective function: L(T)
 F = MXFunction([V],[X2[nk]])
 
-# Terminal constraints: 0<=[x(T);y(T)]<=0
+# Continuity constraints: 0<= x(T(k+1)) - X(T(k)) <=0
 G = MXFunction([V],[vertcat(g)])
 
 # Create NLP solver instance
