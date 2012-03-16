@@ -36,7 +36,8 @@ namespace CasADi{
   
 ControlSimulatorInternal::ControlSimulatorInternal(const FX& control_dae, const FX& output_fcn, const vector<double>& gridc) : control_dae_(control_dae), orig_output_fcn_(output_fcn), gridc_(gridc){
   setOption("name","unnamed controlsimulator");
-  addOption("nf",OT_INTEGER,1,"Number of minor grained integration steps per major interval. nf>0 must hold.");
+  addOption("nf",OT_INTEGER,1,"Number of minor grained integration steps per major interval. nf>0 must hold. This option is not used when 'minor_grid' is provided.");
+  addOption("minor_grid",OT_INTEGERVECTOR,GenericType(),"The local grid used on each major interval, with time normalized to 1. By default, option 'nf' is used to construct a linearly spaced grid.");
   addOption("integrator",               OT_INTEGRATOR, GenericType(), "An integrator creator function");
   addOption("integrator_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the integrator");
   addOption("simulator_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the simulator");
@@ -150,17 +151,27 @@ void ControlSimulatorInternal::init(){
   
   casadi_assert_message(nf_>0,"Option 'nf' must be greater than zero.");
   
+  if (hasSetOption("minor_grid")) {
+    gridlocal_ = getOption("minor_grid");
+    nf_ = gridlocal_.size()-1;
+    casadi_assert_message(gridlocal_.size()>1,"Option 'minor_grid' must have more then one element.");
+  } else {
+    gridlocal_.resize(nf_+1);
+    linspace(gridlocal_,0,1);
+  }
+
+  
   // Populate the fine-grained grid_
   if (nf_==1) { 
  	  // The default case: don't change the grid 
  	  grid_ = gridc_; 
  	} else { 
  	  // Interpolate the grid. 
- 	  grid_.resize((gridc_.size()-1)*nf_+1); 	     
- 	  std::vector< double > refined(nf_+1,0); 	 
+ 	  grid_.resize((gridc_.size()-1)*nf_+1); 	     	 
  	  for (int k=0;k<gridc_.size()-1;++k) { 
-      linspace(refined,gridc_[k],gridc_[k+1]); 
-      std::copy(refined.begin(),refined.end()-1,grid_.begin()+k*nf_); 
+      for (int i=0;i<gridlocal_.size()-1;++i) {
+        grid_[k*nf_+i] = gridc_[k] + gridlocal_[i]*(gridc_[k+1]-gridc_[k]);
+      }
  	  } 
          
  	  grid_[grid_.size()-1] = gridc_[gridc_.size()-1]; 
@@ -265,10 +276,6 @@ void ControlSimulatorInternal::init(){
   
   // Initialize the output function again
   output_fcn_.init();
-  
-  // Make a local grid with non-dimensional time
-  gridlocal_.resize(nf_+1);
-  linspace(gridlocal_,0,1); 
   
   // Create the simulator
   simulator_ = Simulator(integrator_,output_fcn_,gridlocal_);
