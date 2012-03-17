@@ -37,8 +37,7 @@ using namespace CasADi;
 
 int main(int argc, char **argv){
   // Get the problem
-  casadi_assert(argc==2);
-  std::string problem = argv[1];
+  std::string problem = (argc==2) ? argv[1] : "../examples/nl_files/hs107.nl";
   
   // Create an NLP instance
   SymbolicNLP nlp;
