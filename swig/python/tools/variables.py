@@ -103,7 +103,7 @@ class Variables(object):
       c._orderflag = copy.copy(self._orderflag)
       return c
         
-    def freeze(self,parent=True):
+    def freeze(self,parent=True,bare=False):
       self._createParent = parent
       self._frozen = True
       self._order = sorted(self._d.iterkeys())
@@ -112,8 +112,9 @@ class Variables(object):
           self._d[k].freeze()
       if self._type == "MX" and self._createParent:
         self.createParent()
-      self._numbers = Numbers(self,recycle=True)
-      self.buildlookuptable()
+      if not(bare):
+        self._numbers = Numbers(self,recycle=True)
+        self.buildlookuptable()
                 
     def buildlookuptable(self):
       self._reverselookup  = [None]*self.getSize()
@@ -244,7 +245,7 @@ class Variables(object):
           value = value.unfrozencopy()
           value.freeze()
         self._d[name] = value
-        if isinstance(value,MX) or self._type == "MX":
+        if (isinstance(value,MX) and value.isSymbolic()) or self._type == "MX":
            self._type = "MX"
         
             
