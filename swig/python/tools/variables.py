@@ -241,7 +241,8 @@ class Variables(object):
         if self._frozen:
           raise Exception("This Variables instance is frozen. You cannot add more members ('%s' in this case). This is for your own protection." % name)
         if isinstance(value,Variables):
-          value = copy.copy(value)
+          value = value.unfrozencopy()
+          value.freeze()
         self._d[name] = value
         if isinstance(value,MX) or self._type == "MX":
            self._type = "MX"
