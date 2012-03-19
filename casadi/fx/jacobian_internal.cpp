@@ -99,19 +99,24 @@ void JacobianInternal::init(){
       // Increase the number of sensitivities in the user function
       int nfwd = D1_.front().isNull() ? 0 : D1_.front().size1();
       int nadj = D2_.front().isNull() ? 0 : D2_.front().size1();
-      int nfdir_fcn_old = fcn_.getOption("number_of_fwd_dir");
-      int nadir_fcn_old = fcn_.getOption("number_of_adj_dir");
-      
-      int nfwd_max = std::max(1, 1000000 / (fcn_.input(iind_).size()+fcn_.output(oind_).size()));
-      int nadj_max = std::max(1, 1000000 / (fcn_.input(iind_).size()+fcn_.output(oind_).size()));
 
-      fcn_.setOption("number_of_fwd_dir",std::min(std::max(nfwd,nfdir_fcn_old),nfwd_max));
-      fcn_.setOption("number_of_adj_dir",std::min(std::max(nadj,nadir_fcn_old),nadj_max));
-      fcn_.updateNumSens();
-      
       if(verbose()){
-        cout << "JacobianInternal::init: " << fcn_.getOption("number_of_fwd_dir") << " forward directions and " << fcn_.getOption("number_of_adj_dir") << " adjoint directions needed for the jacobian" << endl;
+        cout << "JacobianInternal::init: " << nfwd << " forward directions and " << nadj << " adjoint directions needed for the jacobian." << endl;
       }
+      
+      // At least the previous number of directions
+      nfwd = std::max(nfwd,int(fcn_.getOption("number_of_fwd_dir")));
+      nadj = std::max(nadj,int(fcn_.getOption("number_of_adj_dir")));
+
+      // Cap the number of directions
+      const int max_num_dir = 100;
+      nfwd = std::min(nfwd,max_num_dir);
+      nadj = std::min(nadj,max_num_dir);
+      
+      // Allocate memory for more sensitivity directions
+      fcn_.setOption("number_of_fwd_dir",nfwd);
+      fcn_.setOption("number_of_adj_dir",nadj);
+      fcn_.updateNumSens();
     }
   }
   
