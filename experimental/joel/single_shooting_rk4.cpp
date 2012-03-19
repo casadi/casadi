@@ -44,119 +44,22 @@ double norm22(const DMatrix& v){
 double norm2(const DMatrix& v){
   return sqrt(norm22(v));
 }
-
-int main(){
-    
-  cout << "program started" << endl;
-    
   
-  // Automatic initialization
-  bool manual_init = true;
-
-  // Use the Gauss-Newton method
-  bool gauss_newton = false;
-  
-  // QP-solver
-  QPSolverCreator qp_solver_creator = Interfaces::QPOasesSolver::creator;
-  Dictionary qp_solver_options;
-  qp_solver_options["printLevel"] = "none";
-
-  // Initial guess
-  double x0 = 0.08;
-
-  // Bounds on the state
-  double x_min = -1;
-  double x_max =  1;
-  double xf_min = 0;
-  double xf_max = 0;
-
-  // Control
-  double u_min_d = -1;
-  double u_max_d =  1;
-  
-  // End time
-  double T = 3;
-
-  // Control discretization
-  int nk = 30;
-
-  // Time step
-  double dT = T/nk;
-
-  // Discretized control
-  SXMatrix u = ssym("u",nk);
-
-  // Initial guess for u
-  DMatrix u_guess = DMatrix::zeros(nk);
-  DMatrix u_min = u_min_d*DMatrix::ones(nk);
-  DMatrix u_max = u_max_d*DMatrix::ones(nk);
-
-  // Lifted variables
-  SXMatrix L;
-
-  // Objective terms
-  SXMatrix F;
-
-  // NLP functions
-  SXFunction F1, F2;
-  
-  // Get an expression for the state that the final time
-  SXMatrix x = x0;
-  
-  for(int k=0; k<nk; ++k){
-    // Get new value for X
-    x = x + dT*(x*(x+1)+u[k]);
-    
-    // Append terms to objective function
-    F.append(u[k]);
-    F.append(x);
-    
-    // Lift x
-    L.append(x);
-  }
-
-  if(gauss_newton){
-    // Objective function (GN)
-    F1 = SXFunction(u,F);
-    
-  } else {
-    // Objective function (SQP)
-    F1 = SXFunction(u,inner_prod(F,F));
-  }
-
-  // Constraint function
-  F2 = SXFunction(u,x);
-  DMatrix g_min = xf_min;
-  DMatrix g_max = xf_max;
-
-  // Solve with ipopt
-  IpoptSolver nlp_solver(F1,F2);
-  nlp_solver.init();
-  nlp_solver.setInput(u_guess,NLP_X_INIT);
-  nlp_solver.setInput(u_min,NLP_LBX);
-  nlp_solver.setInput(u_max,NLP_UBX);
-  nlp_solver.setInput(xf_min,NLP_LBG);
-  nlp_solver.setInput(xf_max,NLP_UBG);
-  nlp_solver.solve();
-
-  // Lifting function
-  SXFunction ifcn(u,L);
-
-  // Problem formulation ends
-  // Everything below should go into a lifted newton SQP solver class
+void liftedNewton(SXFunction &F1, SXFunction &F2, SXFunction &ifcn, bool manual_init, bool gauss_newton, QPSolverCreator qp_solver_creator, const Dictionary& qp_solver_options,
+  const DMatrix& u_min, const DMatrix& u_max, const DMatrix& g_min, const DMatrix& g_max){
 
   // Options
   double tol = 1e-6;     // Stopping tolerance
   int max_iter = 30;  // Maximum number of iterations
 
   // Extract the free variable and expressions for F and xdef
-  u = F1.inputSX();
+  SXMatrix u = F1.inputSX();
   SXMatrix f1 = F1.outputSX();
   SXMatrix f2 = F2.outputSX();
   SXMatrix xdef = ifcn.outputSX();
 
   // Lifted variables
-  x = ssym("x",xdef.size());
+  SXMatrix x = ssym("x",xdef.size());
 
   // Substitute in the lifted variables x into the expressions for xdef, F1 and F2
   SXMatrixVector ex(2);
@@ -257,7 +160,7 @@ int main(){
   int nx = x.size1();
 
   // Variables
-  DMatrix u_k = u_guess;
+  DMatrix u_k(u.sparsity(),0);
   DMatrix x_k(x.sparsity(),0);
   DMatrix d_k(x.sparsity(),0);
   DMatrix mux_k(mux.sparsity(),0);
@@ -308,9 +211,9 @@ int main(){
     AB.setInput(mux_k,2);
     AB.setInput(mug_k,3);
     AB.evaluate();
-    DMatrix A_k = AB.output(0);
-    DMatrix B1_k = AB.output(1); // NOTE: # mux dissappears (constant term)
-    DMatrix B2_k = AB.output(2);
+    const DMatrix& A_k = AB.output(0);
+    const DMatrix& B1_k = AB.output(1); // NOTE: # mux dissappears (constant term)
+    const DMatrix& B2_k = AB.output(2);
     
     // Get a_k and b_k
     Z.setInput(u_k,0);
@@ -416,7 +319,7 @@ int main(){
     if(k % 10 == 0){
       cout << setw(4) << "iter" << setw(20) << "norm_res" << setw(20) << "norm_step" << setw(20) << "norm_viol" << endl;
     }
-    cout   << setw(4) <<     k << setw(20) <<   norm_res  << setw(20) <<  norm_step  << setw(20) <<  norm_viol  << endl;
+    cout   << setw(4) <<     k  << setw(20) <<  norm_res  << setw(20) <<  norm_step  << setw(20) <<  norm_viol  << endl;
     
     // Check if stopping criteria is satisfied
     if(norm_viol + norm_res  + norm_step < tol){
@@ -437,8 +340,9 @@ int main(){
   
   
   
-  return 0;
-  
+  return;
+
+#if 0
   {  
   
   // Dimensions
@@ -597,11 +501,113 @@ int main(){
   file.close();
   cout << "Results saved to \"" << filename << "\"" << endl;
 
-  return 0;
-  
   }
+#endif  
+  
 }
 
+int main(){
+    
+  cout << "program started" << endl;
+    
+  
+  // Automatic initialization
+  bool manual_init = false;
+
+  // Use the Gauss-Newton method
+  bool gauss_newton = false;
+  
+  // QP-solver
+  QPSolverCreator qp_solver_creator = Interfaces::QPOasesSolver::creator;
+  Dictionary qp_solver_options;
+  qp_solver_options["printLevel"] = "none";
+
+  // Initial guess
+  double x0 = 0.08;
+
+  // Bounds on the state
+  double x_min = -1;
+  double x_max =  1;
+  double xf_min = 0;
+  double xf_max = 0;
+
+  // Control
+  double u_min_d = -1;
+  double u_max_d =  1;
+  
+  // End time
+  double T = 3;
+
+  // Control discretization
+  int nk = 30;
+
+  // Time step
+  double dT = T/nk;
+
+  // Discretized control
+  SXMatrix u = ssym("u",nk);
+
+  // Initial guess for u
+  DMatrix u_guess = DMatrix::zeros(nk);
+  DMatrix u_min = u_min_d*DMatrix::ones(nk);
+  DMatrix u_max = u_max_d*DMatrix::ones(nk);
+
+  // Lifted variables
+  SXMatrix L;
+
+  // Objective terms
+  SXMatrix F;
+
+  // NLP functions
+  SXFunction F1, F2;
+  
+  // Get an expression for the state that the final time
+  SXMatrix x = x0;
+  
+  for(int k=0; k<nk; ++k){
+    // Get new value for X
+    x = x + dT*(x*(x+1)+u[k]);
+    
+    // Append terms to objective function
+    F.append(u[k]);
+    F.append(x);
+    
+    // Lift x
+    L.append(x);
+  }
+
+  if(gauss_newton){
+    // Objective function (GN)
+    F1 = SXFunction(u,F);
+    
+  } else {
+    // Objective function (SQP)
+    F1 = SXFunction(u,inner_prod(F,F));
+  }
+
+  // Constraint function
+  F2 = SXFunction(u,x);
+  DMatrix g_min = xf_min;
+  DMatrix g_max = xf_max;
+
+  // Solve with ipopt
+  IpoptSolver nlp_solver(F1,F2);
+  nlp_solver.init();
+  nlp_solver.setInput(u_guess,NLP_X_INIT);
+  nlp_solver.setInput(u_min,NLP_LBX);
+  nlp_solver.setInput(u_max,NLP_UBX);
+  nlp_solver.setInput(xf_min,NLP_LBG);
+  nlp_solver.setInput(xf_max,NLP_UBG);
+  nlp_solver.solve();
+
+  // Lifting function
+  SXFunction ifcn(u,L);
+
+  // Solve problem
+  liftedNewton(F1,F2,ifcn,manual_init,gauss_newton,qp_solver_creator,qp_solver_options,u_min,u_max,g_min,g_max);
+  
+  return 0;
+}
 
 
 
