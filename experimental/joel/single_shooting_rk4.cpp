@@ -23,6 +23,7 @@
 #include <iostream>
 #include <fstream>
 #include <ctime>
+#include <iomanip>
 #include <casadi/casadi.hpp>
 #include <nonlinear_programming/sqp_method.hpp>
 #include <interfaces/qpoases/qpoases_solver.hpp>
@@ -31,6 +32,18 @@
 
 using namespace CasADi;
 using namespace std;
+
+double norm22(const DMatrix& v){
+  double ret = 0;
+  for(DMatrix::const_iterator it=v.begin(); it!=v.end(); ++it){
+    ret += (*it) * (*it);
+  }
+  return ret;
+}
+
+double norm2(const DMatrix& v){
+  return sqrt(norm22(v));
+}
 
 int main(){
     
@@ -44,7 +57,7 @@ int main(){
   bool gauss_newton = false;
   
   // QP-solver
-  QPSolverCreator qp_solver = Interfaces::QPOasesSolver::creator;
+  QPSolverCreator qp_solver_creator = Interfaces::QPOasesSolver::creator;
   Dictionary qp_solver_options;
   qp_solver_options["printLevel"] = "none";
 
@@ -102,11 +115,6 @@ int main(){
     L.append(x);
   }
 
-  // Bounds on G
-  SXMatrix G = x;
-  DMatrix g_min = xf_min;
-  DMatrix g_max = xf_max;
-
   if(gauss_newton){
     // Objective function (GN)
     F1 = SXFunction(u,F);
@@ -117,7 +125,9 @@ int main(){
   }
 
   // Constraint function
-  F2 = SXFunction(u,G);
+  F2 = SXFunction(u,x);
+  DMatrix g_min = xf_min;
+  DMatrix g_max = xf_max;
 
   // Solve with ipopt
   IpoptSolver nlp_solver(F1,F2);
@@ -125,8 +135,8 @@ int main(){
   nlp_solver.setInput(u_guess,NLP_X_INIT);
   nlp_solver.setInput(u_min,NLP_LBX);
   nlp_solver.setInput(u_max,NLP_UBX);
-  nlp_solver.setInput(g_min,NLP_LBG);
-  nlp_solver.setInput(g_max,NLP_UBG);
+  nlp_solver.setInput(xf_min,NLP_LBG);
+  nlp_solver.setInput(xf_max,NLP_UBG);
   nlp_solver.solve();
 
   // Lifting function
@@ -191,13 +201,239 @@ int main(){
     }
     xdotdef = xdotdef_reversed;
     
-#if 0
-    
-    # Append to xdef and x
-    x.append(xdot)
-    xdef.append(xdotdef)
-#endif
+    // Append to xdef and x
+    x.append(xdot);
+    xdef.append(xdotdef);
   }
+
+  // Residual function G
+  SXMatrixVector G_in,G_out;
+  G_in.push_back(u);
+  G_in.push_back(x);
+  G_in.push_back(mux);
+  G_in.push_back(mug);
+  G_out.push_back(xdef-x);
+  G_out.push_back(f1);
+  G_out.push_back(f2);
+  SXFunction G(G_in,G_out);
+  G.init();
+
+  // Difference vector d
+  SXMatrix d = ssym("d",xdef.size1());
+
+  // Substitute out the x from the zdef
+  SXMatrix z = xdef-d;
+  ex[0] = f1;
+  ex[1] = f2;
+  substituteInPlace(x, z, ex, false, false);
+  f1 = ex[0];
+  f2 = ex[1];
+
+  // Modified function Z
+  SXMatrixVector Z_in,Z_out;
+  Z_in.push_back(u);
+  Z_in.push_back(d);
+  Z_in.push_back(mux);
+  Z_in.push_back(mug);
+  Z_out.push_back(z);
+  Z_out.push_back(f1);
+  Z_out.push_back(f2);
+  SXFunction Z(Z_in,Z_out);
+  Z.init();
+
+  // Matrix A and B in lifted Newton
+  SXMatrix A = Z.jac(0,0);
+  SXMatrix B1 = Z.jac(0,1);
+  SXMatrix B2 = Z.jac(0,2);
+
+  SXMatrixVector AB_out;
+  AB_out.push_back(A);
+  AB_out.push_back(B1);
+  AB_out.push_back(B2);
+  SXFunction AB(Z_in,AB_out);
+  AB.init();
+  
+  // Dimensions
+  int nx = x.size1();
+
+  // Variables
+  DMatrix u_k = u_guess;
+  DMatrix x_k(x.sparsity(),0);
+  DMatrix d_k(x.sparsity(),0);
+  DMatrix mux_k(mux.sparsity(),0);
+  DMatrix mug_k(mug.sparsity(),0);
+  DMatrix dmux_k(mux.sparsity(),0);
+  DMatrix dmug_k(mug.sparsity(),0);
+  DMatrix f1_k(f1.sparsity(),0);
+  DMatrix f2_k(f2.sparsity(),0);
+
+  if(manual_init){
+    // Initialize node values manually
+    G.setInput(u_k,0);
+    G.setInput(x_k,1);
+    G.setInput(mux_k,2);
+    G.setInput(mug_k,3);
+    G.evaluate();
+    G.getOutput(d_k,0);
+    G.getOutput(f1_k,1); // mux is zero (initial multiplier guess)
+    G.getOutput(f2_k,2);
+  } else {
+    // Initialize x0 by function evaluation
+    Z.setInput(u_k,0);
+    Z.setInput(d_k,1);
+    Z.setInput(mux_k,2);
+    Z.setInput(mug_k,3);
+    Z.evaluate();
+    Z.getOutput(x_k,0);
+    Z.getOutput(f1_k,1); // mux is zero (initial multiplier guess)
+    Z.getOutput(f2_k,2);
+  }
+    
+  // Zero seeds
+  DMatrix u0seed(u.sparsity(),0);
+  DMatrix d0seed(d.sparsity(),0);
+  DMatrix mux0seed(mux.sparsity(),0);
+  DMatrix mug0seed(mug.sparsity(),0);
+
+  // QP solver
+  QPSolver qp_solver;
+  
+  // Iterate
+  int k = 0;
+  while(true){
+    
+    // Get A_k and Bk
+    AB.setInput(u_k,0);
+    AB.setInput(d_k,1);
+    AB.setInput(mux_k,2);
+    AB.setInput(mug_k,3);
+    AB.evaluate();
+    DMatrix A_k = AB.output(0);
+    DMatrix B1_k = AB.output(1); // NOTE: # mux dissappears (constant term)
+    DMatrix B2_k = AB.output(2);
+    
+    // Get a_k and b_k
+    Z.setInput(u_k,0);
+    Z.setInput(d_k,1);
+    Z.setInput(mux_k,2);
+    Z.setInput(mug_k,3);
+    Z.setFwdSeed(u0seed,0);
+    Z.setFwdSeed(d_k,1);
+    Z.setFwdSeed(mux0seed,2);
+    Z.setFwdSeed(mug0seed,3);
+
+    Z.evaluate(1,0);
+    //Z.getOutput(x_k,0);
+    Z.getOutput(f1_k,1);
+    Z.getOutput(f2_k,2);
+    DMatrix a_k = -Z.fwdSens(0);
+    DMatrix b1_k = f1_k-Z.fwdSens(1); // mux disappears from Z (constant term)
+    DMatrix b2_k = f2_k-Z.fwdSens(2);
+
+    DMatrix H,g,A,a;
+    if(gauss_newton){
+      // Gauss-Newton Hessian
+      H = mul(trans(B1_k),B1_k);
+      g = mul(trans(B1_k),b1_k);
+      A = B2_k;
+      a = b2_k;
+    } else {
+      // Exact Hessian
+      H = B1_k;
+      g = b1_k; // +/- mux_k here?
+      A = B2_k;
+      a = b2_k;
+    }
+
+    if(k==0){
+      // Allocate a QP solver
+      qp_solver = qp_solver_creator(H.sparsity(),A.sparsity());
+      qp_solver.setOption(qp_solver_options);
+      qp_solver.init();
+    }
+
+    // Formulate the QP
+    qp_solver.setInput(H,QP_H);
+    qp_solver.setInput(g,QP_G);
+    qp_solver.setInput(A,QP_A);
+    qp_solver.setInput(u_min-u_k,QP_LBX);
+    qp_solver.setInput(u_max-u_k,QP_UBX);
+    qp_solver.setInput(g_min-a,QP_LBA);
+    qp_solver.setInput(g_max-a,QP_UBA);
+
+    // Solve the QP
+    qp_solver.evaluate();
+
+    // Get the primal solution
+    DMatrix du_k = qp_solver.output(QP_PRIMAL);
+    
+    // Get the dual solution
+    if(!gauss_newton){
+      qp_solver.getOutput(dmux_k,QP_DUAL_X);
+      qp_solver.getOutput(dmug_k,QP_DUAL_A);
+    }
+    
+    // Calculate the step in x
+    Z.setFwdSeed(du_k,0);
+    Z.setFwdSeed(d0seed,1); // could the a_k term be moved here?
+    Z.setFwdSeed(dmux_k,2);
+    Z.setFwdSeed(dmug_k,3);
+    Z.evaluate(1,0);
+    DMatrix dx_k = Z.fwdSens(0);
+        
+    // Take a full step
+    u_k =     u_k +   du_k;
+    x_k =     x_k +    a_k + dx_k;
+    mug_k = mug_k + dmug_k;
+    mux_k = mux_k + dmux_k;
+
+    // Call algorithm 2 to obtain new d_k and fk
+    G.setInput(u_k,0);
+    G.setInput(x_k,1);
+    G.setInput(mux_k,2);
+    G.setInput(mug_k,3);
+    G.evaluate();
+    G.getOutput(d_k,0);
+    G.getOutput(f1_k,1); // mux?
+    G.getOutput(f2_k,2);
+
+    // Norm of residual error
+    double norm_res = norm2(d_k);
+    
+    // Norm of step size
+    double step_du_k = norm22(du_k);
+    double step_dmug_k = norm22(dmug_k);
+    double norm_step = sqrt(step_du_k + step_dmug_k); // add mux
+
+    // Norm of constraint violation
+    double viol_umax = norm22(fmax(u_k-u_max,0));
+    double viol_umin = norm22(fmax(u_min-u_k,0));
+    double viol_gmax = norm22(fmax(f2_k-g_max,0));
+    double viol_gmin = norm22(fmax(g_min-f2_k,0));
+    double norm_viol = sqrt(viol_umax + viol_umin + viol_gmax + viol_gmin);
+
+    // Print progress (including the header every 10 rows)
+    if(k % 10 == 0){
+      cout << setw(4) << "iter" << setw(20) << "norm_res" << setw(20) << "norm_step" << setw(20) << "norm_viol" << endl;
+    }
+    cout   << setw(4) <<     k << setw(20) <<   norm_res  << setw(20) <<  norm_step  << setw(20) <<  norm_viol  << endl;
+    
+    // Check if stopping criteria is satisfied
+    if(norm_viol + norm_res  + norm_step < tol){
+      cout << "Convergens achieved!" << endl;
+      break;
+    }
+    
+    // Increase iteration count
+    k = k+1;
+    
+    // Check if number of iterations have been reached
+    if(k >= max_iter){
+      cout << "Maximum number of iterations (" << max_iter << ") reached" << endl;
+      break;
+    }
+  }
+
   
   
   
