@@ -504,7 +504,7 @@ SX SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<SX>& v)
 	    case 28:  return x >= y;
 	    case 29:  return x > y;
 	    case 30:  return x != y;
-	    // case 48:  return atan2(x,y); // FIXME
+	    case 48:  return atan2(x,y);
 	    // case 55:  return intdiv(x,y); // FIXME
 	    // case 56:  return precision(x,y); // FIXME
 	    // case 57:  return round(x,y); // FIXME

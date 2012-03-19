@@ -775,6 +775,10 @@ MX MX::fmax(const MX& b) const{
   return binary(FMAX,*this,b);
 }
 
+MX MX::arctan2(const MX& b) const{       
+  return binary(ATAN2,*this,b);
+}
+
 MX MX::printme(const MX& b) const{ 
   return binary(OP_PRINTME,*this,b);
 }
@@ -949,108 +953,5 @@ std::vector<int> MX::getDepInd() const {
   casadi_assert_message(m!=0, "mapping: argument MX should point to a Mapping node");
   return m->getDepInd();
 }
- 	
-} // namespace CasADi
-
-// GLobal namespace
-
-using namespace CasADi;
-
-MX exp(const MX& x){
-  return x.exp();
-}
-
-MX log(const MX& x){
-  return x.log();
-}
-
-MX log10(const MX& x){
-  return x.log10();
-}
-
-MX sqrt(const MX& x){
-  return x.sqrt();
-}
-
-MX sin(const MX& x){
-  return x.sin();
-}
-
-MX cos(const MX& x){
-  return x.cos();
-}
-
-MX tan(const MX& x){
-  return x.tan();
-}
-
-MX atan(const MX& x){
-  return x.arctan();
-}
-
-MX asin(const MX& x){
-  return x.arcsin();
-}
-
-MX acos(const MX& x){
-  return x.arccos();
-}
-
-MX sinh(const MX& x){
-  return x.sinh();
-}
-
-MX cosh(const MX& x){
-  return x.cosh();
-}
-
-MX tanh(const MX& x){
-  return x.tanh();
-}
-
-MX pow(const MX& x, const MX& n){
-  return x.__pow__(n);
-}
-
-MX floor(const MX& x){
-  return x.floor();
-}
-
-MX ceil(const MX& x){
-  return x.ceil();
-}
-
-MX fabs(const MX& x){
-  return x.fabs();
-}
-
-MX erf(const MX& x){
-  return x.erf();
-}
-
-MX fmin(const MX& x, const MX& y){
-  return x.fmin(y);
-}
-
-MX fmax(const MX& x, const MX& y){
-  return x.fmax(y);
-}
-
-namespace CasADi{
-  MX constpow(const MX& x, const MX& n){
-    return x.constpow(n);
-  }
-
-  MX sign(const MX& x){
-    return x.sign();
-  }
-
-  MX erfinv(const MX& x){
-    return x.erfinv();
-  }
-
-  MX printme(const MX& x, const MX& y){
-    return x.printme(y);
-  }
-  
+ 	  
 } // namespace CasADi

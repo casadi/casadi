@@ -5,7 +5,7 @@ import glob
 login = input('Enter remote host within string quotes: ')
 
 # For all the problems
-for fullname in glob.glob('cuter_selected2' + '/*.mod'):
+for fullname in glob.glob('cuter_selected' + '/*.mod'):
 
   # Filename
   modfile = os.path.basename(fullname)

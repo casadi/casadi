@@ -1038,6 +1038,11 @@ Matrix<T> Matrix<T>::fmin(const Matrix<T>& y) const{
 }
 
 template<class T>
+Matrix<T> Matrix<T>::arctan2(const Matrix<T>& y) const{
+  return binary(ATAN2,*this,y);
+}
+
+template<class T>
 Matrix<T> Matrix<T>::fmax(const Matrix<T>& y) const{
   return binary(FMAX,*this,y);
 }

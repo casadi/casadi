@@ -245,6 +245,7 @@ class SX{
     SX sinh() const;
     SX cosh() const;
     SX tanh() const;
+    SX arctan2(const SX &b) const;
     SX log10() const;
     SX printme(const SX &b) const;
     SX sign() const;
@@ -257,6 +258,7 @@ class SX{
     Matrix<SX> fmin(const Matrix<SX>& b) const;
     Matrix<SX> fmax(const Matrix<SX>& b) const;
     Matrix<SX> constpow(const Matrix<SX>& n) const;
+    Matrix<SX> arctan2(const Matrix<SX>& b) const;
         
     // Get the temporary variable
     int getTemp() const;

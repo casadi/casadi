@@ -5,6 +5,7 @@ find_package(BLAS QUIET)
 find_package(LAPACK QUIET)
 find_package(LIFTOPT QUIET)
 find_package(OOQP QUIET)
+find_package(ACADO QUIET)
 
 IF(IPOPT_FOUND)
 include_directories(${IPOPT_INCLUDE_DIR})
@@ -97,3 +98,10 @@ target_link_libraries(ticket_309 casadi ${CASADI_DEPENDENCIES})
 if(WITH_LLVM)
 add_subdirectory(llvm)
 endif(WITH_LLVM)
+
+# single shooting using a RK4 integrator and SQP
+IF(IPOPT_FOUND AND ACADO_FOUND AND ACADO_SHARED_LIBRARIES)
+  add_executable(single_shooting_rk4 single_shooting_rk4.cpp)
+  target_link_libraries(single_shooting_rk4 integration nonlinear_programming qpoases_interface ipopt_interface casadi ${CASADI_DEPENDENCIES} ${IPOPT_LIBRARIES} ${ACADO_SHARED_LIBRARIES})
+ENDIF(IPOPT_FOUND AND ACADO_FOUND AND ACADO_SHARED_LIBRARIES)
+

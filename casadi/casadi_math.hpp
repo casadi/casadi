@@ -62,6 +62,7 @@ bool operation_checker(unsigned int op){
     case OP_CONST:      return F<OP_CONST>::check;
     case ERFINV:        return F<ERFINV>::check;
     case OP_PRINTME:    return F<OP_PRINTME>::check;
+    case ATAN2:         return F<ATAN2>::check;
   }
 };
 
@@ -164,6 +165,7 @@ inline void casadi_math<T>::fun(unsigned char op, const T& x, const T& y, T& f){
     case SINH+OFF:      C<SINH>::fcn(X,Y,F);          break;\
     case COSH+OFF:      C<COSH>::fcn(X,Y,F);          break;\
     case TANH+OFF:      C<TANH>::fcn(X,Y,F);          break;\
+    case ATAN2+OFF:     C<ATAN2>::fcn(X,Y,F);        break; \
     case ERFINV+OFF:    C<ERFINV>::fcn(X,Y,F);        break;\
     case OP_PRINTME+OFF:   C<OP_PRINTME>::fcn(X,Y,F);       break;
   
@@ -214,6 +216,7 @@ inline void casadi_math<T>::der(unsigned char op, const T& x, const T& y, const 
     case SINH:      BinaryOperation<SINH>::der(X,Y,F,D);       break;\
     case COSH:      BinaryOperation<COSH>::der(X,Y,F,D);       break;\
     case TANH:      BinaryOperation<TANH>::der(X,Y,F,D);       break;\
+    case ATAN2:      BinaryOperation<ATAN2>::der(X,Y,F,D);       break;\
     case ERFINV:    BinaryOperation<ERFINV>::der(X,Y,F,D);     break;\
     case OP_PRINTME:   BinaryOperation<OP_PRINTME>::der(X,Y,F,D);    break;\
   }
@@ -258,6 +261,7 @@ inline void casadi_math<T>::derF(unsigned char op, const T& x, const T& y, T& f,
     case SINH:      DerBinaryOpertion<SINH>::derf(X,Y,F,D);        break;\
     case COSH:      DerBinaryOpertion<COSH>::derf(X,Y,F,D);        break;\
     case TANH:      DerBinaryOpertion<TANH>::derf(X,Y,F,D);        break;\
+    case ATAN2:      DerBinaryOpertion<ATAN2>::derf(X,Y,F,D);        break;\
     case ERFINV:    DerBinaryOpertion<ERFINV>::derf(X,Y,F,D);        break;\
     case OP_PRINTME:   DerBinaryOpertion<OP_PRINTME>::derf(X,Y,F,D);     break;\
   }
@@ -277,6 +281,7 @@ inline int casadi_math<T>::ndeps(unsigned char op){
     case EQUALITY:
     case FMIN:
     case FMAX:
+    case ATAN2:
     case OP_PRINTME:
       return 2;
     default:
@@ -332,6 +337,7 @@ inline void casadi_math<T>::printPre(unsigned char op, std::ostream &stream){
     case SINH:      stream << "sinh(";    break;
     case COSH:      stream << "cosh(";    break;
     case TANH:      stream << "tanh(";    break;
+    case ATAN2:      stream << "atan2(";    break;
     case ERFINV:    stream << "erfinv(";  break;
     case OP_PRINTME:   stream << "printme("; break;
   }

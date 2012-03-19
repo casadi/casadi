@@ -331,6 +331,10 @@ Matrix<SX> SX::constpow(const Matrix<SX>& n) const {
  return Matrix<SX>(*this).__constpow__(n);
 }
 
+Matrix<SX> SX::arctan2(const Matrix<SX>& b) const { 
+  return Matrix<SX>(*this).arctan2(b);
+}
+
 SX operator+(const SX &x, const SX &y){
   return x.add(y);
 }
@@ -669,6 +673,10 @@ SX SX::fmin(const SX &b) const{
 
 SX SX::fmax(const SX &b) const{
   return BinarySXNode::createT<FMAX>(*this,b);
+}
+
+SX SX::arctan2(const SX &b) const{
+  return BinarySXNode::createT<ATAN2>(*this,b);
 }
 
 SX SX::printme(const SX &b) const{

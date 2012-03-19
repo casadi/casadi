@@ -110,6 +110,12 @@ namespace CasADi{
   
   template<class T> T ceil(const T &x){return x.ceil();}
   using std::ceil;
+
+  template<class T> T atan2(const T &x, const T &n){ return x.arctan2(n);}
+  template<class T> T atan2(const T &x,   double n){ return x.arctan2(n);}
+  template<class T> T atan2(double   x, const T &n){ return T(x).arctan2(n);}
+  using std::atan2;
+
   //@}
 
   //@{
@@ -285,6 +291,7 @@ enum Operation{
   ERF,  FMIN,  FMAX,
   INV,
   SINH,  COSH,  TANH,
+  ATAN2,
   
   OP_CONST,
   
@@ -347,6 +354,7 @@ enum Operation{
   template<>      struct CommChecker<POW>{ static const bool check=false;};
   template<>      struct CommChecker<CONSTPOW>{ static const bool check=false;};
   template<>      struct CommChecker<OP_PRINTME>{ static const bool check=false;};
+  template<>      struct CommChecker<ATAN2>{ static const bool check=false;};
 //@}
 
 //@{
@@ -362,6 +370,7 @@ enum Operation{
   template<>      struct BinaryChecker<FMIN>{ static const bool check=true;};
   template<>      struct BinaryChecker<FMAX>{ static const bool check=true;};
   template<>      struct BinaryChecker<OP_PRINTME>{ static const bool check=true;};
+  template<>      struct BinaryChecker<ATAN2>{ static const bool check=true;};
 //@}
 
 /// Simple assignment
@@ -608,6 +617,16 @@ struct BinaryOperation<OP_PRINTME>{
   template<typename T> static inline void fcn(const T& x, const T& y, T& f){f = printme(x,y); }
   template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ d[0]=1; d[1]=0;}
 };
+
+/// Arctan2
+template<>
+struct BinaryOperation<ATAN2>{
+  public:
+    template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f = atan2(x,y);}
+    template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ T t = x*x+y*y; d[0]=y/t; d[1]=-x/t;}
+};
+
+
 
 } // namespace CasADi
 

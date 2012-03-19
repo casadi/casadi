@@ -469,6 +469,7 @@ class Matrix : public GenericMatrix<Matrix<T> >, public PrintableObject{
     Matrix<T> sinh() const;
     Matrix<T> cosh() const;
     Matrix<T> tanh() const;
+    Matrix<T> arctan2(const Matrix<T>& y) const;
     Matrix<T> log10() const;
     Matrix<T> printme(const Matrix<T>& y) const;
     //@}
