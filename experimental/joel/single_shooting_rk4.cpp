@@ -46,8 +46,8 @@ double norm2(const DMatrix& v){
 }
   
 void liftedNewton(SXFunction &F1, SXFunction &F2, SXFunction &ifcn, bool manual_init, bool gauss_newton, QPSolverCreator qp_solver_creator, const Dictionary& qp_solver_options,
-  const DMatrix& u_min, const DMatrix& u_max, const DMatrix& g_min, const DMatrix& g_max){
-
+  const DMatrix& u_min, const DMatrix& u_max, const DMatrix& u_init, const DMatrix& g_min, const DMatrix& g_max, DMatrix x_init){
+  
   // Options
   double tol = 1e-6;     // Stopping tolerance
   int max_iter = 30;  // Maximum number of iterations
@@ -59,8 +59,21 @@ void liftedNewton(SXFunction &F1, SXFunction &F2, SXFunction &ifcn, bool manual_
   SXMatrix xdef = ifcn.outputSX();
 
   // Lifted variables
-  SXMatrix x = ssym("x",xdef.size());
+  int nx = xdef.size();
+  SXMatrix x = ssym("x",nx);
 
+  // Lagrange multipliers
+  SXMatrix lam = ssym("lam",f2.size());
+  
+  // Gradient of the lagrangian
+  SXMatrix lgrad1 = gradient(f1 + inner_prod(lam,f2),u);
+  
+  SXMatrixVector lgradfcn_in(2);
+  lgradfcn_in[0] = u;
+  lgradfcn_in[1] = lam;
+  SXFunction lgradfcn(lgradfcn_in,lgrad1);
+  lgradfcn.init();
+  
   // Substitute in the lifted variables x into the expressions for xdef, F1 and F2
   SXMatrixVector ex(2);
   ex[0] = f1;
@@ -69,8 +82,83 @@ void liftedNewton(SXFunction &F1, SXFunction &F2, SXFunction &ifcn, bool manual_
   f1 = ex[0];
   f2 = ex[1];
 
+  // Formulate the full-space problem
+  SXMatrix ux = vertcat(u,x);
+  SXMatrix f2_full = vertcat(f2,x-xdef);
+  
+  SXFunction ffcn_full(ux,f1);
+  SXFunction gfcn_full(ux,f2_full);
+  IpoptSolver ipopt_full(ffcn_full,gfcn_full);
+
+//   x.printDense();
+//   xdef.printDense();
+//   f1.printDense();
+//   return;
+  
+  
+  // Set options
+  ipopt_full.setOption("generate_hessian",true);
+  ipopt_full.setOption("tol",1e-10);
+  
+  // initialize the solver
+  ipopt_full.init();
+
+  // Initial guess and bounds
+  DMatrix ux_init = vertcat(u_init,x_init);
+  DMatrix ux_min = vertcat(u_min,-DMatrix::inf(nx));
+  DMatrix ux_max = vertcat(u_max, DMatrix::inf(nx));
+  DMatrix g_min_full = vertcat(g_min,DMatrix::zeros(nx));
+  DMatrix g_max_full = vertcat(g_max,DMatrix::zeros(nx));
+  
+  ipopt_full.setInput(ux_min,NLP_LBX);
+  ipopt_full.setInput(ux_max,NLP_UBX);
+  ipopt_full.setInput(ux_init,NLP_X_INIT);
+  ipopt_full.setInput(g_min_full,NLP_LBG);
+  ipopt_full.setInput(g_max_full,NLP_UBG);
+
+  
+  
+//   cout << x.numel() << endl;
+//   
+// 
+//   cout << u.numel() << endl;
+//   cout << f2.numel() << endl;
+//   cout << u_min << endl;
+//   cout << u_max << endl;
+//   cout << g_min << endl;
+//   cout << g_max << endl;
+// 
+//   cout << ux.numel() << endl;
+//   cout << f2_full.numel() << endl;
+//   cout << ux_min << endl;
+//   cout << ux_max << endl;
+//   cout << g_min_full << endl;
+//   cout << g_max_full << endl;
+
+  //return;
+  
+  
+  
+  
+  // Solve the problem
+  ipopt_full.solve();
+  
+  // Print the optimal solution
+  cout << "F: optimal cost:    " << ipopt_full.output(NLP_COST).toScalar() << endl;
+  cout << "F: optimal control: " << ipopt_full.output(NLP_X_OPT) << endl;
+  cout << "F: multipliers (u): " << ipopt_full.output(NLP_LAMBDA_X) << endl;
+  cout << "F: multipliers (g): " << ipopt_full.output(NLP_LAMBDA_G) << endl;
+  
+  
+  return;
+  
+  
+  
+  
+  DMatrix x_init2 = x_init;
+  
   SXMatrix mux, mug;
-  if(!gauss_newton){ 
+  if(!gauss_newton){
     // if Gauss-Newton no multipliers needed
     // If SQP, get the gradient of the lagrangian now
     
@@ -83,7 +171,8 @@ void liftedNewton(SXFunction &F1, SXFunction &F2, SXFunction &ifcn, bool manual_
 
     // Gradient of the Lagrangian
     SXMatrix xu = vertcat(u,x);
-    SXMatrix lgrad = gradient(f1 - inner_prod(mug,f2) + inner_prod(xdot,xdef),xu);
+    SXMatrix lgrad = gradient(f1 + inner_prod(mug,f2) + inner_prod(xdot,xdef),xu);
+    makeDense(lgrad);
 
     // Gradient of the Lagrangian
     f1 = lgrad(range(u.size1()),0); // + mux // NOTE: What about the mux term?
@@ -94,19 +183,22 @@ void liftedNewton(SXFunction &F1, SXFunction &F2, SXFunction &ifcn, bool manual_
     // Reverse direction of x
     SXMatrix xdot_reversed = xdot;
     for(int k=0; k<xdot.size(); ++k){
-      xdot_reversed[k] = xdot[xdot.size()-1-k];
+      xdot_reversed[k] = xdot[-1-k];
     }
     xdot = xdot_reversed;
     
     SXMatrix xdotdef_reversed = xdotdef;
     for(int k=0; k<xdotdef.size(); ++k){
-      xdotdef_reversed[k] = xdotdef[xdotdef.size()-1-k];
+      xdotdef_reversed[k] = xdotdef[-1-k];
     }
     xdotdef = xdotdef_reversed;
     
     // Append to xdef and x
     x.append(xdot);
     xdef.append(xdotdef);
+    
+    // Append to initial guess
+    x_init.append(DMatrix::zeros(x_init.size()));
   }
 
   // Residual function G
@@ -120,7 +212,7 @@ void liftedNewton(SXFunction &F1, SXFunction &F2, SXFunction &ifcn, bool manual_
   G_out.push_back(f2);
   SXFunction G(G_in,G_out);
   G.init();
-
+  
   // Difference vector d
   SXMatrix d = ssym("d",xdef.size1());
 
@@ -156,12 +248,9 @@ void liftedNewton(SXFunction &F1, SXFunction &F2, SXFunction &ifcn, bool manual_
   SXFunction AB(Z_in,AB_out);
   AB.init();
   
-  // Dimensions
-  int nx = x.size1();
-
   // Variables
-  DMatrix u_k(u.sparsity(),0);
-  DMatrix x_k(x.sparsity(),0);
+  DMatrix u_k = u_init;
+  DMatrix x_k = x_init;
   DMatrix d_k(x.sparsity(),0);
   DMatrix mux_k(mux.sparsity(),0);
   DMatrix mug_k(mug.sparsity(),0);
@@ -170,6 +259,7 @@ void liftedNewton(SXFunction &F1, SXFunction &F2, SXFunction &ifcn, bool manual_
   DMatrix f1_k(f1.sparsity(),0);
   DMatrix f2_k(f2.sparsity(),0);
 
+    
   if(manual_init){
     // Initialize node values manually
     G.setInput(u_k,0);
@@ -185,7 +275,7 @@ void liftedNewton(SXFunction &F1, SXFunction &F2, SXFunction &ifcn, bool manual_
     Z.setInput(u_k,0);
     Z.setInput(d_k,1);
     Z.setInput(mux_k,2);
-    Z.setInput(mug_k,3);
+    Z.setInput(-mug_k,3);
     Z.evaluate();
     Z.getOutput(x_k,0);
     Z.getOutput(f1_k,1); // mux is zero (initial multiplier guess)
@@ -209,7 +299,7 @@ void liftedNewton(SXFunction &F1, SXFunction &F2, SXFunction &ifcn, bool manual_
     AB.setInput(u_k,0);
     AB.setInput(d_k,1);
     AB.setInput(mux_k,2);
-    AB.setInput(mug_k,3);
+    AB.setInput(-mug_k,3);
     AB.evaluate();
     const DMatrix& A_k = AB.output(0);
     const DMatrix& B1_k = AB.output(1); // NOTE: # mux dissappears (constant term)
@@ -219,7 +309,7 @@ void liftedNewton(SXFunction &F1, SXFunction &F2, SXFunction &ifcn, bool manual_
     Z.setInput(u_k,0);
     Z.setInput(d_k,1);
     Z.setInput(mux_k,2);
-    Z.setInput(mug_k,3);
+    Z.setInput(-mug_k,3);
     Z.setFwdSeed(u0seed,0);
     Z.setFwdSeed(d_k,1);
     Z.setFwdSeed(mux0seed,2);
@@ -264,6 +354,14 @@ void liftedNewton(SXFunction &F1, SXFunction &F2, SXFunction &ifcn, bool manual_
     qp_solver.setInput(g_min-a,QP_LBA);
     qp_solver.setInput(g_max-a,QP_UBA);
 
+//     cout << "H   = " << qp_solver.input(QP_H) << endl;
+//     cout << "g   = " << qp_solver.input(QP_G) << endl;
+//     cout << "A   = " << qp_solver.input(QP_A) << endl;
+//     cout << "lb  = " << qp_solver.input(QP_LBX) << endl;
+//     cout << "ub  = " << qp_solver.input(QP_UBX) << endl;
+//     cout << "lbA = " << qp_solver.input(QP_LBA) << endl;
+//     cout << "ubA = " << qp_solver.input(QP_UBA) << endl;
+
     // Solve the QP
     qp_solver.evaluate();
 
@@ -280,7 +378,7 @@ void liftedNewton(SXFunction &F1, SXFunction &F2, SXFunction &ifcn, bool manual_
     Z.setFwdSeed(du_k,0);
     Z.setFwdSeed(d0seed,1); // could the a_k term be moved here?
     Z.setFwdSeed(dmux_k,2);
-    Z.setFwdSeed(dmug_k,3);
+    Z.setFwdSeed(-dmug_k,3);
     Z.evaluate(1,0);
     DMatrix dx_k = Z.fwdSens(0);
         
@@ -294,7 +392,7 @@ void liftedNewton(SXFunction &F1, SXFunction &F2, SXFunction &ifcn, bool manual_
     G.setInput(u_k,0);
     G.setInput(x_k,1);
     G.setInput(mux_k,2);
-    G.setInput(mug_k,3);
+    G.setInput(-mug_k,3);
     G.evaluate();
     G.getOutput(d_k,0);
     G.getOutput(f1_k,1); // mux?
@@ -336,10 +434,22 @@ void liftedNewton(SXFunction &F1, SXFunction &F2, SXFunction &ifcn, bool manual_
       break;
     }
   }
+  
+  F1.init();
+  F1.setInput(u_k);
+  F1.evaluate();
+  double cost;
+  F1.getOutput(cost);
+  
+  cout << "optimal cost:    " << cost << endl;
+  cout << "optimal control: " << u_k << endl;
+  cout << "multipliers (u): " << mux_k << endl;
+  cout << "multipliers (g): " << mug_k << endl;
+  
 
-  
-  
-  
+  lgradfcn.setInput(u_k,0);
+//   lgradfcn.setInput(x_init,0);
+
   return;
 
 #if 0
@@ -512,7 +622,7 @@ int main(){
     
   
   // Automatic initialization
-  bool manual_init = false;
+  bool manual_init = true;
 
   // Use the Gauss-Newton method
   bool gauss_newton = false;
@@ -522,89 +632,124 @@ int main(){
   Dictionary qp_solver_options;
   qp_solver_options["printLevel"] = "none";
 
-  // Initial guess
-  double x0 = 0.08;
-
-  // Bounds on the state
-  double x_min = -1;
-  double x_max =  1;
-  double xf_min = 0;
-  double xf_max = 0;
+  // Dimensions
+  int nu = 20;  // Number of control segments
+  int nj = 100; // Number of integration steps per control segment
 
   // Control
-  double u_min_d = -1;
-  double u_max_d =  1;
+  SXMatrix u = ssym("u",nu); // control
+
+  // Initial conditions
+  DMatrix x_0 = DMatrix::zeros(3,1);
+  x_0[0] = 0; // initial position
+  x_0[1] = 0; // initial speed
+  x_0[2] = 1; // initial mass
   
-  // End time
-  double T = 3;
+  SX dt = 10.0/(nj*nu); // time step
+  SX alpha = 0.05; // friction
+  SX beta = 0.1; // fuel consumption rate
 
-  // Control discretization
-  int nk = 30;
-
-  // Time step
-  double dT = T/nk;
-
-  // Discretized control
-  SXMatrix u = ssym("u",nk);
-
-  // Initial guess for u
-  DMatrix u_guess = DMatrix::zeros(nk);
-  DMatrix u_min = u_min_d*DMatrix::ones(nk);
-  DMatrix u_max = u_max_d*DMatrix::ones(nk);
+  // Trajectory
+  SXMatrix s_traj, v_traj, m_traj;
 
   // Lifted variables
   SXMatrix L;
-
-  // Objective terms
-  SXMatrix F;
-
-  // NLP functions
-  SXFunction F1, F2;
-  
-  // Get an expression for the state that the final time
-  SXMatrix x = x0;
-  
-  for(int k=0; k<nk; ++k){
-    // Get new value for X
-    x = x + dT*(x*(x+1)+u[k]);
     
-    // Append terms to objective function
-    F.append(u[k]);
-    F.append(x);
+  // For all the shooting intervals
+  SXMatrix x = x_0;
+  SXMatrix ode_rhs(x.sparsity(),0);
+  for(int k=0; k<nu; ++k){
+    // Get control
+    SX u_k = u[k].at(0);
     
+    // Integrate over the interval with Euler forward
+    for(int j=0; j<nj; ++j){
+      
+      // Get the state
+      SX s = x.at(0);
+      SX v = x.at(1);
+      SX m = x.at(2);
+      
+      // ODE right hand side
+      ode_rhs[0] = v;
+      ode_rhs[1] = (u_k - alpha * v*v)/m;
+      ode_rhs[2] = -beta*u_k*u_k;
+      
+      // Take a step
+      x += dt*ode_rhs;
+    }
+    
+    // Save trajectory
+    s_traj.append(x[0]);
+    v_traj.append(x[1]);
+    m_traj.append(x[2]);
+
     // Lift x
     L.append(x);
   }
+  
+  // Objective function
+//   SXMatrix f = inner_prod(u,u);
+  SXMatrix f = -x[2];
+  
+  // Terminal constraints
+  SXMatrix g;
+  g.append(x[0]);
+  g.append(x[1]);
+  g.append(v_traj);
+  
+  // Create the NLP
+  SXFunction ffcn(u,f); // objective function
+  SXFunction gfcn(u,g); // constraint
+  
+  // Allocate an NLP solver
+  IpoptSolver ipopt(ffcn,gfcn);
 
-  if(gauss_newton){
-    // Objective function (GN)
-    F1 = SXFunction(u,F);
-    
-  } else {
-    // Objective function (SQP)
-    F1 = SXFunction(u,inner_prod(F,F));
+  // Set options
+  ipopt.setOption("generate_hessian",true);
+  ipopt.setOption("tol",1e-10);
+
+  // initialize the solver
+  ipopt.init();
+
+  // Initial guess for the intermediate variables
+  DMatrix x_init = repmat(x_0,nu,1);
+
+  // Bounds on u and initial condition
+  vector<double> u_min(nu), u_max(nu), u_init(nu);
+  for(int i=0; i<nu; ++i){
+    u_min[i] = -10;
+    u_max[i] =  10;
+    u_init[i] = 0.4;
   }
+  ipopt.setInput(u_min,NLP_LBX);
+  ipopt.setInput(u_max,NLP_UBX);
+  ipopt.setInput(u_init,NLP_X_INIT);
+  
+  // Bounds on g
+  vector<double> g_min(2), g_max(2);
+  g_min[0] = g_max[0] = 10;
+  g_min[1] = g_max[1] =  0;
+  g_min.resize(2+nu, -numeric_limits<double>::infinity());
+  g_max.resize(2+nu, 1.1);
+  
+  ipopt.setInput(g_min,NLP_LBG);
+  ipopt.setInput(g_max,NLP_UBG);
 
-  // Constraint function
-  F2 = SXFunction(u,x);
-  DMatrix g_min = xf_min;
-  DMatrix g_max = xf_max;
+  // Solve the problem
+  ipopt.solve();
 
-  // Solve with ipopt
-  IpoptSolver nlp_solver(F1,F2);
-  nlp_solver.init();
-  nlp_solver.setInput(u_guess,NLP_X_INIT);
-  nlp_solver.setInput(u_min,NLP_LBX);
-  nlp_solver.setInput(u_max,NLP_UBX);
-  nlp_solver.setInput(xf_min,NLP_LBG);
-  nlp_solver.setInput(xf_max,NLP_UBG);
-  nlp_solver.solve();
-
+  // Print the optimal solution
+  cout << "I: optimal cost:    " << ipopt.output(NLP_COST).toScalar() << endl;
+  cout << "I: optimal control: " << ipopt.output(NLP_X_OPT) << endl;
+  cout << "I: multipliers (u): " << ipopt.output(NLP_LAMBDA_X) << endl;
+  cout << "I: multipliers (g): " << ipopt.output(NLP_LAMBDA_G) << endl;
+  
   // Lifting function
   SXFunction ifcn(u,L);
 
   // Solve problem
-  liftedNewton(F1,F2,ifcn,manual_init,gauss_newton,qp_solver_creator,qp_solver_options,u_min,u_max,g_min,g_max);
+  liftedNewton(ffcn,gfcn,ifcn,manual_init,gauss_newton,qp_solver_creator,qp_solver_options,u_min,u_max,u_init,g_min,g_max,x_init);
   
   return 0;
 }
