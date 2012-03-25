@@ -142,25 +142,28 @@ void IpoptInternal::init(){
     else             std::cout << "Using limited memory Hessian approximation" << std::endl;
   }
  
+  bool ret = true;
+       
   // Pass all the options to ipopt
   for(map<string,opt_type>::const_iterator it=ops_.begin(); it!=ops_.end(); ++it)
     if(hasSetOption(it->first)){
       GenericType op = getOption(it->first);
       switch(it->second){
         case OT_REAL:
-          app->Options()->SetNumericValue(it->first,op.toDouble(),false);
+          ret &= app->Options()->SetNumericValue(it->first,op.toDouble(),false);
           break;
         case OT_INTEGER:
-          app->Options()->SetIntegerValue(it->first,op.toInt(),false);
+          ret &= app->Options()->SetIntegerValue(it->first,op.toInt(),false);
           break;
         case OT_STRING:
-          app->Options()->SetStringValue(it->first,op.toString(),false);
+          ret &= app->Options()->SetStringValue(it->first,op.toString(),false);
           break;
         default:
           throw CasadiException("Illegal type");
       }
     }
   
+  if (!ret) casadi_error("IpoptInternal::Init: Invalid options were detected by Ipopt.");
   // Intialize the IpoptApplication and process the options
   Ipopt::ApplicationReturnStatus status = app->Initialize();
   if (status != Solve_Succeeded) {
