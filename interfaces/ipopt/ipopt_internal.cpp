@@ -148,13 +148,13 @@ void IpoptInternal::init(){
       GenericType op = getOption(it->first);
       switch(it->second){
         case OT_REAL:
-          app->Options()->SetNumericValue(it->first,op.toDouble());
+          app->Options()->SetNumericValue(it->first,op.toDouble(),false);
           break;
         case OT_INTEGER:
-          app->Options()->SetIntegerValue(it->first,op.toInt());
+          app->Options()->SetIntegerValue(it->first,op.toInt(),false);
           break;
         case OT_STRING:
-          app->Options()->SetStringValue(it->first,op.toString());
+          app->Options()->SetStringValue(it->first,op.toString(),false);
           break;
         default:
           throw CasadiException("Illegal type");
