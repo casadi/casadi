@@ -192,7 +192,10 @@ SX SX::add(const SX& y) const{
           y.getDep(1).isConstant() && y.getDep(1).getValue()==2 &&
           y.getDep(0).isEquivalent(getDep(0))) // x/2+x/2 = x
     return getDep(0);
-    
+  else if(isBinary() && getOp()==SUB && getDep(1).isEquivalent(y))
+    return getDep(0);
+  else if(y.isBinary() && y.getOp()==SUB && isEquivalent(y.getDep(1)))
+    return y.getDep(0);
   else // create a new branch
     return BinarySXNode::createT<ADD>( *this, y);
 }
@@ -208,6 +211,14 @@ SX SX::sub(const SX& y) const{
     return 0;
   else if(y.isBinary() && y.getOp()==NEG) // x - (-y) -> x + y
     return add(-y);
+  else if(isBinary() && getOp()==ADD && getDep(1).isEquivalent(y))
+    return getDep(0);
+  else if(isBinary() && getOp()==ADD && getDep(0).isEquivalent(y))
+    return getDep(1);
+  else if(y.isBinary() && y.getOp()==ADD && isEquivalent(y.getDep(1)))
+    return y.getDep(0);
+  else if(y.isBinary() && y.getOp()==ADD && isEquivalent(y.getDep(0)))
+    return y.getDep(1);
   else // create a new branch
     return BinarySXNode::createT<SUB>( *this, y);
 }
