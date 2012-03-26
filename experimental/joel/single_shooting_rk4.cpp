@@ -162,6 +162,7 @@ void liftedNewton(SXFunction &ffcn, SXFunction &gfcn, const DMatrix& x_min, cons
   vector<vector<SXMatrix> > Z_adjSeed;
   vector<vector<SXMatrix> > Z_adjSens;
   Z_fwdSeed[0][0].setZero();
+  Z_fwdSeed[0][1] = -d;
   Z_fwdSeed[0][2].setZero();
   Z_fwdSeed[0][3].setZero();
   Z_fwdSeed[0][4].setZero();
@@ -170,14 +171,15 @@ void liftedNewton(SXFunction &ffcn, SXFunction &gfcn, const DMatrix& x_min, cons
   SXMatrix du = ssym("du",nu);
   SXMatrix dlam_g = ssym("dlam_g",ng);
   
-  Z_fwdSeed[1][0] = -du;
+  Z_fwdSeed[1][0] = du;
+  Z_fwdSeed[1][1] = -d;
   Z_fwdSeed[1][2].setZero();
-  Z_fwdSeed[1][3] = -dlam_g;
+  Z_fwdSeed[1][3] = dlam_g;
   Z_fwdSeed[1][4].setZero();
   Z.eval(Z_in,Z_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true,false);
-  SXMatrix a = -Z_fwdSens[0][0];
-  SXMatrix b1 = lgrad_u_z-Z_fwdSens[0][1]; // mux disappears from Z (constant term)
-  SXMatrix b2 = g_z-Z_fwdSens[0][2];
+  SXMatrix a = Z_fwdSens[0][0];
+  SXMatrix b1 = lgrad_u_z+Z_fwdSens[0][1]; // mux disappears from Z (constant term)
+  SXMatrix b2 = g_z+Z_fwdSens[0][2];
   SXMatrixVector AB_out;
   AB_out.push_back(A);
   AB_out.push_back(B1);
@@ -190,7 +192,7 @@ void liftedNewton(SXFunction &ffcn, SXFunction &gfcn, const DMatrix& x_min, cons
   AB.init();
   
   // Step expansion
-  SXMatrix e = -Z_fwdSens[1][0];
+  SXMatrix e = Z_fwdSens[1][0];
   SXMatrixVector E_in = Z_in;
   E_in.push_back(du);
   E_in.push_back(dlam_g);
@@ -289,8 +291,8 @@ void liftedNewton(SXFunction &ffcn, SXFunction &gfcn, const DMatrix& x_min, cons
     
     qp_solver2.evaluate();
     const DMatrix& du_k = qp_solver2.output(QP_PRIMAL);
-    const DMatrix& dlam_u_k = qp_solver2.output(QP_DUAL_X);
-    const DMatrix& dlam_g_k = qp_solver2.output(QP_DUAL_A);
+    DMatrix dlam_u_k = -qp_solver2.output(QP_DUAL_X);
+    DMatrix dlam_g_k = -qp_solver2.output(QP_DUAL_A);
     
     // Get temporary vectors of the right dimensions
     DMatrix dx_k1 = qp_solver.output(QP_PRIMAL);
@@ -305,27 +307,14 @@ void liftedNewton(SXFunction &ffcn, SXFunction &gfcn, const DMatrix& x_min, cons
     // Expand the step
     E.setInput(AB.input(0),0);
     E.setInput(AB.input(1),1);
-    for(vector<double>::iterator it=E.input(1).begin()+nv; it<E.input(1).end(); ++it){
-      *it = -*it;
-    }
-    
-    
     E.setInput(AB.input(2),2);
     E.setInput(AB.input(3),3);
+    
     E.setInput(AB.input(4),4);
     E.setInput(du_k,5);
     E.setInput(dlam_g_k,6);
     E.evaluate();
     const DMatrix& dv_k = E.output();
-//     cout << "E.input(0) = " << E.inputSX(0) << " = " << E.input(0) << endl;
-//     cout << "E.input(1) = " << E.inputSX(1) << " = " << E.input(1) << endl;
-//     cout << "E.input(2) = " << E.inputSX(2) << " = " << E.input(2) << endl;
-
-    //     cout << "E.outputSX()[nv-1] = " << E.output()[nv-1] << " = " << E.outputSX()[nv-1] << endl;
-//     cout << "E.outputSX()[nv+0] = " << E.output()[nv+0] << " = " << E.outputSX()[nv+0] << endl;
-//     cout << "E.outputSX()[nv+1] = " << E.output()[nv+1] << " = " << E.outputSX()[nv+1] << endl;
-//     cout << "E.outputSX()[nv+2] = " << E.output()[nv+2] << " = " << E.outputSX()[nv+2] << endl;
-//     cout << "E.outputSX()[nv+3] = " << E.output()[nv+3] << " = " << E.outputSX()[nv+3] << endl;
     
     // Expanded primal step
     copy(du_k.begin(),du_k.end(),dx_k1.begin());
@@ -338,9 +327,9 @@ void liftedNewton(SXFunction &ffcn, SXFunction &gfcn, const DMatrix& x_min, cons
     copy(dlam_g_k.begin(),dlam_g_k.end(),dlam_hg_k1.begin()+nv);
     copy(dv_k.rbegin(),dv_k.rbegin()+nv,dlam_hg_k1.begin());
 
-    bool show_dx =false;
-    bool show_dlam_x =false;
-    bool show_dlam_hg =false;
+    bool show_dx = false;
+    bool show_dlam_x = false;
+    bool show_dlam_hg = false;
 
     if(show_dx){
       cout << "dx_k1 = " << dx_k1 << endl;
@@ -375,10 +364,15 @@ void liftedNewton(SXFunction &ffcn, SXFunction &gfcn, const DMatrix& x_min, cons
     qp_solver.setInput(g_min-hg_k,QP_LBA);
     qp_solver.setInput(g_max-hg_k,QP_UBA);
     qp_solver.evaluate();
-    const DMatrix& dx_k = qp_solver.output(QP_PRIMAL);
-    const DMatrix& dlam_x_k = qp_solver.output(QP_DUAL_X);
-    const DMatrix& dlam_hg_k = qp_solver.output(QP_DUAL_A);
+    DMatrix dx_k = qp_solver.output(QP_PRIMAL);
+    DMatrix dlam_x_k = -qp_solver.output(QP_DUAL_X);
+    DMatrix dlam_hg_k = -qp_solver.output(QP_DUAL_A);
 
+    
+//     dx_k = dx_k1;
+//     dlam_x_k = dlam_x_k1;
+//     dlam_hg_k = dlam_hg_k1;
+    
     if(show_dx){
       cout << "dx_k2 = " << dx_k << endl;
     }
@@ -391,8 +385,8 @@ void liftedNewton(SXFunction &ffcn, SXFunction &gfcn, const DMatrix& x_min, cons
     
     // Take a full step
     x_k += dx_k;
-    lam_x_k -= dlam_x_k;
-    lam_hg_k -= dlam_hg_k;
+    lam_x_k += dlam_x_k;
+    lam_hg_k += dlam_hg_k;
 
     double step_du_k = norm22(dx_k);
     double step_dmug_k = norm22(dlam_hg_k);
