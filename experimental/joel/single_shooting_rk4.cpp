@@ -33,9 +33,6 @@
 using namespace CasADi;
 using namespace std;
 
-enum LinIn{LIN_X,LIN_LAM_X,LIN_LAM_HG,LIN_NUM_IN};
-enum LinOut{LIN_LHESS,LIN_LGRAD,LIN_GJAC,LIN_GLIN,LIN_OBJ,LIN_CON,LIN_NUM_OUT};
-
 double norm22(const DMatrix& v){
   double ret = 0;
   for(DMatrix::const_iterator it=v.begin(); it!=v.end(); ++it){
@@ -118,16 +115,20 @@ void liftedNewton(SXFunction &ffcn, SXFunction &gfcn, const DMatrix& x_min, cons
   SXMatrix v_extended = vertcat(v,lam_h_reversed);
 
   // Residual function G
-  SXMatrixVector G_in,G_out;
-  G_in.push_back(u);
-  G_in.push_back(v_extended);
-  G_in.push_back(lam_u);
-  G_in.push_back(lam_g);
-  G_in.push_back(lam_v);
-  G_out.push_back(h_extended);
-  G_out.push_back(lgrad_u);
-  G_out.push_back(hg);
-  G_out.push_back(f);
+  enum ZIn{Z_U,Z_D,Z_LAM_U,Z_LAM_G,Z_LAM_V,Z_NUM_IN};
+  SXMatrixVector G_in(Z_NUM_IN);
+  G_in[Z_U] = u;
+  G_in[Z_D] = v_extended;
+  G_in[Z_LAM_U] = lam_u;
+  G_in[Z_LAM_G] = lam_g;
+  G_in[Z_LAM_V] = lam_v;
+
+  enum GOut{G_H,G_LGRAD,G_HG,G_F,G_NUM_OUT};
+  SXMatrixVector G_out(G_NUM_OUT);
+  G_out[G_H] = h_extended;
+  G_out[G_LGRAD] = lgrad_u;
+  G_out[G_HG] = hg;
+  G_out[G_F] = f;
   SXFunction G(G_in,G_out);
   G.init();
   
@@ -148,35 +149,25 @@ void liftedNewton(SXFunction &ffcn, SXFunction &gfcn, const DMatrix& x_min, cons
   SXMatrix g_z = ex[2];
   
   // Modified function Z
-  enum ZIn{Z_U,Z_D,Z_LAM_U,Z_LAM_G,Z_LAM_V,Z_NUM_IN};
   SXMatrixVector zfcn_in(Z_NUM_IN);
   zfcn_in[Z_U] = u;
   zfcn_in[Z_D] = d;
   zfcn_in[Z_LAM_U] = lam_u;
   zfcn_in[Z_LAM_G] = lam_g;
   zfcn_in[Z_LAM_V] = lam_v;
-  enum ZOut{Z_D_DEF,Z_LGRAD,Z_G,Z_NUM_OUT};
+  
+  enum ZOut{Z_D_DEF,Z_LGRADG,Z_NUM_OUT};
   SXMatrixVector zfcn_out(Z_NUM_OUT);
   zfcn_out[Z_D_DEF] = d_def;
-  zfcn_out[Z_LGRAD] = lgrad_u_z;
-  zfcn_out[Z_G] = g_z;
+  zfcn_out[Z_LGRADG] = vertcat(lgrad_u_z,g_z);
+  
   SXFunction zfcn(zfcn_in,zfcn_out);
   zfcn.init();
 
   // Matrix A and B in lifted Newton
-  SXMatrix B1 = zfcn.jac(0,1);
-  SXMatrix B2 = zfcn.jac(0,2);
-
-  // Directional derivative of Z
-  vector<vector<SXMatrix> > Z_fwdSeed(2,zfcn_in);
-  vector<vector<SXMatrix> > Z_fwdSens(2,zfcn_out);
-  vector<vector<SXMatrix> > Z_adjSeed;
-  vector<vector<SXMatrix> > Z_adjSens;
-  Z_fwdSeed[0][0].setZero();
-  Z_fwdSeed[0][1] = -d;
-  Z_fwdSeed[0][2].setZero();
-  Z_fwdSeed[0][3].setZero();
-  Z_fwdSeed[0][4].setZero();
+  SXMatrix B = zfcn.jac(Z_U,Z_LGRADG);
+  SXMatrix B1 = B(Slice(0,nu),Slice(0,B.size2()));
+  SXMatrix B2 = B(Slice(nu,B.size1()),Slice(0,B.size2()));
   
   // Step in u
   SXMatrix du = ssym("du",nu);
@@ -184,25 +175,38 @@ void liftedNewton(SXFunction &ffcn, SXFunction &gfcn, const DMatrix& x_min, cons
   
   SXMatrix b1 = lgrad_u_z;
   SXMatrix b2 = g_z;
+  SXMatrix e;
   if(!v.empty()){
-    Z_fwdSeed[1][0] = du;
-    Z_fwdSeed[1][1] = -d;
-    Z_fwdSeed[1][2].setZero();
-    Z_fwdSeed[1][3] = dlam_g;
-    Z_fwdSeed[1][4].setZero();
+    // Directional derivative of Z
+    vector<vector<SXMatrix> > Z_fwdSeed(2,zfcn_in);
+    vector<vector<SXMatrix> > Z_fwdSens(2,zfcn_out);
+    vector<vector<SXMatrix> > Z_adjSeed;
+    vector<vector<SXMatrix> > Z_adjSens;
+    Z_fwdSeed[0][Z_U].setZero();
+    Z_fwdSeed[0][Z_D] = -d;
+    Z_fwdSeed[0][Z_LAM_U].setZero();
+    Z_fwdSeed[0][Z_LAM_G].setZero();
+    Z_fwdSeed[0][Z_LAM_V].setZero();
+    
+    Z_fwdSeed[1][Z_U] = du;
+    Z_fwdSeed[1][Z_D] = -d;
+    Z_fwdSeed[1][Z_LAM_U].setZero();
+    Z_fwdSeed[1][Z_LAM_G] = dlam_g;
+    Z_fwdSeed[1][Z_LAM_V].setZero();
+    
     zfcn.eval(zfcn_in,zfcn_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true,false);
-    b1 += Z_fwdSens[0][1];
-    b2 += Z_fwdSens[0][2];
+    b1 += Z_fwdSens[0][Z_LGRADG](Slice(0,nu));
+    b2 += Z_fwdSens[0][Z_LGRADG](Slice(nu,B.size1()));
+    e = Z_fwdSens[1][Z_D_DEF];
   }
   
+  // Quadratic approximation
+  enum LinOut{LIN_LHESS,LIN_LGRAD,LIN_GJAC,LIN_GLIN,LIN_NUM_OUT};
   SXMatrixVector lfcn_out(LIN_NUM_OUT);
   lfcn_out[LIN_LHESS] = B1;
   lfcn_out[LIN_LGRAD] = b1;
   lfcn_out[LIN_GJAC] = B2;
   lfcn_out[LIN_GLIN] = b2;
-  lfcn_out[LIN_OBJ] = f_z;
-  lfcn_out[LIN_CON] = g_z; 
-  lfcn_out.insert(lfcn_out.end(),zfcn_out.begin(),zfcn_out.end());
   SXFunction lfcn(zfcn_in,lfcn_out);
   lfcn.init();
   
@@ -210,7 +214,7 @@ void liftedNewton(SXFunction &ffcn, SXFunction &gfcn, const DMatrix& x_min, cons
   SXMatrixVector efcn_in = zfcn_in;
   efcn_in.push_back(du);
   efcn_in.push_back(dlam_g);
-  SXFunction efcn(efcn_in,Z_fwdSens[1][0]);
+  SXFunction efcn(efcn_in,e);
   efcn.init();
   
   // Current guess for the primal solution
@@ -220,23 +224,14 @@ void liftedNewton(SXFunction &ffcn, SXFunction &gfcn, const DMatrix& x_min, cons
   DMatrix lam_x_k(lam_x.sparsity(),0);
   DMatrix lam_hg_k(lam_hg.sparsity(),0);
 
-  // Residual
-  DMatrix d_k(d.sparsity(),0);
-  
-  // Initialize node values manually
-  copy(x_k.begin(),   x_k.begin()+nu,G.input(0).begin());
-  copy(x_k.begin()+nu,x_k.end(),     G.input(1).begin());
-  copy(lam_hg_k.begin(),lam_hg_k.begin()+nv,G.input(1).rbegin());
-  copy(lam_x_k.begin(),lam_x_k.begin()+nu,G.input(2).begin());
-  copy(lam_hg_k.begin()+nv,lam_hg_k.end(),G.input(3).begin());
-  G.evaluate();
-  G.getOutput(d_k,0);
-      
   // Allocate a QP solver (2)
   QPSolver qp_solver = qp_solver_creator(B1.sparsity(),B2.sparsity());
   qp_solver.setOption(qp_solver_options);
   qp_solver.init();
 
+  // Residual
+  DMatrix d_k(d.sparsity(),0);
+  
   // Objective
   double f_k;
   
@@ -249,31 +244,30 @@ void liftedNewton(SXFunction &ffcn, SXFunction &gfcn, const DMatrix& x_min, cons
   
   int k=0;
   while(true){
-    
-    copy(x_k.begin(),   x_k.begin()+nu,G.input(0).begin());
-    copy(x_k.begin()+nu,x_k.end(),     G.input(1).begin());
-    copy(lam_hg_k.begin(),lam_hg_k.begin()+nv,G.input(1).rbegin());
-    copy(lam_x_k.begin(),lam_x_k.begin()+nu,G.input(2).begin());
-    copy(lam_hg_k.begin()+nv,lam_hg_k.end(),G.input(3).begin());
-
+    // Evaluate residual
+    copy(x_k.begin(),   x_k.begin()+nu,G.input(Z_U).begin());
+    copy(x_k.begin()+nu,x_k.end(),     G.input(Z_D).begin());
+    copy(lam_hg_k.begin(),lam_hg_k.begin()+nv,G.input(Z_D).rbegin());
+    copy(lam_x_k.begin(),lam_x_k.begin()+nu,G.input(Z_LAM_U).begin());
+    copy(lam_hg_k.begin()+nv,lam_hg_k.end(),G.input(Z_LAM_G).begin());
     G.evaluate();
-    G.getOutput(d_k,0);
-    f_k = G.output(3).toScalar();
-    const DMatrix& hg_k = G.output(2);
+    G.getOutput(d_k,G_H);
+    f_k = G.output(G_F).toScalar();
+    const DMatrix& hg_k = G.output(G_HG);
     
-    // Get A_k and Bk
-    lfcn.setInput(G.input(0),0);
-    lfcn.setInput(d_k,1);
-    lfcn.setInput(G.input(2),2);
-    lfcn.setInput(G.input(3),3);
-    lfcn.setInput(G.input(4),4);
-    
+    // Construct the QP
+    lfcn.setInput(G.input(Z_U),Z_U);
+    lfcn.setInput(d_k,Z_D);
+    lfcn.setInput(G.input(Z_LAM_U),Z_LAM_U);
+    lfcn.setInput(G.input(Z_LAM_G),Z_LAM_G);
+    lfcn.setInput(G.input(Z_LAM_V),Z_LAM_V);
     lfcn.evaluate();
     const DMatrix& B1_k = lfcn.output(LIN_LHESS);
     const DMatrix& b1_k = lfcn.output(LIN_LGRAD);
     const DMatrix& B2_k = lfcn.output(LIN_GJAC);
     const DMatrix& b2_k = lfcn.output(LIN_GLIN);
 
+    // Solve the QP
     qp_solver.setInput(B1_k,QP_H);
     qp_solver.setInput(b1_k,QP_G);
     qp_solver.setInput(B2_k,QP_A);
@@ -281,21 +275,17 @@ void liftedNewton(SXFunction &ffcn, SXFunction &gfcn, const DMatrix& x_min, cons
     std::transform(x_max.begin(),x_max.begin()+nu,x_k.begin(),qp_solver.input(QP_UBX).begin(),std::minus<double>());
     std::transform(g_min.begin()+nv,g_min.end(), b2_k.begin(),qp_solver.input(QP_LBA).begin(),std::minus<double>());
     std::transform(g_max.begin()+nv,g_max.end(), b2_k.begin(),qp_solver.input(QP_UBA).begin(),std::minus<double>());
-    
     qp_solver.evaluate();
     const DMatrix& du_k = qp_solver.output(QP_PRIMAL);
     const DMatrix& dlam_u_k = qp_solver.output(QP_LAMBDA_X);
     const DMatrix& dlam_g_k = qp_solver.output(QP_LAMBDA_A);
         
     // Expand the step
-    efcn.setInput(lfcn.input(0),0);
-    efcn.setInput(lfcn.input(1),1);
-    efcn.setInput(lfcn.input(2),2);
-    efcn.setInput(lfcn.input(3),3);
-    
-    efcn.setInput(lfcn.input(4),4);
-    efcn.setInput(du_k,5);
-    efcn.setInput(dlam_g_k,6);
+    for(int i=0; i<Z_NUM_IN; ++i){
+      efcn.setInput(lfcn.input(i),i);
+    }
+    efcn.setInput(du_k,Z_NUM_IN);
+    efcn.setInput(dlam_g_k,Z_NUM_IN+1);
     efcn.evaluate();
     const DMatrix& dv_k = efcn.output();
     
@@ -512,12 +502,12 @@ int main(){
 //   cout << "I: multipliers (u): " << ipopt.output(NLP_LAMBDA_X) << endl;
 //   cout << "I: multipliers (g): " << ipopt.output(NLP_LAMBDA_G) << endl;
   
-  // Solve lifted problem
-  liftedNewton(ffcn_full,gfcn_full,xv_min,xv_max,xv_init,gv_min,gv_max,v.size(),qp_solver_creator,qp_solver_options);
-
   // Solve full-space problem
   liftedNewton(ffcn_full,gfcn_full,xv_min,xv_max,xv_init,gv_min,gv_max,0,qp_solver_creator,qp_solver_options);
   
+  // Solve lifted problem
+  liftedNewton(ffcn_full,gfcn_full,xv_min,xv_max,xv_init,gv_min,gv_max,v.size(),qp_solver_creator,qp_solver_options);
+
   
   return 0;
 }
