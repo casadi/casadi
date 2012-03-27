@@ -74,8 +74,8 @@ QPSolverInternal::QPSolverInternal(const CRSSparsity &H, const CRSSparsity &A){
   setNumOutputs(QP_NUM_OUT);
   output(QP_PRIMAL) = DMatrix(x_sparsity);
   output(QP_COST) = 0.0;
-  output(QP_DUAL_X) = DMatrix(x_sparsity);
-  output(QP_DUAL_A) = DMatrix(bounds_sparsity);
+  output(QP_LAMBDA_X) = DMatrix(x_sparsity);
+  output(QP_LAMBDA_A) = DMatrix(bounds_sparsity);
 }
     
 void QPSolverInternal::init() {

@@ -291,17 +291,17 @@ void liftedNewton(SXFunction &ffcn, SXFunction &gfcn, const DMatrix& x_min, cons
     
     qp_solver2.evaluate();
     const DMatrix& du_k = qp_solver2.output(QP_PRIMAL);
-    DMatrix dlam_u_k = -qp_solver2.output(QP_DUAL_X);
-    DMatrix dlam_g_k = -qp_solver2.output(QP_DUAL_A);
+    DMatrix dlam_u_k = qp_solver2.output(QP_LAMBDA_X);
+    DMatrix dlam_g_k = qp_solver2.output(QP_LAMBDA_A);
     
     // Get temporary vectors of the right dimensions
     DMatrix dx_k1 = qp_solver.output(QP_PRIMAL);
     dx_k1.setAll(numeric_limits<double>::quiet_NaN());
 
-    DMatrix dlam_x_k1 = qp_solver.output(QP_DUAL_X);
+    DMatrix dlam_x_k1 = qp_solver.output(QP_LAMBDA_X);
     dlam_x_k1.setZero();
     
-    DMatrix dlam_hg_k1 = qp_solver.output(QP_DUAL_A);
+    DMatrix dlam_hg_k1 = qp_solver.output(QP_LAMBDA_A);
     dlam_hg_k1.setAll(numeric_limits<double>::quiet_NaN());
     
     // Expand the step
@@ -365,8 +365,8 @@ void liftedNewton(SXFunction &ffcn, SXFunction &gfcn, const DMatrix& x_min, cons
     qp_solver.setInput(g_max-hg_k,QP_UBA);
     qp_solver.evaluate();
     DMatrix dx_k = qp_solver.output(QP_PRIMAL);
-    DMatrix dlam_x_k = -qp_solver.output(QP_DUAL_X);
-    DMatrix dlam_hg_k = -qp_solver.output(QP_DUAL_A);
+    DMatrix dlam_x_k = qp_solver.output(QP_LAMBDA_X);
+    DMatrix dlam_hg_k = qp_solver.output(QP_LAMBDA_A);
 
     
 //     dx_k = dx_k1;

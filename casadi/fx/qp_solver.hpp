@@ -71,9 +71,9 @@ enum QPOutput{
   /// The optimal cost
   QP_COST,
   /// The dual solution corresponding to linear bounds
-  QP_DUAL_A,
+  QP_LAMBDA_A,
   /// The dual solution corresponding to simple bounds
-  QP_DUAL_X,
+  QP_LAMBDA_X,
   
   QP_NUM_OUT};
 

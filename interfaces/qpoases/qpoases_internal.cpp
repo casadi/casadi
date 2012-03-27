@@ -164,8 +164,8 @@ void QPOasesInternal::evaluate(int nfdir, int nadir) {
   qp_->getDualSolution(&dual_.front());
   
   // Split up the dual solution in multipliers for the simple bounds and the linear bounds
-  copy(dual_.begin(),   dual_.begin()+nx_,output(QP_DUAL_X).begin());
-  copy(dual_.begin()+nx_,dual_.end(),     output(QP_DUAL_A).begin());
+  transform(dual_.begin(),   dual_.begin()+nx_,output(QP_LAMBDA_X).begin(),negate<double>());
+  transform(dual_.begin()+nx_,dual_.end(),     output(QP_LAMBDA_A).begin(),negate<double>());
 }
 
 map<int,string> QPOasesInternal::calc_flagmap(){

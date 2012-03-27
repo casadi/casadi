@@ -206,10 +206,10 @@ while True:
   p = qp_solver.output(QP_PRIMAL)
   
   # Get the dual solution for the inequalities
-  lambda_hat = qp_solver.output(QP_DUAL_A)
+  lambda_hat = -qp_solver.output(QP_LAMBDA_A)
   
   # Get the dual solution for the bounds
-  lambda_x_hat = qp_solver.output(QP_DUAL_X)
+  lambda_x_hat = -qp_solver.output(QP_LAMBDA_X)
   
   # Get the gradient of the Lagrangian
   gradL = ffcn.adjSens() - dot(trans(Jgk),lambda_hat) - lambda_x_hat

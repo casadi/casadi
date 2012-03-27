@@ -149,7 +149,7 @@ void OOQPInternal::evaluate(int nfdir, int nadir) {
   }
   
   // Get multipliers for the bounds
-  vector<double> &dual_x = output(QP_DUAL_X).data();
+  vector<double> &lambda_x = output(QP_LAMBDA_X).data();
 
   // BUG?
   #if 0
@@ -169,11 +169,11 @@ void OOQPInternal::evaluate(int nfdir, int nadir) {
   // Lower bounds
   int k_gamma=0;
   vars_->gamma->copyIntoArray(getPtr(temp_));
-  for(int k=0; k<dual_x.size(); ++k){
+  for(int k=0; k<lambda_x.size(); ++k){
     if(ixlow_[k]){
-      dual_x[k] = temp_[k_gamma++];
+      lambda_x[k] = -temp_[k_gamma++];
     } else {
-      dual_x[k] = 0;
+      lambda_x[k] = 0;
     }
   }
   casadi_assert(k_gamma==vars_->gamma->length());
@@ -181,9 +181,9 @@ void OOQPInternal::evaluate(int nfdir, int nadir) {
   // Upper bounds
   int k_phi=0;
   vars_->phi->copyIntoArray(getPtr(temp_));
-  for(int k=0; k<dual_x.size(); ++k){
+  for(int k=0; k<lambda_x.size(); ++k){
     if(ixupp_[k]){
-      dual_x[k] -= temp_[k_phi++];
+      lambda_x[k] += temp_[k_phi++];
     }
   }
   casadi_assert(k_phi==vars_->phi->length());
@@ -191,18 +191,18 @@ void OOQPInternal::evaluate(int nfdir, int nadir) {
 
   
   // Get multipliers for the equality constraints
-  vector<double> &dual_a = output(QP_DUAL_A).data();
+  vector<double> &lambda_a = output(QP_LAMBDA_A).data();
   casadi_assert(vars_->y->length()==eq_.size());
   vars_->y->copyIntoArray(getPtr(temp_));
   for(int k=0; k<eq_.size(); ++k){
-    dual_a[eq_[k]] = temp_[k];
+    lambda_a[eq_[k]] = -temp_[k];
   }
   
   // Get multipliers for the inequality constraints
   casadi_assert(vars_->z->length()==ineq_.size());
   vars_->z->copyIntoArray(getPtr(temp_));
   for(int k=0; k<ineq_.size(); ++k){
-    dual_a[ineq_[k]] = temp_[k];
+    lambda_a[ineq_[k]] = -temp_[k];
   }
   
   if(flag!=SUCCESSFUL_TERMINATION) ooqp_error("Solve",flag);

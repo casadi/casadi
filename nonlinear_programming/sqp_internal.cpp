@@ -293,10 +293,10 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     DMatrix p = qp_solver_.output(QP_PRIMAL);
     
     // Get the dual solution for the inequalities
-    DMatrix lambda_hat = qp_solver_.output(QP_DUAL_A);
+    DMatrix lambda_hat = -qp_solver_.output(QP_LAMBDA_A);
     
     // Get the dual solution for the bounds
-    DMatrix lambda_x_hat = qp_solver_.output(QP_DUAL_X);
+    DMatrix lambda_x_hat = -qp_solver_.output(QP_LAMBDA_X);
     
     // Get the gradient of the Lagrangian
     DMatrix gradL = gfk - (G_.isNull() ? 0 : mul(trans(Jgk),lambda_hat)) - lambda_x_hat;

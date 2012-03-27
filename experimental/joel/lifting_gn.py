@@ -294,8 +294,10 @@ for (i,x0) in enumerate([0.08]):
     
     # Get the dual solution
     if not gauss_newton:
-      qp_solver.getOutput(dmux_k,QP_DUAL_X)
-      qp_solver.getOutput(dmug_k,QP_DUAL_A)
+      qp_solver.getOutput(dmux_k,QP_LAMBDA_X)
+      qp_solver.getOutput(dmug_k,QP_LAMBDA_A)
+      dmux_k = -dmux_k
+      dmug_k = -dmug_k
     
     # Calculate the step in x
     Z.setFwdSeed(du_k,0)
