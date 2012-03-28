@@ -83,22 +83,7 @@ void LiftedSQPInternal::init(){
   mu_safety_ = getOption("mu_safety");
   eta_ = getOption("eta");
   tau_ = getOption("tau");
-  
-//   // Allocate a QP solver
-//   CRSSparsity H_sparsity = getOption("hessian_approximation")=="exact"? H_.output().sparsity() : sp_dense(n,n);
-//   CRSSparsity A_sparsity = J_.isNull() ? CRSSparsity(0,n,false) : J_.output().sparsity();
-// 
-//   QPSolverCreator qp_solver_creator = getOption("qp_solver");
-//   qp_solver_ = qp_solver_creator(H_sparsity,A_sparsity);
-//   
-//   // Set options if provided
-//   if(hasSetOption("qp_solver_options")){
-//     Dictionary qp_solver_options = getOption("qp_solver_options");
-//     qp_solver_.setOption(qp_solver_options);
-//   }
-// 
-//   qp_solver_.init();
-  
+    
   // Assume SXFunction for now
   SXFunction ffcn = shared_cast<SXFunction>(F_);
   casadi_assert(!ffcn.isNull());
@@ -362,7 +347,7 @@ void LiftedSQPInternal::evaluate(int nfdir, int nadir){
     const DMatrix& du_k = qp_solver_.output(QP_PRIMAL);
     const DMatrix& dlam_u_k = qp_solver_.output(QP_LAMBDA_X);
     const DMatrix& dlam_g_k = qp_solver_.output(QP_LAMBDA_A);
-        
+            
     // Expand the step
     for(int i=0; i<Z_NUM_IN; ++i){
       efcn.setInput(lfcn.input(i),i);
@@ -382,9 +367,9 @@ void LiftedSQPInternal::evaluate(int nfdir, int nadir){
     copy(dv_k.rbegin(),dv_k.rbegin()+nv,dlam_hg_k_.begin());
     
     // Take a full step
-    x_k += dx_k_;
-    lam_x_k += dlam_x_k_;
-    lam_hg_k += dlam_hg_k_;
+    transform(dx_k_.begin(),dx_k_.end(),x_k.begin(),x_k.begin(),plus<double>());
+    copy(dlam_x_k_.begin(),dlam_x_k_.end(),lam_x_k.begin());
+    transform(dlam_hg_k_.begin(),dlam_hg_k_.end(),lam_hg_k.begin(),lam_hg_k.begin(),plus<double>());
 
     double step_du_k = norm22(dx_k_);
     double step_dmug_k = norm22(dlam_hg_k_);
