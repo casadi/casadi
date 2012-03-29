@@ -33,18 +33,6 @@
 using namespace std;
 namespace CasADi{
 
-double norm22(const DMatrix& v){
-  double ret = 0;
-  for(DMatrix::const_iterator it=v.begin(); it!=v.end(); ++it){
-    ret += (*it) * (*it);
-  }
-  return ret;
-}
-
-double norm2(const DMatrix& v){
-  return sqrt(norm22(v));
-}
-
 LiftedSQPInternal::LiftedSQPInternal(const FX& F, const FX& G, const FX& H, const FX& J) : NLPSolverInternal(F,G,H,J){
   casadi_warning("The lifted SQP method is under development");
   addOption("qp_solver",         OT_QPSOLVER,   GenericType(), "The QP solver to be used by the SQP method");
@@ -155,20 +143,19 @@ void LiftedSQPInternal::init(){
   SXMatrix v_extended = vertcat(v,lam_h_reversed);
 
   // Residual function G
-  SXMatrixVector G_in(Z_NUM_IN);
-  G_in[Z_U] = u;
-  G_in[Z_D] = v_extended;
-  G_in[Z_LAM_U] = lam_u;
-  G_in[Z_LAM_G] = lam_g;
-  G_in[Z_LAM_V] = lam_v;
+  SXMatrixVector G_in(G_NUM_IN);
+  G_in[G_X] = x;
+  G_in[G_LAM_X] = lam_x;
+  G_in[G_LAM_HG] = lam_hg;
 
   SXMatrixVector G_out(G_NUM_OUT);
   G_out[G_H] = h_extended;
   G_out[G_LGRAD] = lgrad_u;
   G_out[G_HG] = hg;
   G_out[G_F] = f;
-  G = SXFunction(G_in,G_out);
-  G.init();
+
+  rfcn = SXFunction(G_in,G_out);
+  rfcn.init();
   
   // Difference vector d
   SXMatrix d = ssym("d",2*nv);
@@ -187,12 +174,12 @@ void LiftedSQPInternal::init(){
   SXMatrix g_z = ex[2];
   
   // Modified function Z
+  enum ZIn{Z_U,Z_D,Z_LAM_X,Z_LAM_G,Z_NUM_IN};
   SXMatrixVector zfcn_in(Z_NUM_IN);
   zfcn_in[Z_U] = u;
   zfcn_in[Z_D] = d;
-  zfcn_in[Z_LAM_U] = lam_u;
+  zfcn_in[Z_LAM_X] = lam_x;
   zfcn_in[Z_LAM_G] = lam_g;
-  zfcn_in[Z_LAM_V] = lam_v;
   
   enum ZOut{Z_D_DEF,Z_LGRADG,Z_NUM_OUT};
   SXMatrixVector zfcn_out(Z_NUM_OUT);
@@ -222,15 +209,13 @@ void LiftedSQPInternal::init(){
     vector<vector<SXMatrix> > Z_adjSens;
     Z_fwdSeed[0][Z_U].setZero();
     Z_fwdSeed[0][Z_D] = -d;
-    Z_fwdSeed[0][Z_LAM_U].setZero();
+    Z_fwdSeed[0][Z_LAM_X].setZero();
     Z_fwdSeed[0][Z_LAM_G].setZero();
-    Z_fwdSeed[0][Z_LAM_V].setZero();
     
     Z_fwdSeed[1][Z_U] = du;
     Z_fwdSeed[1][Z_D] = -d;
-    Z_fwdSeed[1][Z_LAM_U].setZero();
+    Z_fwdSeed[1][Z_LAM_X].setZero();
     Z_fwdSeed[1][Z_LAM_G] = dlam_g;
-    Z_fwdSeed[1][Z_LAM_V].setZero();
     
     zfcn.eval(zfcn_in,zfcn_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true,false);
     b1 += Z_fwdSens[0][Z_LGRADG](Slice(0,nu));
@@ -239,16 +224,22 @@ void LiftedSQPInternal::init(){
   }
   
   // Quadratic approximation
+  SXMatrixVector lfcn_in(LIN_NUM_IN);
+  lfcn_in[LIN_X] = x;
+  lfcn_in[LIN_D] = d;
+  lfcn_in[LIN_LAM_X] = lam_x;
+  lfcn_in[LIN_LAM_HG] = lam_hg;
+  
   SXMatrixVector lfcn_out(LIN_NUM_OUT);
   lfcn_out[LIN_LHESS] = B1;
   lfcn_out[LIN_LGRAD] = b1;
   lfcn_out[LIN_GJAC] = B2;
   lfcn_out[LIN_GLIN] = b2;
-  lfcn = SXFunction(zfcn_in,lfcn_out);
+  lfcn = SXFunction(lfcn_in,lfcn_out);
   lfcn.init();
-  
+    
   // Step expansion
-  SXMatrixVector efcn_in = zfcn_in;
+  SXMatrixVector efcn_in = lfcn_in;
   efcn_in.push_back(du);
   efcn_in.push_back(dlam_g);
   efcn = SXFunction(efcn_in,e);
@@ -312,22 +303,19 @@ void LiftedSQPInternal::evaluate(int nfdir, int nadir){
   int k=0;
   while(true){
     // Evaluate residual
-    copy(x_k.begin(),   x_k.begin()+nu,G.input(Z_U).begin());
-    copy(x_k.begin()+nu,x_k.end(),     G.input(Z_D).begin());
-    copy(lam_hg_k.begin(),lam_hg_k.begin()+nv,G.input(Z_D).rbegin());
-    copy(lam_x_k.begin(),lam_x_k.begin()+nu,G.input(Z_LAM_U).begin());
-    copy(lam_hg_k.begin()+nv,lam_hg_k.end(),G.input(Z_LAM_G).begin());
-    G.evaluate();
-    G.getOutput(d_k_,G_H);
-    f_k = G.output(G_F).toScalar();
-    const DMatrix& hg_k = G.output(G_HG);
+    rfcn.setInput(x_k,G_X);
+    rfcn.setInput(lam_x_k,G_LAM_X);
+    rfcn.setInput(lam_hg_k,G_LAM_HG);
+    rfcn.evaluate();
+    rfcn.getOutput(d_k_,G_H);
+    f_k = rfcn.output(G_F).toScalar();
+    const DMatrix& hg_k = rfcn.output(G_HG);
     
     // Construct the QP
-    lfcn.setInput(G.input(Z_U),Z_U);
-    lfcn.setInput(d_k_,Z_D);
-    lfcn.setInput(G.input(Z_LAM_U),Z_LAM_U);
-    lfcn.setInput(G.input(Z_LAM_G),Z_LAM_G);
-    lfcn.setInput(G.input(Z_LAM_V),Z_LAM_V);
+    lfcn.setInput(x_k,LIN_X);
+    lfcn.setInput(lam_x_k,LIN_LAM_X);
+    lfcn.setInput(lam_hg_k,LIN_LAM_HG);
+    lfcn.setInput(d_k_,LIN_D);
     lfcn.evaluate();
     const DMatrix& B1_k = lfcn.output(LIN_LHESS);
     const DMatrix& b1_k = lfcn.output(LIN_LGRAD);
@@ -342,18 +330,17 @@ void LiftedSQPInternal::evaluate(int nfdir, int nadir){
     std::transform(x_max.begin(),x_max.begin()+nu,x_k.begin(),qp_solver_.input(QP_UBX).begin(),std::minus<double>());
     std::transform(g_min.begin()+nv,g_min.end(), b2_k.begin(),qp_solver_.input(QP_LBA).begin(),std::minus<double>());
     std::transform(g_max.begin()+nv,g_max.end(), b2_k.begin(),qp_solver_.input(QP_UBA).begin(),std::minus<double>());
-
     qp_solver_.evaluate();
     const DMatrix& du_k = qp_solver_.output(QP_PRIMAL);
     const DMatrix& dlam_u_k = qp_solver_.output(QP_LAMBDA_X);
     const DMatrix& dlam_g_k = qp_solver_.output(QP_LAMBDA_A);
             
     // Expand the step
-    for(int i=0; i<Z_NUM_IN; ++i){
+    for(int i=0; i<LIN_NUM_IN; ++i){
       efcn.setInput(lfcn.input(i),i);
     }
-    efcn.setInput(du_k,Z_NUM_IN);
-    efcn.setInput(dlam_g_k,Z_NUM_IN+1);
+    efcn.setInput(du_k,LIN_NUM_IN);
+    efcn.setInput(dlam_g_k,LIN_NUM_IN+1);
     efcn.evaluate();
     const DMatrix& dv_k = efcn.output();
     
@@ -371,27 +358,33 @@ void LiftedSQPInternal::evaluate(int nfdir, int nadir){
     copy(dlam_x_k_.begin(),dlam_x_k_.end(),lam_x_k.begin());
     transform(dlam_hg_k_.begin(),dlam_hg_k_.end(),lam_hg_k.begin(),lam_hg_k.begin(),plus<double>());
 
-    double step_du_k = norm22(dx_k_);
-    double step_dmug_k = norm22(dlam_hg_k_);
-    double norm_step = sqrt(step_du_k + step_dmug_k); // add mux
-    double norm_res = 0;
+    // Step size
+    double norm_step=0;
+    for(vector<double>::const_iterator it=dx_k_.begin(); it!=dx_k_.end(); ++it)  norm_step += *it**it;
+    for(vector<double>::const_iterator it=dlam_hg_k_.begin(); it!=dlam_hg_k_.end(); ++it) norm_step += *it**it;
+    norm_step = sqrt(norm_step);
     
-    // Norm of constraint violation
-    double viol_umax = norm22(fmax(x_k-x_max,0));
-    double viol_umin = norm22(fmax(x_min-x_k,0));
-    double viol_gmax = norm22(fmax(hg_k-g_max,0));
-    double viol_gmin = norm22(fmax(g_min-hg_k,0));
-    double norm_viol = sqrt(viol_umax + viol_umin + viol_gmax + viol_gmin);
+    // Constraint violation
+    double norm_viol = 0;
+    for(int i=0; i<x_k.size(); ++i){
+      double d = fmax(x_k.at(i)-x_max.at(i),0.) + fmax(x_min.at(i)-x_k.at(i),0.);
+      norm_viol += d*d;
+    }
+    for(int i=0; i<hg_k.size(); ++i){
+      double d = fmax(hg_k.at(i)-g_max.at(i),0.) + fmax(g_min.at(i)-hg_k.at(i),0.);
+      norm_viol += d*d;
+    }
+    norm_viol = sqrt(norm_viol);
     
     // Print progress (including the header every 10 rows)
     if(k % 10 == 0){
-      cout << setw(4) << "iter" << setw(20) << "objective" << setw(20) << "norm_res" << setw(20) << "norm_step" << setw(20) << "norm_viol" << endl;
+      cout << setw(4) << "iter" << setw(20) << "objective" << setw(20) << "norm_step" << setw(20) << "norm_viol" << endl;
     }
-    cout   << setw(4) <<     k  << setw(20) <<  f_k        << setw(20) <<  norm_res  << setw(20) <<  norm_step  << setw(20) <<  norm_viol  << endl;
+    cout   << setw(4) <<     k  << setw(20) <<  f_k        << setw(20) <<  norm_step  << setw(20) <<  norm_viol  << endl;
     
     
     // Check if stopping criteria is satisfied
-    if(norm_viol + norm_res  + norm_step < toldx_){
+    if(norm_viol + norm_step < toldx_){
       cout << "Convergence achieved!" << endl;
       break;
     }

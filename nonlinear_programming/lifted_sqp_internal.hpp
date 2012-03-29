@@ -71,12 +71,14 @@ public:
    DMatrix dlam_x_k_, dlam_hg_k_;
 
    /// Indices
-   enum ZIn{Z_U,Z_D,Z_LAM_U,Z_LAM_G,Z_LAM_V,Z_NUM_IN};
+   enum GIn{G_X,G_LAM_X,G_LAM_HG,G_NUM_IN};
    enum GOut{G_H,G_LGRAD,G_HG,G_F,G_NUM_OUT};
+   
+   enum LinIn{LIN_X,LIN_LAM_X,LIN_LAM_HG,LIN_D,LIN_NUM_IN};
    enum LinOut{LIN_LHESS,LIN_LGRAD,LIN_GJAC,LIN_GLIN,LIN_NUM_OUT};
 
    /// Residual function
-   FX G;
+   FX rfcn;
    
    /// Quadratic approximation
    FX lfcn;
