@@ -31,7 +31,7 @@ using namespace std;
 namespace CasADi{
 
 Multiplication::Multiplication(const MX& x, const MX& y_trans){
-  casadi_assert_message(x.size2() == y_trans.size2(),"Multiplication::Multiplication: dimension mismatch");
+  casadi_assert_message(x.size2() == y_trans.size2(),"Multiplication::Multiplication: dimension mismatch. Attempting to multiply " << x.dimString() << " with " << y_trans.dimString());
   setDependencies(x,y_trans);
 
   // Create the sparsity pattern for the matrix-matrix product
