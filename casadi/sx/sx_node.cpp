@@ -31,7 +31,6 @@ namespace CasADi{
 SXNode::SXNode(){
   count = 0;
   temp = 0;
-/*  temp2 = 0;*/
 }
 
 SXNode::~SXNode(){

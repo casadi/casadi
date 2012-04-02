@@ -141,7 +141,8 @@ class FX : public OptionsFunctionality{
   /** \brief Calculate jacobian of output oind with respect to input iind
   *
   * This method calls the method \em jacobian on the \em internal twin of this class.
-  * The default behaviour for FX is to use CasADi::Jacobian, which takes an AD approach.
+  * The default behaviour for FX is to use CasADi::Jacobian, which uses (numerical) directional
+  * derivatives (i.e. operator overloading) to form the Jacobian.
   */
   FX jacobian(int iind=0, int oind=0);
   

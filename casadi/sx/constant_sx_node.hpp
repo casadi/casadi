@@ -298,8 +298,8 @@ public:
 class NanSXNode : public ConstantSXNode{
 public:
   
-  explicit NanSXNode(){}
-  virtual ~NanSXNode(){}
+  explicit NanSXNode(){this->count++;}
+  virtual ~NanSXNode(){this->count--;}
 
   /** \brief  Get the value */
   virtual double getValue() const{ return std::numeric_limits<double>::quiet_NaN();}
