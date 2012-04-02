@@ -47,7 +47,7 @@ FXInternal::FXInternal(){
   addOption("sparsity_generator",       OT_SPARSITYGENERATOR,   GenericType(),  "Function that provides sparsity for a given input output block, overrides internal routines");
   addOption("jac_for_sens",             OT_BOOLEAN,             false,          "Create the a Jacobian function and use this to calculate forward sensitivities");
   addOption("user_data",                OT_VOIDPTR,             GenericType(),  "A user-defined field that can be used to identify the function or pass additional information");
-  addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "Monitors to be activated","");
+  addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "Monitors to be activated","inputs|outputs");
   
   verbose_ = false;
   numeric_jacobian_ = false;
@@ -55,6 +55,8 @@ FXInternal::FXInternal(){
   spgen_ = 0;
   user_data_ = 0;
   jac_for_sens_ = false;
+  monitor_inputs_ = false;
+  monitor_outputs_ = false;
 }
 
 FXInternal::~FXInternal(){
@@ -102,6 +104,10 @@ void FXInternal::init(){
       monitors_.insert(*it);
     }
   }
+  
+  monitor_inputs_ = monitored("inputs");
+  monitor_outputs_ = monitored("outputs");
+  
 
   // Mark the function as initialized
   is_init_ = true;
@@ -553,6 +559,12 @@ void FXInternal::getFullJacobian(){
 }
 
 void FXInternal::evaluate_switch(int nfdir, int nadir){
+  if (monitor_inputs_) {
+    std::cout << "FXInternal::evaluate_switch:Inputs:" << std::endl;
+    for (int i=0;i<getNumInputs();++i) {
+      std::cout << "#" << i << ": " << input(i) << std::endl;
+    }
+  }
   if(!jac_for_sens_ || (nfdir==0 && nadir==0)){     // Default, directional derivatives
     evaluate(nfdir,nadir);
   } else { // Calculate complete Jacobian and multiply

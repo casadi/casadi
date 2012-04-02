@@ -224,6 +224,10 @@ class FXInternal : public OptionsFunctionalityNode{
     /// Full jacobian function used to calculate directional derivatives instead of the using directional derivatives
     bool jac_for_sens_;
     FX full_jacobian_;
+    
+    bool monitor_inputs_;
+    
+    bool monitor_outputs_;
 };
 
 
