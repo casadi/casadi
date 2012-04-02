@@ -51,6 +51,8 @@ class IpoptSolver : public NLPSolver {
                          const FX& GF = FX()  /**< Gradient of the objective function (default: adjoint mode AD on F): \f$ [\mathbf{R}^n] \mapsto [\mathbf{R}^n]\f$ */
                         );
 
+    FX getGF()	const;
+    
     /// Access functions of the node
     IpoptInternal* operator->();
     const IpoptInternal* operator->() const;

@@ -44,6 +44,8 @@ public:
   virtual ~IpoptInternal();
   virtual IpoptInternal* clone() const{ return new IpoptInternal(*this);}
   
+  FX getGF() const { return GF_; }
+  
 virtual void init();
 virtual void evaluate(int nfdir, int nadir);
 
