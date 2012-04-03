@@ -1,7 +1,6 @@
 %{
 #include "casadi/fx/fx.hpp"
 #include "casadi/fx/jacobian.hpp"
-#include "casadi/fx/x_function.hpp"
 #include "casadi/fx/sx_function.hpp"
 #include "casadi/fx/mx_function.hpp"
 #include "casadi/fx/linear_solver.hpp"
@@ -29,7 +28,6 @@
 
 %include "casadi/fx/fx.hpp"
 %include "casadi/fx/jacobian.hpp"
-%include "casadi/fx/x_function.hpp"
 %include "casadi/fx/sx_function.hpp"
 %include "casadi/fx/mx_function.hpp"
 %include "casadi/fx/linear_solver.hpp"

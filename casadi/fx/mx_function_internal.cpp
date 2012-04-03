@@ -38,7 +38,7 @@ using namespace std;
 namespace CasADi{
 
 MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv, const std::vector<MX>& outputv) :
-  XFunctionInternalCommon<MXFunctionInternal,MX,MXNode>(inputv,outputv) {
+  XFunctionInternal<MXFunctionInternal,MX,MXNode>(inputv,outputv) {
   
   setOption("name", "unnamed_mx_function");
   setOption("topological_sorting","depth-first"); // breadth-first not working

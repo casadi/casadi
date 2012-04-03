@@ -46,7 +46,7 @@ namespace CasADi{
   \author Joel Andersson 
   \date 2010
 */
-class SXFunctionInternal : public XFunctionInternalCommon<SXFunctionInternal,Matrix<SX>,SXNode>{
+class SXFunctionInternal : public XFunctionInternal<SXFunctionInternal,Matrix<SX>,SXNode>{
   friend class SXFunction;
   
   protected:

@@ -630,40 +630,20 @@ void FXInternal::evaluate_switch(int nfdir, int nadir){
   }
 }
 
+void FXInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
+			const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
+			const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
+			bool output_given, bool eliminate_constants){
+  casadi_error("FXInternal::evalSX not defined for class " << typeid(*this).name());
+}
 
-// void setv(double val, vector<double>& v){
-//   if(v.size() != 1) throw CasadiException("setv(double,vector<double>&): dimension mismatch");
-//   v[0] = val;
-// }
-// 
-// void setv(int val, vector<double>& v){
-//   setv(double(val),v);
-// }
-// 
-// void setv(const double* val, vector<double>& v){
-//   // no checking
-//   copy(val,val+v.size(),v.begin());
-// }
-// 
-// void setv(const vector<double>& val, vector<double>& v){
-//   if(v.size() != val.size()) throw CasadiException("setv(const vector<double>&,vector<double>&): dimension mismatch");
-//   copy(val.begin(),val.end(),v.begin());
-// }
-//   
-// void getv(double &val, const vector<double>& v){
-//   if(v.size() != 1) throw CasadiException("getv(double&,vector<double>&): dimension mismatch");
-//   val = v[0];  
-// }
-// 
-// void getv(double* val, const vector<double>& v){
-//   // no checking
-//   copy(v.begin(),v.end(),val);
-// }
-// 
-// void getv(vector<double>& val, const vector<double>& v){
-//   if(v.size() != val.size()) throw CasadiException("getv(vector<double>&,const vector<double>&): dimension mismatch");
-//   copy(v.begin(),v.end(),val.begin());
-// }
+void FXInternal::evalMX(const std::vector<MX>& input, std::vector<MX>& output, 
+			const std::vector<std::vector<MX> >& fwdSeed, std::vector<std::vector<MX> >& fwdSens, 
+			const std::vector<std::vector<MX> >& adjSeed, std::vector<std::vector<MX> >& adjSens,
+			bool output_given, bool eliminate_constants){
+  casadi_error("FXInternal::evalMX not defined for class " << typeid(*this).name());
+}
+
 
 } // namespace CasADi
 

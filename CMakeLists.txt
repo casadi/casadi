@@ -82,7 +82,7 @@ SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake_modules)
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib/)
 
-# Core dependencies
+# Optional core dependencies
 if(WITH_LLVM)
   # Core depends on LLVM for Just-in-time compilation
   find_package(LLVM REQUIRED)
@@ -100,6 +100,15 @@ else(WITH_LLVM)
     set(CASADI_DEPENDENCIES)
   endif(WITH_DL)
 endif(WITH_LLVM)
+
+# Optional auxillary dependencies
+find_package(LAPACK)
+find_package(SUNDIALS)
+find_package(IPOPT)
+find_package(ACADO)
+find_package(KNITRO)
+find_package(LIFTOPT)
+find_package(CPLEX)
 
 
 add_subdirectory(casadi)

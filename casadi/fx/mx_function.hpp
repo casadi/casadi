@@ -62,7 +62,7 @@ class MXFunctionInternal;
   \author Joel Andersson 
   \date 2010
 */
-class MXFunction : public XFunction{
+class MXFunction : public FX{
 public:
 
   /** \brief  Ddefault constructor */

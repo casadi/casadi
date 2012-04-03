@@ -23,7 +23,7 @@
 #ifndef SX_FUNCTION_HPP
 #define SX_FUNCTION_HPP
 
-#include "x_function.hpp"
+#include "fx.hpp"
 
 namespace CasADi{
 
@@ -62,7 +62,7 @@ class MXFunction;
 \date 2010
 */
 
-class SXFunction : public XFunction{
+class SXFunction : public FX{
 
 public:
   /// Default constructor

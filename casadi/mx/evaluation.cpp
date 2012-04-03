@@ -25,7 +25,6 @@
 #include "../stl_vector_tools.hpp"
 #include "../mx/mx_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
-#include "../fx/x_function.hpp"
 #include "jacobian_reference.hpp"
 
 using namespace std;
@@ -162,15 +161,13 @@ FX& Evaluation::getFunction(){
 
 void Evaluation::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
   // Make sure that the function is an X-function
-  XFunction fcn = shared_cast<XFunction>(fcn_);
-  casadi_assert_message(!fcn.isNull(),"Function not an SXFunction or MXFunction");
   vector<SXMatrix> arg(input.size());
   for(int i=0; i<arg.size(); ++i){
     if(input[i]!=0)
       arg[i] = *input[i];
   }
   
-  std::vector<SXMatrix> res = fcn.eval(arg);
+  std::vector<SXMatrix> res = fcn_.eval(arg);
   
   for(int i=0; i<res.size(); ++i){
     if(output[i]!=0)

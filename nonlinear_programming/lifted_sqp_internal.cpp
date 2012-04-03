@@ -202,11 +202,13 @@ void LiftedSQPInternal::init(){
   SXMatrix b2 = g_z;
   SXMatrix e;
   if(!v.empty()){
+    
     // Directional derivative of Z
     vector<vector<SXMatrix> > Z_fwdSeed(2,zfcn_in);
     vector<vector<SXMatrix> > Z_fwdSens(2,zfcn_out);
     vector<vector<SXMatrix> > Z_adjSeed;
     vector<vector<SXMatrix> > Z_adjSens;
+    
     Z_fwdSeed[0][Z_U].setZero();
     Z_fwdSeed[0][Z_D] = -d;
     Z_fwdSeed[0][Z_LAM_X].setZero();
@@ -218,6 +220,7 @@ void LiftedSQPInternal::init(){
     Z_fwdSeed[1][Z_LAM_G] = dlam_g;
     
     zfcn.eval(zfcn_in,zfcn_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true,false);
+    
     b1 += Z_fwdSens[0][Z_LGRADG](Slice(0,nu));
     b2 += Z_fwdSens[0][Z_LGRADG](Slice(nu,B.size1()));
     e = Z_fwdSens[1][Z_D_DEF];
@@ -333,8 +336,8 @@ void LiftedSQPInternal::evaluate(int nfdir, int nadir){
     qp_solver_.evaluate();
     const DMatrix& du_k = qp_solver_.output(QP_PRIMAL);
     const DMatrix& dlam_u_k = qp_solver_.output(QP_LAMBDA_X);
-    const DMatrix& dlam_g_k = qp_solver_.output(QP_LAMBDA_A);
-            
+    const DMatrix& dlam_g_k = qp_solver_.output(QP_LAMBDA_A);    
+    
     // Expand the step
     for(int i=0; i<LIN_NUM_IN; ++i){
       efcn.setInput(lfcn.input(i),i);

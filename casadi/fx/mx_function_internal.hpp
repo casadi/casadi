@@ -38,7 +38,7 @@ namespace CasADi{
   \author Joel Andersson 
   \date 2010
 */
-class MXFunctionInternal : public XFunctionInternalCommon<MXFunctionInternal,MX,MXNode>{
+class MXFunctionInternal : public XFunctionInternal<MXFunctionInternal,MX,MXNode>{
   friend class MXFunction;
   
   public:

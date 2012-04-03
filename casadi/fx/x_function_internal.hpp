@@ -23,7 +23,6 @@
 #ifndef X_FUNCTION_INTERNAL_HPP
 #define X_FUNCTION_INTERNAL_HPP
 
-#include "x_function.hpp"
 #include <map>
 #include <stack>
 #include "fx_internal.hpp"
@@ -32,61 +31,20 @@
 
 namespace CasADi{
 
-/** \brief  Internal node class for XFunction (type independent)
-    \author Joel Andersson 
-    \date 2011
-*/
-
-class XFunctionInternal : public FXInternal{
-  friend class XFunction;
-  public:
-    
-    /** \brief  Constructor  */
-    XFunctionInternal();
-    
-    /** \brief  Destructor */
-    virtual ~XFunctionInternal();
-    
-    /** \brief  Evaluate symbolically, SX type */
-    virtual void evalSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
-                        const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
-                        const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
-                        bool output_given, bool eliminate_constants)=0;
-
-    /** \brief  Evaluate symbolically, MX type */
-    virtual void evalMX(const std::vector<MX>& input, std::vector<MX>& output, 
-                        const std::vector<std::vector<MX> >& fwdSeed, std::vector<std::vector<MX> >& fwdSens, 
-                        const std::vector<std::vector<MX> >& adjSeed, std::vector<std::vector<MX> >& adjSens,
-                        bool output_given, bool eliminate_constants){casadi_assert_message(0,"not implemented");}
-                        
-    /** \brief  Evaluate symbolically, SX type (overloaded)*/
-    void eval(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
-              const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
-              const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
-              bool output_given, bool eliminate_constants);
-
-    /** \brief  Evaluate symbolically, MX type (overloaded)*/
-    void eval(const std::vector<MX>& input, std::vector<MX>& output, 
-              const std::vector<std::vector<MX> >& fwdSeed, std::vector<std::vector<MX> >& fwdSens, 
-              const std::vector<std::vector<MX> >& adjSeed, std::vector<std::vector<MX> >& adjSens,
-              bool output_given, bool eliminate_constants);
-
-};
-
-/** \brief  Internal node class for XFunction (type specific)
+/** \brief  Internal node class for the base class of SXFunctionInternal and MXFunctionInternal (lacks a public counterpart)
     The design of the class uses the curiously recurring template pattern (CRTP) idiom
     \author Joel Andersson 
     \date 2011
 */
 template<typename DerivedType, typename MatType, typename NodeType>
-class XFunctionInternalCommon : public XFunctionInternal{
+class XFunctionInternal : public FXInternal{
   public:
     
     /** \brief  Constructor  */
-    XFunctionInternalCommon(const std::vector<MatType>& inputv, const std::vector<MatType>& outputv);
+    XFunctionInternal(const std::vector<MatType>& inputv, const std::vector<MatType>& outputv);
     
     /** \brief  Destructor */
-    virtual ~XFunctionInternalCommon(){}
+    virtual ~XFunctionInternal(){}
 
     /** \brief  Topological sorting of the nodes based on Depth-First Search (DFS) */
     static void sort_depth_first(std::stack<NodeType*>& s, std::vector<NodeType*>& nodes);
@@ -116,8 +74,9 @@ class XFunctionInternalCommon : public XFunctionInternal{
 // Template implementations
 
 template<typename DerivedType, typename MatType, typename NodeType>
-XFunctionInternalCommon<DerivedType,MatType,NodeType>::XFunctionInternalCommon(
+XFunctionInternal<DerivedType,MatType,NodeType>::XFunctionInternal(
     const std::vector<MatType>& inputv, const std::vector<MatType>& outputv) : inputv_(inputv),  outputv_(outputv){
+      addOption("topological_sorting",OT_STRING,"breadth-first","Topological sorting algorithm","depth-first|breadth-first");
   
   // Make sure that inputs are symbolic
   for(int i=0; i<inputv.size(); ++i){
@@ -148,7 +107,7 @@ XFunctionInternalCommon<DerivedType,MatType,NodeType>::XFunctionInternalCommon(
 
 
 template<typename DerivedType, typename MatType, typename NodeType>
-void XFunctionInternalCommon<DerivedType,MatType,NodeType>::sort_depth_first(std::stack<NodeType*>& s, std::vector<NodeType*>& nodes){
+void XFunctionInternal<DerivedType,MatType,NodeType>::sort_depth_first(std::stack<NodeType*>& s, std::vector<NodeType*>& nodes){
 
     while(!s.empty()){
       
@@ -198,7 +157,7 @@ void XFunctionInternalCommon<DerivedType,MatType,NodeType>::sort_depth_first(std
 }
 
 template<typename DerivedType, typename MatType, typename NodeType>
-void XFunctionInternalCommon<DerivedType,MatType,NodeType>::resort_postpone(std::vector<NodeType*>& algnodes, std::vector<int>& lind){
+void XFunctionInternal<DerivedType,MatType,NodeType>::resort_postpone(std::vector<NodeType*>& algnodes, std::vector<int>& lind){
 
   // Number of levels
   int nlevels = lind.size()-1;
@@ -302,7 +261,7 @@ void XFunctionInternalCommon<DerivedType,MatType,NodeType>::resort_postpone(std:
 }
 
 template<typename DerivedType, typename MatType, typename NodeType>
-void XFunctionInternalCommon<DerivedType,MatType,NodeType>::resort_breadth_first(std::vector<NodeType*>& algnodes){
+void XFunctionInternal<DerivedType,MatType,NodeType>::resort_breadth_first(std::vector<NodeType*>& algnodes){
 
   // We shall assign a "level" to each element of the algorithm. A node which does not depend on other binary nodes are assigned level 0 and for nodes that depend on other nodes of the algorithm, the level will be the maximum level of any of the children plus 1. Note that all nodes of a level can be evaluated in parallel. The level will be saved in the temporary variable
 
@@ -485,7 +444,7 @@ std::cout << "  "<< ii++ << ": ";
 }
 
 template<typename DerivedType, typename MatType, typename NodeType>
-std::vector<MatType> XFunctionInternalCommon<DerivedType,MatType,NodeType>::jacGen(
+std::vector<MatType> XFunctionInternal<DerivedType,MatType,NodeType>::jacGen(
     const std::vector<std::pair<int,int> >& jblocks, bool compact, const std::vector<bool>& symmetric_block){
   using namespace std;
   if(verbose()) std::cout << "XFunctionInternal::jacGen begin" << std::endl;
@@ -789,7 +748,7 @@ std::vector<MatType> XFunctionInternalCommon<DerivedType,MatType,NodeType>::jacG
 }
 
 template<typename DerivedType, typename MatType, typename NodeType>
-CRSSparsity XFunctionInternalCommon<DerivedType,MatType,NodeType>::getJacSparsity(int iind, int oind){
+CRSSparsity XFunctionInternal<DerivedType,MatType,NodeType>::getJacSparsity(int iind, int oind){
   if(verbose()) std::cout << "XFunctionInternal::getJacSparsity begin (iind == " << iind <<", oind == " << oind << ")" << std::endl;
   
   // Reset the virtual machine

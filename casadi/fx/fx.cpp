@@ -299,6 +299,91 @@ void FX::updateNumSens(){
   return (*this)->updateNumSens(true);
 }
 
+vector<SXMatrix> FX::evalSX(const vector<SXMatrix>& arg){
+  casadi_assert_message(isInit(),"Function has not been initialized");
+  
+  // Copy the arguments into a new vector with the right sparsity
+  casadi_assert_message(arg.size()==getNumInputs(),"FX::evalSX: mismatch in number of arguments. Expecting " << getNumInputs() << ", but got " << arg.size() << " instead.");
+  vector<SXMatrix> arg2 = arg;
+  for(int iind=0; iind<arg.size(); ++iind){
+    // If sparsities do not match, we need to map the nonzeros
+    if(!(arg2[iind].sparsity()==input(iind).sparsity())){
+      // The sparsity should be that of the inputs
+      arg2[iind] = SXMatrix(input(iind).sparsity(),0);
+
+      if (!arg2[iind].empty() || !arg[iind].empty()) {
+        // Make sure that the dimensions match
+        casadi_assert_message(arg[iind].size1()==arg2[iind].size1(),"FX::evalSX: shape mismatch of argument #" << iind <<  ". Expecting " << arg2[iind].size1() << "-by-" << arg2[iind].size2() << ", but got " << arg[iind].size1() << "-by-" << arg[iind].size2() << " instead.");
+        casadi_assert_message(arg[iind].size2()==arg2[iind].size2(),"FX::evalSX: shape mismatch of argument #" << iind <<  ". Expecting " << arg2[iind].size1() << "-by-" << arg2[iind].size2() << ", but got " << arg[iind].size1() << "-by-" << arg[iind].size2() << " instead.");
+      }
+
+      // Get the indices of the known supplied arguments
+      vector<int> known_ind = arg[iind].sparsity().getElements(false);
+      
+      // Find the corresponding nonzeros of the argument matrix
+      arg2[iind].sparsity().getNZInplace(known_ind);
+      
+      // Set the element values
+      for(int k=0; k<known_ind.size(); ++k){
+        if(known_ind[k]!=-1){
+          arg2[iind].at(known_ind[k]) = arg[iind].at(k);
+        }
+      }
+    }
+  }
+
+  // Create result vector with correct sparsity for the result
+  vector<SXMatrix> res(getNumOutputs());
+  for(int i=0; i<res.size(); ++i){
+    res[i] = SXMatrix(output(i).sparsity());
+  }
+  
+  // No sensitivities
+  vector<vector<SXMatrix> > dummy;
+  
+  // Evaluate the algorithm
+  (*this)->eval(arg2,res,dummy,dummy,dummy,dummy,false,false);
+  
+  // Return the result
+  return res;
+}
+
+vector<MX> FX::evalMX(const vector<MX>& arg){
+  vector<MX> res;
+  vector<vector<MX> > dummy;
+  (*this)->evalMX(arg,res,dummy,dummy,dummy,dummy,false,false);
+  return res;
+}
+
+void FX::evalSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
+		       const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
+		       const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
+		       bool output_given, bool eliminate_constants){
+  (*this)->evalSX(input,output,fwdSeed,fwdSens,adjSeed,adjSens,output_given,eliminate_constants);
+}
+
+void FX::evalMX(const std::vector<MX>& input, std::vector<MX>& output, 
+		       const std::vector<std::vector<MX> >& fwdSeed, std::vector<std::vector<MX> >& fwdSens, 
+		       const std::vector<std::vector<MX> >& adjSeed, std::vector<std::vector<MX> >& adjSens,
+		       bool output_given, bool eliminate_constants){
+  (*this)->evalMX(input,output,fwdSeed,fwdSens,adjSeed,adjSens,output_given,eliminate_constants);
+}
+                        
+void FX::eval(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
+		     const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
+		     const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
+		     bool output_given, bool eliminate_constants){
+  (*this)->eval(input,output,fwdSeed,fwdSens,adjSeed,adjSens,output_given,eliminate_constants);
+}
+
+void FX::eval(const std::vector<MX>& input, std::vector<MX>& output, 
+		     const std::vector<std::vector<MX> >& fwdSeed, std::vector<std::vector<MX> >& fwdSens, 
+		     const std::vector<std::vector<MX> >& adjSeed, std::vector<std::vector<MX> >& adjSens,
+		     bool output_given, bool eliminate_constants){
+  (*this)->eval(input,output,fwdSeed,fwdSens,adjSeed,adjSens,output_given,eliminate_constants);
+}
+
+
 #if 0
 
 vector<DMatrix> FX::jac(const vector<DMatrix> &x, int iind){
