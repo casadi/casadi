@@ -128,7 +128,7 @@ int main(){
   
   // Set options
   ipopt_solver.setOption("generate_hessian",true);
-  ipopt_solver.setOption("tol",1e-15);
+  ipopt_solver.setOption("tol",1e-10);
   
   // initialize the solver
   ipopt_solver.init();
@@ -149,33 +149,41 @@ int main(){
   cout << "I: multipliers (u): " << ipopt_solver.output(NLP_LAMBDA_X) << endl;
   cout << "I: multipliers (gb): " << ipopt_solver.output(NLP_LAMBDA_G) << endl;
   
-  // Solve using lifted SQP solver
-  LiftedSQP lifted_sqp(ffcn,gfcn);
-  
-  // Set options
-  lifted_sqp.setOption("qp_solver",Interfaces::QPOasesSolver::creator);
+  // QP solver options
   Dictionary qp_solver_options;
   qp_solver_options["printLevel"] = "none";
-  lifted_sqp.setOption("qp_solver_options",qp_solver_options);
-  lifted_sqp.setOption("num_lifted",v.size());
   
-  // initialize the solver
-  lifted_sqp.init();
-
-  lifted_sqp.setInput(xv_min,NLP_LBX);
-  lifted_sqp.setInput(xv_max,NLP_UBX);
-  lifted_sqp.setInput(xv_init,NLP_X_INIT);
-  lifted_sqp.setInput(gv_min,NLP_LBG);
-  lifted_sqp.setInput(gv_max,NLP_UBG);
-
-  // Solve the problem
-  lifted_sqp.solve();
+  // Solve both full-space and lifted
+  for(int is_lifted=0; is_lifted<2; ++is_lifted){
   
-  // Print the optimal solution
-  cout << "L: optimal cost:    " << lifted_sqp.output(NLP_COST).toScalar() << endl;
-  cout << "L: optimal control: " << lifted_sqp.output(NLP_X_OPT) << endl;
-  cout << "L: multipliers (u): " << lifted_sqp.output(NLP_LAMBDA_X) << endl;
-  cout << "L: multipliers (gb): " << lifted_sqp.output(NLP_LAMBDA_G) << endl;
+    // Solve using lifted SQP solver
+    LiftedSQP lifted_sqp(ffcn,gfcn);
+    
+    // Set options
+    lifted_sqp.setOption("qp_solver",Interfaces::QPOasesSolver::creator);
+    lifted_sqp.setOption("qp_solver_options",qp_solver_options);
+    lifted_sqp.setOption("num_lifted",is_lifted ? v.size() : 0);
+    lifted_sqp.setOption("toldx",1e-10);
+    
+    // initialize the solver
+    lifted_sqp.init();
+
+    lifted_sqp.setInput(xv_min,NLP_LBX);
+    lifted_sqp.setInput(xv_max,NLP_UBX);
+    lifted_sqp.setInput(xv_init,NLP_X_INIT);
+    lifted_sqp.setInput(gv_min,NLP_LBG);
+    lifted_sqp.setInput(gv_max,NLP_UBG);
+
+    // Solve the problem
+    lifted_sqp.solve();
+    
+    // Print the optimal solution
+    cout << "L: optimal cost:    " << lifted_sqp.output(NLP_COST).toScalar() << endl;
+    cout << "L: optimal control: " << lifted_sqp.output(NLP_X_OPT) << endl;
+    cout << "L: multipliers (u): " << lifted_sqp.output(NLP_LAMBDA_X) << endl;
+    cout << "L: multipliers (gb): " << lifted_sqp.output(NLP_LAMBDA_G) << endl;
+  }
+  return 0;
   
   // Solve using old SQP method
   SQPMethod sqp_method(ffcn,gfcn);
