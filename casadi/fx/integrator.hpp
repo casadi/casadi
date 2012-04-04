@@ -35,6 +35,33 @@
   x(t0) = x0
   over a time interval [t0, tf].
   \endverbatim 
+  
+  NOTE: The ODE/DAE formulation in CasADi will be replaced by a more general
+  forward/backward two-point boundary value problem with the differential equation
+  given as a semi-explicit DAE with quadrature states:
+  \verbatim
+  Initial conditions at t=t0
+    x_d(t0)  = x_d0
+    x_q(t0)  = x_q0
+  
+  Forward integration from t=t0 to t=tf
+    der(x_d) = f_d(t,x_d,x_a,p)           Forward ODE
+    der(x_q) = f_q(t,x_d,x_a,p)           Forward quadratures
+    der(x_a) = f_a(t,x_d,x_a,p)           Forward algebraic equations
+  
+  Terminal conditions at t=tf
+    y_d(tf)  = h_d(x_d(tf),x_q(tf),p)
+    y_q(tf)  = h_q(x_d(tf),x_q(tf),p)
+  
+  Backward integration from t=tf to t=t0
+    der(y_d) = g_d(t,x_d,x_a,y_d,y_a,p)   Backward ODE
+    der(y_q) = g_q(t,x_d,x_a,y_d,y_a,p)   Backward quadratures
+    der(y_a) = g_a(t,x_d,x_a,y_d,y_a,p)   Backward algebraic equations
+
+  Where we assume that both the forward and backwards integrations are index-1
+  (i.e. d_f_a/d_x_a and d_q_a/d_y_a are invertible) and furthermore that 
+  g_d, g_q and g_a have a linear dependency on y_d and y_a.
+  \endverbatim 
 */
 
 /** \defgroup ODE_doc
@@ -73,6 +100,84 @@ enum DAEOutput{
   DAE_NUM_OUT
 };
 
+/// Input arguments of an ODE/DAE forward integration function (new, not yet ready implementation)
+enum DAEFInput{
+  /** Time */
+  DAE_F_T,
+  /** Differential state */
+  DAE_F_XD,
+  /** Algebraic state */
+  DAE_F_XA,
+  /** Parameter vector */
+  DAE_F_P,
+  /** Number of arguments. */
+  DAE_F_NUM_IN
+};
+
+/// Output arguments of an ODE/DAE forward integration function (new, not yet ready implementation)
+enum DAEFOutput{
+  /** Right hand side of ODE.*/
+  DAE_F_ODE,
+  /** Right hand side of quadratures.*/
+  DAE_F_QUAD,
+  /** Right hand side of algebraic equations.*/
+  DAE_F_ALG,
+  /** Number of arguments. */
+  DAE_F_NUM_OUT
+};
+
+/// Input arguments of an ODE/DAE terminal constraint function (new, not yet ready implementation)
+enum DAEHInput{
+  /** Differential state */
+  DAE_H_XD,
+  /** Quadrature state */
+  DAE_H_XQ,
+  /** Parameter vector */
+  DAE_H_P,
+  /** Number of arguments. */
+  DAE_H_NUM_IN
+};
+
+/// Output arguments of an ODE/DAE terminal function (new, not yet ready implementation)
+enum DAEHOutput{
+  /** Initial conditions for the backwards integration, differential states. */
+  DAE_H_YD,
+  /** Initial conditions for the backwards integration, quadrature states. */
+  DAE_H_YQ,
+  /** Number of arguments. */
+  DAE_H_NUM_OUT
+};
+
+/// Input arguments of an ODE/DAE backward integration function (new, not yet ready implementation)
+enum DAEGInput{
+  /** Time */
+  DAE_G_T,
+  /** Forward differential state */
+  DAE_G_XD,
+  /** Forward algebraic state */
+  DAE_G_XA,
+  /** Backward differential state */
+  DAE_G_YD,
+  /** Backward algebraic state */
+  DAE_G_YA,
+  /** Parameter vector */
+  DAE_G_P,
+  /** Number of arguments. */
+  DAE_G_NUM_IN
+};
+
+/// Output arguments of an ODE/DAE backward integration function (new, not yet ready implementation)
+enum DAEGOutput{
+  /** Right hand side of ODE.*/
+  DAE_G_ODE,
+  /** Right hand side of quadratures.*/
+  DAE_G_QUAD,
+  /** Right hand side of algebraic equations.*/
+  DAE_G_ALG,
+  /** Number of arguments. */
+  DAE_G_NUM_OUT
+};
+
 /// Input arguments of an integrator
 enum IntegratorInput{
   /** Differential or algebraic state at t0  (dimension nx-by-1) */
@@ -95,6 +200,37 @@ enum IntegratorOutput{
  INTEGRATOR_XPF, 
   /** Number of output arguments of an integrator */
  INTEGRATOR_NUM_OUT
+};
+
+/// Input arguments of an integrator (new, not yet ready implementation)
+enum NewIntegratorInput{
+  /** Differential state at t0 */
+  NEW_INTEGRATOR_XD0,
+  /** Quadrature state at t0 */
+  NEW_INTEGRATOR_XQ0,
+  /** Initial guess for the algebraic state at t0 */
+  NEW_INTEGRATOR_XA0,
+  /** Parameters p */
+  NEW_INTEGRATOR_P,
+  /** Number of input arguments of an integrator */
+  NEW_INTEGRATOR_NUM_IN};
+
+/// Output arguments of an integrator (new, not yet ready implementation)
+enum NewIntegratorOutput{
+  /**  Differential state at tf */
+  NEW_INTEGRATOR_XDF,
+  /**  Quadrature state at tf */
+  NEW_INTEGRATOR_XQF,
+  /**  Algebraic state at tf */
+  NEW_INTEGRATOR_XAF,
+  /**  Backward differential state at t0 */
+  NEW_INTEGRATOR_YD0,
+  /**  Backward quadrature state at t0 */
+  NEW_INTEGRATOR_YQ0,
+  /**  Backward algebraic state at t0 */
+  NEW_INTEGRATOR_YA0,
+  /** Number of output arguments of an integrator */
+  NEW_INTEGRATOR_NUM_OUT
 };
 
 /// Forward declaration of internal class
