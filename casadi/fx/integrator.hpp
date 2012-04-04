@@ -132,6 +132,8 @@ enum DAEHInput{
   DAE_H_XD,
   /** Quadrature state */
   DAE_H_XQ,
+  /** Algebraic state */
+  DAE_H_XA,
   /** Parameter vector */
   DAE_H_P,
   /** Number of arguments. */
@@ -144,6 +146,8 @@ enum DAEHOutput{
   DAE_H_YD,
   /** Initial conditions for the backwards integration, quadrature states. */
   DAE_H_YQ,
+  /** Guess for the initial conditions for the backwards integration, algebraic states. */
+  DAE_H_YA,
   /** Number of arguments. */
   DAE_H_NUM_OUT
 };
@@ -208,7 +212,7 @@ enum NewIntegratorInput{
   NEW_INTEGRATOR_XD0,
   /** Quadrature state at t0 */
   NEW_INTEGRATOR_XQ0,
-  /** Initial guess for the algebraic state at t0 */
+  /** Guess for the algebraic state at t0 */
   NEW_INTEGRATOR_XA0,
   /** Parameters p */
   NEW_INTEGRATOR_P,

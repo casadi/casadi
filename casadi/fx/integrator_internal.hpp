@@ -39,6 +39,9 @@ public:
   /** \brief  Constructor */
   IntegratorInternal(const FX& f, const FX& q);
 
+  /** \brief  Constructor, new, not yet ready implementation */
+  //IntegratorInternal(const FX& f, const FX& g, const FX& h);
+
   /** \brief  Destructor */
   virtual ~IntegratorInternal()=0;
 
@@ -99,22 +102,28 @@ public:
   /// Set final time
   void setFinalTime(double tf);
 
-  /// DAE residual function
+  /// ODE/DAE forward integration function
   FX f_;
 
-  /// Quadrature function
+  /// ODE/DAE terminal constraint function (new)
+  //FX h_;
+  
+  /// ODE/DAE backward integration function (new)
+  //FX g_;
+  
+  /// Quadrature function (old)
   FX q_;
 
-  /// Jacobian of the ODE/DAE with respect to the state and state derivatives
+  /// Jacobian of the ODE/DAE with respect to the state and state derivatives (old)
   FX jac_;
 
-  /// Linear solver
-  LinearSolver linsol_;  
+  /// Linear solver (old)
+  LinearSolver linsol_;
 
   /// Number of states (including algebraic states and quadrature states)
   int nx_;
   
-  /// number of states, excluding quadrature states
+  /// number of states, excluding quadrature states (old)
   int ny_;
   
   /// number of quadrature states

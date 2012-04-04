@@ -8,18 +8,10 @@ if(PRECOND_TEST)
 endif(PRECOND_TEST)
 
 set(SUNDIALS_INTERFACE_SRCS
-  cvodes_internal.hpp
-  cvodes_internal.cpp
-  cvodes_integrator.hpp
-  cvodes_integrator.cpp
-  idas_internal.hpp
-  idas_internal.cpp
-  idas_integrator.hpp
-  idas_integrator.cpp
-  kinsol_internal.hpp
-  kinsol_internal.cpp
-  kinsol_solver.hpp
-  kinsol_solver.cpp
+  sundials_internal.hpp  sundials_internal.cpp  sundials_integrator.hpp  sundials_integrator.cpp
+  cvodes_internal.hpp    cvodes_internal.cpp    cvodes_integrator.hpp    cvodes_integrator.cpp
+  idas_internal.hpp      idas_internal.cpp      idas_integrator.hpp      idas_integrator.cpp
+  kinsol_internal.hpp    kinsol_internal.cpp    kinsol_solver.hpp        kinsol_solver.cpp
 )
 
 if(ENABLE_STATIC)

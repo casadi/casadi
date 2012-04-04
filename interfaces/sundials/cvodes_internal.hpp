@@ -24,7 +24,7 @@
 #define CVODES_INTERNAL_HPP
 
 #include "cvodes_integrator.hpp"
-#include "casadi/fx/integrator_internal.hpp"
+#include "sundials_internal.hpp"
 #include "casadi/fx/linear_solver.hpp"
 #include <nvector/nvector_serial.h>   /* serial N_Vector types, fcts., and macros */
 #include <sundials/sundials_dense.h>  /* definitions DlsMat DENSE_ELEM */
@@ -44,7 +44,7 @@ namespace Sundials{
 /**
   @copydoc ODE_doc
 */
-class CVodesInternal : public IntegratorInternal{
+class CVodesInternal : public SundialsInternal{
   friend class CVodesIntegrator;
 public:
   /** \brief  Constructor */

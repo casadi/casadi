@@ -40,7 +40,7 @@ CVodesInternal* CVodesInternal::clone() const{
   return node;
 }
 
-CVodesInternal::CVodesInternal(const FX& f, const FX& q) : IntegratorInternal(f,q){
+CVodesInternal::CVodesInternal(const FX& f, const FX& q) : SundialsInternal(f,q){
   addOption("linear_multistep_method",     OT_STRING,  "bdf","bdf|adams");
   addOption("nonlinear_solver_iteration",  OT_STRING,  "newton","","newton|functional");
   addOption("fsens_all_at_once",           OT_BOOLEAN,true); // calculate all right hand sides of the sensitivity equations at once
@@ -127,7 +127,7 @@ void CVodesInternal::init(){
    "Mismatch between number of non-zeros"
   );
   
-  IntegratorInternal::init();
+  SundialsInternal::init();
   
   // Read options
   monitor_rhsB_  = monitored("resB");
@@ -1417,7 +1417,7 @@ LinearSolver CVodesInternal::getLinearSolver(){
 
 
 void CVodesInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
-  IntegratorInternal::deepCopyMembers(already_copied);
+  SundialsInternal::deepCopyMembers(already_copied);
   jac_f_ = deepcopy(jac_f_,already_copied);
 }
 

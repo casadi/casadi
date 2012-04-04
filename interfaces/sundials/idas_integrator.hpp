@@ -23,7 +23,7 @@
 #ifndef IDAS_INTEGRATOR_HPP
 #define IDAS_INTEGRATOR_HPP
 
-#include "casadi/fx/integrator.hpp"
+#include "sundials_integrator.hpp"
 
 /**
 * \defgroup IdasIntegrator_doc
@@ -63,7 +63,7 @@ enum JACOutput{JAC_J, JAC_NUM_OUT};
    \date 2010
 */
 
-class IdasIntegrator : public Integrator{
+class IdasIntegrator : public SundialsIntegrator{
 public:
 
   /// Default constructor

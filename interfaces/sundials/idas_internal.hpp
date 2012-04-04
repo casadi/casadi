@@ -24,7 +24,7 @@
 #define IDAS_INTERNAL_HPP
 
 #include "idas_integrator.hpp"
-#include "casadi/fx/integrator_internal.hpp"
+#include "sundials_internal.hpp"
 #include "casadi/fx/linear_solver.hpp"
 #include <nvector/nvector_serial.h>   /* serial N_Vector types, fcts., and macros */
 #include <sundials/sundials_dense.h>  /* definitions DlsMat DENSE_ELEM */
@@ -79,7 +79,7 @@ namespace Sundials{
 /**
 @copydoc IdasIntegrator_doc
 */
-class IdasInternal : public IntegratorInternal{
+class IdasInternal : public SundialsInternal{
   friend class IdasIntegrator;
 
   public:

@@ -23,10 +23,7 @@
 #ifndef CVODES_INTEGRATOR_HPP
 #define CVODES_INTEGRATOR_HPP
 
-#include "casadi/fx/integrator.hpp"
-
-
-
+#include "sundials_integrator.hpp"
 
 namespace CasADi{
 namespace Sundials{
@@ -51,7 +48,7 @@ class CVodesInternal;
   
 
 */
-class CVodesIntegrator : public Integrator{
+class CVodesIntegrator : public SundialsIntegrator{
 public:
 
   /** \brief  Default constructor */

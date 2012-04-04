@@ -40,10 +40,10 @@ IdasInternal* IdasInternal::clone() const{
 }
 
 void IdasInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
-  IntegratorInternal::deepCopyMembers(already_copied);
+  SundialsInternal::deepCopyMembers(already_copied);
 }
 
-IdasInternal::IdasInternal(const FX& f, const FX& q) : IntegratorInternal(f,q){
+IdasInternal::IdasInternal(const FX& f, const FX& q) : SundialsInternal(f,q){
   addOption("suppress_algebraic",          OT_BOOLEAN, false, "supress algebraic variables in the error testing");
   addOption("calc_ic",                     OT_BOOLEAN, true,  "use IDACalcIC to get consistent initial conditions. This only works for semi-explicit index-one systems. Else, you must provide consistent initial conditions yourself.");
   addOption("calc_icB",                    OT_BOOLEAN, false, "use IDACalcIC to get consistent initial conditions. This only works for semi-explicit index-one systems. Else, you must provide consistent initial conditions yourself.");
@@ -135,7 +135,7 @@ void IdasInternal::init(){
   );
   
   // Call the base class init
-  IntegratorInternal::init();
+  SundialsInternal::init();
   log("IdasInternal::init","begin");
   
   if(hasSetOption("linear_solver_creator")){
