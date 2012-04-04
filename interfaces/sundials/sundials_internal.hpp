@@ -39,6 +39,20 @@ public:
     
   /** \brief  Initialize */
   virtual void init();
+
+  /** \brief  Deep copy data members */
+  virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
+  
+  //@{
+  /// options
+  bool exact_jacobian_;
+  double abstol_, reltol_;
+  double fsens_abstol_, fsens_reltol_;
+  double asens_abstol_, asens_reltol_;
+  int max_num_steps_;
+  bool finite_difference_fsens_;  
+  //@}
+  
 };
   
 } // namespace Sundials

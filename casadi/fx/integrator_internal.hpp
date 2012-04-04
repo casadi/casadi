@@ -105,25 +105,19 @@ public:
   /// ODE/DAE forward integration function
   FX f_;
 
-  /// ODE/DAE terminal constraint function (new)
-  //FX h_;
-  
-  /// ODE/DAE backward integration function (new)
-  //FX g_;
-  
-  /// Quadrature function (old)
+  /// Quadrature function
   FX q_;
 
-  /// Jacobian of the ODE/DAE with respect to the state and state derivatives (old)
+  /// Jacobian of the ODE/DAE with respect to the state and state derivatives
   FX jac_;
 
-  /// Linear solver (old)
+  /// Linear solver
   LinearSolver linsol_;
 
   /// Number of states (including algebraic states and quadrature states)
   int nx_;
   
-  /// number of states, excluding quadrature states (old)
+  /// number of states, excluding quadrature states
   int ny_;
   
   /// number of quadrature states
@@ -141,22 +135,13 @@ public:
   /// Integration horizon
   double t0_, tf_;
   
-  // Do not integrate past the end point
-  bool stop_at_end_;
-  
+  /// Set dimensions
+  void setDimensions(int nx, int np);
+
   //@{
   /// options
-  bool exact_jacobian_;
-  double abstol_, reltol_;
-  double fsens_abstol_, fsens_reltol_;
-  double asens_abstol_, asens_reltol_;
-  int max_num_steps_;
-  bool finite_difference_fsens_;  
+  bool stop_at_end_;
   //@}
-  
-  // Set dimensions
-  void setDimensions(int nx, int np);
-    
 };
   
 } // namespace CasADi
