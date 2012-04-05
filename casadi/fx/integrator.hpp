@@ -100,7 +100,7 @@ enum DAEOutput{
   DAE_NUM_OUT
 };
 
-/// Input arguments of an ODE/DAE forward integration function (new, not yet ready implementation)
+/// Input arguments of an ODE/DAE forward integration function
 enum DAEFInput{
   /** Differential state */
   DAE_F_XD,
@@ -114,7 +114,7 @@ enum DAEFInput{
   DAE_F_NUM_IN
 };
 
-/// Helper function to create DAE forward integration function input arguments
+/// Helper function to create ODE/DAE forward integration function input arguments
 template<class M>
 std::vector<M> daeFIn(const M& xd, const M& xa=M(), const M& p=M(), const M& t=M()){
   M ret[DAE_F_NUM_IN] = {xd,xa,p,t};
@@ -125,7 +125,7 @@ std::vector<M> daeFIn(const M& xd, const M& xa=M(), const M& p=M(), const M& t=M
 %template(daeFIn) daeFIn<MX>;
 #endif //SWIG
 
-/// Output arguments of an ODE/DAE forward integration function (new, not yet ready implementation)
+/// Output arguments of an ODE/DAE forward integration function
 enum DAEFOutput{
   /** Right hand side of ODE.*/
   DAE_F_ODE,
@@ -137,7 +137,7 @@ enum DAEFOutput{
   DAE_F_NUM_OUT
 };
 
-/// Helper function to create DAE forward integration function output arguments
+/// Helper function to create ODE/DAE forward integration function output arguments
 template<class M>
 std::vector<M> daeFOut(const M& ode, const M& alg=M(), const M& quad=M()){
   M ret[DAE_F_NUM_OUT] = {ode,alg,quad};
@@ -148,7 +148,7 @@ std::vector<M> daeFOut(const M& ode, const M& alg=M(), const M& quad=M()){
 %template(daeFOut) daeFOut<MX>;
 #endif //SWIG
 
-/// Input arguments of an ODE/DAE terminal constraint function (new, not yet ready implementation)
+/// Input arguments of an ODE/DAE terminal constraint function
 enum DAEHInput{
   /** Differential state */
   DAE_H_XD,
@@ -177,15 +177,15 @@ std::vector<M> daeHIn(const M& xd, const M& xa=M(), const M& xq=M(), const M& p=
 enum DAEHOutput{
   /** Initial conditions for the backwards integration, differential states. */
   DAE_H_YD,
-  /** Initial conditions for the backwards integration, quadrature states. */
-  DAE_H_YA,
   /** Guess for the initial conditions for the backwards integration, algebraic states. */
+  DAE_H_YA,
+  /** Initial conditions for the backwards integration, quadrature states. */
   DAE_H_YQ,
   /** Number of arguments. */
   DAE_H_NUM_OUT
 };
 
-/// Helper function to create DAE terminal constraint function output arguments
+/// Helper function to create ODE/DAE terminal constraint function output arguments
 template<class M>
 std::vector<M> daeHOut(const M& yd, const M& ya=M(), const M& yq=M()){
   M ret[DAE_H_NUM_OUT] = {yd,ya,yq};
@@ -196,7 +196,7 @@ std::vector<M> daeHOut(const M& yd, const M& ya=M(), const M& yq=M()){
 %template(daeHOut) daeHOut<MX>;
 #endif //SWIG
 
-/// Input arguments of an ODE/DAE backward integration function (new, not yet ready implementation)
+/// Input arguments of an ODE/DAE backward integration function 
 enum DAEGInput{
   /** Forward differential state */
   DAE_G_XD,
@@ -272,7 +272,7 @@ enum IntegratorOutput{
  INTEGRATOR_NUM_OUT
 };
 
-/// Input arguments of an integrator (new, not yet ready implementation)
+/// Input arguments of an integrator 
 enum NewIntegratorInput{
   /** Differential state at t0 */
   NEW_INTEGRATOR_XD0,
@@ -285,7 +285,7 @@ enum NewIntegratorInput{
   /** Number of input arguments of an integrator */
   NEW_INTEGRATOR_NUM_IN};
 
-/// Output arguments of an integrator (new, not yet ready implementation)
+/// Output arguments of an integrator
 enum NewIntegratorOutput{
   /**  Differential state at tf */
   NEW_INTEGRATOR_XDF,
