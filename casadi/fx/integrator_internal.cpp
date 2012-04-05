@@ -41,10 +41,10 @@ IntegratorInternal::IntegratorInternal(const FX& fd, const FX& fq) : fd_(fd), fq
   ctorInit();
 }
 
-// IntegratorInternal::IntegratorInternal(const FX& f, const FX& g, const FX& h) : f_(f), g_(g), h_(h){
-//   new_design_ = false;
-//   ctorInit();
-// }
+IntegratorInternal::IntegratorInternal(const FX& f, const FX& g, const FX& h) : f_(f), g_(g), h_(h){
+  new_design_ = true;
+  ctorInit();
+}
 
 void IntegratorInternal::ctorInit(){
   // set default options
@@ -61,33 +61,6 @@ void IntegratorInternal::ctorInit(){
 }
 
 IntegratorInternal::~IntegratorInternal(){ 
-}
-
-void IntegratorInternal::setDimensions(int nxd, int nxa, int nxq, int nyd, int nya, int nyq, int np){
-  // Save dimensions
-  nxd_ = nxd;
-  nxa_ = nxa;
-  nxq_ = nxq;
-  nyd_ = nyd;
-  nya_ = nya;
-  nyq_ = nyq;
-  np_  = np;
-  
-  // Allocate space for inputs
-  input_.resize(NEW_INTEGRATOR_NUM_IN);
-  input(NEW_INTEGRATOR_XD0) = DMatrix::zeros(nxd_,1);
-  input(NEW_INTEGRATOR_XQ0) = DMatrix::zeros(nxq_,1);
-  input(NEW_INTEGRATOR_XA0) = DMatrix::zeros(nxa_,1);
-  input(NEW_INTEGRATOR_P) = DMatrix::zeros(np_,1);
-  
-  // Allocate space for outputs
-  output_.resize(NEW_INTEGRATOR_NUM_OUT);
-  output(NEW_INTEGRATOR_XDF) = input(NEW_INTEGRATOR_XD0);
-  output(NEW_INTEGRATOR_XQF) = input(NEW_INTEGRATOR_XQ0);
-  output(NEW_INTEGRATOR_XAF) = input(NEW_INTEGRATOR_XA0);
-  output(NEW_INTEGRATOR_YD0) = DMatrix::zeros(nyd_,1);
-  output(NEW_INTEGRATOR_YQ0) = DMatrix::zeros(nyq_,1);
-  output(NEW_INTEGRATOR_YA0) = DMatrix::zeros(nya_,1);
 }
 
 void IntegratorInternal::setDimensions(int nx, int np){
@@ -129,6 +102,69 @@ void IntegratorInternal::evaluate(int nfdir, int nadir){
 }
 
 void IntegratorInternal::init(){
+  
+  // Initialize the functions and get dimensions
+  if(new_design_){
+    
+    // Initialize the functions
+    casadi_assert(!f_.isNull());
+
+    // Initialize, get and assert dimensions of the forward integration
+    if(!f_.isInit()) f_.init();
+    nxd_ = f_.input(DAE_F_XD).numel();
+    nxa_ = f_.input(DAE_F_XA).numel();
+    np_  = f_.input(DAE_F_P).numel();
+    nxq_ = f_.output(DAE_F_QUAD).numel();
+    casadi_assert_message(f_.output(DAE_F_ODE).numel()==nxd_,"Inconsistent dimensions");
+    casadi_assert_message(f_.output(DAE_F_ALG).numel()==nxa_,"Inconsistent dimensions");
+
+    // Make sure that both h and g are given, or neither
+    casadi_assert_message(h_.isNull()==g_.isNull(),"Either both h and g should be given, or neither of them");
+    if(h_.isNull()){
+      nyd_ = 0;
+      nyq_ = 0;
+      nya_ = 0;
+    } else {
+      // Initialize, get and assert dimensions of the terminal constraint function
+      if(!h_.isInit()) h_.init();
+      casadi_assert_message(h_.input(DAE_H_XD).numel()==nxd_,"Inconsistent dimensions");
+      casadi_assert_message(h_.input(DAE_H_XA).numel()==nxa_,"Inconsistent dimensions");
+      casadi_assert_message(h_.input(DAE_H_P).numel()==np_,"Inconsistent dimensions");
+      nyd_ = h_.output(DAE_H_YD).numel();
+      nyq_ = h_.output(DAE_H_YQ).numel();
+      nya_ = h_.output(DAE_H_YA).numel();
+      
+      // Initialize and assert the dimensions of the backward integration
+      if(!g_.isInit()) g_.init();
+      casadi_assert_message(g_.input(DAE_G_XD).numel()==nxd_,"Inconsistent dimensions");
+      casadi_assert_message(g_.input(DAE_G_XA).numel()==nxa_,"Inconsistent dimensions");
+      casadi_assert_message(g_.input(DAE_G_YD).numel()==nyd_,"Inconsistent dimensions");
+      casadi_assert_message(g_.input(DAE_G_YA).numel()==nya_,"Inconsistent dimensions");
+      casadi_assert_message(g_.input(DAE_G_P).numel()==np_,"Inconsistent dimensions");
+      casadi_assert_message(g_.output(DAE_G_ODE).numel()==nyd_,"Inconsistent dimensions");
+      casadi_assert_message(g_.output(DAE_G_QUAD).numel()==nyq_,"Inconsistent dimensions");
+      casadi_assert_message(g_.output(DAE_G_ALG).numel()==nya_,"Inconsistent dimensions");
+    }
+    
+    // Allocate space for inputs
+    input_.resize(NEW_INTEGRATOR_NUM_IN);
+    input(NEW_INTEGRATOR_XD0) = f_.output(DAE_F_ODE);
+    input(NEW_INTEGRATOR_XQ0) = f_.output(DAE_F_QUAD);
+    input(NEW_INTEGRATOR_XA0) = f_.output(DAE_F_ALG);
+    input(NEW_INTEGRATOR_P) = f_.input(DAE_F_P);
+  
+    // Allocate space for outputs
+    output_.resize(NEW_INTEGRATOR_NUM_OUT);
+    output(NEW_INTEGRATOR_XDF) = input(NEW_INTEGRATOR_XD0);
+    output(NEW_INTEGRATOR_XQF) = input(NEW_INTEGRATOR_XQ0);
+    output(NEW_INTEGRATOR_XAF) = input(NEW_INTEGRATOR_XA0);
+    if(!g_.isNull()){
+      output(NEW_INTEGRATOR_YD0) = g_.output(DAE_G_ODE);
+      output(NEW_INTEGRATOR_YQ0) = g_.output(DAE_G_QUAD);
+      output(NEW_INTEGRATOR_YA0) = g_.output(DAE_G_ALG);
+    }
+  }
+  
   // Make sure that the dimensions have been set
   casadi_assert_message(np_>=0, "\"setDimensions\" has not been called.");
   
@@ -145,8 +181,14 @@ void IntegratorInternal::init(){
 
 void IntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
   FXInternal::deepCopyMembers(already_copied);
-  fd_ = deepcopy(fd_,already_copied);
-  fq_ = deepcopy(fq_,already_copied);
+  if(new_design_){
+    f_ = deepcopy(f_,already_copied);
+    g_ = deepcopy(g_,already_copied);
+    h_ = deepcopy(h_,already_copied);
+  } else {
+    fd_ = deepcopy(fd_,already_copied);
+    fq_ = deepcopy(fq_,already_copied);
+  }
 }
 
 } // namespace CasADi

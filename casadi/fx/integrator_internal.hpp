@@ -40,7 +40,7 @@ public:
   IntegratorInternal(const FX& fd, const FX& fq);
 
   /** \brief  Constructor, new, not yet ready implementation */
-//   IntegratorInternal(const FX& f, const FX& g, const FX& h);
+  IntegratorInternal(const FX& f, const FX& g, const FX& h);
 
   /** \brief  Common to both constructors */
   void ctorInit();  
@@ -81,9 +81,6 @@ public:
   /** \brief  Initialize */
   virtual void init();
 
-  /** \brief Set dimensions before initialization (new) */
-  void setDimensions(int nxd, int nxa, int nxq, int nyd, int nya, int nyq, int np);
-
   /// Number of states for the forward integration
   int nxd_, nxa_, nxq_;
   
@@ -98,6 +95,15 @@ public:
   
   /// Are we using the new integrator class
   bool new_design_;
+  
+  /// ODE/DAE forward integration function
+  FX f_;
+  
+  /// ODE/DAE backward integration function, if any
+  FX g_;
+  
+  /// Terminal constraint function, if any
+  FX h_;
   
   /// Set dimensions (to be removed)
   void setDimensions(int nx, int np);
