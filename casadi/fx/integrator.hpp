@@ -102,60 +102,102 @@ enum DAEOutput{
 
 /// Input arguments of an ODE/DAE forward integration function (new, not yet ready implementation)
 enum DAEFInput{
-  /** Time */
-  DAE_F_T,
   /** Differential state */
   DAE_F_XD,
   /** Algebraic state */
   DAE_F_XA,
   /** Parameter vector */
   DAE_F_P,
+  /** Explicit time dependence */
+  DAE_F_T,
   /** Number of arguments. */
   DAE_F_NUM_IN
 };
+
+/// Helper function to create DAE forward integration function input arguments
+template<class M>
+std::vector<M> daeFIn(const M& xd, const M& xa=M(), const M& p=M(), const M& t=M()){
+  M ret[DAE_F_NUM_IN] = {xd,xa,p,t};
+  return std::vector<M>(ret,ret+DAE_F_NUM_IN);
+}
+#ifdef SWIG
+%template(daeFIn) daeFIn<SXMatrix>;
+%template(daeFIn) daeFIn<MX>;
+#endif //SWIG
 
 /// Output arguments of an ODE/DAE forward integration function (new, not yet ready implementation)
 enum DAEFOutput{
   /** Right hand side of ODE.*/
   DAE_F_ODE,
-  /** Right hand side of quadratures.*/
-  DAE_F_QUAD,
   /** Right hand side of algebraic equations.*/
   DAE_F_ALG,
+  /** Right hand side of quadratures.*/
+  DAE_F_QUAD,
   /** Number of arguments. */
   DAE_F_NUM_OUT
 };
+
+/// Helper function to create DAE forward integration function output arguments
+template<class M>
+std::vector<M> daeFOut(const M& ode, const M& alg=M(), const M& quad=M()){
+  M ret[DAE_F_NUM_OUT] = {ode,alg,quad};
+  return std::vector<M>(ret,ret+DAE_F_NUM_OUT);
+}
+#ifdef SWIG
+%template(daeFOut) daeFOut<SXMatrix>;
+%template(daeFOut) daeFOut<MX>;
+#endif //SWIG
 
 /// Input arguments of an ODE/DAE terminal constraint function (new, not yet ready implementation)
 enum DAEHInput{
   /** Differential state */
   DAE_H_XD,
-  /** Quadrature state */
-  DAE_H_XQ,
   /** Algebraic state */
   DAE_H_XA,
+  /** Quadrature state */
+  DAE_H_XQ,
   /** Parameter vector */
   DAE_H_P,
   /** Number of arguments. */
   DAE_H_NUM_IN
 };
 
-/// Output arguments of an ODE/DAE terminal function (new, not yet ready implementation)
+/// Helper function to create ODE/DAE terminal constraint function input arguments
+template<class M>
+std::vector<M> daeHIn(const M& xd, const M& xa=M(), const M& xq=M(), const M& p=M()){
+  M ret[DAE_H_NUM_IN] = {xd,xa,xq,p};
+  return std::vector<M>(ret,ret+DAE_H_NUM_IN);
+}
+#ifdef SWIG
+%template(daeHIn) daeHIn<SXMatrix>;
+%template(daeHIn) daeHIn<MX>;
+#endif //SWIG
+
+/// Output arguments of an ODE/DAE terminal function
 enum DAEHOutput{
   /** Initial conditions for the backwards integration, differential states. */
   DAE_H_YD,
   /** Initial conditions for the backwards integration, quadrature states. */
-  DAE_H_YQ,
-  /** Guess for the initial conditions for the backwards integration, algebraic states. */
   DAE_H_YA,
+  /** Guess for the initial conditions for the backwards integration, algebraic states. */
+  DAE_H_YQ,
   /** Number of arguments. */
   DAE_H_NUM_OUT
 };
 
+/// Helper function to create DAE terminal constraint function output arguments
+template<class M>
+std::vector<M> daeHOut(const M& yd, const M& ya=M(), const M& yq=M()){
+  M ret[DAE_H_NUM_OUT] = {yd,ya,yq};
+  return std::vector<M>(ret,ret+DAE_H_NUM_OUT);
+}
+#ifdef SWIG
+%template(daeHOut) daeHOut<SXMatrix>;
+%template(daeHOut) daeHOut<MX>;
+#endif //SWIG
+
 /// Input arguments of an ODE/DAE backward integration function (new, not yet ready implementation)
 enum DAEGInput{
-  /** Time */
-  DAE_G_T,
   /** Forward differential state */
   DAE_G_XD,
   /** Forward algebraic state */
@@ -166,21 +208,45 @@ enum DAEGInput{
   DAE_G_YA,
   /** Parameter vector */
   DAE_G_P,
+  /** Explicit time dependence */
+  DAE_G_T,
   /** Number of arguments. */
   DAE_G_NUM_IN
 };
 
-/// Output arguments of an ODE/DAE backward integration function (new, not yet ready implementation)
+/// Helper function to create ODE/DAE backward integration function input arguments
+template<class M>
+std::vector<M> daeGIn(const M& xd, const M& xa=M(), const M& yd=M(), const M& ya=M(), const M& p=M(), const M& t=M()){
+  M ret[DAE_G_NUM_IN] = {xd,xa,yd,ya,p,t};
+  return std::vector<M>(ret,ret+DAE_G_NUM_IN);
+}
+#ifdef SWIG
+%template(daeGIn) daeGIn<SXMatrix>;
+%template(daeGIn) daeGIn<MX>;
+#endif //SWIG
+
+/// Output arguments of an ODE/DAE backward integration function
 enum DAEGOutput{
   /** Right hand side of ODE.*/
   DAE_G_ODE,
-  /** Right hand side of quadratures.*/
-  DAE_G_QUAD,
   /** Right hand side of algebraic equations.*/
   DAE_G_ALG,
+  /** Right hand side of quadratures.*/
+  DAE_G_QUAD,
   /** Number of arguments. */
   DAE_G_NUM_OUT
 };
+
+/// Helper function to create ODE/DAE backward integration function output arguments
+template<class M>
+std::vector<M> daeGOut(const M& ode, const M& alg=M(), const M& quad=M()){
+  M ret[DAE_G_NUM_OUT] = {ode,alg,quad};
+  return std::vector<M>(ret,ret+DAE_G_NUM_OUT);
+}
+#ifdef SWIG
+%template(daeGOut) daeGOut<SXMatrix>;
+%template(daeGOut) daeGOut<MX>;
+#endif //SWIG
 
 /// Input arguments of an integrator
 enum IntegratorInput{
