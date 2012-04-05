@@ -36,7 +36,17 @@ OUTPUTSCHEME(IntegratorOutput)
 using namespace std;
 namespace CasADi{
 
-IntegratorInternal::IntegratorInternal(const FX& f, const FX& q) : f_(f), q_(q){
+IntegratorInternal::IntegratorInternal(const FX& fd, const FX& fq) : fd_(fd), fq_(fq){
+  new_design_ = false;
+  ctorInit();
+}
+
+// IntegratorInternal::IntegratorInternal(const FX& f, const FX& g, const FX& h) : f_(f), g_(g), h_(h){
+//   new_design_ = false;
+//   ctorInit();
+// }
+
+void IntegratorInternal::ctorInit(){
   // set default options
   setOption("name","unnamed_integrator"); // name of the function 
   
@@ -46,9 +56,8 @@ IntegratorInternal::IntegratorInternal(const FX& f, const FX& q) : f_(f), q_(q){
   addOption("t0",                          OT_REAL, 0.0); // start of the integration
   addOption("tf",                          OT_REAL, 1.0); // end of the integration
   
-  nx_ = 0;
-  np_ = 0;
-  
+  // Negative number of parameters for consistancy checking
+  np_ = -1;
 }
 
 IntegratorInternal::~IntegratorInternal(){ 
@@ -102,10 +111,12 @@ void IntegratorInternal::evaluate(int nfdir, int nadir){
   // Reset solver
   reset(nfdir, nadir);
 
-  // Advance solution in time
+  // Integrate forward to the end of the time horizon
   integrate(tf_);
 
+  // If backwards integration is needed
   if(nadir>0){
+    
     // Re-initialize backward problem
     resetAdj();
 
@@ -118,6 +129,9 @@ void IntegratorInternal::evaluate(int nfdir, int nadir){
 }
 
 void IntegratorInternal::init(){
+  // Make sure that the dimensions have been set
+  casadi_assert_message(np_>=0, "\"setDimensions\" has not been called.");
+  
   // Call the base class method
   FXInternal::init();
 
@@ -131,8 +145,8 @@ void IntegratorInternal::init(){
 
 void IntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
   FXInternal::deepCopyMembers(already_copied);
-  f_ = deepcopy(f_,already_copied);
-  q_ = deepcopy(q_,already_copied);
+  fd_ = deepcopy(fd_,already_copied);
+  fq_ = deepcopy(fq_,already_copied);
 }
 
 } // namespace CasADi

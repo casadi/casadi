@@ -60,7 +60,7 @@ public:
   * \copydoc scheme_DAEOutput
   *
   */
-  explicit CVodesIntegrator(const FX& f, const FX& q=FX());
+  explicit CVodesIntegrator(const FX& fd, const FX& fq=FX());
   
   /** \brief  Access functions of the node */
   CVodesInternal* operator->();
@@ -73,7 +73,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static Integrator creator(const FX& f, const FX& q){ return CVodesIntegrator(f,q);}
+  static Integrator creator(const FX& fd, const FX& fq){ return CVodesIntegrator(fd,fq);}
   #ifdef SWIG
   %nocallback;
   #endif

@@ -49,7 +49,7 @@ class CollocationIntegrator : public Integrator {
     * \copydoc scheme_DAEOutput
     *
     */
-    explicit CollocationIntegrator(const FX& f, const FX& q=FX());
+    explicit CollocationIntegrator(const FX& fd, const FX& fq=FX());
 
     /// Access functions of the node
     CollocationIntegratorInternal* operator->();
@@ -62,7 +62,7 @@ class CollocationIntegrator : public Integrator {
     #ifdef SWIG
     %callback("%s_cb");
     #endif
-    static Integrator creator(const FX& f, const FX& q){ return CollocationIntegrator(f,q);}
+    static Integrator creator(const FX& fd, const FX& fq){ return CollocationIntegrator(fd,fq);}
     #ifdef SWIG
     %nocallback;
     #endif

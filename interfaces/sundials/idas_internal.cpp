@@ -32,7 +32,7 @@ namespace Sundials{
 
 IdasInternal* IdasInternal::clone() const{
   // Return a deep copy
-  IdasInternal* node = new IdasInternal(f_,q_);
+  IdasInternal* node = new IdasInternal(fd_,fq_);
   node->setOption(dictionary());
   node->jac_ = jac_;
   node->linsol_ = linsol_;
@@ -43,7 +43,7 @@ void IdasInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& alr
   SundialsInternal::deepCopyMembers(already_copied);
 }
 
-IdasInternal::IdasInternal(const FX& f, const FX& q) : SundialsInternal(f,q){
+IdasInternal::IdasInternal(const FX& fd, const FX& fq) : SundialsInternal(fd,fq){
   addOption("suppress_algebraic",          OT_BOOLEAN, false, "supress algebraic variables in the error testing");
   addOption("calc_ic",                     OT_BOOLEAN, true,  "use IDACalcIC to get consistent initial conditions. This only works for semi-explicit index-one systems. Else, you must provide consistent initial conditions yourself.");
   addOption("calc_icB",                    OT_BOOLEAN, false, "use IDACalcIC to get consistent initial conditions. This only works for semi-explicit index-one systems. Else, you must provide consistent initial conditions yourself.");
@@ -108,29 +108,29 @@ void IdasInternal::init(){
   }
   
   // Init ODE rhs function and quadrature functions, jacobian function
-  if(!f_.isInit()) f_.init();
-  if(!q_.isNull() && !q_.isInit()) q_.init();
+  if(!fd_.isInit()) fd_.init();
+  if(!fq_.isNull() && !fq_.isInit()) fq_.init();
   
   log("IdasInternal::init","functions initialized");
   
   // Check dimensions
-  casadi_assert_message(f_.getNumInputs()==DAE_NUM_IN, "IdasInternal: f has wrong number of inputs");
-  casadi_assert_message(f_.getNumOutputs()==DAE_NUM_OUT, "IdasInternal: f has wrong number of outputs");
-  if(!q_.isNull()){
-    casadi_assert_message(q_.getNumInputs()==DAE_NUM_IN, "IdasInternal: q has wrong number of inputs");
-    casadi_assert_message(q_.getNumOutputs()==DAE_NUM_OUT, "IdasInternal: q has wrong number of outputs");
+  casadi_assert_message(fd_.getNumInputs()==DAE_NUM_IN, "IdasInternal: f has wrong number of inputs");
+  casadi_assert_message(fd_.getNumOutputs()==DAE_NUM_OUT, "IdasInternal: f has wrong number of outputs");
+  if(!fq_.isNull()){
+    casadi_assert_message(fq_.getNumInputs()==DAE_NUM_IN, "IdasInternal: q has wrong number of inputs");
+    casadi_assert_message(fq_.getNumOutputs()==DAE_NUM_OUT, "IdasInternal: q has wrong number of outputs");
   }
 
-  ny_ = f_.input(DAE_Y).numel();
-  nxq_ = q_.isNull() ? 0 : q_.output().numel();
-  int np = f_.input(DAE_P).numel();
+  ny_ = fd_.input(DAE_Y).numel();
+  nxq_ = fq_.isNull() ? 0 : fq_.output().numel();
+  int np = fd_.input(DAE_P).numel();
   setDimensions(ny_+nxq_,np);
   ncheck_ = 0;
 
   // States and RES should match 
-  casadi_assert_message(f_.output(DAE_RES).size()==f_.input(DAE_Y).size(),
-   "IntegratorInternal: residual of DAE is (" <<  f_.output(DAE_RES).size1() << 'x' << f_.output(DAE_RES).size2() << ") - " << f_.output(DAE_RES).size() << " non-zeros" <<
-   "              DAE state matrix is (" <<  f_.input(DAE_Y).size1() << 'x' << f_.input(DAE_Y).size2() << ") - " << f_.input(DAE_Y).size() << " non-zeros" << 
+  casadi_assert_message(fd_.output(DAE_RES).size()==fd_.input(DAE_Y).size(),
+   "IntegratorInternal: residual of DAE is (" <<  fd_.output(DAE_RES).size1() << 'x' << fd_.output(DAE_RES).size2() << ") - " << fd_.output(DAE_RES).size() << " non-zeros" <<
+   "              DAE state matrix is (" <<  fd_.input(DAE_Y).size1() << 'x' << fd_.input(DAE_Y).size2() << ") - " << fd_.input(DAE_Y).size() << " non-zeros" << 
    "Dimension mismatch"
   );
   
@@ -159,10 +159,10 @@ void IdasInternal::init(){
   }
 
   // Get the number of forward and adjoint directions
-  nfdir_f_ = f_.getOption("number_of_fwd_dir");
-  nadir_f_ = f_.getOption("number_of_adj_dir");
-  nfdir_q_ = q_.isNull() ? 0 : int(q_.getOption("number_of_fwd_dir"));
-  nadir_q_ = q_.isNull() ? 0 : int(q_.getOption("number_of_adj_dir"));
+  nfdir_f_ = fd_.getOption("number_of_fwd_dir");
+  nadir_f_ = fd_.getOption("number_of_adj_dir");
+  nfdir_q_ = fq_.isNull() ? 0 : int(fq_.getOption("number_of_fwd_dir"));
+  nadir_q_ = fq_.isNull() ? 0 : int(fq_.getOption("number_of_adj_dir"));
 
   cj_scaling_ = getOption("cj_scaling");
   
@@ -566,23 +566,23 @@ void IdasInternal::res(double t, const double* yz, const double* yp, double* r){
   time1 = clock();
   
   // Pass input
-  f_.setInput(t,DAE_T);
-  f_.setInput(yz,DAE_Y);
-  f_.setInput(yp,DAE_YDOT);
-  f_.setInput(input(INTEGRATOR_P),DAE_P);
+  fd_.setInput(t,DAE_T);
+  fd_.setInput(yz,DAE_Y);
+  fd_.setInput(yp,DAE_YDOT);
+  fd_.setInput(input(INTEGRATOR_P),DAE_P);
 
   // Evaluate
-  f_.evaluate();
+  fd_.evaluate();
   
   // Get results
-  f_.getOutput(r);
+  fd_.getOutput(r);
   
   if(monitored("res")){
     cout << "DAE_T    = " << t << endl;
-    cout << "DAE_Y    = " << f_.input(DAE_Y) << endl;
-    cout << "DAE_YDOT = " << f_.input(DAE_YDOT) << endl;
-    cout << "DAE_P    = " << f_.input(DAE_P) << endl;
-    cout << "residual = " << f_.output() << endl;
+    cout << "DAE_Y    = " << fd_.input(DAE_Y) << endl;
+    cout << "DAE_YDOT = " << fd_.input(DAE_YDOT) << endl;
+    cout << "DAE_P    = " << fd_.input(DAE_P) << endl;
+    cout << "residual = " << fd_.output() << endl;
   }
 
   // Check the result for consistency
@@ -594,10 +594,10 @@ void IdasInternal::res(double t, const double* yz, const double* yp, double* r){
         log("IdasInternal::res",ss.str());
         if(monitored("res")){
           cout << "DAE_T    = " << t << endl;
-          cout << "DAE_Y    = " << f_.input(DAE_Y) << endl;
-          cout << "DAE_YDOT = " << f_.input(DAE_YDOT) << endl;
-          cout << "DAE_P    = " << f_.input(DAE_P) << endl;
-          cout << "residual = " << f_.output() << endl;
+          cout << "DAE_Y    = " << fd_.input(DAE_Y) << endl;
+          cout << "DAE_YDOT = " << fd_.input(DAE_YDOT) << endl;
+          cout << "DAE_P    = " << fd_.input(DAE_P) << endl;
+          cout << "residual = " << fd_.output() << endl;
         }
       }
       throw 1;
@@ -642,23 +642,23 @@ void IdasInternal::jtimes(double t, const double *yz, const double *yp, const do
   time1 = clock();
   
    // Pass input
-   f_.setInput(t,DAE_T);
-   f_.setInput(yz,DAE_Y);
-   f_.setInput(yp,DAE_YDOT);
-   f_.setInput(input(INTEGRATOR_P),DAE_P);
+   fd_.setInput(t,DAE_T);
+   fd_.setInput(yz,DAE_Y);
+   fd_.setInput(yp,DAE_YDOT);
+   fd_.setInput(input(INTEGRATOR_P),DAE_P);
      
    // Pass seeds of the state vectors
-   f_.setFwdSeed(v,DAE_Y);
+   fd_.setFwdSeed(v,DAE_Y);
    
    // Pass seeds of the state derivative
    for(int i=0; i<ny_; ++i) tmp1[i] = cj*v[i];
-   f_.setFwdSeed(tmp1,DAE_YDOT);
+   fd_.setFwdSeed(tmp1,DAE_YDOT);
    
    // Evaluate the AD forward algorithm
-   f_.evaluate(1,0);
+   fd_.evaluate(1,0);
    
    // Get the output seeds
-   f_.getFwdSens(Jv);
+   fd_.getFwdSens(Jv);
 
   // Log time duration
   time2 = clock();
@@ -685,10 +685,10 @@ void IdasInternal::resS(int Ns, double t, const double* yz, const double* yp, co
   time1 = clock();
   
   // Pass input
-  f_.setInput(t,DAE_T);
-  f_.setInput(yz,DAE_Y);
-  f_.setInput(yp,DAE_YDOT);
-  f_.setInput(input(INTEGRATOR_P),DAE_P);
+  fd_.setInput(t,DAE_T);
+  fd_.setInput(yz,DAE_Y);
+  fd_.setInput(yp,DAE_YDOT);
+  fd_.setInput(input(INTEGRATOR_P),DAE_P);
   
   // Calculate the forward sensitivities, nfdir_f_ directions at a time
   for(int offset=0; offset<nfdir_; offset += nfdir_f_){
@@ -697,18 +697,18 @@ void IdasInternal::resS(int Ns, double t, const double* yz, const double* yp, co
     
     for(int dir=0; dir<nfdir_batch; ++dir){
       // Pass forward seeds 
-      f_.setFwdSeed(0.0,DAE_T,dir);
-      f_.setFwdSeed(NV_DATA_S(yS[offset+dir]),DAE_Y,dir);
-      f_.setFwdSeed(NV_DATA_S(ypS[offset+dir]),DAE_YDOT,dir);
-      f_.setFwdSeed(fwdSeed(INTEGRATOR_P,offset+dir),DAE_P,dir);
+      fd_.setFwdSeed(0.0,DAE_T,dir);
+      fd_.setFwdSeed(NV_DATA_S(yS[offset+dir]),DAE_Y,dir);
+      fd_.setFwdSeed(NV_DATA_S(ypS[offset+dir]),DAE_YDOT,dir);
+      fd_.setFwdSeed(fwdSeed(INTEGRATOR_P,offset+dir),DAE_P,dir);
     }
     
     // Evaluate the AD forward algorithm
-    f_.evaluate(nfdir_batch,0);
+    fd_.evaluate(nfdir_batch,0);
     
     // Get the output seeds
     for(int dir=0; dir<nfdir_batch; ++dir){
-      f_.getFwdSens(NV_DATA_S(resvalS[offset+dir]),DAE_RES,dir);
+      fd_.getFwdSens(NV_DATA_S(resvalS[offset+dir]),DAE_RES,dir);
     }
   }
   
@@ -1103,16 +1103,16 @@ int IdasInternal::rhsQ_wrapper(double t, N_Vector yz, N_Vector yp, N_Vector rhsQ
 void IdasInternal::rhsQ(double t, const double* yz, const double* yp, double* rhsQ){
    log("IdasInternal::rhsQ","begin");
    // Pass input
-   q_.setInput(t,DAE_T);
-   q_.setInput(yz,DAE_Y);
-   q_.setInput(yp,DAE_YDOT);
-   q_.setInput(input(INTEGRATOR_P),DAE_P);
+   fq_.setInput(t,DAE_T);
+   fq_.setInput(yz,DAE_Y);
+   fq_.setInput(yp,DAE_YDOT);
+   fq_.setInput(input(INTEGRATOR_P),DAE_P);
 
     // Evaluate
-   q_.evaluate();
+   fq_.evaluate();
     
     // Get results
-   q_.getOutput(rhsQ);
+   fq_.getOutput(rhsQ);
    log("IdasInternal::rhsQ","end");
 }
   
@@ -1122,23 +1122,23 @@ void IdasInternal::rhsQS(int Ns, double t, N_Vector yz, N_Vector yp, N_Vector *y
   log("IdasInternal::rhsQS","enter");
   casadi_assert(Ns==nfdir_);
   // Pass input
-   q_.setInput(t,DAE_T);
-   q_.setInput(NV_DATA_S(yz),DAE_Y);
-   q_.setInput(NV_DATA_S(yp),DAE_YDOT);
-   q_.setInput(input(INTEGRATOR_P),DAE_P);
+   fq_.setInput(t,DAE_T);
+   fq_.setInput(NV_DATA_S(yz),DAE_Y);
+   fq_.setInput(NV_DATA_S(yp),DAE_YDOT);
+   fq_.setInput(input(INTEGRATOR_P),DAE_P);
      
    // Pass forward seeds
   for(int i=0; i<nfdir_; ++i){
-    q_.setFwdSeed(0.0,DAE_T);
-    q_.setFwdSeed(NV_DATA_S(yzS[i]),DAE_Y);
-    q_.setFwdSeed(NV_DATA_S(ypS[i]),DAE_YDOT);
-    q_.setFwdSeed(fwdSeed(INTEGRATOR_P,i),DAE_P);
+    fq_.setFwdSeed(0.0,DAE_T);
+    fq_.setFwdSeed(NV_DATA_S(yzS[i]),DAE_Y);
+    fq_.setFwdSeed(NV_DATA_S(ypS[i]),DAE_YDOT);
+    fq_.setFwdSeed(fwdSeed(INTEGRATOR_P,i),DAE_P);
    
     // Evaluate the AD forward algorithm
-    q_.evaluate(1,0);
+    fq_.evaluate(1,0);
       
     // Get the output seeds
-    q_.getFwdSens(NV_DATA_S(rhsvalQS[i]));
+    fq_.getFwdSens(NV_DATA_S(rhsvalQS[i]));
   }
   log("IdasInternal::rhsQS","end");
 }
@@ -1159,47 +1159,47 @@ int IdasInternal::rhsQS_wrapper(int Ns, double t, N_Vector yz, N_Vector yp, N_Ve
 void IdasInternal::resB(double t, const double* yz, const double* yp, const double* yB, const double* ypB, double* resvalB){
   log("IdasInternal::resB","begin");
   // Pass input
-  f_.setInput(t,DAE_T);
-  f_.setInput(yz,DAE_Y);
-  f_.setInput(yp,DAE_YDOT);
-  f_.setInput(input(INTEGRATOR_P),DAE_P);
+  fd_.setInput(t,DAE_T);
+  fd_.setInput(yz,DAE_Y);
+  fd_.setInput(yp,DAE_YDOT);
+  fd_.setInput(input(INTEGRATOR_P),DAE_P);
   
   // Pass adjoint seeds
-  f_.setAdjSeed(yB,DAE_RES);
+  fd_.setAdjSeed(yB,DAE_RES);
 
   // Evaluate
-  f_.evaluate(0,1);
+  fd_.evaluate(0,1);
 
   // Save to output
-  f_.getAdjSens(resvalB,DAE_Y);
+  fd_.getAdjSens(resvalB,DAE_Y);
 
   // Pass adjoint seeds
-  f_.setAdjSeed(ypB,DAE_RES);
+  fd_.setAdjSeed(ypB,DAE_RES);
   
   // Evaluate AD adjoint
-  f_.evaluate(0,1);
+  fd_.evaluate(0,1);
 
   // Save to output
-  const vector<double>& asens_ydot = f_.adjSens(DAE_YDOT).data();
+  const vector<double>& asens_ydot = fd_.adjSens(DAE_YDOT).data();
   for(int i=0; i<ny_; ++i)
     resvalB[i] -= asens_ydot[i];
   
   // If quadratures are included
   if(nxq_>0){
     // Pass input to quadratures
-    q_.setInput(t,DAE_T);
-    q_.setInput(yz,DAE_Y);
-    q_.setInput(yp,DAE_YDOT);
-    q_.setInput(input(INTEGRATOR_P),DAE_P);
+    fq_.setInput(t,DAE_T);
+    fq_.setInput(yz,DAE_Y);
+    fq_.setInput(yp,DAE_YDOT);
+    fq_.setInput(input(INTEGRATOR_P),DAE_P);
 
     // Pass adjoint seeds
-    q_.setAdjSeed(&adjSeed(INTEGRATOR_XF).at(ny_),DAE_RES);
+    fq_.setAdjSeed(&adjSeed(INTEGRATOR_XF).at(ny_),DAE_RES);
 
     // Evaluate
-    q_.evaluate(0,1);
+    fq_.evaluate(0,1);
     
     // Get the input seeds
-    const vector<double>& asens_y = q_.adjSens(DAE_Y).data();
+    const vector<double>& asens_y = fq_.adjSens(DAE_Y).data();
     for(int i=0; i<ny_; ++i)
       resvalB[i] += asens_y[i];
   }
@@ -1220,36 +1220,36 @@ int IdasInternal::resB_wrapper(double t, N_Vector y, N_Vector yp, N_Vector yB, N
 void IdasInternal::rhsQB(double t, const double* yz, const double* yp, const double* yB, const double* ypB, double *rhsvalBQ){
   log("IdasInternal::rhsQB","begin");
   // Pass input
-  f_.setInput(t,DAE_T);
-  f_.setInput(yz,DAE_Y);
-  f_.setInput(yp,DAE_YDOT);
-  f_.setInput(input(INTEGRATOR_P),DAE_P);
+  fd_.setInput(t,DAE_T);
+  fd_.setInput(yz,DAE_Y);
+  fd_.setInput(yp,DAE_YDOT);
+  fd_.setInput(input(INTEGRATOR_P),DAE_P);
 
   // Pass adjoint seeds
-  f_.setAdjSeed(yB,DAE_RES);
+  fd_.setAdjSeed(yB,DAE_RES);
 
   // Evaluate
-  f_.evaluate(0,1);
+  fd_.evaluate(0,1);
 
   // Save to output
-  f_.getAdjSens(rhsvalBQ,DAE_P);
+  fd_.getAdjSens(rhsvalBQ,DAE_P);
   
   // If quadratures are included
   if(nxq_>0){
     // Pass input to quadratures
-    q_.setInput(t,DAE_T);
-    q_.setInput(yz,DAE_Y);
-    q_.setInput(yp,DAE_YDOT);
-    q_.setInput(input(INTEGRATOR_P),DAE_P);
+    fq_.setInput(t,DAE_T);
+    fq_.setInput(yz,DAE_Y);
+    fq_.setInput(yp,DAE_YDOT);
+    fq_.setInput(input(INTEGRATOR_P),DAE_P);
 
     // Pass adjoint seeds
-    q_.setAdjSeed(&adjSeed(INTEGRATOR_XF).at(ny_),DAE_RES);
+    fq_.setAdjSeed(&adjSeed(INTEGRATOR_XF).at(ny_),DAE_RES);
 
     // Evaluate
-    q_.evaluate(0,1);
+    fq_.evaluate(0,1);
     
     // Get the input seeds
-    const vector<double>& qres = q_.adjSens(DAE_P).data();
+    const vector<double>& qres = fq_.adjSens(DAE_P).data();
     
     // Copy to result
     for(int i=0; i<np_; ++i){
@@ -1557,7 +1557,7 @@ FX IdasInternal::getJacobian(){
     return jac_;
 
   // If SXFunction
-  SXFunction f_sx = shared_cast<SXFunction>(f_);
+  SXFunction f_sx = shared_cast<SXFunction>(fd_);
   if(!f_sx.isNull()){
     // Get the Jacobian in the Newton iteration
     SX cj("cj");
@@ -1578,7 +1578,7 @@ FX IdasInternal::getJacobian(){
   }
 
   // If SXFunction
-  MXFunction f_mx = shared_cast<MXFunction>(f_);
+  MXFunction f_mx = shared_cast<MXFunction>(fd_);
   if(!f_mx.isNull()){
     // Get the Jacobian in the Newton iteration
     MX cj("cj");

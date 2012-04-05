@@ -31,7 +31,7 @@ using namespace std;
 namespace CasADi{
 
   
-AcadoIntegratorInternal::AcadoIntegratorInternal(const FX& f, const FX& q) : IntegratorInternal(f,q){
+AcadoIntegratorInternal::AcadoIntegratorInternal(const FX& fd, const FX& fq) : IntegratorInternal(fd,fq){
   addOption("time_dependence",   OT_BOOLEAN,  true, "Explicit depencency of time in the DAE");
   addOption("num_algebraic",     OT_INTEGER,  0,    "Number of algebraic states");
   addOption("num_grid_points",   OT_INTEGER,  2,  "Number of uniformly distributed grid points for obtaining the solution, does not influence the integration steps");
@@ -77,7 +77,7 @@ void AcadoIntegratorInternal::freeMem(){
 
 AcadoIntegratorInternal* AcadoIntegratorInternal::clone() const{
   // Return a deep copy
-  AcadoIntegratorInternal* node = new AcadoIntegratorInternal(f_,q_);
+  AcadoIntegratorInternal* node = new AcadoIntegratorInternal(fd_,fq_);
   node->setOption(dictionary());
   return node;
 }
@@ -99,11 +99,11 @@ void AcadoIntegratorInternal::init(){
   ACADO::Parameter().clearStaticCounters();
   
   // Init ODE rhs function and quadrature functions, jacobian function
-  if(!f_.isInit()) f_.init();
-  casadi_assert(q_.isNull());
+  if(!fd_.isInit()) fd_.init();
+  casadi_assert(fq_.isNull());
   
-  int nx = f_.input(DAE_Y).size();
-  int np = f_.input(DAE_P).size();
+  int nx = fd_.input(DAE_Y).size();
+  int np = fd_.input(DAE_P).size();
   setDimensions(nx,np);
   
   // Call the base class init
@@ -115,7 +115,7 @@ void AcadoIntegratorInternal::init(){
   nt_ = bool(getOption("time_dependence")) ? 1 : 0;
   
   // Create wrapper function
-  rhs_ = AcadoFunction(f_);
+  rhs_ = AcadoFunction(fd_);
   rhs_.init();
 
   // Declare ACADO variables

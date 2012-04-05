@@ -31,8 +31,8 @@ namespace Sundials{
 IdasIntegrator::IdasIntegrator(){ 
 }
 
-IdasIntegrator::IdasIntegrator(const FX& f, const FX& q){
-  assignNode(new IdasInternal(f,q));
+IdasIntegrator::IdasIntegrator(const FX& fd, const FX& fq){
+  assignNode(new IdasInternal(fd,fq));
 }
 
 IdasInternal* IdasIntegrator::operator->(){

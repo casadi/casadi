@@ -37,11 +37,14 @@ namespace CasADi{
 class IntegratorInternal : public FXInternal{
 public:
   /** \brief  Constructor */
-  IntegratorInternal(const FX& f, const FX& q);
+  IntegratorInternal(const FX& fd, const FX& fq);
 
   /** \brief  Constructor, new, not yet ready implementation */
-  //IntegratorInternal(const FX& f, const FX& g, const FX& h);
+//   IntegratorInternal(const FX& f, const FX& g, const FX& h);
 
+  /** \brief  Common to both constructors */
+  void ctorInit();  
+  
   /** \brief  Destructor */
   virtual ~IntegratorInternal()=0;
 
@@ -93,14 +96,18 @@ public:
   /// Integration horizon
   double t0_, tf_;
   
+  /// Are we using the new integrator class
+  bool new_design_;
+  
   /// Set dimensions (to be removed)
   void setDimensions(int nx, int np);
 
-  /// ODE/DAE forward integration function (to be removed)
-  FX f_;
+
+  /// DAE residual function (to be removed)
+  FX fd_;
 
   /// Quadrature function (to be removed)
-  FX q_;
+  FX fq_;
   
   /// Number of states (including algebraic states and quadrature states) (to be removed)
   int nx_;

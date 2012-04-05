@@ -31,7 +31,7 @@
 using namespace std;
 namespace CasADi{
 
-CollocationIntegratorInternal::CollocationIntegratorInternal(const FX& f, const FX& q) : IntegratorInternal(f,q){
+CollocationIntegratorInternal::CollocationIntegratorInternal(const FX& fd, const FX& fq) : IntegratorInternal(fd,fq){
   addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
   addOption("interpolation_order",           OT_INTEGER,  3,  "Order of the interpolating polynomials");
   addOption("collocation_scheme",            OT_STRING,  "radau",  "Collocation scheme","radau|legendre");
@@ -56,23 +56,23 @@ CollocationIntegratorInternal::~CollocationIntegratorInternal(){
 void CollocationIntegratorInternal::init(){
   
   // Init ODE rhs function and quadrature functions, jacobian function
-  if(!f_.isInit()) f_.init();
-  if(!q_.isNull() && !q_.isInit()) q_.init();
+  if(!fd_.isInit()) fd_.init();
+  if(!fq_.isNull() && !fq_.isInit()) fq_.init();
   
   log("CollocationIntegratorInternal::init","functions initialized");
   
   // Check dimensions
-  casadi_assert_message(f_.getNumInputs()==DAE_NUM_IN, "CollocationIntegratorInternal: f has wrong number of inputs");
-  casadi_assert_message(f_.getNumOutputs()==DAE_NUM_OUT, "CollocationIntegratorInternal: f has wrong number of outputs");
-  if(!q_.isNull()){
-    casadi_assert_message(q_.getNumInputs()==DAE_NUM_IN, "CollocationIntegratorInternal: q has wrong number of inputs");
-    casadi_assert_message(q_.getNumOutputs()==DAE_NUM_OUT, "CollocationIntegratorInternal: q has wrong number of outputs");
+  casadi_assert_message(fd_.getNumInputs()==DAE_NUM_IN, "CollocationIntegratorInternal: f has wrong number of inputs");
+  casadi_assert_message(fq_.getNumOutputs()==DAE_NUM_OUT, "CollocationIntegratorInternal: f has wrong number of outputs");
+  if(!fq_.isNull()){
+    casadi_assert_message(fq_.getNumInputs()==DAE_NUM_IN, "CollocationIntegratorInternal: q has wrong number of inputs");
+    casadi_assert_message(fq_.getNumOutputs()==DAE_NUM_OUT, "CollocationIntegratorInternal: q has wrong number of outputs");
   }
 
-  ny_ = f_.input(DAE_Y).numel();
-  nxq_ = q_.isNull() ? 0 : q_.output().numel();
+  ny_ = fd_.input(DAE_Y).numel();
+  nxq_ = fq_.isNull() ? 0 : fq_.output().numel();
   
-  int np = f_.input(DAE_P).numel();
+  int np = fd_.input(DAE_P).numel();
   setDimensions(ny_+nxq_,np);
 
   // Call the base class init
@@ -114,7 +114,7 @@ void CollocationIntegratorInternal::init(){
   int deg = getOption("interpolation_order");
 
   // Assume explicit ODE
-  bool explicit_ode = f_.input(DAE_YDOT).size()==0;
+  bool explicit_ode = fd_.input(DAE_YDOT).size()==0;
   
   // All collocation time points
   double* tau_root = use_radau ? radau_points[deg] : legendre_points[deg];
@@ -261,12 +261,12 @@ void CollocationIntegratorInternal::init(){
       
       if(explicit_ode){
         // Assume equation of the form ydot = f(t,y,p)
-        vector<MX> f_out = f_.call(f_in);
+        vector<MX> f_out = fd_.call(f_in);
         g.push_back(h_mx*f_out[DAE_RES] - yp_jk);
       } else {
         // Assume equation of the form 0 = f(t,y,ydot,p)
         f_in[DAE_YDOT] = yp_jk/h_mx;
-        vector<MX> f_out = f_.call(f_in);
+        vector<MX> f_out = fd_.call(f_in);
         g.push_back(f_out[DAE_RES]);
       }
       
@@ -281,7 +281,7 @@ void CollocationIntegratorInternal::init(){
         }
 
         // Add quadrature collocation equations to the NLP
-        vector<MX> q_out = q_.call(f_in);
+        vector<MX> q_out = fq_.call(f_in);
         q_rhs[jk] += h_mx*q_out[0];
       }
     }
@@ -418,7 +418,7 @@ void CollocationIntegratorInternal::init(){
     integratorCreator startup_integrator_creator = getOption("startup_integrator");
     
     // Allocate an NLP solver
-    startup_integrator_ = startup_integrator_creator(f_,FX());
+    startup_integrator_ = startup_integrator_creator(fd_,FX());
     
     // Pass options
     startup_integrator_.setOption("number_of_fwd_dir",0); // not needed

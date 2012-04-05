@@ -32,7 +32,7 @@ namespace Sundials{
 
 CVodesInternal* CVodesInternal::clone() const{
   // Return a deep copy
-  CVodesInternal* node = new CVodesInternal(f_,q_);
+  CVodesInternal* node = new CVodesInternal(fd_,fq_);
   node->setOption(dictionary());
   node->jac_f_ = jac_f_;
   node->jac_ = jac_;
@@ -93,37 +93,37 @@ void CVodesInternal::init(){
   if(is_init) freeCVodes();
   
   // Init ODE rhs function and quadrature functions
-  f_.init();
-  casadi_assert(f_.getNumInputs()==DAE_NUM_IN);
-  casadi_assert(f_.getNumOutputs()==DAE_NUM_OUT);
-  if(!q_.isNull()){
-    q_.init();
-    casadi_assert(q_.getNumInputs()==DAE_NUM_IN);
-    casadi_assert(q_.getNumOutputs()==DAE_NUM_OUT);
+  fd_.init();
+  casadi_assert(fd_.getNumInputs()==DAE_NUM_IN);
+  casadi_assert(fd_.getNumOutputs()==DAE_NUM_OUT);
+  if(!fq_.isNull()){
+    fq_.init();
+    casadi_assert(fq_.getNumInputs()==DAE_NUM_IN);
+    casadi_assert(fq_.getNumOutputs()==DAE_NUM_OUT);
   }
 
   // Number of states
-  int nx = f_.output(INTEGRATOR_XF).numel();
+  int nx = fd_.output(INTEGRATOR_XF).numel();
 
   // Add quadratures, if any
-  if(!q_.isNull()) nx += q_.output().numel();
+  if(!fq_.isNull()) nx += fq_.output().numel();
 
   // Number of parameters
-  int np = f_.input(DAE_P).numel();
+  int np = fd_.input(DAE_P).numel();
   
   // Set dimensions
   setDimensions(nx,np);
   
-  ny_ = f_.output().numel();
-  nxq_ = q_.isNull() ? 0 : q_.output().numel();
+  ny_ = fd_.output().numel();
+  nxq_ = fq_.isNull() ? 0 : fq_.output().numel();
   
   // ODE right hand side must be a dense matrix
-  casadi_assert_message(f_.output(DAE_RES).dense(),"ODE right hand side must be dense: reformulate the problem");
+  casadi_assert_message(fd_.output(DAE_RES).dense(),"ODE right hand side must be dense: reformulate the problem");
   
   // States and RHS should match 
-  casadi_assert_message(f_.output(DAE_RES).size()==f_.input(DAE_Y).size(),
-   "IntegratorInternal: rhs of ODE is (" <<  f_.output(DAE_RES).size1() << 'x' << f_.output(DAE_RES).size2() << ") - " << f_.output(DAE_RES).size() << " non-zeros" <<
-   "              ODE state matrix is (" <<  f_.input(DAE_Y).size1() << 'x' << f_.input(DAE_Y).size2() << ") - " << f_.input(DAE_Y).size() << " non-zeros" << 
+  casadi_assert_message(fd_.output(DAE_RES).size()==fd_.input(DAE_Y).size(),
+   "IntegratorInternal: rhs of ODE is (" <<  fd_.output(DAE_RES).size1() << 'x' << fd_.output(DAE_RES).size2() << ") - " << fd_.output(DAE_RES).size() << " non-zeros" <<
+   "              ODE state matrix is (" <<  fd_.input(DAE_Y).size1() << 'x' << fd_.input(DAE_Y).size2() << ") - " << fd_.input(DAE_Y).size() << " non-zeros" << 
    "Mismatch between number of non-zeros"
   );
   
@@ -136,7 +136,7 @@ void CVodesInternal::init(){
   
   // Try to generate a jacobian if none provided
   if(!linsol_.isNull() && jac_.isNull()){
-    SXFunction f = shared_cast<SXFunction>(f_);
+    SXFunction f = shared_cast<SXFunction>(fd_);
     if(!f.isNull()){
       // Get the Jacobian in the Newton iteration
       SX gamma("gamma");
@@ -162,15 +162,15 @@ void CVodesInternal::init(){
   if(!linsol_.isNull()) linsol_.init();
 
   // Get the number of forward and adjoint directions
-  nfdir_f_ = f_.getOption("number_of_fwd_dir");
-  nadir_f_ = f_.getOption("number_of_adj_dir");
-  nfdir_q_ = q_.isNull() ? 0 : q_.getOption("number_of_fwd_dir").toInt();
-  nadir_q_ = q_.isNull() ? 0 : q_.getOption("number_of_adj_dir").toInt();
+  nfdir_f_ = fd_.getOption("number_of_fwd_dir");
+  nadir_f_ = fd_.getOption("number_of_adj_dir");
+  nfdir_q_ = fq_.isNull() ? 0 : fq_.getOption("number_of_fwd_dir").toInt();
+  nadir_q_ = fq_.isNull() ? 0 : fq_.getOption("number_of_adj_dir").toInt();
 
   // Set state derivative and its derivatives to zero (explicit integrator)
-  f_.input(DAE_YDOT).setAll(0);
-  for(int i=0; i<nfdir_f_; ++i) f_.fwdSeed(DAE_YDOT,i).setAll(0);
-  for(int i=0; i<nadir_f_; ++i) f_.adjSens(DAE_YDOT,i).setAll(0);
+  fd_.input(DAE_YDOT).setAll(0);
+  for(int i=0; i<nfdir_f_; ++i) fd_.fwdSeed(DAE_YDOT,i).setAll(0);
+  for(int i=0; i<nadir_f_; ++i) fd_.adjSens(DAE_YDOT,i).setAll(0);
   
   // Sundials return flag
   int flag;
@@ -218,7 +218,7 @@ void CVodesInternal::init(){
     if(flag!=CV_SUCCESS) cvodes_error("CVDense",flag);
     if(exact_jacobian_){
       // Create jacobian if it does not exist
-      if(jac_f_.isNull()) jac_f_ = f_.jacobian(DAE_Y,DAE_RES);
+      if(jac_f_.isNull()) jac_f_ = fd_.jacobian(DAE_Y,DAE_RES);
       jac_f_.init();
       
       // Pass to CVodes
@@ -510,24 +510,24 @@ void CVodesInternal::rhs(double t, const double* y, double* ydot){
   time1 = clock();
 
   // Pass input
-  f_.setInput(t,DAE_T);
-  f_.setInput(y,DAE_Y);
-  f_.setInput(input(INTEGRATOR_P),DAE_P);
+  fd_.setInput(t,DAE_T);
+  fd_.setInput(y,DAE_Y);
+  fd_.setInput(input(INTEGRATOR_P),DAE_P);
 
   if(monitor_rhs_) {
-    cout << "t       = " << f_.input(DAE_T) << endl;
-    cout << "y       = " << f_.input(DAE_Y) << endl;
-    cout << "p       = " << f_.input(DAE_P) << endl;
+    cout << "t       = " << fd_.input(DAE_T) << endl;
+    cout << "y       = " << fd_.input(DAE_Y) << endl;
+    cout << "p       = " << fd_.input(DAE_P) << endl;
   }
     // Evaluate
-  f_.evaluate();
+  fd_.evaluate();
 
   if(monitor_rhs_) {
-    cout << "ydot       = " << f_.output(DAE_RES)<< endl;
+    cout << "ydot       = " << fd_.output(DAE_RES)<< endl;
   }
     
   // Get results
-  f_.getOutput(ydot);
+  fd_.getOutput(ydot);
 
   // Log time
   time2 = clock();
@@ -826,25 +826,25 @@ void CVodesInternal::rhsS(int Ns, double t, N_Vector y, N_Vector ydot, N_Vector 
   time1 = clock();
   
     // Pass input
-  f_.setInput(t,DAE_T);
-  f_.setInput(NV_DATA_S(y),DAE_Y);
-  f_.setInput(input(INTEGRATOR_P),DAE_P);
+  fd_.setInput(t,DAE_T);
+  fd_.setInput(NV_DATA_S(y),DAE_Y);
+  fd_.setInput(input(INTEGRATOR_P),DAE_P);
 
    // Calculate the forward sensitivities, nfdir_f_ directions at a time
    for(int j=0; j<nfdir_; j += nfdir_f_){
      for(int dir=0; dir<nfdir_f_ && j+dir<nfdir_; ++dir){
        // Pass forward seeds 
-       f_.setFwdSeed(0.0,DAE_T,dir);
-       f_.setFwdSeed(NV_DATA_S(yS[j+dir]),DAE_Y,dir);
-       f_.setFwdSeed(fwdSeed(INTEGRATOR_P,j+dir),DAE_P,dir);
+       fd_.setFwdSeed(0.0,DAE_T,dir);
+       fd_.setFwdSeed(NV_DATA_S(yS[j+dir]),DAE_Y,dir);
+       fd_.setFwdSeed(fwdSeed(INTEGRATOR_P,j+dir),DAE_P,dir);
      }
 
      // Evaluate the AD forward algorithm
-     f_.evaluate(nfdir_f_,0);
+     fd_.evaluate(nfdir_f_,0);
       
      // Get the output seeds
      for(int dir=0; dir<nfdir_f_ && j+dir<nfdir_; ++dir){
-       f_.getFwdSens(NV_DATA_S(ySdot[j+dir]),DAE_RES,dir);
+       fd_.getFwdSens(NV_DATA_S(ySdot[j+dir]),DAE_RES,dir);
      }
    }
   
@@ -869,20 +869,20 @@ void CVodesInternal::rhsS1(int Ns, double t, N_Vector y, N_Vector ydot, int iS, 
   casadi_assert(Ns==nfdir_);
   
     // Pass input
-  f_.setInput(t,DAE_T);
-  f_.setInput(NV_DATA_S(y),DAE_Y);
-  f_.setInput(input(INTEGRATOR_P),DAE_P);
+  fd_.setInput(t,DAE_T);
+  fd_.setInput(NV_DATA_S(y),DAE_Y);
+  fd_.setInput(input(INTEGRATOR_P),DAE_P);
 
   // Pass forward seeds
-  f_.setFwdSeed(0.0,DAE_T);
-  f_.setFwdSeed(NV_DATA_S(yS),DAE_Y);
-  f_.setFwdSeed(fwdSeed(INTEGRATOR_P,iS),DAE_P);
+  fd_.setFwdSeed(0.0,DAE_T);
+  fd_.setFwdSeed(NV_DATA_S(yS),DAE_Y);
+  fd_.setFwdSeed(fwdSeed(INTEGRATOR_P,iS),DAE_P);
     
   // Evaluate the AD forward algorithm
-  f_.evaluate(1,0);
+  fd_.evaluate(1,0);
   
   // Get the fwd sensitivities
-  f_.getFwdSens(NV_DATA_S(ySdot));
+  fd_.getFwdSens(NV_DATA_S(ySdot));
 }
 
 int CVodesInternal::rhsS1_wrapper(int Ns, double t, N_Vector y, N_Vector ydot, int iS, N_Vector yS, N_Vector ySdot, void *user_data, N_Vector tmp1, N_Vector tmp2){
@@ -911,36 +911,36 @@ try{
 
 void CVodesInternal::rhsQ(double t, const double* yy, double* rhsQ){
 // Pass input
-  q_.setInput(t,DAE_T);
-  q_.setInput(yy,DAE_Y);
-  q_.setInput(input(INTEGRATOR_P),DAE_P);
+  fq_.setInput(t,DAE_T);
+  fq_.setInput(yy,DAE_Y);
+  fq_.setInput(input(INTEGRATOR_P),DAE_P);
 
   // Evaluate
-  q_.evaluate();
+  fq_.evaluate();
     
   // Get results
-  q_.getOutput(rhsQ);
+  fq_.getOutput(rhsQ);
 }
 
 void CVodesInternal::rhsQS(int Ns, double t, N_Vector y, N_Vector *yS, N_Vector yQdot, N_Vector *rhsvalQS, N_Vector tmp1, N_Vector tmp2){
   casadi_assert(Ns==nfdir_);
   
   // Pass input
-  q_.setInput(t,DAE_T);
-  q_.setInput(NV_DATA_S(y),DAE_Y);
-  q_.setInput(input(INTEGRATOR_P),DAE_P);
+  fq_.setInput(t,DAE_T);
+  fq_.setInput(NV_DATA_S(y),DAE_Y);
+  fq_.setInput(input(INTEGRATOR_P),DAE_P);
 
   for(int i=0; i<nfdir_; ++i){
     // Pass forward seeds
-    q_.setFwdSeed(0.0,DAE_T);
-    q_.setFwdSeed(NV_DATA_S(yS[i]),DAE_Y);
-    q_.setFwdSeed(fwdSeed(INTEGRATOR_P,i),DAE_P);
+    fq_.setFwdSeed(0.0,DAE_T);
+    fq_.setFwdSeed(NV_DATA_S(yS[i]),DAE_Y);
+    fq_.setFwdSeed(fwdSeed(INTEGRATOR_P,i),DAE_P);
 
     // Evaluate the AD forward algorithm
-    q_.evaluate(1,0);
+    fq_.evaluate(1,0);
       
     // Get the forward sensitivities
-    q_.getFwdSens(NV_DATA_S(rhsvalQS[i]));
+    fq_.getFwdSens(NV_DATA_S(rhsvalQS[i]));
   }
 }
 
@@ -967,51 +967,51 @@ void CVodesInternal::rhsB(double t, const double* y, const double *yB, double* y
   }
     
   // Pass input
-  f_.setInput(t,DAE_T);
-  f_.setInput(y,DAE_Y);
-  f_.setInput(input(INTEGRATOR_P),DAE_P);
+  fd_.setInput(t,DAE_T);
+  fd_.setInput(y,DAE_Y);
+  fd_.setInput(input(INTEGRATOR_P),DAE_P);
 
   // Pass adjoint seeds
-  f_.setAdjSeed(yB,DAE_RES);
+  fd_.setAdjSeed(yB,DAE_RES);
 
   if(monitor_rhsB_){
-    cout << "t       = " << f_.input(DAE_T) << endl;
-    cout << "y       = " << f_.input(DAE_Y) << endl;
-    cout << "p       = " << f_.input(DAE_P) << endl;
-    cout << "aseed   = " << f_.adjSeed(DAE_RES) << endl;
+    cout << "t       = " << fd_.input(DAE_T) << endl;
+    cout << "y       = " << fd_.input(DAE_Y) << endl;
+    cout << "p       = " << fd_.input(DAE_P) << endl;
+    cout << "aseed   = " << fd_.adjSeed(DAE_RES) << endl;
   }
   
   // Evaluate and tape
-  f_.evaluate(0,1);
+  fd_.evaluate(0,1);
 
   if(monitor_rhsB_){
-    cout << "f_asens = " << f_.adjSens(DAE_Y) << endl;
+    cout << "f_asens = " << fd_.adjSens(DAE_Y) << endl;
   }
   
   // Save to output
-  const vector<double>& fres = f_.adjSens(DAE_Y).data();
+  const vector<double>& fres = fd_.adjSens(DAE_Y).data();
   for(int i=0; i<ny_; ++i)
     yBdot[i] = -fres[i];
 
   // If quadratures are included
   if(nxq_>0){
     // Pass input to quadratures
-    q_.setInput(t,DAE_T);
-    q_.setInput(y,DAE_Y);
-    q_.setInput(input(INTEGRATOR_P),DAE_P);
+    fq_.setInput(t,DAE_T);
+    fq_.setInput(y,DAE_Y);
+    fq_.setInput(input(INTEGRATOR_P),DAE_P);
 
     // Pass adjoint seeds
-    q_.setAdjSeed(&adjSeed(INTEGRATOR_XF).data()[ny_],DAE_RES);
+    fq_.setAdjSeed(&adjSeed(INTEGRATOR_XF).data()[ny_],DAE_RES);
 
     // Evaluate
-    q_.evaluate(0,1);
+    fq_.evaluate(0,1);
 
     if(monitor_rhsB_){
-      cout << "q_asens = " << q_.adjSens(DAE_Y) << endl;
+      cout << "q_asens = " << fq_.adjSens(DAE_Y) << endl;
     }
     
     // Get the adjoint sensitivities
-    const vector<double>& qres = q_.adjSens(DAE_Y).data();
+    const vector<double>& qres = fq_.adjSens(DAE_Y).data();
     
     // Copy to result
     for(int i=0; i<ny_; ++i)
@@ -1057,60 +1057,60 @@ void CVodesInternal::rhsQB(double t, const double* y, const double* yB, double* 
 
   
   // Pass input
-  f_.setInput(t,DAE_T);
-  f_.setInput(y,DAE_Y);
-  f_.setInput(input(INTEGRATOR_P),DAE_P);
+  fd_.setInput(t,DAE_T);
+  fd_.setInput(y,DAE_Y);
+  fd_.setInput(input(INTEGRATOR_P),DAE_P);
   
   if(monitor_rhs_) {
-    cout << "t       = " << f_.input(DAE_T) << endl;
-    cout << "y       = " << f_.input(DAE_Y) << endl;
-    cout << "p       = " << f_.input(DAE_P) << endl;
+    cout << "t       = " << fd_.input(DAE_T) << endl;
+    cout << "y       = " << fd_.input(DAE_Y) << endl;
+    cout << "p       = " << fd_.input(DAE_P) << endl;
   }
   
 
   // Pass adjoint seeds
-  f_.setAdjSeed(yB,DAE_RES);
+  fd_.setAdjSeed(yB,DAE_RES);
   
 
   if(monitor_rhsQB_) {
-    cout << "adjSeed       = " << f_.adjSeed(DAE_RES) << endl;
+    cout << "adjSeed       = " << fd_.adjSeed(DAE_RES) << endl;
   }
     
 
   // Evaluate
-  f_.evaluate(0,1);
+  fd_.evaluate(0,1);
 
   // Save to output
-  f_.getAdjSens(qBdot,DAE_P);
+  fd_.getAdjSens(qBdot,DAE_P);
   
   if(monitor_rhsQB_) {
-    cout << "adjSens       = " << f_.adjSens(DAE_P) << endl;
+    cout << "adjSens       = " << fd_.adjSens(DAE_P) << endl;
   }
     
     
   // If quadratures are included
   if(nxq_>0){
     // Pass input to quadratures
-    q_.setInput(t,DAE_T);
-    q_.setInput(y,DAE_Y);
-    q_.setInput(input(INTEGRATOR_P),DAE_P);
+    fq_.setInput(t,DAE_T);
+    fq_.setInput(y,DAE_Y);
+    fq_.setInput(input(INTEGRATOR_P),DAE_P);
 
     // Pass adjoint seeds
-    q_.setAdjSeed(&adjSeed(INTEGRATOR_XF).data()[ny_],DAE_RES);
+    fq_.setAdjSeed(&adjSeed(INTEGRATOR_XF).data()[ny_],DAE_RES);
 
     if(monitor_rhsQB_) {
-      cout << "adjSeed  (quadrature) = " << q_.adjSeed(DAE_RES) << endl;
+      cout << "adjSeed  (quadrature) = " << fq_.adjSeed(DAE_RES) << endl;
     }
     
     // Evaluate
-    q_.evaluate(0,1);
+    fq_.evaluate(0,1);
     
     // Get the input seeds
-    const vector<double>& qres = q_.adjSens(DAE_P).data();
+    const vector<double>& qres = fq_.adjSens(DAE_P).data();
     
   
     if(monitor_rhsQB_) {
-      cout << "adjSens   (quadrature)  = " << q_.adjSens(DAE_P) << endl;
+      cout << "adjSens   (quadrature)  = " << fq_.adjSens(DAE_P) << endl;
     }
   
     // Copy to result
@@ -1132,7 +1132,7 @@ int CVodesInternal::jtimes_wrapper(N_Vector v, N_Vector Jv, double t, N_Vector y
   try{
     casadi_assert(user_data);
     CVodesInternal *this_ = (CVodesInternal*)user_data;
-    casadi_assert(this_->f_.fwdSens(DAE_RES).size() == this_->ny_);
+    casadi_assert(this_->fd_.fwdSens(DAE_RES).size() == this_->ny_);
     casadi_assert(NV_LENGTH_S(v) == this_->ny_);
     casadi_assert(NV_LENGTH_S(Jv) == this_->ny_);
     this_->jtimes(NV_DATA_S(v),NV_DATA_S(Jv),t,NV_DATA_S(y),NV_DATA_S(fy),NV_DATA_S(tmp));
@@ -1148,20 +1148,20 @@ void CVodesInternal::jtimes(const double *v, double* Jv, double t, const double*
   time1 = clock();
 
   // Pass input
-  f_.setInput(t,DAE_T);
-  f_.setInput(y,DAE_Y);
-  f_.setInput(input(INTEGRATOR_P),DAE_P);
+  fd_.setInput(t,DAE_T);
+  fd_.setInput(y,DAE_Y);
+  fd_.setInput(input(INTEGRATOR_P),DAE_P);
 
   // Pass input seeds
-  f_.setFwdSeed(0.0,DAE_T);
-  f_.setFwdSeed(v,DAE_Y);
-  fill_n(f_.fwdSeed(DAE_P).begin(),np_,0.0);
+  fd_.setFwdSeed(0.0,DAE_T);
+  fd_.setFwdSeed(v,DAE_Y);
+  fill_n(fd_.fwdSeed(DAE_P).begin(),np_,0.0);
   
   // Evaluate
-  f_.evaluate(1,0);
+  fd_.evaluate(1,0);
 
   // Get the output seeds
-  f_.getFwdSens(Jv,DAE_RES);
+  fd_.getFwdSens(Jv,DAE_RES);
   
   // Log time duration
   time2 = clock();
@@ -1187,7 +1187,7 @@ void CVodesInternal::djac(int N, double t, N_Vector y, N_Vector fy, DlsMat Jac, 
   // Pass inputs to the jacobian function
   jac_f_.setInput(t,DAE_T);
   jac_f_.setInput(NV_DATA_S(y),DAE_Y);
-  jac_f_.setInput(f_.input(DAE_P),DAE_P);
+  jac_f_.setInput(fd_.input(DAE_P),DAE_P);
 
   // Evaluate
   jac_f_.evaluate();
@@ -1234,7 +1234,7 @@ void CVodesInternal::bjac(int N, int mupper, int mlower, double t, N_Vector y, N
   // Pass inputs to the jacobian function
   jac_f_.setInput(t,DAE_T);
   jac_f_.setInput(NV_DATA_S(y),DAE_Y);
-  jac_f_.setInput(f_.input(DAE_P),DAE_P);
+  jac_f_.setInput(fd_.input(DAE_P),DAE_P);
 
   // Evaluate
   jac_f_.evaluate();

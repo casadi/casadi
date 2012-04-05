@@ -35,7 +35,7 @@ using namespace std;
 namespace CasADi{
 namespace Sundials{
   
-SundialsInternal::SundialsInternal(const FX& f, const FX& q) : IntegratorInternal(f,q){
+SundialsInternal::SundialsInternal(const FX& fd, const FX& fq) : IntegratorInternal(fd,fq){
   addOption("max_num_steps",               OT_INTEGER, 10000); // maximum number of steps
   addOption("reltol",                      OT_REAL,    1e-6); // relative tolerence for the IVP solution
   addOption("abstol",                      OT_REAL,    1e-8); // absolute tolerence  for the IVP solution
@@ -98,20 +98,20 @@ void SundialsInternal::init(){
   stop_at_end_ = getOption("stop_at_end");
   
   // If time was not specified, initialise it.
-  if(f_.input(DAE_T).numel()==0) {
+  if(fd_.input(DAE_T).numel()==0) {
     std::vector<MX> in1(DAE_NUM_IN);
     in1[DAE_T] = MX("T");
-    in1[DAE_Y] = MX("Y",f_.input(DAE_Y).size1(),f_.input(DAE_Y).size2());
-    in1[DAE_YDOT] = MX("YDOT",f_.input(DAE_YDOT).size1(),f_.input(DAE_YDOT).size2());
-    in1[DAE_P] = MX("P",f_.input(DAE_P).size1(),f_.input(DAE_P).size2());
+    in1[DAE_Y] = MX("Y",fd_.input(DAE_Y).size1(),fd_.input(DAE_Y).size2());
+    in1[DAE_YDOT] = MX("YDOT",fd_.input(DAE_YDOT).size1(),fd_.input(DAE_YDOT).size2());
+    in1[DAE_P] = MX("P",fd_.input(DAE_P).size1(),fd_.input(DAE_P).size2());
     std::vector<MX> in2(in1);
     in2[DAE_T] = MX();
-    f_ = MXFunction(in1,f_.call(in2));
-    f_.init();
+    fd_ = MXFunction(in1,fd_.call(in2));
+    fd_.init();
   }
   
   // We only allow for 0-D time
-  casadi_assert_message(f_.input(DAE_T).numel()==1, "IntegratorInternal: time must be zero-dimensional, not (" <<  f_.input(DAE_T).size1() << 'x' << f_.input(DAE_T).size2() << ")");
+  casadi_assert_message(fd_.input(DAE_T).numel()==1, "IntegratorInternal: time must be zero-dimensional, not (" <<  fd_.input(DAE_T).size1() << 'x' << fd_.input(DAE_T).size2() << ")");
   
   // Get the linear solver creator function
   if(linsol_.isNull() && hasSetOption("linear_solver_creator")){
@@ -139,14 +139,14 @@ SundialsIntegrator SundialsInternal::jac(bool with_x, bool with_p){
   casadi_assert(with_x || with_p);
   
   // Type cast to SXMatrix (currently supported)
-  SXFunction f = shared_cast<SXFunction>(f_);
-  if(f.isNull() != f_.isNull()) return SundialsIntegrator();
+  SXFunction f = shared_cast<SXFunction>(fd_);
+  if(f.isNull() != fd_.isNull()) return SundialsIntegrator();
   
-  SXFunction q = shared_cast<SXFunction>(q_);
-  if(q.isNull() != q_.isNull()) return SundialsIntegrator();
+  SXFunction q = shared_cast<SXFunction>(fq_);
+  if(q.isNull() != fq_.isNull()) return SundialsIntegrator();
     
   // Number of state derivatives
-  int nyp = f_.input(DAE_YDOT).numel();
+  int nyp = fd_.input(DAE_YDOT).numel();
   
   // Number of sensitivities
   int ns_x = with_x*nx_;

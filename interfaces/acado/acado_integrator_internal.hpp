@@ -41,13 +41,13 @@ class AcadoIntegratorInternal : public IntegratorInternal{
   public:
   
   /** \brief  Constructor */
-  explicit AcadoIntegratorInternal(const FX& f, const FX& q);
+  explicit AcadoIntegratorInternal(const FX& fd, const FX& fq);
 
   /** \brief  Clone */
   virtual AcadoIntegratorInternal* clone() const;
   
   /** \brief  Create a new integrator */
-  virtual AcadoIntegratorInternal* create(const FX& f, const FX& q) const{ return new AcadoIntegratorInternal(f,q);}
+  virtual AcadoIntegratorInternal* create(const FX& fd, const FX& fq) const{ return new AcadoIntegratorInternal(fd,fq);}
 
   /** \brief  Destructor */
   virtual ~AcadoIntegratorInternal();

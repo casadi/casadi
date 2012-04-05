@@ -31,7 +31,7 @@
 using namespace std;
 namespace CasADi{
 
-RKIntegratorInternal::RKIntegratorInternal(const FX& f, const FX& q) : IntegratorInternal(f,q){
+RKIntegratorInternal::RKIntegratorInternal(const FX& fd, const FX& fq) : IntegratorInternal(fd,fq){
   addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
   addOption("interpolation_order",           OT_INTEGER,  4,  "Order of the interpolating polynomials");
   addOption("expand_f",                      OT_BOOLEAN,  false, "Expand the ODE/DAE residual function in an SX graph");
@@ -47,24 +47,24 @@ RKIntegratorInternal::~RKIntegratorInternal(){
 void RKIntegratorInternal::init(){
   
   // Init ODE rhs function and quadrature functions, jacobian function
-  if(!f_.isInit()) f_.init();
-  if(!q_.isNull() && !q_.isInit()) q_.init();
+  if(!fd_.isInit()) fd_.init();
+  if(!fq_.isNull() && !fq_.isInit()) fq_.init();
   
   log("RKIntegratorInternal::init","functions initialized");
   
   // Check dimensions
-  casadi_assert_message(f_.getNumInputs()==DAE_NUM_IN, "RKIntegratorInternal: f has wrong number of inputs");
-  casadi_assert_message(f_.getNumOutputs()==DAE_NUM_OUT, "RKIntegratorInternal: f has wrong number of outputs");
-  if(!q_.isNull()){
-    casadi_assert_message(q_.getNumInputs()==DAE_NUM_IN, "RKIntegratorInternal: q has wrong number of inputs");
-    casadi_assert_message(q_.getNumOutputs()==DAE_NUM_OUT, "RKIntegratorInternal: q has wrong number of outputs");
+  casadi_assert_message(fd_.getNumInputs()==DAE_NUM_IN, "RKIntegratorInternal: f has wrong number of inputs");
+  casadi_assert_message(fd_.getNumOutputs()==DAE_NUM_OUT, "RKIntegratorInternal: f has wrong number of outputs");
+  if(!fq_.isNull()){
+    casadi_assert_message(fq_.getNumInputs()==DAE_NUM_IN, "RKIntegratorInternal: q has wrong number of inputs");
+    casadi_assert_message(fq_.getNumOutputs()==DAE_NUM_OUT, "RKIntegratorInternal: q has wrong number of outputs");
   }
 
-  ny_ = f_.input(DAE_Y).numel();
-  nxq_ = q_.isNull() ? 0 : q_.output().numel();
+  ny_ = fd_.input(DAE_Y).numel();
+  nxq_ = fq_.isNull() ? 0 : fq_.output().numel();
   casadi_assert_message(nxq_==0, "Quadratures not supported.");
   
-  int np = f_.input(DAE_P).numel();
+  int np = fd_.input(DAE_P).numel();
   setDimensions(ny_+nxq_,np);
 
   // Call the base class init
@@ -77,7 +77,7 @@ void RKIntegratorInternal::init(){
   int deg = getOption("interpolation_order");
 
   // Assume explicit ODE
-  bool explicit_ode = f_.input(DAE_YDOT).size()==0;
+  bool explicit_ode = fd_.input(DAE_YDOT).size()==0;
 
   // Expand f?
   bool expand_f = getOption("expand_f");
@@ -112,7 +112,7 @@ void RKIntegratorInternal::init(){
     f_in[DAE_Y] = Y;
     f_in[DAE_YDOT] = YDOT;
     f_in[DAE_P] = P;
-    vector<MX> f_out = f_.call(f_in);
+    vector<MX> f_out = fd_.call(f_in);
     MX ode_rhs = f_out[DAE_RES];
     
     // Explicit Euler step

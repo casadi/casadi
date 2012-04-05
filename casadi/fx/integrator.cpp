@@ -69,7 +69,7 @@ void Integrator::integrateAdj(double t_out){
 }
 
 FX Integrator::getDAE(){
-  return (*this)->f_;
+  return (*this)->fd_;
 }
   
  

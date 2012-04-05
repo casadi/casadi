@@ -60,7 +60,7 @@ public:
   AcadoIntegrator();
   
   /// Create an integrator for a fully implicit DAE with quadrature states (nz is the number of states not to be included in the state vector)
-  explicit AcadoIntegrator(const FX& f, const FX& q=FX());
+  explicit AcadoIntegrator(const FX& fd, const FX& fq=FX());
 
   /// Access functions of the node
   AcadoIntegratorInternal* operator->();

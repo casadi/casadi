@@ -30,8 +30,8 @@ namespace CasADi{
 AcadoIntegrator::AcadoIntegrator(){ 
 }
 
-AcadoIntegrator::AcadoIntegrator(const FX& f, const FX& q){
-  assignNode(new AcadoIntegratorInternal(f,q));
+AcadoIntegrator::AcadoIntegrator(const FX& fd, const FX& fq){
+  assignNode(new AcadoIntegratorInternal(fd,fq));
 }
 
 AcadoIntegratorInternal* AcadoIntegrator::operator->(){
