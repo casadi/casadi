@@ -61,7 +61,7 @@ public:
   virtual void printStats(std::ostream &stream) const = 0;
 
     /** \brief  Reset the solver and bring the time back to t0 */
-  virtual void reset(int fsens_order, int asens_order) = 0;
+  virtual void reset(int nfdir, int nadir) = 0;
 
     /** \brief  Reset the solver of the adjoint problem and take time to tf */
   virtual void resetAdj() = 0;
@@ -72,76 +72,44 @@ public:
   /** \brief  Integrate backwards in time until a specified time point */
   virtual void integrateAdj(double t_out) = 0;
 
-  /** \brief  Set stop time for the integration */
-  virtual void setStopTime(double tf) = 0;
-  
   /** \brief  evaluate */
   virtual void evaluate(int nfdir, int nadir);
 
   /** \brief  Initialize */
   virtual void init();
 
-  /** \brief Create an integrator which integrates the ODE/DAE augmented with the forward sensitivity equations */
-  virtual Integrator jac(bool with_x, bool with_p);
+  /** \brief Set dimensions before initialization (new) */
+  void setDimensions(int nxd, int nxa, int nxq, int nyd, int nya, int nyq, int np);
 
-  /** \brief Calculate the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs */
-  virtual FX jacobian(const std::vector<std::pair<int,int> >& jblocks);
-
-  /// Generate the sparsity of a Jacobian block
-  virtual CRSSparsity getJacSparsity(int iind, int oind);
-
-  /// Get the Jacobian
-  virtual FX getJacobian() = 0;
+  /// Number of states for the forward integration
+  int nxd_, nxa_, nxq_;
   
-  /// Get the Linear solver
-  virtual LinearSolver getLinearSolver() = 0;
-
-  /// Set initial time
-  void setInitialTime(double t0);
-
-  /// Set final time
-  void setFinalTime(double tf);
-
-  /// ODE/DAE forward integration function
-  FX f_;
-
-  /// Quadrature function
-  FX q_;
-
-  /// Jacobian of the ODE/DAE with respect to the state and state derivatives
-  FX jac_;
-
-  /// Linear solver
-  LinearSolver linsol_;
-
-  /// Number of states (including algebraic states and quadrature states)
-  int nx_;
-  
-  /// number of states, excluding quadrature states
-  int ny_;
-  
-  /// number of quadrature states
-  int nq_; 
+  /// Number of states for the backward integration
+  int nyd_, nya_, nyq_;
 
   /// Number of parameters
   int np_;
-  
-  /// Number of right hand sides
-  int nrhs_;
-  
-  /// Current time
-  double t_;
 
   /// Integration horizon
   double t0_, tf_;
   
-  /// Set dimensions
+  /// Set dimensions (to be removed)
   void setDimensions(int nx, int np);
 
-  //@{
-  /// options
-  bool stop_at_end_;
-  //@}
+  /// ODE/DAE forward integration function (to be removed)
+  FX f_;
+
+  /// Quadrature function (to be removed)
+  FX q_;
+  
+  /// Number of states (including algebraic states and quadrature states) (to be removed)
+  int nx_;
+  
+  /// number of states, excluding quadrature states (to be removed)
+  int ny_;  
+  
+  /// Number of right hand sides
+  int nrhs_;
 };
   
 } // namespace CasADi

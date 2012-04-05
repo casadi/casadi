@@ -118,7 +118,7 @@ class IdasInternal : public SundialsInternal{
   virtual void initAdj();
   
   /** \brief  Reset the solver and bring the time back to t0 */
-  virtual void reset(int nfsens=0, int nasens=0);
+  virtual void reset(int nfdir, int nadir);
 
   /** \brief  Reset the solver of the adjoint problem and take time to tf */
   virtual void resetAdj();

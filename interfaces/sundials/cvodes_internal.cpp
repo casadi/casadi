@@ -115,7 +115,7 @@ void CVodesInternal::init(){
   setDimensions(nx,np);
   
   ny_ = f_.output().numel();
-  nq_ = q_.isNull() ? 0 : q_.output().numel();
+  nxq_ = q_.isNull() ? 0 : q_.output().numel();
   
   // ODE right hand side must be a dense matrix
   casadi_assert_message(f_.output(DAE_RES).dense(),"ODE right hand side must be dense: reformulate the problem");
@@ -287,10 +287,10 @@ void CVodesInternal::init(){
   if(flag!=CV_SUCCESS) cvodes_error("CVodeSetUserData",flag);
 
   // Quadrature equations
-  if(nq_>0){
+  if(nxq_>0){
     // Allocate n-vectors for quadratures
-    yQ0_ = N_VMake_Serial(nq_,&input(INTEGRATOR_X0).data()[ny_]);
-    yQ_ = N_VMake_Serial(nq_,&output(INTEGRATOR_XF).data()[ny_]);
+    yQ0_ = N_VMake_Serial(nxq_,&input(INTEGRATOR_X0).data()[ny_]);
+    yQ_ = N_VMake_Serial(nxq_,&output(INTEGRATOR_XF).data()[ny_]);
 
     // Initialize quadratures in CVodes
     flag = CVodeQuadInit(mem_, rhsQ_wrapper, yQ0_);
@@ -318,12 +318,12 @@ void CVodesInternal::init(){
       }
 
       // Allocate n-vectors for quadratures
-      if(nq_>0){
+      if(nxq_>0){
         yQS0_.resize(nfdir_,0);
         yQS_.resize(nfdir_,0);
         for(int i=0; i<nfdir_; ++i){
-          yQS0_[i] = N_VMake_Serial(nq_,&fwdSeed(INTEGRATOR_X0,i).data()[ny_]);
-          yQS_[i] = N_VMake_Serial(nq_,&fwdSens(INTEGRATOR_XF,i).data()[ny_]);
+          yQS0_[i] = N_VMake_Serial(nxq_,&fwdSeed(INTEGRATOR_X0,i).data()[ny_]);
+          yQS_[i] = N_VMake_Serial(nxq_,&fwdSens(INTEGRATOR_XF,i).data()[ny_]);
         }
       }
       
@@ -375,7 +375,7 @@ void CVodesInternal::init(){
     if(flag != CV_SUCCESS) cvodes_error("CVodeSetSensErrCon",flag);
     
     // Quadrature equations
-    if(nq_>0){
+    if(nxq_>0){
       flag = CVodeQuadSensInit(mem_, rhsQS_wrapper, getPtr(yQS0_));
       if(flag != CV_SUCCESS) cvodes_error("CVodeQuadSensInit",flag);
 
@@ -551,7 +551,7 @@ try{
   }
 }
   
-void CVodesInternal::reset(int fsens_order, int asens_order){
+void CVodesInternal::reset(int nfdir, int nadir){
   if(monitored("reset")){
     cout << "initial state: " << endl;
     cout << "p = " << input(INTEGRATOR_P) << endl;
@@ -561,8 +561,8 @@ void CVodesInternal::reset(int fsens_order, int asens_order){
   // Reset timers
   t_res = t_fres = t_jac = t_lsolve = t_lsetup_jac = t_lsetup_fac = 0;
   
-  fsens_order_ = fsens_order;
-  asens_order_ = asens_order;
+  fsens_order_ = nfdir>0;
+  asens_order_ = nadir>0;
   
   // Get the time horizon
   t_ = t0_;
@@ -572,7 +572,7 @@ void CVodesInternal::reset(int fsens_order, int asens_order){
   if(flag!=CV_SUCCESS) cvodes_error("CVodeReInit",flag);
   
   // Re-initialize quadratures
-  if(nq_>0){
+  if(nxq_>0){
     flag = CVodeQuadReInit(mem_, yQ0_);
     if(flag != CV_SUCCESS) cvodes_error("CVodeQuadReInit",flag);
   }
@@ -582,7 +582,7 @@ void CVodesInternal::reset(int fsens_order, int asens_order){
     flag = CVodeSensReInit(mem_,ism_,getPtr(yS0_));
     if(flag != CV_SUCCESS) cvodes_error("CVodeSensReInit",flag);
     
-    if(nq_>0){
+    if(nxq_>0){
       flag = CVodeQuadSensReInit(mem_, getPtr(yQS0_));
       if(flag != CV_SUCCESS) cvodes_error("CVodeQuadSensReInit",flag);
     }
@@ -591,6 +591,9 @@ void CVodesInternal::reset(int fsens_order, int asens_order){
     flag = CVodeSensToggleOff(mem_);
     if(flag != CV_SUCCESS) cvodes_error("CVodeSensToggleOff",flag);
   }
+  
+  // Set the stop time of the integration -- don't integrate past this point
+  if(stop_at_end_) setStopTime(tf_);
 }
 
 void CVodesInternal::integrate(double t_out){
@@ -618,7 +621,7 @@ void CVodesInternal::integrate(double t_out){
     if(flag!=CV_SUCCESS && flag!=CV_TSTOP_RETURN) cvodes_error("CVode",flag);
   }
   
-  if(nq_>0){
+  if(nxq_>0){
     double tret;
     flag = CVodeGetQuad(mem_, &tret, yQ_);
     if(flag!=CV_SUCCESS) cvodes_error("CVodeGetQuad",flag);
@@ -629,7 +632,7 @@ void CVodesInternal::integrate(double t_out){
     flag = CVodeGetSens(mem_, &t_, getPtr(yS_));
     if(flag != CV_SUCCESS) cvodes_error("CVodeGetSens",flag);
     
-    if(nq_>0){
+    if(nxq_>0){
       double tret;
       flag = CVodeGetQuadSens(mem_, &tret, getPtr(yQS_));
       if(flag != CV_SUCCESS) cvodes_error("CVodeGetQuadSens",flag);
@@ -678,7 +681,7 @@ void CVodesInternal::integrateAdj(double t_out){
     if(flag!=CV_SUCCESS) cvodes_error("CVodeGetQuadB",flag);
    
     // Quadrature sensitivities are trivial
-    if(nq_>0){
+    if(nxq_>0){
       copy(adjSeed(INTEGRATOR_XF,dir).begin()+ny_,
            adjSeed(INTEGRATOR_XF,dir).end(),
            adjSens(INTEGRATOR_X0,dir).begin()+ny_);
@@ -991,7 +994,7 @@ void CVodesInternal::rhsB(double t, const double* y, const double *yB, double* y
     yBdot[i] = -fres[i];
 
   // If quadratures are included
-  if(nq_>0){
+  if(nxq_>0){
     // Pass input to quadratures
     q_.setInput(t,DAE_T);
     q_.setInput(y,DAE_Y);
@@ -1086,7 +1089,7 @@ void CVodesInternal::rhsQB(double t, const double* y, const double* yB, double* 
     
     
   // If quadratures are included
-  if(nq_>0){
+  if(nxq_>0){
     // Pass input to quadratures
     q_.setInput(t,DAE_T);
     q_.setInput(y,DAE_Y);

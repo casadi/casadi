@@ -273,7 +273,7 @@ public:
   const IntegratorInternal* operator->() const;
   
   /// Reset the solver and bring the time back to t0 and state back to INTEGRATOR_X0
-  void reset(int fsens_order=0, int asens_order=0);
+  void reset(int nfdir=0, int nadir=0);
 
   /// Integrate until a specified time point 
   void integrate(double t_out);
@@ -284,27 +284,9 @@ public:
   /// Integrate backwards in time until a specified time point
   void integrateAdj(double t_out);
 
-  /// Set initial time
-  void setInitialTime(double t0);
-
-  /// Set final time
-  void setFinalTime(double tf);
-
-  /// Set a stop time for the forward integration
-  void setStopTime(double tf);
-
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
 
-  /// Set linear solver
-  void setLinearSolver(const LinearSolver& linsol, const FX& jac=FX());
-  
-  /// Get the Jacobian
-  FX getJacobian();
-  
-  /// Get the Linear solver
-  LinearSolver getLinearSolver();
-  
   /// Get the DAE
   FX getDAE();
 };

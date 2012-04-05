@@ -61,11 +61,11 @@ void RKIntegratorInternal::init(){
   }
 
   ny_ = f_.input(DAE_Y).numel();
-  nq_ = q_.isNull() ? 0 : q_.output().numel();
-  casadi_assert_message(nq_==0, "Quadratures not supported.");
+  nxq_ = q_.isNull() ? 0 : q_.output().numel();
+  casadi_assert_message(nxq_==0, "Quadratures not supported.");
   
   int np = f_.input(DAE_P).numel();
-  setDimensions(ny_+nq_,np);
+  setDimensions(ny_+nxq_,np);
 
   // Call the base class init
   IntegratorInternal::init();
