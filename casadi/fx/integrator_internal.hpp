@@ -55,7 +55,10 @@ public:
   virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
   
   /** \brief  Create a new integrator */
-  virtual IntegratorInternal* create(const FX& f, const FX& q) const = 0;
+  virtual IntegratorInternal* create(const FX& fd, const FX& fq) const{ return 0;}
+  
+  /** \brief  Create a new integrator, new, not yet ready implementation */
+  virtual IntegratorInternal* create(const FX& f, const FX& g, const FX& h) const{ return 0;}
   
   /** \brief  Set linear solver */
   virtual void setLinearSolver(const LinearSolver& linsol, const FX& jac)=0;
