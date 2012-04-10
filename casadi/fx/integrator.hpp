@@ -181,8 +181,8 @@ enum TermOutput{
 
 /// Helper function to create ODE/DAE terminal constraint function output arguments
 template<class M>
-std::vector<M> termOut(const M& rx, const M& rz=M(), const M& rq=M()){
-  M ret[TERM_NUM_OUT] = {rx,rz,rq};
+std::vector<M> termOut(const M& rx){
+  M ret[TERM_NUM_OUT] = {rx};
   return std::vector<M>(ret,ret+TERM_NUM_OUT);
 }
 #ifdef SWIG
