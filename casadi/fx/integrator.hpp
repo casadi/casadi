@@ -162,8 +162,8 @@ enum TermInput{
 
 /// Helper function to create ODE/DAE terminal constraint function input arguments
 template<class M>
-std::vector<M> termIn(const M& x, const M& z=M(), const M& q=M(), const M& p=M()){
-  M ret[TERM_NUM_IN] = {x,z,q,p};
+std::vector<M> termIn(const M& x, const M& q=M(), const M& p=M()){
+  M ret[TERM_NUM_IN] = {x,q,p};
   return std::vector<M>(ret,ret+TERM_NUM_IN);
 }
 #ifdef SWIG
