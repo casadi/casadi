@@ -519,7 +519,7 @@ MXFunctionInternal* MXFunctionInternal::clone() const{
 }
 
 void MXFunctionInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
-  XFunctionInternal::deepCopyMembers(already_copied);
+  XFunctionInternal<MXFunctionInternal,MX,MXNode>::deepCopyMembers(already_copied);
   for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); ++it){
     if(it->mx->isEvaluation()){
       it->mx.makeUnique(already_copied,false);
