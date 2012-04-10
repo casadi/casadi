@@ -64,7 +64,7 @@ void MXFunctionInternal::init(){
   log("MXFunctionInternal::init begin");
   
   // Call the init function of the base class
-  XFunctionInternal::init();
+  XFunctionInternal<MXFunctionInternal,MX,MXNode>::init();
 
   // Stack for nodes to be added to the list of nodes
   stack<MXNode*> s;
@@ -361,7 +361,7 @@ log("MXFunctionInternal::init end");
 
 void MXFunctionInternal::updateNumSens(bool recursive){
   // Call the base class if needed
-  if(recursive) XFunctionInternal::updateNumSens(recursive);
+  if(recursive) XFunctionInternal<MXFunctionInternal,MX,MXNode>::updateNumSens(recursive);
   
   // Allocate work for directional derivatives
   for(vector<FunctionIO>::iterator it=work.begin(); it!=work.end(); it++){

@@ -498,7 +498,7 @@ void SXFunctionInternal::generateCode(const string& src_name){
 
 void SXFunctionInternal::init(){
   // Call the init function of the base class
-  XFunctionInternal::init();
+  XFunctionInternal<SXFunctionInternal,Matrix<SX>,SXNode>::init();
 
   // Stack used to sort the computational graph
   stack<SXNode*> s;
@@ -1082,7 +1082,7 @@ void SXFunctionInternal::init(){
 
 void SXFunctionInternal::updateNumSens(bool recursive){
   // Call the base class if needed
-  if(recursive) XFunctionInternal::updateNumSens(recursive);
+  if(recursive) XFunctionInternal<SXFunctionInternal,Matrix<SX>,SXNode>::updateNumSens(recursive);
   
   // Allocate a working array
   if(nfdir_>0 || nadir_>0){
