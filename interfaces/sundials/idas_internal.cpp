@@ -104,7 +104,7 @@ void IdasInternal::init(){
   
   // Print
   if(verbose()){
-    cout << "Initializing IDAS with ny_ = " << ny_ << ", nxq_ = " << nxq_ << ", np_ = " << np_ << endl;
+    cout << "Initializing IDAS with ny_ = " << ny_ << ", nq_ = " << nq_ << ", np_ = " << np_ << endl;
   }
   
   // Init ODE rhs function and quadrature functions, jacobian function
@@ -122,9 +122,9 @@ void IdasInternal::init(){
   }
 
   ny_ = fd_.input(DAE_Y).numel();
-  nxq_ = fq_.isNull() ? 0 : fq_.output().numel();
+  nq_ = fq_.isNull() ? 0 : fq_.output().numel();
   int np = fd_.input(DAE_P).numel();
-  setDimensions(ny_+nxq_,np);
+  setDimensions(ny_+nq_,np);
   ncheck_ = 0;
 
   // States and RES should match 
@@ -304,10 +304,10 @@ void IdasInternal::init(){
   } else throw CasadiException("IDAS: Unknown linear solver");
 
   // Quadrature equations
-  if(nxq_>0){
+  if(nq_>0){
 
     // Allocate n-vectors for quadratures
-    yQ_ = N_VNew_Serial(nxq_);
+    yQ_ = N_VNew_Serial(nq_);
 
     // Initialize quadratures in IDAS
     flag = IDAQuadInit(mem_, rhsQ_wrapper, yQ_);
@@ -338,9 +338,9 @@ void IdasInternal::init(){
       }
 
       // Allocate n-vectors for quadratures
-      if(nxq_>0){
+      if(nq_>0){
         for(int i=0; i<nfdir_; ++i){
-          yQS_[i] = N_VNew_Serial(nxq_);
+          yQS_[i] = N_VNew_Serial(nq_);
         }
       }
       
@@ -422,7 +422,7 @@ void IdasInternal::init(){
     if(flag != IDA_SUCCESS) idas_error("IDASetSensErrCon",flag);
 
     // Quadrature equations
-    if(nxq_>0){
+    if(nq_>0){
       flag = IDAQuadSensInit(mem_, rhsQS_wrapper, getPtr(yQS_));
       if(flag != IDA_SUCCESS) idas_error("IDAQuadSensInit",flag);
       
@@ -761,7 +761,7 @@ void IdasInternal::reset(int nfdir, int nadir){
 
 
   // Re-initialize quadratures
-  if(nxq_>0){
+  if(nq_>0){
     flag = IDAQuadReInit(mem_, yQ_);
     if(flag != IDA_SUCCESS) idas_error("IDAQuadReInit",flag);
     log("IdasInternal::reset","re-initialized quadratures");
@@ -778,7 +778,7 @@ void IdasInternal::reset(int nfdir, int nadir){
     if(flag != IDA_SUCCESS) idas_error("IDASensReInit",flag);
     log("IdasInternal::reset","re-initialized forward sensitivity solution");
 
-    if(nxq_>0){
+    if(nq_>0){
       flag = IDAQuadSensReInit(mem_, getPtr(yQS_));
       if(flag != IDA_SUCCESS) idas_error("IDAQuadSensReInit",flag);
       log("IdasInternal::reset","re-initialized forward sensitivity dependent quadratures");
@@ -882,7 +882,7 @@ void IdasInternal::integrate(double t_out){
     log("IdasInternal::integrate","integration complete");
     
     // Get quadrature states
-    if(nxq_>0){
+    if(nq_>0){
       double tret;
       flag = IDAGetQuad(mem_, &tret, yQ_);
       if(flag != IDA_SUCCESS) idas_error("IDAGetQuad",flag);
@@ -893,7 +893,7 @@ void IdasInternal::integrate(double t_out){
       flag = IDAGetSens(mem_,&t_, getPtr(yS_));
       if(flag != IDA_SUCCESS) idas_error("IDAGetSens",flag);
     
-      if(nxq_>0){
+      if(nq_>0){
         double tret;
         flag = IDAGetQuadSens(mem_, &tret, getPtr(yQS_));
         if(flag != IDA_SUCCESS) idas_error("IDAGetQuadSens",flag);
@@ -977,7 +977,7 @@ void IdasInternal::integrateAdj(double t_out){
     if(flag!=IDA_SUCCESS) idas_error("IDAGetQuadB",flag);
     
     // Quadrature sensitivities are trivial
-    if(nxq_>0){
+    if(nq_>0){
       copy(adjSeed(INTEGRATOR_XF,dir).begin()+ny_,
            adjSeed(INTEGRATOR_XF,dir).end(),
            adjSens(INTEGRATOR_X0,dir).begin()+ny_);
@@ -1185,7 +1185,7 @@ void IdasInternal::resB(double t, const double* yz, const double* yp, const doub
     resvalB[i] -= asens_ydot[i];
   
   // If quadratures are included
-  if(nxq_>0){
+  if(nq_>0){
     // Pass input to quadratures
     fq_.setInput(t,DAE_T);
     fq_.setInput(yz,DAE_Y);
@@ -1235,7 +1235,7 @@ void IdasInternal::rhsQB(double t, const double* yz, const double* yp, const dou
   fd_.getAdjSens(rhsvalBQ,DAE_P);
   
   // If quadratures are included
-  if(nxq_>0){
+  if(nq_>0){
     // Pass input to quadratures
     fq_.setInput(t,DAE_T);
     fq_.setInput(yz,DAE_Y);
@@ -1613,7 +1613,7 @@ void IdasInternal::copyNV(const Matrix<double>& x, const Matrix<double>& xp, N_V
   copy(x.begin(), x.begin()+ny_, yzd);
   copy(xp.begin(), xp.begin()+ny_, yPd);
 
-  if(nxq_>0){
+  if(nq_>0){
     double *yQd = NV_DATA_S(yQ);
     copy(x.begin()+ny_, x.end(), yQd);
   }
@@ -1626,9 +1626,9 @@ void IdasInternal::copyNV(const N_Vector& yz, const N_Vector& yP, const N_Vector
   copy(yzd,yzd+ny_,x.begin());
   copy(ypd,ypd+ny_,xp.begin());
   
-  if(nxq_>0){
+  if(nq_>0){
     const double *yQd = NV_DATA_S(yQ);
-    copy(yQd,yQd+nxq_, x.begin()+ny_);
+    copy(yQd,yQd+nq_, x.begin()+ny_);
   }
 }
 

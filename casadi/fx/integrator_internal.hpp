@@ -85,10 +85,10 @@ public:
   virtual void init();
 
   /// Number of states for the forward integration
-  int nxd_, nxa_, nxq_;
+  int nx_, nz_, nq_;
   
   /// Number of states for the backward integration
-  int nyd_, nya_, nyq_;
+  int nrx_, nrz_, nrq_;
 
   /// Number of parameters
   int np_;
@@ -117,9 +117,6 @@ public:
 
   /// Quadrature function (to be removed)
   FX fq_;
-  
-  /// Number of states (including algebraic states and quadrature states) (to be removed)
-  int nx_;
   
   /// number of states, excluding quadrature states (to be removed)
   int ny_;  

@@ -70,10 +70,10 @@ void CollocationIntegratorInternal::init(){
   }
 
   ny_ = fd_.input(DAE_Y).numel();
-  nxq_ = fq_.isNull() ? 0 : fq_.output().numel();
+  nq_ = fq_.isNull() ? 0 : fq_.output().numel();
   
   int np = fd_.input(DAE_P).numel();
-  setDimensions(ny_+nxq_,np);
+  setDimensions(ny_+nq_,np);
 
   // Call the base class init
   IntegratorInternal::init();
@@ -230,9 +230,9 @@ void CollocationIntegratorInternal::init(){
   
   // Quadrature left and right hand side
   vector<MX> q_lhs, q_rhs;
-  if(nxq_>0){
+  if(nq_>0){
     q_lhs.resize(nQ-1,0);
-    q_rhs.resize(nQ-1,MX::sparse(nxq_));
+    q_rhs.resize(nQ-1,MX::sparse(nq_));
   }
   
   // Counter
@@ -270,7 +270,7 @@ void CollocationIntegratorInternal::init(){
         g.push_back(f_out[DAE_RES]);
       }
       
-      if(nxq_>0){
+      if(nq_>0){
         // Get an expression for the quadrature state derivative at the collocation point
         for(int j2=0; j2<deg+1; ++j2){
           if(k==0 && j2==0){
@@ -298,7 +298,7 @@ void CollocationIntegratorInternal::init(){
     // Add continuity equation to NLP
     g.push_back(Y[k+1][0] - yf_k);
     
-    if(nxq_>0){
+    if(nq_>0){
       // Get an expression for the state at the end of the finite element
       for(int j=0; j<deg+1; ++j){
         if(k==0 && j==0){
@@ -352,7 +352,7 @@ void CollocationIntegratorInternal::init(){
   // Initialize the solver
   implicit_solver_.init();
 
-  if(nxq_>0){
+  if(nq_>0){
     // Quadrature left hand side
     MXFunction qfcn_lhs(QV,vertcat(q_lhs));
     qfcn_lhs.init();
@@ -440,7 +440,7 @@ void CollocationIntegratorInternal::init(){
   MX X0("X0",nx_);
   
   // Split the differential and quadrature states
-  if(nxq_>0){
+  if(nq_>0){
     Y0 = X0[range(ny_)];
     Q0 = X0[range(ny_,nx_)];
   } else {
@@ -457,7 +457,7 @@ void CollocationIntegratorInternal::init(){
  
   // Solve the quadrature equations
   MX Q_all;
-  if(nxq_>0){
+  if(nq_>0){
     // Evaluate the quadrature right hand side
     
     
@@ -560,12 +560,12 @@ void CollocationIntegratorInternal::reset(int nfdir, int nadir){
   implicit_solver_.evaluate(nfdir_, nadir_);
   
   // Solve quadrature equations
-  if(nxq_>0){
+  if(nq_>0){
     // Pass inputs to right hand side function
     qfcn_.input(0).set(implicit_solver_.output());
     qfcn_.input(1).setArray(&x0.front(),ny_); // only the ny_ first elements
     qfcn_.input(2).set(input(INTEGRATOR_P));
-    qfcn_.input(3).setArray(&x0.front()+ny_,nxq_); // only the ny_ first elements
+    qfcn_.input(3).setArray(&x0.front()+ny_,nq_); // only the ny_ first elements
 
     // Pass the forward seeds
     for(int dir=0; dir<nfdir_; ++dir){
@@ -573,16 +573,16 @@ void CollocationIntegratorInternal::reset(int nfdir, int nadir){
       qfcn_.fwdSeed(0,dir).set(implicit_solver_.fwdSens(0,dir));
       qfcn_.fwdSeed(1,dir).setArray(&x0.front(),ny_);
       qfcn_.fwdSeed(2,dir).set(fwdSeed(INTEGRATOR_P,dir));
-      qfcn_.fwdSeed(3,dir).setArray(&x0.front()+ny_,nxq_);
+      qfcn_.fwdSeed(3,dir).setArray(&x0.front()+ny_,nq_);
     }
 
     // Evaluate
     qfcn_.evaluate(nfdir_,0);
     
     // Solve for qf
-    quadrature_solver_.solve(&qfcn_.output().front(),nxq_);
+    quadrature_solver_.solve(&qfcn_.output().front(),nq_);
     for(int dir=0; dir<nfdir_; ++dir){
-      quadrature_solver_.solve(&qfcn_.fwdSens(0,dir).front(),nxq_);
+      quadrature_solver_.solve(&qfcn_.fwdSens(0,dir).front(),nq_);
     }
   }
   
@@ -601,10 +601,10 @@ void CollocationIntegratorInternal::integrate(double t_out){
     xf[i] = Yf[Yf.size()-ny_+i];
   }
   
-  if(nxq_>0){
+  if(nq_>0){
     const vector<double>& Qf = qfcn_.output().data();
-    for(int i=0; i<nxq_; ++i){
-      int nQ = Qf.size()/nxq_;
+    for(int i=0; i<nq_; ++i){
+      int nQ = Qf.size()/nq_;
       xf[ny_+i] = Qf[nQ*i + nQ-1];
     }
   }
@@ -618,10 +618,10 @@ void CollocationIntegratorInternal::integrate(double t_out){
       xf[i] = Yf[Yf.size()-ny_+i];
     }
     
-    if(nxq_>0){
+    if(nq_>0){
       const vector<double>& Qf = qfcn_.fwdSens(0,dir).data();
-      for(int i=0; i<nxq_; ++i){
-        int nQ = Qf.size()/nxq_;
+      for(int i=0; i<nq_; ++i){
+        int nQ = Qf.size()/nq_;
         xf[ny_+i] = Qf[nQ*i + nQ-1];
       }
     }

@@ -185,7 +185,7 @@ SundialsIntegrator SundialsInternal::jac(bool with_x, bool with_p){
     // Sensitivity quadratures
     SXMatrix q_s = mul(q.jac(DAE_Y,DAE_RES),ysens);
     if(nyp>0) q_s += mul(q.jac(DAE_YDOT,DAE_RES),ypsens);
-    if(with_p) q_s += horzcat(SXMatrix(nxq_,ns_x),q.jac(DAE_P,DAE_RES));
+    if(with_p) q_s += horzcat(SXMatrix(nq_,ns_x),q.jac(DAE_P,DAE_RES));
 
     // Augmented quadratures
     SXMatrix qaug = vec(horzcat(q.outputSX(INTEGRATOR_XF),q_s));
@@ -287,13 +287,13 @@ FX SundialsInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks){
     
     // Initial condition for the sensitivitiy equations
     DMatrix y0_sens(ns*ny_,1,0);
-    DMatrix q0_sens(ns*nxq_,1,0);
+    DMatrix q0_sens(ns*nq_,1,0);
     
     if(with_x){
         for(int i=0; i<ny_; ++i)
           y0_sens.data()[i + i*ns_x] = 1;
       
-      for(int i=0; i<nxq_; ++i)
+      for(int i=0; i<nq_; ++i)
         q0_sens.data()[ny_ + i + i*ns_x] = 1;
     }
     
@@ -320,23 +320,23 @@ FX SundialsInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks){
     
     // Get the state and state derivative at the final time
     MX yf = yf_aug[range(ny_)];
-    MX qf = qf_aug[range(nxq_)];
+    MX qf = qf_aug[range(nq_)];
     MX xf = vertcat(yf,qf);
     MX ypf = ypf_aug[range(ny_)];
-    MX qpf = qpf_aug[range(nxq_)];
+    MX qpf = qpf_aug[range(nq_)];
     MX xpf = vertcat(ypf,qpf);
     
     // Get the sensitivitiy equations state at the final time
     MX yf_sens = yf_aug[range(ny_,(ns+1)*ny_)];
-    MX qf_sens = qf_aug[range(nxq_,(ns+1)*nxq_)];
+    MX qf_sens = qf_aug[range(nq_,(ns+1)*nq_)];
     MX ypf_sens = yf_aug[range(ny_,(ns+1)*ny_)];
-    MX qpf_sens = qf_aug[range(nxq_,(ns+1)*nxq_)];
+    MX qpf_sens = qf_aug[range(nq_,(ns+1)*nq_)];
 
     // Reshape the sensitivity state and state derivatives
     yf_sens = trans(reshape(yf_sens,ns,ny_));
     ypf_sens = trans(reshape(ypf_sens,ns,ny_));
-    qf_sens = trans(reshape(qf_sens,ns,nxq_));
-    qpf_sens = trans(reshape(qpf_sens,ns,nxq_));
+    qf_sens = trans(reshape(qf_sens,ns,nq_));
+    qpf_sens = trans(reshape(qpf_sens,ns,nq_));
     
     // We are now able to get the Jacobian
     MX J_xf = vertcat(yf_sens,qf_sens);

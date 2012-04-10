@@ -108,60 +108,53 @@ void IntegratorInternal::init(){
     
     // Initialize the functions
     casadi_assert(!f_.isNull());
-
+    
     // Initialize, get and assert dimensions of the forward integration
     if(!f_.isInit()) f_.init();
-    nxd_ = f_.input(DAE_F_XD).numel();
-    nxa_ = f_.input(DAE_F_XA).numel();
-    np_  = f_.input(DAE_F_P).numel();
-    nxq_ = f_.output(DAE_F_QUAD).numel();
-    casadi_assert_message(f_.output(DAE_F_ODE).numel()==nxd_,"Inconsistent dimensions");
-    casadi_assert_message(f_.output(DAE_F_ALG).numel()==nxa_,"Inconsistent dimensions");
-
+    nx_ = f_.input(NEW_DAE_X).numel();
+    nz_ = f_.input(NEW_DAE_Z).numel();
+    np_  = f_.input(NEW_DAE_P).numel();
+    nq_ = f_.output(NEW_DAE_QUAD).numel();
+    casadi_assert_message(f_.output(NEW_DAE_ODE).numel()==nx_,"Inconsistent dimensions");
+    casadi_assert_message(f_.output(NEW_DAE_ALG).numel()==nz_,"Inconsistent dimensions");
+    
     // Make sure that both h and g are given, or neither
     casadi_assert_message(h_.isNull()==g_.isNull(),"Either both h and g should be given, or neither of them");
     if(h_.isNull()){
-      nyd_ = 0;
-      nyq_ = 0;
-      nya_ = 0;
+      nrx_ = 0;
+      nrq_ = 0;
+      nrz_ = 0;
     } else {
       // Initialize, get and assert dimensions of the terminal constraint function
       if(!h_.isInit()) h_.init();
-      casadi_assert_message(h_.input(DAE_H_XD).numel()==nxd_,"Inconsistent dimensions");
-      casadi_assert_message(h_.input(DAE_H_XA).numel()==nxa_,"Inconsistent dimensions");
-      casadi_assert_message(h_.input(DAE_H_P).numel()==np_,"Inconsistent dimensions");
-      nyd_ = h_.output(DAE_H_YD).numel();
-      nyq_ = h_.output(DAE_H_YQ).numel();
-      nya_ = h_.output(DAE_H_YA).numel();
+      casadi_assert_message(h_.input(TERM_X).numel()==nx_,"Inconsistent dimensions");
+      casadi_assert_message(h_.input(TERM_P).numel()==np_,"Inconsistent dimensions");
+      nrx_ = h_.output(TERM_RX).numel();
       
       // Initialize and assert the dimensions of the backward integration
       if(!g_.isInit()) g_.init();
-      casadi_assert_message(g_.input(DAE_G_XD).numel()==nxd_,"Inconsistent dimensions");
-      casadi_assert_message(g_.input(DAE_G_XA).numel()==nxa_,"Inconsistent dimensions");
-      casadi_assert_message(g_.input(DAE_G_YD).numel()==nyd_,"Inconsistent dimensions");
-      casadi_assert_message(g_.input(DAE_G_YA).numel()==nya_,"Inconsistent dimensions");
-      casadi_assert_message(g_.input(DAE_G_P).numel()==np_,"Inconsistent dimensions");
-      casadi_assert_message(g_.output(DAE_G_ODE).numel()==nyd_,"Inconsistent dimensions");
-      casadi_assert_message(g_.output(DAE_G_QUAD).numel()==nyq_,"Inconsistent dimensions");
-      casadi_assert_message(g_.output(DAE_G_ALG).numel()==nya_,"Inconsistent dimensions");
+      nrz_ = g_.output(RDAE_ALG).numel();
+      nrq_ = g_.output(RDAE_QUAD).numel();
+      casadi_assert_message(g_.input(RDAE_X).numel()==nx_,"Inconsistent dimensions");
+      casadi_assert_message(g_.input(RDAE_Z).numel()==nz_,"Inconsistent dimensions");
+      casadi_assert_message(g_.input(RDAE_RX).numel()==nrx_,"Inconsistent dimensions");
+      casadi_assert_message(g_.input(RDAE_RZ).numel()==nrz_,"Inconsistent dimensions");
+      casadi_assert_message(g_.input(RDAE_P).numel()==np_,"Inconsistent dimensions");
+      casadi_assert_message(g_.output(RDAE_ODE).numel()==nrx_,"Inconsistent dimensions");
     }
     
     // Allocate space for inputs
     input_.resize(NEW_INTEGRATOR_NUM_IN);
-    input(NEW_INTEGRATOR_XD0) = f_.output(DAE_F_ODE);
-    input(NEW_INTEGRATOR_XQ0) = f_.output(DAE_F_QUAD);
-    input(NEW_INTEGRATOR_XA0) = f_.output(DAE_F_ALG);
-    input(NEW_INTEGRATOR_P) = f_.input(DAE_F_P);
+    input(NEW_INTEGRATOR_X0) = f_.output(NEW_DAE_ODE);
+    input(NEW_INTEGRATOR_P) = f_.input(NEW_DAE_P);
   
     // Allocate space for outputs
     output_.resize(NEW_INTEGRATOR_NUM_OUT);
-    output(NEW_INTEGRATOR_XDF) = input(NEW_INTEGRATOR_XD0);
-    output(NEW_INTEGRATOR_XQF) = input(NEW_INTEGRATOR_XQ0);
-    output(NEW_INTEGRATOR_XAF) = input(NEW_INTEGRATOR_XA0);
+    output(NEW_INTEGRATOR_XF) = f_.output(NEW_DAE_ODE);
+    output(NEW_INTEGRATOR_QF) = f_.output(NEW_DAE_QUAD);
     if(!g_.isNull()){
-      output(NEW_INTEGRATOR_YD0) = g_.output(DAE_G_ODE);
-      output(NEW_INTEGRATOR_YQ0) = g_.output(DAE_G_QUAD);
-      output(NEW_INTEGRATOR_YA0) = g_.output(DAE_G_ALG);
+      output(NEW_INTEGRATOR_RX0) = g_.output(RDAE_ODE);
+      output(NEW_INTEGRATOR_RQ0) = g_.output(RDAE_QUAD);
     }
   }
   

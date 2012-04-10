@@ -115,7 +115,7 @@ void CVodesInternal::init(){
   setDimensions(nx,np);
   
   ny_ = fd_.output().numel();
-  nxq_ = fq_.isNull() ? 0 : fq_.output().numel();
+  nq_ = fq_.isNull() ? 0 : fq_.output().numel();
   
   // ODE right hand side must be a dense matrix
   casadi_assert_message(fd_.output(DAE_RES).dense(),"ODE right hand side must be dense: reformulate the problem");
@@ -287,10 +287,10 @@ void CVodesInternal::init(){
   if(flag!=CV_SUCCESS) cvodes_error("CVodeSetUserData",flag);
 
   // Quadrature equations
-  if(nxq_>0){
+  if(nq_>0){
     // Allocate n-vectors for quadratures
-    yQ0_ = N_VMake_Serial(nxq_,&input(INTEGRATOR_X0).data()[ny_]);
-    yQ_ = N_VMake_Serial(nxq_,&output(INTEGRATOR_XF).data()[ny_]);
+    yQ0_ = N_VMake_Serial(nq_,&input(INTEGRATOR_X0).data()[ny_]);
+    yQ_ = N_VMake_Serial(nq_,&output(INTEGRATOR_XF).data()[ny_]);
 
     // Initialize quadratures in CVodes
     flag = CVodeQuadInit(mem_, rhsQ_wrapper, yQ0_);
@@ -318,12 +318,12 @@ void CVodesInternal::init(){
       }
 
       // Allocate n-vectors for quadratures
-      if(nxq_>0){
+      if(nq_>0){
         yQS0_.resize(nfdir_,0);
         yQS_.resize(nfdir_,0);
         for(int i=0; i<nfdir_; ++i){
-          yQS0_[i] = N_VMake_Serial(nxq_,&fwdSeed(INTEGRATOR_X0,i).data()[ny_]);
-          yQS_[i] = N_VMake_Serial(nxq_,&fwdSens(INTEGRATOR_XF,i).data()[ny_]);
+          yQS0_[i] = N_VMake_Serial(nq_,&fwdSeed(INTEGRATOR_X0,i).data()[ny_]);
+          yQS_[i] = N_VMake_Serial(nq_,&fwdSens(INTEGRATOR_XF,i).data()[ny_]);
         }
       }
       
@@ -375,7 +375,7 @@ void CVodesInternal::init(){
     if(flag != CV_SUCCESS) cvodes_error("CVodeSetSensErrCon",flag);
     
     // Quadrature equations
-    if(nxq_>0){
+    if(nq_>0){
       flag = CVodeQuadSensInit(mem_, rhsQS_wrapper, getPtr(yQS0_));
       if(flag != CV_SUCCESS) cvodes_error("CVodeQuadSensInit",flag);
 
@@ -572,7 +572,7 @@ void CVodesInternal::reset(int nfdir, int nadir){
   if(flag!=CV_SUCCESS) cvodes_error("CVodeReInit",flag);
   
   // Re-initialize quadratures
-  if(nxq_>0){
+  if(nq_>0){
     flag = CVodeQuadReInit(mem_, yQ0_);
     if(flag != CV_SUCCESS) cvodes_error("CVodeQuadReInit",flag);
   }
@@ -582,7 +582,7 @@ void CVodesInternal::reset(int nfdir, int nadir){
     flag = CVodeSensReInit(mem_,ism_,getPtr(yS0_));
     if(flag != CV_SUCCESS) cvodes_error("CVodeSensReInit",flag);
     
-    if(nxq_>0){
+    if(nq_>0){
       flag = CVodeQuadSensReInit(mem_, getPtr(yQS0_));
       if(flag != CV_SUCCESS) cvodes_error("CVodeQuadSensReInit",flag);
     }
@@ -621,7 +621,7 @@ void CVodesInternal::integrate(double t_out){
     if(flag!=CV_SUCCESS && flag!=CV_TSTOP_RETURN) cvodes_error("CVode",flag);
   }
   
-  if(nxq_>0){
+  if(nq_>0){
     double tret;
     flag = CVodeGetQuad(mem_, &tret, yQ_);
     if(flag!=CV_SUCCESS) cvodes_error("CVodeGetQuad",flag);
@@ -632,7 +632,7 @@ void CVodesInternal::integrate(double t_out){
     flag = CVodeGetSens(mem_, &t_, getPtr(yS_));
     if(flag != CV_SUCCESS) cvodes_error("CVodeGetSens",flag);
     
-    if(nxq_>0){
+    if(nq_>0){
       double tret;
       flag = CVodeGetQuadSens(mem_, &tret, getPtr(yQS_));
       if(flag != CV_SUCCESS) cvodes_error("CVodeGetQuadSens",flag);
@@ -681,7 +681,7 @@ void CVodesInternal::integrateAdj(double t_out){
     if(flag!=CV_SUCCESS) cvodes_error("CVodeGetQuadB",flag);
    
     // Quadrature sensitivities are trivial
-    if(nxq_>0){
+    if(nq_>0){
       copy(adjSeed(INTEGRATOR_XF,dir).begin()+ny_,
            adjSeed(INTEGRATOR_XF,dir).end(),
            adjSens(INTEGRATOR_X0,dir).begin()+ny_);
@@ -994,7 +994,7 @@ void CVodesInternal::rhsB(double t, const double* y, const double *yB, double* y
     yBdot[i] = -fres[i];
 
   // If quadratures are included
-  if(nxq_>0){
+  if(nq_>0){
     // Pass input to quadratures
     fq_.setInput(t,DAE_T);
     fq_.setInput(y,DAE_Y);
@@ -1089,7 +1089,7 @@ void CVodesInternal::rhsQB(double t, const double* y, const double* yB, double* 
     
     
   // If quadratures are included
-  if(nxq_>0){
+  if(nq_>0){
     // Pass input to quadratures
     fq_.setInput(t,DAE_T);
     fq_.setInput(y,DAE_Y);
