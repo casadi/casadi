@@ -237,10 +237,10 @@ class TestSuite:
       alarm(60*60) # 1 hour
       try:
         stdoutdata, stderrdata = f.communicate(inp)
-      except TimeoutEven:
+      except TimeoutEvent:
         killProcess(p.pid)
         killProcess(f.pid)
-        raise Exception("Timout.")
+        raise Exception("Timeout.")
       alarm(0) # Remove alarm
       m = re.search('definitely lost: (.*) bytes', stdoutdata)
       lost = "0"
