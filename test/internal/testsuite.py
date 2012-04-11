@@ -3,6 +3,7 @@ import sys
 from subprocess import *
 import time
 import re
+import tempfile
 
 class TimeoutEvent(Exception):
     pass
@@ -231,12 +232,14 @@ class TestSuite:
       # --suppressions=../internal/valgrind-python.supp
       suppressions = ["internal/valgrind-python.supp"]
       supps = ":".join([os.path.join(os.getcwd(),s) for s in suppressions])
-      p=Popen(['valgrind','--leak-check=full','--suppressions='+supps]+self.command(dir,fn),cwd=self.workingdir(dir),stdout=PIPE, stderr=PIPE, stdin=PIPE)
+      stdoutfile = tempfile.TemporaryFile()
+      p=Popen(['valgrind','--leak-check=full','--suppressions='+supps]+self.command(dir,fn),cwd=self.workingdir(dir),stdout=stdoutfile, stderr=PIPE, stdin=PIPE)
       f=Popen(['grep','-E','-A','10', "definitely lost|leaks|ERROR SUMMARY|Invalid read"],stdin=p.stderr,stdout=PIPE)
       p.stderr.close()
       alarm(60*60) # 1 hour
       try:
-        stdoutdata, stderrdata = f.communicate(inp)
+        stdoutdata, stderrdata = f.communicate()
+        stdoutdata = stdoutfile.read() + "\n"+ stdoutdata
       except TimeoutEvent:
         killProcess(p.pid)
         killProcess(f.pid)
