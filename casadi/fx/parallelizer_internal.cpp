@@ -42,15 +42,25 @@ ParallelizerInternal::~ParallelizerInternal(){
 
 void ParallelizerInternal::init(){
   // Get mode
-  if(getOption("parallelization")=="serial")
+  if(getOption("parallelization")=="serial"){
     mode_ = SERIAL;
-  else if(getOption("parallelization")=="openmp")
+  } else if(getOption("parallelization")=="openmp") {
     mode_ = OPENMP;
-  else if(getOption("parallelization")=="mpi")
+  } else if(getOption("parallelization")=="mpi") {
     mode_ = MPI;
-  else
+  } else {
     throw CasadiException(string("Parallelization mode: ")+getOption("parallelization").toString());
+  }
 
+  // Switch to serial mode if OPENMP is not supported
+  #ifndef WITH_OPENMP
+  if(mode_ == OPENMP){
+    casadi_warning("OpenMP parallelization is not available, switching to serial mode. Recompile CasADi setting the option WITH_OPENMP to ON.");
+    mode_ = SERIAL;
+  }
+  #endif // WITH_OPENMP
+  
+  
   // Check if a node is a copy of another
   copy_of_.resize(funcs_.size(),-1);
   map<void*,int> is_copy_of;
