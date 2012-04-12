@@ -6,8 +6,8 @@ import os
 from testsuite import TestSuite
 
 path = os.getcwd() + '/../build/lib'
-if 'CASADILIBDIR' in sys.env:
-  path = sys.env['CASADILIBDIR']
+if 'CASADILIBDIR' in os.environ:
+  path = os.environ['CASADILIBDIR']
 
 t = TestSuite(dirname=src,
   suffix="m",
