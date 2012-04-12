@@ -1,5 +1,5 @@
 all: python.pdf
 
 %.pdf: %.tex
-        pdflatex -interaction=nonstopmode $<
+	pdflatex -interaction=nonstopmode $<
 
