@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmodelicaModelDescription xmlns:exp="https://svn.jmodelica.org/trunk/XML/daeExpressions.xsd" xmlns:equ="https://svn.jmodelica.org/trunk/XML/daeEquations.xsd" xmlns:fun="https://svn.jmodelica.org/trunk/XML/daeFunctions.xsd" xmlns:opt="https://svn.jmodelica.org/trunk/XML/daeOptimization.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+fmiVersion="1.0" modelName="Parameters" modelIdentifier="Parameters" guid="10541638fee9fc8f3e36561e4a36c1f0" generationDateAndTime="2012-03-21T14:59:48" variableNamingConvention="structured" numberOfContinuousStates="2" numberOfEventIndicators="0">
+	
+	
+	
+	<VendorAnnotations>
+		<Tool name="JModelica">
+		</Tool>
+	</VendorAnnotations>		
+	<ModelVariables>
+		<ScalarVariable name="cost" valueReference="7" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" fixed="true" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="cost"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>state</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="der(cost)" valueReference="5" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="cost"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>derivative</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="finalTime" valueReference="2" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="20.0" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="finalTime"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="startTime" valueReference="1" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="startTime"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="u" valueReference="8" variability="continuous" causality="input" alias="noAlias">
+			<Real relativeQuantity="false" max="0.2" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="u"/>
+			</QualifiedName>
+			<isLinear>false</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="u_cost" valueReference="3" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="u_cost"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>dependentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="x" valueReference="6" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="1.0" fixed="true" free="false" initialGuess="1.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="x"/>
+			</QualifiedName>
+			<isLinear>false</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>state</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="der(x)" valueReference="4" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="x"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>derivative</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="x_start" valueReference="0" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="1.0" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="x_start"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+	</ModelVariables>
+	<equ:BindingEquations>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="x_start"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>1</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="startTime"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>0</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="finalTime"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>20</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="u_cost"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:Mul>
+					<exp:IntegerLiteral>2</exp:IntegerLiteral>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="x_start"/>
+						</exp:Identifier>
+				</exp:Mul>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+	</equ:BindingEquations>
+
+	<equ:DynamicEquations>
+		<equ:Equation>
+			<exp:Sub>
+				<exp:Der>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="x"/>
+					</exp:Identifier>
+				</exp:Der>
+				<exp:Neg>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="u"/>
+						</exp:Identifier>
+				</exp:Neg>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+				<exp:Der>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="cost"/>
+					</exp:Identifier>
+				</exp:Der>
+				<exp:Add>
+					<exp:Pow>
+							<exp:Identifier>
+									<exp:QualifiedNamePart name="x"/>
+							</exp:Identifier>
+						<exp:IntegerLiteral>2</exp:IntegerLiteral>
+					</exp:Pow>
+					<exp:Mul>
+							<exp:Identifier>
+									<exp:QualifiedNamePart name="u_cost"/>
+							</exp:Identifier>
+						<exp:Pow>
+								<exp:Identifier>
+										<exp:QualifiedNamePart name="u"/>
+								</exp:Identifier>
+							<exp:IntegerLiteral>2</exp:IntegerLiteral>
+						</exp:Pow>
+					</exp:Mul>
+				</exp:Add>
+			</exp:Sub>
+		</equ:Equation>
+	</equ:DynamicEquations>
+
+	<equ:InitialEquations>
+		<equ:Equation>
+			<exp:Sub>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="x"/>
+					</exp:Identifier>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="x_start"/>
+					</exp:Identifier>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="cost"/>
+					</exp:Identifier>
+				<exp:IntegerLiteral>0</exp:IntegerLiteral>
+			</exp:Sub>
+		</equ:Equation>
+	</equ:InitialEquations>
+
+	<opt:Optimization static="false" >
+		<opt:ObjectiveFunction>
+			<exp:TimedVariable>
+				<exp:Identifier>
+						<exp:QualifiedNamePart name="cost"/>
+				</exp:Identifier>
+				<exp:Instant>20.0</exp:Instant>
+			</exp:TimedVariable>
+		</opt:ObjectiveFunction>
+		<opt:IntegrandObjectiveFunction>
+			<exp:StringLiteral>No integrand objective function</exp:StringLiteral>
+		</opt:IntegrandObjectiveFunction>
+		<opt:IntervalStartTime>
+			<opt:Value>0.0</opt:Value>
+			<opt:Free>false</opt:Free>
+			<opt:InitialGuess>0.0</opt:InitialGuess>
+		</opt:IntervalStartTime>
+		<opt:IntervalFinalTime>
+			<opt:Value>20.0</opt:Value>
+			<opt:Free>false</opt:Free>
+			<opt:InitialGuess>1.0</opt:InitialGuess>
+		</opt:IntervalFinalTime>
+		<opt:TimePoints>
+			<opt:Index>0</opt:Index>
+			<opt:Value>20.0</opt:Value>
+		</opt:TimePoints>
+		<opt:Constraints>
+		</opt:Constraints>
+	</opt:Optimization>
+
+	<fun:FunctionsList>
+	</fun:FunctionsList>
+
+</jmodelicaModelDescription>
