@@ -147,6 +147,6 @@ set(DOXYFILE_IN_DIR ${CMAKE_SOURCE_DIR}/documentation/api-doc)
 set(DOXYFILE_OUTPUT_DIR  ${CMAKE_SOURCE_DIR}/documentation/api-doc)
 set(DOXYFILE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/casadi)
 include(UseDoxygen OPTIONAL)
-add_subdirectory(documentation/examples/ctemplate)
 endif(WITH_DOC)
 
+add_subdirectory(documentation/examples/ctemplate)
