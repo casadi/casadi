@@ -63,7 +63,7 @@ void CollocationIntegratorInternal::init(){
   
   // Check dimensions
   casadi_assert_message(fd_.getNumInputs()==DAE_NUM_IN, "CollocationIntegratorInternal: f has wrong number of inputs");
-  casadi_assert_message(fq_.getNumOutputs()==DAE_NUM_OUT, "CollocationIntegratorInternal: f has wrong number of outputs");
+  casadi_assert_message(fd_.getNumOutputs()==DAE_NUM_OUT, "CollocationIntegratorInternal: f has wrong number of outputs");
   if(!fq_.isNull()){
     casadi_assert_message(fq_.getNumInputs()==DAE_NUM_IN, "CollocationIntegratorInternal: q has wrong number of inputs");
     casadi_assert_message(fq_.getNumOutputs()==DAE_NUM_OUT, "CollocationIntegratorInternal: q has wrong number of outputs");
