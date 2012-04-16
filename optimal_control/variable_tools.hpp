@@ -36,6 +36,9 @@ namespace CasADi{
   /// Get a vector of highest order undetermined expression from a vector of variables
   std::vector<SX> highest(const std::vector<Variable> v);
 
+  /// Get a vector of binding expressions from a vector of variables
+  std::vector<SX> binding(const std::vector<Variable> v);
+
 #ifndef SWIG
   /// Call a member function for all members of a vector (note: fcn pointer to member function)
   std::vector<double> getAll(double (Variable::*fcn)() const, const std::vector<Variable> v, bool nominal=false);
@@ -55,6 +58,9 @@ namespace CasADi{
 
   /// Get a lower bounds
   std::vector<double> getMin(const std::vector<Variable> v, bool nominal=false);
+
+  /// Get the initial guess
+  std::vector<double> getInitialGuess(const std::vector<Variable> v, bool nominal=false);
 
 } // namespace CasADi
 

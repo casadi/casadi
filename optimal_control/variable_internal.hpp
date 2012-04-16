@@ -60,19 +60,23 @@ namespace CasADi{
       std::string name_;
       Variability variability_;
       Causality causality_;
+      Category category_;
       Alias alias_;
       std::string description_;
       int valueReference_;
       bool free_;
       
-      double min_, max_, nominal_, start_, derivative_start_;
+      double min_, max_, nominal_, start_, derivative_start_, initial_guess_;
       std::string unit_, displayUnit_;
       
       // variable expression
-      SX sx_; 
+      SX var_; 
 
       // Derivative expression
-      SX dx_;
+      SX der_;
+          
+      // Binding expression
+      SX binding_;
           
       // Timed variables
       std::map<double, SX> timed_sx_;

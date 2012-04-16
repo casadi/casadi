@@ -23,9 +23,15 @@
 #ifndef OCP_TOOLS_HPP
 #define OCP_TOOLS_HPP
 
-#include "casadi/sx/sx.hpp"
+#include "symbolic_ocp.hpp"
 
 namespace CasADi{
+  
+  /// Update dependent variables in an OCP
+  void updateDependent(SymbolicOCP& ocp);
+
+  // Legacy stuff:
+  
   namespace OptimalControl{
 
   // Go through the equations of an ocp and make them explicit, if possible

@@ -46,6 +46,13 @@ vector<SX> highest(const vector<Variable> v){
   return ret;
 }
 
+vector<SX> binding(const vector<Variable> v){
+  vector<SX> ret(v.size());
+  for(int i=0; i<v.size(); ++i)
+    ret[i] = v[i].binding();
+  return ret;
+}
+
 vector<double> getNominal(const vector<Variable> v){
   vector<double> ret(v.size());
   for(int i=0; i<v.size(); ++i)
@@ -82,6 +89,10 @@ vector<double> getMin(const vector<Variable> v, bool nominal){
 
 vector<double> getMax(const vector<Variable> v, bool nominal){
   return getAll(&Variable::getMax, v, nominal);
+}
+
+vector<double> getInitialGuess(const vector<Variable> v, bool nominal){
+  return getAll(&Variable::getInitialGuess, v, nominal);
 }
 
     

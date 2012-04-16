@@ -50,11 +50,15 @@ const VariableInternal* Variable::operator->() const{
 }
   
 SX Variable::der() const{
-  return (*this)->dx_;
+  return (*this)->der_;
 }
 
 SX Variable::var() const{
-  return (*this)->sx_;
+  return (*this)->var_;
+}
+
+SX Variable::binding() const{
+  return (*this)->binding_;
 }
 
 const string& Variable::getName() const{
@@ -80,7 +84,15 @@ Causality Variable::getCausality() const{
 void Variable::setCausality(Causality causality){
   (*this)->causality_ = causality;
 }
-    
+
+Category Variable::getCategory() const{
+  return (*this)->category_;
+}
+
+void Variable::setCategory(Category category){
+  (*this)->category_ = category;
+}
+
 Alias Variable::getAlias() const{
   return (*this)->alias_;
 }
@@ -140,7 +152,15 @@ double Variable::getDerivativeStart() const{
 void Variable::setStart(double start){
   (*this)->start_ = start;
 }
-    
+
+double Variable::getInitialGuess() const{
+  return (*this)->initial_guess_;
+}
+
+void Variable::setInitialGuess(double initial_guess){
+  (*this)->initial_guess_ = initial_guess;
+}
+
 void Variable::setDerivativeStart(double start){
   (*this)->derivative_start_ = start;
 }
@@ -161,12 +181,16 @@ void Variable::setDisplayUnit(const string& displayUnit){
   (*this)->displayUnit_ = displayUnit;
 }
 
-void Variable::setExpression(const SX& sx){
-  (*this)->sx_ = sx;
+void Variable::setExpression(const SX& v){
+  (*this)->var_ = v;
 }
 
-void Variable::setDerivative(const SX& dx){
-  (*this)->dx_ = dx;
+void Variable::setDerivative(const SX& d){
+  (*this)->der_ = d;
+}
+
+void Variable::setBinding(const SX& binding){
+  (*this)->binding_ = binding;
 }
 
 bool Variable::checkNode() const{

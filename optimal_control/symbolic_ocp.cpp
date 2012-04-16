@@ -163,14 +163,37 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
 	else throw CasadiException("Unknown alias");
 	
 	// Other properties
-	const XMLNode& props = vnode[0];
-	if(props.hasAttribute("unit"))         var.setUnit(props.attribute("unit"));
-	if(props.hasAttribute("displayUnit"))  var.setDisplayUnit(props.attribute("displayUnit"));
-	if(props.hasAttribute("min"))          var.setMin(props.attribute("min"));
-	if(props.hasAttribute("max"))          var.setMax(props.attribute("max"));
-	if(props.hasAttribute("start"))        var.setStart(props.attribute("start"));
-	if(props.hasAttribute("nominal"))      var.setNominal(props.attribute("nominal"));
-	if(props.hasAttribute("free"))         var.setFree(string(props.attribute("free")).compare("true") == 0);
+	if(vnode.hasChild("Real")){
+	  const XMLNode& props = vnode["Real"];
+	  if(props.hasAttribute("unit"))         var.setUnit(props.attribute("unit"));
+	  if(props.hasAttribute("displayUnit"))  var.setDisplayUnit(props.attribute("displayUnit"));
+	  if(props.hasAttribute("min"))          var.setMin(props.attribute("min"));
+	  if(props.hasAttribute("max"))          var.setMax(props.attribute("max"));
+	  if(props.hasAttribute("start"))        var.setStart(props.attribute("start"));
+	  if(props.hasAttribute("nominal"))      var.setNominal(props.attribute("nominal"));
+	  if(props.hasAttribute("free"))         var.setFree(string(props.attribute("free")).compare("true") == 0);
+	  if(props.hasAttribute("initialGuess")) var.setInitialGuess(props.attribute("initialGuess"));
+	}
+	
+	// Variable category
+	if(vnode.hasChild("VariableCategory")){
+	  string cat = vnode["VariableCategory"].getText();
+	  if(cat.compare("derivative")==0)
+	    var.setCategory(CAT_DERIVATIVE);
+	  else if(cat.compare("state")==0)
+	    var.setCategory(CAT_STATE);
+	  else if(cat.compare("dependentConstant")==0)
+	    var.setCategory(CAT_DEPENDENT_CONSTANT);
+	  else if(cat.compare("independentConstant")==0)
+	    var.setCategory(CAT_INDEPENDENT_CONSTANT);
+	  else if(cat.compare("dependentParameter")==0)
+	    var.setCategory(CAT_DEPENDENT_PARAMETER);
+	  else if(cat.compare("independentParameter")==0)
+	    var.setCategory(CAT_INDEPENDENT_PARAMETER);
+	  else if(cat.compare("algebraic")==0)
+	    var.setCategory(CAT_ALGEBRAIC);
+	  else throw CasadiException("Unknown variable category: " + cat);
+	}
 	
 	// Add to list of variables
 	addVariable(qn,var);
@@ -195,8 +218,9 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
       SX bexpr = readExpr(beq[1][0]);
       
       // Add binding equation
-      y.push_back(var);
-      dep.append(bexpr);
+      var.setBinding(bexpr);
+      y.push_back(var); // legacy
+      dep.append(bexpr); // legacy
     }
   }
 
@@ -463,7 +487,7 @@ void SymbolicOCP::repr(std::ostream &stream) const{
 
 void SymbolicOCP::print(ostream &stream) const{
   stream << "Dimensions: "; 
-  stream << "#s = " << x.size() << ", ";
+  stream << "s = " << x.size() << ", ";
   stream << "#xd = " << xd.size() << ", ";
   stream << "#z = " << xa.size() << ", ";
   stream << "#q = " << xq.size() << ", ";
@@ -484,6 +508,11 @@ void SymbolicOCP::print(ostream &stream) const{
   stream << "  q =  " << xq << endl;
   stream << "  y =  " << y << endl;
   stream << "  p =  " << p << endl;
+  stream << "  pi =  " << pi << endl;
+  stream << "  pd =  " << pd << endl;
+  stream << "  p_free =  " << p_free << endl;
+  stream << "  ci =  " << ci << endl;
+  stream << "  cd =  " << cd << endl;
   stream << "  u =  " << u << endl;
   stream << "}" << endl;
   
@@ -632,49 +661,103 @@ void SymbolicOCP::eliminateQuadratureStates(){
   quad.clear();
 }
 
-void SymbolicOCP::sortType(){
+void SymbolicOCP::sortType(bool sort_by_variable_category){
   // Clear variables
   x.clear();
   xd.clear();
   xa.clear();
   u.clear();
+  cd.clear();
+  ci.clear();
+  pd.clear();
+  pi.clear();
+  p_free.clear();
+  
+  // To be removed
   p.clear();
   
-  // Mark all dependent variables
-  for(vector<Variable>::iterator it=y.begin(); it!=y.end(); ++it){
-    it->var().setTemp(1);
-  }
-  
-  // Loop over variables
-  for(map<string,Variable>::iterator it=varmap_.begin(); it!=varmap_.end(); ++it){
-    // Get the variable
-    Variable& v = it->second;
-    
-    // If not dependent
-    if(v.var().getTemp()!=1){
-      // Try to determine the type
-      if(v.getVariability() == PARAMETER){
-        if(v.getFree()){
-          p.push_back(v); 
-        } else {
-          casadi_assert(0);
-        }
-      } else if(v.getVariability() == CONTINUOUS) {
-        if(v.getCausality() == INTERNAL){
-          x.push_back(v);
-        } else if(v.getCausality() == INPUT){
-          u.push_back(v);
-        }
-      } else if(v.getVariability() == CONSTANT){
-        y.push_back(v);
-        dep.append(v.getNominal());
+  if(sort_by_variable_category){
+
+    // Loop over variables
+    for(map<string,Variable>::iterator it=varmap_.begin(); it!=varmap_.end(); ++it){
+      // Get the variable
+      Variable& v = it->second;
+      
+      // Sort by category
+      switch(v.getCategory()){
+	case CAT_DERIVATIVE:
+	  // Skip derivatives
+	  break;
+	case CAT_STATE:
+	  x.push_back(v);
+	  break;
+	case CAT_DEPENDENT_CONSTANT:
+	  cd.push_back(v);
+	  break;
+	case CAT_INDEPENDENT_CONSTANT:
+	  ci.push_back(v);
+	  break;
+	case CAT_DEPENDENT_PARAMETER:
+	  pd.push_back(v);
+	  break;
+	case CAT_INDEPENDENT_PARAMETER:
+	  if(v.getFree()){
+	    p_free.push_back(v);
+	  } else {
+	    pi.push_back(v);
+	  }
+	  break;
+	case CAT_ALGEBRAIC:
+	  if(v.getCausality() == INTERNAL){
+	    x.push_back(v);
+	  } else if(v.getCausality() == INPUT){
+	    u.push_back(v);
+	  }
+	  break;
+	default:
+	  casadi_assert_message(0,"Unknown category");
       }
     }
-  }
+   
+   // Old implementation
+  } else {
+  
+    // Mark all dependent variables
+    for(vector<Variable>::iterator it=y.begin(); it!=y.end(); ++it){
+      it->var().setTemp(1);
+    }
+    
+    // Loop over variables
+    for(map<string,Variable>::iterator it=varmap_.begin(); it!=varmap_.end(); ++it){
+      // Get the variable
+      Variable& v = it->second;
+      
+      // If not dependent
+      if(v.var().getTemp()!=1){
+	// Try to determine the type
+	if(v.getVariability() == PARAMETER){
+	  if(v.getFree()){
+	    p.push_back(v); 
+	  } else {
+	    casadi_assert(0);
+	  }
+	} else if(v.getVariability() == CONTINUOUS) {
+	  if(v.getCausality() == INTERNAL){
+	    x.push_back(v);
+	  } else if(v.getCausality() == INPUT){
+	    u.push_back(v);
+	  }
+	} else if(v.getVariability() == CONSTANT){
+	  y.push_back(v);
+	  dep.append(v.getNominal());
+	}
+      }
+    }
 
-  // Unmark all dependent variables
-  for(vector<Variable>::iterator it=y.begin(); it!=y.end(); ++it){
-    it->var().setTemp(0);
+    // Unmark all dependent variables
+    for(vector<Variable>::iterator it=y.begin(); it!=y.end(); ++it){
+      it->var().setTemp(0);
+    }
   }
 }
 

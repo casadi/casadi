@@ -41,6 +41,26 @@ namespace CasADi{
     /// Dynamics of the variable
     enum Alias{NO_ALIAS,ALIAS,NEGATED_ALIAS};
     
+    /// Variable category
+    enum Category{
+      /** Unknown, not set */
+      CAT_UNKNOWN,
+      /** A state derivative */
+      CAT_DERIVATIVE,
+      /** A differential state, i.e. a variable that appears differentiated in the model */
+      CAT_STATE, 
+      /** An independent constant: "constant Real c1 = 3" */
+      CAT_DEPENDENT_CONSTANT,
+      /** A dependent constant "constant Real c2=c1*3". */
+      CAT_INDEPENDENT_CONSTANT,
+      /** A dependent parameter "parameter Real p1=p2"*/
+      CAT_DEPENDENT_PARAMETER,
+      /** An independent parameter "parameter Real p2=3"*/
+      CAT_INDEPENDENT_PARAMETER,
+      /** An algebraic variabel or input */
+      CAT_ALGEBRAIC
+    };
+
     // Forward declaration
     class VariableInternal;
 
@@ -62,6 +82,9 @@ namespace CasADi{
     
     /// Get differential expression
     SX der() const;
+    
+    /// Get the binding expression
+    SX binding() const;
     
     /// Get the highest order derivative (i.e. der() or var())
     SX highest() const;
@@ -98,7 +121,13 @@ namespace CasADi{
 
     /// Set the causality (see Fritzon)
     void setCausality(Causality causality);
-    
+
+    /// Get the variable category
+    Category getCategory() const;
+
+    /// Set the variable category
+    void setCategory(Category category);
+
     /// Check if the variable is an alias variable
     Alias getAlias() const;
 
@@ -144,6 +173,12 @@ namespace CasADi{
     /// Set the value at time 0
     void setStart(double start);
     
+    /// Get the lower bound
+    double getInitialGuess() const;
+
+    /// Set the lower bound
+    void setInitialGuess(double initial_guess);
+    
     /// Set the derivative at time 0
     void setDerivativeStart(double start);
     
@@ -160,10 +195,13 @@ namespace CasADi{
     void setDisplayUnit(const std::string& displayUnit);
     
     /// Set the expression
-    void setExpression(const SX& sx);
+    void setExpression(const SX& v);
 
     /// Set the derivative expression
-    void setDerivative(const SX& dx);
+    void setDerivative(const SX& d);
+                
+    /// Set the binding expression
+    void setBinding(const SX& binding);
                 
     /// Set the variable index
     void setIndex(int ind);

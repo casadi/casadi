@@ -28,18 +28,23 @@ namespace CasADi{
   
 VariableInternal::VariableInternal(const string& name) : name_(name){
   // No expression by default
-  sx_ = casadi_limits<SX>::nan;
+  var_ = casadi_limits<SX>::nan;
   
   // Not differentable by default
-  dx_ = casadi_limits<SX>::nan;
+  der_ = casadi_limits<SX>::nan;
+    
+  // Not binding expression by default
+  binding_ = casadi_limits<SX>::nan;
     
   variability_ = CONTINUOUS;
   causality_ = INTERNAL;
+  category_ = CAT_UNKNOWN;
   alias_ = NO_ALIAS;
   description_ = "";
   valueReference_ = -1; //?
   min_ = -numeric_limits<double>::infinity();
   max_ = numeric_limits<double>::infinity();
+  initial_guess_ = 0;
   nominal_ = 1.0;
   start_ = 0.0;
   derivative_start_ = 0.0;
@@ -81,7 +86,7 @@ SX VariableInternal::atTime(double t, bool allocate){
     if(allocate){
       // Create a timed variable
       stringstream ss;
-      ss << sx_ << ".atTime(" << t << ")";
+      ss << var_ << ".atTime(" << t << ")";
       SX tvar(ss.str());
       
       // Save to map

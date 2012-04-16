@@ -96,7 +96,7 @@ class SymbolicOCP : public PrintableObject{
     /// Default constructor
     SymbolicOCP();
     
-    /** @name Variables
+    /** @name Variables categories
     *  Public data members
     */
     //@{
@@ -114,11 +114,29 @@ class SymbolicOCP : public PrintableObject{
     
     /// Quadrature states (length == quad().size())
     std::vector<Variable> xq;
+
+    /** \brief Independent constants */
+    std::vector<Variable> ci;
+
+    /** \brief Dependent constants */
+    std::vector<Variable> cd;
+
+    /** \brief Independent parameters 
+     An independent parameter is a parameter whose value is determined by an expression that contains only literals: "parameter Real p1=2" or "parameter Boolean b(start=true)". In the latter case, the value of the parameter becomes true, and the Modelica compiler will generate a warning since there is no binding expression for the parameter. An independent parameter is fixed after the DAE has been initialized. */
+    std::vector<Variable> pi;
+
+    /** \brief Dependent parameters 
+     A dependent parameter is a parameter whose value is determined by an expression which contains references to other parameters: "parameter Real p2=2*p1". A dependent parameter is fixed after the DAE has been initialized. */
+    std::vector<Variable> pd;
+
+    /** \brief Free parameters 
+     A free parameter (which is Optimica specific without correspondance in Modelica) is a parameter that the optimization algorithm can change in order to minimize the cost function: "parameter Real x(free=true)". Note that these parameters in contrast to dependent/independent parameters may change after the DAE has been initialized. A free parameter should not have any binding expression since it would then no longer be free. The compiler will transform non-free parameters to free parameters if they depend on a free parameters. The "free" attribute thus propagage through the parameter binding equations. */
+    std::vector<Variable> p_free;
     
     /// Dependent variables (length == dep().size())
     std::vector<Variable> y;
     
-    /// Independent parameters
+    /// Independent parameters (to be removed and replaced by pi, pd and p_free)
     std::vector<Variable> p;
     
     /// Control signals
@@ -260,7 +278,7 @@ class SymbolicOCP : public PrintableObject{
     Variable& readVariable(const XMLNode& node);
 
     /// Sort variables according to type
-    void sortType();
+    void sortType(bool sort_by_variable_category=false);
     
     /// Scale the variables
     void scaleVariables();

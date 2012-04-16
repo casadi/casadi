@@ -24,6 +24,7 @@
 #include "casadi/sx/sx_tools.hpp"
 #include "casadi/fx/sx_function.hpp"
 #include "casadi/stl_vector_tools.hpp"
+#include "variable_tools.hpp"
 
 #include <algorithm>
 #include <set>
@@ -37,6 +38,52 @@ extern "C" void dsterf_(int *n, double *d, double *e, int *info); // needed by L
 using namespace std;
 
 namespace CasADi{
+  
+void updateDependent(SymbolicOCP& ocp){
+  // Quick return if no dependent parameters
+  if(ocp.pd.empty()) return;
+  
+  // Get the binding equations
+  SXMatrix pd_def = binding(ocp.pd);
+  
+  // Get expressions for the variables
+  SXMatrix pd = var(ocp.pd);
+  
+  // Sort out interdependencies
+  bool reverse=false;
+  bool eliminate_constants=true;
+  substituteInPlace(pd, pd_def, reverse, eliminate_constants);
+
+  // Create a function which evaluates the binding equations numerically
+  SXMatrix ci = var(ocp.ci);
+  SXMatrix pi = var(ocp.pi);
+  vector<SXMatrix> f_in(2);
+  f_in[0] = ci;
+  f_in[1] = pi;
+  SXFunction f(f_in,pd_def);
+  f.init();
+  
+  // Evaluate the start attribute
+  f.setInput(getStart(ocp.ci),0);
+  f.setInput(getStart(ocp.pi),1);
+  f.evaluate();
+  const vector<double>& res = f.output().data();
+  
+  // Save to variables
+  for(int k=0; k<ocp.pd.size(); ++k){
+    ocp.pd[k].setStart(res[k]);
+  }
+}
+  
+  
+  
+  
+  
+  
+  
+// Legacy: 
+  
+  
   namespace OptimalControl{
 
 // Get the coefficeints for the collocation and continuity equations
