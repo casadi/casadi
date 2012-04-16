@@ -33,8 +33,7 @@
 #include <casadi/matrix/matrix_tools.hpp>
 #include <casadi/fx/jacobian.hpp>
 
-#include <optimal_control/flat_ocp.hpp>
-#include <optimal_control/flat_ocp_internal.hpp>
+#include <optimal_control/symbolic_ocp.hpp>
 #include <optimal_control/ocp_tools.hpp>
 #include <optimal_control/variable_tools.hpp>
 #include <optimal_control/multiple_shooting.hpp>
@@ -48,17 +47,19 @@ using namespace std;
 int main(){
   bool use_kinsol = false;
 
-  // Allocate an OCP and load the xml
-  FlatOCP ocp("../examples/xml_files/cstr.xml");
+  // Allocate an OCP object
+  SymbolicOCP ocp;
 
-  // Set options
-  ocp.setOption("scale_variables",true);
-  ocp.setOption("eliminate_dependent",true);
-  ocp.setOption("scale_equations",false);
+  // Load the XML file
+  Dictionary parse_options;
+  parse_options["scale_variables"] = true;
+  parse_options["eliminate_dependent"] = true;
+  parse_options["scale_equations"] = false;
+  ocp.parseFMI("../examples/xml_files/cstr.xml",parse_options);
   
-  // Initialize
-  ocp.init();
-
+  // To explicit form
+//   ocp.makeExplicit();
+  
   // Print the ocp to screen
   ocp.print();
   
@@ -71,21 +72,21 @@ int main(){
   ocp.variable("cstr.T").setMax(350);
   
   // Variables
-  SXMatrix t = ocp.t();
-  SXMatrix x = var(ocp.x());
-  SXMatrix xdot = der(ocp.x());
-  SXMatrix p = var(ocp.p());
-  SXMatrix u = var(ocp.u());
-  
+  SXMatrix t = ocp.t;
+  SXMatrix x = var(ocp.x);
+  SXMatrix xdot = der(ocp.x);
+  SXMatrix p = var(ocp.p);
+  SXMatrix u = var(ocp.u);
+    
   // Initial guess and bounds for the state
-  vector<double> x0 = getStart(ocp.x(),true);
-  vector<double> xmin = getMin(ocp.x(),true);
-  vector<double> xmax = getMax(ocp.x(),true);
+  vector<double> x0 = getStart(ocp.x,true);
+  vector<double> xmin = getMin(ocp.x,true);
+  vector<double> xmax = getMax(ocp.x,true);
   
   // Initial guess and bounds for the control
-  vector<double> u0 = getStart(ocp.u(),true);
-  vector<double> umin = getMin(ocp.u(),true);
-  vector<double> umax = getMax(ocp.u(),true);
+  vector<double> u0 = getStart(ocp.u,true);
+  vector<double> umin = getMin(ocp.u,true);
+  vector<double> umax = getMax(ocp.u,true);
   
   // Number of shooting nodes
   int num_nodes = 100;
@@ -100,7 +101,7 @@ int main(){
   integrator_options["abstol"]=1e-8;
   integrator_options["reltol"]=1e-8;
   integrator_options["store_jacobians"]=true;
-  integrator_options["tf"]=ocp.tf()/num_nodes;
+  integrator_options["tf"]=ocp.tf/num_nodes;
 
   // Mayer objective function
   SXMatrix xf = ssym("xf",x.size(),1);
@@ -116,7 +117,7 @@ int main(){
     impres_in[1+DAE_T] = t;
     impres_in[1+DAE_Y] = x;
     impres_in[1+DAE_P] = u;
-    SXFunction impres(impres_in,ocp.dae());
+    SXFunction impres(impres_in,ocp.dae);
 
     // Create an implicit function (KINSOL)
     KinsolSolver ode(impres);
@@ -134,14 +135,14 @@ int main(){
     dae_in[DAE_Y] = x;
     dae_in[DAE_YDOT] = xdot;
     dae_in[DAE_P] = u;
-    SXFunction dae(dae_in,ocp.dae());
+    SXFunction dae(dae_in,ocp.dae);
     
     ocp_solver = MultipleShooting(dae,mterm);
     ocp_solver.setOption("integrator",IdasIntegrator::creator);
   }
   ocp_solver.setOption("integrator_options",integrator_options);
   ocp_solver.setOption("number_of_grid_points",num_nodes);
-  ocp_solver.setOption("final_time",ocp.tf());
+  ocp_solver.setOption("final_time",ocp.tf);
   ocp_solver.setOption("parallelization","openmp");
 //  ocp_solver.setOption("parallelization","expand");
 

@@ -177,22 +177,22 @@ class OCPtests(casadiTestCase):
     
   def test_XML(self):
     self.message("JModelica XML parsing")
-    ocp = FlatOCP('data/cstr.xml')
-    ocp.init()
+    ocp = SymbolicOCP()
+    ocp.parseFMI('data/cstr.xml')
     
-    self.assertEqual(ocp.t0(),0)
-    self.assertEqual(ocp.tf(),150)
+    self.assertEqual(ocp.t0,0)
+    self.assertEqual(ocp.tf,150)
     #self.assertFalse(ocp.t0_free)
     #self.assertFalse(ocp.tf_free)
-    self.assertTrue(len(ocp.lterm())==0)
-    self.assertTrue(len(ocp.mterm())==1)
-    m = ocp.mterm()[0]
-    self.assertTrue(isinstance(m,SX))
-    self.assertTrue(isinstance(ocp.t(),SX))
+    self.assertTrue(ocp.lterm.size()==0)
+    self.assertTrue(ocp.mterm.size()==1)
+    m = ocp.mterm
+    self.assertTrue(isinstance(m,SXMatrix))
+    self.assertTrue(isinstance(ocp.t,SXMatrix))
     self.assertEquals(str(m),'cost.atTime(150)')
     print dir(ocp)
-    self.assertEquals(len(ocp.dae()),3)
-    self.assertEquals(len(ocp.x()),3) # there are three states
+    self.assertEquals(ocp.dae.size(),3)
+    self.assertEquals(len(ocp.x),3) # there are three states
     c = ocp.variable("cstr.c")
     T = ocp.variable("cstr.T")
     cost = ocp.variable("cost")
@@ -210,7 +210,7 @@ class OCPtests(casadiTestCase):
     cost = cost.var()
     
     u = ocp.variable("u").var()
-    self.assertEquals(len(ocp.path()),3)
+    self.assertEquals(ocp.path.size(),3)
     #self.assertEquals(len(ocp.cfcn_lb),3)
     #self.assertEquals(len(ocp.cfcn_ub),3)
     #self.assertTrue(ocp.cfcn[0].isEqual(T)) 
@@ -222,10 +222,10 @@ class OCPtests(casadiTestCase):
     #self.assertEquals(ocp.cfcn_ub[0].getValue(),350) 
     #self.assertTrue(ocp.cfcn_ub[1].isInf())
     #self.assertEquals(ocp.cfcn_ub[2].getValue(),370) 
-    print ocp.initial()
+    print ocp.initial
     print c,T,cost
     #print c.atTime(0)
-    f=SXFunction([[c,T,cost]],[ocp.initial()])
+    f=SXFunction([[c,T,cost]],[ocp.initial])
     f.init()
     return 
     f.evaluate()

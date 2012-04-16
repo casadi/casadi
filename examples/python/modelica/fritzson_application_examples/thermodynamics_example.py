@@ -6,15 +6,17 @@ from numpy import *
 import matplotlib.pyplot as plt
 import zipfile
 import time
+import shutil
 
 try:
   # JModelica
   from pymodelica import compile_jmu
   from pyjmi import JMUModel
   import pymodelica
+  use_precompiled = False
 except:
-  print "This example requires a jmodelica installation"
-  sys.exit(0)
+  print "No jmodelica installation, falling back to precompiled XML-files"
+  use_precompiled = True
 
 # CasADi
 from casadi import *
@@ -25,27 +27,36 @@ from casadi import *
 # Compile Modelica code to XML
 def comp(name):
   curr_dir = os.path.dirname(os.path.abspath(__file__))
-  jmu_name = compile_jmu(name, curr_dir+"/thermodynamics_example.mo",'modelica','ipopt',{'generate_xml_equations':True, 'generate_fmi_me_xml':False})
-  modname = name.replace('.','_')
-  sfile = zipfile.ZipFile(curr_dir+'/'+modname+'.jmu','r')
-  mfile = sfile.extract('modelDescription.xml','.')
-  os.remove(modname+'.jmu')
-  os.rename('modelDescription.xml',modname+'.xml')
+  if use_precompiled:
+    shutil.copy(curr_dir + '/precompiled_' + name + '.xml', name + '.xml')
+  else:
+    jmu_name = compile_jmu(name, curr_dir+"/thermodynamics_example.mo",'modelica','ipopt',{'generate_xml_equations':True, 'generate_fmi_me_xml':False})
+    modname = name.replace('.','_')
+    sfile = zipfile.ZipFile(curr_dir+'/'+modname+'.jmu','r')
+    mfile = sfile.extract('modelDescription.xml','.')
+    os.remove(modname+'.jmu')
+    os.rename('modelDescription.xml',modname+'.xml')
 
 # Compile the simplemost example (conservation of mass in control volume)
 comp("BasicVolumeMassConservation")
 
 # Read a model from XML
-ocp = FlatOCP('BasicVolumeMassConservation.xml')
+ocp = SymbolicOCP()
+ocp.parseFMI('BasicVolumeMassConservation.xml')
 
-# Set options
-ocp.setOption("make_explicit",True)
-
-# Parse the model
-ocp.init()
+# Make the OCP explicit
+ocp.makeExplicit()
 
 # Create an integrator
-integrator = CVodesIntegrator(ocp.daeFcn())
+dae_in = DAE_NUM_IN * [[]]
+dae_in[DAE_T] = ocp.t
+dae_in[DAE_Y] = var(ocp.xd)
+dae_in[DAE_YDOT] = der(ocp.xd)
+dae_in[DAE_P] = var(ocp.p)
+dae_out = DAE_NUM_OUT * [[]]
+dae_out[DAE_RES] = ocp.ode
+dae = SXFunction(dae_in,dae_out)
+integrator = CVodesIntegrator(dae)
 
 # Output function
 m = ocp.variable("m").var()
@@ -60,7 +71,7 @@ simulator = Simulator(integrator,output_fcn,grid)
 simulator.init()
 
 # Pass initial conditions
-x0 = getStart(ocp.xd())
+x0 = getStart(ocp.xd)
 simulator.setInput(x0,INTEGRATOR_X0)
 
 # Simulate
@@ -86,16 +97,22 @@ plt.draw()
 comp("BasicVolumeEnergyConservation")
 
 # Allocate a parser and load the xml
-ocp = FlatOCP('BasicVolumeEnergyConservation.xml')
+ocp = SymbolicOCP()
+ocp.parseFMI('BasicVolumeEnergyConservation.xml')
 
-# Set options
-ocp.setOption("make_explicit",True)
-
-# Parse the model
-ocp.init()
+# Make the OCP explicit
+ocp.makeExplicit()
 
 # Create an integrator
-integrator = CVodesIntegrator(ocp.daeFcn())
+dae_in = DAE_NUM_IN * [[]]
+dae_in[DAE_T] = ocp.t
+dae_in[DAE_Y] = var(ocp.xd)
+dae_in[DAE_YDOT] = der(ocp.xd)
+dae_in[DAE_P] = var(ocp.p)
+dae_out = DAE_NUM_OUT * [[]]
+dae_out[DAE_RES] = ocp.ode
+dae = SXFunction(dae_in,dae_out)
+integrator = CVodesIntegrator(dae)
 
 # Output function
 T = ocp.variable("T").var()
@@ -109,7 +126,7 @@ simulator = Simulator(integrator,output_fcn,grid)
 simulator.init()
 
 # Pass initial conditions
-x0 = getStart(ocp.xd())
+x0 = getStart(ocp.xd)
 simulator.setInput(x0,INTEGRATOR_X0)
 
 # Simulate
@@ -128,16 +145,22 @@ plt.draw()
 comp("BasicVolumeTest")
 
 # Allocate a parser and load the xml
-ocp = FlatOCP('BasicVolumeTest.xml')
+ocp = SymbolicOCP()
+ocp.parseFMI('BasicVolumeTest.xml')
 
-# Set options
-ocp.setOption("make_explicit",True)
-
-# Parse the model
-ocp.init()
+# Make explicit
+ocp.makeExplicit()
 
 # Create an integrator
-integrator = CVodesIntegrator(ocp.daeFcn())
+dae_in = DAE_NUM_IN * [[]]
+dae_in[DAE_T] = ocp.t
+dae_in[DAE_Y] = var(ocp.xd)
+dae_in[DAE_YDOT] = der(ocp.xd)
+dae_in[DAE_P] = var(ocp.p)
+dae_out = DAE_NUM_OUT * [[]]
+dae_out[DAE_RES] = ocp.ode
+dae = SXFunction(dae_in,dae_out)
+integrator = CVodesIntegrator(dae)
 
 # Output function
 T = ocp.variable("T").var()
@@ -153,7 +176,7 @@ simulator = Simulator(integrator,output_fcn,grid)
 simulator.init()
 
 # Pass initial conditions
-x0 = getStart(ocp.xd())
+x0 = getStart(ocp.xd)
 simulator.setInput(x0,INTEGRATOR_X0)
 
 # Simulate
@@ -180,13 +203,11 @@ plt.draw()
 comp("CtrlFlowSystem")
 
 # Allocate a parser and load the xml
-ocp = FlatOCP('CtrlFlowSystem.xml')
+ocp = SymbolicOCP()
+ocp.parseFMI('CtrlFlowSystem.xml')
 
-# Set options
-ocp.setOption("make_explicit",True)
-
-# Parse the model
-ocp.init()
+# Make the OCP explicit
+ocp.makeExplicit()
 
 # Print the ocp
 print ocp
@@ -195,15 +216,3 @@ print ocp
 
 
 plt.show()
-
-
-
-
-
-
-
-
-
-
-
-

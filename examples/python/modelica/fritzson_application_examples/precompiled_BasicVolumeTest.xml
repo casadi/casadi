@@ -1,0 +1,668 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmodelicaModelDescription xmlns:exp="https://svn.jmodelica.org/trunk/XML/daeExpressions.xsd" xmlns:equ="https://svn.jmodelica.org/trunk/XML/daeEquations.xsd" xmlns:fun="https://svn.jmodelica.org/trunk/XML/daeFunctions.xsd" xmlns:opt="https://svn.jmodelica.org/trunk/XML/daeOptimization.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+fmiVersion="1.0" modelName="BasicVolumeTest" modelIdentifier="BasicVolumeTest" guid="601148cac597de2af5eb166c55bcb670" generationDateAndTime="2012-02-22T17:46:21" variableNamingConvention="structured" numberOfContinuousStates="2" numberOfEventIndicators="0">
+	<UnitDefinitions>
+		<BaseUnit unit="Pa">
+			<DisplayUnitDefinition displayUnit="bar" gain="1" offset="0"/>
+		</BaseUnit>
+		<BaseUnit unit="K">
+			<DisplayUnitDefinition displayUnit="degC" gain="1" offset="0"/>
+		</BaseUnit>
+	</UnitDefinitions>
+	
+	
+	<VendorAnnotations>
+		<Tool name="JModelica">
+		</Tool>
+	</VendorAnnotations>		
+	<ModelVariables>
+		<ScalarVariable name="H" valueReference="14" variability="continuous" causality="internal" alias="noAlias">
+			<Real quantity="Energy" unit="J" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="H"/>
+			</QualifiedName>
+			<isLinear>false</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="P" valueReference="18" variability="continuous" causality="internal" alias="noAlias">
+			<Real quantity="Pressure" unit="Pa" displayUnit="bar" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="P"/>
+			</QualifiedName>
+			<isLinear>false</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="Qdot" valueReference="15" variability="continuous" causality="internal" alias="noAlias">
+			<Real quantity="Power" unit="W" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="Qdot"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="R" valueReference="3" variability="parameter" causality="internal" alias="noAlias">
+			<Real quantity="SpecificHeatCapacity" unit="J/(kg.K)" relativeQuantity="false" start="287.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="R"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="T" valueReference="20" variability="continuous" causality="internal" alias="noAlias">
+			<Real quantity="ThermodynamicTemperature" unit="K" displayUnit="degC" relativeQuantity="false" min="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="T"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="T_0" valueReference="4" variability="parameter" causality="internal" alias="noAlias">
+			<Real quantity="ThermodynamicTemperature" unit="K" displayUnit="degC" relativeQuantity="false" min="0.0" start="293.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="T_0"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="U" valueReference="8" variability="continuous" causality="internal" alias="noAlias">
+			<Real quantity="Energy" unit="J" relativeQuantity="false" start="248.77902000000003" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="U"/>
+			</QualifiedName>
+			<isLinear>false</isLinear>
+			<VariableCategory>state</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="der(U)" valueReference="6" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="U"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>derivative</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="V" valueReference="9" variability="continuous" causality="internal" alias="noAlias">
+			<Real quantity="Volume" unit="m3" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="V"/>
+			</QualifiedName>
+			<isLinear>false</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="Wdot_e" valueReference="16" variability="continuous" causality="internal" alias="noAlias">
+			<Real quantity="Power" unit="W" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="Wdot_e"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="Wdot_s" valueReference="17" variability="continuous" causality="internal" alias="noAlias">
+			<Real quantity="Power" unit="W" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="Wdot_s"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="c_v" valueReference="2" variability="parameter" causality="internal" alias="noAlias">
+			<Real quantity="SpecificHeatCapacity" unit="J/(kg.K)" relativeQuantity="false" start="717.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="c_v"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="h" valueReference="13" variability="continuous" causality="internal" alias="alias" >
+			<Real quantity="SpecificEnergy" unit="J/kg" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="h"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="h_in" valueReference="12" variability="continuous" causality="internal" alias="noAlias">
+			<Real quantity="SpecificEnergy" unit="J/kg" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="h_in"/>
+			</QualifiedName>
+			<isLinear>false</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="h_out" valueReference="13" variability="continuous" causality="internal" alias="noAlias">
+			<Real quantity="SpecificEnergy" unit="J/kg" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="h_out"/>
+			</QualifiedName>
+			<isLinear>false</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="inlet.P" valueReference="18" variability="continuous" causality="internal" alias="alias" >
+			<Real quantity="Pressure" unit="Pa" displayUnit="bar" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="inlet"/>
+				<exp:QualifiedNamePart name="P"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="inlet.h" valueReference="12" variability="continuous" causality="internal" alias="alias" >
+			<Real quantity="SpecificEnergy" unit="J/kg" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="inlet"/>
+				<exp:QualifiedNamePart name="h"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="inlet.mdot" valueReference="10" variability="continuous" causality="internal" alias="alias" >
+			<Real quantity="MassFlowRate" unit="kg/s" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="inlet"/>
+				<exp:QualifiedNamePart name="mdot"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="m" valueReference="7" variability="continuous" causality="internal" alias="noAlias">
+			<Real quantity="Mass" unit="kg" relativeQuantity="false" min="0.0" start="0.00119" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="m"/>
+			</QualifiedName>
+			<isLinear>false</isLinear>
+			<VariableCategory>state</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="der(m)" valueReference="5" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="m"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>derivative</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="m_0" valueReference="0" variability="parameter" causality="internal" alias="noAlias">
+			<Real quantity="Mass" unit="kg" relativeQuantity="false" min="0.0" start="0.00119" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="m_0"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="mdot_in" valueReference="10" variability="continuous" causality="internal" alias="noAlias">
+			<Real quantity="MassFlowRate" unit="kg/s" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="mdot_in"/>
+			</QualifiedName>
+			<isLinear>false</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="mdot_out" valueReference="11" variability="continuous" causality="internal" alias="noAlias">
+			<Real quantity="MassFlowRate" unit="kg/s" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="mdot_out"/>
+			</QualifiedName>
+			<isLinear>false</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="outlet.P" valueReference="18" variability="continuous" causality="internal" alias="alias" >
+			<Real quantity="Pressure" unit="Pa" displayUnit="bar" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="outlet"/>
+				<exp:QualifiedNamePart name="P"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="outlet.h" valueReference="13" variability="continuous" causality="internal" alias="alias" >
+			<Real quantity="SpecificEnergy" unit="J/kg" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="outlet"/>
+				<exp:QualifiedNamePart name="h"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="outlet.mdot" valueReference="11" variability="continuous" causality="internal" alias="negatedAlias" >
+			<Real quantity="MassFlowRate" unit="kg/s" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="outlet"/>
+				<exp:QualifiedNamePart name="mdot"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="u" valueReference="21" variability="continuous" causality="internal" alias="noAlias">
+			<Real quantity="SpecificEnergy" unit="J/kg" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="u"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="u_0" valueReference="1" variability="parameter" causality="internal" alias="noAlias">
+			<Real quantity="SpecificEnergy" unit="J/kg" relativeQuantity="false" start="209058.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="u_0"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="v" valueReference="19" variability="continuous" causality="internal" alias="noAlias">
+			<Real quantity="SpecificVolume" unit="m3/kg" relativeQuantity="false" min="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="v"/>
+			</QualifiedName>
+			<isLinear>false</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+	</ModelVariables>
+	<equ:BindingEquations>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="m_0"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:RealLiteral>0.00119</exp:RealLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="u_0"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>209058</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="c_v"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>717</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="R"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>287</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="T_0"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>293</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+	</equ:BindingEquations>
+
+	<equ:DynamicEquations>
+		<equ:Equation>
+			<exp:Sub>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="h_in"/>
+					</exp:Identifier>
+				<exp:IntegerLiteral>300190</exp:IntegerLiteral>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="V"/>
+					</exp:Identifier>
+				<exp:Add>
+					<exp:RealLiteral>0.001</exp:RealLiteral>
+					<exp:Mul>
+						<exp:RealLiteral>1.0E-4</exp:RealLiteral>
+						<exp:Div>
+							<exp:Sub>
+								<exp:Time>time</exp:Time>
+								<exp:RealLiteral>0.5</exp:RealLiteral>
+							</exp:Sub>
+							<exp:Add>
+								<exp:IntegerLiteral>1</exp:IntegerLiteral>
+								<exp:Exp>
+									<exp:Mul>
+										<exp:Mul>
+											<exp:Neg>
+												<exp:IntegerLiteral>2</exp:IntegerLiteral>
+											</exp:Neg>
+											<exp:IntegerLiteral>100</exp:IntegerLiteral>
+										</exp:Mul>
+										<exp:Sub>
+											<exp:Time>time</exp:Time>
+											<exp:RealLiteral>0.5</exp:RealLiteral>
+										</exp:Sub>
+									</exp:Mul>
+								</exp:Exp>
+							</exp:Add>
+						</exp:Div>
+					</exp:Mul>
+				</exp:Add>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="Qdot"/>
+					</exp:Identifier>
+				<exp:RealLiteral>0.0</exp:RealLiteral>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="Wdot_s"/>
+					</exp:Identifier>
+				<exp:RealLiteral>0.0</exp:RealLiteral>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+				<exp:Der>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="m"/>
+					</exp:Identifier>
+				</exp:Der>
+				<exp:Sub>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="mdot_in"/>
+						</exp:Identifier>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="mdot_out"/>
+						</exp:Identifier>
+				</exp:Sub>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+				<exp:Der>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="U"/>
+					</exp:Identifier>
+				</exp:Der>
+				<exp:Sub>
+					<exp:Add>
+						<exp:Sub>
+							<exp:Mul>
+									<exp:Identifier>
+											<exp:QualifiedNamePart name="h_in"/>
+									</exp:Identifier>
+									<exp:Identifier>
+											<exp:QualifiedNamePart name="mdot_in"/>
+									</exp:Identifier>
+							</exp:Mul>
+							<exp:Mul>
+									<exp:Identifier>
+											<exp:QualifiedNamePart name="h_out"/>
+									</exp:Identifier>
+									<exp:Identifier>
+											<exp:QualifiedNamePart name="mdot_out"/>
+									</exp:Identifier>
+							</exp:Mul>
+						</exp:Sub>
+							<exp:Identifier>
+									<exp:QualifiedNamePart name="Qdot"/>
+							</exp:Identifier>
+					</exp:Add>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="Wdot_e"/>
+						</exp:Identifier>
+				</exp:Sub>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="Wdot_e"/>
+					</exp:Identifier>
+				<exp:Add>
+					<exp:Mul>
+							<exp:Identifier>
+									<exp:QualifiedNamePart name="P"/>
+							</exp:Identifier>
+						<exp:Mul>
+							<exp:RealLiteral>1.0E-4</exp:RealLiteral>
+							<exp:Add>
+								<exp:Div>
+									<exp:IntegerLiteral>1</exp:IntegerLiteral>
+									<exp:Add>
+										<exp:IntegerLiteral>1</exp:IntegerLiteral>
+										<exp:Exp>
+											<exp:Mul>
+												<exp:Neg>
+													<exp:IntegerLiteral>200</exp:IntegerLiteral>
+												</exp:Neg>
+												<exp:Sub>
+													<exp:Time>time</exp:Time>
+													<exp:RealLiteral>0.5</exp:RealLiteral>
+												</exp:Sub>
+											</exp:Mul>
+										</exp:Exp>
+									</exp:Add>
+								</exp:Div>
+								<exp:Mul>
+									<exp:Div>
+										<exp:Neg>
+											<exp:Div>
+												<exp:Sub>
+													<exp:Time>time</exp:Time>
+													<exp:RealLiteral>0.5</exp:RealLiteral>
+												</exp:Sub>
+												<exp:Add>
+													<exp:IntegerLiteral>1</exp:IntegerLiteral>
+													<exp:Exp>
+														<exp:Mul>
+															<exp:Neg>
+																<exp:IntegerLiteral>200</exp:IntegerLiteral>
+															</exp:Neg>
+															<exp:Sub>
+																<exp:Time>time</exp:Time>
+																<exp:RealLiteral>0.5</exp:RealLiteral>
+															</exp:Sub>
+														</exp:Mul>
+													</exp:Exp>
+												</exp:Add>
+											</exp:Div>
+										</exp:Neg>
+										<exp:Add>
+											<exp:IntegerLiteral>1</exp:IntegerLiteral>
+											<exp:Exp>
+												<exp:Mul>
+													<exp:Neg>
+														<exp:IntegerLiteral>200</exp:IntegerLiteral>
+													</exp:Neg>
+													<exp:Sub>
+														<exp:Time>time</exp:Time>
+														<exp:RealLiteral>0.5</exp:RealLiteral>
+													</exp:Sub>
+												</exp:Mul>
+											</exp:Exp>
+										</exp:Add>
+									</exp:Div>
+									<exp:Mul>
+										<exp:Exp>
+											<exp:Mul>
+												<exp:Neg>
+													<exp:IntegerLiteral>200</exp:IntegerLiteral>
+												</exp:Neg>
+												<exp:Sub>
+													<exp:Time>time</exp:Time>
+													<exp:RealLiteral>0.5</exp:RealLiteral>
+												</exp:Sub>
+											</exp:Mul>
+										</exp:Exp>
+										<exp:Neg>
+											<exp:IntegerLiteral>200</exp:IntegerLiteral>
+										</exp:Neg>
+									</exp:Mul>
+								</exp:Mul>
+							</exp:Add>
+						</exp:Mul>
+					</exp:Mul>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="Wdot_s"/>
+						</exp:Identifier>
+				</exp:Add>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="H"/>
+					</exp:Identifier>
+				<exp:Add>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="U"/>
+						</exp:Identifier>
+					<exp:Mul>
+							<exp:Identifier>
+									<exp:QualifiedNamePart name="P"/>
+							</exp:Identifier>
+							<exp:Identifier>
+									<exp:QualifiedNamePart name="V"/>
+							</exp:Identifier>
+					</exp:Mul>
+				</exp:Add>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="u"/>
+					</exp:Identifier>
+				<exp:Div>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="U"/>
+						</exp:Identifier>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="m"/>
+						</exp:Identifier>
+				</exp:Div>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="v"/>
+					</exp:Identifier>
+				<exp:Div>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="V"/>
+						</exp:Identifier>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="m"/>
+						</exp:Identifier>
+				</exp:Div>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="h_out"/>
+					</exp:Identifier>
+				<exp:Div>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="H"/>
+						</exp:Identifier>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="m"/>
+						</exp:Identifier>
+				</exp:Div>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="u"/>
+					</exp:Identifier>
+				<exp:Add>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="u_0"/>
+						</exp:Identifier>
+					<exp:Mul>
+							<exp:Identifier>
+									<exp:QualifiedNamePart name="c_v"/>
+							</exp:Identifier>
+						<exp:Sub>
+								<exp:Identifier>
+										<exp:QualifiedNamePart name="T"/>
+								</exp:Identifier>
+								<exp:Identifier>
+										<exp:QualifiedNamePart name="T_0"/>
+								</exp:Identifier>
+						</exp:Sub>
+					</exp:Mul>
+				</exp:Add>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+				<exp:Mul>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="P"/>
+						</exp:Identifier>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="v"/>
+						</exp:Identifier>
+				</exp:Mul>
+				<exp:Mul>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="R"/>
+						</exp:Identifier>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="T"/>
+						</exp:Identifier>
+				</exp:Mul>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="mdot_in"/>
+					</exp:Identifier>
+				<exp:IntegerLiteral>0</exp:IntegerLiteral>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+				<exp:Neg>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="mdot_out"/>
+						</exp:Identifier>
+				</exp:Neg>
+				<exp:IntegerLiteral>0</exp:IntegerLiteral>
+			</exp:Sub>
+		</equ:Equation>
+	</equ:DynamicEquations>
+
+	<equ:InitialEquations>
+		<equ:Equation>
+			<exp:Sub>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="m"/>
+					</exp:Identifier>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="m_0"/>
+					</exp:Identifier>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="U"/>
+					</exp:Identifier>
+				<exp:Mul>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="u_0"/>
+						</exp:Identifier>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="m_0"/>
+						</exp:Identifier>
+				</exp:Mul>
+			</exp:Sub>
+		</equ:Equation>
+	</equ:InitialEquations>
+
+	
+	<fun:FunctionsList>
+	</fun:FunctionsList>
+
+</jmodelicaModelDescription>

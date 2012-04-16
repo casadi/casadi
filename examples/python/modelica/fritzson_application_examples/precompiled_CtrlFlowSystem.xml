@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmodelicaModelDescription xmlns:exp="https://svn.jmodelica.org/trunk/XML/daeExpressions.xsd" xmlns:equ="https://svn.jmodelica.org/trunk/XML/daeEquations.xsd" xmlns:fun="https://svn.jmodelica.org/trunk/XML/daeFunctions.xsd" xmlns:opt="https://svn.jmodelica.org/trunk/XML/daeOptimization.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+fmiVersion="1.0" modelName="CtrlFlowSystem" modelIdentifier="CtrlFlowSystem" guid="cbdb6ae4aaa3c1a0cca29edee847cfb0" generationDateAndTime="2012-02-22T17:46:24" variableNamingConvention="structured" numberOfContinuousStates="0" numberOfEventIndicators="0">
+	<UnitDefinitions>
+		<BaseUnit unit="Pa">
+			<DisplayUnitDefinition displayUnit="bar" gain="1" offset="0"/>
+		</BaseUnit>
+	</UnitDefinitions>
+	
+	
+	<VendorAnnotations>
+		<Tool name="JModelica">
+		</Tool>
+	</VendorAnnotations>		
+	<ModelVariables>
+		<ScalarVariable name="ctrlFlowModel.A" valueReference="6" variability="parameter" causality="internal" alias="noAlias">
+			<Real quantity="Area" unit="m2" relativeQuantity="false" start="1.0E-4" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="ctrlFlowModel"/>
+				<exp:QualifiedNamePart name="A"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="ctrlFlowModel.P_in" valueReference="0" variability="continuous" causality="internal" alias="alias" >
+			<Real quantity="Pressure" unit="Pa" displayUnit="bar" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="ctrlFlowModel"/>
+				<exp:QualifiedNamePart name="P_in"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="ctrlFlowModel.P_out" valueReference="8" variability="continuous" causality="internal" alias="alias" >
+			<Real quantity="Pressure" unit="Pa" displayUnit="bar" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="ctrlFlowModel"/>
+				<exp:QualifiedNamePart name="P_out"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="ctrlFlowModel.beta" valueReference="7" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="5.0E-5" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="ctrlFlowModel"/>
+				<exp:QualifiedNamePart name="beta"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="ctrlFlowModel.inlet.P" valueReference="0" variability="continuous" causality="internal" alias="alias" >
+			<Real quantity="Pressure" unit="Pa" displayUnit="bar" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="ctrlFlowModel"/>
+				<exp:QualifiedNamePart name="inlet"/>
+				<exp:QualifiedNamePart name="P"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="ctrlFlowModel.inlet.h" valueReference="1" variability="continuous" causality="internal" alias="alias" >
+			<Real quantity="SpecificEnergy" unit="J/kg" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="ctrlFlowModel"/>
+				<exp:QualifiedNamePart name="inlet"/>
+				<exp:QualifiedNamePart name="h"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="ctrlFlowModel.inlet.mdot" valueReference="11" variability="continuous" causality="internal" alias="alias" >
+			<Real quantity="MassFlowRate" unit="kg/s" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="ctrlFlowModel"/>
+				<exp:QualifiedNamePart name="inlet"/>
+				<exp:QualifiedNamePart name="mdot"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="ctrlFlowModel.mdot" valueReference="11" variability="continuous" causality="internal" alias="noAlias">
+			<Real quantity="MassFlowRate" unit="kg/s" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="ctrlFlowModel"/>
+				<exp:QualifiedNamePart name="mdot"/>
+			</QualifiedName>
+			<isLinear>false</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="ctrlFlowModel.outlet.P" valueReference="8" variability="continuous" causality="internal" alias="alias" >
+			<Real quantity="Pressure" unit="Pa" displayUnit="bar" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="ctrlFlowModel"/>
+				<exp:QualifiedNamePart name="outlet"/>
+				<exp:QualifiedNamePart name="P"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="ctrlFlowModel.outlet.h" valueReference="9" variability="continuous" causality="internal" alias="noAlias">
+			<Real quantity="SpecificEnergy" unit="J/kg" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="ctrlFlowModel"/>
+				<exp:QualifiedNamePart name="outlet"/>
+				<exp:QualifiedNamePart name="h"/>
+			</QualifiedName>
+			<isLinear>false</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="ctrlFlowModel.outlet.mdot" valueReference="11" variability="continuous" causality="internal" alias="negatedAlias" >
+			<Real quantity="MassFlowRate" unit="kg/s" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="ctrlFlowModel"/>
+				<exp:QualifiedNamePart name="outlet"/>
+				<exp:QualifiedNamePart name="mdot"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="ctrlFlowModel.u" valueReference="10" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="ctrlFlowModel"/>
+				<exp:QualifiedNamePart name="u"/>
+			</QualifiedName>
+			<isLinear>false</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="pressureEnthalpySource.P_0" valueReference="0" variability="parameter" causality="internal" alias="noAlias">
+			<Real quantity="Pressure" unit="Pa" displayUnit="bar" relativeQuantity="false" start="120000.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="pressureEnthalpySource"/>
+				<exp:QualifiedNamePart name="P_0"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="pressureEnthalpySource.h_0" valueReference="1" variability="parameter" causality="internal" alias="noAlias">
+			<Real quantity="SpecificEnergy" unit="J/kg" relativeQuantity="false" start="300190.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="pressureEnthalpySource"/>
+				<exp:QualifiedNamePart name="h_0"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="pressureEnthalpySource.outlet.P" valueReference="0" variability="continuous" causality="internal" alias="alias" >
+			<Real quantity="Pressure" unit="Pa" displayUnit="bar" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="pressureEnthalpySource"/>
+				<exp:QualifiedNamePart name="outlet"/>
+				<exp:QualifiedNamePart name="P"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="pressureEnthalpySource.outlet.h" valueReference="1" variability="continuous" causality="internal" alias="alias" >
+			<Real quantity="SpecificEnergy" unit="J/kg" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="pressureEnthalpySource"/>
+				<exp:QualifiedNamePart name="outlet"/>
+				<exp:QualifiedNamePart name="h"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="pressureEnthalpySource.outlet.mdot" valueReference="11" variability="continuous" causality="internal" alias="negatedAlias" >
+			<Real quantity="MassFlowRate" unit="kg/s" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="pressureEnthalpySource"/>
+				<exp:QualifiedNamePart name="outlet"/>
+				<exp:QualifiedNamePart name="mdot"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="pressureSink.P_0" valueReference="8" variability="parameter" causality="internal" alias="noAlias">
+			<Real quantity="Pressure" unit="Pa" displayUnit="bar" relativeQuantity="false" start="100000.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="pressureSink"/>
+				<exp:QualifiedNamePart name="P_0"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="pressureSink.inlet.P" valueReference="8" variability="continuous" causality="internal" alias="alias" >
+			<Real quantity="Pressure" unit="Pa" displayUnit="bar" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="pressureSink"/>
+				<exp:QualifiedNamePart name="inlet"/>
+				<exp:QualifiedNamePart name="P"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="pressureSink.inlet.h" valueReference="9" variability="continuous" causality="internal" alias="alias" >
+			<Real quantity="SpecificEnergy" unit="J/kg" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="pressureSink"/>
+				<exp:QualifiedNamePart name="inlet"/>
+				<exp:QualifiedNamePart name="h"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="pressureSink.inlet.mdot" valueReference="11" variability="continuous" causality="internal" alias="alias" >
+			<Real quantity="MassFlowRate" unit="kg/s" relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="pressureSink"/>
+				<exp:QualifiedNamePart name="inlet"/>
+				<exp:QualifiedNamePart name="mdot"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="step.K" valueReference="5" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="100.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="step"/>
+				<exp:QualifiedNamePart name="K"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="step.height" valueReference="4" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="-0.5" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="step"/>
+				<exp:QualifiedNamePart name="height"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="step.offset" valueReference="2" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="1.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="step"/>
+				<exp:QualifiedNamePart name="offset"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="step.startTime" valueReference="3" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.5" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="step"/>
+				<exp:QualifiedNamePart name="startTime"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="step.y" valueReference="10" variability="continuous" causality="internal" alias="alias" >
+			<Real relativeQuantity="false" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="step"/>
+				<exp:QualifiedNamePart name="y"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+	</ModelVariables>
+	<equ:BindingEquations>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="pressureEnthalpySource"/>
+				<exp:QualifiedNamePart name="P_0"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:RealLiteral>120000.0</exp:RealLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="pressureEnthalpySource"/>
+				<exp:QualifiedNamePart name="h_0"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>300190</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="step"/>
+				<exp:QualifiedNamePart name="offset"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>1</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="step"/>
+				<exp:QualifiedNamePart name="startTime"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:RealLiteral>0.5</exp:RealLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="step"/>
+				<exp:QualifiedNamePart name="height"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:Neg>
+					<exp:RealLiteral>0.5</exp:RealLiteral>
+				</exp:Neg>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="step"/>
+				<exp:QualifiedNamePart name="K"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>100</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="ctrlFlowModel"/>
+				<exp:QualifiedNamePart name="A"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:RealLiteral>1.0E-4</exp:RealLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="ctrlFlowModel"/>
+				<exp:QualifiedNamePart name="beta"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:RealLiteral>5.0E-5</exp:RealLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="pressureSink"/>
+				<exp:QualifiedNamePart name="P_0"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:RealLiteral>100000.0</exp:RealLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+	</equ:BindingEquations>
+
+	<equ:DynamicEquations>
+		<equ:Equation>
+			<exp:Sub>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="ctrlFlowModel"/>
+							<exp:QualifiedNamePart name="u"/>
+					</exp:Identifier>
+				<exp:Add>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="step"/>
+								<exp:QualifiedNamePart name="offset"/>
+						</exp:Identifier>
+					<exp:Div>
+							<exp:Identifier>
+									<exp:QualifiedNamePart name="step"/>
+									<exp:QualifiedNamePart name="height"/>
+							</exp:Identifier>
+						<exp:Add>
+							<exp:IntegerLiteral>1</exp:IntegerLiteral>
+							<exp:Exp>
+								<exp:Mul>
+									<exp:Mul>
+										<exp:Neg>
+											<exp:IntegerLiteral>2</exp:IntegerLiteral>
+										</exp:Neg>
+											<exp:Identifier>
+													<exp:QualifiedNamePart name="step"/>
+													<exp:QualifiedNamePart name="K"/>
+											</exp:Identifier>
+									</exp:Mul>
+									<exp:Sub>
+										<exp:Time>time</exp:Time>
+											<exp:Identifier>
+													<exp:QualifiedNamePart name="step"/>
+													<exp:QualifiedNamePart name="startTime"/>
+											</exp:Identifier>
+									</exp:Sub>
+								</exp:Mul>
+							</exp:Exp>
+						</exp:Add>
+					</exp:Div>
+				</exp:Add>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+				<exp:IntegerLiteral>0</exp:IntegerLiteral>
+				<exp:Add>
+					<exp:Mul>
+							<exp:Identifier>
+									<exp:QualifiedNamePart name="ctrlFlowModel"/>
+									<exp:QualifiedNamePart name="mdot"/>
+							</exp:Identifier>
+							<exp:Identifier>
+									<exp:QualifiedNamePart name="pressureEnthalpySource"/>
+									<exp:QualifiedNamePart name="h_0"/>
+							</exp:Identifier>
+					</exp:Mul>
+					<exp:Mul>
+						<exp:Neg>
+								<exp:Identifier>
+										<exp:QualifiedNamePart name="ctrlFlowModel"/>
+										<exp:QualifiedNamePart name="mdot"/>
+								</exp:Identifier>
+						</exp:Neg>
+							<exp:Identifier>
+									<exp:QualifiedNamePart name="ctrlFlowModel"/>
+									<exp:QualifiedNamePart name="outlet"/>
+									<exp:QualifiedNamePart name="h"/>
+							</exp:Identifier>
+					</exp:Mul>
+				</exp:Add>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+				<exp:Mul>
+					<exp:Mul>
+							<exp:Identifier>
+									<exp:QualifiedNamePart name="ctrlFlowModel"/>
+									<exp:QualifiedNamePart name="beta"/>
+							</exp:Identifier>
+						<exp:Pow>
+							<exp:Mul>
+									<exp:Identifier>
+											<exp:QualifiedNamePart name="ctrlFlowModel"/>
+											<exp:QualifiedNamePart name="A"/>
+									</exp:Identifier>
+									<exp:Identifier>
+											<exp:QualifiedNamePart name="ctrlFlowModel"/>
+											<exp:QualifiedNamePart name="u"/>
+									</exp:Identifier>
+							</exp:Mul>
+							<exp:IntegerLiteral>2</exp:IntegerLiteral>
+						</exp:Pow>
+					</exp:Mul>
+					<exp:Sub>
+							<exp:Identifier>
+									<exp:QualifiedNamePart name="pressureEnthalpySource"/>
+									<exp:QualifiedNamePart name="P_0"/>
+							</exp:Identifier>
+							<exp:Identifier>
+									<exp:QualifiedNamePart name="pressureSink"/>
+									<exp:QualifiedNamePart name="P_0"/>
+							</exp:Identifier>
+					</exp:Sub>
+				</exp:Mul>
+				<exp:Pow>
+						<exp:Identifier>
+								<exp:QualifiedNamePart name="ctrlFlowModel"/>
+								<exp:QualifiedNamePart name="mdot"/>
+						</exp:Identifier>
+					<exp:IntegerLiteral>2</exp:IntegerLiteral>
+				</exp:Pow>
+			</exp:Sub>
+		</equ:Equation>
+	</equ:DynamicEquations>
+
+	<equ:InitialEquations>
+	</equ:InitialEquations>
+
+	
+	<fun:FunctionsList>
+	</fun:FunctionsList>
+
+</jmodelicaModelDescription>

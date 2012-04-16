@@ -919,13 +919,18 @@ This will generate a \texttt{jmu}-file, which is essentially a zipfile containin
   mfile = sfile.extract('modelDescription.xml','.')
 \end{verbatim}
 
-\section{The FlatOCP class} \label{sec:modelica_import}
-The symbolic optimal control problem representation (or just model description) contained in \texttt{modelDescription.xml} can be imported into CasADi in the form of the FlatOCP class:
+\section{The SymbolicOCP class} \label{sec:modelica_import}
+The symbolic optimal control problem representation (or just model description) contained in \texttt{modelDescription.xml} can be imported into CasADi in the form of the SymbolicOCP class:
 \begin{verbatim}
-ocp = FlatOCP('modelDescription.xml')
+ocp = SymbolicOCP()
 \end{verbatim}
 
-The FlatOCP class contains symbolic representation of the optimal control problem designed to be general and allow manipulation. The basic usage of this class is first to set options that influences the parsing of the XML file, initialize it by calling \texttt{ocp.init()} and then calling the different class methods to access or manipulate the optimal control problem. For a description of this class and its method, we refer to the API documentation.
+The SymbolicOCP class contains symbolic representation of the optimal control problem designed to be general and allow manipulation. The basic usage of this class is to call the member function \texttt{parseFMI} with the XML file name and a set of options\footnote{In C++, the dictionary with options corresponds to a \texttt{CasADi::Dictionary} object}:
+\begin{verbatim}
+ocp.parseFMI('modelDescription.xml',{'scale_variables':True})
+\end{verbatim}
+
+For a more detailed description of this class and its functionalities, we refer to the API documentation.
 
 \chapter{Syntax differences between CasADi in Python, C++ and Octave}\label{sec:syntax_differences}
 \scriptsize
@@ -947,6 +952,7 @@ The FlatOCP class contains symbolic representation of the optimal control proble
     Elementwise division & \verb|x/y| & \verb|x/y| & \verb|x./y| \\ \hline
     Power & \verb|x**y| & \verb|pow(x,y)| & \verb|x^y| or \verb|x.^y| \\ \hline
     Transpose & \verb|trans(A)| or \verb|A.T| & \verb|trans(A)| & \verb|trans(A)| or \verb|A'| or \verb|A.'| \\ \hline
+    Creating a dictionary (e.g. for options) & \verb|d = {'opt1':opt1}| or \verb|d = {}; a['opt1'] = opt1| & \verb|a = Dictionary();| \verb|a['opt1'] = opt1;| & \verb|a = Dictionary();| \verb|a('opt1') = opt1;| (?) \\ \hline
   \end{tabular}
 \end{center}
 

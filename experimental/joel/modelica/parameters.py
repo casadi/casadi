@@ -1,6 +1,6 @@
 import casadi
-ocp = casadi.FlatOCP('modelDescription.xml')
-ocp.init()
+ocp = casadi.SymbolicOCP()
+ocp.parseFMI('modelDescription.xml')
 
 x = ocp.variable('x')
 x_start = ocp.variable('x_start')
