@@ -14,7 +14,7 @@
 <tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -45,7 +45,7 @@
 <tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -71,7 +71,7 @@
 <tr><td>convex</td><td>OT_BOOLEAN</td><td>false</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPSolverInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>mutol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setMuTol to OOQP</td><td>CasADi::Interfaces::OOQPInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -97,7 +97,7 @@
 <tr><td>convex</td><td>OT_BOOLEAN</td><td>false</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPSolverInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>mutol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setMuTol to OOQP</td><td>CasADi::Interfaces::OOQPInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -121,7 +121,7 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -144,7 +144,7 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -158,40 +158,6 @@
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
 */
-/** \class CasADi::OptimalControl::FlatOCPInternal
-\n
-\par
-<table>
-<caption>List of available options</caption>
-<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>eliminate_algebraic</td><td>OT_BOOLEAN</td><td>false</td><td>Completely eliminate algebraic states</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
-<tr><td>eliminate_dependent</td><td>OT_BOOLEAN</td><td>true</td><td>Eliminate variables that can be written as an explicit expression of other variables</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
-<tr><td>eliminate_dependents_with_bounds</td><td>OT_BOOLEAN</td><td>true</td><td>Eliminate dependent variables even if they have bounds that may become active (this may result in extra path constraints)</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
-<tr><td>make_explicit</td><td>OT_BOOLEAN</td><td>false</td><td>Make the DAE semi-explicit</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
-<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
-<tr><td>scale_equations</td><td>OT_BOOLEAN</td><td>false</td><td>Scale the implicit equations so that they get unity order of magnitude</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
-<tr><td>scale_variables</td><td>OT_BOOLEAN</td><td>false</td><td>Scale the variables so that they get unity order of magnitude</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
-<tr><td>sort_equations</td><td>OT_BOOLEAN</td><td>true</td><td>Sort the dynamic equations</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
-<tr><td>verbose</td><td>OT_BOOLEAN</td><td>true</td><td>Verbose parsing</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
-</table>
-*/
-/** \class CasADi::OptimalControl::FlatOCP
-\n
-\par
-<table>
-<caption>List of available options</caption>
-<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>eliminate_algebraic</td><td>OT_BOOLEAN</td><td>false</td><td>Completely eliminate algebraic states</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
-<tr><td>eliminate_dependent</td><td>OT_BOOLEAN</td><td>true</td><td>Eliminate variables that can be written as an explicit expression of other variables</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
-<tr><td>eliminate_dependents_with_bounds</td><td>OT_BOOLEAN</td><td>true</td><td>Eliminate dependent variables even if they have bounds that may become active (this may result in extra path constraints)</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
-<tr><td>make_explicit</td><td>OT_BOOLEAN</td><td>false</td><td>Make the DAE semi-explicit</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
-<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
-<tr><td>scale_equations</td><td>OT_BOOLEAN</td><td>false</td><td>Scale the implicit equations so that they get unity order of magnitude</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
-<tr><td>scale_variables</td><td>OT_BOOLEAN</td><td>false</td><td>Scale the variables so that they get unity order of magnitude</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
-<tr><td>sort_equations</td><td>OT_BOOLEAN</td><td>true</td><td>Sort the dynamic equations</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
-<tr><td>verbose</td><td>OT_BOOLEAN</td><td>true</td><td>Verbose parsing</td><td>CasADi::OptimalControl::FlatOCPInternal</td></tr>
-</table>
-*/
 /** \class CasADi::Interfaces::LapackLUDenseInternal
 \n
 \par
@@ -203,7 +169,7 @@
 <tr><td>equilibration</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>CasADi::Interfaces::LapackLUDenseInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -228,7 +194,7 @@
 <tr><td>equilibration</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>CasADi::Interfaces::LapackLUDenseInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -248,43 +214,17 @@
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>absolute tolerence  for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>asens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>collocation_scheme</td><td>OT_STRING</td><td>"radau"</td><td>Collocation scheme (radau|legendre)</td><td>CasADi::CollocationIntegratorInternal</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the ODE/DAE residual function in an SX graph</td><td>CasADi::CollocationIntegratorInternal</td></tr>
 <tr><td>expand_q</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the quadrature function in an SX graph</td><td>CasADi::CollocationIntegratorInternal</td></tr>
-<tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the forward sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>include the forward sensitivities in all error controls</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the forward sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_scaling_factors</td><td>OT_REALVECTOR</td><td></td><td>scaling factor for the components if finite differences is used</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_sensitiviy_parameters</td><td>OT_INTEGERVECTOR</td><td></td><td>specifies which components will be used when estimating the sensitivity equations</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>hotstart</td><td>OT_BOOLEAN</td><td>true</td><td>Initialize the trajectory at the previous solution</td><td>CasADi::CollocationIntegratorInternal</td></tr>
 <tr><td>implicit_solver</td><td>OT_IMPLICITFUNCTION</td><td>GenericType()</td><td>An implicit function solver</td><td>CasADi::CollocationIntegratorInternal</td></tr>
 <tr><td>implicit_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the NLP Solver</td><td>CasADi::CollocationIntegratorInternal</td></tr>
 <tr><td>interpolation_order</td><td>OT_INTEGER</td><td>3</td><td>Order of the interpolating polynomials</td><td>CasADi::CollocationIntegratorInternal</td></tr>
-<tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>A vector with a boolean describing the nature for each state.</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>maximum number of steps</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>nrhs</td><td>OT_INTEGER</td><td>1</td><td>number of right hand sides</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -292,23 +232,16 @@
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>quad_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>should the quadratures affect the step size control</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>quadrature_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver to solver the quadrature equations</td><td>CasADi::CollocationIntegratorInternal</td></tr>
 <tr><td>quadrature_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the quadrature solver</td><td>CasADi::CollocationIntegratorInternal</td></tr>
-<tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>startup_integrator</td><td>OT_INTEGRATOR</td><td>GenericType()</td><td>An ODE/DAE integrator that can be used to generate a startup trajectory</td><td>CasADi::CollocationIntegratorInternal</td></tr>
 <tr><td>startup_integrator_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the startup integrator</td><td>CasADi::CollocationIntegratorInternal</td></tr>
-<tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>start of the integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>end of the integration</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>precondition an iterative solver</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -319,43 +252,17 @@
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>absolute tolerence  for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>asens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>collocation_scheme</td><td>OT_STRING</td><td>"radau"</td><td>Collocation scheme (radau|legendre)</td><td>CasADi::CollocationIntegratorInternal</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the ODE/DAE residual function in an SX graph</td><td>CasADi::CollocationIntegratorInternal</td></tr>
 <tr><td>expand_q</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the quadrature function in an SX graph</td><td>CasADi::CollocationIntegratorInternal</td></tr>
-<tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the forward sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>include the forward sensitivities in all error controls</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the forward sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_scaling_factors</td><td>OT_REALVECTOR</td><td></td><td>scaling factor for the components if finite differences is used</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_sensitiviy_parameters</td><td>OT_INTEGERVECTOR</td><td></td><td>specifies which components will be used when estimating the sensitivity equations</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>hotstart</td><td>OT_BOOLEAN</td><td>true</td><td>Initialize the trajectory at the previous solution</td><td>CasADi::CollocationIntegratorInternal</td></tr>
 <tr><td>implicit_solver</td><td>OT_IMPLICITFUNCTION</td><td>GenericType()</td><td>An implicit function solver</td><td>CasADi::CollocationIntegratorInternal</td></tr>
 <tr><td>implicit_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the NLP Solver</td><td>CasADi::CollocationIntegratorInternal</td></tr>
 <tr><td>interpolation_order</td><td>OT_INTEGER</td><td>3</td><td>Order of the interpolating polynomials</td><td>CasADi::CollocationIntegratorInternal</td></tr>
-<tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>A vector with a boolean describing the nature for each state.</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>maximum number of steps</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>nrhs</td><td>OT_INTEGER</td><td>1</td><td>number of right hand sides</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -363,23 +270,16 @@
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>quad_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>should the quadratures affect the step size control</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>quadrature_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver to solver the quadrature equations</td><td>CasADi::CollocationIntegratorInternal</td></tr>
 <tr><td>quadrature_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the quadrature solver</td><td>CasADi::CollocationIntegratorInternal</td></tr>
-<tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>startup_integrator</td><td>OT_INTEGRATOR</td><td>GenericType()</td><td>An ODE/DAE integrator that can be used to generate a startup trajectory</td><td>CasADi::CollocationIntegratorInternal</td></tr>
 <tr><td>startup_integrator_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the startup integrator</td><td>CasADi::CollocationIntegratorInternal</td></tr>
-<tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>start of the integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>end of the integration</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>precondition an iterative solver</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -404,7 +304,7 @@
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>0</td><td></td><td>CasADi::Sundials::KinsolInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated<br />(eval_f|eval_djac)</td><td>CasADi::FXInternal<br />CasADi::Sundials::KinsolInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(eval_f|eval_djac)</td><td>CasADi::FXInternal<br />CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -442,7 +342,7 @@
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>0</td><td></td><td>CasADi::Sundials::KinsolInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated<br />(eval_f|eval_djac)</td><td>CasADi::FXInternal<br />CasADi::Sundials::KinsolInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(eval_f|eval_djac)</td><td>CasADi::FXInternal<br />CasADi::Sundials::KinsolInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -472,7 +372,7 @@
 <tr><td>integrator_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the integrator</td><td>CasADi::OptimalControl::MultipleShootingInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>nlp_solver</td><td>OT_NLPSOLVER</td><td>GenericType()</td><td>An NLPSolver creator function</td><td>CasADi::OptimalControl::MultipleShootingInternal</td></tr>
 <tr><td>nlp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the NLP Solver</td><td>CasADi::OptimalControl::MultipleShootingInternal</td></tr>
@@ -502,7 +402,7 @@
 <tr><td>integrator_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the integrator</td><td>CasADi::OptimalControl::MultipleShootingInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>nlp_solver</td><td>OT_NLPSOLVER</td><td>GenericType()</td><td>An NLPSolver creator function</td><td>CasADi::OptimalControl::MultipleShootingInternal</td></tr>
 <tr><td>nlp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the NLP Solver</td><td>CasADi::OptimalControl::MultipleShootingInternal</td></tr>
@@ -520,6 +420,126 @@
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
 */
+/** \class CasADi::Sundials::SundialsInternal
+\n
+\par
+<table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>absolute tolerence  for the IVP solution</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>asens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>fsens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the forward sensitivity solution [default: equal to abstol]</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>fsens_err_con</td><td>OT_BOOLEAN</td><td>true</td><td>include the forward sensitivities in all error controls</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>fsens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the forward sensitivity solution [default: equal to reltol]</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>fsens_scaling_factors</td><td>OT_REALVECTOR</td><td></td><td>scaling factor for the components if finite differences is used</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>fsens_sensitiviy_parameters</td><td>OT_INTEGERVECTOR</td><td></td><td>specifies which components will be used when estimating the sensitivity equations</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>A vector with a boolean describing the nature for each state.</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>maximum number of steps</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
+<tr><td>nrhs</td><td>OT_INTEGER</td><td>1</td><td>number of right hand sides</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>quad_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>should the quadratures affect the step size control</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
+<tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>start of the integration</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>end of the integration</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>precondition an iterative solver</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
+</table>
+*/
+/** \class CasADi::Sundials::SundialsIntegrator
+\n
+\par
+<table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>absolute tolerence  for the IVP solution</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>asens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>fsens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the forward sensitivity solution [default: equal to abstol]</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>fsens_err_con</td><td>OT_BOOLEAN</td><td>true</td><td>include the forward sensitivities in all error controls</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>fsens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the forward sensitivity solution [default: equal to reltol]</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>fsens_scaling_factors</td><td>OT_REALVECTOR</td><td></td><td>scaling factor for the components if finite differences is used</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>fsens_sensitiviy_parameters</td><td>OT_INTEGERVECTOR</td><td></td><td>specifies which components will be used when estimating the sensitivity equations</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>A vector with a boolean describing the nature for each state.</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>maximum number of steps</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
+<tr><td>nrhs</td><td>OT_INTEGER</td><td>1</td><td>number of right hand sides</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>quad_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>should the quadratures affect the step size control</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
+<tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>start of the integration</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>end of the integration</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>precondition an iterative solver</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
+</table>
+*/
 /** \class CasADi::SimulatorInternal
 \n
 \par
@@ -529,7 +549,7 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(initial|step)</td><td>CasADi::FXInternal<br />CasADi::SimulatorInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -551,7 +571,7 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(initial|step)</td><td>CasADi::FXInternal<br />CasADi::SimulatorInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -574,7 +594,7 @@
 <tr><td>convex</td><td>OT_BOOLEAN</td><td>false</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPSolverInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -597,7 +617,7 @@
 <tr><td>convex</td><td>OT_BOOLEAN</td><td>false</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPSolverInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -621,7 +641,7 @@
 <tr><td>convex</td><td>OT_BOOLEAN</td><td>false</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPSolverInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>nWSR</td><td>OT_INTEGER</td><td>GenericType()</td><td>The maximum number of working set recalculations to be performed during the initial homotopy. Default is 5(nx + nc)</td><td>CasADi::Interfaces::QPOasesInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -647,7 +667,7 @@
 <tr><td>convex</td><td>OT_BOOLEAN</td><td>false</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPSolverInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>nWSR</td><td>OT_INTEGER</td><td>GenericType()</td><td>The maximum number of working set recalculations to be performed during the initial homotopy. Default is 5(nx + nc)</td><td>CasADi::Interfaces::QPOasesInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -662,98 +682,92 @@
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
 */
-/** \class CasADi::CFunctionInternal
+/** \class CasADi::LiftedSQPInternal
 \n
 \par
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>eta</td><td>OT_REAL</td><td>0.0001</td><td>Linesearch parameter: See Nocedal 3.4</td><td>CasADi::LiftedSQPInternal</td></tr>
+<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the objective function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>hessian_approximation</td><td>OT_STRING</td><td>"BFGS"</td><td>BFGS|exact</td><td>CasADi::LiftedSQPInternal</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>iteration_callback</td><td>OT_FX</td><td>FX()</td><td>A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>maxiter</td><td>OT_INTEGER</td><td>100</td><td>Maximum number of SQP iterations</td><td>CasADi::LiftedSQPInternal</td></tr>
+<tr><td>maxiter_ls</td><td>OT_INTEGER</td><td>100</td><td>Maximum number of linesearch iterations</td><td>CasADi::LiftedSQPInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp)</td><td>CasADi::FXInternal<br />CasADi::LiftedSQPInternal</td></tr>
+<tr><td>mu_safety</td><td>OT_REAL</td><td>1.1</td><td>Safety factor for linesearch mu</td><td>CasADi::LiftedSQPInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
+<tr><td>num_lifted</td><td>OT_INTEGER</td><td>0</td><td>Number of variables to lift</td><td>CasADi::LiftedSQPInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>parametric</td><td>OT_BOOLEAN</td><td>false</td><td>Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>qp_solver</td><td>OT_QPSOLVER</td><td>GenericType()</td><td>The QP solver to be used by the SQP method</td><td>CasADi::LiftedSQPInternal</td></tr>
+<tr><td>qp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the QP solver</td><td>CasADi::LiftedSQPInternal</td></tr>
+<tr><td>rho</td><td>OT_REAL</td><td>0.5</td><td>Linesearch parameter</td><td>CasADi::LiftedSQPInternal</td></tr>
+<tr><td>sigma</td><td>OT_REAL</td><td>1.0</td><td>Linesearch parameter</td><td>CasADi::LiftedSQPInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
+<tr><td>tau</td><td>OT_REAL</td><td>0.2</td><td>Linesearch parameter</td><td>CasADi::LiftedSQPInternal</td></tr>
+<tr><td>toldx</td><td>OT_REAL</td><td>1e-12</td><td>Stopping criterion for the stepsize</td><td>CasADi::LiftedSQPInternal</td></tr>
+<tr><td>tolgl</td><td>OT_REAL</td><td>1e-12</td><td>Stopping criterion for the Lagrangian gradient</td><td>CasADi::LiftedSQPInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
+<tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>false</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>CasADi::NLPSolverInternal</td></tr>
 </table>
 */
-/** \class CasADi::CFunction
+/** \class CasADi::LiftedSQP
 \n
 \par
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>eta</td><td>OT_REAL</td><td>0.0001</td><td>Linesearch parameter: See Nocedal 3.4</td><td>CasADi::LiftedSQPInternal</td></tr>
+<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the objective function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>hessian_approximation</td><td>OT_STRING</td><td>"BFGS"</td><td>BFGS|exact</td><td>CasADi::LiftedSQPInternal</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>iteration_callback</td><td>OT_FX</td><td>FX()</td><td>A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>maxiter</td><td>OT_INTEGER</td><td>100</td><td>Maximum number of SQP iterations</td><td>CasADi::LiftedSQPInternal</td></tr>
+<tr><td>maxiter_ls</td><td>OT_INTEGER</td><td>100</td><td>Maximum number of linesearch iterations</td><td>CasADi::LiftedSQPInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp)</td><td>CasADi::FXInternal<br />CasADi::LiftedSQPInternal</td></tr>
+<tr><td>mu_safety</td><td>OT_REAL</td><td>1.1</td><td>Safety factor for linesearch mu</td><td>CasADi::LiftedSQPInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
+<tr><td>num_lifted</td><td>OT_INTEGER</td><td>0</td><td>Number of variables to lift</td><td>CasADi::LiftedSQPInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>parametric</td><td>OT_BOOLEAN</td><td>false</td><td>Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>qp_solver</td><td>OT_QPSOLVER</td><td>GenericType()</td><td>The QP solver to be used by the SQP method</td><td>CasADi::LiftedSQPInternal</td></tr>
+<tr><td>qp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the QP solver</td><td>CasADi::LiftedSQPInternal</td></tr>
+<tr><td>rho</td><td>OT_REAL</td><td>0.5</td><td>Linesearch parameter</td><td>CasADi::LiftedSQPInternal</td></tr>
+<tr><td>sigma</td><td>OT_REAL</td><td>1.0</td><td>Linesearch parameter</td><td>CasADi::LiftedSQPInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
+<tr><td>tau</td><td>OT_REAL</td><td>0.2</td><td>Linesearch parameter</td><td>CasADi::LiftedSQPInternal</td></tr>
+<tr><td>toldx</td><td>OT_REAL</td><td>1e-12</td><td>Stopping criterion for the stepsize</td><td>CasADi::LiftedSQPInternal</td></tr>
+<tr><td>tolgl</td><td>OT_REAL</td><td>1e-12</td><td>Stopping criterion for the Lagrangian gradient</td><td>CasADi::LiftedSQPInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
-</table>
-*/
-/** \class CasADi::SXFunctionInternal
-\n
-\par
-<table>
-<caption>List of available options</caption>
-<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>inplace</td><td>OT_BOOLEAN</td><td>false</td><td>Evaluate with inplace operations (experimental)</td><td>CasADi::SXFunctionInternal</td></tr>
-<tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
-<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>live_variables</td><td>OT_BOOLEAN</td><td>false</td><td>Reuse variables in the work vector</td><td>CasADi::SXFunctionInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
-<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
-<tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
-<tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
-<tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
-<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
-<tr><td>topological_sorting</td><td>OT_STRING</td><td>"breadth-first"</td><td>Topological sorting algorithm (depth-first|breadth-first)</td><td>CasADi::XFunctionInternal</td></tr>
-<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
-<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
-</table>
-*/
-/** \class CasADi::SXFunction
-\n
-\par
-<table>
-<caption>List of available options</caption>
-<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>inplace</td><td>OT_BOOLEAN</td><td>false</td><td>Evaluate with inplace operations (experimental)</td><td>CasADi::SXFunctionInternal</td></tr>
-<tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
-<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>live_variables</td><td>OT_BOOLEAN</td><td>false</td><td>Reuse variables in the work vector</td><td>CasADi::SXFunctionInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
-<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
-<tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
-<tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
-<tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
-<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
-<tr><td>topological_sorting</td><td>OT_STRING</td><td>"breadth-first"</td><td>Topological sorting algorithm (depth-first|breadth-first)</td><td>CasADi::XFunctionInternal</td></tr>
-<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
-<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
+<tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>false</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>CasADi::NLPSolverInternal</td></tr>
 </table>
 */
 /** \class CasADi::IpoptInternal
@@ -907,7 +921,7 @@
 <tr><td>min_alpha_primal</td><td>OT_REAL</td><td>1e-13</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>min_hessian_perturbation</td><td>OT_REAL</td><td>1e-20</td><td>Smallest perturbation of the Hessian block. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>min_refinement_steps</td><td>OT_INTEGER</td><td>1</td><td>Minimum number of iterative refinement steps per linear system solve. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated<br />(eval_f|eval_g|eval_jac_g|eval_grad_f)</td><td>CasADi::FXInternal<br />CasADi::IpoptInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(eval_f|eval_g|eval_jac_g|eval_grad_f)</td><td>CasADi::FXInternal<br />CasADi::IpoptInternal</td></tr>
 <tr><td>mu_allow_fast_monotone_decrease</td><td>OT_STRING</td><td>yes</td><td>Allow skipping of barrier problem if barrier test is already met. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>mu_init</td><td>OT_REAL</td><td>0.1</td><td>Initial value for the barrier parameter. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>mu_linear_decrease_factor</td><td>OT_REAL</td><td>0.2</td><td>Determines linear decrease rate of barrier parameter. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
@@ -1047,7 +1061,20 @@
 <tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>False</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>watchdog_shortened_iter_trigger</td><td>OT_INTEGER</td><td>10</td><td>Number of shortened iterations that trigger the watchdog. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>watchdog_trial_iter_max</td><td>OT_INTEGER</td><td>3</td><td>Maximum number of watchdog iterations. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>wsmp_inexact_droptol</td><td>OT_REAL</td><td>0.0</td><td>Drop tolerance for inexact factorization preconditioner in WISMP. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>wsmp_inexact_fillin_limit</td><td>OT_REAL</td><td>0.0</td><td>Fill-in limit for inexact factorization preconditioner in WISMP. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>wsmp_iterative</td><td>OT_STRING</td><td>no</td><td>Switches to iterative solver in WSMP. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>wsmp_max_iter</td><td>OT_INTEGER</td><td>1000</td><td>Maximal number of iterations in iterative WISMP (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>wsmp_no_pivoting</td><td>OT_STRING</td><td>no</td><td>Use the static pivoting option of WSMP. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>wsmp_num_threads</td><td>OT_INTEGER</td><td>1</td><td>Number of threads to be used in WSMP (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>wsmp_ordering_option</td><td>OT_INTEGER</td><td>1</td><td>Determines how ordering is done in WSMP (IPARM(16) (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>wsmp_ordering_option2</td><td>OT_INTEGER</td><td>1</td><td>Determines how ordering is done in WSMP (IPARM(20) (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>wsmp_pivtol</td><td>OT_REAL</td><td>0.0001</td><td>Pivot tolerance for the linear solver WSMP. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>wsmp_pivtolmax</td><td>OT_REAL</td><td>0.1</td><td>Maximum pivot tolerance for the linear solver WSMP. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>wsmp_scaling</td><td>OT_INTEGER</td><td>0</td><td>Determines how the matrix is scaled by WSMP. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>wsmp_singularity_threshold</td><td>OT_REAL</td><td>1e-18</td><td>WSMP's singularity threshold. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>wsmp_skip_inertia_check</td><td>OT_STRING</td><td>no</td><td>Always pretent inertia is correct. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>wsmp_write_matrix_iteration</td><td>OT_INTEGER</td><td>-1</td><td>Iteration in which the matrices are written to files. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 </table>
 */
 /** \class CasADi::IpoptSolver
@@ -1201,7 +1228,7 @@
 <tr><td>min_alpha_primal</td><td>OT_REAL</td><td>1e-13</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>min_hessian_perturbation</td><td>OT_REAL</td><td>1e-20</td><td>Smallest perturbation of the Hessian block. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>min_refinement_steps</td><td>OT_INTEGER</td><td>1</td><td>Minimum number of iterative refinement steps per linear system solve. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated<br />(eval_f|eval_g|eval_jac_g|eval_grad_f)</td><td>CasADi::FXInternal<br />CasADi::IpoptInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(eval_f|eval_g|eval_jac_g|eval_grad_f)</td><td>CasADi::FXInternal<br />CasADi::IpoptInternal</td></tr>
 <tr><td>mu_allow_fast_monotone_decrease</td><td>OT_STRING</td><td>yes</td><td>Allow skipping of barrier problem if barrier test is already met. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>mu_init</td><td>OT_REAL</td><td>0.1</td><td>Initial value for the barrier parameter. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>mu_linear_decrease_factor</td><td>OT_REAL</td><td>0.2</td><td>Determines linear decrease rate of barrier parameter. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
@@ -1341,7 +1368,20 @@
 <tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>False</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>watchdog_shortened_iter_trigger</td><td>OT_INTEGER</td><td>10</td><td>Number of shortened iterations that trigger the watchdog. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>watchdog_trial_iter_max</td><td>OT_INTEGER</td><td>3</td><td>Maximum number of watchdog iterations. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>wsmp_inexact_droptol</td><td>OT_REAL</td><td>0.0</td><td>Drop tolerance for inexact factorization preconditioner in WISMP. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>wsmp_inexact_fillin_limit</td><td>OT_REAL</td><td>0.0</td><td>Fill-in limit for inexact factorization preconditioner in WISMP. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>wsmp_iterative</td><td>OT_STRING</td><td>no</td><td>Switches to iterative solver in WSMP. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>wsmp_max_iter</td><td>OT_INTEGER</td><td>1000</td><td>Maximal number of iterations in iterative WISMP (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>wsmp_no_pivoting</td><td>OT_STRING</td><td>no</td><td>Use the static pivoting option of WSMP. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>wsmp_num_threads</td><td>OT_INTEGER</td><td>1</td><td>Number of threads to be used in WSMP (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>wsmp_ordering_option</td><td>OT_INTEGER</td><td>1</td><td>Determines how ordering is done in WSMP (IPARM(16) (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>wsmp_ordering_option2</td><td>OT_INTEGER</td><td>1</td><td>Determines how ordering is done in WSMP (IPARM(20) (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>wsmp_pivtol</td><td>OT_REAL</td><td>0.0001</td><td>Pivot tolerance for the linear solver WSMP. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>wsmp_pivtolmax</td><td>OT_REAL</td><td>0.1</td><td>Maximum pivot tolerance for the linear solver WSMP. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>wsmp_scaling</td><td>OT_INTEGER</td><td>0</td><td>Determines how the matrix is scaled by WSMP. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>wsmp_singularity_threshold</td><td>OT_REAL</td><td>1e-18</td><td>WSMP's singularity threshold. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>wsmp_skip_inertia_check</td><td>OT_STRING</td><td>no</td><td>Always pretent inertia is correct. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>wsmp_write_matrix_iteration</td><td>OT_INTEGER</td><td>-1</td><td>Iteration in which the matrices are written to files. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 </table>
 */
 /** \class CasADi::AcadoOCPInternal
@@ -1364,7 +1404,7 @@
 <tr><td>kkt_tolerance</td><td>OT_REAL</td><td></td><td></td><td>CasADi::AcadoOCPInternal</td></tr>
 <tr><td>max_num_integrator_steps</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::AcadoOCPInternal</td></tr>
 <tr><td>max_num_iterations</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::AcadoOCPInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -1402,7 +1442,7 @@
 <tr><td>kkt_tolerance</td><td>OT_REAL</td><td></td><td></td><td>CasADi::AcadoOCPInternal</td></tr>
 <tr><td>max_num_integrator_steps</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::AcadoOCPInternal</td></tr>
 <tr><td>max_num_iterations</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::AcadoOCPInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -1426,39 +1466,39 @@
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>absolute tolerence  for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>absolute tolerence  for the IVP solution</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>asens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>asens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOLEAN</td><td>false</td><td>Disable CVodes internal warning messages</td><td>CasADi::Sundials::CVodesInternal</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the forward sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>fsens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the forward sensitivity solution [default: equal to abstol]</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>fsens_all_at_once</td><td>OT_BOOLEAN</td><td>true</td><td>calculate all right hand sides of the sensitivity equations at once</td><td>CasADi::Sundials::CVodesInternal</td></tr>
-<tr><td>fsens_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>include the forward sensitivities in all error controls</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the forward sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_scaling_factors</td><td>OT_REALVECTOR</td><td></td><td>scaling factor for the components if finite differences is used</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_sensitiviy_parameters</td><td>OT_INTEGERVECTOR</td><td></td><td>specifies which components will be used when estimating the sensitivity equations</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>A vector with a boolean describing the nature for each state.</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>fsens_err_con</td><td>OT_BOOLEAN</td><td>true</td><td>include the forward sensitivities in all error controls</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>fsens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the forward sensitivity solution [default: equal to reltol]</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>fsens_scaling_factors</td><td>OT_REALVECTOR</td><td></td><td>scaling factor for the components if finite differences is used</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>fsens_sensitiviy_parameters</td><td>OT_INTEGERVECTOR</td><td></td><td>specifies which components will be used when estimating the sensitivity equations</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>A vector with a boolean describing the nature for each state.</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>linear_multistep_method</td><td>OT_STRING</td><td>"bdf"</td><td>bdf|adams</td><td>CasADi::Sundials::CVodesInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>maximum number of steps</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated<br />(integrate|res|resB|resQB|reset)</td><td>CasADi::FXInternal<br />CasADi::Sundials::CVodesInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>maximum number of steps</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(res|resB|resQB|reset)</td><td>CasADi::FXInternal<br />CasADi::Sundials::CVodesInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>nonlinear_solver_iteration</td><td>OT_STRING</td><td>"newton"</td><td>(newton|functional)</td><td>CasADi::Sundials::CVodesInternal</td></tr>
 <tr><td>nrhs</td><td>OT_INTEGER</td><td>1</td><td>number of right hand sides</td><td>CasADi::IntegratorInternal</td></tr>
@@ -1466,19 +1506,20 @@
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>quad_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>should the quadratures affect the step size control</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>quad_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>should the quadratures affect the step size control</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>start of the integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>end of the integration</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>precondition an iterative solver</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>precondition an iterative solver</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -1489,39 +1530,39 @@
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>absolute tolerence  for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>absolute tolerence  for the IVP solution</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>asens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>asens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOLEAN</td><td>false</td><td>Disable CVodes internal warning messages</td><td>CasADi::Sundials::CVodesInternal</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the forward sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>fsens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the forward sensitivity solution [default: equal to abstol]</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>fsens_all_at_once</td><td>OT_BOOLEAN</td><td>true</td><td>calculate all right hand sides of the sensitivity equations at once</td><td>CasADi::Sundials::CVodesInternal</td></tr>
-<tr><td>fsens_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>include the forward sensitivities in all error controls</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the forward sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_scaling_factors</td><td>OT_REALVECTOR</td><td></td><td>scaling factor for the components if finite differences is used</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_sensitiviy_parameters</td><td>OT_INTEGERVECTOR</td><td></td><td>specifies which components will be used when estimating the sensitivity equations</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>A vector with a boolean describing the nature for each state.</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>fsens_err_con</td><td>OT_BOOLEAN</td><td>true</td><td>include the forward sensitivities in all error controls</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>fsens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the forward sensitivity solution [default: equal to reltol]</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>fsens_scaling_factors</td><td>OT_REALVECTOR</td><td></td><td>scaling factor for the components if finite differences is used</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>fsens_sensitiviy_parameters</td><td>OT_INTEGERVECTOR</td><td></td><td>specifies which components will be used when estimating the sensitivity equations</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>A vector with a boolean describing the nature for each state.</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>linear_multistep_method</td><td>OT_STRING</td><td>"bdf"</td><td>bdf|adams</td><td>CasADi::Sundials::CVodesInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>maximum number of steps</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated<br />(integrate|res|resB|resQB|reset)</td><td>CasADi::FXInternal<br />CasADi::Sundials::CVodesInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>maximum number of steps</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(res|resB|resQB|reset)</td><td>CasADi::FXInternal<br />CasADi::Sundials::CVodesInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>nonlinear_solver_iteration</td><td>OT_STRING</td><td>"newton"</td><td>(newton|functional)</td><td>CasADi::Sundials::CVodesInternal</td></tr>
 <tr><td>nrhs</td><td>OT_INTEGER</td><td>1</td><td>number of right hand sides</td><td>CasADi::IntegratorInternal</td></tr>
@@ -1529,19 +1570,20 @@
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>quad_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>should the quadratures affect the step size control</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>quad_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>should the quadratures affect the step size control</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>start of the integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>end of the integration</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>precondition an iterative solver</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>precondition an iterative solver</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -1552,36 +1594,10 @@
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>absolute tolerence  for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>asens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the forward sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>include the forward sensitivities in all error controls</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the forward sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_scaling_factors</td><td>OT_REALVECTOR</td><td></td><td>scaling factor for the components if finite differences is used</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_sensitiviy_parameters</td><td>OT_INTEGERVECTOR</td><td></td><td>specifies which components will be used when estimating the sensitivity equations</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>A vector with a boolean describing the nature for each state.</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>maximum number of steps</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>nrhs</td><td>OT_INTEGER</td><td>1</td><td>number of right hand sides</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>num_algebraic</td><td>OT_INTEGER</td><td>0</td><td>Number of algebraic states</td><td>CasADi::AcadoIntegratorInternal</td></tr>
@@ -1590,20 +1606,13 @@
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>quad_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>should the quadratures affect the step size control</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>start of the integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>end of the integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>time_dependence</td><td>OT_BOOLEAN</td><td>true</td><td>Explicit depencency of time in the DAE</td><td>CasADi::AcadoIntegratorInternal</td></tr>
-<tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>precondition an iterative solver</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -1614,36 +1623,10 @@
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>absolute tolerence  for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>asens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the forward sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>include the forward sensitivities in all error controls</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the forward sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_scaling_factors</td><td>OT_REALVECTOR</td><td></td><td>scaling factor for the components if finite differences is used</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_sensitiviy_parameters</td><td>OT_INTEGERVECTOR</td><td></td><td>specifies which components will be used when estimating the sensitivity equations</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>A vector with a boolean describing the nature for each state.</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>maximum number of steps</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>nrhs</td><td>OT_INTEGER</td><td>1</td><td>number of right hand sides</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>num_algebraic</td><td>OT_INTEGER</td><td>0</td><td>Number of algebraic states</td><td>CasADi::AcadoIntegratorInternal</td></tr>
@@ -1652,43 +1635,13 @@
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>quad_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>should the quadratures affect the step size control</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>start of the integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>end of the integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>time_dependence</td><td>OT_BOOLEAN</td><td>true</td><td>Explicit depencency of time in the DAE</td><td>CasADi::AcadoIntegratorInternal</td></tr>
-<tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>precondition an iterative solver</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
-<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
-</table>
-*/
-/** \class CasADi::XFunctionInternalCommon
-\n
-\par
-<table>
-<caption>List of available options</caption>
-<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
-<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
-<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
-<tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
-<tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
-<tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
-<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
-<tr><td>topological_sorting</td><td>OT_STRING</td><td>"breadth-first"</td><td>Topological sorting algorithm (depth-first|breadth-first)</td><td>CasADi::XFunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -1702,7 +1655,7 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"default"</td><td>default means both (forward|adjoint|default)</td><td>CasADi::JacobianInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -1724,7 +1677,57 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"default"</td><td>default means both (forward|adjoint|default)</td><td>CasADi::JacobianInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
+<tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
+</table>
+*/
+/** \class CasADi::SXFunctionInternal
+\n
+\par
+<table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>inplace</td><td>OT_BOOLEAN</td><td>false</td><td>Evaluate with inplace operations (experimental)</td><td>CasADi::SXFunctionInternal</td></tr>
+<tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>just_in_time</td><td>OT_BOOLEAN</td><td>false</td><td>Just-in-time compilation for numeric evaluation (experimental)</td><td>CasADi::SXFunctionInternal</td></tr>
+<tr><td>live_variables</td><td>OT_BOOLEAN</td><td>false</td><td>Reuse variables in the work vector</td><td>CasADi::SXFunctionInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
+<tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
+</table>
+*/
+/** \class CasADi::SXFunction
+\n
+\par
+<table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>inplace</td><td>OT_BOOLEAN</td><td>false</td><td>Evaluate with inplace operations (experimental)</td><td>CasADi::SXFunctionInternal</td></tr>
+<tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>just_in_time</td><td>OT_BOOLEAN</td><td>false</td><td>Just-in-time compilation for numeric evaluation (experimental)</td><td>CasADi::SXFunctionInternal</td></tr>
+<tr><td>live_variables</td><td>OT_BOOLEAN</td><td>false</td><td>Reuse variables in the work vector</td><td>CasADi::SXFunctionInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -1869,7 +1872,7 @@
 <tr><td>mehrotra_algorithm</td><td>OT_STRING</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
 <tr><td>min_hessian_perturbation</td><td>OT_REAL</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
 <tr><td>min_refinement_steps</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>mu_init</td><td>OT_REAL</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
 <tr><td>mu_linear_decrease_factor</td><td>OT_REAL</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
 <tr><td>mu_max</td><td>OT_REAL</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
@@ -2009,7 +2012,7 @@
 <tr><td>mehrotra_algorithm</td><td>OT_STRING</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
 <tr><td>min_hessian_perturbation</td><td>OT_REAL</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
 <tr><td>min_refinement_steps</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>mu_init</td><td>OT_REAL</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
 <tr><td>mu_linear_decrease_factor</td><td>OT_REAL</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
 <tr><td>mu_max</td><td>OT_REAL</td><td></td><td></td><td>CasADi::Interfaces::IpoptQPInternal</td></tr>
@@ -2100,7 +2103,7 @@
 <tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -2140,7 +2143,7 @@
 <tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -2172,7 +2175,7 @@
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>lifted</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>CasADi::Interfaces::LiftoptInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -2205,7 +2208,7 @@
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>lifted</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>CasADi::Interfaces::LiftoptInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -2227,55 +2230,22 @@
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>absolute tolerence  for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>asens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the forward sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>include the forward sensitivities in all error controls</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the forward sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_scaling_factors</td><td>OT_REALVECTOR</td><td></td><td>scaling factor for the components if finite differences is used</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_sensitiviy_parameters</td><td>OT_INTEGERVECTOR</td><td></td><td>specifies which components will be used when estimating the sensitivity equations</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>A vector with a boolean describing the nature for each state.</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>maximum number of steps</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>nrhs</td><td>OT_INTEGER</td><td>1</td><td>number of right hand sides</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>quad_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>should the quadratures affect the step size control</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>start of the integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>end of the integration</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>precondition an iterative solver</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -2286,55 +2256,22 @@
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>absolute tolerence  for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>asens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the forward sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>include the forward sensitivities in all error controls</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the forward sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_scaling_factors</td><td>OT_REALVECTOR</td><td></td><td>scaling factor for the components if finite differences is used</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_sensitiviy_parameters</td><td>OT_INTEGERVECTOR</td><td></td><td>specifies which components will be used when estimating the sensitivity equations</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>A vector with a boolean describing the nature for each state.</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>maximum number of steps</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>nrhs</td><td>OT_INTEGER</td><td>1</td><td>number of right hand sides</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>quad_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>should the quadratures affect the step size control</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>start of the integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>end of the integration</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>precondition an iterative solver</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -2348,7 +2285,7 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -2357,30 +2294,6 @@
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
-<tr><td>topological_sorting</td><td>OT_STRING</td><td>"breadth-first"</td><td>Topological sorting algorithm (depth-first|breadth-first)</td><td>CasADi::XFunctionInternal</td></tr>
-<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
-<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
-</table>
-*/
-/** \class CasADi::XFunction
-\n
-\par
-<table>
-<caption>List of available options</caption>
-<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
-<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
-<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
-<tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
-<tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
-<tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
-<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
-<tr><td>topological_sorting</td><td>OT_STRING</td><td>"breadth-first"</td><td>Topological sorting algorithm (depth-first|breadth-first)</td><td>CasADi::XFunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -2399,7 +2312,7 @@
 <tr><td>iterrefine</td><td>OT_STRING</td><td>"norefine"</td><td></td><td>CasADi::SuperLUInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -2432,7 +2345,7 @@
 <tr><td>iterrefine</td><td>OT_STRING</td><td>"norefine"</td><td></td><td>CasADi::SuperLUInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -2460,7 +2373,7 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -2482,7 +2395,7 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -2504,7 +2417,7 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -2526,7 +2439,7 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -2545,65 +2458,66 @@
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>absolute tolerence  for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>absolute tolerence  for the IVP solution</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>abstolv</td><td>OT_REALVECTOR</td><td></td><td></td><td>CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>asens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>asens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>calc_ic</td><td>OT_BOOLEAN</td><td>true</td><td>use IDACalcIC to get consistent initial conditions. This only works for semi-explicit index-one systems. Else, you must provide consistent initial conditions yourself.</td><td>CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>calc_icB</td><td>OT_BOOLEAN</td><td>false</td><td>use IDACalcIC to get consistent initial conditions. This only works for semi-explicit index-one systems. Else, you must provide consistent initial conditions yourself.</td><td>CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>cj_scaling</td><td>OT_BOOLEAN</td><td>false</td><td>IDAS scaling on cj for the user-defined linear solver module</td><td>CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOLEAN</td><td>false</td><td>Disable IDAS internal warning messages</td><td>CasADi::Sundials::IdasInternal</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>extra_fsens_calc_ic</td><td>OT_BOOLEAN</td><td>false</td><td>Call calc ic an extra time, with fsens=0</td><td>CasADi::Sundials::IdasInternal</td></tr>
-<tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>first_time</td><td>OT_REAL</td><td>GenericType()</td><td>first requested time as a fraction of the time interval</td><td>CasADi::Sundials::IdasInternal</td></tr>
-<tr><td>fsens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the forward sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>fsens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the forward sensitivity solution [default: equal to abstol]</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>fsens_abstolv</td><td>OT_REALVECTOR</td><td></td><td></td><td>CasADi::Sundials::IdasInternal</td></tr>
-<tr><td>fsens_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>include the forward sensitivities in all error controls</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the forward sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_scaling_factors</td><td>OT_REALVECTOR</td><td></td><td>scaling factor for the components if finite differences is used</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_sensitiviy_parameters</td><td>OT_INTEGERVECTOR</td><td></td><td>specifies which components will be used when estimating the sensitivity equations</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>A vector with a boolean describing the nature for each state.</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>fsens_err_con</td><td>OT_BOOLEAN</td><td>true</td><td>include the forward sensitivities in all error controls</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>fsens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the forward sensitivity solution [default: equal to reltol]</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>fsens_scaling_factors</td><td>OT_REALVECTOR</td><td></td><td>scaling factor for the components if finite differences is used</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>fsens_sensitiviy_parameters</td><td>OT_INTEGERVECTOR</td><td></td><td>specifies which components will be used when estimating the sensitivity equations</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>A vector with a boolean describing the nature for each state.</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>maximum number of steps</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>maximum number of steps</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>max_step_size</td><td>OT_REAL</td><td>0</td><td>maximim step size</td><td>CasADi::Sundials::IdasInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated<br />(correctInitialConditions|res|resS)</td><td>CasADi::FXInternal<br />CasADi::Sundials::IdasInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(correctInitialConditions|res|resS)</td><td>CasADi::FXInternal<br />CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>nrhs</td><td>OT_INTEGER</td><td>1</td><td>number of right hand sides</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>quad_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>should the quadratures affect the step size control</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>quad_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>should the quadratures affect the step size control</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>suppress_algebraic</td><td>OT_BOOLEAN</td><td>false</td><td>supress algebraic variables in the error testing</td><td>CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>start of the integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>end of the integration</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>precondition an iterative solver</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>precondition an iterative solver</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -2614,65 +2528,66 @@
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>absolute tolerence  for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>absolute tolerence  for the IVP solution</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>abstolv</td><td>OT_REALVECTOR</td><td></td><td></td><td>CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>asens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>asens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>calc_ic</td><td>OT_BOOLEAN</td><td>true</td><td>use IDACalcIC to get consistent initial conditions. This only works for semi-explicit index-one systems. Else, you must provide consistent initial conditions yourself.</td><td>CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>calc_icB</td><td>OT_BOOLEAN</td><td>false</td><td>use IDACalcIC to get consistent initial conditions. This only works for semi-explicit index-one systems. Else, you must provide consistent initial conditions yourself.</td><td>CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>cj_scaling</td><td>OT_BOOLEAN</td><td>false</td><td>IDAS scaling on cj for the user-defined linear solver module</td><td>CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOLEAN</td><td>false</td><td>Disable IDAS internal warning messages</td><td>CasADi::Sundials::IdasInternal</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>extra_fsens_calc_ic</td><td>OT_BOOLEAN</td><td>false</td><td>Call calc ic an extra time, with fsens=0</td><td>CasADi::Sundials::IdasInternal</td></tr>
-<tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>first_time</td><td>OT_REAL</td><td>GenericType()</td><td>first requested time as a fraction of the time interval</td><td>CasADi::Sundials::IdasInternal</td></tr>
-<tr><td>fsens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the forward sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>fsens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the forward sensitivity solution [default: equal to abstol]</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>fsens_abstolv</td><td>OT_REALVECTOR</td><td></td><td></td><td>CasADi::Sundials::IdasInternal</td></tr>
-<tr><td>fsens_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>include the forward sensitivities in all error controls</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the forward sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_scaling_factors</td><td>OT_REALVECTOR</td><td></td><td>scaling factor for the components if finite differences is used</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_sensitiviy_parameters</td><td>OT_INTEGERVECTOR</td><td></td><td>specifies which components will be used when estimating the sensitivity equations</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>A vector with a boolean describing the nature for each state.</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>fsens_err_con</td><td>OT_BOOLEAN</td><td>true</td><td>include the forward sensitivities in all error controls</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>fsens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the forward sensitivity solution [default: equal to reltol]</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>fsens_scaling_factors</td><td>OT_REALVECTOR</td><td></td><td>scaling factor for the components if finite differences is used</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>fsens_sensitiviy_parameters</td><td>OT_INTEGERVECTOR</td><td></td><td>specifies which components will be used when estimating the sensitivity equations</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>A vector with a boolean describing the nature for each state.</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>maximum number of steps</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>maximum number of steps</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>max_step_size</td><td>OT_REAL</td><td>0</td><td>maximim step size</td><td>CasADi::Sundials::IdasInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated<br />(correctInitialConditions|res|resS)</td><td>CasADi::FXInternal<br />CasADi::Sundials::IdasInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(correctInitialConditions|res|resS)</td><td>CasADi::FXInternal<br />CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>nrhs</td><td>OT_INTEGER</td><td>1</td><td>number of right hand sides</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>quad_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>should the quadratures affect the step size control</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>quad_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>should the quadratures affect the step size control</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>suppress_algebraic</td><td>OT_BOOLEAN</td><td>false</td><td>supress algebraic variables in the error testing</td><td>CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>start of the integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>end of the integration</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>precondition an iterative solver</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>precondition an iterative solver</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -2686,7 +2601,7 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -2710,7 +2625,7 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -2745,7 +2660,7 @@
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>maxiter</td><td>OT_INTEGER</td><td>100</td><td>Maximum number of SQP iterations</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>maxiter_ls</td><td>OT_INTEGER</td><td>100</td><td>Maximum number of linesearch iterations</td><td>CasADi::SQPInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated<br />(eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp)</td><td>CasADi::FXInternal<br />CasADi::SQPInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp)</td><td>CasADi::FXInternal<br />CasADi::SQPInternal</td></tr>
 <tr><td>mu_safety</td><td>OT_REAL</td><td>1.1</td><td>Safety factor for linesearch mu</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -2788,7 +2703,7 @@
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>maxiter</td><td>OT_INTEGER</td><td>100</td><td>Maximum number of SQP iterations</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>maxiter_ls</td><td>OT_INTEGER</td><td>100</td><td>Maximum number of linesearch iterations</td><td>CasADi::SQPInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated<br />(eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp)</td><td>CasADi::FXInternal<br />CasADi::SQPInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp)</td><td>CasADi::FXInternal<br />CasADi::SQPInternal</td></tr>
 <tr><td>mu_safety</td><td>OT_REAL</td><td>1.1</td><td>Safety factor for linesearch mu</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -2820,7 +2735,7 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -2829,7 +2744,6 @@
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
-<tr><td>topological_sorting</td><td>OT_STRING</td><td>"breadth-first"</td><td>Topological sorting algorithm (depth-first|breadth-first)</td><td>CasADi::XFunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -2843,7 +2757,7 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -2852,7 +2766,6 @@
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
-<tr><td>topological_sorting</td><td>OT_STRING</td><td>"breadth-first"</td><td>Topological sorting algorithm (depth-first|breadth-first)</td><td>CasADi::XFunctionInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -2863,39 +2776,13 @@
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>absolute tolerence  for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>asens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the ODE/DAE residual function in an SX graph</td><td>CasADi::RKIntegratorInternal</td></tr>
 <tr><td>expand_q</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the quadrature function in an SX graph</td><td>CasADi::RKIntegratorInternal</td></tr>
-<tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the forward sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>include the forward sensitivities in all error controls</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the forward sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_scaling_factors</td><td>OT_REALVECTOR</td><td></td><td>scaling factor for the components if finite differences is used</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_sensitiviy_parameters</td><td>OT_INTEGERVECTOR</td><td></td><td>specifies which components will be used when estimating the sensitivity equations</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>interpolation_order</td><td>OT_INTEGER</td><td>4</td><td>Order of the interpolating polynomials</td><td>CasADi::RKIntegratorInternal</td></tr>
-<tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>A vector with a boolean describing the nature for each state.</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>maximum number of steps</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>nrhs</td><td>OT_INTEGER</td><td>1</td><td>number of right hand sides</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -2903,19 +2790,12 @@
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>quad_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>should the quadratures affect the step size control</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>start of the integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>end of the integration</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>precondition an iterative solver</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -2926,39 +2806,13 @@
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>absolute tolerence  for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>asens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the ODE/DAE residual function in an SX graph</td><td>CasADi::RKIntegratorInternal</td></tr>
 <tr><td>expand_q</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the quadrature function in an SX graph</td><td>CasADi::RKIntegratorInternal</td></tr>
-<tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the forward sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>include the forward sensitivities in all error controls</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the forward sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_scaling_factors</td><td>OT_REALVECTOR</td><td></td><td>scaling factor for the components if finite differences is used</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_sensitiviy_parameters</td><td>OT_INTEGERVECTOR</td><td></td><td>specifies which components will be used when estimating the sensitivity equations</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>interpolation_order</td><td>OT_INTEGER</td><td>4</td><td>Order of the interpolating polynomials</td><td>CasADi::RKIntegratorInternal</td></tr>
-<tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>A vector with a boolean describing the nature for each state.</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>maximum number of steps</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>nrhs</td><td>OT_INTEGER</td><td>1</td><td>number of right hand sides</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -2966,19 +2820,12 @@
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>quad_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>should the quadratures affect the step size control</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>start of the integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>end of the integration</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>precondition an iterative solver</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -2993,7 +2840,7 @@
 <tr><td>final_time</td><td>OT_REAL</td><td>1.0</td><td></td><td>CasADi::OCPSolverInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -3018,7 +2865,7 @@
 <tr><td>final_time</td><td>OT_REAL</td><td>1.0</td><td></td><td>CasADi::OCPSolverInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -3043,7 +2890,7 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -3066,7 +2913,51 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
+<tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
+</table>
+*/
+/** \class CasADi::CFunctionInternal
+\n
+\par
+<table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
+<tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
+</table>
+*/
+/** \class CasADi::CFunction
+\n
+\par
+<table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -3086,17 +2977,21 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>control_endpoint</td><td>OT_BOOLEAN</td><td>false</td><td>Include a control value at the end of the simulation domain. Used for interpolation.</td><td>CasADi::ControlSimulatorInternal</td></tr>
+<tr><td>control_interpolation</td><td>OT_STRING</td><td>"none"</td><td>none|nearest|linear</td><td>CasADi::ControlSimulatorInternal</td></tr>
 <tr><td>integrator</td><td>OT_INTEGRATOR</td><td>GenericType()</td><td>An integrator creator function</td><td>CasADi::ControlSimulatorInternal</td></tr>
 <tr><td>integrator_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the integrator</td><td>CasADi::ControlSimulatorInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>minor_grid</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>The local grid used on each major interval, with time normalized to 1. By default, option 'nf' is used to construct a linearly spaced grid.</td><td>CasADi::ControlSimulatorInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
-<tr><td>nf</td><td>OT_INTEGER</td><td>1</td><td>Number of fine grained integration steps.</td><td>CasADi::ControlSimulatorInternal</td></tr>
+<tr><td>nf</td><td>OT_INTEGER</td><td>1</td><td>Number of minor grained integration steps per major interval. nf>0 must hold. This option is not used when 'minor_grid' is provided.</td><td>CasADi::ControlSimulatorInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>simulator_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the simulator</td><td>CasADi::ControlSimulatorInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
@@ -3111,17 +3006,21 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>control_endpoint</td><td>OT_BOOLEAN</td><td>false</td><td>Include a control value at the end of the simulation domain. Used for interpolation.</td><td>CasADi::ControlSimulatorInternal</td></tr>
+<tr><td>control_interpolation</td><td>OT_STRING</td><td>"none"</td><td>none|nearest|linear</td><td>CasADi::ControlSimulatorInternal</td></tr>
 <tr><td>integrator</td><td>OT_INTEGRATOR</td><td>GenericType()</td><td>An integrator creator function</td><td>CasADi::ControlSimulatorInternal</td></tr>
 <tr><td>integrator_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the integrator</td><td>CasADi::ControlSimulatorInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>minor_grid</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>The local grid used on each major interval, with time normalized to 1. By default, option 'nf' is used to construct a linearly spaced grid.</td><td>CasADi::ControlSimulatorInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
-<tr><td>nf</td><td>OT_INTEGER</td><td>1</td><td>Number of fine grained integration steps.</td><td>CasADi::ControlSimulatorInternal</td></tr>
+<tr><td>nf</td><td>OT_INTEGER</td><td>1</td><td>Number of minor grained integration steps per major interval. nf>0 must hold. This option is not used when 'minor_grid' is provided.</td><td>CasADi::ControlSimulatorInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>simulator_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the simulator</td><td>CasADi::ControlSimulatorInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
@@ -3138,7 +3037,7 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -3161,7 +3060,7 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -3191,7 +3090,7 @@
 <tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_cplex_problem"</td><td></td><td>CasADi::CplexInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -3223,7 +3122,7 @@
 <tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_cplex_problem"</td><td></td><td>CasADi::CplexInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -3239,120 +3138,62 @@
 <tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>false</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>CasADi::NLPSolverInternal</td></tr>
 </table>
 */
-/** \class CasADi::GSL::GslInternal
+/** \class CasADi::OptimalControl::CollocationInternal
 \n
 \par
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>absolute tolerence  for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>asens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the forward sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>include the forward sensitivities in all error controls</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the forward sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_scaling_factors</td><td>OT_REALVECTOR</td><td></td><td>scaling factor for the components if finite differences is used</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_sensitiviy_parameters</td><td>OT_INTEGERVECTOR</td><td></td><td>specifies which components will be used when estimating the sensitivity equations</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>A vector with a boolean describing the nature for each state.</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>final_time</td><td>OT_REAL</td><td>1.0</td><td></td><td>CasADi::OCPSolverInternal</td></tr>
+<tr><td>integrator</td><td>OT_INTEGRATOR</td><td>GenericType()</td><td>An integrator creator function</td><td>CasADi::OptimalControl::CollocationInternal</td></tr>
+<tr><td>integrator_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the integrator</td><td>CasADi::OptimalControl::CollocationInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>maximum number of steps</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated<br />(reset)</td><td>CasADi::FXInternal<br />CasADi::GSL::GslInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
-<tr><td>nrhs</td><td>OT_INTEGER</td><td>1</td><td>number of right hand sides</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>nlp_solver</td><td>OT_NLPSOLVER</td><td>GenericType()</td><td>An NLPSolver creator function</td><td>CasADi::OptimalControl::CollocationInternal</td></tr>
+<tr><td>nlp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the NLP Solver</td><td>CasADi::OptimalControl::CollocationInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>number_of_grid_points</td><td>OT_INTEGER</td><td>20</td><td></td><td>CasADi::OCPSolverInternal</td></tr>
+<tr><td>number_of_parameters</td><td>OT_INTEGER</td><td>0</td><td></td><td>CasADi::OCPSolverInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>quad_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>should the quadratures affect the step size control</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>parallelization</td><td>OT_STRING</td><td>GenericType()</td><td>Passed on to CasADi::Parallelizer</td><td>CasADi::OptimalControl::CollocationInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
-<tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>start of the integration</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>end of the integration</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>precondition an iterative solver</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
 */
-/** \class CasADi::GSL::GslIntegrator
+/** \class CasADi::OptimalControl::Collocation
 \n
 \par
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>absolute tolerence  for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>asens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_abstol</td><td>OT_REAL</td><td></td><td>absolute tolerence for the forward sensitivity solution [default: equal to abstol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>include the forward sensitivities in all error controls</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the forward sensitivity solution [default: equal to reltol]</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_scaling_factors</td><td>OT_REALVECTOR</td><td></td><td>scaling factor for the components if finite differences is used</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>fsens_sensitiviy_parameters</td><td>OT_INTEGERVECTOR</td><td></td><td>specifies which components will be used when estimating the sensitivity equations</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>is_differential</td><td>OT_INTEGERVECTOR</td><td>GenericType()</td><td>A vector with a boolean describing the nature for each state.</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>final_time</td><td>OT_REAL</td><td>1.0</td><td></td><td>CasADi::OCPSolverInternal</td></tr>
+<tr><td>integrator</td><td>OT_INTEGRATOR</td><td>GenericType()</td><td>An integrator creator function</td><td>CasADi::OptimalControl::CollocationInternal</td></tr>
+<tr><td>integrator_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the integrator</td><td>CasADi::OptimalControl::CollocationInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td>lower band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>maximum krylov subspace size</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>maximum number of steps</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated<br />(reset)</td><td>CasADi::FXInternal<br />CasADi::GSL::GslInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
-<tr><td>nrhs</td><td>OT_INTEGER</td><td>1</td><td>number of right hand sides</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>nlp_solver</td><td>OT_NLPSOLVER</td><td>GenericType()</td><td>An NLPSolver creator function</td><td>CasADi::OptimalControl::CollocationInternal</td></tr>
+<tr><td>nlp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the NLP Solver</td><td>CasADi::OptimalControl::CollocationInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>number_of_grid_points</td><td>OT_INTEGER</td><td>20</td><td></td><td>CasADi::OCPSolverInternal</td></tr>
+<tr><td>number_of_parameters</td><td>OT_INTEGER</td><td>0</td><td></td><td>CasADi::OCPSolverInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>quad_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>should the quadratures affect the step size control</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>relative tolerence for the IVP solution</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>parallelization</td><td>OT_STRING</td><td>GenericType()</td><td>Passed on to CasADi::Parallelizer</td><td>CasADi::OptimalControl::CollocationInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>number of steps between two consecutive checkpoints</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
-<tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>start of the integration</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>end of the integration</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td></td><td>upper band-width of banded jacobians</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>precondition an iterative solver</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -3384,7 +3225,7 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -3407,7 +3248,7 @@
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -3427,160 +3268,159 @@
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>AcceptTolFeas</td><td>OT_REAL</td><td>0.001</td><td>Tolerance for acceptable feasibility</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>AcceptTolOpti</td><td>OT_REAL</td><td>0.001</td><td>Tolerance for acceptable optimality</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>AlphaMinConst</td><td>OT_BOOLEAN</td><td>False</td><td>Use a constant lower bound on Armijo stepsize in Filter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>Ares</td><td>OT_INTEGERVECTOR</td><td>(42, 41, 42, 45, 43, 46, 44)</td><td>Armijo recovery strategies. Vector of size 7</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ArmijoBeta</td><td>OT_REAL</td><td>0.712</td><td>Trial stepsize decrease factor for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ArmijoMaxAlpha</td><td>OT_REAL</td><td>1.0</td><td>Initial alpha for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ArmijoMinAlpha</td><td>OT_REAL</td><td>1e-06</td><td>Lower bound on alpha for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ArmijoMinAlphaRec</td><td>OT_REAL</td><td>1e-06</td><td>Lower bound on alpha for Armijo rule during recovery</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ArmijoSigma</td><td>OT_REAL</td><td>0.005</td><td>Scale factor for linearised descent check in Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>AutoQPRecovery</td><td>OT_BOOLEAN</td><td>True</td><td>Enable automatic QP recovery</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BFGSmaxblockSize</td><td>OT_INTEGER</td><td>300</td><td>Maximum BFGS block size (depends on BFGS method)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BFGSmethod</td><td>OT_INTEGER</td><td>0</td><td>Choose BFGS method (dense, block, sparse)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BFGSminblockSize</td><td>OT_INTEGER</td><td>300</td><td>Minimum BFGS block size (depends on BFGS method)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BFGSrestart</td><td>OT_INTEGER</td><td>50</td><td>Restart BFGS update after this many iterations</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BettsFactor</td><td>OT_REAL</td><td>2.1</td><td>Update factor for Betts' Hessian regularisation</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BettsPoint</td><td>OT_REAL</td><td>1.0</td><td>Smallest eigenvalue of the regularised Hessian</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BoundTolFac</td><td>OT_REAL</td><td>1000.0</td><td>Factor in determining active constraints by KKT</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CheckFJ</td><td>OT_REAL</td><td>1e+12</td><td>Upper bound used by Fritz-John heuristic</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CheckStructureDF</td><td>OT_BOOLEAN</td><td>True</td><td>Enable structural checking of DF</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CheckStructureDG</td><td>OT_BOOLEAN</td><td>True</td><td>Enable structural checking of DG</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CheckStructureHM</td><td>OT_BOOLEAN</td><td>True</td><td>Enable structural checking of HM</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepBettsSum</td><td>OT_REAL</td><td>0.5</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepConStop</td><td>OT_REAL</td><td>1e-06</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepConvio</td><td>OT_REAL</td><td>1.0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepMaxIter</td><td>OT_INTEGER</td><td>50</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepMethod</td><td>OT_INTEGER</td><td>0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepMode</td><td>OT_INTEGER</td><td>1</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepPFactor</td><td>OT_REAL</td><td>1.0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepPMax</td><td>OT_REAL</td><td>1000000.0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepRecoveryDX</td><td>OT_BOOLEAN</td><td>False</td><td>Enable structural checking of HM</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CurvBCond</td><td>OT_REAL</td><td>0.02</td><td>Block BFGS curvature condition bound</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CurvBFac</td><td>OT_REAL</td><td>0.3</td><td>Block BFGS curvature condition regularisation factor</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CurvCond</td><td>OT_REAL</td><td>0.02</td><td>BFGS Curvature condition bound</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CurvFac</td><td>OT_REAL</td><td>0.3</td><td>BFGS curvature condition regularisation factor</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CutLength</td><td>OT_REAL</td><td>0.001</td><td>Scaling factor for Cut recovery strategy</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>DebugMarker06</td><td>OT_INTEGER</td><td>42</td><td>Debug marker, only needed for ASTOS integration</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FGtogether</td><td>OT_BOOLEAN</td><td>False</td><td>F and G cannot be evaluated separately</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FJandND</td><td>OT_BOOLEAN</td><td>False</td><td>Enable Fritz-John and non-differentiable check heuristics</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FeasibleDual</td><td>OT_BOOLEAN</td><td>False</td><td>Activate dual feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FeasibleInit</td><td>OT_BOOLEAN</td><td>False</td><td>Activate initial feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FeasibleInitTol</td><td>OT_REAL</td><td>0.001</td><td>Feasibility tolerance for no-objective feasible mode</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FeasibleOnly</td><td>OT_BOOLEAN</td><td>False</td><td>Activate feasible-only mode</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FidifEps</td><td>OT_REAL</td><td>1e-05</td><td>Finite difference perturbation</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FidifHM</td><td>OT_BOOLEAN</td><td>False</td><td>Approximate Hessian by finite differences (otherwise BFGS)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FilterBisecAlpha</td><td>OT_BOOLEAN</td><td>True</td><td>Filter heuristic to save Armijo iterations</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FilterGammaCV</td><td>OT_REAL</td><td>7.5e-06</td><td>Constraint violation decrease factor in Filter acceptance check</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FilterGammaF</td><td>OT_REAL</td><td>1.1e-05</td><td>Objective decrease factor in Filter acceptance check</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FilterIntersecAlpha</td><td>OT_BOOLEAN</td><td>True</td><td>Filter heuristic to save Armijo iterations</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FirstDifCentral</td><td>OT_BOOLEAN</td><td>True</td><td>Use central finite difference quotient for first derivatives</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FocusOnFeas</td><td>OT_BOOLEAN</td><td>True</td><td>Enable Focus-on-Feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FocusOnFeasFactor</td><td>OT_REAL</td><td>1.36</td><td>Factor in Focus-on-Feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>GammaAlpha</td><td>OT_REAL</td><td>0.05</td><td>Safety factor for alphamin calculation by Filter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>GroupMethod</td><td>OT_INTEGER</td><td>1</td><td>Select method to determine graph colouring groups</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>IgnoreFilterCrit</td><td>OT_BOOLEAN</td><td>False</td><td>Activate accelerating heuristics for Filter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>IncBettsTau</td><td>OT_REAL</td><td>2.0</td><td>Increase factor for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>IncBettsTauMore</td><td>OT_REAL</td><td>100.0</td><td>Larger increase factor for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>IncreaseIWS</td><td>OT_REAL</td><td>1.0</td><td>Increase factor for estimated integer workspace requirement</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>IncreaseRWS</td><td>OT_REAL</td><td>1.0</td><td>Increase factor for estimated real workspace requirement</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>Infty</td><td>OT_REAL</td><td>1e+20</td><td>Upper bound for numbers to be regarded as finite</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>InftyUnbounded</td><td>OT_REAL</td><td>1e+20</td><td>Tolerance for unboundedness detection heuristic</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>InitialLMest</td><td>OT_BOOLEAN</td><td>True</td><td>Enable initial Lagrange multiplier estimate</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>KeepAcceptableSol</td><td>OT_BOOLEAN</td><td>True</td><td>Save acceptable solutions as fallback</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LMestQPipComTol</td><td>OT_REAL</td><td>0.003</td><td>IP complementarity tolerance in initial multiplier estimate</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LMestQPipResTol</td><td>OT_REAL</td><td>1.0</td><td>IP residual tolerance in initial multiplier estimate</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LinMult</td><td>OT_BOOLEAN</td><td>False</td><td>Control Lagrange multiplier update</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LogLevel</td><td>OT_INTEGER</td><td>0</td><td>Enable XML logfiles and writing interval</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LogResult</td><td>OT_INTEGER</td><td>0</td><td>Enable XML result logging and detail level</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LowPassAlphaF</td><td>OT_REAL</td><td>0.95</td><td>Lowpass-filter update factor for objective values</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LowPassAlphaG</td><td>OT_REAL</td><td>0.95</td><td>Lowpass-filter update factor for constraint values</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LowPassAlphaMerit</td><td>OT_REAL</td><td>0.1</td><td>Lowpass-filter update factor for merit function values</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LowPassFilter</td><td>OT_BOOLEAN</td><td>True</td><td>Enable lowpass-filter termination criterion</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>Ma57PivotThresh</td><td>OT_REAL</td><td>1e-06</td><td>Pivoting tolerance for MA57 = CNTL(1)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MatrixCC</td><td>OT_BOOLEAN</td><td>False</td><td>Not to be included into a parameter file!</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MaxCalls</td><td>OT_INTEGER</td><td>2147483647</td><td>Upper bound to Reverse Communication calls</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MaxForce</td><td>OT_INTEGER</td><td>1000</td><td>Maximum number of Force recovery strategy steps</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MaxGPart</td><td>OT_INTEGER</td><td>1</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MaxIter</td><td>OT_INTEGER</td><td>500</td><td>Upper bound on major iterations</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MaxLScounter</td><td>OT_INTEGER</td><td>3</td><td>Control activation of Filter acceleration heuristics</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MaxNorm</td><td>OT_BOOLEAN</td><td>True</td><td>Select max-norm instead of 1-norm in Filter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MeritFunction</td><td>OT_INTEGER</td><td>4</td><td>Select merit function and penalty update [0, 3..5]</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MeritGradTol</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Threshold of meritfunction gradient for increasing Hessian regularisation</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MinBettsTau</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Lower bound for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MoreRelax</td><td>OT_BOOLEAN</td><td>False</td><td>Introduce one relaxation variable for every constraint</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>NLPmethod</td><td>OT_INTEGER</td><td>1</td><td>Select (1) Meritfunction or (3) Filter globalisation</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>NLPprint</td><td>OT_INTEGER</td><td>2</td><td>NLP print level [-1..4]</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PairMethod</td><td>OT_INTEGER</td><td>1</td><td>Select method to determine graph colouring pairgroups</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PenUpdEpsBar</td><td>OT_REAL</td><td>0.9</td><td>Penalty update parameter factor for MeritFunction = 3</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PenUpdEpsKFac</td><td>OT_REAL</td><td>2.0</td><td>Penalty update parameter factor for MeritFunction = 4</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PenUpdEpsKSequence</td><td>OT_INTEGER</td><td>2</td><td>Penalty update parameter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PenUpdMaxDeltaK</td><td>OT_REAL</td><td>11.0</td><td>Max penalty for MeritFunction = 4</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PenUpdMaxFac</td><td>OT_REAL</td><td>100000000.0</td><td>Max factor for increasing penalty for MeritFunction = 4</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PenUpdRBar</td><td>OT_REAL</td><td>2.0</td><td>Penalty update parameter for MeritFunction = 3</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PrecisionF</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>(currently unused) Relative precision of objective</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PrecisionG</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>(currently unused) Relative precision of constraints</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>QPscaleParam</td><td>OT_REAL</td><td>0.0</td><td>(currently unused)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>QuadraticProblem</td><td>OT_BOOLEAN</td><td>False</td><td>Not to be included into a parameter file!</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ReduceBettsTau</td><td>OT_REAL</td><td>0.3</td><td>Decrease factor for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>RegStrategy</td><td>OT_INTEGER</td><td>1</td><td>Select Hessian regularisation strategy in Filter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ReinitFilter</td><td>OT_BOOLEAN</td><td>False</td><td>Enables Filter-reinitialisation accelerating heuristic</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>RelaxMaxDelta</td><td>OT_REAL</td><td>0.92</td><td>Upper bound for accepting the constraint relaxation variable</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>RelaxMaxPen</td><td>OT_REAL</td><td>50000000.0</td><td>Upper bound on the constraint relaxation penalty</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>RelaxRho</td><td>OT_REAL</td><td>6.0</td><td>Update factor for the constraint relaxation penalty</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>RelaxStart</td><td>OT_REAL</td><td>1.0</td><td>Initial value of the constraint relaxation penalty</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>RestUntilFeas</td><td>OT_BOOLEAN</td><td>False</td><td>Do restoration until a feasible solution is found</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaleConIter</td><td>OT_BOOLEAN</td><td>False</td><td>Scale constraints in every iteration</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaleFacObj</td><td>OT_REAL</td><td>10.0</td><td>Value to scale large objective functions to</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaleFacQP</td><td>OT_REAL</td><td>10.0</td><td>Upper bound on resulting matrix norm for QP scaling</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaledFD</td><td>OT_BOOLEAN</td><td>True</td><td>Use a scaled perturbation for finite differences</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaledKKT</td><td>OT_BOOLEAN</td><td>True</td><td>Scale KKT conditions</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaledObj</td><td>OT_BOOLEAN</td><td>True</td><td>Scale the objective function</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaledQP</td><td>OT_BOOLEAN</td><td>True</td><td>Scale some matrices handed to the QP</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>StartBettsTau</td><td>OT_REAL</td><td>0.1</td><td>Initial value for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>SwitchingDelta</td><td>OT_REAL</td><td>0.01</td><td>Filter switching condition parameter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>SwitchingSCV</td><td>OT_REAL</td><td>1.1</td><td>Filter switching condition parameter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>SwitchingSF</td><td>OT_REAL</td><td>2.3</td><td>Filter switching condition parameter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TakeQPSol</td><td>OT_BOOLEAN</td><td>False</td><td>Evaluate QP search direction regardless of convergence</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>Timeout</td><td>OT_REAL</td><td>300.0</td><td>Timeout in seconds</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TolComp</td><td>OT_REAL</td><td>0.001</td><td>Complementarity tolerance</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TolFeas</td><td>OT_REAL</td><td>1e-06</td><td>Feasibility tolerance</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TolOpti</td><td>OT_REAL</td><td>1e-06</td><td>Optimality tolerance</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TolWeakActive</td><td>OT_REAL</td><td>1.0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TooBig</td><td>OT_BOOLEAN</td><td>True</td><td>Enable too-big termination heuristics</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TooBigCV</td><td>OT_REAL</td><td>1e+25</td><td>Upper bound on constraint violation for too-big heuristic</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TooBigKKT</td><td>OT_REAL</td><td>1e+30</td><td>Upper bound on KKT values for too-big heuristic</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>UserDF</td><td>OT_BOOLEAN</td><td>True</td><td>Objective gradient values supplied by caller</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>UserDG</td><td>OT_BOOLEAN</td><td>True</td><td>Jacobian values supplied by caller</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>UserHM</td><td>OT_BOOLEAN</td><td>False</td><td>Hessian values supplied by caller</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>UserHMstructure</td><td>OT_INTEGER</td><td>2</td><td>Enable automatic Hessian structure generation or checking</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>WeakActiveSet</td><td>OT_BOOLEAN</td><td>False</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ad_mode</td><td>OT_STRING</td><td>automatic</td><td>How to calculate the Jacobians: "forward" (only forward mode) "reverse" (only adjoint mode) or "automatic" (a heuristic decides which is more appropriate)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>eps</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Machine epsilon</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>False</td><td>Expand the objective function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>expand_g</td><td>OT_BOOLEAN</td><td>False</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>False</td><td>Generate an exact Hessian of the Lagrangian</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>False</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>initialised</td><td>OT_BOOLEAN</td><td>True</td><td>Automatically added initialisation flag. </td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>iteration_callback</td><td>OT_FX</td><td></td><td>A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>False</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>False</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td></td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td></td><td>Monitors to be activated</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>name</td><td>OT_STRING</td><td>unnamed_shared_object</td><td>n/a</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>False</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>False</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>parametric</td><td>OT_BOOLEAN</td><td>False</td><td>Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>sparse</td><td>OT_BOOLEAN</td><td>True</td><td>function is sparse</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td></td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>False</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>user_data</td><td>OT_UNKNOWN</td><td></td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>verbose</td><td>OT_BOOLEAN</td><td>False</td><td>verbose evaluation -- for debugging</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>False</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>AcceptTolFeas</td><td>OT_REAL</td><td>worhp_p.AcceptTolFeas</td><td>Tolerance for acceptable feasibility</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>AcceptTolOpti</td><td>OT_REAL</td><td>worhp_p.AcceptTolOpti</td><td>Tolerance for acceptable optimality</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>AlphaMinConst</td><td>OT_BOOLEAN</td><td>worhp_p.AlphaMinConst</td><td>Use a constant lower bound on Armijo stepsize in Filter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ArmijoBeta</td><td>OT_REAL</td><td>worhp_p.ArmijoBeta</td><td>Trial stepsize decrease factor for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ArmijoMaxAlpha</td><td>OT_REAL</td><td>worhp_p.ArmijoMaxAlpha</td><td>Initial alpha for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ArmijoMinAlpha</td><td>OT_REAL</td><td>worhp_p.ArmijoMinAlpha</td><td>Lower bound on alpha for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ArmijoMinAlphaRec</td><td>OT_REAL</td><td>worhp_p.ArmijoMinAlphaRec</td><td>Lower bound on alpha for Armijo rule during recovery</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ArmijoSigma</td><td>OT_REAL</td><td>worhp_p.ArmijoSigma</td><td>Scale factor for linearised descent check in Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>AutoQPRecovery</td><td>OT_BOOLEAN</td><td>worhp_p.AutoQPRecovery</td><td>Enable automatic QP recovery</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BFGSmaxblockSize</td><td>OT_INTEGER</td><td>worhp_p.BFGSmaxblockSize</td><td>Maximum BFGS block size (depends on BFGS method)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BFGSmethod</td><td>OT_INTEGER</td><td>worhp_p.BFGSmethod</td><td>Choose BFGS method (dense, block, sparse)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BFGSminblockSize</td><td>OT_INTEGER</td><td>worhp_p.BFGSminblockSize</td><td>Minimum BFGS block size (depends on BFGS method)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BFGSrestart</td><td>OT_INTEGER</td><td>worhp_p.BFGSrestart</td><td>Restart BFGS update after this many iterations</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BettsFactor</td><td>OT_REAL</td><td>worhp_p.BettsFactor</td><td>Update factor for Betts' Hessian regularisation</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BettsPoint</td><td>OT_REAL</td><td>worhp_p.BettsPoint</td><td>Smallest eigenvalue of the regularised Hessian</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BoundTolFac</td><td>OT_REAL</td><td>worhp_p.BoundTolFac</td><td>Factor in determining active constraints by KKT</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CheckFJ</td><td>OT_REAL</td><td>worhp_p.CheckFJ</td><td>Upper bound used by Fritz-John heuristic</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CheckStructureDF</td><td>OT_BOOLEAN</td><td>worhp_p.CheckStructureDF</td><td>Enable structural checking of DF</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CheckStructureDG</td><td>OT_BOOLEAN</td><td>worhp_p.CheckStructureDG</td><td>Enable structural checking of DG</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CheckStructureHM</td><td>OT_BOOLEAN</td><td>worhp_p.CheckStructureHM</td><td>Enable structural checking of HM</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepBettsSum</td><td>OT_REAL</td><td>worhp_p.CorStepBettsSum</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepConStop</td><td>OT_REAL</td><td>worhp_p.CorStepConStop</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepConvio</td><td>OT_REAL</td><td>worhp_p.CorStepConvio</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepMaxIter</td><td>OT_INTEGER</td><td>worhp_p.CorStepMaxIter</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepMethod</td><td>OT_INTEGER</td><td>worhp_p.CorStepMethod</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepMode</td><td>OT_INTEGER</td><td>worhp_p.CorStepMode</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepPFactor</td><td>OT_REAL</td><td>worhp_p.CorStepPFactor</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepPMax</td><td>OT_REAL</td><td>worhp_p.CorStepPMax</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepRecoveryDX</td><td>OT_BOOLEAN</td><td>worhp_p.CorStepRecoveryDX</td><td>Enable structural checking of HM</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CurvBCond</td><td>OT_REAL</td><td>worhp_p.CurvBCond</td><td>Block BFGS curvature condition bound</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CurvBFac</td><td>OT_REAL</td><td>worhp_p.CurvBFac</td><td>Block BFGS curvature condition regularisation factor</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CurvCond</td><td>OT_REAL</td><td>worhp_p.CurvCond</td><td>BFGS Curvature condition bound</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CurvFac</td><td>OT_REAL</td><td>worhp_p.CurvFac</td><td>BFGS curvature condition regularisation factor</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CutLength</td><td>OT_REAL</td><td>worhp_p.CutLength</td><td>Scaling factor for Cut recovery strategy</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>DebugMarker06</td><td>OT_INTEGER</td><td>worhp_p.DebugMarker06</td><td>Debug marker, only needed for ASTOS integration</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FGtogether</td><td>OT_BOOLEAN</td><td>worhp_p.FGtogether</td><td>F and G cannot be evaluated separately</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FJandND</td><td>OT_BOOLEAN</td><td>worhp_p.FJandND</td><td>Enable Fritz-John and non-differentiable check heuristics</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FeasibleDual</td><td>OT_BOOLEAN</td><td>worhp_p.FeasibleDual</td><td>Activate dual feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FeasibleInit</td><td>OT_BOOLEAN</td><td>worhp_p.FeasibleInit</td><td>Activate initial feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FeasibleInitTol</td><td>OT_REAL</td><td>worhp_p.FeasibleInitTol</td><td>Feasibility tolerance for no-objective feasible mode</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FeasibleOnly</td><td>OT_BOOLEAN</td><td>worhp_p.FeasibleOnly</td><td>Activate feasible-only mode</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FidifEps</td><td>OT_REAL</td><td>worhp_p.FidifEps</td><td>Finite difference perturbation</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FidifHM</td><td>OT_BOOLEAN</td><td>worhp_p.FidifHM</td><td>Approximate Hessian by finite differences (otherwise BFGS)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FilterBisecAlpha</td><td>OT_BOOLEAN</td><td>worhp_p.FilterBisecAlpha</td><td>Filter heuristic to save Armijo iterations</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FilterGammaCV</td><td>OT_REAL</td><td>worhp_p.FilterGammaCV</td><td>Constraint violation decrease factor in Filter acceptance check</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FilterGammaF</td><td>OT_REAL</td><td>worhp_p.FilterGammaF</td><td>Objective decrease factor in Filter acceptance check</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FilterIntersecAlpha</td><td>OT_BOOLEAN</td><td>worhp_p.FilterIntersecAlpha</td><td>Filter heuristic to save Armijo iterations</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FirstDifCentral</td><td>OT_BOOLEAN</td><td>worhp_p.FirstDifCentral</td><td>Use central finite difference quotient for first derivatives</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FocusOnFeas</td><td>OT_BOOLEAN</td><td>worhp_p.FocusOnFeas</td><td>Enable Focus-on-Feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FocusOnFeasFactor</td><td>OT_REAL</td><td>worhp_p.FocusOnFeasFactor</td><td>Factor in Focus-on-Feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>GammaAlpha</td><td>OT_REAL</td><td>worhp_p.GammaAlpha</td><td>Safety factor for alphamin calculation by Filter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>GroupMethod</td><td>OT_INTEGER</td><td>worhp_p.GroupMethod</td><td>Select method to determine graph colouring groups</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>IgnoreFilterCrit</td><td>OT_BOOLEAN</td><td>worhp_p.IgnoreFilterCrit</td><td>Activate accelerating heuristics for Filter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>IncBettsTau</td><td>OT_REAL</td><td>worhp_p.IncBettsTau</td><td>Increase factor for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>IncBettsTauMore</td><td>OT_REAL</td><td>worhp_p.IncBettsTauMore</td><td>Larger increase factor for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>IncreaseIWS</td><td>OT_REAL</td><td>worhp_p.IncreaseIWS</td><td>Increase factor for estimated integer workspace requirement</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>IncreaseRWS</td><td>OT_REAL</td><td>worhp_p.IncreaseRWS</td><td>Increase factor for estimated real workspace requirement</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>Infty</td><td>OT_REAL</td><td>worhp_p.Infty</td><td>Upper bound for numbers to be regarded as finite</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>InftyUnbounded</td><td>OT_REAL</td><td>worhp_p.InftyUnbounded</td><td>Tolerance for unboundedness detection heuristic</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>InitialLMest</td><td>OT_BOOLEAN</td><td>worhp_p.InitialLMest</td><td>Enable initial Lagrange multiplier estimate</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>KeepAcceptableSol</td><td>OT_BOOLEAN</td><td>worhp_p.KeepAcceptableSol</td><td>Save acceptable solutions as fallback</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LMestQPipComTol</td><td>OT_REAL</td><td>worhp_p.LMestQPipComTol</td><td>IP complementarity tolerance in initial multiplier estimate</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LMestQPipResTol</td><td>OT_REAL</td><td>worhp_p.LMestQPipResTol</td><td>IP residual tolerance in initial multiplier estimate</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LinMult</td><td>OT_BOOLEAN</td><td>worhp_p.LinMult</td><td>Control Lagrange multiplier update</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LogLevel</td><td>OT_INTEGER</td><td>worhp_p.LogLevel</td><td>Enable XML logfiles and writing interval</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LogResult</td><td>OT_INTEGER</td><td>worhp_p.LogResult</td><td>Enable XML result logging and detail level</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LowPassAlphaF</td><td>OT_REAL</td><td>worhp_p.LowPassAlphaF</td><td>Lowpass-filter update factor for objective values</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LowPassAlphaG</td><td>OT_REAL</td><td>worhp_p.LowPassAlphaG</td><td>Lowpass-filter update factor for constraint values</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LowPassAlphaMerit</td><td>OT_REAL</td><td>worhp_p.LowPassAlphaMerit</td><td>Lowpass-filter update factor for merit function values</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LowPassFilter</td><td>OT_BOOLEAN</td><td>worhp_p.LowPassFilter</td><td>Enable lowpass-filter termination criterion</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>Ma57PivotThresh</td><td>OT_REAL</td><td>worhp_p.Ma57PivotThresh</td><td>Pivoting tolerance for MA57 = CNTL(1)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MatrixCC</td><td>OT_BOOLEAN</td><td>worhp_p.MatrixCC</td><td>Not to be included into a parameter file!</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MaxCalls</td><td>OT_INTEGER</td><td>worhp_p.MaxCalls</td><td>Upper bound to Reverse Communication calls</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MaxForce</td><td>OT_INTEGER</td><td>worhp_p.MaxForce</td><td>Maximum number of Force recovery strategy steps</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MaxGPart</td><td>OT_INTEGER</td><td>worhp_p.MaxGPart</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MaxIter</td><td>OT_INTEGER</td><td>worhp_p.MaxIter</td><td>Upper bound on major iterations</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MaxLScounter</td><td>OT_INTEGER</td><td>worhp_p.MaxLScounter</td><td>Control activation of Filter acceleration heuristics</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MaxNorm</td><td>OT_BOOLEAN</td><td>worhp_p.MaxNorm</td><td>Select max-norm instead of 1-norm in Filter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MeritFunction</td><td>OT_INTEGER</td><td>worhp_p.MeritFunction</td><td>Select merit function and penalty update [0, 3..5]</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MeritGradTol</td><td>OT_REAL</td><td>worhp_p.MeritGradTol</td><td>Threshold of meritfunction gradient for increasing Hessian regularisation</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MinBettsTau</td><td>OT_REAL</td><td>worhp_p.MinBettsTau</td><td>Lower bound for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MoreRelax</td><td>OT_BOOLEAN</td><td>worhp_p.MoreRelax</td><td>Introduce one relaxation variable for every constraint</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>NLPmethod</td><td>OT_INTEGER</td><td>worhp_p.NLPmethod</td><td>Select (1) Meritfunction or (3) Filter globalisation</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>NLPprint</td><td>OT_INTEGER</td><td>worhp_p.NLPprint</td><td>NLP print level [-1..4]</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PairMethod</td><td>OT_INTEGER</td><td>worhp_p.PairMethod</td><td>Select method to determine graph colouring pairgroups</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PenUpdEpsBar</td><td>OT_REAL</td><td>worhp_p.PenUpdEpsBar</td><td>Penalty update parameter factor for MeritFunction = 3</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PenUpdEpsKFac</td><td>OT_REAL</td><td>worhp_p.PenUpdEpsKFac</td><td>Penalty update parameter factor for MeritFunction = 4</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PenUpdEpsKSequence</td><td>OT_INTEGER</td><td>worhp_p.PenUpdEpsKSequence</td><td>Penalty update parameter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PenUpdMaxDeltaK</td><td>OT_REAL</td><td>worhp_p.PenUpdMaxDeltaK</td><td>Max penalty for MeritFunction = 4</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PenUpdMaxFac</td><td>OT_REAL</td><td>worhp_p.PenUpdMaxFac</td><td>Max factor for increasing penalty for MeritFunction = 4</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PenUpdRBar</td><td>OT_REAL</td><td>worhp_p.PenUpdRBar</td><td>Penalty update parameter for MeritFunction = 3</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PrecisionF</td><td>OT_REAL</td><td>worhp_p.PrecisionF</td><td>(currently unused) Relative precision of objective</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PrecisionG</td><td>OT_REAL</td><td>worhp_p.PrecisionG</td><td>(currently unused) Relative precision of constraints</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>QPscaleParam</td><td>OT_REAL</td><td>worhp_p.QPscaleParam</td><td>(currently unused)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>QuadraticProblem</td><td>OT_BOOLEAN</td><td>worhp_p.QuadraticProblem</td><td>Not to be included into a parameter file!</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ReduceBettsTau</td><td>OT_REAL</td><td>worhp_p.ReduceBettsTau</td><td>Decrease factor for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>RegStrategy</td><td>OT_INTEGER</td><td>worhp_p.RegStrategy</td><td>Select Hessian regularisation strategy in Filter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ReinitFilter</td><td>OT_BOOLEAN</td><td>worhp_p.ReinitFilter</td><td>Enables Filter-reinitialisation accelerating heuristic</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>RelaxMaxDelta</td><td>OT_REAL</td><td>worhp_p.RelaxMaxDelta</td><td>Upper bound for accepting the constraint relaxation variable</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>RelaxMaxPen</td><td>OT_REAL</td><td>worhp_p.RelaxMaxPen</td><td>Upper bound on the constraint relaxation penalty</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>RelaxRho</td><td>OT_REAL</td><td>worhp_p.RelaxRho</td><td>Update factor for the constraint relaxation penalty</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>RelaxStart</td><td>OT_REAL</td><td>worhp_p.RelaxStart</td><td>Initial value of the constraint relaxation penalty</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>RestUntilFeas</td><td>OT_BOOLEAN</td><td>worhp_p.RestUntilFeas</td><td>Do restoration until a feasible solution is found</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaleConIter</td><td>OT_BOOLEAN</td><td>worhp_p.ScaleConIter</td><td>Scale constraints in every iteration</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaleFacObj</td><td>OT_REAL</td><td>worhp_p.ScaleFacObj</td><td>Value to scale large objective functions to</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaleFacQP</td><td>OT_REAL</td><td>worhp_p.ScaleFacQP</td><td>Upper bound on resulting matrix norm for QP scaling</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaledFD</td><td>OT_BOOLEAN</td><td>worhp_p.ScaledFD</td><td>Use a scaled perturbation for finite differences</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaledKKT</td><td>OT_BOOLEAN</td><td>worhp_p.ScaledKKT</td><td>Scale KKT conditions</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaledObj</td><td>OT_BOOLEAN</td><td>worhp_p.ScaledObj</td><td>Scale the objective function</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaledQP</td><td>OT_BOOLEAN</td><td>worhp_p.ScaledQP</td><td>Scale some matrices handed to the QP</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>StartBettsTau</td><td>OT_REAL</td><td>worhp_p.StartBettsTau</td><td>Initial value for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>SwitchingDelta</td><td>OT_REAL</td><td>worhp_p.SwitchingDelta</td><td>Filter switching condition parameter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>SwitchingSCV</td><td>OT_REAL</td><td>worhp_p.SwitchingSCV</td><td>Filter switching condition parameter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>SwitchingSF</td><td>OT_REAL</td><td>worhp_p.SwitchingSF</td><td>Filter switching condition parameter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TakeQPSol</td><td>OT_BOOLEAN</td><td>worhp_p.TakeQPSol</td><td>Evaluate QP search direction regardless of convergence</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>Timeout</td><td>OT_REAL</td><td>worhp_p.Timeout</td><td>Timeout in seconds</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TolComp</td><td>OT_REAL</td><td>worhp_p.TolComp</td><td>Complementarity tolerance</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TolFeas</td><td>OT_REAL</td><td>worhp_p.TolFeas</td><td>Feasibility tolerance</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TolOpti</td><td>OT_REAL</td><td>worhp_p.TolOpti</td><td>Optimality tolerance</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TolWeakActive</td><td>OT_REAL</td><td>worhp_p.TolWeakActive</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TooBig</td><td>OT_BOOLEAN</td><td>worhp_p.TooBig</td><td>Enable too-big termination heuristics</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TooBigCV</td><td>OT_REAL</td><td>worhp_p.TooBigCV</td><td>Upper bound on constraint violation for too-big heuristic</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TooBigKKT</td><td>OT_REAL</td><td>worhp_p.TooBigKKT</td><td>Upper bound on KKT values for too-big heuristic</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>UserDF</td><td>OT_BOOLEAN</td><td>worhp_p.UserDF</td><td>Objective gradient values supplied by caller</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>UserDG</td><td>OT_BOOLEAN</td><td>worhp_p.UserDG</td><td>Jacobian values supplied by caller</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>UserHM</td><td>OT_BOOLEAN</td><td>worhp_p.UserHM</td><td>Hessian values supplied by caller</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>UserHMstructure</td><td>OT_INTEGER</td><td>worhp_p.UserHMstructure</td><td>Enable automatic Hessian structure generation or checking</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>WeakActiveSet</td><td>OT_BOOLEAN</td><td>worhp_p.WeakActiveSet</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>eps</td><td>OT_REAL</td><td>worhp_p.eps</td><td>Machine epsilon</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the objective function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>initialised</td><td>OT_BOOLEAN</td><td>worhp_p.initialised</td><td>Automatically added initialisation flag.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>iteration_callback</td><td>OT_FX</td><td>FX()</td><td>A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h)</td><td>CasADi::FXInternal<br />CasADi::WorhpInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
+<tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>parametric</td><td>OT_BOOLEAN</td><td>false</td><td>Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
+<tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>false</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>CasADi::NLPSolverInternal</td></tr>
 </table>
 */
 /** \class CasADi::WorhpSolver
@@ -3589,159 +3429,158 @@
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>AcceptTolFeas</td><td>OT_REAL</td><td>0.001</td><td>Tolerance for acceptable feasibility</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>AcceptTolOpti</td><td>OT_REAL</td><td>0.001</td><td>Tolerance for acceptable optimality</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>AlphaMinConst</td><td>OT_BOOLEAN</td><td>False</td><td>Use a constant lower bound on Armijo stepsize in Filter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>Ares</td><td>OT_INTEGERVECTOR</td><td>(42, 41, 42, 45, 43, 46, 44)</td><td>Armijo recovery strategies. Vector of size 7</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ArmijoBeta</td><td>OT_REAL</td><td>0.712</td><td>Trial stepsize decrease factor for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ArmijoMaxAlpha</td><td>OT_REAL</td><td>1.0</td><td>Initial alpha for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ArmijoMinAlpha</td><td>OT_REAL</td><td>1e-06</td><td>Lower bound on alpha for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ArmijoMinAlphaRec</td><td>OT_REAL</td><td>1e-06</td><td>Lower bound on alpha for Armijo rule during recovery</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ArmijoSigma</td><td>OT_REAL</td><td>0.005</td><td>Scale factor for linearised descent check in Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>AutoQPRecovery</td><td>OT_BOOLEAN</td><td>True</td><td>Enable automatic QP recovery</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BFGSmaxblockSize</td><td>OT_INTEGER</td><td>300</td><td>Maximum BFGS block size (depends on BFGS method)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BFGSmethod</td><td>OT_INTEGER</td><td>0</td><td>Choose BFGS method (dense, block, sparse)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BFGSminblockSize</td><td>OT_INTEGER</td><td>300</td><td>Minimum BFGS block size (depends on BFGS method)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BFGSrestart</td><td>OT_INTEGER</td><td>50</td><td>Restart BFGS update after this many iterations</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BettsFactor</td><td>OT_REAL</td><td>2.1</td><td>Update factor for Betts' Hessian regularisation</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BettsPoint</td><td>OT_REAL</td><td>1.0</td><td>Smallest eigenvalue of the regularised Hessian</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>BoundTolFac</td><td>OT_REAL</td><td>1000.0</td><td>Factor in determining active constraints by KKT</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CheckFJ</td><td>OT_REAL</td><td>1e+12</td><td>Upper bound used by Fritz-John heuristic</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CheckStructureDF</td><td>OT_BOOLEAN</td><td>True</td><td>Enable structural checking of DF</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CheckStructureDG</td><td>OT_BOOLEAN</td><td>True</td><td>Enable structural checking of DG</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CheckStructureHM</td><td>OT_BOOLEAN</td><td>True</td><td>Enable structural checking of HM</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepBettsSum</td><td>OT_REAL</td><td>0.5</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepConStop</td><td>OT_REAL</td><td>1e-06</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepConvio</td><td>OT_REAL</td><td>1.0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepMaxIter</td><td>OT_INTEGER</td><td>50</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepMethod</td><td>OT_INTEGER</td><td>0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepMode</td><td>OT_INTEGER</td><td>1</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepPFactor</td><td>OT_REAL</td><td>1.0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepPMax</td><td>OT_REAL</td><td>1000000.0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CorStepRecoveryDX</td><td>OT_BOOLEAN</td><td>False</td><td>Enable structural checking of HM</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CurvBCond</td><td>OT_REAL</td><td>0.02</td><td>Block BFGS curvature condition bound</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CurvBFac</td><td>OT_REAL</td><td>0.3</td><td>Block BFGS curvature condition regularisation factor</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CurvCond</td><td>OT_REAL</td><td>0.02</td><td>BFGS Curvature condition bound</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CurvFac</td><td>OT_REAL</td><td>0.3</td><td>BFGS curvature condition regularisation factor</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>CutLength</td><td>OT_REAL</td><td>0.001</td><td>Scaling factor for Cut recovery strategy</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>DebugMarker06</td><td>OT_INTEGER</td><td>42</td><td>Debug marker, only needed for ASTOS integration</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FGtogether</td><td>OT_BOOLEAN</td><td>False</td><td>F and G cannot be evaluated separately</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FJandND</td><td>OT_BOOLEAN</td><td>False</td><td>Enable Fritz-John and non-differentiable check heuristics</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FeasibleDual</td><td>OT_BOOLEAN</td><td>False</td><td>Activate dual feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FeasibleInit</td><td>OT_BOOLEAN</td><td>False</td><td>Activate initial feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FeasibleInitTol</td><td>OT_REAL</td><td>0.001</td><td>Feasibility tolerance for no-objective feasible mode</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FeasibleOnly</td><td>OT_BOOLEAN</td><td>False</td><td>Activate feasible-only mode</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FidifEps</td><td>OT_REAL</td><td>1e-05</td><td>Finite difference perturbation</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FidifHM</td><td>OT_BOOLEAN</td><td>False</td><td>Approximate Hessian by finite differences (otherwise BFGS)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FilterBisecAlpha</td><td>OT_BOOLEAN</td><td>True</td><td>Filter heuristic to save Armijo iterations</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FilterGammaCV</td><td>OT_REAL</td><td>7.5e-06</td><td>Constraint violation decrease factor in Filter acceptance check</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FilterGammaF</td><td>OT_REAL</td><td>1.1e-05</td><td>Objective decrease factor in Filter acceptance check</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FilterIntersecAlpha</td><td>OT_BOOLEAN</td><td>True</td><td>Filter heuristic to save Armijo iterations</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FirstDifCentral</td><td>OT_BOOLEAN</td><td>True</td><td>Use central finite difference quotient for first derivatives</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FocusOnFeas</td><td>OT_BOOLEAN</td><td>True</td><td>Enable Focus-on-Feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>FocusOnFeasFactor</td><td>OT_REAL</td><td>1.36</td><td>Factor in Focus-on-Feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>GammaAlpha</td><td>OT_REAL</td><td>0.05</td><td>Safety factor for alphamin calculation by Filter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>GroupMethod</td><td>OT_INTEGER</td><td>1</td><td>Select method to determine graph colouring groups</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>IgnoreFilterCrit</td><td>OT_BOOLEAN</td><td>False</td><td>Activate accelerating heuristics for Filter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>IncBettsTau</td><td>OT_REAL</td><td>2.0</td><td>Increase factor for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>IncBettsTauMore</td><td>OT_REAL</td><td>100.0</td><td>Larger increase factor for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>IncreaseIWS</td><td>OT_REAL</td><td>1.0</td><td>Increase factor for estimated integer workspace requirement</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>IncreaseRWS</td><td>OT_REAL</td><td>1.0</td><td>Increase factor for estimated real workspace requirement</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>Infty</td><td>OT_REAL</td><td>1e+20</td><td>Upper bound for numbers to be regarded as finite</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>InftyUnbounded</td><td>OT_REAL</td><td>1e+20</td><td>Tolerance for unboundedness detection heuristic</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>InitialLMest</td><td>OT_BOOLEAN</td><td>True</td><td>Enable initial Lagrange multiplier estimate</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>KeepAcceptableSol</td><td>OT_BOOLEAN</td><td>True</td><td>Save acceptable solutions as fallback</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LMestQPipComTol</td><td>OT_REAL</td><td>0.003</td><td>IP complementarity tolerance in initial multiplier estimate</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LMestQPipResTol</td><td>OT_REAL</td><td>1.0</td><td>IP residual tolerance in initial multiplier estimate</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LinMult</td><td>OT_BOOLEAN</td><td>False</td><td>Control Lagrange multiplier update</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LogLevel</td><td>OT_INTEGER</td><td>0</td><td>Enable XML logfiles and writing interval</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LogResult</td><td>OT_INTEGER</td><td>0</td><td>Enable XML result logging and detail level</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LowPassAlphaF</td><td>OT_REAL</td><td>0.95</td><td>Lowpass-filter update factor for objective values</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LowPassAlphaG</td><td>OT_REAL</td><td>0.95</td><td>Lowpass-filter update factor for constraint values</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LowPassAlphaMerit</td><td>OT_REAL</td><td>0.1</td><td>Lowpass-filter update factor for merit function values</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>LowPassFilter</td><td>OT_BOOLEAN</td><td>True</td><td>Enable lowpass-filter termination criterion</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>Ma57PivotThresh</td><td>OT_REAL</td><td>1e-06</td><td>Pivoting tolerance for MA57 = CNTL(1)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MatrixCC</td><td>OT_BOOLEAN</td><td>False</td><td>Not to be included into a parameter file!</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MaxCalls</td><td>OT_INTEGER</td><td>2147483647</td><td>Upper bound to Reverse Communication calls</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MaxForce</td><td>OT_INTEGER</td><td>1000</td><td>Maximum number of Force recovery strategy steps</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MaxGPart</td><td>OT_INTEGER</td><td>1</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MaxIter</td><td>OT_INTEGER</td><td>500</td><td>Upper bound on major iterations</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MaxLScounter</td><td>OT_INTEGER</td><td>3</td><td>Control activation of Filter acceleration heuristics</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MaxNorm</td><td>OT_BOOLEAN</td><td>True</td><td>Select max-norm instead of 1-norm in Filter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MeritFunction</td><td>OT_INTEGER</td><td>4</td><td>Select merit function and penalty update [0, 3..5]</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MeritGradTol</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Threshold of meritfunction gradient for increasing Hessian regularisation</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MinBettsTau</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Lower bound for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>MoreRelax</td><td>OT_BOOLEAN</td><td>False</td><td>Introduce one relaxation variable for every constraint</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>NLPmethod</td><td>OT_INTEGER</td><td>1</td><td>Select (1) Meritfunction or (3) Filter globalisation</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>NLPprint</td><td>OT_INTEGER</td><td>2</td><td>NLP print level [-1..4]</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PairMethod</td><td>OT_INTEGER</td><td>1</td><td>Select method to determine graph colouring pairgroups</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PenUpdEpsBar</td><td>OT_REAL</td><td>0.9</td><td>Penalty update parameter factor for MeritFunction = 3</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PenUpdEpsKFac</td><td>OT_REAL</td><td>2.0</td><td>Penalty update parameter factor for MeritFunction = 4</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PenUpdEpsKSequence</td><td>OT_INTEGER</td><td>2</td><td>Penalty update parameter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PenUpdMaxDeltaK</td><td>OT_REAL</td><td>11.0</td><td>Max penalty for MeritFunction = 4</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PenUpdMaxFac</td><td>OT_REAL</td><td>100000000.0</td><td>Max factor for increasing penalty for MeritFunction = 4</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PenUpdRBar</td><td>OT_REAL</td><td>2.0</td><td>Penalty update parameter for MeritFunction = 3</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PrecisionF</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>(currently unused) Relative precision of objective</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>PrecisionG</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>(currently unused) Relative precision of constraints</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>QPscaleParam</td><td>OT_REAL</td><td>0.0</td><td>(currently unused)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>QuadraticProblem</td><td>OT_BOOLEAN</td><td>False</td><td>Not to be included into a parameter file!</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ReduceBettsTau</td><td>OT_REAL</td><td>0.3</td><td>Decrease factor for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>RegStrategy</td><td>OT_INTEGER</td><td>1</td><td>Select Hessian regularisation strategy in Filter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ReinitFilter</td><td>OT_BOOLEAN</td><td>False</td><td>Enables Filter-reinitialisation accelerating heuristic</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>RelaxMaxDelta</td><td>OT_REAL</td><td>0.92</td><td>Upper bound for accepting the constraint relaxation variable</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>RelaxMaxPen</td><td>OT_REAL</td><td>50000000.0</td><td>Upper bound on the constraint relaxation penalty</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>RelaxRho</td><td>OT_REAL</td><td>6.0</td><td>Update factor for the constraint relaxation penalty</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>RelaxStart</td><td>OT_REAL</td><td>1.0</td><td>Initial value of the constraint relaxation penalty</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>RestUntilFeas</td><td>OT_BOOLEAN</td><td>False</td><td>Do restoration until a feasible solution is found</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaleConIter</td><td>OT_BOOLEAN</td><td>False</td><td>Scale constraints in every iteration</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaleFacObj</td><td>OT_REAL</td><td>10.0</td><td>Value to scale large objective functions to</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaleFacQP</td><td>OT_REAL</td><td>10.0</td><td>Upper bound on resulting matrix norm for QP scaling</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaledFD</td><td>OT_BOOLEAN</td><td>True</td><td>Use a scaled perturbation for finite differences</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaledKKT</td><td>OT_BOOLEAN</td><td>True</td><td>Scale KKT conditions</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaledObj</td><td>OT_BOOLEAN</td><td>True</td><td>Scale the objective function</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ScaledQP</td><td>OT_BOOLEAN</td><td>True</td><td>Scale some matrices handed to the QP</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>StartBettsTau</td><td>OT_REAL</td><td>0.1</td><td>Initial value for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>SwitchingDelta</td><td>OT_REAL</td><td>0.01</td><td>Filter switching condition parameter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>SwitchingSCV</td><td>OT_REAL</td><td>1.1</td><td>Filter switching condition parameter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>SwitchingSF</td><td>OT_REAL</td><td>2.3</td><td>Filter switching condition parameter</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TakeQPSol</td><td>OT_BOOLEAN</td><td>False</td><td>Evaluate QP search direction regardless of convergence</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>Timeout</td><td>OT_REAL</td><td>300.0</td><td>Timeout in seconds</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TolComp</td><td>OT_REAL</td><td>0.001</td><td>Complementarity tolerance</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TolFeas</td><td>OT_REAL</td><td>1e-06</td><td>Feasibility tolerance</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TolOpti</td><td>OT_REAL</td><td>1e-06</td><td>Optimality tolerance</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TolWeakActive</td><td>OT_REAL</td><td>1.0</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TooBig</td><td>OT_BOOLEAN</td><td>True</td><td>Enable too-big termination heuristics</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TooBigCV</td><td>OT_REAL</td><td>1e+25</td><td>Upper bound on constraint violation for too-big heuristic</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>TooBigKKT</td><td>OT_REAL</td><td>1e+30</td><td>Upper bound on KKT values for too-big heuristic</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>UserDF</td><td>OT_BOOLEAN</td><td>True</td><td>Objective gradient values supplied by caller</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>UserDG</td><td>OT_BOOLEAN</td><td>True</td><td>Jacobian values supplied by caller</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>UserHM</td><td>OT_BOOLEAN</td><td>False</td><td>Hessian values supplied by caller</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>UserHMstructure</td><td>OT_INTEGER</td><td>2</td><td>Enable automatic Hessian structure generation or checking</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>WeakActiveSet</td><td>OT_BOOLEAN</td><td>False</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ad_mode</td><td>OT_STRING</td><td>automatic</td><td>How to calculate the Jacobians: "forward" (only forward mode) "reverse" (only adjoint mode) or "automatic" (a heuristic decides which is more appropriate)</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>eps</td><td>OT_REAL</td><td>2.22044604925e-16</td><td>Machine epsilon</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>False</td><td>Expand the objective function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>expand_g</td><td>OT_BOOLEAN</td><td>False</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>False</td><td>Generate an exact Hessian of the Lagrangian</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>False</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>initialised</td><td>OT_BOOLEAN</td><td>True</td><td>Automatically added initialisation flag. </td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>iteration_callback</td><td>OT_FX</td><td></td><td>A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>False</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>False</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td></td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td></td><td>Monitors to be activated</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>name</td><td>OT_STRING</td><td>unnamed_shared_object</td><td>n/a</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>False</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>False</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>parametric</td><td>OT_BOOLEAN</td><td>False</td><td>Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>sparse</td><td>OT_BOOLEAN</td><td>True</td><td>function is sparse</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td></td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>False</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>user_data</td><td>OT_UNKNOWN</td><td></td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>verbose</td><td>OT_BOOLEAN</td><td>False</td><td>verbose evaluation -- for debugging</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>False</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>AcceptTolFeas</td><td>OT_REAL</td><td>worhp_p.AcceptTolFeas</td><td>Tolerance for acceptable feasibility</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>AcceptTolOpti</td><td>OT_REAL</td><td>worhp_p.AcceptTolOpti</td><td>Tolerance for acceptable optimality</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>AlphaMinConst</td><td>OT_BOOLEAN</td><td>worhp_p.AlphaMinConst</td><td>Use a constant lower bound on Armijo stepsize in Filter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ArmijoBeta</td><td>OT_REAL</td><td>worhp_p.ArmijoBeta</td><td>Trial stepsize decrease factor for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ArmijoMaxAlpha</td><td>OT_REAL</td><td>worhp_p.ArmijoMaxAlpha</td><td>Initial alpha for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ArmijoMinAlpha</td><td>OT_REAL</td><td>worhp_p.ArmijoMinAlpha</td><td>Lower bound on alpha for Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ArmijoMinAlphaRec</td><td>OT_REAL</td><td>worhp_p.ArmijoMinAlphaRec</td><td>Lower bound on alpha for Armijo rule during recovery</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ArmijoSigma</td><td>OT_REAL</td><td>worhp_p.ArmijoSigma</td><td>Scale factor for linearised descent check in Armijo rule</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>AutoQPRecovery</td><td>OT_BOOLEAN</td><td>worhp_p.AutoQPRecovery</td><td>Enable automatic QP recovery</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BFGSmaxblockSize</td><td>OT_INTEGER</td><td>worhp_p.BFGSmaxblockSize</td><td>Maximum BFGS block size (depends on BFGS method)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BFGSmethod</td><td>OT_INTEGER</td><td>worhp_p.BFGSmethod</td><td>Choose BFGS method (dense, block, sparse)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BFGSminblockSize</td><td>OT_INTEGER</td><td>worhp_p.BFGSminblockSize</td><td>Minimum BFGS block size (depends on BFGS method)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BFGSrestart</td><td>OT_INTEGER</td><td>worhp_p.BFGSrestart</td><td>Restart BFGS update after this many iterations</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BettsFactor</td><td>OT_REAL</td><td>worhp_p.BettsFactor</td><td>Update factor for Betts' Hessian regularisation</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BettsPoint</td><td>OT_REAL</td><td>worhp_p.BettsPoint</td><td>Smallest eigenvalue of the regularised Hessian</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>BoundTolFac</td><td>OT_REAL</td><td>worhp_p.BoundTolFac</td><td>Factor in determining active constraints by KKT</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CheckFJ</td><td>OT_REAL</td><td>worhp_p.CheckFJ</td><td>Upper bound used by Fritz-John heuristic</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CheckStructureDF</td><td>OT_BOOLEAN</td><td>worhp_p.CheckStructureDF</td><td>Enable structural checking of DF</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CheckStructureDG</td><td>OT_BOOLEAN</td><td>worhp_p.CheckStructureDG</td><td>Enable structural checking of DG</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CheckStructureHM</td><td>OT_BOOLEAN</td><td>worhp_p.CheckStructureHM</td><td>Enable structural checking of HM</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepBettsSum</td><td>OT_REAL</td><td>worhp_p.CorStepBettsSum</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepConStop</td><td>OT_REAL</td><td>worhp_p.CorStepConStop</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepConvio</td><td>OT_REAL</td><td>worhp_p.CorStepConvio</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepMaxIter</td><td>OT_INTEGER</td><td>worhp_p.CorStepMaxIter</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepMethod</td><td>OT_INTEGER</td><td>worhp_p.CorStepMethod</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepMode</td><td>OT_INTEGER</td><td>worhp_p.CorStepMode</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepPFactor</td><td>OT_REAL</td><td>worhp_p.CorStepPFactor</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepPMax</td><td>OT_REAL</td><td>worhp_p.CorStepPMax</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CorStepRecoveryDX</td><td>OT_BOOLEAN</td><td>worhp_p.CorStepRecoveryDX</td><td>Enable structural checking of HM</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CurvBCond</td><td>OT_REAL</td><td>worhp_p.CurvBCond</td><td>Block BFGS curvature condition bound</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CurvBFac</td><td>OT_REAL</td><td>worhp_p.CurvBFac</td><td>Block BFGS curvature condition regularisation factor</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CurvCond</td><td>OT_REAL</td><td>worhp_p.CurvCond</td><td>BFGS Curvature condition bound</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CurvFac</td><td>OT_REAL</td><td>worhp_p.CurvFac</td><td>BFGS curvature condition regularisation factor</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>CutLength</td><td>OT_REAL</td><td>worhp_p.CutLength</td><td>Scaling factor for Cut recovery strategy</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>DebugMarker06</td><td>OT_INTEGER</td><td>worhp_p.DebugMarker06</td><td>Debug marker, only needed for ASTOS integration</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FGtogether</td><td>OT_BOOLEAN</td><td>worhp_p.FGtogether</td><td>F and G cannot be evaluated separately</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FJandND</td><td>OT_BOOLEAN</td><td>worhp_p.FJandND</td><td>Enable Fritz-John and non-differentiable check heuristics</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FeasibleDual</td><td>OT_BOOLEAN</td><td>worhp_p.FeasibleDual</td><td>Activate dual feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FeasibleInit</td><td>OT_BOOLEAN</td><td>worhp_p.FeasibleInit</td><td>Activate initial feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FeasibleInitTol</td><td>OT_REAL</td><td>worhp_p.FeasibleInitTol</td><td>Feasibility tolerance for no-objective feasible mode</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FeasibleOnly</td><td>OT_BOOLEAN</td><td>worhp_p.FeasibleOnly</td><td>Activate feasible-only mode</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FidifEps</td><td>OT_REAL</td><td>worhp_p.FidifEps</td><td>Finite difference perturbation</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FidifHM</td><td>OT_BOOLEAN</td><td>worhp_p.FidifHM</td><td>Approximate Hessian by finite differences (otherwise BFGS)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FilterBisecAlpha</td><td>OT_BOOLEAN</td><td>worhp_p.FilterBisecAlpha</td><td>Filter heuristic to save Armijo iterations</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FilterGammaCV</td><td>OT_REAL</td><td>worhp_p.FilterGammaCV</td><td>Constraint violation decrease factor in Filter acceptance check</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FilterGammaF</td><td>OT_REAL</td><td>worhp_p.FilterGammaF</td><td>Objective decrease factor in Filter acceptance check</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FilterIntersecAlpha</td><td>OT_BOOLEAN</td><td>worhp_p.FilterIntersecAlpha</td><td>Filter heuristic to save Armijo iterations</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FirstDifCentral</td><td>OT_BOOLEAN</td><td>worhp_p.FirstDifCentral</td><td>Use central finite difference quotient for first derivatives</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FocusOnFeas</td><td>OT_BOOLEAN</td><td>worhp_p.FocusOnFeas</td><td>Enable Focus-on-Feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>FocusOnFeasFactor</td><td>OT_REAL</td><td>worhp_p.FocusOnFeasFactor</td><td>Factor in Focus-on-Feasibility mode</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>GammaAlpha</td><td>OT_REAL</td><td>worhp_p.GammaAlpha</td><td>Safety factor for alphamin calculation by Filter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>GroupMethod</td><td>OT_INTEGER</td><td>worhp_p.GroupMethod</td><td>Select method to determine graph colouring groups</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>IgnoreFilterCrit</td><td>OT_BOOLEAN</td><td>worhp_p.IgnoreFilterCrit</td><td>Activate accelerating heuristics for Filter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>IncBettsTau</td><td>OT_REAL</td><td>worhp_p.IncBettsTau</td><td>Increase factor for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>IncBettsTauMore</td><td>OT_REAL</td><td>worhp_p.IncBettsTauMore</td><td>Larger increase factor for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>IncreaseIWS</td><td>OT_REAL</td><td>worhp_p.IncreaseIWS</td><td>Increase factor for estimated integer workspace requirement</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>IncreaseRWS</td><td>OT_REAL</td><td>worhp_p.IncreaseRWS</td><td>Increase factor for estimated real workspace requirement</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>Infty</td><td>OT_REAL</td><td>worhp_p.Infty</td><td>Upper bound for numbers to be regarded as finite</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>InftyUnbounded</td><td>OT_REAL</td><td>worhp_p.InftyUnbounded</td><td>Tolerance for unboundedness detection heuristic</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>InitialLMest</td><td>OT_BOOLEAN</td><td>worhp_p.InitialLMest</td><td>Enable initial Lagrange multiplier estimate</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>KeepAcceptableSol</td><td>OT_BOOLEAN</td><td>worhp_p.KeepAcceptableSol</td><td>Save acceptable solutions as fallback</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LMestQPipComTol</td><td>OT_REAL</td><td>worhp_p.LMestQPipComTol</td><td>IP complementarity tolerance in initial multiplier estimate</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LMestQPipResTol</td><td>OT_REAL</td><td>worhp_p.LMestQPipResTol</td><td>IP residual tolerance in initial multiplier estimate</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LinMult</td><td>OT_BOOLEAN</td><td>worhp_p.LinMult</td><td>Control Lagrange multiplier update</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LogLevel</td><td>OT_INTEGER</td><td>worhp_p.LogLevel</td><td>Enable XML logfiles and writing interval</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LogResult</td><td>OT_INTEGER</td><td>worhp_p.LogResult</td><td>Enable XML result logging and detail level</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LowPassAlphaF</td><td>OT_REAL</td><td>worhp_p.LowPassAlphaF</td><td>Lowpass-filter update factor for objective values</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LowPassAlphaG</td><td>OT_REAL</td><td>worhp_p.LowPassAlphaG</td><td>Lowpass-filter update factor for constraint values</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LowPassAlphaMerit</td><td>OT_REAL</td><td>worhp_p.LowPassAlphaMerit</td><td>Lowpass-filter update factor for merit function values</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>LowPassFilter</td><td>OT_BOOLEAN</td><td>worhp_p.LowPassFilter</td><td>Enable lowpass-filter termination criterion</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>Ma57PivotThresh</td><td>OT_REAL</td><td>worhp_p.Ma57PivotThresh</td><td>Pivoting tolerance for MA57 = CNTL(1)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MatrixCC</td><td>OT_BOOLEAN</td><td>worhp_p.MatrixCC</td><td>Not to be included into a parameter file!</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MaxCalls</td><td>OT_INTEGER</td><td>worhp_p.MaxCalls</td><td>Upper bound to Reverse Communication calls</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MaxForce</td><td>OT_INTEGER</td><td>worhp_p.MaxForce</td><td>Maximum number of Force recovery strategy steps</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MaxGPart</td><td>OT_INTEGER</td><td>worhp_p.MaxGPart</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MaxIter</td><td>OT_INTEGER</td><td>worhp_p.MaxIter</td><td>Upper bound on major iterations</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MaxLScounter</td><td>OT_INTEGER</td><td>worhp_p.MaxLScounter</td><td>Control activation of Filter acceleration heuristics</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MaxNorm</td><td>OT_BOOLEAN</td><td>worhp_p.MaxNorm</td><td>Select max-norm instead of 1-norm in Filter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MeritFunction</td><td>OT_INTEGER</td><td>worhp_p.MeritFunction</td><td>Select merit function and penalty update [0, 3..5]</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MeritGradTol</td><td>OT_REAL</td><td>worhp_p.MeritGradTol</td><td>Threshold of meritfunction gradient for increasing Hessian regularisation</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MinBettsTau</td><td>OT_REAL</td><td>worhp_p.MinBettsTau</td><td>Lower bound for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>MoreRelax</td><td>OT_BOOLEAN</td><td>worhp_p.MoreRelax</td><td>Introduce one relaxation variable for every constraint</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>NLPmethod</td><td>OT_INTEGER</td><td>worhp_p.NLPmethod</td><td>Select (1) Meritfunction or (3) Filter globalisation</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>NLPprint</td><td>OT_INTEGER</td><td>worhp_p.NLPprint</td><td>NLP print level [-1..4]</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PairMethod</td><td>OT_INTEGER</td><td>worhp_p.PairMethod</td><td>Select method to determine graph colouring pairgroups</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PenUpdEpsBar</td><td>OT_REAL</td><td>worhp_p.PenUpdEpsBar</td><td>Penalty update parameter factor for MeritFunction = 3</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PenUpdEpsKFac</td><td>OT_REAL</td><td>worhp_p.PenUpdEpsKFac</td><td>Penalty update parameter factor for MeritFunction = 4</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PenUpdEpsKSequence</td><td>OT_INTEGER</td><td>worhp_p.PenUpdEpsKSequence</td><td>Penalty update parameter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PenUpdMaxDeltaK</td><td>OT_REAL</td><td>worhp_p.PenUpdMaxDeltaK</td><td>Max penalty for MeritFunction = 4</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PenUpdMaxFac</td><td>OT_REAL</td><td>worhp_p.PenUpdMaxFac</td><td>Max factor for increasing penalty for MeritFunction = 4</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PenUpdRBar</td><td>OT_REAL</td><td>worhp_p.PenUpdRBar</td><td>Penalty update parameter for MeritFunction = 3</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PrecisionF</td><td>OT_REAL</td><td>worhp_p.PrecisionF</td><td>(currently unused) Relative precision of objective</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>PrecisionG</td><td>OT_REAL</td><td>worhp_p.PrecisionG</td><td>(currently unused) Relative precision of constraints</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>QPscaleParam</td><td>OT_REAL</td><td>worhp_p.QPscaleParam</td><td>(currently unused)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>QuadraticProblem</td><td>OT_BOOLEAN</td><td>worhp_p.QuadraticProblem</td><td>Not to be included into a parameter file!</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ReduceBettsTau</td><td>OT_REAL</td><td>worhp_p.ReduceBettsTau</td><td>Decrease factor for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>RegStrategy</td><td>OT_INTEGER</td><td>worhp_p.RegStrategy</td><td>Select Hessian regularisation strategy in Filter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ReinitFilter</td><td>OT_BOOLEAN</td><td>worhp_p.ReinitFilter</td><td>Enables Filter-reinitialisation accelerating heuristic</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>RelaxMaxDelta</td><td>OT_REAL</td><td>worhp_p.RelaxMaxDelta</td><td>Upper bound for accepting the constraint relaxation variable</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>RelaxMaxPen</td><td>OT_REAL</td><td>worhp_p.RelaxMaxPen</td><td>Upper bound on the constraint relaxation penalty</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>RelaxRho</td><td>OT_REAL</td><td>worhp_p.RelaxRho</td><td>Update factor for the constraint relaxation penalty</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>RelaxStart</td><td>OT_REAL</td><td>worhp_p.RelaxStart</td><td>Initial value of the constraint relaxation penalty</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>RestUntilFeas</td><td>OT_BOOLEAN</td><td>worhp_p.RestUntilFeas</td><td>Do restoration until a feasible solution is found</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaleConIter</td><td>OT_BOOLEAN</td><td>worhp_p.ScaleConIter</td><td>Scale constraints in every iteration</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaleFacObj</td><td>OT_REAL</td><td>worhp_p.ScaleFacObj</td><td>Value to scale large objective functions to</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaleFacQP</td><td>OT_REAL</td><td>worhp_p.ScaleFacQP</td><td>Upper bound on resulting matrix norm for QP scaling</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaledFD</td><td>OT_BOOLEAN</td><td>worhp_p.ScaledFD</td><td>Use a scaled perturbation for finite differences</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaledKKT</td><td>OT_BOOLEAN</td><td>worhp_p.ScaledKKT</td><td>Scale KKT conditions</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaledObj</td><td>OT_BOOLEAN</td><td>worhp_p.ScaledObj</td><td>Scale the objective function</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ScaledQP</td><td>OT_BOOLEAN</td><td>worhp_p.ScaledQP</td><td>Scale some matrices handed to the QP</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>StartBettsTau</td><td>OT_REAL</td><td>worhp_p.StartBettsTau</td><td>Initial value for Betts' update dampening term</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>SwitchingDelta</td><td>OT_REAL</td><td>worhp_p.SwitchingDelta</td><td>Filter switching condition parameter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>SwitchingSCV</td><td>OT_REAL</td><td>worhp_p.SwitchingSCV</td><td>Filter switching condition parameter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>SwitchingSF</td><td>OT_REAL</td><td>worhp_p.SwitchingSF</td><td>Filter switching condition parameter</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TakeQPSol</td><td>OT_BOOLEAN</td><td>worhp_p.TakeQPSol</td><td>Evaluate QP search direction regardless of convergence</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>Timeout</td><td>OT_REAL</td><td>worhp_p.Timeout</td><td>Timeout in seconds</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TolComp</td><td>OT_REAL</td><td>worhp_p.TolComp</td><td>Complementarity tolerance</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TolFeas</td><td>OT_REAL</td><td>worhp_p.TolFeas</td><td>Feasibility tolerance</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TolOpti</td><td>OT_REAL</td><td>worhp_p.TolOpti</td><td>Optimality tolerance</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TolWeakActive</td><td>OT_REAL</td><td>worhp_p.TolWeakActive</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TooBig</td><td>OT_BOOLEAN</td><td>worhp_p.TooBig</td><td>Enable too-big termination heuristics</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TooBigCV</td><td>OT_REAL</td><td>worhp_p.TooBigCV</td><td>Upper bound on constraint violation for too-big heuristic</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>TooBigKKT</td><td>OT_REAL</td><td>worhp_p.TooBigKKT</td><td>Upper bound on KKT values for too-big heuristic</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>UserDF</td><td>OT_BOOLEAN</td><td>worhp_p.UserDF</td><td>Objective gradient values supplied by caller</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>UserDG</td><td>OT_BOOLEAN</td><td>worhp_p.UserDG</td><td>Jacobian values supplied by caller</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>UserHM</td><td>OT_BOOLEAN</td><td>worhp_p.UserHM</td><td>Hessian values supplied by caller</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>UserHMstructure</td><td>OT_INTEGER</td><td>worhp_p.UserHMstructure</td><td>Enable automatic Hessian structure generation or checking</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>WeakActiveSet</td><td>OT_BOOLEAN</td><td>worhp_p.WeakActiveSet</td><td>(experimental)</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>eps</td><td>OT_REAL</td><td>worhp_p.eps</td><td>Machine epsilon</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the objective function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>generate_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Generate an exact Hessian of the Lagrangian</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>ignore_check_vec</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, the input shape of F will not be checked.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>initialised</td><td>OT_BOOLEAN</td><td>worhp_p.initialised</td><td>Automatically added initialisation flag.</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>iteration_callback</td><td>OT_FX</td><td>FX()</td><td>A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>false</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h)</td><td>CasADi::FXInternal<br />CasADi::WorhpInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
+<tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>parametric</td><td>OT_BOOLEAN</td><td>false</td><td>Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>CasADi::NLPSolverInternal</td></tr>
+<tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
+<tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>false</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>CasADi::NLPSolverInternal</td></tr>
 </table>
 */
