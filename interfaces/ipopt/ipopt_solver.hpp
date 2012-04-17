@@ -62,7 +62,7 @@ class IpoptSolver : public NLPSolver {
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
 
-    /// Static creator function (@Joris: can we get this to work in SWIG?)
+    /// Static creator function 
     #ifdef SWIG
     %callback("%s_cb");
     #endif

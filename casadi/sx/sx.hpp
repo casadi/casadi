@@ -190,7 +190,7 @@ class SX{
     /** \brief Get the number of dependencies of a binary SX */
     int getNdeps() const;
     
-    /** \bief Check if two nodes are equivalent up to a given depth 
+    /** \brief Check if two nodes are equivalent up to a given depth 
     *  a = x*x
     *  b = x*x
     *
