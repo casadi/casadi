@@ -77,6 +77,15 @@ class FXInternal : public OptionsFunctionalityNode{
     /** \brief Hessian of output oind with respect to input iind */
     virtual FX hessian(int iind=0, int oind=0);
 
+    /** \brief  Propagate the sparsity pattern through a set of directional derivatives forward or backward */
+    virtual void spEvaluate(bool fwd);
+
+    /** \brief  Is the class able to propate seeds through the algorithm? */
+    virtual bool spCanEvaluate(bool fwd){ return false;}
+
+    /** \brief  Reset the sparsity propagation */
+    virtual void spInit(bool fwd){}
+    
     /** \brief  Evaluate symbolically, SX type */
     virtual void evalSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
                         const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 

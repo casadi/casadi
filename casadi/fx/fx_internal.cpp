@@ -644,6 +644,9 @@ void FXInternal::evalMX(const std::vector<MX>& input, std::vector<MX>& output,
   casadi_error("FXInternal::evalMX not defined for class " << typeid(*this).name());
 }
 
+void FXInternal::spEvaluate(bool fwd){
+  casadi_error("FXInternal::spEvaluate not defined for class " << typeid(*this).name());
+}
 
 } // namespace CasADi
 

@@ -1401,16 +1401,84 @@ FX SXFunctionInternal::jacobian(const vector<pair<int,int> >& jblocks){
   return SXFunction(inputv_v,jac_out);
 }
 
+void SXFunctionInternal::spInit(bool fwd){
+  // Make sure that dwork_, which we will now use, has been allocated
+  if(dwork_.size() < worksize_) dwork_.resize(worksize_);
+  
+  // We need a work array containing unsigned long rather than doubles. Since the two datatypes have the same size (64 bits)
+  // we can save overhead by reusing the double array
+  iwork_ = get_bvec_t(dwork_);
+  if(!fwd){
+    fill_n(iwork_,dwork_.size(),0);
+  }
+}
+
+void SXFunctionInternal::spEvaluate(bool fwd){
+  if(fwd){ // Forward propagation
+    
+    // Pass input seeds
+    for(int ind=0; ind<input_ind_.size(); ++ind){
+      bvec_t* swork = get_bvec_t(input(ind).data());
+      for(int k=0; k<input_ind_[ind].size(); ++k){
+	iwork_[input_ind_[ind][k]] = swork[k];
+      }
+    }
+    
+    // Propagate sparsity forward
+    for(std::vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
+      iwork_[it->res] = iwork_[it->arg.i[0]] | iwork_[it->arg.i[1]];
+    }
+    
+    // Get the output seeds
+    for(int ind=0; ind<output_ind_.size(); ++ind){
+      bvec_t* swork = get_bvec_t(output(ind).data());
+      for(int k=0; k<output_ind_[ind].size(); ++k){
+	swork[k] = iwork_[output_ind_[ind][k]];
+      }
+    }
+    
+  } else { // Backward propagation
+
+    // Pass output seeds
+    for(int ind=0; ind<output_ind_.size(); ++ind){
+      bvec_t* swork = get_bvec_t(output(ind).data());
+      for(int k=0; k<output_ind_[ind].size(); ++k){
+	iwork_[output_ind_[ind][k]] = swork[k];
+      }
+    }
+
+    // Propagate sparsity backward
+    for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it){
+      
+      // Get the seed
+      bvec_t seed = iwork_[it->res];
+      
+      // Clear the seed
+      iwork_[it->res] = 0;
+      
+      // Propagate seeds
+      iwork_[it->arg.i[0]] |= seed;
+      iwork_[it->arg.i[1]] |= seed;
+    }
+    
+    // Get the input seeds and clear it from the work vector
+    for(int ind=0; ind<input_ind_.size(); ++ind){
+      bvec_t* swork = get_bvec_t(input(ind).data());
+      for(int k=0; k<input_ind_[ind].size(); ++k){
+	swork[k] |= iwork_[input_ind_[ind][k]];
+	iwork_[input_ind_[ind][k]] = 0;
+      }
+    }
+  }
+}
+
 void SXFunctionInternal::spProp(bool fwd){
   if(fwd){
     for(std::vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
       iwork_[it->res] = iwork_[it->arg.i[0]] | iwork_[it->arg.i[1]];
     }
   } else {
-    // The following is commented out due to bug(?) in Mac using old gcc
-    // for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it)
-    for(int i=algorithm_.size()-1; i>=0; --i){ // workaround
-      AlgEl *it = &algorithm_[i];
+    for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it){
       
       // Get the seed
       bvec_t seed = iwork_[it->res];

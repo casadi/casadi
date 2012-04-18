@@ -140,6 +140,15 @@ class SXFunctionInternal : public XFunctionInternal<SXFunctionInternal,Matrix<SX
   /// Propagate the sparsity seeds
   void spProp(bool fwd);
   
+  /// Propagate a sparsity pattern through the algorithm
+  virtual void spEvaluate(bool fwd);
+
+  /// Is the class able to propate seeds through the algorithm?
+  virtual bool spCanEvaluate(bool fwd){ return true;}
+
+  /// Reset the sparsity propagation
+  virtual void spInit(bool fwd);
+
   /// Get the forward/adjoint sparsity seed
   inline bvec_t& spGet(bool get_input, int ind, int sdir){
     if(get_input){

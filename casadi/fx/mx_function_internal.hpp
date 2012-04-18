@@ -139,6 +139,15 @@ class MXFunctionInternal : public XFunctionInternal<MXFunctionInternal,MX,MXNode
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<MX> symbolicInput() const{ return inputv_;}
 
+    /// Propagate a sparsity pattern through the algorithm
+    virtual void spEvaluate(bool fwd);
+
+    /// Is the class able to propate seeds through the algorithm?
+    virtual bool spCanEvaluate(bool fwd){ return true;}
+
+    /// Reset the sparsity propagation
+    virtual void spInit(bool fwd);
+
     /// Reset the virtual machine for sparsity calculations
     void spReset(int iind, int oind);
 

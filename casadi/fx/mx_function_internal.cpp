@@ -528,6 +528,96 @@ void MXFunctionInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject
   }
 }
 
+void MXFunctionInternal::spInit(bool fwd){
+  if(!fwd){
+    // Start by setting all elements of the work vector to zero
+    for(vector<FunctionIO>::iterator it=work.begin(); it!=work.end(); ++it){
+      //Get a pointer to the int array
+      bvec_t *iwork = get_bvec_t(it->data.data());
+      fill_n(iwork,it->data.size(),0);
+    }
+  }
+}
+
+void MXFunctionInternal::spEvaluate(bool fwd){
+  if(fwd){ // Forward propagation
+    
+    // Pass input seeds
+    for(int ind=0; ind<input_ind_.size(); ++ind){
+      vector<double> &w = work[input_ind_[ind]].data.data();
+      bvec_t* iwork = get_bvec_t(w);
+      bvec_t* swork = get_bvec_t(input(ind).data());
+      for(int k=0; k<w.size(); ++k){
+	iwork[k] = swork[k];
+      }
+    }
+    
+    // Propagate sparsity forward
+    for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++){
+      if(it->mx->isSymbolic()) continue;
+      
+      // Point pointers to the data corresponding to the element
+      updatePointers(*it,0,0);
+
+      // Propagate sparsity forwards
+      it->mx->propagateSparsity(mx_input_, mx_output_,true);
+    }
+    
+    // Get the output seeds
+    for(int ind=0; ind<output_ind_.size(); ++ind){
+      vector<double> &w = work[output_ind_[ind]].data.data();
+      bvec_t* iwork = get_bvec_t(w);
+      bvec_t* swork = get_bvec_t(output(ind).data());
+      for(int k=0; k<w.size(); ++k){
+	swork[k] = iwork[k];
+      }
+    }
+    
+  } else { // Backward propagation
+
+    // Pass output seeds
+    for(int ind=0; ind<output_ind_.size(); ++ind){
+      vector<double> &w = work[output_ind_[ind]].data.data();
+      bvec_t* iwork = get_bvec_t(w);
+      bvec_t* swork = get_bvec_t(output(ind).data());
+      for(int k=0; k<w.size(); ++k){
+	iwork[k] = swork[k];
+      }
+    }
+
+    // Propagate sparsity backwards
+    for(vector<AlgEl>::reverse_iterator it=alg.rbegin(); it!=alg.rend(); it++){
+      if(it->mx->isSymbolic()) continue;
+      
+      // Point pointers to the data corresponding to the element
+      updatePointers(*it,0,0);
+      
+      // Propagate sparsity backwards
+      it->mx->propagateSparsity(mx_input_, mx_output_,false);
+      
+      // Clear the seeds for the next sweep
+      for(DMatrixPtrV::iterator it=mx_output_.begin(); it!=mx_output_.end(); ++it){
+        DMatrix* seed = *it;
+        if(seed){
+          bvec_t *iseed = get_bvec_t(seed->data());
+          fill_n(iseed,seed->size(),0);
+        }
+      }
+    }
+    
+    // Get the input seeds and clear it from the work vector
+    for(int ind=0; ind<input_ind_.size(); ++ind){
+      vector<double> &w = work[input_ind_[ind]].data.data();
+      bvec_t* iwork = get_bvec_t(w);
+      bvec_t* swork = get_bvec_t(input(ind).data());
+      for(int k=0; k<w.size(); ++k){
+	 swork[k] |= iwork[k];
+	 iwork[k] = 0;
+      }
+    }
+  }
+}
+
 void MXFunctionInternal::spProp(bool fwd){
   if(fwd){
     for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++){

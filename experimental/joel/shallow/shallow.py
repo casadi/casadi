@@ -1,6 +1,8 @@
 from casadi import *
 from numpy import *
 from matplotlib.pylab import plt
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
 import time
 import copy
 
@@ -14,7 +16,7 @@ spheight = 0.01
 endtime = 1.0
 
 # Discretization
-numboxes = 30
+numboxes = 20
 num_eulersteps = 100
 num_measurements = 100
 
@@ -48,24 +50,40 @@ p = vertcat([drag,depth])
 uk = ssym("uk",numboxes+1, numboxes)
 vk = ssym("vk",numboxes  , numboxes+1)
 hk = ssym("hk",numboxes  , numboxes)
-hmeas = ssym("h_meas",numboxes  , numboxes)
 
-# Integrate over one interval with Euler forward
+# Mayer term
+hmeas = ssym("h_meas",numboxes  , numboxes)
+m = SXFunction([hk,hmeas],[sumAll((hk-hmeas)**2)])
+m.init()
+
+# Take one step of the integrator
 u = SXMatrix(uk)
 v = SXMatrix(vk)
 h = SXMatrix(hk)
-for j in range(num_eulersteps):
-  u[1:-1,:] = u[1:-1,:] + dt*(-g/dx * (h[1:,:]-h[:-1,:]) - u[1:-1,:]*drag)
-  v[:,1:-1] = v[:,1:-1] + dt*(-g/dy * (h[:,1:]-h[:,:-1]) - v[:,1:-1]*drag)
-  h[:,:] = h[:,:] + (-depth*dt)*(1.0/dx*(u[1:,:]-u[:-1,:]) + 1.0/dy * (v[:,1:]-v[:,:-1]))
+u[1:-1,:] = u[1:-1,:] + dt*(-g/dx * (h[1:,:]-h[:-1,:]) - u[1:-1,:]*drag)
+v[:,1:-1] = v[:,1:-1] + dt*(-g/dy * (h[:,1:]-h[:,:-1]) - v[:,1:-1]*drag)
+h[:,:] = h[:,:] + (-depth*dt)*(1.0/dx*(u[1:,:]-u[:-1,:]) + 1.0/dy * (v[:,1:]-v[:,:-1]))
 
 # Create an integrator function
-f = SXFunction([p,uk,vk,hk],[u,v,h])
-f.init()
+f_step = SXFunction([p,uk,vk,hk],[u,v,h])
+f_step.init()
 
-# Mayer term
-m = SXFunction([hk,hmeas],[sumAll((hk-hmeas)**2)])
-m.init()
+# Expand to SX
+#f_step = SXFunction(f_step)
+#f_step.init()
+
+# Integrate over one interval
+uk = msym("uk",numboxes+1, numboxes)
+vk = msym("vk",numboxes  , numboxes+1)
+hk = msym("hk",numboxes  , numboxes)
+p = msym("p",2)
+u,v,h = uk, vk, hk
+for j in range(num_eulersteps):
+  [u,v,h] = f_step.call([p,u,v,h])
+
+# Create an integrator function
+f = MXFunction([p,uk,vk,hk],[u,v,h])
+f.init()
 
 print "generated discrete dynamics"
 
@@ -76,9 +94,10 @@ h = copy.deepcopy(h0)
 
 # Prepare plotting
 if plot_progress:
-  plt.figure(1)
-  plt.clf()
-  plt.grid(True)
+  fig = plt.figure(1)
+  ax = fig.add_subplot(111, projection='3d')
+  #plt.clf()
+  #plt.grid(True)
   plt.ion()
   plt.hold(False)
   plt.draw()
@@ -91,21 +110,31 @@ h_meas = []
 for k in range(num_measurements):
   # Visualize the pool
   if plot_progress:
-    plt.ioff()
-    plt.contour(X[::numboxes_per_plot],Y[::numboxes_per_plot],h[::numboxes_per_plot])
-    plt.axis([0,poolwidth,0,poolwidth])
+    #plt.ioff()
+    #print h[::numboxes_per_plot]
+    ax.cla()
+    surf = ax.plot_surface(X[::numboxes_per_plot],Y[::numboxes_per_plot],h[::numboxes_per_plot], rstride=1, cstride=1, cmap=cm.jet, 
+      linewidth=0, antialiased=False, vmin = -spheight/10, vmax = spheight/10)
+    #plt.contour(X[::numboxes_per_plot],Y[::numboxes_per_plot],h[::numboxes_per_plot])
+    #ax.axis([0,poolwidth,0,poolwidth])
+    ax.set_zlim(-spheight, spheight)
     plt.draw()
-    time.sleep(0.1)
+    plt.show()
+    #time.sleep(0.02)
     
-  # Integrate with Euler forward
-  for j in range(num_eulersteps):
-    u[1:-1,:] += dt*(-g/dx * (h[1:,:]-h[:-1,:]) - u[1:-1,:]*drag0)
-    v[:,1:-1] += dt*(-g/dy * (h[:,1:]-h[:,:-1]) - v[:,1:-1]*drag0)
-    h[:,:]    += (-depth0*dt)*(1.0/dx*(u[1:,:]-u[:-1,:]) + 1.0/dy * (v[:,1:]-v[:,:-1]))
-
+  # Integrate
+  f.setInput([drag0,depth0],0)
+  f.setInput(u,1)
+  f.setInput(v,2)
+  f.setInput(h,3)
+  f.evaluate()
+  u = f.output(0).toArray()
+  v = f.output(1).toArray()
+  h = f.output(2).toArray()
+    
   # Save a copy of h
   h_meas.append(copy.deepcopy(h))
-  
+
 print "measurements generated"
 
 # Parameters in the single shooting problem
@@ -134,19 +163,36 @@ for k in range(num_measurements):
 ffcn = MXFunction([x],[obj])
 #ffcn.setOption("verbose",True)
 
+ffcn.init()
+
+hfcb = ffcn.jacobian()
+
+#ffcn = SXFunction(ffcn)
+
+#t1 = time.time()
+#ffcn.evaluate()
+#t2 = time.time()
+#print "t = %g" % (t2-t1)
+
+
+#raise Exception('ss')
+
 # Solve with IPOPT
 nlp_solver = IpoptSolver(ffcn)
 
 # Set options
+#nlp_solver.setOption("generate_hessian",True)
 #nlp_solver.setOption("verbose",True)
 nlp_solver.setOption("max_iter",10)
 #nlp_solver.setOption("mu_init",1e-10)
+nlp_solver.setOption("derivative_test","first-order")
 
 # Initialize NLP solver
 nlp_solver.init()
 
 # Set initial condition and bounds
-nlp_solver.setInput([2.0,0.01],NLP_X_INIT)
+nlp_solver.setInput([drag0,depth0],NLP_X_INIT)
+#nlp_solver.setInput([2.0,0.01],NLP_X_INIT)
 #nlp_solver.setInput([0.5,0.01],NLP_X_INIT)
 nlp_solver.setInput([0,0],NLP_LBX)
 
