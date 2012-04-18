@@ -529,13 +529,11 @@ void MXFunctionInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject
 }
 
 void MXFunctionInternal::spInit(bool fwd){
-  if(!fwd){
-    // Start by setting all elements of the work vector to zero
-    for(vector<FunctionIO>::iterator it=work.begin(); it!=work.end(); ++it){
-      //Get a pointer to the int array
-      bvec_t *iwork = get_bvec_t(it->data.data());
-      fill_n(iwork,it->data.size(),0);
-    }
+  // Start by setting all elements of the work vector to zero
+  for(vector<FunctionIO>::iterator it=work.begin(); it!=work.end(); ++it){
+    //Get a pointer to the int array
+    bvec_t *iwork = get_bvec_t(it->data.data());
+    fill_n(iwork,it->data.size(),0);
   }
 }
 

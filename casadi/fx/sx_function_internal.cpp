@@ -1408,9 +1408,7 @@ void SXFunctionInternal::spInit(bool fwd){
   // We need a work array containing unsigned long rather than doubles. Since the two datatypes have the same size (64 bits)
   // we can save overhead by reusing the double array
   iwork_ = get_bvec_t(dwork_);
-  if(!fwd){
-    fill_n(iwork_,dwork_.size(),0);
-  }
+  fill_n(iwork_,dwork_.size(),0);
 }
 
 void SXFunctionInternal::spEvaluate(bool fwd){

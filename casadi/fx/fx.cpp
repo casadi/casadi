@@ -383,6 +383,17 @@ void FX::eval(const std::vector<MX>& input, std::vector<MX>& output,
   (*this)->eval(input,output,fwdSeed,fwdSens,adjSeed,adjSens,output_given,eliminate_constants);
 }
 
+void FX::spEvaluate(bool fwd){
+  (*this)->spEvaluate(fwd);
+}
+
+bool FX::spCanEvaluate(bool fwd){
+  return (*this)->spCanEvaluate(fwd);
+}
+
+void FX::spInit(bool fwd){
+    (*this)->spInit(fwd);
+}
 
 #if 0
 
