@@ -636,6 +636,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::AcadoIntegrator::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::AcadoIntegrator::getOptionNames "
 
 Get a list of all option names. ";
@@ -1092,6 +1107,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::AcadoIntegratorInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::AcadoIntegratorInternal::evalSX "
 
@@ -1894,6 +1922,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::AcadoOCP::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::AcadoOCP::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::AcadoOCP::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::AcadoOCP::getOptionNames "
 
 Get a list of all option names. ";
@@ -2223,6 +2266,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::AcadoOCPInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::AcadoOCPInternal::evalSX "
 
@@ -3521,6 +3577,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::CFunction::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::CFunction::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::CFunction::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::CFunction::getOptionNames "
 
 Get a list of all option names. ";
@@ -3796,6 +3867,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::CFunctionInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::CFunctionInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::CFunctionInternal::evalSX "
 
@@ -4684,6 +4768,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::OptimalControl::Collocation::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::OptimalControl::Collocation::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::OptimalControl::Collocation::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::OptimalControl::Collocation::getOptionNames "
 
 Get a list of all option names. ";
@@ -5452,6 +5551,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::CollocationIntegrator::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::CollocationIntegrator::getOptionNames "
 
 Get a list of all option names. ";
@@ -5901,6 +6015,20 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::CollocationIntegratorInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::spCanEvaluate
+"
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::CollocationIntegratorInternal::evalSX "
 
@@ -6456,6 +6584,21 @@ Numeric Jacobian. ";
 "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")
+CasADi::OptimalControl::CollocationInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")
+CasADi::OptimalControl::CollocationInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::OptimalControl::CollocationInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::OptimalControl::CollocationInternal::evalSX "
 
@@ -7577,6 +7720,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::ControlSimulator::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::ControlSimulator::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::ControlSimulator::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::ControlSimulator::getOptionNames "
 
 Get a list of all option names. ";
@@ -7939,6 +8097,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::ControlSimulatorInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::ControlSimulatorInternal::evalSX "
 
@@ -8508,6 +8679,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::CplexInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::CplexInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::CplexInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::CplexInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::CplexInternal::evalSX "
 
@@ -9450,6 +9634,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
+
+%feature("docstring")  CasADi::CplexSolver::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::CplexSolver::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::CplexSolver::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
 
 %feature("docstring")  CasADi::CplexSolver::getOptionNames "
 
@@ -10756,6 +10955,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::Interfaces::CSparse::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Interfaces::CSparse::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Interfaces::CSparse::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::Interfaces::CSparse::getOptionNames "
 
 Get a list of all option names. ";
@@ -11056,6 +11270,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::evalSX "
 
@@ -12192,6 +12419,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::Sundials::CVodesIntegrator::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Sundials::CVodesIntegrator::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Sundials::CVodesIntegrator::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::getOptionNames "
 
 Get a list of all option names. ";
@@ -12832,6 +13074,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::Sundials::CVodesInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesInternal::evalSX "
 
@@ -14040,6 +14295,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::ExternalFunction::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::ExternalFunction::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::ExternalFunction::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::ExternalFunction::getOptionNames "
 
 Get a list of all option names. ";
@@ -14313,6 +14583,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::ExternalFunctionInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::ExternalFunctionInternal::evalSX "
 
@@ -15401,6 +15684,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::FX::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::FX::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::FX::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::FX::getOptionNames "
 
 Get a list of all option names. ";
@@ -15693,6 +15991,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::FXInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::FXInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::FXInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::FXInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::FXInternal::evalSX "
 
@@ -17235,6 +17546,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::Sundials::IdasIntegrator::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Sundials::IdasIntegrator::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Sundials::IdasIntegrator::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::getOptionNames "
 
 Get a list of all option names. ";
@@ -17974,6 +18300,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::Sundials::IdasInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::Sundials::IdasInternal::evalSX "
 
@@ -18939,6 +19278,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::ImplicitFunction::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::ImplicitFunction::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::ImplicitFunction::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::ImplicitFunction::getOptionNames "
 
 Get a list of all option names. ";
@@ -19219,6 +19573,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::ImplicitFunctionInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::evalSX "
 
@@ -20271,6 +20638,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::Integrator::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Integrator::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Integrator::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::Integrator::getOptionNames "
 
 Get a list of all option names. ";
@@ -20650,6 +21032,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::IntegratorInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::IntegratorInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::IntegratorInternal::evalSX "
 
@@ -23826,6 +24221,19 @@ Numeric Jacobian. ";
 
 Hessian of output oind with respect to input iind. ";
 
+%feature("docstring")  CasADi::IpoptInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::IpoptInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::IpoptInternal::spInit "
+
+Reset the sparsity propagation. ";
+
 %feature("docstring")  CasADi::IpoptInternal::evalSX "
 
 Evaluate symbolically, SX type. ";
@@ -24790,6 +25198,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::evalSX "
 
@@ -26065,6 +26486,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPSolver::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPSolver::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPSolver::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::getOptionNames "
 
@@ -29430,6 +29866,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::IpoptSolver::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::IpoptSolver::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::IpoptSolver::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::IpoptSolver::getOptionNames "
 
 Get a list of all option names. ";
@@ -30084,6 +30535,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::Jacobian::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Jacobian::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Jacobian::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::Jacobian::getOptionNames "
 
 Get a list of all option names. ";
@@ -30346,6 +30812,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::JacobianInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::JacobianInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::JacobianInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::JacobianInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::JacobianInternal::evalSX "
 
@@ -31114,6 +31593,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::Sundials::KinsolInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::Sundials::KinsolInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::Sundials::KinsolInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::Sundials::KinsolInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolInternal::evalSX "
 
@@ -31978,6 +32470,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::Sundials::KinsolSolver::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Sundials::KinsolSolver::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Sundials::KinsolSolver::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::Sundials::KinsolSolver::getOptionNames "
 
 Get a list of all option names. ";
@@ -32622,6 +33129,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::KnitroInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::KnitroInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::KnitroInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::KnitroInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::KnitroInternal::evalSX "
 
@@ -33631,6 +34151,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::KnitroSolver::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::KnitroSolver::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::KnitroSolver::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::KnitroSolver::getOptionNames "
 
 Get a list of all option names. ";
@@ -34273,6 +34808,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::Interfaces::LapackLUDense::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Interfaces::LapackLUDense::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Interfaces::LapackLUDense::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::getOptionNames "
 
 Get a list of all option names. ";
@@ -34585,6 +35135,21 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::spEvaluate
+"
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackLUDenseInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::evalSX "
 
@@ -35408,6 +35973,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::Interfaces::LapackQRDense::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Interfaces::LapackQRDense::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Interfaces::LapackQRDense::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::getOptionNames "
 
 Get a list of all option names. ";
@@ -35710,6 +36290,21 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::spEvaluate
+"
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackQRDenseInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::evalSX "
 
@@ -36736,6 +37331,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::LiftedSQP::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::LiftedSQP::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::LiftedSQP::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::LiftedSQP::getOptionNames "
 
 Get a list of all option names. ";
@@ -37225,6 +37835,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::LiftedSQPInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::LiftedSQPInternal::evalSX "
 
@@ -37805,6 +38428,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::evalSX "
 
@@ -38724,6 +39360,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::Interfaces::LiftoptSolver::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptSolver::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptSolver::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::getOptionNames "
 
 Get a list of all option names. ";
@@ -39330,6 +39981,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::LinearSolver::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::LinearSolver::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::LinearSolver::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::LinearSolver::getOptionNames "
 
 Get a list of all option names. ";
@@ -39618,6 +40284,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::LinearSolverInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::LinearSolverInternal::evalSX "
 
@@ -41899,6 +42578,23 @@ Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
 %feature("docstring")
+CasADi::OptimalControl::MultipleShooting::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::OptimalControl::MultipleShooting::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::OptimalControl::MultipleShooting::spEvaluate
+"
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
+%feature("docstring")
 CasADi::OptimalControl::MultipleShooting::getOptionNames "
 
 Get a list of all option names. ";
@@ -42300,6 +42996,22 @@ Numeric Jacobian. ";
 CasADi::OptimalControl::MultipleShootingInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")
 CasADi::OptimalControl::MultipleShootingInternal::evalSX "
@@ -44652,6 +45364,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::MXFunction::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::MXFunction::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::MXFunction::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::MXFunction::getOptionNames "
 
 Get a list of all option names. ";
@@ -44970,6 +45697,18 @@ Expand the matrix valued graph into a scalar valued graph. ";
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::spEvaluate "
+
+Propagate a sparsity pattern through the algorithm. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::spReset "
 
@@ -46173,6 +46912,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::NLPSolver::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::NLPSolver::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::NLPSolver::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::NLPSolver::getOptionNames "
 
 Get a list of all option names. ";
@@ -46581,6 +47335,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::NLPSolverInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::NLPSolverInternal::evalSX "
 
@@ -48946,6 +49713,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::OCPSolver::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::OCPSolver::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::OCPSolver::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::OCPSolver::getOptionNames "
 
 Get a list of all option names. ";
@@ -49312,6 +50094,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::OCPSolverInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::OCPSolverInternal::evalSX "
 
@@ -49914,6 +50709,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::evalSX "
 
@@ -50749,6 +51557,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPSolver::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPSolver::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPSolver::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::getOptionNames "
 
@@ -51891,6 +52714,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::Parallelizer::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Parallelizer::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Parallelizer::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::Parallelizer::getOptionNames "
 
 Get a list of all option names. ";
@@ -52201,6 +53039,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::ParallelizerInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::ParallelizerInternal::evalSX "
 
@@ -52751,6 +53602,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::evalSX "
 
@@ -53594,6 +54458,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::Interfaces::QPOasesSolver::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesSolver::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesSolver::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::getOptionNames "
 
 Get a list of all option names. ";
@@ -54238,6 +55117,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::QPSolver::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::QPSolver::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::QPSolver::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::QPSolver::getOptionNames "
 
 Get a list of all option names. ";
@@ -54559,6 +55453,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::QPSolverInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::QPSolverInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::QPSolverInternal::evalSX "
 
@@ -55522,6 +56429,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::RKIntegrator::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::RKIntegrator::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::RKIntegrator::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::RKIntegrator::getOptionNames "
 
 Get a list of all option names. ";
@@ -55916,6 +56838,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::RKIntegratorInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::RKIntegratorInternal::evalSX "
 
@@ -57121,6 +58056,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::Simulator::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Simulator::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Simulator::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::Simulator::getOptionNames "
 
 Get a list of all option names. ";
@@ -57426,6 +58376,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::SimulatorInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::SimulatorInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::SimulatorInternal::evalSX "
 
@@ -58350,6 +59313,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::SQPInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::SQPInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::SQPInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::SQPInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::SQPInternal::evalSX "
 
@@ -59349,6 +60325,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::SQPMethod::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::SQPMethod::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::SQPMethod::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::SQPMethod::getOptionNames "
 
 Get a list of all option names. ";
@@ -60264,6 +61255,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::Sundials::SundialsIntegrator::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Sundials::SundialsIntegrator::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Sundials::SundialsIntegrator::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::Sundials::SundialsIntegrator::getOptionNames
 "
 
@@ -60861,6 +61867,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::Sundials::SundialsInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::Sundials::SundialsInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::Sundials::SundialsInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::Sundials::SundialsInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::Sundials::SundialsInternal::evalSX "
 
@@ -61687,6 +62706,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::SuperLU::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::SuperLU::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::SuperLU::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::SuperLU::getOptionNames "
 
 Get a list of all option names. ";
@@ -62024,6 +63058,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::SuperLUInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::SuperLUInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::SuperLUInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::SuperLUInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::SuperLUInternal::evalSX "
 
@@ -63150,6 +64197,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::SXFunction::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::SXFunction::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::SXFunction::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::SXFunction::getOptionNames "
 
 Get a list of all option names. ";
@@ -63467,6 +64529,18 @@ Reset the virtual machine for sparsity calculations. ";
 %feature("docstring")  CasADi::SXFunctionInternal::spProp "
 
 Propagate the sparsity seeds. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::spEvaluate "
+
+Propagate a sparsity pattern through the algorithm. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::spGet "
 
@@ -66128,6 +67202,19 @@ Numeric Jacobian. ";
 
 Hessian of output oind with respect to input iind. ";
 
+%feature("docstring")  CasADi::WorhpInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::WorhpInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::WorhpInternal::spInit "
+
+Reset the sparsity propagation. ";
+
 %feature("docstring")  CasADi::WorhpInternal::evalSX "
 
 Evaluate symbolically, SX type. ";
@@ -67755,6 +68842,21 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 Get a vector of symbolic variables with the same dimensions as the inputs,
 SX graph. ";
 
+%feature("docstring")  CasADi::WorhpSolver::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::WorhpSolver::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::WorhpSolver::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
 %feature("docstring")  CasADi::WorhpSolver::getOptionNames "
 
 Get a list of all option names. ";
@@ -68048,6 +69150,19 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::XFunctionInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::XFunctionInternal::spInit "
+
+Reset the sparsity propagation. ";
 
 %feature("docstring")  CasADi::XFunctionInternal::evalSX "
 
