@@ -485,28 +485,27 @@ std::vector<MatType> XFunctionInternal<DerivedType,MatType,NodeType>::jacGen(
     if(verbose()) std::cout << "XFunctionInternal::jac end 1" << std::endl;
     return ret;
   }
+  casadi_assert_message(jblocks_no_f.size()==1,"Multiple Jacobian blocks are not supported (and won't be)");
   
   // Get a bidirectional partition
-  std::vector<CRSSparsity> D1(jblocks_no_f.size()), D2(jblocks_no_f.size());
-  getPartition(jblocks_no_f,D1,D2,true,symmetric_block_no_f);
+  CRSSparsity D1, D2;
+  getPartition(jblocks_no_f.front().second,jblocks_no_f.front().first,D1,D2,true,symmetric_block_no_f.front());
   if(verbose()) std::cout << "XFunctionInternal::jac graph coloring completed" << std::endl;
 
   // Get the number of forward and adjoint sweeps
-  int nfwd = D1.front().isNull() ? 0 : D1.front().size1();
-  int nadj = D2.front().isNull() ? 0 : D2.front().size1();
+  int nfwd = D1.isNull() ? 0 : D1.size1();
+  int nadj = D2.isNull() ? 0 : D2.size1();
 
   if(false)  { // commented out: too verbose
     std::cout << "XFunctionInternal::jac partitioning" << std::endl;
-    for (int i=0;i<jblocks_no_f.size();++i) {
-      std::cout << "   jblocks_no_f[" << i << "] " << jblocks_no_f[i] << std::endl;
-      std::cout << "             D1[" << i << "] " << D1[i] << std::endl;
-      if (!D1[i].isNull()) {
-        std::cout << "                  col        " << D1[i].col() << std::endl;
-        std::cout << "                  rowind     " << D1[i].rowind() << std::endl;
-        std::cout << "                  spy        " << DMatrix(D1[i],1) << std::endl;
-      }
-      std::cout << "             D2[" << i << "] " << D2[i] << std::endl;
+    std::cout << "   jblocks_no_f " << jblocks_no_f.front() << std::endl;
+    std::cout << "             D1 " << D1 << std::endl;
+    if (!D1.isNull()) {
+      std::cout << "                  col        " << D1.col() << std::endl;
+      std::cout << "                  rowind     " << D1.rowind() << std::endl;
+      std::cout << "                  spy        " << DMatrix(D1,1) << std::endl;
     }
+    std::cout << "             D2 " << D2 << std::endl;
   }
   
   // Forward seeds
@@ -518,21 +517,17 @@ std::vector<MatType> XFunctionInternal<DerivedType,MatType,NodeType>::jacGen(
       fseed[dir][iind] = MatType(input(iind).sparsity(),0);
     }
     
-    // Pass seeds
-    for(int v=0; v<D1.size(); ++v){
+    // Get the input index
+    int iind = jblocks_no_f.front().second;
+    
+    // For all the directions
+    for(int el = D1.rowind(dir); el<D1.rowind(dir+1); ++el){
       
-      // Get the input index
-      int iind = jblocks_no_f[v].second;
-      
-      // For all the directions
-      for(int el = D1[v].rowind(dir); el<D1[v].rowind(dir+1); ++el){
-        
-        // Get the direction
-        int c = D1[v].col(el);
+      // Get the direction
+      int c = D1.col(el);
 
-        // Give a seed in the direction
-        fseed[dir][iind].at(c) = 1;
-      }
+      // Give a seed in the direction
+      fseed[dir][iind].at(c) = 1;
     }
   }
   
@@ -549,13 +544,13 @@ std::vector<MatType> XFunctionInternal<DerivedType,MatType,NodeType>::jacGen(
     for(int v=0; v<D2.size(); ++v){
       
       // Get the output index
-      int oind = jblocks_no_f[v].first;
+      int oind = jblocks_no_f.front().first;
       
       // For all the directions
-      for(int el = D2[v].rowind(dir); el<D2[v].rowind(dir+1); ++el){
+      for(int el = D2.rowind(dir); el<D2.rowind(dir+1); ++el){
         
         // Get the direction
-        int c = D2[v].col(el);
+        int c = D2.col(el);
 
         // Give a seed in the direction
         aseed[dir][oind].at(c) = 1; // NOTE: should be +=, right?
@@ -616,84 +611,80 @@ std::vector<MatType> XFunctionInternal<DerivedType,MatType,NodeType>::jacGen(
   bool symmetric2=false;
   for(int dir=0; dir<nfwd; ++dir){
     
-    // For all the input variables
-    for(int v=0; v<D1.size(); ++v){
-      
-      // Get the output index
-      int oind = jblocks_no_f[v].first;
-      int iind = jblocks_no_f[v].second;
+    // Get the output index
+    int oind = jblocks_no_f.front().first;
+    int iind = jblocks_no_f.front().second;
 
-      // Is the block symmetric
-      bool symmetric = symmetric_block_no_f[v];
-      symmetric2 = symmetric;
+    // Is the block symmetric
+    bool symmetric = symmetric_block_no_f.front();
+    symmetric2 = symmetric;
+    
+    // If symmetric, see how many times each output appears
+    if(symmetric){
+      // Initialize to zero
+      hits.resize(output(oind).sparsity().size());
+      fill(hits.begin(),hits.end(),0);
       
-      // If symmetric, see how many times each output appears
-      if(symmetric){
-        // Initialize to zero
-        hits.resize(output(oind).sparsity().size());
-        fill(hits.begin(),hits.end(),0);
-        
-        // Get the sparsity of the Jacobian block
-        const CRSSparsity& jsp = jacSparsity(iind,oind,true);
-        const std::vector<int>& jsp_rowind = jsp.rowind();
-        const std::vector<int>& jsp_col = jsp.col();
+      // Get the sparsity of the Jacobian block
+      const CRSSparsity& jsp = jacSparsity(iind,oind,true);
+      const std::vector<int>& jsp_rowind = jsp.rowind();
+      const std::vector<int>& jsp_col = jsp.col();
 
-        // "Multiply" Jacobian sparsity by seed vector
-        for(int el = D1[v].rowind(dir); el<D1[v].rowind(dir+1); ++el){
-          
-          // Get the input nonzero
-          int c = D1[v].col(el);
-          
-          // Propagate dependencies
-          for(int el_jsp=jsp_rowind[c]; el_jsp<jsp_rowind[c+1]; ++el_jsp){
-            hits[jsp_col[el_jsp]]++;
-          }
-        }
+      // "Multiply" Jacobian sparsity by seed vector
+      for(int el = D1.rowind(dir); el<D1.rowind(dir+1); ++el){
+	
+	// Get the input nonzero
+	int c = D1.col(el);
+	
+	// Propagate dependencies
+	for(int el_jsp=jsp_rowind[c]; el_jsp<jsp_rowind[c+1]; ++el_jsp){
+	  hits[jsp_col[el_jsp]]++;
+	}
       }
+    }
 
-      // Locate the nonzeros of the forward sensitivity matrix
-      output(oind).sparsity().getElements(nzmap,false);
-      fsens[dir][oind].sparsity().getNZInplace(nzmap);
+    // Locate the nonzeros of the forward sensitivity matrix
+    output(oind).sparsity().getElements(nzmap,false);
+    fsens[dir][oind].sparsity().getNZInplace(nzmap);
 
+    if(symmetric){
+      input(iind).sparsity().getElements(nzmap2,false);
+      fsens[dir][oind].sparsity().getNZInplace(nzmap2);
+    }
+    
+    
+    // For all the input nonzeros treated in the sweep
+    for(int el = D1.rowind(dir); el<D1.rowind(dir+1); ++el){
+
+      // Get the input nonzero
+      int c = D1.col(el);
+      int f2_out;
       if(symmetric){
-        input(iind).sparsity().getElements(nzmap2,false);
-        fsens[dir][oind].sparsity().getNZInplace(nzmap2);
+	f2_out = nzmap2[c];
       }
       
-      
-      // For all the input nonzeros treated in the sweep
-      for(int el = D1[v].rowind(dir); el<D1[v].rowind(dir+1); ++el){
-
-        // Get the input nonzero
-        int c = D1[v].col(el);
-        int f2_out;
-        if(symmetric){
-          f2_out = nzmap2[c];
-        }
-        
-        // Loop over the output nonzeros corresponding to this input nonzero
-        for(int el_out = sp_trans[v].rowind(c); el_out<sp_trans[v].rowind(c+1); ++el_out){
-          
-          // Get the output nonzero
-          int r_out = sp_trans[v].col(el_out);
-          
-          // Get the forward sensitivity nonzero
-          int f_out = nzmap[r_out];
-          if(f_out<0) continue; // Skip if structurally zero
-          
-          // The nonzero of the Jacobian now treated
-          int elJ = mapping[v][el_out];
-          
-          if(symmetric){
-            if(hits[r_out]==1){
-              ret[jblock_ind[v]].at(el_out) = fsens[dir][oind].at(f_out);
-              ret[jblock_ind[v]].at(elJ) = fsens[dir][oind].at(f_out);
-            }
-          } else {
-            // Get the output seed
-            ret[jblock_ind[v]].at(elJ) = fsens[dir][oind].at(f_out);
-          }
-        }
+      // Loop over the output nonzeros corresponding to this input nonzero
+      for(int el_out = sp_trans.front().rowind(c); el_out<sp_trans.front().rowind(c+1); ++el_out){
+	
+	// Get the output nonzero
+	int r_out = sp_trans.front().col(el_out);
+	
+	// Get the forward sensitivity nonzero
+	int f_out = nzmap[r_out];
+	if(f_out<0) continue; // Skip if structurally zero
+	
+	// The nonzero of the Jacobian now treated
+	int elJ = mapping.front()[el_out];
+	
+	if(symmetric){
+	  if(hits[r_out]==1){
+	    ret[jblock_ind.front()].at(el_out) = fsens[dir][oind].at(f_out);
+	    ret[jblock_ind.front()].at(elJ) = fsens[dir][oind].at(f_out);
+	  }
+	} else {
+	  // Get the output seed
+	  ret[jblock_ind.front()].at(elJ) = fsens[dir][oind].at(f_out);
+	}
       }
     }
   }
@@ -705,8 +696,8 @@ std::vector<MatType> XFunctionInternal<DerivedType,MatType,NodeType>::jacGen(
     for(int v=0; v<D2.size(); ++v){
 
       // Get the input and output index of the block
-      int oind = jblocks_no_f[v].first;
-      int iind = jblocks_no_f[v].second;
+      int oind = jblocks_no_f.front().first;
+      int iind = jblocks_no_f.front().second;
       
       // Locate the nonzeros of the adjoint sensitivity matrix
       input(iind).sparsity().getElements(nzmap,false);
@@ -716,10 +707,10 @@ std::vector<MatType> XFunctionInternal<DerivedType,MatType,NodeType>::jacGen(
       const CRSSparsity& sp = jacSparsity(iind,oind,true);
 
       // For all the output nonzeros treated in the sweep
-      for(int el = D2[v].rowind(dir); el<D2[v].rowind(dir+1); ++el){
+      for(int el = D2.rowind(dir); el<D2.rowind(dir+1); ++el){
 
         // Get the output nonzero
-        int r = D2[v].col(el);
+        int r = D2.col(el);
 
         // Loop over the input nonzeros that influences this output nonzero
         for(int elJ = sp.rowind(r); elJ<sp.rowind(r+1); ++elJ){
@@ -732,7 +723,7 @@ std::vector<MatType> XFunctionInternal<DerivedType,MatType,NodeType>::jacGen(
           if(anz<0) continue;
           
           // Get the input seed
-          ret[jblock_ind[v]].at(elJ) = asens[dir][iind].at(anz);
+          ret[jblock_ind.front()].at(elJ) = asens[dir][iind].at(anz);
         }
       }
     }

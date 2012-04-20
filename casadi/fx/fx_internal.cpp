@@ -612,14 +612,7 @@ CRSSparsity& FXInternal::jacSparsity(int iind, int oind, bool compact){
   return jsp;
 }
 
-void FXInternal::getPartition(const vector<pair<int,int> >& blocks, 
-                              vector<CRSSparsity> &D1, vector<CRSSparsity> &D2, 
-                              bool compact, const std::vector<bool>& symmetric_block){
-  casadi_assert(blocks.size()==1);
-  int oind = blocks.front().first;
-  int iind = blocks.front().second;
-  casadi_assert(symmetric_block.size()==1);
-  bool symmetric = symmetric_block.front();
+void FXInternal::getPartition(int iind, int oind, CRSSparsity& D1, CRSSparsity& D2, bool compact, bool symmetric){
   
   // Sparsity pattern with transpose
   CRSSparsity &A = jacSparsity(iind,oind,compact);
@@ -640,26 +633,26 @@ void FXInternal::getPartition(const vector<pair<int,int> >& blocks,
   // Get seed matrices by graph coloring
   if(symmetric){
     // Star coloring if symmetric
-    D1[0] = A.starColoring();
+    D1 = A.starColoring();
     
   } else {
     
     // Test unidirectional coloring using forward mode
     if(test_ad_fwd){
-      D1[0] = AT.unidirectionalColoring(A);
+      D1 = AT.unidirectionalColoring(A);
     }
       
     // Test unidirectional coloring using reverse mode
     if(test_ad_adj){
-      D2[0] = A.unidirectionalColoring(AT);
+      D2 = A.unidirectionalColoring(AT);
     }
 
     // Use whatever required less colors if we tried both (with preference to forward mode)
     if(test_ad_fwd && test_ad_adj){
-      if((D1[0].size1() <= D2[0].size1())){
-        D2[0]=CRSSparsity();
+      if((D1.size1() <= D2.size1())){
+        D2=CRSSparsity();
       } else {
-        D1[0]=CRSSparsity();
+        D1=CRSSparsity();
       }
     }
   }

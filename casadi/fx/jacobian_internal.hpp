@@ -62,7 +62,7 @@ class JacobianInternal : public FXInternal{
     std::vector<std::pair<int,int> > jblocks_;
 
     // Seeding matrices
-    std::vector<CRSSparsity> D1_, D2_;
+    CRSSparsity D1_, D2_;
 
     // Number of simultaineous forward or adjoint directions of the function to be differentiated
     int nadir_fcn_;

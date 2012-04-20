@@ -91,14 +91,11 @@ void JacobianInternal::init(){
       
       oind_ = jblocks_[i].first;
       iind_ = jblocks_[i].second;
-      vector<pair<int,int> > jblocks_no_f(1,jblocks_[i]);
-      D1_.resize(1);
-      D2_.resize(1);
-      fcn_->getPartition(jblocks_no_f,D1_,D2_,false,vector<bool>(jblocks_no_f.size(),false));
+      fcn_->getPartition(iind_,oind_,D1_,D2_,false,false);
 
       // Increase the number of sensitivities in the user function
-      int nfwd = D1_.front().isNull() ? 0 : D1_.front().size1();
-      int nadj = D2_.front().isNull() ? 0 : D2_.front().size1();
+      int nfwd = D1_.isNull() ? 0 : D1_.size1();
+      int nadj = D2_.isNull() ? 0 : D2_.size1();
 
       if(verbose()){
         cout << "JacobianInternal::init: " << nfwd << " forward directions and " << nadj << " adjoint directions needed for the jacobian." << endl;
@@ -146,8 +143,8 @@ void JacobianInternal::evaluate(int nfdir, int nadir){
     if(iind<0) continue;
     
     // Get the number of forward and adjoint sweeps
-    int nfwd = D1_.front().isNull() ? 0 : D1_.front().size1();
-    int nadj = D2_.front().isNull() ? 0 : D2_.front().size1();
+    int nfwd = D1_.isNull() ? 0 : D1_.size1();
+    int nadj = D2_.isNull() ? 0 : D2_.size1();
     casadi_assert(nfwd || nadj);
     casadi_assert(!(nfwd && nadj));
 
@@ -165,9 +162,9 @@ void JacobianInternal::evaluate(int nfdir, int nadir){
       // Pass forward seeds
       for(int dir=0; dir<ndir; ++dir){
         int d = ofs+dir;
-        for(int el=D1_[0].rowind(d); el<D1_[0].rowind(d+1); ++el){
+        for(int el=D1_.rowind(d); el<D1_.rowind(d+1); ++el){
           // Get the direction
-          int j=D1_[0].col(el);
+          int j=D1_.col(el);
           
           // Set the seed
           Matrix<double>& fseed = fcn_.fwdSeed(iind,dir);
@@ -188,9 +185,9 @@ void JacobianInternal::evaluate(int nfdir, int nadir){
       // Get the output seeds
       for(int dir=0; dir<ndir; ++dir){
         int d = ofs+dir;
-        for(int el=D1_[0].rowind(d); el<D1_[0].rowind(d+1); ++el){
+        for(int el=D1_.rowind(d); el<D1_.rowind(d+1); ++el){
           // Get the direction
-          int j=D1_[0].col(el);
+          int j=D1_.col(el);
 
           // Save to the result
           const Matrix<double>& fsens = fcn_.fwdSens(oind,dir);
@@ -228,9 +225,9 @@ void JacobianInternal::evaluate(int nfdir, int nadir){
       // Set the adjoint seeds
       for(int dir=0; dir<ndir; ++dir){
         int d = ofs+dir;
-        for(int el=D2_[0].rowind(d); el<D2_[0].rowind(d+1); ++el){
+        for(int el=D2_.rowind(d); el<D2_.rowind(d+1); ++el){
           // Get the output
-          int i=D2_[0].col(el);
+          int i=D2_.col(el);
 
           // Save to the result
           Matrix<double>& aseed = fcn_.adjSeed(oind,dir);
@@ -253,9 +250,9 @@ void JacobianInternal::evaluate(int nfdir, int nadir){
       // Set the adjoint sensitivities
       for(int dir=0; dir<ndir; ++dir){
         int d = ofs+dir;
-        for(int el=D2_[0].rowind(d); el<D2_[0].rowind(d+1); ++el){
+        for(int el=D2_.rowind(d); el<D2_.rowind(d+1); ++el){
           // Get the direction
-          int i=D2_[0].col(el);
+          int i=D2_.col(el);
 
           // Save to the result
           const Matrix<double>& asens = fcn_.adjSens(iind,dir);
