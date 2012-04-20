@@ -27,7 +27,6 @@
 #include <stack>
 #include "fx_internal.hpp"
 #include "../matrix/sparsity_tools.hpp"
-#include "../matrix/sparsity_tools.hpp"
 
 namespace CasADi{
 
@@ -58,9 +57,6 @@ class XFunctionInternal : public FXInternal{
     /** \brief  Construct a complete Jacobian by compression */
     std::vector<MatType> jacGen(const std::vector<std::pair<int,int> >& jblocks, bool compact, 
                           const std::vector<bool>& symmetric_block);
-
-    /** \brief  Generate the sparsity of a Jacobian block */
-    virtual CRSSparsity getJacSparsity(int iind, int oind);
 
     // Data members (all public)
     
@@ -744,122 +740,6 @@ std::vector<MatType> XFunctionInternal<DerivedType,MatType,NodeType>::jacGen(
   
   // Return
   if(verbose()) std::cout << "XFunctionInternal::jac end" << std::endl;
-  return ret;
-}
-
-template<typename DerivedType, typename MatType, typename NodeType>
-CRSSparsity XFunctionInternal<DerivedType,MatType,NodeType>::getJacSparsity(int iind, int oind){
-  if(verbose()) std::cout << "XFunctionInternal::getJacSparsity begin (iind == " << iind <<", oind == " << oind << ")" << std::endl;
-  
-  // Reset the virtual machine
-  static_cast<DerivedType*>(this)->spReset(iind,oind);
-  
-  // Number of nonzero inputs
-  int nz_in = input(iind).size();
-  
-  // Number of nonzero outputs
-  int nz_out = output(oind).size();
-
-  // Number of forward sweeps we must make
-  int nsweep_fwd = nz_in/bvec_size;
-  if(nz_in%bvec_size>0) nsweep_fwd++;
-  
-  // Number of adjoint sweeps we must make
-  int nsweep_adj = nz_out/bvec_size;
-  if(nz_out%bvec_size>0) nsweep_adj++;
-  
-  // Use forward mode?
-  bool use_fwd = nsweep_fwd <= nsweep_adj;
-  
-  // Number of sweeps needed
-  int nsweep = use_fwd ? nsweep_fwd : nsweep_adj;
-  
-  // The number of zeros in the seed and sensitivity directions
-  int nz_seed = use_fwd ? nz_in  : nz_out;
-  int nz_sens = use_fwd ? nz_out : nz_in;
-
-  // Input/output index
-  int ind_seed = use_fwd ? iind : oind;
-  int ind_sens = use_fwd ? oind : iind;
-
-  // Print
-  if(verbose()){
-    std::cout << "XFunctionInternal::getJacSparsity: using " << (use_fwd ? "forward" : "adjoint") << " mode: ";
-    std::cout << nsweep << " sweeps needed for " << nz_seed << " directions" << std::endl;
-  }
-  
-  // Progress
-  int progress = -10;
-
-  // Temporary vectors
-  std::vector<int> jrow, jcol;
-  
-  // Loop over the variables, ndir variables at a time
-  for(int s=0; s<nsweep; ++s){
-    // Print progress
-    if(verbose()){
-      int progress_new = (s*100)/nsweep;
-      // Print when entering a new decade
-      if(progress_new / 10 > progress / 10){
-        progress = progress_new;
-        std::cout << progress << " %"  << std::endl;
-      }
-    }
-    
-    // Nonzero offset
-    int offset = s*bvec_size;
-
-    // Number of local seed directions
-    int ndir_local = std::min(bvec_size,nz_seed-offset);
-    
-    // Give seeds to a set of directions
-    for(int i=0; i<ndir_local; ++i){
-      static_cast<DerivedType*>(this)->spGet(use_fwd,ind_seed,offset+i) |= bvec_t(1)<<i;
-    }
-    
-    // Propagate the dependencies
-    static_cast<DerivedType*>(this)->spProp(use_fwd);
-          
-    // Loop over the nonzeros of the output
-    for(int el=0; el<nz_sens; ++el){
-
-      // Get the sparsity sensitivity
-      bvec_t spsens = static_cast<DerivedType*>(this)->spGet(!use_fwd,ind_sens,el);
-
-      // Clear the seeds for the next sweep
-      if(!use_fwd){
-        static_cast<DerivedType*>(this)->spGet(true,iind,el) = 0; 
-      }
-      
-      // If there is a dependency in any of the directions
-      if(0!=spsens){
-        
-        // Loop over seed directions
-        for(int i=0; i<ndir_local; ++i){
-          
-          // If dependents on the variable
-          if((bvec_t(1) << i) & spsens){
-            // Add to pattern
-            jrow.push_back(el);
-            jcol.push_back(i+offset);
-          }
-        }
-      }
-    }
-    
-    // Remove the seeds
-    if(use_fwd){
-      for(int i=0; i<bvec_size && offset+i<nz_in; ++i){
-        static_cast<DerivedType*>(this)->spGet(true,iind,offset+i) = 0;
-      }
-    }
-  }
-
-  // Construct sparsity pattern
-  CRSSparsity ret = sp_triplet(nz_out, nz_in,use_fwd ? jrow : jcol, use_fwd ? jcol : jrow);
-  
-  // Return sparsity pattern
-  if(verbose()) std::cout << "XFunctionInternal::getJacSparsity end " << std::endl;
   return ret;
 }
 

@@ -147,24 +147,6 @@ class MXFunctionInternal : public XFunctionInternal<MXFunctionInternal,MX,MXNode
 
     /// Reset the sparsity propagation
     virtual void spInit(bool fwd);
-
-    /// Reset the virtual machine for sparsity calculations
-    void spReset(int iind, int oind);
-
-    /// Propagate the sparsity seeds
-    void spProp(bool fwd);
-
-    /// Get the forward/adjoint sparsity seed
-    inline bvec_t& spGet(bool get_input, int ind, int sdir){
-      if(get_input){
-        return iwork_in_[sdir];
-      } else {
-        return iwork_out_[sdir];
-      }
-    }
-    
-    /// Work vector for sparsity detection
-    bvec_t *iwork_in_, *iwork_out_;
 };
 
 } // namespace CasADi

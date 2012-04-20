@@ -134,12 +134,6 @@ class SXFunctionInternal : public XFunctionInternal<SXFunctionInternal,Matrix<SX
   /** \brief Clear the function from its symbolic representation, to free up memory, no symbolic evaluations are possible after this */
   void clearSymbolic();
 
-  /// Reset the virtual machine for sparsity calculations
-  void spReset(int iind, int oind);
-
-  /// Propagate the sparsity seeds
-  void spProp(bool fwd);
-  
   /// Propagate a sparsity pattern through the algorithm
   virtual void spEvaluate(bool fwd);
 
@@ -149,18 +143,6 @@ class SXFunctionInternal : public XFunctionInternal<SXFunctionInternal,Matrix<SX
   /// Reset the sparsity propagation
   virtual void spInit(bool fwd);
 
-  /// Get the forward/adjoint sparsity seed
-  inline bvec_t& spGet(bool get_input, int ind, int sdir){
-    if(get_input){
-      return iwork_[input_ind_[ind][sdir]];
-    } else {
-      return iwork_[output_ind_[ind][sdir]];
-    }
-  }
-
-  /// Work vector for sparsity detection
-  bvec_t *iwork_;
-  
   /// With just-in-time compilation
   bool just_in_time_;
   

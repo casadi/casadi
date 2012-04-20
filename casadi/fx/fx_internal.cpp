@@ -28,6 +28,7 @@
 #include "mx_function.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "../sx/sx_tools.hpp"
+#include "../matrix/sparsity_tools.hpp"
 
 using namespace std;
 
@@ -415,8 +416,131 @@ FX FXInternal::numeric_jacobian(const vector<pair<int,int> >& jblocks){
 }
 
 CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
-  // Dense sparsity by default
-  return CRSSparsity(output(oind).size(),input(iind).size(),true);
+  // Check if we are able to propagate dependencies throught he function
+  if(spCanEvaluate(true) || spCanEvaluate(false)){
+    
+    // Number of nonzero inputs
+    int nz_in = input(iind).size();
+    
+    // Number of nonzero outputs
+    int nz_out = output(oind).size();
+
+    // Number of forward sweeps we must make
+    int nsweep_fwd = nz_in/bvec_size;
+    if(nz_in%bvec_size>0) nsweep_fwd++;
+    
+    // Number of adjoint sweeps we must make
+    int nsweep_adj = nz_out/bvec_size;
+    if(nz_out%bvec_size>0) nsweep_adj++;
+    
+    // Use forward mode?
+    bool use_fwd = spCanEvaluate(true) && nsweep_fwd <= nsweep_adj;
+    
+    // Reset the virtual machine
+    spInit(use_fwd);
+
+    // Give seeds to a set of directions
+    bvec_t* seed_v = use_fwd ? get_bvec_t(input(iind).data()) : get_bvec_t(output(oind).data());
+    bvec_t* sens_v = use_fwd ? get_bvec_t(output(oind).data()) : get_bvec_t(input(iind).data());
+    
+    // Number of sweeps needed
+    int nsweep = use_fwd ? nsweep_fwd : nsweep_adj;
+    
+    // The number of zeros in the seed and sensitivity directions
+    int nz_seed = use_fwd ? nz_in  : nz_out;
+    int nz_sens = use_fwd ? nz_out : nz_in;
+
+    // Input/output index
+    int ind_seed = use_fwd ? iind : oind;
+    int ind_sens = use_fwd ? oind : iind;
+
+    // Print
+    if(verbose()){
+      std::cout << "XFunctionInternal::getJacSparsity: using " << (use_fwd ? "forward" : "adjoint") << " mode: ";
+      std::cout << nsweep << " sweeps needed for " << nz_seed << " directions" << std::endl;
+    }
+    
+    // Progress
+    int progress = -10;
+
+    // Temporary vectors
+    std::vector<int> jrow, jcol;
+    
+    // Loop over the variables, ndir variables at a time
+    for(int s=0; s<nsweep; ++s){
+      // Print progress
+      if(verbose()){
+	int progress_new = (s*100)/nsweep;
+	// Print when entering a new decade
+	if(progress_new / 10 > progress / 10){
+	  progress = progress_new;
+	  std::cout << progress << " %"  << std::endl;
+	}
+      }
+      
+      // Nonzero offset
+      int offset = s*bvec_size;
+
+      // Number of local seed directions
+      int ndir_local = std::min(bvec_size,nz_seed-offset);
+
+      for(int i=0; i<ndir_local; ++i){
+	seed_v[offset+i] |= bvec_t(1)<<i;
+      }
+      
+      // Propagate the dependencies
+      spEvaluate(use_fwd);
+	    
+      // Loop over the nonzeros of the output
+      for(int el=0; el<nz_sens; ++el){
+
+	// Get the sparsity sensitivity
+	bvec_t spsens = sens_v[el];
+
+	// Clear the sensitivities for the next sweep
+	if(!use_fwd){
+	  sens_v[el] = 0;
+	}
+	
+	// If there is a dependency in any of the directions
+	if(0!=spsens){
+	  
+	  // Loop over seed directions
+	  for(int i=0; i<ndir_local; ++i){
+	    
+	    // If dependents on the variable
+	    if((bvec_t(1) << i) & spsens){
+	      // Add to pattern
+	      jrow.push_back(el);
+	      jcol.push_back(i+offset);
+	    }
+	  }
+	}
+      }
+      
+      // Remove the seeds
+      if(use_fwd){
+	for(int i=0; i<bvec_size && offset+i<nz_in; ++i){
+	  seed_v[offset+i] = 0;
+	}
+      }
+    }
+    
+    // Set inputs and outputs to zero
+    for(int ind=0; ind<getNumInputs(); ++ind) input(ind).setZero();
+    for(int ind=0; ind<getNumOutputs(); ++ind) output(ind).setZero();
+
+    // Construct sparsity pattern
+    CRSSparsity ret = sp_triplet(nz_out, nz_in,use_fwd ? jrow : jcol, use_fwd ? jcol : jrow);
+    
+    // Return sparsity pattern
+    if(verbose()) std::cout << "XFunctionInternal::getJacSparsity end " << std::endl;
+    return ret;
+
+  } else {
+    // Dense sparsity by default
+    return CRSSparsity(output(oind).size(),input(iind).size(),true);
+  }
 }
 
 void FXInternal::setJacSparsity(const CRSSparsity& sp, int iind, int oind, bool compact){
