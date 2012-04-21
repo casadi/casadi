@@ -45710,25 +45710,9 @@ Is the class able to propate seeds through the algorithm? ";
 
 Reset the sparsity propagation. ";
 
-%feature("docstring")  CasADi::MXFunctionInternal::spReset "
-
-Reset the virtual machine for sparsity calculations. ";
-
-%feature("docstring")  CasADi::MXFunctionInternal::spProp "
-
-Propagate the sparsity seeds. ";
-
-%feature("docstring")  CasADi::MXFunctionInternal::spGet "
-
-Get the forward/adjoint sparsity seed. ";
-
 %feature("docstring")  CasADi::MXFunctionInternal::jacGen "
 
 Construct a complete Jacobian by compression. ";
-
-%feature("docstring")  CasADi::MXFunctionInternal::getJacSparsity "
-
-Generate the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::evaluate_switch "
 
@@ -45853,6 +45837,10 @@ Get all statistics obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::MXFunctionInternal::getStat "
 
 Get single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::getJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::setJacSparsity "
 
@@ -64522,14 +64510,6 @@ Print to a c file. ";
 Clear the function from its symbolic representation, to free up memory, no
 symbolic evaluations are possible after this. ";
 
-%feature("docstring")  CasADi::SXFunctionInternal::spReset "
-
-Reset the virtual machine for sparsity calculations. ";
-
-%feature("docstring")  CasADi::SXFunctionInternal::spProp "
-
-Propagate the sparsity seeds. ";
-
 %feature("docstring")  CasADi::SXFunctionInternal::spEvaluate "
 
 Propagate a sparsity pattern through the algorithm. ";
@@ -64542,17 +64522,9 @@ Is the class able to propate seeds through the algorithm? ";
 
 Reset the sparsity propagation. ";
 
-%feature("docstring")  CasADi::SXFunctionInternal::spGet "
-
-Get the forward/adjoint sparsity seed. ";
-
 %feature("docstring")  CasADi::SXFunctionInternal::jacGen "
 
 Construct a complete Jacobian by compression. ";
-
-%feature("docstring")  CasADi::SXFunctionInternal::getJacSparsity "
-
-Generate the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::evaluate_switch "
 
@@ -64681,6 +64653,10 @@ Get all statistics obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::SXFunctionInternal::getStat "
 
 Get single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::getJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::setJacSparsity "
 
@@ -69110,10 +69086,6 @@ Destructor. ";
 
 Construct a complete Jacobian by compression. ";
 
-%feature("docstring")  CasADi::XFunctionInternal::getJacSparsity "
-
-Generate the sparsity of a Jacobian block. ";
-
 %feature("docstring")  CasADi::XFunctionInternal::evaluate_switch "
 
 Evaluate switch. ";
@@ -69287,6 +69259,10 @@ Get all statistics obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::XFunctionInternal::getStat "
 
 Get single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::getJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
 
 %feature("docstring")  CasADi::XFunctionInternal::setJacSparsity "
 
