@@ -654,7 +654,26 @@ FX MXFunctionInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks)
 }
 
 vector<MX> MXFunctionInternal::jac(const vector<pair<int,int> >& jblocks, bool compact, const std::vector<bool>& symmetric_block){
-  return jacGen(jblocks,compact,symmetric_block);
+  // Create return object
+  std::vector<MX> ret(jblocks.size());
+  
+  // Add the information we already know
+  for(int i=0; i<ret.size(); ++i){
+    // Get input/output indices for the block
+    int oind = jblocks[i].first;
+    int iind = jblocks[i].second;
+
+    // Check if nondifferentiated variable
+    if(iind<0){
+      // Nondifferentiated variable
+      ret[i] = outputv_.at(oind);
+    } else { // Jacobian block
+      // Get Jacobian
+      ret[i] = jacGen(iind,oind,compact,!symmetric_block.empty() && symmetric_block[i]);
+    }
+  }
+
+  return ret;
 }
 
 std::vector<MX> MXFunctionInternal::jac(int ider){
@@ -705,7 +724,9 @@ std::vector<MX> MXFunctionInternal::jac(int ider){
   }
   
   // Forward mode automatic differentiation, symbolically
-  vector<vector<MX> > fsens = adFwd(fseed);
+  vector<vector<MX> > fsens;
+  std::vector<std::vector<MX> > dummy;
+  evalMX(inputv_,outputv_,fseed,fsens,dummy,dummy,true,false);
 
   // Collect the directions
   vector<MX> ret(outputv_.size());
@@ -761,7 +782,9 @@ std::vector<MX> MXFunctionInternal::grad(int igrad){
   }
   
   // Forward mode automatic differentiation, symbolically
-  vector<vector<MX> > asens = adAdj(aseed);
+  vector<vector<MX> > asens;
+  std::vector<std::vector<MX> > dummy;
+  evalMX(inputv_,outputv_,dummy,dummy,aseed,asens,true,false);
 
   // Collect the sensitivities
   vector<MX> ret(inputv_.size());
@@ -969,22 +992,6 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
       asens[d][iind] = dwork[el][d];
     }
   }
-}
-
-std::vector<std::vector<MX> > MXFunctionInternal::adFwd(const std::vector<std::vector<MX> > & fseed){
-  // NOTE: Function to be removed
-  std::vector<std::vector<MX> > ret;
-  std::vector<std::vector<MX> > dummy;
-  evalMX(inputv_,outputv_,fseed,ret,dummy,dummy,true,false);
-  return ret;
-}
-
-std::vector<std::vector<MX> > MXFunctionInternal::adAdj(const std::vector<std::vector<MX> > & aseed){
-  // NOTE: Function to be removed
-  std::vector<std::vector<MX> > ret;
-  std::vector<std::vector<MX> > dummy;
-  evalMX(inputv_,outputv_,dummy,dummy,aseed,ret,true,false);
-  return ret;
 }
 
 FX MXFunctionInternal::hessian(int iind, int oind) {

@@ -82,12 +82,6 @@ class MXFunctionInternal : public XFunctionInternal<MXFunctionInternal,MX,MXNode
     /** \brief Gradient via source code transformation (identity matrix seed in a particular direction) */
     std::vector<MX> grad(int oind);
     
-    /** \brief Forward mode AD using source code transformation */
-    std::vector<std::vector<MX> > adFwd(const std::vector<std::vector<MX> > & fseed);
-
-    /** \brief Adjoint mode AD using source code transformation */
-    std::vector<std::vector<MX> > adAdj(const std::vector<std::vector<MX> > & aseed);
-    
     /** \brief  An elemenent of the algorithm, namely an MX node */
     typedef MXAlgEl AlgEl;
 
