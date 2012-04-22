@@ -84,7 +84,7 @@ class CachedObjectNode : public SharedObjectNode{
     std::vector<WeakRef*> weak_;
     
     /// List of unused locations in the list of weak references
-    std::stack<int> unused_;
+    std::stack<int,std::vector<int> > unused_;
 };
 
 /** \brief A weak reference to a cached object
