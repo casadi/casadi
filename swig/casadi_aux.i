@@ -3,6 +3,7 @@
 #include "casadi/stl_vector_tools.hpp"
 #include "casadi/printable_object.hpp"
 #include "casadi/shared_object.hpp"
+#include "casadi/cached_object.hpp"
 #include "casadi/generic_type.hpp"
 #include "casadi/options_functionality.hpp"
 %}
@@ -24,6 +25,7 @@ VECTOR_TOOLS_TEMPLATES(double)
 
 %include "casadi/printable_object.hpp"
 %include "casadi/shared_object.hpp"
+%include "casadi/cached_object.hpp"
 %include "casadi/casadi_types.hpp"
 %include "casadi/generic_type.hpp"
 %include "casadi/options_functionality.hpp"

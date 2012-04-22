@@ -27,7 +27,7 @@
 
 namespace CasADi{
 
-class CRSSparsityInternal : public SharedObjectNode{
+class CRSSparsityInternal : public CachedObjectNode{
   public:
     /// Construct a sparsity pattern from vectors
     CRSSparsityInternal(int nrow, int ncol, std::vector<int> col, std::vector<int> rowind) : nrow_(nrow), ncol_(ncol), col_(col), rowind_(rowind) { sanityCheck(false); }
