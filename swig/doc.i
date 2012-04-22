@@ -45667,14 +45667,6 @@ Jacobian via source code transformation. ";
 Gradient via source code transformation (identity matrix seed in a
 particular direction) ";
 
-%feature("docstring")  CasADi::MXFunctionInternal::adFwd "
-
-Forward mode AD using source code transformation. ";
-
-%feature("docstring")  CasADi::MXFunctionInternal::adAdj "
-
-Adjoint mode AD using source code transformation. ";
-
 %feature("docstring")  CasADi::MXFunctionInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
