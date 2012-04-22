@@ -20,6 +20,10 @@ ENDIF(SUNDIALS_FOUND)
 add_executable(casadi_error_handling casadi_error_handling.cpp)
 target_link_libraries(casadi_error_handling casadi ${CASADI_DEPENDENCIES})
 
+# Working with weak references
+add_executable(weak_references weak_references.cpp )
+target_link_libraries(weak_references casadi ${CASADI_DEPENDENCIES})
+
 # Determinant by minor expansion using MX
 add_executable(det_minor_mx det_minor_mx.cpp)
 target_link_libraries(det_minor_mx casadi ${CASADI_DEPENDENCIES})

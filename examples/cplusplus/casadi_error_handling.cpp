@@ -1,3 +1,38 @@
+/*
+ *    This file is part of CasADi.
+ *
+ *    CasADi -- A symbolic framework for dynamic optimization.
+ *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *
+ *    CasADi is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    CasADi is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with CasADi; if not, write to the Free Software
+ *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+
+/** \brief Demonstration of how to work with the error handling in CasADi
+ * NOTE: Example is mainly intended for developers of CasADi.
+ * CasADi provides a set of macros facilitating debugging. They are designed to 
+ * work in a similar way as the macros in "assert.h" in the C standard library
+ * with the difference that the error message will be contained in a C++ 
+ * exception rather than written to standard error and causing program termination.
+ * 
+ * \author Joel Andersson
+ * \date 2012
+ */
+
+#include "casadi/casadi.hpp"
+
 // Uncomment this line to compile without error handling
 //#define CASADI_NDEBUG
 

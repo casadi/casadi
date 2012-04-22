@@ -74,10 +74,6 @@ target_link_libraries(det_minor casadi ${CASADI_DEPENDENCIES})
 add_executable(det_minor_paper det_minor_paper.cpp )
 target_link_libraries(det_minor_paper casadi ${CASADI_DEPENDENCIES})
 
-# Weak references
-add_executable(weak_references weak_references.cpp )
-target_link_libraries(weak_references casadi ${CASADI_DEPENDENCIES})
-
 if(LIFTOPT_FOUND)
 include_directories(${LIFTOPT_INCLUDE_DIRS})
 add_executable(test_liftopt test_liftopt.cpp)

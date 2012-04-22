@@ -23,7 +23,7 @@
 #ifndef MX_HPP
 #define MX_HPP
 
-#include "../shared_object.hpp"
+#include "../cached_object.hpp"
 #include "../matrix/matrix.hpp"
 #include <vector>
 namespace CasADi{
@@ -48,7 +48,7 @@ class FX;
   \author Joel Andersson 
   \date 2010-2011
 */
-class MX : public GenericMatrix<MX>, public SharedObject{
+class MX : public GenericMatrix<MX>, public CachedObject{
   public:
   
     /** \brief  Default constructor */

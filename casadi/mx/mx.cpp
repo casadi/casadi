@@ -652,7 +652,7 @@ MX MX::operator-() const{
   }
 }
 
-MX::MX(const MX& x) : SharedObject(x){
+MX::MX(const MX& x) : CachedObject(x){
 }
 
 const CRSSparsity& MX::sparsity() const{

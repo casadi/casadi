@@ -91,7 +91,7 @@ class CachedObjectNode : public SharedObjectNode{
   \author Joel Andersson 
   \date 2012
 */
-class WeakRef{
+class WeakRef: public PrintableObject{
   friend class CachedObjectNode;
   public:
     /// Default constructor
@@ -127,6 +127,12 @@ class WeakRef{
 
     /// Clear the weak pointer by setting the owner to null
     void clear();
+    
+    /// Print a representation of the object
+    virtual void repr(std::ostream &stream) const;
+
+    /// Print a destription of the object
+    virtual void print(std::ostream &stream=std::cout) const;
     
   private:
 

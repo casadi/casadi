@@ -20,7 +20,8 @@
  *
  */
 
-/**
+/** \brief Demonstration of sparsity propagation in CasADi
+ * NOTE: Example is mainly intended for developers of CasADi.
  * This example demonstrates how dependencies can be propagated through symbolic expressions,
  * a low-level feature useful when determining sparsity patterns. This functionality is mostly
  * used internally in CasADi when calculating the sparsity pattern of Jacobians and Hessians.
@@ -29,11 +30,7 @@
  * \date 2012
  */
 
-#include <casadi/stl_vector_tools.hpp>
-#include <casadi/sx/sx_tools.hpp>
-#include <casadi/fx/sx_function.hpp>
-#include <casadi/mx/mx_tools.hpp>
-#include <casadi/fx/mx_function.hpp>
+#include "casadi/casadi.hpp"
 
 using namespace CasADi;
 using namespace std;

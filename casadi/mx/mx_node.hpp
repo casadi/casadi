@@ -71,7 +71,7 @@ namespace CasADi{
     \date 2010
     Internal class.
 */
-class MXNode : public SharedObjectNode{
+class MXNode : public CachedObjectNode{
   friend class MX;
   friend class MXFunctionInternal;
   

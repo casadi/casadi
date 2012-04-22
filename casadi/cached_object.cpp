@@ -142,6 +142,23 @@ namespace CasADi{
     owner_ = 0;
   }
   
+  void WeakRef::repr(std::ostream &stream) const{
+    stream << "WeakRef(";
+    if(owner_==0){
+      stream << "NULL";
+    } else {
+      owner_->repr(stream);
+    }
+    stream << ")";
+  }
+
+  void WeakRef::print(std::ostream &stream) const{
+    if(owner_==0){
+      stream << "NULL";
+    } else {
+      owner_->print(stream);
+    }
+  }
   
 } // namespace CasADi
 
