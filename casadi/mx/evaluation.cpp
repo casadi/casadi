@@ -31,20 +31,32 @@ using namespace std;
 
 namespace CasADi{
 
-Evaluation::Evaluation(const FX& fcn, const vector<MX>& dep) : fcn_(fcn) {
+Evaluation::Evaluation(const FX& fcn, 
+		       const std::vector<MX> &x, 
+		       const std::vector<std::vector<MX> > &fseed, 
+		       const std::vector<std::vector<MX> > &aseed) : fcn_(fcn){
+  
+  // Number inputs and outputs
+  int num_in = fcn.getNumInputs();
+  int num_out = fcn.getNumOutputs();
+  
+  // Number of directional derivatives
+  nfwd_ = fseed.size();
+  nadj_ = aseed.size();
+  
   // Argument checking
-  casadi_assert_message(dep.size()==fcn.getNumInputs(), "Evaluation::Evaluation: number of passed-in dependencies (" << dep.size() << ") should match number of inputs of function (" << fcn.getNumInputs() << ").");
+  casadi_assert_message(x.size()==num_in, "Evaluation::Evaluation: number of passed-in dependencies (" << x.size() << ") should match number of inputs of function (" << fcn.getNumInputs() << ").");
 
   // Assumes initialised
-  for (int i=0;i<fcn.getNumInputs();i++) {
-     if (dep[i].isNull() || dep[i].empty())
-       continue;
-      casadi_assert_message(dep[i].size1()==fcn.input(i).size1() && dep[i].size2()==fcn.input(i).size2(),
-        "Evaluation::shapes of passed-in dependencies should match shapes of inputs of function." << std::endl <<
-        "Input argument " << i << " has shape (" << fcn.input(i).size1() << "," << fcn.input(i).size2() << ") while a shape (" << dep[i].size1() << "," << dep[i].size2() << ") was supplied."
-      );  
-   }
-  setDependencies(dep);
+  for(int i=0; i<num_in; ++i){
+    if(x[i].isNull() || x[i].empty()) continue;
+    casadi_assert_message(x[i].size1()==fcn.input(i).size1() && x[i].size2()==fcn.input(i).size2(),
+			  "Evaluation::shapes of passed-in dependencies should match shapes of inputs of function." << 
+			  std::endl << "Input argument " << i << " has shape (" << fcn.input(i).size1() << 
+			  "," << fcn.input(i).size2() << ") while a shape (" << x[i].size1() << "," << x[i].size2() << 
+			  ") was supplied.");
+  }
+  setDependencies(x);
   setSparsity(CRSSparsity(1,1,true));
 }
 
@@ -321,6 +333,31 @@ void Evaluation::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool
   }
 }
 
+void Evaluation::create(const FX& fcn, 
+			const std::vector<MX> &input, std::vector<MX> &output){
+  // Dummy argument
+  std::vector<std::vector<MX> > dummy;
+  create(fcn,input,output,dummy,dummy,dummy,dummy);
+}
+
+void Evaluation::create(const FX& fcn, 
+			const std::vector<MX> &input, std::vector<MX> &output,
+			const std::vector<std::vector<MX> > &fseed, std::vector<std::vector<MX> > &fsens, 
+			const std::vector<std::vector<MX> > &aseed, std::vector<std::vector<MX> > &asens){
+  
+  // Create the evaluation node
+  MX ev;
+  ev.assignNode(new Evaluation(fcn,input));
+
+  // Create the output nodes
+  output.clear();
+  output.resize(fcn.getNumOutputs());
+  for(int i=0; i<output.size(); ++i){
+    if(fcn.output(i).numel()>0){
+      output[i].assignNode(new OutputNode(ev,i));
+    }
+  }
+}
 
 
 } // namespace CasADi

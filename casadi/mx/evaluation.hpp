@@ -36,7 +36,20 @@ class Evaluation : public MultipleOutput{
   public:
 
     /** \brief  Constructor */
-    explicit Evaluation(const FX& fcn, const std::vector<MX> &dep);
+    explicit Evaluation(const FX& fcn, 
+			const std::vector<MX> &input, 
+			const std::vector<std::vector<MX> > &fseed = std::vector<std::vector<MX> >(), 
+			const std::vector<std::vector<MX> > &aseed = std::vector<std::vector<MX> >());
+
+    /** \brief  Creator function, no directional derivatives */
+    static void create(const FX& fcn, 
+		       const std::vector<MX> &input, std::vector<MX> &output);
+
+    /** \brief  Creator function, directional derivatives */
+    static void create(const FX& fcn, 
+		       const std::vector<MX> &input, std::vector<MX> &output, 
+		       const std::vector<std::vector<MX> > &fseed, std::vector<std::vector<MX> > &fsens, 
+		       const std::vector<std::vector<MX> > &aseed, std::vector<std::vector<MX> > &asens);
     
     /** \brief  Destructor */
     virtual ~Evaluation(){}
@@ -80,7 +93,11 @@ class Evaluation : public MultipleOutput{
     /** \brief  Get the sparsity of output oind */
     virtual const CRSSparsity& sparsity(int oind);
 
+    // Function to be evaluated
     FX fcn_;
+    
+    // Number of directional derivatives
+    int nfwd_, nadj_;
 };
 
 } // namespace CasADi

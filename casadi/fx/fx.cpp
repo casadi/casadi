@@ -59,14 +59,8 @@ vector<MX> FX::call(const MX &x){
 
 vector<MX> FX::call(const vector<MX> &x){
   assertInit();
-  
-  MX ev;
-  ev.assignNode(new Evaluation(*this,x));
-  vector<MX> ret(getNumOutputs());
-  for(int i=0; i<ret.size(); ++i){
-    if(output(i).numel()>0)
-      ret[i].assignNode(new OutputNode(ev,i));
-  }
+  vector<MX> ret;
+  Evaluation::create(*this,x,ret);
   return ret;
 }
 
@@ -78,9 +72,7 @@ vector<vector<MX> > FX::call(const vector<vector<MX> > &x, const Dictionary& par
   
   // Return object
   vector<vector<MX> > ret(x.size());
-  
-
-  
+    
   // Check if we are bypassing the parallelizer
   Dictionary::const_iterator ii=paropt.find("parallelization");
   if(ii!=paropt.end() && ii->second=="expand"){
