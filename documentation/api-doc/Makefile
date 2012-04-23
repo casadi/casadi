@@ -20,7 +20,7 @@ doxlocal:
 doxpublish:
 	patch -u Doxyfile.in publish.patch -o - | sed 's/PROJECT_NUMBER         = /PROJECT_NUMBER         = $(SVNREVISION)/' | doxygen -
 	cp style/casadi.png html/casadi.png
-	find -name *-example.html | xargs perl -ni~ -w -e 'print \$_ unless /<span class="comment">#[^\!]/'
+	find -name *-example.html | xargs perl -ni~ -w -e 'print $$_ unless /<span class="comment">#[^\!]/'
 
 swig:
 	sh extra/doc2swig.sh
