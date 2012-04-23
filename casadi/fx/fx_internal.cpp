@@ -452,8 +452,10 @@ CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
     }
     
     // Get seeds and sensitivities
-    bvec_t* seed_v = use_fwd ? get_bvec_t(input(iind).data()) : get_bvec_t(output(oind).data());
-    bvec_t* sens_v = use_fwd ? get_bvec_t(output(oind).data()) : get_bvec_t(input(iind).data());
+    bvec_t* input_v = get_bvec_t(input(iind).data());
+    bvec_t* output_v = get_bvec_t(output(oind).data());
+    bvec_t* seed_v = use_fwd ? input_v : output_v;
+    bvec_t* sens_v = use_fwd ? output_v : input_v;
     
     // Number of sweeps needed
     int nsweep = use_fwd ? nsweep_fwd : nsweep_adj;
@@ -480,6 +482,7 @@ CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
     
     // Loop over the variables, ndir variables at a time
     for(int s=0; s<nsweep; ++s){
+      
       // Print progress
       if(verbose()){
 	int progress_new = (s*100)/nsweep;
@@ -531,10 +534,8 @@ CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
       }
       
       // Remove the seeds
-      if(use_fwd){
-	for(int i=0; i<bvec_size && offset+i<nz_in; ++i){
-	  seed_v[offset+i] = 0;
-	}
+      for(int i=0; i<bvec_size && offset+i<nz_seed; ++i){
+	seed_v[offset+i] = 0;
       }
     }
     
