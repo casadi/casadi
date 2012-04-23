@@ -1348,6 +1348,14 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
+%feature("docstring")  CasADi::AcadoIntegratorInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")  CasADi::AcadoIntegratorInternal::getCount "
 
 Get the reference count. ";
@@ -2506,6 +2514,14 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
+%feature("docstring")  CasADi::AcadoOCPInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")  CasADi::AcadoOCPInternal::deepCopyMembers "
 
 Deep copy data members. ";
@@ -2795,6 +2811,14 @@ Get size. ";
 
 Get size. ";
 
+%feature("docstring")  CasADi::BinaryOp::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::BinaryOp::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")  CasADi::BinaryOp::getCount "
 
 Get the reference count. ";
@@ -2994,6 +3018,155 @@ MXNode) ";
 %feature("docstring")  CasADi::BinarySXNode::print "
 
 print ";
+
+
+// File: classCasADi_1_1CachedObject.xml
+%feature("docstring") CasADi::CachedObject "
+
+A cached reference counted object.
+
+Joel Andersson
+
+C++ includes: cached_object.hpp ";
+
+%feature("docstring")  CasADi::CachedObject::makeUnique "
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object. ";
+
+%feature("docstring")  CasADi::CachedObject::makeUnique "";
+
+%feature("docstring")  CasADi::CachedObject::CachedObject "
+
+Default constructor. ";
+
+%feature("docstring")  CasADi::CachedObject::~CachedObject "
+
+Destructor. ";
+
+%feature("docstring")  CasADi::CachedObject::checkNode "
+
+Assert that the node is pointing to the right type of object. ";
+
+%feature("docstring")  CasADi::CachedObject::clone "
+
+Deep copy. ";
+
+%feature("docstring")  CasADi::CachedObject::assignNode "
+
+Assign the node to a node class pointer (or null) ";
+
+%feature("docstring")  CasADi::CachedObject::assignNodeNoCount "
+
+Assign the node to a node class pointer without reference counting: inproper
+use will cause memory leaks! ";
+
+%feature("docstring")  CasADi::CachedObject::get "
+
+Get a const pointer to the node. ";
+
+%feature("docstring")  CasADi::CachedObject::get "
+
+Get a pointer to the node. ";
+
+%feature("docstring")  CasADi::CachedObject::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::CachedObject::swap "
+
+Swap content with another instance. ";
+
+%feature("docstring")  CasADi::CachedObject::repr "
+
+Print a representation of the object. ";
+
+%feature("docstring")  CasADi::CachedObject::print "
+
+Print a destription of the object. ";
+
+%feature("docstring")  CasADi::CachedObject::init "
+
+Initialize the object: more documentation in the node class (
+SharedObjectNode and derived classes) ";
+
+%feature("docstring")  CasADi::CachedObject::isInit "
+
+Is initialized? ";
+
+%feature("docstring")  CasADi::CachedObject::assertInit "
+
+Assert that it is initialized. ";
+
+%feature("docstring")  CasADi::CachedObject::isNull "
+
+Is a null pointer? ";
+
+%feature("docstring")  CasADi::CachedObject::getRepresentation "
+
+Return a string with a representation (for SWIG) ";
+
+%feature("docstring")  CasADi::CachedObject::getDescription "
+
+Return a string with a destription (for SWIG) ";
+
+
+// File: classCasADi_1_1CachedObjectNode.xml
+%feature("docstring") CasADi::CachedObjectNode "
+
+Internal class.
+
+Joel Andersson
+
+C++ includes: cached_object.hpp ";
+
+%feature("docstring")  CasADi::CachedObjectNode::CachedObjectNode "
+
+Constructor. ";
+
+%feature("docstring")  CasADi::CachedObjectNode::~CachedObjectNode "
+
+Destructor (marks the element as deleted in any lingering references) ";
+
+%feature("docstring")  CasADi::CachedObjectNode::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::CachedObjectNode::unregRef "
+
+Unregister a weak reference. ";
+
+%feature("docstring")  CasADi::CachedObjectNode::clone "
+
+Make a deep copy of the instance. ";
+
+%feature("docstring")  CasADi::CachedObjectNode::deepCopyMembers "
+
+Deep copy data members. ";
+
+%feature("docstring")  CasADi::CachedObjectNode::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::CachedObjectNode::init "
+
+Initialize the object. ";
+
+%feature("docstring")  CasADi::CachedObjectNode::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::CachedObjectNode::assertInit "
+
+Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::CachedObjectNode::repr "
+
+Print a representation of the object. ";
+
+%feature("docstring")  CasADi::CachedObjectNode::print "
+
+Print a destription of the object. ";
 
 
 // File: classCasADi_1_1casadi__limits.xml
@@ -4106,6 +4279,14 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::CFunctionInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::CFunctionInternal::deepCopyMembers "
 
@@ -6270,6 +6451,14 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
+%feature("docstring")  CasADi::CollocationIntegratorInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")  CasADi::CollocationIntegratorInternal::getCount "
 
 Get the reference count. ";
@@ -6868,6 +7057,15 @@ Get the dictionary. ";
 CasADi::OptimalControl::CollocationInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::OptimalControl::CollocationInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::OptimalControl::CollocationInternal::unregRef
+"
+
+Unregister a weak reference. ";
 
 %feature("docstring")
 CasADi::OptimalControl::CollocationInternal::deepCopyMembers "
@@ -8338,6 +8536,14 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
+%feature("docstring")  CasADi::ControlSimulatorInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")  CasADi::ControlSimulatorInternal::deepCopyMembers "
 
 Deep copy data members. ";
@@ -8918,6 +9124,14 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::CplexInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::CplexInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::CplexInternal::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::CplexInternal::deepCopyMembers "
 
@@ -9768,7 +9982,7 @@ If the matrix is dense, i.e. length(col) == size1()*size2(), the format
 reduces to standard dense row major format, which allows access to an
 arbitrary element in constant time.
 
-Since the object is reference counted (it inherits from SharedObject),
+Since the object is reference counted (it inherits from CachedObject),
 several matrices are allowed to share the same sparsity pattern.
 
 The implementations of some methods of this class has been taken from the
@@ -10393,6 +10607,14 @@ Order the rows by decreasing degree. ";
 %feature("docstring")  CasADi::CRSSparsityInternal::pmult "
 
 Permute rows and/or columns. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::CRSSparsityInternal::deepCopyMembers "
 
@@ -11515,6 +11737,14 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::deepCopyMembers
 "
@@ -13311,6 +13541,14 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
+%feature("docstring")  CasADi::Sundials::CVodesInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")  CasADi::Sundials::CVodesInternal::getCount "
 
 Get the reference count. ";
@@ -13522,6 +13760,14 @@ Get size. ";
 %feature("docstring")  CasADi::Densification::size2 "
 
 Get size. ";
+
+%feature("docstring")  CasADi::Densification::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::Densification::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::Densification::getCount "
 
@@ -13773,6 +14019,14 @@ Get size. ";
 %feature("docstring")  CasADi::Evaluation::size2 "
 
 Get size. ";
+
+%feature("docstring")  CasADi::Evaluation::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::Evaluation::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::Evaluation::getCount "
 
@@ -14823,6 +15077,14 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::ExternalFunctionInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::ExternalFunctionInternal::deepCopyMembers "
 
@@ -16230,6 +16492,14 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::FXInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::FXInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::FXInternal::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::FXInternal::clone "
 
@@ -18537,6 +18807,14 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
+%feature("docstring")  CasADi::Sundials::IdasInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")  CasADi::Sundials::IdasInternal::getCount "
 
 Get the reference count. ";
@@ -18748,6 +19026,14 @@ Get size. ";
 %feature("docstring")  CasADi::IfNode::size2 "
 
 Get size. ";
+
+%feature("docstring")  CasADi::IfNode::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::IfNode::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::IfNode::getCount "
 
@@ -19813,6 +20099,14 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::ImplicitFunctionInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::clone "
 
@@ -21271,6 +21565,14 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::IntegratorInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::IntegratorInternal::getCount "
 
@@ -24460,6 +24762,14 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
+%feature("docstring")  CasADi::IpoptInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::IpoptInternal::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")  CasADi::IpoptInternal::deepCopyMembers "
 
 Deep copy data members. ";
@@ -25443,6 +25753,14 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::deepCopyMembers
 "
@@ -31052,6 +31370,14 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
+%feature("docstring")  CasADi::JacobianInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::JacobianInternal::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")  CasADi::JacobianInternal::getCount "
 
 Get the reference count. ";
@@ -31263,6 +31589,14 @@ Get size. ";
 %feature("docstring")  CasADi::JacobianReference::size2 "
 
 Get size. ";
+
+%feature("docstring")  CasADi::JacobianReference::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::JacobianReference::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::JacobianReference::getCount "
 
@@ -31833,6 +32167,14 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::Sundials::KinsolInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::Sundials::KinsolInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::Sundials::KinsolInternal::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolInternal::deepCopyMembers "
 
@@ -33368,6 +33710,14 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::KnitroInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::KnitroInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::KnitroInternal::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::KnitroInternal::deepCopyMembers "
 
@@ -35409,6 +35759,14 @@ CasADi::Interfaces::LapackLUDenseInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
 
+%feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")
 CasADi::Interfaces::LapackLUDenseInternal::deepCopyMembers "
 
@@ -36563,6 +36921,14 @@ Get the dictionary. ";
 CasADi::Interfaces::LapackQRDenseInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")
 CasADi::Interfaces::LapackQRDenseInternal::deepCopyMembers "
@@ -38075,6 +38441,14 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
+%feature("docstring")  CasADi::LiftedSQPInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")  CasADi::LiftedSQPInternal::deepCopyMembers "
 
 Deep copy data members. ";
@@ -38673,6 +39047,14 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::deepCopyMembers
 "
@@ -40524,6 +40906,14 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
+%feature("docstring")  CasADi::LinearSolverInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")  CasADi::LinearSolverInternal::clone "
 
 Make a deep copy of the instance. ";
@@ -40765,6 +41155,14 @@ Get size. ";
 %feature("docstring")  CasADi::Mapping::size2 "
 
 Get size. ";
+
+%feature("docstring")  CasADi::Mapping::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::Mapping::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::Mapping::getCount "
 
@@ -41819,6 +42217,14 @@ Get size. ";
 %feature("docstring")  CasADi::MultipleOutput::size2 "
 
 Get size. ";
+
+%feature("docstring")  CasADi::MultipleOutput::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::MultipleOutput::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::MultipleOutput::getCount "
 
@@ -43295,6 +43701,16 @@ CasADi::OptimalControl::MultipleShootingInternal::getBestMatches "
 Get th ebest suggestions of option names. ";
 
 %feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::unregRef "
+
+Unregister a weak reference. ";
+
+%feature("docstring")
 CasADi::OptimalControl::MultipleShootingInternal::deepCopyMembers "
 
 Deep copy data members. ";
@@ -43514,6 +43930,14 @@ Get size. ";
 %feature("docstring")  CasADi::Multiplication::size2 "
 
 Get size. ";
+
+%feature("docstring")  CasADi::Multiplication::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::Multiplication::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::Multiplication::getCount "
 
@@ -43986,6 +44410,14 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::MuscodInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::MuscodInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::MuscodInternal::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::MuscodInternal::deepCopyMembers "
 
@@ -44510,6 +44942,10 @@ Check if the matrix expression is dense. ";
 
 Check if the matrix expression is scalar. ";
 
+%feature("docstring")  CasADi::MX::checkNode "
+
+Assert that the node is pointing to the right type of object. ";
+
 %feature("docstring")  CasADi::MX::clone "
 
 Deep copy. ";
@@ -44563,10 +44999,6 @@ Assert that it is initialized. ";
 %feature("docstring")  CasADi::MX::isNull "
 
 Is a null pointer? ";
-
-%feature("docstring")  CasADi::MX::checkNode "
-
-Assert that the node is pointing to the right type of object. ";
 
 %feature("docstring")  CasADi::MX::getRepresentation "
 
@@ -44785,6 +45217,14 @@ Get size. ";
 %feature("docstring")  CasADi::MXConstant::size2 "
 
 Get size. ";
+
+%feature("docstring")  CasADi::MXConstant::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::MXConstant::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::MXConstant::getCount "
 
@@ -45927,6 +46367,14 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
+%feature("docstring")  CasADi::MXFunctionInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")  CasADi::MXFunctionInternal::getCount "
 
 Get the reference count. ";
@@ -46138,6 +46586,14 @@ Get size. ";
 %feature("docstring")  CasADi::MXNode::size2 "
 
 Get size. ";
+
+%feature("docstring")  CasADi::MXNode::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::MXNode::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::MXNode::getCount "
 
@@ -47555,6 +48011,14 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
+%feature("docstring")  CasADi::NLPSolverInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")  CasADi::NLPSolverInternal::clone "
 
 Make a deep copy of the instance. ";
@@ -47793,6 +48257,14 @@ Get size. ";
 
 Get size. ";
 
+%feature("docstring")  CasADi::NonzerosNonzerosOp::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::NonzerosNonzerosOp::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")  CasADi::NonzerosNonzerosOp::getCount "
 
 Get the reference count. ";
@@ -48012,6 +48484,14 @@ Get size. ";
 
 Get size. ";
 
+%feature("docstring")  CasADi::NonzerosScalarOp::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::NonzerosScalarOp::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")  CasADi::NonzerosScalarOp::getCount "
 
 Get the reference count. ";
@@ -48229,6 +48709,14 @@ Get size. ";
 
 Get size. ";
 
+%feature("docstring")  CasADi::Norm::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::Norm::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")  CasADi::Norm::getCount "
 
 Get the reference count. ";
@@ -48444,6 +48932,14 @@ Get size. ";
 %feature("docstring")  CasADi::Norm1::size2 "
 
 Get size. ";
+
+%feature("docstring")  CasADi::Norm1::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::Norm1::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::Norm1::getCount "
 
@@ -48661,6 +49157,14 @@ Get size. ";
 
 Get size. ";
 
+%feature("docstring")  CasADi::Norm2::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::Norm2::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")  CasADi::Norm2::getCount "
 
 Get the reference count. ";
@@ -48877,6 +49381,14 @@ Get size. ";
 
 Get size. ";
 
+%feature("docstring")  CasADi::NormF::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::NormF::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")  CasADi::NormF::getCount "
 
 Get the reference count. ";
@@ -49092,6 +49604,14 @@ Get size. ";
 %feature("docstring")  CasADi::NormInf::size2 "
 
 Get size. ";
+
+%feature("docstring")  CasADi::NormInf::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::NormInf::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::NormInf::getCount "
 
@@ -50314,6 +50834,14 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
+%feature("docstring")  CasADi::OCPSolverInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")  CasADi::OCPSolverInternal::clone "
 
 Make a deep copy of the instance. ";
@@ -50929,6 +51457,14 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::deepCopyMembers "
 
@@ -51916,6 +52452,14 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
+%feature("docstring")  CasADi::OptionsFunctionalityNode::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::OptionsFunctionalityNode::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")  CasADi::OptionsFunctionalityNode::clone "
 
 Make a deep copy of the instance. ";
@@ -52139,6 +52683,14 @@ Get size. ";
 %feature("docstring")  CasADi::OutputNode::size2 "
 
 Get size. ";
+
+%feature("docstring")  CasADi::OutputNode::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::OutputNode::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::OutputNode::getCount "
 
@@ -53255,6 +53807,14 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
+%feature("docstring")  CasADi::ParallelizerInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")  CasADi::ParallelizerInternal::getCount "
 
 Get the reference count. ";
@@ -53827,6 +54387,14 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::deepCopyMembers
 "
@@ -55673,6 +56241,14 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
+%feature("docstring")  CasADi::QPSolverInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")  CasADi::QPSolverInternal::clone "
 
 Make a deep copy of the instance. ";
@@ -57054,6 +57630,14 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
+%feature("docstring")  CasADi::RKIntegratorInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")  CasADi::RKIntegratorInternal::getCount "
 
 Get the reference count. ";
@@ -57268,6 +57852,14 @@ Get size. ";
 %feature("docstring")  CasADi::ScalarNonzerosOp::size2 "
 
 Get size. ";
+
+%feature("docstring")  CasADi::ScalarNonzerosOp::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::ScalarNonzerosOp::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::ScalarNonzerosOp::getCount "
 
@@ -58596,6 +59188,14 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
+%feature("docstring")  CasADi::SimulatorInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")  CasADi::SimulatorInternal::deepCopyMembers "
 
 Deep copy data members. ";
@@ -58866,6 +59466,14 @@ Get size. ";
 %feature("docstring")  CasADi::SparseSparseOp::size2 "
 
 Get size. ";
+
+%feature("docstring")  CasADi::SparseSparseOp::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::SparseSparseOp::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::SparseSparseOp::getCount "
 
@@ -59532,6 +60140,14 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::SQPInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::SQPInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::SQPInternal::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::SQPInternal::deepCopyMembers "
 
@@ -62087,6 +62703,14 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
+%feature("docstring")  CasADi::Sundials::SundialsInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::Sundials::SundialsInternal::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")  CasADi::Sundials::SundialsInternal::getCount "
 
 Get the reference count. ";
@@ -63277,6 +63901,14 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::SuperLUInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::SuperLUInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::SuperLUInternal::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::SuperLUInternal::deepCopyMembers "
 
@@ -64748,6 +65380,14 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
+%feature("docstring")  CasADi::SXFunctionInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")  CasADi::SXFunctionInternal::deepCopyMembers "
 
 Deep copy data members. ";
@@ -65060,6 +65700,14 @@ Get size. ";
 %feature("docstring")  CasADi::SymbolicMatrix::size2 "
 
 Get size. ";
+
+%feature("docstring")  CasADi::SymbolicMatrix::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::SymbolicMatrix::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::SymbolicMatrix::getCount "
 
@@ -65603,6 +66251,14 @@ Get size. ";
 
 Get size. ";
 
+%feature("docstring")  CasADi::UnaryOp::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::UnaryOp::unregRef "
+
+Unregister a weak reference. ";
+
 %feature("docstring")  CasADi::UnaryOp::getCount "
 
 Get the reference count. ";
@@ -66114,6 +66770,56 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::VariableInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+
+// File: classCasADi_1_1WeakRef.xml
+%feature("docstring") CasADi::WeakRef "
+
+A weak reference to a cached object.
+
+Joel Andersson
+
+C++ includes: cached_object.hpp ";
+
+%feature("docstring")  CasADi::WeakRef::WeakRef "
+
+Default constructor. ";
+
+%feature("docstring")  CasADi::WeakRef::~WeakRef "
+
+Destructor. ";
+
+%feature("docstring")  CasADi::WeakRef::WeakRef "
+
+Copy constructor. ";
+
+%feature("docstring")  CasADi::WeakRef::WeakRef "
+
+Construct weak reference from shared object. ";
+
+%feature("docstring")  CasADi::WeakRef::isNull "
+
+Check if the weak object is null. ";
+
+%feature("docstring")  CasADi::WeakRef::clear "
+
+Clear the weak pointer by setting the owner to null. ";
+
+%feature("docstring")  CasADi::WeakRef::repr "
+
+Print a representation of the object. ";
+
+%feature("docstring")  CasADi::WeakRef::print "
+
+Print a destription of the object. ";
+
+%feature("docstring")  CasADi::WeakRef::getRepresentation "
+
+Return a string with a representation (for SWIG) ";
+
+%feature("docstring")  CasADi::WeakRef::getDescription "
+
+Return a string with a destription (for SWIG) ";
 
 
 // File: classCasADi_1_1WorhpInternal.xml
@@ -67408,6 +68114,14 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::WorhpInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::WorhpInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::WorhpInternal::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::WorhpInternal::deepCopyMembers "
 
@@ -69353,6 +70067,14 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::XFunctionInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::unregRef "
+
+Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::XFunctionInternal::clone "
 
@@ -71457,6 +72179,12 @@ h:  internal expressions which the user may wish to inspect ";
 
 
 // File: c__function__internal_8hpp.xml
+
+
+// File: cached__object_8cpp.xml
+
+
+// File: cached__object_8hpp.xml
 
 
 // File: callback_8hpp.xml
