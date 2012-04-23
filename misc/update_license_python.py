@@ -56,12 +56,12 @@ def recursive_traversal(dir,  oldcopyright, copyright):
         if (os.path.isdir(fullfn)):
             recursive_traversal(fullfn, oldcopyright, copyright)
         else:
-            if (fullfn.endswith(".cpp") or fullfn.endswith(".hpp") or fullfn.endswith(".h") or fullfn.endswith(".i")):
+            if (fullfn.endswith(".py") ):
                 update_source(fullfn, oldcopyright, copyright)
 
 
-oldcright = file("old_license_header.txt","r+").read()
-#oldcright = None
-cright = file("license_header.txt","r+").read()
+#oldcright = file("old_license_header.txt","r+").read()
+oldcright = None
+cright = file("license_header_python.txt","r+").read()
 recursive_traversal("..", oldcright, cright)
 exit()
