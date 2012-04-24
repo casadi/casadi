@@ -87,44 +87,44 @@ class FXInternal : public OptionsFunctionalityNode{
     virtual void spInit(bool fwd){}
     
     /** \brief  Evaluate symbolically, SX type */
-    virtual void evalSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
-                        const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
-                        const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
+    virtual void evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
+                        const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
+                        const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
                         bool output_given, bool eliminate_constants);
 
     /** \brief  Evaluate symbolically, MX type */
-    virtual void evalMX(const std::vector<MX>& input, std::vector<MX>& output, 
-                        const std::vector<std::vector<MX> >& fwdSeed, std::vector<std::vector<MX> >& fwdSens, 
-                        const std::vector<std::vector<MX> >& adjSeed, std::vector<std::vector<MX> >& adjSens,
+    virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 
+                        const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
+                        const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
                         bool output_given, bool eliminate_constants);
 
     /** \brief  Evaluate symbolically, SX type (overloaded)*/
-    void eval(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
-              const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
-              const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
+    void eval(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
+              const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
+              const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
               bool output_given, bool eliminate_constants){
-      evalSX(input,output,fwdSeed,fwdSens,adjSeed,adjSens,output_given,eliminate_constants);
+      evalSX(arg,res,fseed,fsens,aseed,asens,output_given,eliminate_constants);
     }
 
     /** \brief  Evaluate symbolically, MX type (overloaded)*/
-    void eval(const std::vector<MX>& input, std::vector<MX>& output, 
-              const std::vector<std::vector<MX> >& fwdSeed, std::vector<std::vector<MX> >& fwdSens, 
-              const std::vector<std::vector<MX> >& adjSeed, std::vector<std::vector<MX> >& adjSens,
+    void eval(const std::vector<MX>& arg, std::vector<MX>& res, 
+              const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
+              const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
               bool output_given, bool eliminate_constants){
-      evalMX(input,output,fwdSeed,fwdSens,adjSeed,adjSens,output_given,eliminate_constants);
+      evalMX(arg,res,fseed,fsens,aseed,asens,output_given,eliminate_constants);
     }
     
     /** \brief  Access an input */
-    FunctionIO& inputStruct(int i=0);
+    FunctionIO& iStruct(int i=0);
 
     /** \brief  Const access an input */
-    const FunctionIO& inputStruct(int i=0) const;
+    const FunctionIO& iStruct(int i=0) const;
     
     /** \brief  Access an output*/
-    FunctionIO& outputStruct(int i=0);
+    FunctionIO& oStruct(int i=0);
 
     /** \brief  Const access an output*/
-    const FunctionIO& outputStruct(int i=0) const;
+    const FunctionIO& oStruct(int i=0) const;
       
     /** \brief  Print */
     virtual void print(std::ostream &stream) const;
@@ -148,16 +148,16 @@ class FXInternal : public OptionsFunctionalityNode{
     bool monitored(const std::string& mod) const;
     
       /// Access input argument
-    Matrix<double>& input(int iind=0);
+    inline Matrix<double>& input(int iind=0){ return iStruct(iind).data;}
       
     /// Const access input argument
-    const Matrix<double>& input(int iind=0) const;
+    inline const Matrix<double>& input(int iind=0) const{ return iStruct(iind).data;}
 
     /// Access input argument
-    Matrix<double>& output(int oind=0);
+    inline Matrix<double>& output(int oind=0){ return oStruct(oind).data;}
       
     /// Const access input argument
-    const Matrix<double>& output(int oind=0) const;
+    inline const Matrix<double>& output(int oind=0) const{ return oStruct(oind).data;}
 
     /// Access forward seed
     Matrix<double>& fwdSeed(int iind=0, int dir=0);
@@ -190,10 +190,10 @@ class FXInternal : public OptionsFunctionalityNode{
     void setNumOutputs(int num_out);
 
     /// Get the number of function inputs
-    int getNumInputs() const;
+    inline int getNumInputs() const{ return input_.size();}
 
     /// Get the number of function outputs
-    int getNumOutputs() const;
+    inline int getNumOutputs() const{ return output_.size();}
     
     /// Get all statistics obtained at the end of the last evaluate call
     const Dictionary & getStats() const;

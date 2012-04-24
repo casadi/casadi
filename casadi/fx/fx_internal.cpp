@@ -155,34 +155,34 @@ FX FXInternal::hessian(int iind, int oind){
   casadi_error("FXInternal::hessian: hessian not defined for class " << typeid(*this).name());
 }
 
-FunctionIO& FXInternal::inputStruct(int i){
-  if (i<0 || i>=input_.size()) {
-    std::stringstream ss;
-    ss <<  "In function " << getOption("name") << ": input " << i << " not in interval [0," << input_.size() << "]";
-    if (!isInit()) ss << endl << "Did you forget to initialize?";
-    casadi_error(ss.str());
+FunctionIO& FXInternal::iStruct(int i){
+  try{
+    return input_.at(i);
+  } catch(std::out_of_range&){
+      std::stringstream ss;
+      ss <<  "In function " << getOption("name") << ": input " << i << " not in interval [0," << getNumInputs() << ")";
+      if (!isInit()) ss << endl << "Did you forget to initialize?";
+      throw CasadiException(ss.str());
   }
-
-  return input_.at(i);
 }
 
-const FunctionIO& FXInternal::inputStruct(int i) const{
-  return const_cast<FXInternal*>(this)->inputStruct(i);
+const FunctionIO& FXInternal::iStruct(int i) const{
+  return const_cast<FXInternal*>(this)->iStruct(i);
 }
   
-FunctionIO& FXInternal::outputStruct(int i){
-  if (i<0 || i>=output_.size()) {
-    std::stringstream ss;
-    ss << "In function " << getOption("name") << ": output " << i << " not in interval [0," << output_.size() << "]";
-    if (!isInit()) ss << endl << "Did you forget to initialize?";
-    casadi_error(ss.str());
+FunctionIO& FXInternal::oStruct(int i){
+  try{
+    return output_.at(i);
+  } catch(std::out_of_range&){
+      std::stringstream ss;
+      ss <<  "In function " << getOption("name") << ": output " << i << " not in interval [0," << getNumOutputs() << ")";
+      if (!isInit()) ss << endl << "Did you forget to initialize?";
+      throw CasadiException(ss.str());
   }
-
-  return output_.at(i);
 }
 
-const FunctionIO& FXInternal::outputStruct(int i) const{
-  return const_cast<FXInternal*>(this)->outputStruct(i);
+const FunctionIO& FXInternal::oStruct(int i) const{
+  return const_cast<FXInternal*>(this)->oStruct(i);
 }
 
 void FXInternal::log(const string& msg) const{
@@ -205,34 +205,18 @@ bool FXInternal::monitored(const string& mod) const{
   return monitors_.count(mod)>0;
 }
 
-Matrix<double>& FXInternal::input(int iind){
-  return inputStruct(iind).data;
-}
-    
-const Matrix<double>& FXInternal::input(int iind) const{
-  return inputStruct(iind).data;
-}
-
-Matrix<double>& FXInternal::output(int oind){
-  return outputStruct(oind).data;
-}
-    
-const Matrix<double>& FXInternal::output(int oind) const{
-  return outputStruct(oind).data;
-}
-
 Matrix<double>& FXInternal::fwdSeed(int iind, int dir){
   try{
-    return inputStruct(iind).dataF.at(dir);
+    return iStruct(iind).dataF.at(dir);
   } catch(out_of_range&){
     stringstream ss;
-    if(inputStruct(iind).dataF.empty()){
+    if(iStruct(iind).dataF.empty()){
       ss << "No forward directions ";
     } else {
-      ss << "Forward direction " << dir << " is out of range [0," << inputStruct(iind).dataF.size() << ") ";
+      ss << "Forward direction " << dir << " is out of range [0," << iStruct(iind).dataF.size() << ") ";
     }
     ss << "for function " << getOption("name");
-    casadi_error(ss.str());
+    throw CasadiException(ss.str());
   }
 }
     
@@ -242,16 +226,16 @@ const Matrix<double>& FXInternal::fwdSeed(int iind, int dir) const{
 
 Matrix<double>& FXInternal::fwdSens(int oind, int dir){
   try{
-    return outputStruct(oind).dataF.at(dir);
+    return oStruct(oind).dataF.at(dir);
   } catch(out_of_range&){
     stringstream ss;
-    if(outputStruct(oind).dataF.empty()){
+    if(oStruct(oind).dataF.empty()){
       ss << "No forward directions ";
     } else {
-      ss << "Forward direction " << dir << " is out of range [0," << outputStruct(oind).dataF.size() << ") ";
+      ss << "Forward direction " << dir << " is out of range [0," << oStruct(oind).dataF.size() << ") ";
     }
     ss << "for function " << getOption("name");
-    casadi_error(ss.str());
+    throw CasadiException(ss.str());
   }
 }
     
@@ -261,16 +245,16 @@ const Matrix<double>& FXInternal::fwdSens(int oind, int dir) const{
 
 Matrix<double>& FXInternal::adjSeed(int oind, int dir){
   try{
-    return outputStruct(oind).dataA.at(dir);
+    return oStruct(oind).dataA.at(dir);
   } catch(out_of_range&){
     stringstream ss;
-    if(outputStruct(oind).dataA.empty()){
+    if(oStruct(oind).dataA.empty()){
       ss << "No adjoint directions ";
     } else {
-      ss << "Adjoint direction " << dir << " is out of range [0," << outputStruct(oind).dataA.size() << ") ";
+      ss << "Adjoint direction " << dir << " is out of range [0," << oStruct(oind).dataA.size() << ") ";
     }
     ss << "for function " << getOption("name");
-    casadi_error(ss.str());
+    throw CasadiException(ss.str());
   }
 }
     
@@ -280,16 +264,16 @@ const Matrix<double>& FXInternal::adjSeed(int oind, int dir) const{
 
 Matrix<double>& FXInternal::adjSens(int iind, int dir){
   try{
-    return inputStruct(iind).dataA.at(dir);
+    return iStruct(iind).dataA.at(dir);
   } catch(out_of_range&){
     stringstream ss;
-    if(inputStruct(iind).dataA.empty()){
+    if(iStruct(iind).dataA.empty()){
       ss << "No adjoint directions ";
     } else {
-      ss << "Adjoint direction " << dir << " is out of range [0," << inputStruct(iind).dataA.size() << ") ";
+      ss << "Adjoint direction " << dir << " is out of range [0," << iStruct(iind).dataA.size() << ") ";
     }
     ss << "for function " << getOption("name");
-    casadi_error(ss.str());
+    throw CasadiException(ss.str());
   }
 }
     
@@ -298,19 +282,11 @@ const Matrix<double>& FXInternal::adjSens(int iind, int dir) const{
 }
 
 void FXInternal::setNumInputs(int num_in){
-  return input_.resize(num_in);
+  input_.resize(num_in);
 }
 
 void FXInternal::setNumOutputs(int num_out){
-  return output_.resize(num_out);  
-}
-
-int FXInternal::getNumInputs() const{
-  return input_.size();
-}
-
-int FXInternal::getNumOutputs() const{
-  return output_.size();
+  output_.resize(num_out);  
 }
 
 const Dictionary & FXInternal::getStats() const {
@@ -760,22 +736,71 @@ void FXInternal::evaluate_switch(int nfdir, int nadir){
   }
 }
 
-void FXInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
-			const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
-			const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
+void FXInternal::evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
+			const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
+			const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
 			bool output_given, bool eliminate_constants){
   casadi_error("FXInternal::evalSX not defined for class " << typeid(*this).name());
 }
 
-void FXInternal::evalMX(const std::vector<MX>& input, std::vector<MX>& output, 
-			const std::vector<std::vector<MX> >& fwdSeed, std::vector<std::vector<MX> >& fwdSens, 
-			const std::vector<std::vector<MX> >& adjSeed, std::vector<std::vector<MX> >& adjSens,
+void FXInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 
+			const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
+			const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
 			bool output_given, bool eliminate_constants){
   casadi_error("FXInternal::evalMX not defined for class " << typeid(*this).name());
 }
 
 void FXInternal::spEvaluate(bool fwd){
-  casadi_error("FXInternal::spEvaluate not defined for class " << typeid(*this).name());
+  if(fwd){
+    // Clear the outputs
+    for(int oind=0; oind<getNumOutputs(); ++oind){
+      vector<double>& v = output(oind).data();
+      fill_n(get_bvec_t(v),v.size(),0);
+    }
+  }
+  
+  // Loop over inputs
+  for(int iind=0; iind<getNumInputs(); ++iind){
+    
+    // Skip if no seeds
+    if(fwd && input(iind).empty()) continue;
+
+    // Get data array for input
+    bvec_t *inputd = get_bvec_t(input(iind).data());
+    
+    // Loop over outputs
+    for(int oind=0; oind<getNumOutputs(); ++oind){
+
+      // Skip if no seeds
+      if(!fwd && output(oind).empty()) continue;
+
+      // Get the sparsity of the Jacobian block
+      CRSSparsity& sp = jacSparsity(iind,oind,true);
+      if(sp.isNull() || sp.size()==0) continue; // Skip if zero
+      const int d1 = sp.size1();
+      //const int d2 = sp.size2();
+      const vector<int>& rowind = sp.rowind();
+      const vector<int>& col = sp.col();
+
+      // Get data array for output
+      bvec_t *outputd = get_bvec_t(output(oind).data());
+
+      // Carry out the sparse matrix-vector multiplication
+      for(int i=0; i<d1; ++i){
+        for(int el=rowind[i]; el<rowind[i+1]; ++el){
+          // Get column
+          int j=col[el];
+          
+          // Propagate dependencies
+          if(fwd){
+            outputd[i] |= inputd[j];
+          } else {
+            inputd[j] |= outputd[i];
+          }
+        }
+      }
+    }
+  }
 }
 
 } // namespace CasADi

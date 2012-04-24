@@ -272,6 +272,63 @@ void Evaluation::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& alrea
 }
 
 void Evaluation::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+#if 0
+  // Pass/clear forward seeds/adjoint sensitivities
+  for(int iind=0; iind<input.size(); ++iind){
+    // Input vector
+    vector<double> &v = fcn_.input(iind).data();
+
+    if(input[iind]==0){
+      // Set to zero if not used
+      fill_n(get_bvec_t(v),v.size(),bvec_t(0));
+    } else {
+      // Copy output
+      bvec_t* vd = get_bvec_t(input[iind]->data());
+      copy(vd,vd+v.size(),get_bvec_t(v));
+    }
+  }
+
+  // Pass/clear adjoint seeds/forward sensitivities
+  for(int oind=0; oind<output.size(); ++oind){
+    // Output vector
+    vector<double> &v = fcn_.output(oind).data();
+    
+    if(output[oind]==0){
+      // Set to zero if not used
+      fill_n(get_bvec_t(v),v.size(),bvec_t(0));
+    } else {
+      // Copy output
+      bvec_t* vd = get_bvec_t(output[oind]->data());
+      copy(vd,vd+v.size(),get_bvec_t(v));
+    }
+  }
+  
+  // Propagate seedsfcn_.
+  fcn_.spInit(fwd);
+  fcn_.spEvaluate(fwd);
+  
+  // Get the sensitivities
+  if(fwd){
+    for(int oind=0; oind<output.size(); ++oind){
+      const vector<double> &v = fcn_.output(oind).data();
+      if(output[oind]!=0){
+	const bvec_t* vd = get_bvec_t(v);
+	copy(vd,vd+v.size(),get_bvec_t(output[oind]->data()));
+      }
+    }
+  } else {
+    for(int iind=0; iind<input.size(); ++iind){
+      const vector<double> &v = fcn_.input(iind).data();
+      if(input[iind]!=0){
+	const bvec_t* vd = get_bvec_t(v);
+	copy(vd,vd+v.size(),get_bvec_t(input[iind]->data()));
+      }
+    }
+  }
+  
+  return;
+#endif
+  
   if(fwd){
     // Clear the outputs
     for(int oind=0; oind<output.size(); ++oind){

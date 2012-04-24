@@ -347,32 +347,32 @@ vector<MX> FX::evalMX(const vector<MX>& arg){
   return res;
 }
 
-void FX::evalSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
-		       const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
-		       const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
+void FX::evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
+		       const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
+		       const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
 		       bool output_given, bool eliminate_constants){
-  (*this)->evalSX(input,output,fwdSeed,fwdSens,adjSeed,adjSens,output_given,eliminate_constants);
+  (*this)->evalSX(arg,res,fseed,fsens,aseed,asens,output_given,eliminate_constants);
 }
 
-void FX::evalMX(const std::vector<MX>& input, std::vector<MX>& output, 
-		       const std::vector<std::vector<MX> >& fwdSeed, std::vector<std::vector<MX> >& fwdSens, 
-		       const std::vector<std::vector<MX> >& adjSeed, std::vector<std::vector<MX> >& adjSens,
+void FX::evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 
+		       const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
+		       const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
 		       bool output_given, bool eliminate_constants){
-  (*this)->evalMX(input,output,fwdSeed,fwdSens,adjSeed,adjSens,output_given,eliminate_constants);
+  (*this)->evalMX(arg,res,fseed,fsens,aseed,asens,output_given,eliminate_constants);
 }
                         
-void FX::eval(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
-		     const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
-		     const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
+void FX::eval(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
+		     const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
+		     const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
 		     bool output_given, bool eliminate_constants){
-  (*this)->eval(input,output,fwdSeed,fwdSens,adjSeed,adjSens,output_given,eliminate_constants);
+  (*this)->eval(arg,res,fseed,fsens,aseed,asens,output_given,eliminate_constants);
 }
 
-void FX::eval(const std::vector<MX>& input, std::vector<MX>& output, 
-		     const std::vector<std::vector<MX> >& fwdSeed, std::vector<std::vector<MX> >& fwdSens, 
-		     const std::vector<std::vector<MX> >& adjSeed, std::vector<std::vector<MX> >& adjSens,
+void FX::eval(const std::vector<MX>& arg, std::vector<MX>& res, 
+		     const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
+		     const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
 		     bool output_given, bool eliminate_constants){
-  (*this)->eval(input,output,fwdSeed,fwdSens,adjSeed,adjSens,output_given,eliminate_constants);
+  (*this)->eval(arg,res,fseed,fsens,aseed,asens,output_given,eliminate_constants);
 }
 
 void FX::spEvaluate(bool fwd){
@@ -386,58 +386,6 @@ bool FX::spCanEvaluate(bool fwd){
 void FX::spInit(bool fwd){
     (*this)->spInit(fwd);
 }
-
-#if 0
-
-vector<DMatrix> FX::jac(const vector<DMatrix> &x, int iind){
-  casadi_assert(0);  
-}
-
-vector<SXMatrix> FX::jac(const vector<SXMatrix> &x, int iind){
-  casadi_assert(0);
-}
-
-vector<MX> FX::jac(const vector<MX> &x, int iind){
-  casadi_assert(0);
-}
-
-vector<DMatrix> FX::jac(const vector<DMatrix> &x, const vector<DMatrix> &v){
-  casadi_assert(0);
-}
-
-vector<SXMatrix> FX::jac(const vector<SXMatrix> &x, const vector<SXMatrix> &v){
-  casadi_assert(0);
-}
-
-vector<MX> FX::jac(const vector<MX> &x, const vector<MX> &v){
-  casadi_assert(0);  
-}
-
-vector<DMatrix> FX::grad(const vector<DMatrix> &x, int oind){
-    casadi_assert(0);
-}
-
-vector<SXMatrix> FX::grad(const vector<SXMatrix> &x, int oind){
-  casadi_assert(0);  
-}
-
-vector<MX> FX::grad(const vector<MX> &x, int oind){
-  casadi_assert(0);  
-}
-
-vector<DMatrix> FX::grad(const vector<DMatrix> &x, const vector<DMatrix> &v){
-  casadi_assert(0);  
-}
-
-vector<SXMatrix> FX::grad(const vector<SXMatrix> &x, const vector<SXMatrix> &v){
-  casadi_assert(0);
-}
-
-vector<MX> FX::grad(const vector<MX> &x, const vector<MX> &v){
-  casadi_assert(0);
-}
-
-#endif
 
 } // namespace CasADi
 

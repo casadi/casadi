@@ -169,7 +169,7 @@ class FX : public OptionsFunctionality{
   /** \brief  Evaluate symbolically in parallel (matrix graph)
       paropt: Set of options to be passed to the Parallelizer
   */
-  std::vector<std::vector<MX> > call(const std::vector<std::vector<MX> > &x, const Dictionary& paropt=Dictionary());
+  std::vector<std::vector<MX> > call(const std::vector<std::vector<MX> > &arg, const Dictionary& paropt=Dictionary());
 
   
   /// evaluate symbolically, SX type (overloaded)
@@ -194,9 +194,9 @@ class FX : public OptionsFunctionality{
    * assuming it is already known and the second boolean arguments allows constants to be eliminated during the 
    * evaluations (as the treatment of constants in CasADi will get more efficient, this will become unnecessary).
    */
-  void evalSX(const SXMatrixVector& input, SXMatrixVector& output, 
-	      const SXMatrixVectorVector& fwdSeed, SXMatrixVectorVector& fwdSens, 
-	      const SXMatrixVectorVector& adjSeed, SXMatrixVectorVector& adjSens,
+  void evalSX(const SXMatrixVector& arg, SXMatrixVector& res, 
+	      const SXMatrixVectorVector& fseed, SXMatrixVectorVector& fsens, 
+	      const SXMatrixVectorVector& aseed, SXMatrixVectorVector& asens,
 	      bool output_given=false, bool eliminate_constants=false);
 
   /** \brief Evaluate symbolically with with directional derivatives, MX type
@@ -209,9 +209,9 @@ class FX : public OptionsFunctionality{
    * assuming it is already known and the second boolean arguments allows constants to be eliminated during the 
    * evaluations (as the treatment of constants in CasADi will get more efficient, this will become unnecessary).
    */
-  void evalMX(const MXVector& input, MXVector& output, 
-	      const MXVectorVector& fwdSeed, MXVectorVector& fwdSens, 
-	      const MXVectorVector& adjSeed, MXVectorVector& adjSens,
+  void evalMX(const MXVector& arg, MXVector& res, 
+	      const MXVectorVector& fseed, MXVectorVector& fsens, 
+	      const MXVectorVector& aseed, MXVectorVector& asens,
 	      bool output_given=false, bool eliminate_constants=false);
                         
   /** \brief Evaluate symbolically with with directional derivatives, SX type, overloaded
@@ -224,9 +224,9 @@ class FX : public OptionsFunctionality{
    * assuming it is already known and the second boolean arguments allows constants to be eliminated during the 
    * evaluations (as the treatment of constants in CasADi will get more efficient, this will become unnecessary).
    */
-  void eval(const SXMatrixVector& input, std::vector<SXMatrix>& output, 
-	    const SXMatrixVectorVector& fwdSeed, SXMatrixVectorVector& fwdSens, 
-	    const SXMatrixVectorVector& adjSeed, SXMatrixVectorVector& adjSens,
+  void eval(const SXMatrixVector& arg, std::vector<SXMatrix>& res, 
+	    const SXMatrixVectorVector& fseed, SXMatrixVectorVector& fsens, 
+	    const SXMatrixVectorVector& aseed, SXMatrixVectorVector& asens,
 	    bool output_given=false, bool eliminate_constants=false);
 
   /** \brief Evaluate symbolically with with directional derivatives, MX type, overloaded
@@ -239,9 +239,9 @@ class FX : public OptionsFunctionality{
    * assuming it is already known and the second boolean arguments allows constants to be eliminated during the 
    * evaluations (as the treatment of constants in CasADi will get more efficient, this will become unnecessary).
    */
-  void eval(const MXVector& input, MXVector& output, 
-	    const MXVectorVector& fwdSeed, MXVectorVector& fwdSens, 
-	    const MXVectorVector& adjSeed, MXVectorVector& adjSens,
+  void eval(const MXVector& arg, MXVector& res, 
+	    const MXVectorVector& fseed, MXVectorVector& fsens, 
+	    const MXVectorVector& aseed, MXVectorVector& asens,
 	    bool output_given=false, bool eliminate_constants=false);
   
 #ifndef SWIG
@@ -262,46 +262,6 @@ class FX : public OptionsFunctionality{
 
   FX indexed_one_based(int k) const{ return operator[](k-1);}
   FX indexed_zero_based(int k) const{ return operator[](k);}
-
-//#ifndef SWIG
-#if 0
-  /** \brief  Get Jacobian numerically (shorthand) */
-  std::vector<DMatrix> jac(const std::vector<DMatrix> &x, int iind=0);
-
-  /** \brief  Get Jacobian symbolically (scalar graph) */
-  std::vector<SXMatrix> jac(const std::vector<SXMatrix> &x, int iind=0);
-
-  /** \brief  Get Jacobian symbolically (matrix graph) */
-  std::vector<MX> jac(const std::vector<MX> &x, int iind=0);
-
-  /** \brief  Get Jacobian-times-vector numerically (shorthand) */
-  std::vector<DMatrix> jac(const std::vector<DMatrix> &x, const std::vector<DMatrix> &v);
-
-  /** \brief  Get Jacobian-times-vector symbolically (scalar graph) */
-  std::vector<SXMatrix> jac(const std::vector<SXMatrix> &x, const std::vector<SXMatrix> &v);
-
-  /** \brief  Get Jacobian-times-vector symbolically (matrix graph) */
-  std::vector<MX> jac(const std::vector<MX> &x, const std::vector<MX> &v);
-    
-  /** \brief  Get Gradient numerically (shorthand) */
-  std::vector<DMatrix> grad(const std::vector<DMatrix> &x, int oind=0);
-
-  /** \brief  Get Gradient symbolically (scalar graph) */
-  std::vector<SXMatrix> grad(const std::vector<SXMatrix> &x, int oind=0);
-
-  /** \brief  Get Gradient symbolically (matrix graph) */
-  std::vector<MX> grad(const std::vector<MX> &x, int oind=0);
-
-  /** \brief  Get Gradient-times-vector numerically (shorthand) */
-  std::vector<DMatrix> grad(const std::vector<DMatrix> &x, const std::vector<DMatrix> &v);
-
-  /** \brief  Get Gradient-times-vector symbolically (scalar graph) */
-  std::vector<SXMatrix> grad(const std::vector<SXMatrix> &x, const std::vector<SXMatrix> &v);
-
-  /** \brief  Get Gradient-times-vector symbolically (matrix graph) */
-  std::vector<MX> grad(const std::vector<MX> &x, const std::vector<MX> &v);
-
-#endif // SWIG
   
   /** \brief  Access functions of the node */
   FXInternal* operator->();

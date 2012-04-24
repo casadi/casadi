@@ -198,13 +198,15 @@ template<class T>
 Matrix<T> outer_prod(const Matrix<T> &x, const Matrix<T> &y);
 
 /** \brief  QR factorization using the modified Gram-Schmidt algorithm 
-More stable than the classical Gram-Schmidt, but may break down if the columns of A are nearly linearly dependent
-See J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.) */
+ * More stable than the classical Gram-Schmidt, but may break down if the columns of A are nearly linearly dependent
+ * See J. Demmel: Applied Numerical Linear Algebra (algorithm 3.1.). 
+ * Note that in SWIG, Q and R are returned by value. */
 template<class T>
-void qr(const Matrix<T>& A, Matrix<T>& Q, Matrix<T> &R);
-
-template<class T>
-std::vector<Matrix<T> > qr(const Matrix<T>& A);
+#ifndef SWIG
+void qr(const Matrix<T>& A, Matrix<T>& Q, Matrix<T>& R);
+#else // SWIG
+void qr(const Matrix<T>& A, Matrix<T>& OUTPUT, Matrix<T>& OUTPUT);
+#endif
 
 /** \brief  Solve a system of equations: A*x = b 
 The solve routine works similar to Matlab's backslash when A is square and nonsingular. The algorithm
@@ -764,17 +766,6 @@ Matrix<T> norm_1(const Matrix<T>& x){
 template<class T>
 Matrix<T> norm_2(const Matrix<T>& x){
   return sqrt(1.0*sumAll(x*x));
-}
-
-template<class T>
-std::vector<Matrix<T> > qr(const Matrix<T>& A){
-  // Create return value
-  std::vector<Matrix<T> > QR(2);
-  Matrix<T> &Q = QR[0];
-  Matrix<T> &R = QR[1];
-  
-  qr(A,Q,R);
-  return QR;
 }
 
 template<class T>
