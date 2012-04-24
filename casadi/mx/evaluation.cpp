@@ -272,119 +272,138 @@ void Evaluation::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& alrea
 }
 
 void Evaluation::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
-#if 0
-  // Pass/clear forward seeds/adjoint sensitivities
-  for(int iind=0; iind<input.size(); ++iind){
-    // Input vector
-    vector<double> &v = fcn_.input(iind).data();
-
-    if(input[iind]==0){
-      // Set to zero if not used
-      fill_n(get_bvec_t(v),v.size(),bvec_t(0));
-    } else {
-      // Copy output
-      bvec_t* vd = get_bvec_t(input[iind]->data());
-      copy(vd,vd+v.size(),get_bvec_t(v));
-    }
-  }
-
-  // Pass/clear adjoint seeds/forward sensitivities
-  for(int oind=0; oind<output.size(); ++oind){
-    // Output vector
-    vector<double> &v = fcn_.output(oind).data();
+  if(false && fcn_.spCanEvaluate(fwd)){
+    // Propagating sparsity pattern supported
     
-    if(output[oind]==0){
-      // Set to zero if not used
-      fill_n(get_bvec_t(v),v.size(),bvec_t(0));
-    } else {
-      // Copy output
-      bvec_t* vd = get_bvec_t(output[oind]->data());
-      copy(vd,vd+v.size(),get_bvec_t(v));
-    }
-  }
-  
-  // Propagate seedsfcn_.
-  fcn_.spInit(fwd);
-  fcn_.spEvaluate(fwd);
-  
-  // Get the sensitivities
-  if(fwd){
-    for(int oind=0; oind<output.size(); ++oind){
-      const vector<double> &v = fcn_.output(oind).data();
-      if(output[oind]!=0){
-	const bvec_t* vd = get_bvec_t(v);
-	copy(vd,vd+v.size(),get_bvec_t(output[oind]->data()));
+    // Pass/clear forward seeds/adjoint sensitivities
+    for(int iind=0; iind<fcn_.getNumInputs(); ++iind){
+      // Input vector
+      vector<double> &v = fcn_.input(iind).data();
+      if(v.empty()) continue; // NOTE: should not be needed!
+
+      if(input[iind]==0){
+	// Set to zero if not used
+	fill_n(get_bvec_t(v),v.size(),bvec_t(0));
+      } else {
+	// Copy output
+	vector<double> &a = input[iind]->data();
+	if(!a.empty()){ // NOTE: should not be needed!
+	  copy(get_bvec_t(a),get_bvec_t(a)+a.size(),get_bvec_t(v));
+	}
       }
     }
+
+    // Pass/clear adjoint seeds/forward sensitivities
+    for(int oind=0; oind<fcn_.getNumOutputs(); ++oind){
+      // Output vector
+      vector<double> &v = fcn_.output(oind).data();
+      if(v.empty()) continue; // NOTE: should not be needed!
+      
+      if(output[oind]==0){
+	// Set to zero if not used
+	fill_n(get_bvec_t(v),v.size(),bvec_t(0));
+      } else {
+	// Copy output
+	vector<double> &a = output[oind]->data();
+	if(!a.empty()){ // NOTE: should not be needed!
+	  copy(get_bvec_t(a),get_bvec_t(a)+a.size(),get_bvec_t(v));
+	}
+      }
+    }
+    
+    // Propagate seedsfcn_.
+    fcn_.spInit(fwd); // NOTE: should only be done once
+    fcn_.spEvaluate(fwd);
+    
+    // Get the sensitivities
+  if(fwd){
+      for(int oind=0; oind<output.size(); ++oind){
+	vector<double> &v = fcn_.output(oind).data();
+	if(output[oind]!=0){
+	  bvec_t* vd = get_bvec_t(v);
+	  copy(vd,vd+v.size(),get_bvec_t(output[oind]->data()));
+	}
+      }
   } else {
+      for(int iind=0; iind<input.size(); ++iind){
+	vector<double> &v = fcn_.input(iind).data();
+	if(input[iind]!=0){
+	  bvec_t* vd = get_bvec_t(v);
+	  copy(vd,vd+v.size(),get_bvec_t(input[iind]->data()));
+	}
+      }
+  }
+
+    // Clear seeds and sensitivities
     for(int iind=0; iind<input.size(); ++iind){
-      const vector<double> &v = fcn_.input(iind).data();
-      if(input[iind]!=0){
-	const bvec_t* vd = get_bvec_t(v);
-	copy(vd,vd+v.size(),get_bvec_t(input[iind]->data()));
+      vector<double> &v = fcn_.input(iind).data();
+      fill(v.begin(),v.end(),0);
+    }
+    for(int oind=0; oind<output.size(); ++oind){
+      vector<double> &v = fcn_.output(oind).data();
+      fill(v.begin(),v.end(),0);
+    }
+
+  } else {
+    // Propagating sparsity pattern not supported
+  
+    if(fwd){
+      // Clear the outputs
+      for(int oind=0; oind<output.size(); ++oind){
+	// Skip of not used
+	if(output[oind]==0) continue;
+	    
+	// Get data array for output and clear it
+	bvec_t *outputd = get_bvec_t(output[oind]->data());
+	fill_n(outputd,output[oind]->size(),0);
       }
     }
-  }
-  
-  return;
-#endif
-  
-  if(fwd){
-    // Clear the outputs
-    for(int oind=0; oind<output.size(); ++oind){
-      // Skip of not used
-      if(output[oind]==0) continue;
-          
-      // Get data array for output and clear it
-      bvec_t *outputd = get_bvec_t(output[oind]->data());
-      fill_n(outputd,output[oind]->size(),0);
-    }
-  }
-  
-  // Loop over inputs
-  for(int iind=0; iind<input.size(); ++iind){
-    // Skip of not used
-    if(input[iind]==0) continue;
-  
-    // Skip if no seeds
-    if(fwd && input[iind]->empty()) continue;
-
-    // Get data array for input
-    bvec_t *inputd = get_bvec_t(input[iind]->data());
     
-    // Loop over outputs
-    for(int oind=0; oind<output.size(); ++oind){
-
+    // Loop over inputs
+    for(int iind=0; iind<input.size(); ++iind){
       // Skip of not used
-      if(output[oind]==0) continue;
-
+      if(input[iind]==0) continue;
+    
       // Skip if no seeds
-      if(!fwd && output[oind]->empty()) continue;
+      if(fwd && input[iind]->empty()) continue;
 
-      // Get the sparsity of the Jacobian block
-      CRSSparsity& sp = fcn_.jacSparsity(iind,oind,true);
-      if(sp.isNull() || sp.size()==0) continue; // Skip if zero
-      const int d1 = sp.size1();
-      //const int d2 = sp.size2();
-      const vector<int>& rowind = sp.rowind();
-      const vector<int>& col = sp.col();
+      // Get data array for input
+      bvec_t *inputd = get_bvec_t(input[iind]->data());
+      
+      // Loop over outputs
+      for(int oind=0; oind<output.size(); ++oind){
 
-      // Get data array for output
-      bvec_t *outputd = get_bvec_t(output[oind]->data());
+	// Skip of not used
+	if(output[oind]==0) continue;
 
-      // Carry out the sparse matrix-vector multiplication
-      for(int i=0; i<d1; ++i){
-        for(int el=rowind[i]; el<rowind[i+1]; ++el){
-          // Get column
-          int j=col[el];
-          
-          // Propagate dependencies
-          if(fwd){
-            outputd[i] |= inputd[j];
-          } else {
-            inputd[j] |= outputd[i];
-          }
-        }
+	// Skip if no seeds
+	if(!fwd && output[oind]->empty()) continue;
+
+	// Get the sparsity of the Jacobian block
+	CRSSparsity& sp = fcn_.jacSparsity(iind,oind,true);
+	if(sp.isNull() || sp.size()==0) continue; // Skip if zero
+	const int d1 = sp.size1();
+	//const int d2 = sp.size2();
+	const vector<int>& rowind = sp.rowind();
+	const vector<int>& col = sp.col();
+
+	// Get data array for output
+	bvec_t *outputd = get_bvec_t(output[oind]->data());
+
+	// Carry out the sparse matrix-vector multiplication
+	for(int i=0; i<d1; ++i){
+	  for(int el=rowind[i]; el<rowind[i+1]; ++el){
+	    // Get column
+	    int j=col[el];
+	    
+	    // Propagate dependencies
+	    if(fwd){
+	      outputd[i] |= inputd[j];
+	    } else {
+	      inputd[j] |= outputd[i];
+	    }
+	  }
+	}
       }
     }
   }
