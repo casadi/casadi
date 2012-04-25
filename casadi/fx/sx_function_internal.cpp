@@ -314,6 +314,11 @@ void SXFunctionInternal::printOperation(std::ostream &stream, int i) const{
 
 void SXFunctionInternal::generateCode(const string& src_name){
   assertInit();
+
+  // Make sure that there are no free variables
+  if (!free_vars_.empty()) {
+    casadi_error("Code generation is not possible since variables " << free_vars_ << " are free.");
+  }
   
    // Output
   if(verbose()){
