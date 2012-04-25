@@ -153,19 +153,28 @@ class FX : public OptionsFunctionality{
   FX jacobian(const std::vector<std::pair<int,int> >& jblocks);
 
 #ifndef SWIG
-  /** \brief  Create a function call (evaluation mx node), single input */
-  std::vector<MX> call(const MX &x);
-  
-  /** \brief  Evaluate numerically (shorthand) */
-  std::vector<DMatrix> call(const std::vector<DMatrix> &x);
-
-  /** \brief  Evaluate symbolically (scalar graph) */
-  std::vector<SXMatrix> call(const std::vector<SXMatrix> &x);
+  /** \brief  Create a function call (single input) */
+  std::vector<MX> call(const MX &arg);
 #endif // SWIG
   
-  /** \brief  Evaluate symbolically (matrix graph) */
-  std::vector<MX> call(const std::vector<MX> &x);
+  /** \brief  Create a function call */
+  std::vector<MX> call(const std::vector<MX> &arg);
 
+  /** \brief  Create a function call with directional derivatives 
+   * Note: return by reference with SWIG
+   */
+  #ifndef SWIG
+  void call(const MXVector& arg, MXVector& res, 
+	    const MXVectorVector& fseed, MXVectorVector& fsens, 
+	    const MXVectorVector& aseed, MXVectorVector& asens,
+	    bool output_given=false);
+  #else // SWIG
+  void call(const MXVector& arg, MXVector& OUTPUT, 
+	    const MXVectorVector& fseed, MXVectorVector& OUTPUT, 
+	    const MXVectorVector& aseed, MXVectorVector& OUTPUT,
+	    bool output_given=false);
+  #endif // SWIG
+  
   /** \brief  Evaluate symbolically in parallel (matrix graph)
       paropt: Set of options to be passed to the Parallelizer
   */

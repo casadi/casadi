@@ -52,16 +52,36 @@ FXInternal* FX::operator->(){
   return (FXInternal*)OptionsFunctionality::operator->();
 }
 
-vector<MX> FX::call(const MX &x){
-  vector<MX> xvec(1,x);
+vector<MX> FX::call(const MX &arg){
+  vector<MX> xvec(1,arg);
   return call(xvec);
 }
 
-vector<MX> FX::call(const vector<MX> &x){
+vector<MX> FX::call(const vector<MX> &arg){
+  MXVectorVector dummy;
+  MXVector res;
+  call(arg,res,dummy,dummy,dummy,dummy);
+  return res;
+}
+
+void FX::call(const MXVector& arg, MXVector& res,  const MXVectorVector& fseed, MXVectorVector& fsens, 
+	      const MXVectorVector& aseed, MXVectorVector& asens, bool output_given){
   assertInit();
-  vector<MX> ret;
-  Evaluation::create(*this,x,ret);
-  return ret;
+  
+  // Argument checking
+  casadi_assert_message(arg.size()==getNumInputs(), "Evaluation::Evaluation: number of passed-in dependencies (" << arg.size() << ") should match number of inputs of function (" << getNumInputs() << ").");
+
+  // Assumes initialised
+  for(int i=0; i<getNumInputs(); ++i){
+    if(arg[i].isNull() || arg[i].empty()) continue;
+    casadi_assert_message(arg[i].size1()==input(i).size1() && arg[i].size2()==input(i).size2(),
+			  "Evaluation::shapes of passed-in dependencies should match shapes of inputs of function." << 
+			  std::endl << "Input argument " << i << " has shape (" << input(i).size1() << 
+			  "," << input(i).size2() << ") while a shape (" << arg[i].size1() << "," << arg[i].size2() << 
+			  ") was supplied.");
+  }
+  
+  Evaluation::create(*this,arg,res,fseed,fsens,aseed,asens);
 }
 
 vector<vector<MX> > FX::call(const vector<vector<MX> > &x, const Dictionary& paropt){
@@ -81,12 +101,7 @@ vector<vector<MX> > FX::call(const vector<vector<MX> > &x, const Dictionary& par
     }
     return ret;
   }
-    
-//  if(paropt
-    
-//     getOption("parallelization")=="serial")
-
-  
+      
   // Create parallelizer object and initialize it
   Parallelizer p(vector<FX>(x.size(),*this));
   p.setOption(paropt);

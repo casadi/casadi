@@ -31,32 +31,35 @@ using namespace std;
 
 namespace CasADi{
 
-Evaluation::Evaluation(const FX& fcn, 
-		       const std::vector<MX> &x, 
-		       const std::vector<std::vector<MX> > &fseed, 
-		       const std::vector<std::vector<MX> > &aseed) : fcn_(fcn){
+Evaluation::Evaluation(const FX& fcn, const std::vector<MX> &arg, const std::vector<std::vector<MX> > &fseed,
+		       const std::vector<std::vector<MX> > &aseed, bool output_given) : fcn_(fcn), output_given_f_(output_given){
   
   // Number inputs and outputs
   int num_in = fcn.getNumInputs();
   int num_out = fcn.getNumOutputs();
   
   // Number of directional derivatives
-  nfwd_ = fseed.size();
-  nadj_ = aseed.size();
+  nfwd_f_ = fseed.size();
+  nadj_f_ = aseed.size();
   
-  // Argument checking
-  casadi_assert_message(x.size()==num_in, "Evaluation::Evaluation: number of passed-in dependencies (" << x.size() << ") should match number of inputs of function (" << fcn.getNumInputs() << ").");
+  // All dependencies of the function
+  vector<MX> d;
+  d.reserve(num_in + nfwd_f_*num_in + nadj_f_*num_out);
+  
+  // Add arguments
+  d.insert(d.end(),arg.begin(),arg.end());
 
-  // Assumes initialised
-  for(int i=0; i<num_in; ++i){
-    if(x[i].isNull() || x[i].empty()) continue;
-    casadi_assert_message(x[i].size1()==fcn.input(i).size1() && x[i].size2()==fcn.input(i).size2(),
-			  "Evaluation::shapes of passed-in dependencies should match shapes of inputs of function." << 
-			  std::endl << "Input argument " << i << " has shape (" << fcn.input(i).size1() << 
-			  "," << fcn.input(i).size2() << ") while a shape (" << x[i].size1() << "," << x[i].size2() << 
-			  ") was supplied.");
+  // Add forward seeds
+  for(int dir=0; dir<nfwd_f_; ++dir){
+    d.insert(d.end(),fseed[dir].begin(),fseed[dir].end());
   }
-  setDependencies(x);
+    
+  // Add adjoint seeds
+  for(int dir=0; dir<nadj_f_; ++dir){
+    d.insert(d.end(),aseed[dir].begin(),aseed[dir].end());
+  }
+  
+  setDependencies(d);
   setSparsity(CRSSparsity(1,1,true));
 }
 
@@ -74,14 +77,21 @@ void Evaluation::printPart(std::ostream &stream, int part) const{
   }
 }
 
-void Evaluation::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+void Evaluation::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res, const DMatrixPtrVV& fseed, DMatrixPtrVV& fsens, const DMatrixPtrVV& aseed, DMatrixPtrVV& asens){
+  // Check if the function is differentiated
+  bool is_diff = nfwd_f_>0 || nadj_f_>0;
+  
+  // Number of inputs and outputs
+  int num_in = fcn_.getNumInputs();
+  int num_out = fcn_.getNumOutputs();
+  
   // Number of derivative directions to calculate
-  int nfwd = fwdSens.size();
-  int nadj = adjSeed.size();
+  int nfwd = is_diff ? nfwd_f_ : fsens.size();
+  int nadj = is_diff ? nadj_f_ : aseed.size();
 
   // Number of derivative directions supported by the function
-  int nfwd_f = fcn_->nfdir_;
-  int nadj_f = fcn_->nadir_;
+  int max_nfwd = fcn_->nfdir_;
+  int max_nadj = fcn_->nadir_;
     
   // Current forward and adjoint direction
   int offset_fwd=0, offset_adj=0;
@@ -90,9 +100,9 @@ void Evaluation::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const 
   bool fcn_evaluated = false;
 
   // Pass the inputs to the function
-  for(int i=0; i<input.size(); ++i){
-    if(input[i] != 0 && input[i]->size() !=0 ){
-      fcn_.setInput(input[i]->data(),i);
+  for(int i=0; i<num_in; ++i){
+    if(arg[i] != 0 && arg[i]->size() !=0 ){
+      fcn_.setInput(arg[i]->data(),i);
     }
   }
 
@@ -100,35 +110,39 @@ void Evaluation::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const 
   while(!fcn_evaluated || offset_fwd<nfwd || offset_adj<nadj){
 
     // Number of forward and adjoint directions in the current "batch"
-    int nfwd_batch = std::min(nfwd-offset_fwd, nfwd_f);
-    int nadj_batch = std::min(nadj-offset_adj, nadj_f);
+    int nfwd_f_batch = std::min(nfwd-offset_fwd, max_nfwd);
+    int nadj_f_batch = std::min(nadj-offset_adj, max_nadj);
 
     // Pass the forward seeds to the function
-    for(int d=0; d<nfwd_batch; ++d){
-      for(int i=0; i<input.size(); ++i){
-	if(input[i] != 0 && input[i]->size() !=0 ){
-	  fcn_.setFwdSeed(fwdSeed[offset_fwd+d][i]->data(),i,d);
+    for(int d=0; d<nfwd_f_batch; ++d){
+      int dir = offset_fwd+d;
+      for(int i=0; i<num_in; ++i){
+	DMatrix *a = is_diff ? arg[num_in + dir*num_in + i] : fseed[dir][i];
+	if(a != 0 && a->size() !=0 ){
+	  fcn_.setFwdSeed(a->data(),i,d);
 	}
       }
     }
   
     // Pass the adjoint seed to the function
-    for(int d=0; d<nadj_batch; ++d){
-      for(int i=0; i<output.size(); ++i){	
-	if(adjSeed[offset_adj+d][i]!=0 && adjSeed[offset_adj+d][i]->size() != 0){
-	  fcn_.setAdjSeed(adjSeed[offset_adj+d][i]->data(),i,d);
+    for(int d=0; d<nadj_f_batch; ++d){
+      int dir = offset_adj+d;
+      for(int i=0; i<num_out; ++i){
+	DMatrix *a = is_diff ? arg[num_in + nfwd*num_in + dir*num_out + i] : aseed[dir][i];
+	if(a!=0 && a->size() != 0){
+	  fcn_.setAdjSeed(a->data(),i,d);
 	}
       }
     }
 
     // Evaluate
-    fcn_.evaluate(nfwd_batch,nadj_batch);
+    fcn_.evaluate(nfwd_f_batch,nadj_f_batch);
 
     // Get the outputs if first evaluation
     if(!fcn_evaluated){
-      for(int i=0; i<output.size(); ++i){
-	if(output[i] != 0 && output[i]->size() !=0 ){
-	  fcn_.getOutput(output[i]->data(),i);
+      for(int i=0; i<num_out; ++i){
+	if(res[i] != 0 && res[i]->size() !=0 ){
+	  fcn_.getOutput(res[i]->data(),i);
 	}
       }
     }
@@ -137,128 +151,142 @@ void Evaluation::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const 
     fcn_evaluated = true;
     
     // Get the forward sensitivities
-    for(int d=0; d<nfwd_batch; ++d){
-      for(int i=0; i<output.size(); ++i){
-	if(output[i] != 0 && output[i]->size() !=0 ){
-	  fcn_.getFwdSens(fwdSens[offset_fwd+d][i]->data(),i,d);
+    for(int d=0; d<nfwd_f_batch; ++d){
+      int dir = offset_fwd+d;
+      for(int i=0; i<num_out; ++i){
+	DMatrix *a = is_diff ? res[num_out + dir*num_out + i] : fsens[dir][i];
+	if(a != 0 && a->size() !=0 ){
+	  fcn_.getFwdSens(a->data(),i,d);
+	}
+      }
+    }
+
+    // Get the adjoint sensitivities
+    for(int d=0; d<nadj_f_batch; ++d){
+      int dir = offset_adj+d;
+      for(int i=0; i<num_in; ++i){
+	DMatrix *a = is_diff ? res[num_out + nfwd*num_out + dir*num_in + i] : asens[dir][i];
+	if(a != 0 && a->size() != 0){
+	  transform(a->begin(),a->end(),fcn_.adjSens(i,d).begin(),a->begin(),plus<double>());
 	}
       }
     }
   
-    // Get the adjoint sensitivities
-    for(int d=0; d<nadj_batch; ++d){
-      for(int i=0; i<input.size(); ++i){	
-	if(adjSens[offset_adj+d][i] != 0 && adjSens[offset_adj+d][i]->size() != 0){
-	  const vector<double>& asens = fcn_.adjSens(i,d).data();
-	  for(int j=0; j<asens.size(); ++j)
-	    adjSens[offset_adj+d][i]->data()[j] += asens[j];
-	}
-      }
-    }
-
     // Update direction offsets
-    offset_fwd += nfwd_batch;
-    offset_adj += nadj_batch;
+    offset_fwd += nfwd_f_batch;
+    offset_adj += nadj_f_batch;
   }
 }
 
+int Evaluation::getNumOutputs() const{
+  int num_in = fcn_.getNumInputs();
+  int num_out = fcn_.getNumOutputs();
+  return num_out + nfwd_f_*num_out + nadj_f_*num_in;
+}
     
 const CRSSparsity& Evaluation::sparsity(int oind){
-  return fcn_.output(oind).sparsity();
+  int num_in = fcn_.getNumInputs();
+  int num_out = fcn_.getNumOutputs();
+  int num_out_and_fsens = num_out + num_out*nfwd_f_; // number of outputs _and_ forward sensitivities combined
+  if(oind<num_out_and_fsens){ // Output or forward sensitivity
+    return fcn_.output(oind % num_out).sparsity(); 
+  } else { // Adjoint sensitivity
+    return fcn_.input((oind-num_out_and_fsens) % num_in).sparsity();
+  }
 }
 
 FX& Evaluation::getFunction(){ 
   return fcn_;
 }
 
-void Evaluation::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
-  // Make sure that the function is an X-function
-  vector<SXMatrix> arg(input.size());
+void Evaluation::evaluateSX(const SXMatrixPtrV& arg, SXMatrixPtrV& res, const SXMatrixPtrVV& fseed, SXMatrixPtrVV& fsens, const SXMatrixPtrVV& aseed, SXMatrixPtrVV& asens){
+  // Create input arguments
+  vector<SXMatrix> argv(arg.size());
   for(int i=0; i<arg.size(); ++i){
-    if(input[i]!=0)
-      arg[i] = *input[i];
+    if(arg[i]!=0) argv[i] = *arg[i];
   }
   
-  std::vector<SXMatrix> res = fcn_.eval(arg);
+  // Evaluate symbolically
+  vector<SXMatrix> resv = fcn_.eval(argv);
   
+  // Collect the result
   for(int i=0; i<res.size(); ++i){
-    if(output[i]!=0)
-      *output[i] = res[i];
+    if(res[i]!=0) *res[i] = resv[i];
   }
 }
 
-void Evaluation::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+void Evaluation::evaluateMX(const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens, bool output_given){
   // Evaluate function
   if(!output_given){
     // Evaluate the function symbolically
-    vector<MX> arg(input.size());
+    vector<MX> argv(arg.size());
     for(int i=0; i<arg.size(); ++i){
-      if(input[i])
-        arg[i] = *input[i];
+      if(arg[i])
+        argv[i] = *arg[i];
     }
-    vector<MX> res = fcn_.call(arg);
+    vector<MX> resv = fcn_.call(argv);
     for(int i=0; i<res.size(); ++i){
-      if(output[i])
-        *output[i] = res[i];
+      if(res[i])
+        *res[i] = resv[i];
     }
   }
 
   // Sensitivities
-  int nfwd = fwdSens.size();
-  int nadj = adjSeed.size();
+  int nfwd = fsens.size();
+  int nadj = aseed.size();
   if(nfwd>0 || nadj>0){
     // Loop over outputs
-    for(int oind=0; oind<output.size(); ++oind){
+    for(int oind=0; oind<res.size(); ++oind){
       // Skip of not used
-      if(output[oind]==0) continue;
+      if(res[oind]==0) continue;
           
       // Output dimensions
-      int od1 = output[oind]->size1();
-      int od2 = output[oind]->size2();
+      int od1 = res[oind]->size1();
+      int od2 = res[oind]->size2();
       
       // Loop over inputs
-      for(int iind=0; iind<input.size(); ++iind){
+      for(int iind=0; iind<arg.size(); ++iind){
         // Skip of not used
-        if(input[iind]==0) continue;
+        if(arg[iind]==0) continue;
 
         // Input dimensions
-        int id1 = input[iind]->size1();
-        int id2 = input[iind]->size2();
+        int id1 = arg[iind]->size1();
+        int id2 = arg[iind]->size2();
 
         // Create a Jacobian node
-        MX J = MX::create(new JacobianReference(*output[oind],iind));
+        MX J = MX::create(new JacobianReference(*res[oind],iind));
         if(isZero(J)) continue;
         
         // Forward sensitivities
         for(int d=0; d<nfwd; ++d){
-          MX fsens_d = mul(J,flatten(*fwdSeed[d][iind]));
+          MX fsens_d = mul(J,flatten(*fseed[d][iind]));
           if(!isZero(fsens_d)){
             // Reshape sensitivity contribution if necessary
             if(od2>1) fsens_d = reshape(fsens_d,od1,od2);
             
             // Save or add to vector
-            if(fwdSens[d][oind]->isNull()){
-              *fwdSens[d][oind] = fsens_d;
+            if(fsens[d][oind]->isNull()){
+              *fsens[d][oind] = fsens_d;
             } else {
-              *fwdSens[d][oind] += fsens_d;
+              *fsens[d][oind] += fsens_d;
             }
           }
           
           // If no contribution added, set to zero
-          if(fwdSens[d][oind]->isNull()){
-            *fwdSens[d][oind] = MX::sparse(od1,od2);
+          if(fsens[d][oind]->isNull()){
+            *fsens[d][oind] = MX::sparse(od1,od2);
           }
         }
         
         // Adjoint sensitivities
         for(int d=0; d<nadj; ++d){
-          MX asens_d = mul(trans(J),flatten(*adjSeed[d][oind]));
+          MX asens_d = mul(trans(J),flatten(*aseed[d][oind]));
           if(!isZero(asens_d)){
             // Reshape sensitivity contribution if necessary
             if(id2>1) asens_d = reshape(asens_d,id1,id2);
             
             // Add to vector
-            *adjSens[d][iind] += asens_d;
+            *asens[d][iind] += asens_d;
           }
         }
       }
@@ -271,7 +299,7 @@ void Evaluation::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& alrea
   fcn_ = deepcopy(fcn_,already_copied);
 }
 
-void Evaluation::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+void Evaluation::propagateSparsity(DMatrixPtrV& arg, DMatrixPtrV& res, bool fwd){
   if(false && fcn_.spCanEvaluate(fwd)){
     // Propagating sparsity pattern supported
     
@@ -281,12 +309,12 @@ void Evaluation::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool
       vector<double> &v = fcn_.input(iind).data();
       if(v.empty()) continue; // NOTE: should not be needed!
 
-      if(input[iind]==0){
+      if(arg[iind]==0){
 	// Set to zero if not used
 	fill_n(get_bvec_t(v),v.size(),bvec_t(0));
       } else {
 	// Copy output
-	vector<double> &a = input[iind]->data();
+	vector<double> &a = arg[iind]->data();
 	if(!a.empty()){ // NOTE: should not be needed!
 	  copy(get_bvec_t(a),get_bvec_t(a)+a.size(),get_bvec_t(v));
 	}
@@ -299,12 +327,12 @@ void Evaluation::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool
       vector<double> &v = fcn_.output(oind).data();
       if(v.empty()) continue; // NOTE: should not be needed!
       
-      if(output[oind]==0){
+      if(res[oind]==0){
 	// Set to zero if not used
 	fill_n(get_bvec_t(v),v.size(),bvec_t(0));
       } else {
 	// Copy output
-	vector<double> &a = output[oind]->data();
+	vector<double> &a = res[oind]->data();
 	if(!a.empty()){ // NOTE: should not be needed!
 	  copy(get_bvec_t(a),get_bvec_t(a)+a.size(),get_bvec_t(v));
 	}
@@ -317,29 +345,29 @@ void Evaluation::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool
     
     // Get the sensitivities
   if(fwd){
-      for(int oind=0; oind<output.size(); ++oind){
+      for(int oind=0; oind<res.size(); ++oind){
 	vector<double> &v = fcn_.output(oind).data();
-	if(output[oind]!=0){
+	if(res[oind]!=0){
 	  bvec_t* vd = get_bvec_t(v);
-	  copy(vd,vd+v.size(),get_bvec_t(output[oind]->data()));
+	  copy(vd,vd+v.size(),get_bvec_t(res[oind]->data()));
 	}
       }
   } else {
-      for(int iind=0; iind<input.size(); ++iind){
+      for(int iind=0; iind<arg.size(); ++iind){
 	vector<double> &v = fcn_.input(iind).data();
-	if(input[iind]!=0){
+	if(arg[iind]!=0){
 	  bvec_t* vd = get_bvec_t(v);
-	  copy(vd,vd+v.size(),get_bvec_t(input[iind]->data()));
+	  copy(vd,vd+v.size(),get_bvec_t(arg[iind]->data()));
 	}
       }
   }
 
     // Clear seeds and sensitivities
-    for(int iind=0; iind<input.size(); ++iind){
+    for(int iind=0; iind<arg.size(); ++iind){
       vector<double> &v = fcn_.input(iind).data();
       fill(v.begin(),v.end(),0);
     }
-    for(int oind=0; oind<output.size(); ++oind){
+    for(int oind=0; oind<res.size(); ++oind){
       vector<double> &v = fcn_.output(oind).data();
       fill(v.begin(),v.end(),0);
     }
@@ -349,35 +377,35 @@ void Evaluation::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool
   
     if(fwd){
       // Clear the outputs
-      for(int oind=0; oind<output.size(); ++oind){
+      for(int oind=0; oind<res.size(); ++oind){
 	// Skip of not used
-	if(output[oind]==0) continue;
+	if(res[oind]==0) continue;
 	    
 	// Get data array for output and clear it
-	bvec_t *outputd = get_bvec_t(output[oind]->data());
-	fill_n(outputd,output[oind]->size(),0);
+	bvec_t *outputd = get_bvec_t(res[oind]->data());
+	fill_n(outputd,res[oind]->size(),0);
       }
     }
     
     // Loop over inputs
-    for(int iind=0; iind<input.size(); ++iind){
+    for(int iind=0; iind<arg.size(); ++iind){
       // Skip of not used
-      if(input[iind]==0) continue;
+      if(arg[iind]==0) continue;
     
       // Skip if no seeds
-      if(fwd && input[iind]->empty()) continue;
+      if(fwd && arg[iind]->empty()) continue;
 
       // Get data array for input
-      bvec_t *inputd = get_bvec_t(input[iind]->data());
+      bvec_t *inputd = get_bvec_t(arg[iind]->data());
       
       // Loop over outputs
-      for(int oind=0; oind<output.size(); ++oind){
+      for(int oind=0; oind<res.size(); ++oind){
 
 	// Skip of not used
-	if(output[oind]==0) continue;
+	if(res[oind]==0) continue;
 
 	// Skip if no seeds
-	if(!fwd && output[oind]->empty()) continue;
+	if(!fwd && res[oind]->empty()) continue;
 
 	// Get the sparsity of the Jacobian block
 	CRSSparsity& sp = fcn_.jacSparsity(iind,oind,true);
@@ -388,7 +416,7 @@ void Evaluation::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool
 	const vector<int>& col = sp.col();
 
 	// Get data array for output
-	bvec_t *outputd = get_bvec_t(output[oind]->data());
+	bvec_t *outputd = get_bvec_t(res[oind]->data());
 
 	// Carry out the sparse matrix-vector multiplication
 	for(int i=0; i<d1; ++i){
@@ -410,30 +438,61 @@ void Evaluation::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool
 }
 
 void Evaluation::create(const FX& fcn, 
-			const std::vector<MX> &input, std::vector<MX> &output){
-  // Dummy argument
-  std::vector<std::vector<MX> > dummy;
-  create(fcn,input,output,dummy,dummy,dummy,dummy);
-}
-
-void Evaluation::create(const FX& fcn, 
-			const std::vector<MX> &input, std::vector<MX> &output,
+			const std::vector<MX> &arg, std::vector<MX> &res,
 			const std::vector<std::vector<MX> > &fseed, std::vector<std::vector<MX> > &fsens, 
-			const std::vector<std::vector<MX> > &aseed, std::vector<std::vector<MX> > &asens){
+			const std::vector<std::vector<MX> > &aseed, std::vector<std::vector<MX> > &asens,
+			bool output_given){
   
+  // Number inputs and outputs
+  int num_in = fcn.getNumInputs();
+  int num_out = fcn.getNumOutputs();
+  
+  // Number of directional derivatives
+  int nfwd = fseed.size();
+  int nadj = aseed.size();
+
   // Create the evaluation node
   MX ev;
-  ev.assignNode(new Evaluation(fcn,input));
+  ev.assignNode(new Evaluation(fcn,arg,fseed,aseed,output_given));
 
-  // Create the output nodes
-  output.clear();
-  output.resize(fcn.getNumOutputs());
-  for(int i=0; i<output.size(); ++i){
+  // Output index
+  int ind=0;
+  
+  // Create the output nodes corresponding to the nondifferented function
+  res.resize(num_out);
+  for(int i=0; i<num_out; ++i, ++ind){
     if(fcn.output(i).numel()>0){
-      output[i].assignNode(new OutputNode(ev,i));
+      res[i].assignNode(new OutputNode(ev,ind));
+    } else {
+      res[i] = MX();
+    }
+  }
+  
+  // Forward sensitivities
+  fsens.resize(nfwd);
+  for(int dir=0; dir<nfwd; ++dir){
+    fsens[dir].resize(num_out);
+    for(int i=0; i<num_out; ++i, ++ind){
+      if(fcn.output(i).numel()>0){
+	fsens[dir][i].assignNode(new OutputNode(ev,ind));
+      } else {
+	fsens[dir][i] = MX();
+      }
+    }
+  }
+
+  // Adjoint sensitivities
+  asens.resize(nadj);
+  for(int dir=0; dir<nadj; ++dir){
+    asens[dir].resize(num_in);
+    for(int i=0; i<num_in; ++i, ++ind){
+      if(fcn.input(i).numel()>0){
+	asens[dir][i].assignNode(new OutputNode(ev,ind));
+      } else {
+	asens[dir][i] = MX();
+      }
     }
   }
 }
-
 
 } // namespace CasADi

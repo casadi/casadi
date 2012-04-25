@@ -36,20 +36,16 @@ class Evaluation : public MultipleOutput{
   public:
 
     /** \brief  Constructor */
-    explicit Evaluation(const FX& fcn, 
-			const std::vector<MX> &input, 
-			const std::vector<std::vector<MX> > &fseed = std::vector<std::vector<MX> >(), 
-			const std::vector<std::vector<MX> > &aseed = std::vector<std::vector<MX> >());
+    explicit Evaluation(const FX& fcn, const std::vector<MX> &arg, 
+			const std::vector<std::vector<MX> > &fseed, const std::vector<std::vector<MX> > &aseed,
+			bool output_given);
 
-    /** \brief  Creator function, no directional derivatives */
+    /** \brief  Creator function, arranges the outputs */
     static void create(const FX& fcn, 
-		       const std::vector<MX> &input, std::vector<MX> &output);
-
-    /** \brief  Creator function, directional derivatives */
-    static void create(const FX& fcn, 
-		       const std::vector<MX> &input, std::vector<MX> &output, 
+		       const std::vector<MX> &arg, std::vector<MX> &res, 
 		       const std::vector<std::vector<MX> > &fseed, std::vector<std::vector<MX> > &fsens, 
-		       const std::vector<std::vector<MX> > &aseed, std::vector<std::vector<MX> > &asens);
+		       const std::vector<std::vector<MX> > &aseed, std::vector<std::vector<MX> > &asens,
+		       bool output_given=false);
     
     /** \brief  Destructor */
     virtual ~Evaluation(){}
@@ -88,7 +84,7 @@ class Evaluation : public MultipleOutput{
     virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
 
     /** \brief  Number of outputs */
-    virtual int getNumOutputs() const{ return fcn_.getNumOutputs();}
+    virtual int getNumOutputs() const;
         
     /** \brief  Get the sparsity of output oind */
     virtual const CRSSparsity& sparsity(int oind);
@@ -97,7 +93,10 @@ class Evaluation : public MultipleOutput{
     FX fcn_;
     
     // Number of directional derivatives
-    int nfwd_, nadj_;
+    int nfwd_f_, nadj_f_;
+    
+    // Is the argument identical to the input of the function
+    bool output_given_f_;    
 };
 
 } // namespace CasADi
