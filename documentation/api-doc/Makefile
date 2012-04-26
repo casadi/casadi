@@ -35,7 +35,7 @@ full: doxpublish
 	python extra/fetch_examples_pdf.py
 	sh extra/doc2swig.sh
 	patch -u Doxyfile.in publish.patch -o -  | sed 's/PROJECT_NUMBER         = /PROJECT_NUMBER         = $(SVNREVISION)/' | doxygen -
-	find -name *-example.html | xargs perl -ni~ -w -e 'print \$_ unless /<span class="comment">#[^\!]/'
+	find -name *-example.html | xargs perl -ni~ -w -e 'print unless /<span class="comment">#[^\!]/'
 
 publish: 
 	./publish.sh
