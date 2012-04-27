@@ -456,19 +456,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::AcadoIntegrator::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::AcadoIntegrator::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::AcadoIntegrator::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::AcadoIntegrator::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::AcadoIntegrator::call "
 
@@ -1137,19 +1134,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::AcadoIntegratorInternal::inputStruct "
+%feature("docstring")  CasADi::AcadoIntegratorInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::AcadoIntegratorInternal::inputStruct "
+%feature("docstring")  CasADi::AcadoIntegratorInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::AcadoIntegratorInternal::outputStruct "
+%feature("docstring")  CasADi::AcadoIntegratorInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::AcadoIntegratorInternal::outputStruct "
+%feature("docstring")  CasADi::AcadoIntegratorInternal::oStruct "
 
 Const access an output. ";
 
@@ -1750,19 +1747,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::AcadoOCP::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::AcadoOCP::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::AcadoOCP::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::AcadoOCP::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::AcadoOCP::call "
 
@@ -2304,19 +2298,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::AcadoOCPInternal::inputStruct "
+%feature("docstring")  CasADi::AcadoOCPInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::AcadoOCPInternal::inputStruct "
+%feature("docstring")  CasADi::AcadoOCPInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::AcadoOCPInternal::outputStruct "
+%feature("docstring")  CasADi::AcadoOCPInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::AcadoOCPInternal::outputStruct "
+%feature("docstring")  CasADi::AcadoOCPInternal::oStruct "
 
 Const access an output. ";
 
@@ -3570,19 +3564,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::CFunction::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::CFunction::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::CFunction::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::CFunction::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::CFunction::call "
 
@@ -4070,19 +4061,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::CFunctionInternal::inputStruct "
+%feature("docstring")  CasADi::CFunctionInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::CFunctionInternal::inputStruct "
+%feature("docstring")  CasADi::CFunctionInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::CFunctionInternal::outputStruct "
+%feature("docstring")  CasADi::CFunctionInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::CFunctionInternal::outputStruct "
+%feature("docstring")  CasADi::CFunctionInternal::oStruct "
 
 Const access an output. ";
 
@@ -4762,19 +4753,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::OptimalControl::Collocation::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::OptimalControl::Collocation::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::OptimalControl::Collocation::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::OptimalControl::Collocation::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::OptimalControl::Collocation::call "
 
@@ -5552,19 +5540,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::CollocationIntegrator::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::call "
 
@@ -6227,19 +6212,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::CollocationIntegratorInternal::inputStruct "
+%feature("docstring")  CasADi::CollocationIntegratorInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::CollocationIntegratorInternal::inputStruct "
+%feature("docstring")  CasADi::CollocationIntegratorInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::CollocationIntegratorInternal::outputStruct "
+%feature("docstring")  CasADi::CollocationIntegratorInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::CollocationIntegratorInternal::outputStruct "
+%feature("docstring")  CasADi::CollocationIntegratorInternal::oStruct "
 
 Const access an output. ";
 
@@ -6805,23 +6790,23 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")
-CasADi::OptimalControl::CollocationInternal::inputStruct "
+%feature("docstring")  CasADi::OptimalControl::CollocationInternal::iStruct
+"
 
 Access an input. ";
 
-%feature("docstring")
-CasADi::OptimalControl::CollocationInternal::inputStruct "
+%feature("docstring")  CasADi::OptimalControl::CollocationInternal::iStruct
+"
 
 Const access an input. ";
 
-%feature("docstring")
-CasADi::OptimalControl::CollocationInternal::outputStruct "
+%feature("docstring")  CasADi::OptimalControl::CollocationInternal::oStruct
+"
 
 Access an output. ";
 
-%feature("docstring")
-CasADi::OptimalControl::CollocationInternal::outputStruct "
+%feature("docstring")  CasADi::OptimalControl::CollocationInternal::oStruct
+"
 
 Const access an output. ";
 
@@ -7738,19 +7723,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::ControlSimulator::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::ControlSimulator::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::ControlSimulator::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::ControlSimulator::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::ControlSimulator::call "
 
@@ -8325,19 +8307,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::ControlSimulatorInternal::inputStruct "
+%feature("docstring")  CasADi::ControlSimulatorInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::ControlSimulatorInternal::inputStruct "
+%feature("docstring")  CasADi::ControlSimulatorInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::ControlSimulatorInternal::outputStruct "
+%feature("docstring")  CasADi::ControlSimulatorInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::ControlSimulatorInternal::outputStruct "
+%feature("docstring")  CasADi::ControlSimulatorInternal::oStruct "
 
 Const access an output. ";
 
@@ -8915,19 +8897,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::CplexInternal::inputStruct "
+%feature("docstring")  CasADi::CplexInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::CplexInternal::inputStruct "
+%feature("docstring")  CasADi::CplexInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::CplexInternal::outputStruct "
+%feature("docstring")  CasADi::CplexInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::CplexInternal::outputStruct "
+%feature("docstring")  CasADi::CplexInternal::oStruct "
 
 Const access an output. ";
 
@@ -9669,19 +9651,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::CplexSolver::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::CplexSolver::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::CplexSolver::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::CplexSolver::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::CplexSolver::call "
 
@@ -10997,19 +10976,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparse::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Interfaces::CSparse::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparse::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::Interfaces::CSparse::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparse::call "
 
@@ -11522,19 +11498,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::Interfaces::CSparseInternal::inputStruct "
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::Interfaces::CSparseInternal::inputStruct "
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::Interfaces::CSparseInternal::outputStruct "
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::Interfaces::CSparseInternal::outputStruct "
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::oStruct "
 
 Const access an output. ";
 
@@ -12467,19 +12443,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::Sundials::CVodesIntegrator::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::call "
 
@@ -13334,19 +13307,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::Sundials::CVodesInternal::inputStruct "
+%feature("docstring")  CasADi::Sundials::CVodesInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::Sundials::CVodesInternal::inputStruct "
+%feature("docstring")  CasADi::Sundials::CVodesInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::Sundials::CVodesInternal::outputStruct "
+%feature("docstring")  CasADi::Sundials::CVodesInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::Sundials::CVodesInternal::outputStruct "
+%feature("docstring")  CasADi::Sundials::CVodesInternal::oStruct "
 
 Const access an output. ";
 
@@ -14369,19 +14342,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::ExternalFunction::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::ExternalFunction::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::ExternalFunction::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::ExternalFunction::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::ExternalFunction::call "
 
@@ -14867,19 +14837,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::ExternalFunctionInternal::inputStruct "
+%feature("docstring")  CasADi::ExternalFunctionInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::ExternalFunctionInternal::inputStruct "
+%feature("docstring")  CasADi::ExternalFunctionInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::ExternalFunctionInternal::outputStruct "
+%feature("docstring")  CasADi::ExternalFunctionInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::ExternalFunctionInternal::outputStruct "
+%feature("docstring")  CasADi::ExternalFunctionInternal::oStruct "
 
 Const access an output. ";
 
@@ -15762,19 +15732,16 @@ number of function inputs, optionally include the function outputs. ";
 
 %feature("docstring")  CasADi::FX::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::FX::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::FX::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::FX::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::FX::call "
 
@@ -16283,19 +16250,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::FXInternal::inputStruct "
+%feature("docstring")  CasADi::FXInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::FXInternal::inputStruct "
+%feature("docstring")  CasADi::FXInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::FXInternal::outputStruct "
+%feature("docstring")  CasADi::FXInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::FXInternal::outputStruct "
+%feature("docstring")  CasADi::FXInternal::oStruct "
 
 Const access an output. ";
 
@@ -17635,19 +17602,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::Sundials::IdasIntegrator::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::call "
 
@@ -18600,19 +18564,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::Sundials::IdasInternal::inputStruct "
+%feature("docstring")  CasADi::Sundials::IdasInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::Sundials::IdasInternal::inputStruct "
+%feature("docstring")  CasADi::Sundials::IdasInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::Sundials::IdasInternal::outputStruct "
+%feature("docstring")  CasADi::Sundials::IdasInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::Sundials::IdasInternal::outputStruct "
+%feature("docstring")  CasADi::Sundials::IdasInternal::oStruct "
 
 Const access an output. ";
 
@@ -19384,19 +19348,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::ImplicitFunction::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::ImplicitFunction::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::ImplicitFunction::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::ImplicitFunction::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::ImplicitFunction::call "
 
@@ -19889,19 +19850,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::ImplicitFunctionInternal::inputStruct "
+%feature("docstring")  CasADi::ImplicitFunctionInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::ImplicitFunctionInternal::inputStruct "
+%feature("docstring")  CasADi::ImplicitFunctionInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::ImplicitFunctionInternal::outputStruct "
+%feature("docstring")  CasADi::ImplicitFunctionInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::ImplicitFunctionInternal::outputStruct "
+%feature("docstring")  CasADi::ImplicitFunctionInternal::oStruct "
 
 Const access an output. ";
 
@@ -20752,19 +20713,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::Integrator::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Integrator::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::Integrator::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::Integrator::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::Integrator::call "
 
@@ -21356,19 +21314,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::IntegratorInternal::inputStruct "
+%feature("docstring")  CasADi::IntegratorInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::IntegratorInternal::inputStruct "
+%feature("docstring")  CasADi::IntegratorInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::IntegratorInternal::outputStruct "
+%feature("docstring")  CasADi::IntegratorInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::IntegratorInternal::outputStruct "
+%feature("docstring")  CasADi::IntegratorInternal::oStruct "
 
 Const access an output. ";
 
@@ -24552,19 +24510,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::IpoptInternal::inputStruct "
+%feature("docstring")  CasADi::IpoptInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::IpoptInternal::inputStruct "
+%feature("docstring")  CasADi::IpoptInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::IpoptInternal::outputStruct "
+%feature("docstring")  CasADi::IpoptInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::IpoptInternal::outputStruct "
+%feature("docstring")  CasADi::IpoptInternal::oStruct "
 
 Const access an output. ";
 
@@ -25538,19 +25496,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::inputStruct "
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::inputStruct "
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::outputStruct "
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::outputStruct "
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::oStruct "
 
 Const access an output. ";
 
@@ -26623,19 +26581,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::Interfaces::IpoptQPSolver::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::call "
 
@@ -30004,19 +29959,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::IpoptSolver::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::IpoptSolver::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::IpoptSolver::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::IpoptSolver::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::IpoptSolver::call "
 
@@ -30669,19 +30621,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::Jacobian::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Jacobian::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::Jacobian::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::Jacobian::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::Jacobian::call "
 
@@ -31160,19 +31109,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::JacobianInternal::inputStruct "
+%feature("docstring")  CasADi::JacobianInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::JacobianInternal::inputStruct "
+%feature("docstring")  CasADi::JacobianInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::JacobianInternal::outputStruct "
+%feature("docstring")  CasADi::JacobianInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::JacobianInternal::outputStruct "
+%feature("docstring")  CasADi::JacobianInternal::oStruct "
 
 Const access an output. ";
 
@@ -31957,19 +31906,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::Sundials::KinsolInternal::inputStruct "
+%feature("docstring")  CasADi::Sundials::KinsolInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::Sundials::KinsolInternal::inputStruct "
+%feature("docstring")  CasADi::Sundials::KinsolInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::Sundials::KinsolInternal::outputStruct "
+%feature("docstring")  CasADi::Sundials::KinsolInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::Sundials::KinsolInternal::outputStruct "
+%feature("docstring")  CasADi::Sundials::KinsolInternal::oStruct "
 
 Const access an output. ";
 
@@ -32632,19 +32581,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolSolver::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Sundials::KinsolSolver::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolSolver::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::Sundials::KinsolSolver::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolSolver::call "
 
@@ -33501,19 +33447,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::KnitroInternal::inputStruct "
+%feature("docstring")  CasADi::KnitroInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::KnitroInternal::inputStruct "
+%feature("docstring")  CasADi::KnitroInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::KnitroInternal::outputStruct "
+%feature("docstring")  CasADi::KnitroInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::KnitroInternal::outputStruct "
+%feature("docstring")  CasADi::KnitroInternal::oStruct "
 
 Const access an output. ";
 
@@ -34321,19 +34267,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::KnitroSolver::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::KnitroSolver::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::KnitroSolver::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::KnitroSolver::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::KnitroSolver::call "
 
@@ -34976,19 +34919,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::Interfaces::LapackLUDense::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::call "
 
@@ -35517,23 +35457,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")
-CasADi::Interfaces::LapackLUDenseInternal::inputStruct "
+%feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")
-CasADi::Interfaces::LapackLUDenseInternal::inputStruct "
+%feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")
-CasADi::Interfaces::LapackLUDenseInternal::outputStruct "
+%feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")
-CasADi::Interfaces::LapackLUDenseInternal::outputStruct "
+%feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::oStruct "
 
 Const access an output. ";
 
@@ -36149,19 +36085,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::Interfaces::LapackQRDense::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::call "
 
@@ -36680,23 +36613,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")
-CasADi::Interfaces::LapackQRDenseInternal::inputStruct "
+%feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")
-CasADi::Interfaces::LapackQRDenseInternal::inputStruct "
+%feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")
-CasADi::Interfaces::LapackQRDenseInternal::outputStruct "
+%feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")
-CasADi::Interfaces::LapackQRDenseInternal::outputStruct "
+%feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::oStruct "
 
 Const access an output. ";
 
@@ -37517,19 +37446,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::LiftedSQP::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::LiftedSQP::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::LiftedSQP::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::LiftedSQP::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::LiftedSQP::call "
 
@@ -38231,19 +38157,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::LiftedSQPInternal::inputStruct "
+%feature("docstring")  CasADi::LiftedSQPInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::LiftedSQPInternal::inputStruct "
+%feature("docstring")  CasADi::LiftedSQPInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::LiftedSQPInternal::outputStruct "
+%feature("docstring")  CasADi::LiftedSQPInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::LiftedSQPInternal::outputStruct "
+%feature("docstring")  CasADi::LiftedSQPInternal::oStruct "
 
 Const access an output. ";
 
@@ -38832,19 +38758,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::Interfaces::LiftoptInternal::inputStruct "
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::Interfaces::LiftoptInternal::inputStruct "
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::Interfaces::LiftoptInternal::outputStruct "
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::Interfaces::LiftoptInternal::outputStruct "
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::oStruct "
 
 Const access an output. ";
 
@@ -39560,19 +39486,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::Interfaces::LiftoptSolver::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::call "
 
@@ -40183,19 +40106,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::LinearSolver::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::LinearSolver::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::LinearSolver::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::LinearSolver::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::LinearSolver::call "
 
@@ -40696,19 +40616,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::LinearSolverInternal::inputStruct "
+%feature("docstring")  CasADi::LinearSolverInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::LinearSolverInternal::inputStruct "
+%feature("docstring")  CasADi::LinearSolverInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::LinearSolverInternal::outputStruct "
+%feature("docstring")  CasADi::LinearSolverInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::LinearSolverInternal::outputStruct "
+%feature("docstring")  CasADi::LinearSolverInternal::oStruct "
 
 Const access an output. ";
 
@@ -42793,19 +42713,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::OptimalControl::MultipleShooting::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::OptimalControl::MultipleShooting::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::OptimalControl::MultipleShooting::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::OptimalControl::MultipleShooting::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::OptimalControl::MultipleShooting::call "
 
@@ -43440,22 +43357,22 @@ CasADi::OptimalControl::MultipleShootingInternal::eval "
 Evaluate symbolically, MX type (overloaded) ";
 
 %feature("docstring")
-CasADi::OptimalControl::MultipleShootingInternal::inputStruct "
+CasADi::OptimalControl::MultipleShootingInternal::iStruct "
 
 Access an input. ";
 
 %feature("docstring")
-CasADi::OptimalControl::MultipleShootingInternal::inputStruct "
+CasADi::OptimalControl::MultipleShootingInternal::iStruct "
 
 Const access an input. ";
 
 %feature("docstring")
-CasADi::OptimalControl::MultipleShootingInternal::outputStruct "
+CasADi::OptimalControl::MultipleShootingInternal::oStruct "
 
 Access an output. ";
 
 %feature("docstring")
-CasADi::OptimalControl::MultipleShootingInternal::outputStruct "
+CasADi::OptimalControl::MultipleShootingInternal::oStruct "
 
 Const access an output. ";
 
@@ -45624,19 +45541,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::MXFunction::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::MXFunction::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::MXFunction::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::MXFunction::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::MXFunction::call "
 
@@ -46166,19 +46080,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::MXFunctionInternal::inputStruct "
+%feature("docstring")  CasADi::MXFunctionInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::MXFunctionInternal::inputStruct "
+%feature("docstring")  CasADi::MXFunctionInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::MXFunctionInternal::outputStruct "
+%feature("docstring")  CasADi::MXFunctionInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::MXFunctionInternal::outputStruct "
+%feature("docstring")  CasADi::MXFunctionInternal::oStruct "
 
 Const access an output. ";
 
@@ -47168,19 +47082,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::NLPSolver::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::NLPSolver::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::NLPSolver::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::NLPSolver::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::NLPSolver::call "
 
@@ -47801,19 +47712,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::NLPSolverInternal::inputStruct "
+%feature("docstring")  CasADi::NLPSolverInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::NLPSolverInternal::inputStruct "
+%feature("docstring")  CasADi::NLPSolverInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::NLPSolverInternal::outputStruct "
+%feature("docstring")  CasADi::NLPSolverInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::NLPSolverInternal::outputStruct "
+%feature("docstring")  CasADi::NLPSolverInternal::oStruct "
 
 Const access an output. ";
 
@@ -50029,19 +49940,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::OCPSolver::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::OCPSolver::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::OCPSolver::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::OCPSolver::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::OCPSolver::call "
 
@@ -50624,19 +50532,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::OCPSolverInternal::inputStruct "
+%feature("docstring")  CasADi::OCPSolverInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::OCPSolverInternal::inputStruct "
+%feature("docstring")  CasADi::OCPSolverInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::OCPSolverInternal::outputStruct "
+%feature("docstring")  CasADi::OCPSolverInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::OCPSolverInternal::outputStruct "
+%feature("docstring")  CasADi::OCPSolverInternal::oStruct "
 
 Const access an output. ";
 
@@ -51247,19 +51155,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::Interfaces::OOQPInternal::inputStruct "
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::Interfaces::OOQPInternal::inputStruct "
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::Interfaces::OOQPInternal::outputStruct "
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::Interfaces::OOQPInternal::outputStruct "
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::oStruct "
 
 Const access an output. ";
 
@@ -51894,19 +51802,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::Interfaces::OOQPSolver::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::call "
 
@@ -53062,19 +52967,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::Parallelizer::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Parallelizer::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::Parallelizer::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::Parallelizer::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::Parallelizer::call "
 
@@ -53601,19 +53503,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::ParallelizerInternal::inputStruct "
+%feature("docstring")  CasADi::ParallelizerInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::ParallelizerInternal::inputStruct "
+%feature("docstring")  CasADi::ParallelizerInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::ParallelizerInternal::outputStruct "
+%feature("docstring")  CasADi::ParallelizerInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::ParallelizerInternal::outputStruct "
+%feature("docstring")  CasADi::ParallelizerInternal::oStruct "
 
 Const access an output. ";
 
@@ -54172,19 +54074,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::Interfaces::QPOasesInternal::inputStruct "
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::Interfaces::QPOasesInternal::inputStruct "
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::Interfaces::QPOasesInternal::outputStruct "
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::Interfaces::QPOasesInternal::outputStruct "
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::oStruct "
 
 Const access an output. ";
 
@@ -54824,19 +54726,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::Interfaces::QPOasesSolver::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::call "
 
@@ -55485,19 +55384,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::QPSolver::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::QPSolver::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::QPSolver::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::QPSolver::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::QPSolver::call "
 
@@ -56031,19 +55927,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::QPSolverInternal::inputStruct "
+%feature("docstring")  CasADi::QPSolverInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::QPSolverInternal::inputStruct "
+%feature("docstring")  CasADi::QPSolverInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::QPSolverInternal::outputStruct "
+%feature("docstring")  CasADi::QPSolverInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::QPSolverInternal::outputStruct "
+%feature("docstring")  CasADi::QPSolverInternal::oStruct "
 
 Const access an output. ";
 
@@ -56805,19 +56701,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::RKIntegrator::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::RKIntegrator::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::RKIntegrator::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::RKIntegrator::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::RKIntegrator::call "
 
@@ -57424,19 +57317,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::RKIntegratorInternal::inputStruct "
+%feature("docstring")  CasADi::RKIntegratorInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::RKIntegratorInternal::inputStruct "
+%feature("docstring")  CasADi::RKIntegratorInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::RKIntegratorInternal::outputStruct "
+%feature("docstring")  CasADi::RKIntegratorInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::RKIntegratorInternal::outputStruct "
+%feature("docstring")  CasADi::RKIntegratorInternal::oStruct "
 
 Const access an output. ";
 
@@ -58448,19 +58341,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::Simulator::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Simulator::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::Simulator::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::Simulator::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::Simulator::call "
 
@@ -58978,19 +58868,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::SimulatorInternal::inputStruct "
+%feature("docstring")  CasADi::SimulatorInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::SimulatorInternal::inputStruct "
+%feature("docstring")  CasADi::SimulatorInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::SimulatorInternal::outputStruct "
+%feature("docstring")  CasADi::SimulatorInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::SimulatorInternal::outputStruct "
+%feature("docstring")  CasADi::SimulatorInternal::oStruct "
 
 Const access an output. ";
 
@@ -59931,19 +59821,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::SQPInternal::inputStruct "
+%feature("docstring")  CasADi::SQPInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::SQPInternal::inputStruct "
+%feature("docstring")  CasADi::SQPInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::SQPInternal::outputStruct "
+%feature("docstring")  CasADi::SQPInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::SQPInternal::outputStruct "
+%feature("docstring")  CasADi::SQPInternal::oStruct "
 
 Const access an output. ";
 
@@ -60741,19 +60631,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::SQPMethod::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::SQPMethod::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::SQPMethod::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::SQPMethod::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::SQPMethod::call "
 
@@ -61667,19 +61554,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::Sundials::SundialsIntegrator::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Sundials::SundialsIntegrator::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::Sundials::SundialsIntegrator::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::Sundials::SundialsIntegrator::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::Sundials::SundialsIntegrator::call "
 
@@ -62493,19 +62377,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::Sundials::SundialsInternal::inputStruct "
+%feature("docstring")  CasADi::Sundials::SundialsInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::Sundials::SundialsInternal::inputStruct "
+%feature("docstring")  CasADi::Sundials::SundialsInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::Sundials::SundialsInternal::outputStruct "
+%feature("docstring")  CasADi::Sundials::SundialsInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::Sundials::SundialsInternal::outputStruct "
+%feature("docstring")  CasADi::Sundials::SundialsInternal::oStruct "
 
 Const access an output. ";
 
@@ -63130,19 +63014,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::SuperLU::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::SuperLU::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::SuperLU::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::SuperLU::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::SuperLU::call "
 
@@ -63692,19 +63573,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::SuperLUInternal::inputStruct "
+%feature("docstring")  CasADi::SuperLUInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::SuperLUInternal::inputStruct "
+%feature("docstring")  CasADi::SuperLUInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::SuperLUInternal::outputStruct "
+%feature("docstring")  CasADi::SuperLUInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::SuperLUInternal::outputStruct "
+%feature("docstring")  CasADi::SuperLUInternal::oStruct "
 
 Const access an output. ";
 
@@ -64633,19 +64514,16 @@ number of function inputs, optionally include the function outputs. ";
 
 %feature("docstring")  CasADi::SXFunction::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::SXFunction::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::SXFunction::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::SXFunction::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::SXFunction::call "
 
@@ -65174,19 +65052,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::SXFunctionInternal::inputStruct "
+%feature("docstring")  CasADi::SXFunctionInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::SXFunctionInternal::inputStruct "
+%feature("docstring")  CasADi::SXFunctionInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::SXFunctionInternal::outputStruct "
+%feature("docstring")  CasADi::SXFunctionInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::SXFunctionInternal::outputStruct "
+%feature("docstring")  CasADi::SXFunctionInternal::oStruct "
 
 Const access an output. ";
 
@@ -67905,19 +67783,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::WorhpInternal::inputStruct "
+%feature("docstring")  CasADi::WorhpInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::WorhpInternal::inputStruct "
+%feature("docstring")  CasADi::WorhpInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::WorhpInternal::outputStruct "
+%feature("docstring")  CasADi::WorhpInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::WorhpInternal::outputStruct "
+%feature("docstring")  CasADi::WorhpInternal::oStruct "
 
 Const access an output. ";
 
@@ -69344,19 +69222,16 @@ Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::WorhpSolver::call "
 
-Create a function call (evaluation mx node), single input. ";
+Create a function call (single input) ";
 
 %feature("docstring")  CasADi::WorhpSolver::call "
 
-Evaluate numerically (shorthand) ";
+Create a function call. ";
 
 %feature("docstring")  CasADi::WorhpSolver::call "
 
-Evaluate symbolically (scalar graph) ";
-
-%feature("docstring")  CasADi::WorhpSolver::call "
-
-Evaluate symbolically (matrix graph) ";
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
 
 %feature("docstring")  CasADi::WorhpSolver::call "
 
@@ -69858,19 +69733,19 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::XFunctionInternal::inputStruct "
+%feature("docstring")  CasADi::XFunctionInternal::iStruct "
 
 Access an input. ";
 
-%feature("docstring")  CasADi::XFunctionInternal::inputStruct "
+%feature("docstring")  CasADi::XFunctionInternal::iStruct "
 
 Const access an input. ";
 
-%feature("docstring")  CasADi::XFunctionInternal::outputStruct "
+%feature("docstring")  CasADi::XFunctionInternal::oStruct "
 
 Access an output. ";
 
-%feature("docstring")  CasADi::XFunctionInternal::outputStruct "
+%feature("docstring")  CasADi::XFunctionInternal::oStruct "
 
 Const access an output. ";
 
@@ -70691,9 +70566,7 @@ with x and y vectors ";
 QR factorization using the modified Gram-Schmidt algorithm More stable than
 the classical Gram-Schmidt, but may break down if the columns of A are
 nearly linearly dependent See J. Demmel: Applied Numerical Linear Algebra
-(algorithm 3.1.) ";
-
-%feature("docstring")  CasADi::Interfaces::qr "";
+(algorithm 3.1.). Note that in SWIG, Q and R are returned by value. ";
 
 %feature("docstring")  CasADi::Interfaces::solve "
 
