@@ -171,6 +171,9 @@ public:
   
   /** \brief Clear the function from its symbolic representation, to free up memory, no symbolic evaluations are possible after this */
   void clearSymbolic();
+ 
+  /** \brief Get all the free variables of the function */
+  SXMatrix getFree() const;
   
 #ifndef SWIG 
   /// Construct a function that has only the k'th output

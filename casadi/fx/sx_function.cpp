@@ -203,7 +203,9 @@ SXFunction SXFunction::operator[](int k) const {
   return ret;
 }
 
-
+SXMatrix SXFunction::getFree() const{
+  return (*this)->free_vars_;
+}
 
 
 } // namespace CasADi
