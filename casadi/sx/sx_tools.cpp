@@ -1033,6 +1033,13 @@ void makeSemiExplicit(const Matrix<SX>& f, const Matrix<SX>& x, Matrix<SX>& fe, 
   xe = SXMatrix(xev);
 }
 
+SXMatrix getFree(const SXMatrix& ex){
+  SXFunction f(vector<SXMatrix>(),ex);
+  f.init();
+  return f.getFree();
+}
+
+
 } // namespace CasADi
 
 

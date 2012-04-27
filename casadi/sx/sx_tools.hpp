@@ -359,6 +359,9 @@ int countNodes(const Matrix<SX>& A);
 /** \brief Get a string representation for a binary SX, using custom arguments */
 std::string getOperatorRepresentation(const SX& x, const std::vector<std::string>& args);
 
+/** \brief Get all the free variables in an expression */
+SXMatrix getFree(const SXMatrix& ex);
+
 } // namespace CasADi
 
 #endif // SX_TOOLS_HPP
