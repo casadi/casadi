@@ -64470,6 +64470,10 @@ Number of nodes in the algorithm. ";
 Clear the function from its symbolic representation, to free up memory, no
 symbolic evaluations are possible after this. ";
 
+%feature("docstring")  CasADi::SXFunction::getFree "
+
+Get all the free variables of the function. ";
+
 %feature("docstring")  CasADi::SXFunction::indexed_one_based "";
 
 %feature("docstring")  CasADi::SXFunction::indexed_zero_based "";
@@ -71382,6 +71386,10 @@ Count number of nodes. ";
 Get a string representation for a binary SX, using custom arguments. ";
 
 %feature("docstring")  CasADi::Interfaces::makeSemiExplicit "";
+
+%feature("docstring")  CasADi::Interfaces::getFree "
+
+Get all the free variables in an expression. ";
 
 %feature("docstring")  CasADi::Interfaces::contains "
 
