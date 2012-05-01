@@ -151,7 +151,7 @@ MXFunction parameterizeTime(FX dae) {
    ret_in[DAE_XDOT] = dae_input[DAE_XDOT];
 
    std::vector<MX> ret_out(DAE_NUM_OUT);
-   ret_out[DAE_RES] = (tf-t0)*dae.call(dae_in)[0];
+   ret_out[DAE_ODE] = (tf-t0)*dae.call(dae_in)[0];
    
    MXFunction ret(ret_in,ret_out);
    

@@ -132,7 +132,7 @@ void ControlSimulatorInternal::init(){
     control_dae_in_[CONTROL_DAE_X_MAJOR] = dae_in_[DAE_P](iYM);
 
   
-  dae_ = MXFunction(dae_in_,(dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0))*control_dae_.call(control_dae_in_)[0]);
+  dae_ = MXFunction(dae_in_,daeOut((dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0))*control_dae_.call(control_dae_in_)[0]));
   
   dae_.init();
  

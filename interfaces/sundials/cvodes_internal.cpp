@@ -118,11 +118,11 @@ void CVodesInternal::init(){
   nq_ = fq_.isNull() ? 0 : fq_.output().numel();
   
   // ODE right hand side must be a dense matrix
-  casadi_assert_message(fd_.output(DAE_RES).dense(),"ODE right hand side must be dense: reformulate the problem");
+  casadi_assert_message(fd_.output(DAE_ODE).dense(),"ODE right hand side must be dense: reformulate the problem");
   
   // States and RHS should match 
-  casadi_assert_message(fd_.output(DAE_RES).size()==fd_.input(DAE_X).size(),
-   "IntegratorInternal: rhs of ODE is (" <<  fd_.output(DAE_RES).size1() << 'x' << fd_.output(DAE_RES).size2() << ") - " << fd_.output(DAE_RES).size() << " non-zeros" <<
+  casadi_assert_message(fd_.output(DAE_ODE).size()==fd_.input(DAE_X).size(),
+   "IntegratorInternal: rhs of ODE is (" <<  fd_.output(DAE_ODE).size1() << 'x' << fd_.output(DAE_ODE).size2() << ") - " << fd_.output(DAE_ODE).size() << " non-zeros" <<
    "              ODE state matrix is (" <<  fd_.input(DAE_X).size1() << 'x' << fd_.input(DAE_X).size2() << ") - " << fd_.input(DAE_X).size() << " non-zeros" << 
    "Mismatch between number of non-zeros"
   );
@@ -140,7 +140,7 @@ void CVodesInternal::init(){
     if(!f.isNull()){
       // Get the Jacobian in the Newton iteration
       SX gamma("gamma");
-      SXMatrix jac = SXMatrix::eye(ny_) - gamma * f.jac(DAE_X,DAE_RES);
+      SXMatrix jac = SXMatrix::eye(ny_) - gamma * f.jac(DAE_X,DAE_ODE);
       
       // Jacobian function
       vector<vector<SX> > jac_in(Sundials::M_NUM_IN);
@@ -218,7 +218,7 @@ void CVodesInternal::init(){
     if(flag!=CV_SUCCESS) cvodes_error("CVDense",flag);
     if(exact_jacobian_){
       // Create jacobian if it does not exist
-      if(jac_f_.isNull()) jac_f_ = fd_.jacobian(DAE_X,DAE_RES);
+      if(jac_f_.isNull()) jac_f_ = fd_.jacobian(DAE_X,DAE_ODE);
       jac_f_.init();
       
       // Pass to CVodes
@@ -523,7 +523,7 @@ void CVodesInternal::rhs(double t, const double* y, double* ydot){
   fd_.evaluate();
 
   if(monitor_rhs_) {
-    cout << "ydot       = " << fd_.output(DAE_RES)<< endl;
+    cout << "ydot       = " << fd_.output(DAE_ODE)<< endl;
   }
     
   // Get results
@@ -844,7 +844,7 @@ void CVodesInternal::rhsS(int Ns, double t, N_Vector y, N_Vector ydot, N_Vector 
       
      // Get the output seeds
      for(int dir=0; dir<nfdir_f_ && j+dir<nfdir_; ++dir){
-       fd_.getFwdSens(NV_DATA_S(ySdot[j+dir]),DAE_RES,dir);
+       fd_.getFwdSens(NV_DATA_S(ySdot[j+dir]),DAE_ODE,dir);
      }
    }
   
@@ -972,13 +972,13 @@ void CVodesInternal::rhsB(double t, const double* y, const double *yB, double* y
   fd_.setInput(input(INTEGRATOR_P),DAE_P);
 
   // Pass adjoint seeds
-  fd_.setAdjSeed(yB,DAE_RES);
+  fd_.setAdjSeed(yB,DAE_ODE);
 
   if(monitor_rhsB_){
     cout << "t       = " << fd_.input(DAE_T) << endl;
     cout << "y       = " << fd_.input(DAE_X) << endl;
     cout << "p       = " << fd_.input(DAE_P) << endl;
-    cout << "aseed   = " << fd_.adjSeed(DAE_RES) << endl;
+    cout << "aseed   = " << fd_.adjSeed(DAE_ODE) << endl;
   }
   
   // Evaluate and tape
@@ -1001,7 +1001,7 @@ void CVodesInternal::rhsB(double t, const double* y, const double *yB, double* y
     fq_.setInput(input(INTEGRATOR_P),DAE_P);
 
     // Pass adjoint seeds
-    fq_.setAdjSeed(&adjSeed(INTEGRATOR_XF).data()[ny_],DAE_RES);
+    fq_.setAdjSeed(&adjSeed(INTEGRATOR_XF).data()[ny_],DAE_ODE);
 
     // Evaluate
     fq_.evaluate(0,1);
@@ -1069,11 +1069,11 @@ void CVodesInternal::rhsQB(double t, const double* y, const double* yB, double* 
   
 
   // Pass adjoint seeds
-  fd_.setAdjSeed(yB,DAE_RES);
+  fd_.setAdjSeed(yB,DAE_ODE);
   
 
   if(monitor_rhsQB_) {
-    cout << "adjSeed       = " << fd_.adjSeed(DAE_RES) << endl;
+    cout << "adjSeed       = " << fd_.adjSeed(DAE_ODE) << endl;
   }
     
 
@@ -1096,10 +1096,10 @@ void CVodesInternal::rhsQB(double t, const double* y, const double* yB, double* 
     fq_.setInput(input(INTEGRATOR_P),DAE_P);
 
     // Pass adjoint seeds
-    fq_.setAdjSeed(&adjSeed(INTEGRATOR_XF).data()[ny_],DAE_RES);
+    fq_.setAdjSeed(&adjSeed(INTEGRATOR_XF).data()[ny_],DAE_ODE);
 
     if(monitor_rhsQB_) {
-      cout << "adjSeed  (quadrature) = " << fq_.adjSeed(DAE_RES) << endl;
+      cout << "adjSeed  (quadrature) = " << fq_.adjSeed(DAE_ODE) << endl;
     }
     
     // Evaluate
@@ -1132,7 +1132,7 @@ int CVodesInternal::jtimes_wrapper(N_Vector v, N_Vector Jv, double t, N_Vector y
   try{
     casadi_assert(user_data);
     CVodesInternal *this_ = (CVodesInternal*)user_data;
-    casadi_assert(this_->fd_.fwdSens(DAE_RES).size() == this_->ny_);
+    casadi_assert(this_->fd_.fwdSens(DAE_ODE).size() == this_->ny_);
     casadi_assert(NV_LENGTH_S(v) == this_->ny_);
     casadi_assert(NV_LENGTH_S(Jv) == this_->ny_);
     this_->jtimes(NV_DATA_S(v),NV_DATA_S(Jv),t,NV_DATA_S(y),NV_DATA_S(fy),NV_DATA_S(tmp));
@@ -1161,7 +1161,7 @@ void CVodesInternal::jtimes(const double *v, double* Jv, double t, const double*
   fd_.evaluate(1,0);
 
   // Get the output seeds
-  fd_.getFwdSens(Jv,DAE_RES);
+  fd_.getFwdSens(Jv,DAE_ODE);
   
   // Log time duration
   time2 = clock();

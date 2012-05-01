@@ -91,7 +91,7 @@ void dae_res_c(double tt, const double *yy, const double* yydot, const double* p
 // Wrap the function to allow creating an CasADi function
 void dae_res_c_wrapper(CFunction &f, int nfwd, int nadj, void* user_data){
   casadi_assert(nfwd==0 && nadj==0);
-  dae_res_c(f.input(DAE_T).front(), &f.input(DAE_X).front(), &f.input(DAE_XDOT).front(), &f.input(DAE_P).front(), &f.output(DAE_RES).front());
+  dae_res_c(f.input(DAE_T).front(), &f.input(DAE_X).front(), &f.input(DAE_XDOT).front(), &f.input(DAE_P).front(), &f.output(DAE_ODE).front());
 }
 
 // Create an IDAS instance (fully implicit integrator)
@@ -151,11 +151,11 @@ Integrator create_Sundials(){
     ffcn.input(DAE_X)    = DMatrix(3,1,0);
     ffcn.input(DAE_XDOT) = DMatrix(3,1,0);
     ffcn.input(DAE_P)    = DMatrix(1,1,0);
-    ffcn.output(DAE_RES) = DMatrix(3,1,0);
+    ffcn.output(DAE_ODE) = DMatrix(3,1,0);
   }
   
   // Quadrature function
-  SXFunction qfcn(ffcn_in,u_dev);
+  SXFunction qfcn(ffcn_in,daeOut<SXMatrix>(u_dev));
 
   if(implicit_integrator){
     // Create an IDAS instance

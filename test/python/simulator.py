@@ -48,7 +48,7 @@ class Simulatortests(casadiTestCase):
     f[DAE_X] = q
     f[DAE_P] = p
     f[DAE_XDOT] = dp
-    f=SXFunction(f,[q/p*t**2-dp])
+    f=SXFunction(f,daeOut(q/p*t**2-dp))
     f.init()
     integrator = CVodesIntegrator(f)
     integrator.setOption("reltol",1e-15)
@@ -85,7 +85,7 @@ class Simulatortests(casadiTestCase):
     out = SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_X: q, DAE_P: p, DAE_XDOT: dp},[[q],[t],[p],[dp]])
     out.init()
         
-    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_X: q, DAE_P: p, DAE_XDOT: dp},[q/p*t**2-dp])
+    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_X: q, DAE_P: p, DAE_XDOT: dp},daeOut(q/p*t**2-dp))
     f.init()
     integrator = CVodesIntegrator(f)
     integrator.setOption("reltol",1e-15)
@@ -106,7 +106,7 @@ class Simulatortests(casadiTestCase):
     self.checkarray(sim.output(2),DMatrix.ones(tc.shape)*num['p'],"Evaluation output mismatch")
     self.checkarray(sim.output(3),DMatrix.zeros(tc.shape),"Evaluation output mismatch")
     
-    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_X: q, DAE_P: p},[q/p*t**2])
+    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_X: q, DAE_P: p},daeOut(q/p*t**2))
     f.init()
     integrator = CVodesIntegrator(f)
     integrator.setOption("reltol",1e-15)
@@ -130,7 +130,7 @@ class Simulatortests(casadiTestCase):
     out = SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_X: q, DAE_XDOT: dp},[[q],[t],[dp]])
     out.init()
     
-    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_X: q},[q/num['p']*t**2])
+    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_X: q},daeOut(q/num['p']*t**2))
     f.init()
     integrator = CVodesIntegrator(f)
     integrator.setOption("reltol",1e-15)
@@ -149,7 +149,7 @@ class Simulatortests(casadiTestCase):
     self.checkarray(sim.output(1),tc,"Evaluation output mismatch")
     self.checkarray(sim.output(2),DMatrix.zeros(tc.shape),"Evaluation output mismatch")
     
-    f=SXFunction({'NUM': DAE_NUM_IN, DAE_X: q},[-q])
+    f=SXFunction({'NUM': DAE_NUM_IN, DAE_X: q},daeOut(-q))
     f.init()
     integrator = CVodesIntegrator(f)
     integrator.setOption("reltol",1e-15)
@@ -459,7 +459,7 @@ class Simulatortests(casadiTestCase):
     
 
     rhs = vertcat([v - dx, ( -  b*v - k*x) - dv ])
-    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_XDOT: [dx,dv], DAE_X: [x,v], DAE_P: [b,k]},[rhs])
+    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_XDOT: [dx,dv], DAE_X: [x,v], DAE_P: [b,k]},daeOut(rhs))
     f.init()
     
     cf=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_T: t, CONTROL_DAE_XDOT: [dx,dv], CONTROL_DAE_X: [x,v], CONTROL_DAE_P: [b,k]},[rhs])

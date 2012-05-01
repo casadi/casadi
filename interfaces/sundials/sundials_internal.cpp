@@ -158,9 +158,9 @@ SundialsIntegrator SundialsInternal::jac(bool with_x, bool with_p){
   SXMatrix ypsens = ssym("ypsens",nyp,ns);
     
   // Sensitivity equation
-  SXMatrix res_s = mul(f.jac(DAE_X,DAE_RES),ysens);
-  if(nyp>0) res_s += mul(f.jac(DAE_XDOT,DAE_RES),ypsens);
-  if(with_p) res_s += horzcat(SXMatrix(ny_,ns_x),f.jac(DAE_P,DAE_RES));
+  SXMatrix res_s = mul(f.jac(DAE_X,DAE_ODE),ysens);
+  if(nyp>0) res_s += mul(f.jac(DAE_XDOT,DAE_ODE),ypsens);
+  if(with_p) res_s += horzcat(SXMatrix(ny_,ns_x),f.jac(DAE_P,DAE_ODE));
 
   // Augmented DAE
   SXMatrix faug = vec(horzcat(f.outputSX(INTEGRATOR_XF),res_s));
@@ -174,7 +174,7 @@ SundialsIntegrator SundialsInternal::jac(bool with_x, bool with_p){
   faug_in[DAE_P] = f.inputSX(DAE_P);
   
   // Create augmented DAE function
-  SXFunction ffcn_aug(faug_in,faug);
+  SXFunction ffcn_aug(faug_in,daeOut(faug));
   
   // Augmented quadratures
   SXFunction qfcn_aug;
@@ -183,9 +183,9 @@ SundialsIntegrator SundialsInternal::jac(bool with_x, bool with_p){
   if(!q.isNull()){
     
     // Sensitivity quadratures
-    SXMatrix q_s = mul(q.jac(DAE_X,DAE_RES),ysens);
-    if(nyp>0) q_s += mul(q.jac(DAE_XDOT,DAE_RES),ypsens);
-    if(with_p) q_s += horzcat(SXMatrix(nq_,ns_x),q.jac(DAE_P,DAE_RES));
+    SXMatrix q_s = mul(q.jac(DAE_X,DAE_ODE),ysens);
+    if(nyp>0) q_s += mul(q.jac(DAE_XDOT,DAE_ODE),ypsens);
+    if(with_p) q_s += horzcat(SXMatrix(nq_,ns_x),q.jac(DAE_P,DAE_ODE));
 
     // Augmented quadratures
     SXMatrix qaug = vec(horzcat(q.outputSX(INTEGRATOR_XF),q_s));
@@ -199,7 +199,7 @@ SundialsIntegrator SundialsInternal::jac(bool with_x, bool with_p){
     qaug_in[DAE_P] = q.inputSX(DAE_P);
 
     // Create augmented DAE function
-    qfcn_aug = SXFunction(qaug_in,qaug);
+    qfcn_aug = SXFunction(qaug_in,daeOut(qaug));
   }
   
   // Create integrator instance

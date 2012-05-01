@@ -113,7 +113,7 @@ void RKIntegratorInternal::init(){
     f_in[DAE_XDOT] = YDOT;
     f_in[DAE_P] = P;
     vector<MX> f_out = fd_.call(f_in);
-    MX ode_rhs = f_out[DAE_RES];
+    MX ode_rhs = f_out[DAE_ODE];
     
     // Explicit Euler step
     Y += h_mx*ode_rhs;

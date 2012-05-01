@@ -262,12 +262,12 @@ void CollocationIntegratorInternal::init(){
       if(explicit_ode){
         // Assume equation of the form ydot = f(t,y,p)
         vector<MX> f_out = fd_.call(f_in);
-        g.push_back(h_mx*f_out[DAE_RES] - yp_jk);
+        g.push_back(h_mx*f_out[DAE_ODE] - yp_jk);
       } else {
         // Assume equation of the form 0 = f(t,y,ydot,p)
         f_in[DAE_XDOT] = yp_jk/h_mx;
         vector<MX> f_out = fd_.call(f_in);
-        g.push_back(f_out[DAE_RES]);
+        g.push_back(f_out[DAE_ODE]);
       }
       
       if(nq_>0){

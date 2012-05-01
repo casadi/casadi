@@ -109,17 +109,12 @@ std::vector<M> daeIn(const M& xdot, const M& x, const M& z=M(), const M& p=M(), 
 
 /// Output arguments of an DAE function
 enum DAEOutput{
-#ifdef NEW_INTEGRATOR 
   /** Right hand side of the implicit ODE */
   DAE_ODE,
   /** Right hand side of algebraic equations */
   DAE_ALG,
   /** Right hand side of quadratures equations */
   DAE_QUAD,
-#else
-  /** DAE residual */
-  DAE_RES,
-#endif
   /** Number of arguments. */
   DAE_NUM_OUT
 };
@@ -127,11 +122,7 @@ enum DAEOutput{
 /// Helper function to create DAE forward integration function output arguments
 template<class M>
 std::vector<M> daeOut(const M& ode, const M& alg=M(), const M& quad=M()){
-#ifdef NEW_INTEGRATOR 
   M ret[DAE_NUM_OUT] = {ode,alg,quad};
-#else
-  M ret[DAE_NUM_OUT] = {ode};
-#endif
   return std::vector<M>(ret,ret+DAE_NUM_OUT);
 }
 #ifdef SWIG

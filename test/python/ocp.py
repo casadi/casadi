@@ -270,7 +270,7 @@ class OCPtests(casadiTestCase):
     p = ssym("p",nu)
     xp0 = ssym("x0",nx)
     xf = x0 + p[0]
-    daeres = SXFunction({'NUM': DAE_NUM_IN, DAE_T: t,DAE_X: x0,DAE_P: p, DAE_XDOT: xp0},{'NUM': DAE_NUM_OUT, DAE_RES: xf})
+    daeres = SXFunction({'NUM': DAE_NUM_IN, DAE_T: t,DAE_X: x0,DAE_P: p, DAE_XDOT: xp0},{'NUM': DAE_NUM_OUT, DAE_ODE: xf})
     mayer = SXFunction([x0],[7*x0[0]])
     ms = MultipleShooting(daeres,mayer)
     ms.setOption("integrator",CVodesIntegrator)
@@ -309,7 +309,7 @@ class OCPtests(casadiTestCase):
     p = ssym("p",nu+np)
     xp0 = ssym("x0",nx)
     xf = x0 + p[0]
-    daeres = SXFunction({'NUM': DAE_NUM_IN, DAE_T: t,DAE_X: x0,DAE_P: p, DAE_XDOT: xp0},{'NUM': DAE_NUM_OUT, DAE_RES: xf})
+    daeres = SXFunction({'NUM': DAE_NUM_IN, DAE_T: t,DAE_X: x0,DAE_P: p, DAE_XDOT: xp0},{'NUM': DAE_NUM_OUT, DAE_ODE: xf})
     mayer = SXFunction([x0],[7*x0[0]])
     
     t = SX("t")
@@ -365,7 +365,7 @@ class OCPtests(casadiTestCase):
     y=ssym("y",3,1)
     yd=ssym("yd",3,1)
     p=SX("p")
-    f=SXFunction({'NUM':DAE_NUM_IN, DAE_T: t, DAE_X: y, DAE_P: p,DAE_XDOT: yd},[[y[1,0],-y[0,0],p*y[0,0]]])
+    f=SXFunction({'NUM':DAE_NUM_IN, DAE_T: t, DAE_X: y, DAE_P: p,DAE_XDOT: yd},daeOut([y[1,0],-y[0,0],p*y[0,0]]))
     f.init()
     
     # Options to be passed to the integrator
