@@ -99,12 +99,6 @@ public:
   /// Terminal constraint function, if any
   FX h_;
   
-  /// Set dimensions (to be removed)
-  void setDimensions(int nx, int np);
-
-  /// number of states, excluding quadrature states (to be removed)
-  int ny_;  
-  
   /// Number of right hand sides
   int nrhs_;
 };

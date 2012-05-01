@@ -89,37 +89,11 @@ void CVodesInternal::updateNumSens(bool recursive){
 }
 
 void CVodesInternal::init(){
+  // Initialize the base classes
+  SundialsInternal::init();
+
   // Free memory if already initialized
   if(is_init) freeCVodes();
-  
-  // Init ODE rhs function and quadrature functions
-  f_.init();
-  casadi_assert(f_.getNumInputs()==DAE_NUM_IN);
-  casadi_assert(f_.getNumOutputs()==DAE_NUM_OUT);
-
-  // Number of states
-  int nx = f_.output(DAE_ODE).numel() + f_.output(DAE_QUAD).numel();
-
-  // Number of parameters
-  int np = f_.input(DAE_P).numel();
-  
-  // Set dimensions
-  setDimensions(nx,np);
-  
-  ny_ = f_.output(DAE_ODE).numel();
-  nq_ = f_.output(DAE_QUAD).numel();
-  
-  // ODE right hand side must be a dense matrix
-  casadi_assert_message(f_.output(DAE_ODE).dense(),"ODE right hand side must be dense: reformulate the problem");
-  
-  // States and RHS should match 
-  casadi_assert_message(f_.output(DAE_ODE).size()==f_.input(DAE_X).size(),
-   "IntegratorInternal: rhs of ODE is (" <<  f_.output(DAE_ODE).size1() << 'x' << f_.output(DAE_ODE).size2() << ") - " << f_.output(DAE_ODE).size() << " non-zeros" <<
-   "              ODE state matrix is (" <<  f_.input(DAE_X).size1() << 'x' << f_.input(DAE_X).size2() << ") - " << f_.input(DAE_X).size() << " non-zeros" << 
-   "Mismatch between number of non-zeros"
-  );
-  
-  SundialsInternal::init();
   
   // Read options
   monitor_rhsB_  = monitored("resB");

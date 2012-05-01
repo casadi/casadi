@@ -83,6 +83,9 @@ AcadoIntegratorInternal* AcadoIntegratorInternal::clone() const{
 }
 
 void AcadoIntegratorInternal::init(){
+  // Call the base class init
+  IntegratorInternal::init();
+  
   // Free memory and set pointers to NULL
   freeMem();
   setNull();
@@ -98,16 +101,6 @@ void AcadoIntegratorInternal::init(){
   ACADO::IntermediateState().clearStaticCounters();
   ACADO::Parameter().clearStaticCounters();
   
-  // Init ODE rhs function and quadrature functions, jacobian function
-  if(!f_.isInit()) f_.init();
-  
-  int nx = f_.input(DAE_X).size();
-  int np = f_.input(DAE_P).size();
-  setDimensions(nx,np);
-  
-  // Call the base class init
-  IntegratorInternal::init();
-
   // Get the number of differential and algebraic equations
   nxa_ = getOption("num_algebraic");
   nxd_ = nx_ - nxa_;

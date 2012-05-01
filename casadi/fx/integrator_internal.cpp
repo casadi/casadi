@@ -53,22 +53,6 @@ IntegratorInternal::IntegratorInternal(const FX& f) : f_(f){
 IntegratorInternal::~IntegratorInternal(){ 
 }
 
-void IntegratorInternal::setDimensions(int nx, int np){
-  nx_ = nx;
-  np_ = np;
-  
-  // Allocate space for inputs
-  input_.resize(INTEGRATOR_NUM_IN);
-  input(INTEGRATOR_X0)  = DMatrix(nx_,1,0); // initial state value
-  input(INTEGRATOR_XP0) = DMatrix(nx_,1,0); // initial state derivative value
-  input(INTEGRATOR_P)   = DMatrix(np_,1,0); // parameter
-  
-  // Allocate space for outputs
-  output_.resize(INTEGRATOR_NUM_OUT);
-  output(INTEGRATOR_XF) = DMatrix(nx_,1,0);
-  output(INTEGRATOR_XPF)= DMatrix(nx_,1,0);
-}
-
 void IntegratorInternal::evaluate(int nfdir, int nadir){
   
   // Reset solver
@@ -93,8 +77,28 @@ void IntegratorInternal::evaluate(int nfdir, int nadir){
 
 void IntegratorInternal::init(){
   
-  // Make sure that the dimensions have been set
-  casadi_assert_message(np_>=0, "\"setDimensions\" has not been called.");
+  // Initialize the functions
+  casadi_assert(!f_.isNull());
+  
+  // Initialize, get and assert dimensions of the forward integration
+  if(!f_.isInit()) f_.init();
+  nx_ = f_.input(DAE_X).numel();
+  nz_ = f_.input(DAE_Z).numel();
+  np_  = f_.input(DAE_P).numel();
+  nq_ = f_.output(DAE_QUAD).numel();
+  casadi_assert_message(f_.output(DAE_ODE).numel()==nx_,"Inconsistent dimensions");
+  casadi_assert_message(f_.output(DAE_ALG).numel()==nz_,"Inconsistent dimensions");
+  
+  // Allocate space for inputs
+  input_.resize(INTEGRATOR_NUM_IN);
+  input(INTEGRATOR_X0)  = DMatrix(nx_+nq_,1,0);
+  input(INTEGRATOR_XP0) = input(INTEGRATOR_X0);
+  input(INTEGRATOR_P)   = f_.input(DAE_P);
+  
+  // Allocate space for outputs
+  output_.resize(INTEGRATOR_NUM_OUT);
+  output(INTEGRATOR_XF) = input(INTEGRATOR_X0);
+  output(INTEGRATOR_XPF)= input(INTEGRATOR_X0);
   
   // Call the base class method
   FXInternal::init();

@@ -99,39 +99,14 @@ void IdasInternal::updateNumSens(bool recursive){
 }
 
 void IdasInternal::init(){
-  // Free memory if already initialized
-  if(is_init) freeIDAS();
-  
-  // Print
-  if(verbose()){
-    cout << "Initializing IDAS with ny_ = " << ny_ << ", nq_ = " << nq_ << ", np_ = " << np_ << endl;
-  }
-  
-  // Init ODE rhs function and quadrature functions, jacobian function
-  if(!f_.isInit()) f_.init();
-  
-  log("IdasInternal::init","functions initialized");
-  
-  // Check dimensions
-  casadi_assert_message(f_.getNumInputs()==DAE_NUM_IN, "IdasInternal: f has wrong number of inputs");
-  casadi_assert_message(f_.getNumOutputs()==DAE_NUM_OUT, "IdasInternal: f has wrong number of outputs (" << f_.getNumOutputs() << " instead of " << DAE_NUM_OUT << ").");
+  log("IdasInternal::init","begin");
 
-  ny_ = f_.input(DAE_X).numel();
-  nq_ = f_.output(DAE_QUAD).numel();
-  int np = f_.input(DAE_P).numel();
-  setDimensions(ny_+nq_,np);
-  ncheck_ = 0;
-
-  // States and RES should match 
-  casadi_assert_message(f_.output(DAE_ODE).size()==f_.input(DAE_X).size(),
-   "IntegratorInternal: residual of DAE is (" <<  f_.output(DAE_ODE).size1() << 'x' << f_.output(DAE_ODE).size2() << ") - " << f_.output(DAE_ODE).size() << " non-zeros" <<
-   "              DAE state matrix is (" <<  f_.input(DAE_X).size1() << 'x' << f_.input(DAE_X).size2() << ") - " << f_.input(DAE_X).size() << " non-zeros" << 
-   "Dimension mismatch"
-  );
-  
   // Call the base class init
   SundialsInternal::init();
-  log("IdasInternal::init","begin");
+
+  // Free memory if already initialized
+  if(is_init) freeIDAS();
+  ncheck_ = 0;
   
   if(hasSetOption("linear_solver_creator")){
     // Make sure that a Jacobian has been provided

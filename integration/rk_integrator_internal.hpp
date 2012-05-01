@@ -96,6 +96,7 @@ public:
 
   // Number of sensitivity directions
   int nfdir_, nadir_;
+  
 };
 
 } // namespace CasADi

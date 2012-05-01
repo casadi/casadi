@@ -55,23 +55,11 @@ CollocationIntegratorInternal::~CollocationIntegratorInternal(){
 
 void CollocationIntegratorInternal::init(){
   
-  // Init ODE rhs function
-  if(!f_.isInit()) f_.init();
-  
-  log("CollocationIntegratorInternal::init","functions initialized");
-  
-  // Check dimensions
-  casadi_assert_message(f_.getNumInputs()==DAE_NUM_IN, "CollocationIntegratorInternal: f has wrong number of inputs");
-  casadi_assert_message(f_.getNumOutputs()==DAE_NUM_OUT, "CollocationIntegratorInternal: f has wrong number of outputs");
-
-  ny_ = f_.input(DAE_X).numel();
-  nq_ = f_.output(DAE_QUAD).numel();
-  
-  int np = f_.input(DAE_P).numel();
-  setDimensions(ny_+nq_,np);
-
   // Call the base class init
   IntegratorInternal::init();
+  
+  // Differential states and quadrature states
+  ny_ = nx_ + nq_;
   
   // Legendre collocation points
   double legendre_points[][6] = {

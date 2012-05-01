@@ -111,6 +111,10 @@ public:
   
   // Collocated times
   std::vector<double> times_;
+  
+  // Differential states and quadrature states
+  int ny_;
+
 };
 
 } // namespace CasADi

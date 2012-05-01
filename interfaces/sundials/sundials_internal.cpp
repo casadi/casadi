@@ -85,6 +85,8 @@ void SundialsInternal::init(){
   // Call the base class method
   IntegratorInternal::init();
   
+  ny_ = nx_+nq_;
+  
   // Read options
   abstol_ = getOption("abstol");
   reltol_ = getOption("reltol");
@@ -97,7 +99,7 @@ void SundialsInternal::init(){
   asens_reltol_ = hasSetOption("asens_reltol") ? double(getOption("asens_reltol")) : reltol_;
   stop_at_end_ = getOption("stop_at_end");
   
-  // If time was not specified, initialise it.
+  // If time was not specified, initialise it. // NOTE: This slows down the interface and should be removed!!!
   if(f_.input(DAE_T).numel()==0) {
     std::vector<MX> in1(DAE_NUM_IN);
     in1[DAE_T] = MX("T");
@@ -110,7 +112,7 @@ void SundialsInternal::init(){
     f_.init();
   }
   
-  // We only allow for 0-D time
+  // We only allow for 0-D time // NOTE: This slows down the interface and should be removed!!!
   casadi_assert_message(f_.input(DAE_T).numel()==1, "IntegratorInternal: time must be zero-dimensional, not (" <<  f_.input(DAE_T).size1() << 'x' << f_.input(DAE_T).size2() << ")");
   
   // Get the linear solver creator function

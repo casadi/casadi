@@ -45,25 +45,9 @@ RKIntegratorInternal::~RKIntegratorInternal(){
 }
 
 void RKIntegratorInternal::init(){
-  
-  // Init ODE rhs function and quadrature functions, jacobian function
-  if(!f_.isInit()) f_.init();
-  
-  log("RKIntegratorInternal::init","functions initialized");
-  
-  // Check dimensions
-  casadi_assert_message(f_.getNumInputs()==DAE_NUM_IN, "RKIntegratorInternal: f has wrong number of inputs");
-  casadi_assert_message(f_.getNumOutputs()==DAE_NUM_OUT, "RKIntegratorInternal: f has wrong number of outputs");
-
-  ny_ = f_.input(DAE_X).numel();
-  nq_ = f_.output(DAE_QUAD).numel();
-  casadi_assert_message(nq_==0, "Quadratures not supported.");
-  
-  int np = f_.input(DAE_P).numel();
-  setDimensions(ny_+nq_,np);
-
   // Call the base class init
   IntegratorInternal::init();
+  casadi_assert_message(nq_==0, "Quadratures not supported.");
   
   // Number of finite elements
   int nk = getOption("number_of_finite_elements");
@@ -84,7 +68,7 @@ void RKIntegratorInternal::init(){
   MX h_mx = h;
     
   // Initial state
-  MX Y0("Y0",ny_);
+  MX Y0("Y0",nx_);
   
   // Free parameters
   MX P("P",np_);
