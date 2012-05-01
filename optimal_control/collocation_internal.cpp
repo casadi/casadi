@@ -129,8 +129,8 @@ void CollocationInternal::init(){
     fcn_in[k].resize(DAE_NUM_IN);
     fcn_in[k][DAE_T] = input(OCP_T).at(k);
     fcn_in[k][DAE_P] = vertcat(P,U.at(k));
-    fcn_in[k][DAE_Y] = X[k];
-    fcn_in[k][DAE_YDOT] = XP[k];
+    fcn_in[k][DAE_X] = X[k];
+    fcn_in[k][DAE_XDOT] = XP[k];
   }
 
   // Options for the parallelizer

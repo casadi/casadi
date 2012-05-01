@@ -58,9 +58,9 @@ void SimulatorInternal::init(){
 
     vector<SXMatrix> arg(DAE_NUM_IN);
     arg[DAE_T] = t;
-    arg[DAE_Y] = x;
+    arg[DAE_X] = x;
     arg[DAE_P] = p;
-    arg[DAE_YDOT] = xdot;
+    arg[DAE_XDOT] = xdot;
 
     vector<SXMatrix> out(INTEGRATOR_NUM_OUT);
     out[INTEGRATOR_XF] = x;
@@ -75,13 +75,6 @@ void SimulatorInternal::init(){
   
   SimulatorInternal::updateNumSens(false);
   
-  // Check if the output function accepts correct inputs
-  for (int i=0;i<INTEGRATOR_NUM_IN;++i) {
-    if (output_fcn_.input(i+1).numel()!=0) {
-      casadi_assert_message(output_fcn_.input(i+1).sparsity()==integrator_.input(i).sparsity(),"Simulator:: the output function is wrong. Input #" << i+1 << " of the output function has shape " << output_fcn_.input(i+1).dimString() << ", while " << integrator_.input(i).dimString() << " was expected, which corresponds to input #" << i << " of the integrator.");
-    }
-  }
-
   // Allocate inputs
   input_.resize(INTEGRATOR_NUM_IN);
   for(int i=0; i<INTEGRATOR_NUM_IN; ++i){
@@ -146,19 +139,19 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
     // Pass integrator output to the output function
     if(output_fcn_.input(DAE_T).size()!=0)
       output_fcn_.setInput(grid_[k],DAE_T);
-    if(output_fcn_.input(DAE_Y).size()!=0)
-      output_fcn_.setInput(integrator_.output(INTEGRATOR_XF),DAE_Y);
-    if(output_fcn_.input(DAE_YDOT).size()!=0)
-      output_fcn_.setInput(integrator_.output(INTEGRATOR_XPF),DAE_YDOT);
+    if(output_fcn_.input(DAE_X).size()!=0)
+      output_fcn_.setInput(integrator_.output(INTEGRATOR_XF),DAE_X);
+    if(output_fcn_.input(DAE_XDOT).size()!=0)
+      output_fcn_.setInput(integrator_.output(INTEGRATOR_XPF),DAE_XDOT);
     if(output_fcn_.input(DAE_P).size()!=0)
       output_fcn_.setInput(input(INTEGRATOR_P),DAE_P);
 
     for(int dir=0; dir<nfdir; ++dir){
       // Pass the forward seed to the output function
       output_fcn_.setFwdSeed(0.0,DAE_T,dir);
-      output_fcn_.setFwdSeed(integrator_.fwdSens(INTEGRATOR_XF,dir),DAE_Y,dir);
-      if(output_fcn_.input(DAE_YDOT).size()!=0)
-        output_fcn_.setFwdSeed(integrator_.fwdSens(INTEGRATOR_XPF,dir),DAE_YDOT,dir);
+      output_fcn_.setFwdSeed(integrator_.fwdSens(INTEGRATOR_XF,dir),DAE_X,dir);
+      if(output_fcn_.input(DAE_XDOT).size()!=0)
+        output_fcn_.setFwdSeed(integrator_.fwdSens(INTEGRATOR_XPF,dir),DAE_XDOT,dir);
       output_fcn_.setFwdSeed(fwdSeed(INTEGRATOR_P,dir),DAE_P,dir);
     }
     

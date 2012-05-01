@@ -97,15 +97,8 @@ int main(){
   y0[1] = 0;
   y0[2] = 1;
 
-  // Input of the dae residual
-  vector<vector<SX> > daefcn_in(DAE_NUM_IN);
-  daefcn_in[DAE_T].push_back(t);
-  daefcn_in[DAE_Y] = y;
-  daefcn_in[DAE_YDOT] = ydot;
-  daefcn_in[DAE_P].push_back(u);
-
   // DAE residual function
-  SXFunction daefcn(daefcn_in,res);
+  SXFunction daefcn(daeIn<SXMatrix>(ydot,y,SXMatrix(),u,t),daeOut<SXMatrix>(res));
   daefcn.setOption("name","DAE residual");
 
   // Integrator

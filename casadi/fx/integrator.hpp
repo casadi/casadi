@@ -82,7 +82,6 @@ namespace CasADi{
 
 /// Input arguments of an ODE/DAE function
 enum DAEInput{
-#ifdef NEW_INTEGRATOR 
   /** Time derivative of differential states */
   DAE_XDOT,
   /** Differential state */
@@ -93,16 +92,6 @@ enum DAEInput{
   DAE_P,
   /** Explicit time dependence */
   DAE_T,
-#else
-  /** Explicit time dependence */
-  DAE_T,
-  /** Differential and algebraic states. NOTE: To be replaced by DAE_X and DAE_Z */
-  DAE_Y,
-  /** Parameter */
-  DAE_P,
-  /** Time derivative of differential and algebraic states. NOTE: To be replaced by DAE_XDOT */
-  DAE_YDOT,
-#endif
   /** Number of arguments. */
   DAE_NUM_IN
 };
@@ -110,11 +99,7 @@ enum DAEInput{
 /// Helper function to create ODE/DAE forward integration function input arguments
 template<class M>
 std::vector<M> daeIn(const M& xdot, const M& x, const M& z=M(), const M& p=M(), const M& t=M()){
-#ifdef NEW_INTEGRATOR 
   M ret[DAE_NUM_IN] = {xdot,x,z,p,t};
-#else
-  M ret[DAE_NUM_IN] = {t,x,p,xdot};
-#endif
   return std::vector<M>(ret,ret+DAE_NUM_IN);
 }
 #ifdef SWIG

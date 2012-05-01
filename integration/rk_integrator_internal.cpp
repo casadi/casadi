@@ -60,7 +60,7 @@ void RKIntegratorInternal::init(){
     casadi_assert_message(fq_.getNumOutputs()==DAE_NUM_OUT, "RKIntegratorInternal: q has wrong number of outputs");
   }
 
-  ny_ = fd_.input(DAE_Y).numel();
+  ny_ = fd_.input(DAE_X).numel();
   nq_ = fq_.isNull() ? 0 : fq_.output().numel();
   casadi_assert_message(nq_==0, "Quadratures not supported.");
   
@@ -77,7 +77,7 @@ void RKIntegratorInternal::init(){
   int deg = getOption("interpolation_order");
 
   // Assume explicit ODE
-  bool explicit_ode = fd_.input(DAE_YDOT).size()==0;
+  bool explicit_ode = fd_.input(DAE_XDOT).size()==0;
 
   // Expand f?
   bool expand_f = getOption("expand_f");
@@ -109,8 +109,8 @@ void RKIntegratorInternal::init(){
     // Call the ode right hand side function
     vector<MX> f_in(DAE_NUM_IN);
     f_in[DAE_T] = T;
-    f_in[DAE_Y] = Y;
-    f_in[DAE_YDOT] = YDOT;
+    f_in[DAE_X] = Y;
+    f_in[DAE_XDOT] = YDOT;
     f_in[DAE_P] = P;
     vector<MX> f_out = fd_.call(f_in);
     MX ode_rhs = f_out[DAE_RES];

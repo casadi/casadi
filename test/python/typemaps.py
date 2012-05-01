@@ -447,7 +447,7 @@ class typemaptests(casadiTestCase):
     x=SX("x") 
     dx=SX("dx")
 
-    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_Y: [x,dx]},[[dx,-x]])
+    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_X: [x,dx]},[[dx,-x]])
     f.init()
 
     integrator = CVodesIntegrator(f)

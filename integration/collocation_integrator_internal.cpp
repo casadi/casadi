@@ -69,7 +69,7 @@ void CollocationIntegratorInternal::init(){
     casadi_assert_message(fq_.getNumOutputs()==DAE_NUM_OUT, "CollocationIntegratorInternal: q has wrong number of outputs");
   }
 
-  ny_ = fd_.input(DAE_Y).numel();
+  ny_ = fd_.input(DAE_X).numel();
   nq_ = fq_.isNull() ? 0 : fq_.output().numel();
   
   int np = fd_.input(DAE_P).numel();
@@ -114,7 +114,7 @@ void CollocationIntegratorInternal::init(){
   int deg = getOption("interpolation_order");
 
   // Assume explicit ODE
-  bool explicit_ode = fd_.input(DAE_YDOT).size()==0;
+  bool explicit_ode = fd_.input(DAE_XDOT).size()==0;
   
   // All collocation time points
   double* tau_root = use_radau ? radau_points[deg] : legendre_points[deg];
@@ -257,7 +257,7 @@ void CollocationIntegratorInternal::init(){
       vector<MX> f_in(DAE_NUM_IN);
       f_in[DAE_T] = tk;
       f_in[DAE_P] = P;
-      f_in[DAE_Y] = Y[k][j];
+      f_in[DAE_X] = Y[k][j];
       
       if(explicit_ode){
         // Assume equation of the form ydot = f(t,y,p)
@@ -265,7 +265,7 @@ void CollocationIntegratorInternal::init(){
         g.push_back(h_mx*f_out[DAE_RES] - yp_jk);
       } else {
         // Assume equation of the form 0 = f(t,y,ydot,p)
-        f_in[DAE_YDOT] = yp_jk/h_mx;
+        f_in[DAE_XDOT] = yp_jk/h_mx;
         vector<MX> f_out = fd_.call(f_in);
         g.push_back(f_out[DAE_RES]);
       }

@@ -101,8 +101,8 @@ void SundialsInternal::init(){
   if(fd_.input(DAE_T).numel()==0) {
     std::vector<MX> in1(DAE_NUM_IN);
     in1[DAE_T] = MX("T");
-    in1[DAE_Y] = MX("Y",fd_.input(DAE_Y).size1(),fd_.input(DAE_Y).size2());
-    in1[DAE_YDOT] = MX("YDOT",fd_.input(DAE_YDOT).size1(),fd_.input(DAE_YDOT).size2());
+    in1[DAE_X] = MX("Y",fd_.input(DAE_X).size1(),fd_.input(DAE_X).size2());
+    in1[DAE_XDOT] = MX("YDOT",fd_.input(DAE_XDOT).size1(),fd_.input(DAE_XDOT).size2());
     in1[DAE_P] = MX("P",fd_.input(DAE_P).size1(),fd_.input(DAE_P).size2());
     std::vector<MX> in2(in1);
     in2[DAE_T] = MX();
@@ -146,7 +146,7 @@ SundialsIntegrator SundialsInternal::jac(bool with_x, bool with_p){
   if(q.isNull() != fq_.isNull()) return SundialsIntegrator();
     
   // Number of state derivatives
-  int nyp = fd_.input(DAE_YDOT).numel();
+  int nyp = fd_.input(DAE_XDOT).numel();
   
   // Number of sensitivities
   int ns_x = with_x*nx_;
@@ -158,8 +158,8 @@ SundialsIntegrator SundialsInternal::jac(bool with_x, bool with_p){
   SXMatrix ypsens = ssym("ypsens",nyp,ns);
     
   // Sensitivity equation
-  SXMatrix res_s = mul(f.jac(DAE_Y,DAE_RES),ysens);
-  if(nyp>0) res_s += mul(f.jac(DAE_YDOT,DAE_RES),ypsens);
+  SXMatrix res_s = mul(f.jac(DAE_X,DAE_RES),ysens);
+  if(nyp>0) res_s += mul(f.jac(DAE_XDOT,DAE_RES),ypsens);
   if(with_p) res_s += horzcat(SXMatrix(ny_,ns_x),f.jac(DAE_P,DAE_RES));
 
   // Augmented DAE
@@ -169,8 +169,8 @@ SundialsIntegrator SundialsInternal::jac(bool with_x, bool with_p){
   // Input arguments for the augmented DAE
   vector<SXMatrix> faug_in(DAE_NUM_IN);
   faug_in[DAE_T] = f.inputSX(DAE_T);
-  faug_in[DAE_Y] = vec(horzcat(f.inputSX(DAE_Y),ysens));
-  if(nyp>0) faug_in[DAE_YDOT] = vec(horzcat(f.inputSX(DAE_YDOT),ypsens));
+  faug_in[DAE_X] = vec(horzcat(f.inputSX(DAE_X),ysens));
+  if(nyp>0) faug_in[DAE_XDOT] = vec(horzcat(f.inputSX(DAE_XDOT),ypsens));
   faug_in[DAE_P] = f.inputSX(DAE_P);
   
   // Create augmented DAE function
@@ -183,8 +183,8 @@ SundialsIntegrator SundialsInternal::jac(bool with_x, bool with_p){
   if(!q.isNull()){
     
     // Sensitivity quadratures
-    SXMatrix q_s = mul(q.jac(DAE_Y,DAE_RES),ysens);
-    if(nyp>0) q_s += mul(q.jac(DAE_YDOT,DAE_RES),ypsens);
+    SXMatrix q_s = mul(q.jac(DAE_X,DAE_RES),ysens);
+    if(nyp>0) q_s += mul(q.jac(DAE_XDOT,DAE_RES),ypsens);
     if(with_p) q_s += horzcat(SXMatrix(nq_,ns_x),q.jac(DAE_P,DAE_RES));
 
     // Augmented quadratures
@@ -194,8 +194,8 @@ SundialsIntegrator SundialsInternal::jac(bool with_x, bool with_p){
     // Input to the augmented DAE (start with old)
     vector<SXMatrix> qaug_in(DAE_NUM_IN);
     qaug_in[DAE_T] = q.inputSX(DAE_T);
-    qaug_in[DAE_Y] = vec(horzcat(q.inputSX(DAE_Y),ysens));
-    if(nyp>0) qaug_in[DAE_YDOT] = vec(horzcat(q.inputSX(DAE_YDOT),ypsens));
+    qaug_in[DAE_X] = vec(horzcat(q.inputSX(DAE_X),ysens));
+    if(nyp>0) qaug_in[DAE_XDOT] = vec(horzcat(q.inputSX(DAE_XDOT),ypsens));
     qaug_in[DAE_P] = q.inputSX(DAE_P);
 
     // Create augmented DAE function

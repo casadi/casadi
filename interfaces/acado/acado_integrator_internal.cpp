@@ -102,7 +102,7 @@ void AcadoIntegratorInternal::init(){
   if(!fd_.isInit()) fd_.init();
   casadi_assert(fq_.isNull());
   
-  int nx = fd_.input(DAE_Y).size();
+  int nx = fd_.input(DAE_X).size();
   int np = fd_.input(DAE_P).size();
   setDimensions(nx,np);
   

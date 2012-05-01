@@ -45,9 +45,9 @@ class Simulatortests(casadiTestCase):
     dp=ssym("dp")
     f = DAE_NUM_IN * [[]]
     f[DAE_T] = t
-    f[DAE_Y] = q
+    f[DAE_X] = q
     f[DAE_P] = p
-    f[DAE_YDOT] = dp
+    f[DAE_XDOT] = dp
     f=SXFunction(f,[q/p*t**2-dp])
     f.init()
     integrator = CVodesIntegrator(f)
@@ -82,10 +82,10 @@ class Simulatortests(casadiTestCase):
     p=ssym("p")
     dp=ssym("dp")
     
-    out = SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_Y: q, DAE_P: p, DAE_YDOT: dp},[[q],[t],[p],[dp]])
+    out = SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_X: q, DAE_P: p, DAE_XDOT: dp},[[q],[t],[p],[dp]])
     out.init()
         
-    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_Y: q, DAE_P: p, DAE_YDOT: dp},[q/p*t**2-dp])
+    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_X: q, DAE_P: p, DAE_XDOT: dp},[q/p*t**2-dp])
     f.init()
     integrator = CVodesIntegrator(f)
     integrator.setOption("reltol",1e-15)
@@ -106,7 +106,7 @@ class Simulatortests(casadiTestCase):
     self.checkarray(sim.output(2),DMatrix.ones(tc.shape)*num['p'],"Evaluation output mismatch")
     self.checkarray(sim.output(3),DMatrix.zeros(tc.shape),"Evaluation output mismatch")
     
-    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_Y: q, DAE_P: p},[q/p*t**2])
+    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_X: q, DAE_P: p},[q/p*t**2])
     f.init()
     integrator = CVodesIntegrator(f)
     integrator.setOption("reltol",1e-15)
@@ -127,10 +127,10 @@ class Simulatortests(casadiTestCase):
     self.checkarray(sim.output(2),DMatrix.ones(tc.shape)*num['p'],"Evaluation output mismatch")
     self.checkarray(sim.output(3),DMatrix.zeros(tc.shape),"Evaluation output mismatch")
     
-    out = SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_Y: q, DAE_YDOT: dp},[[q],[t],[dp]])
+    out = SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_X: q, DAE_XDOT: dp},[[q],[t],[dp]])
     out.init()
     
-    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_Y: q},[q/num['p']*t**2])
+    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_X: q},[q/num['p']*t**2])
     f.init()
     integrator = CVodesIntegrator(f)
     integrator.setOption("reltol",1e-15)
@@ -149,7 +149,7 @@ class Simulatortests(casadiTestCase):
     self.checkarray(sim.output(1),tc,"Evaluation output mismatch")
     self.checkarray(sim.output(2),DMatrix.zeros(tc.shape),"Evaluation output mismatch")
     
-    f=SXFunction({'NUM': DAE_NUM_IN, DAE_Y: q},[-q])
+    f=SXFunction({'NUM': DAE_NUM_IN, DAE_X: q},[-q])
     f.init()
     integrator = CVodesIntegrator(f)
     integrator.setOption("reltol",1e-15)
@@ -210,7 +210,7 @@ class Simulatortests(casadiTestCase):
     self.checkarray(sim.output(),DMatrix.ones(sim.output().shape)*p,"Evaluation output mismatch")
 
     yv = SX("y")
-    out = SXFunction({'NUM': DAE_NUM_IN, DAE_YDOT: yv},[yv])
+    out = SXFunction({'NUM': DAE_NUM_IN, DAE_XDOT: yv},[yv])
     
     out.init()
     sim = Simulator(self.integrator,out,t)
@@ -236,10 +236,10 @@ class Simulatortests(casadiTestCase):
     
     qm = ssym("qm")
     
-    out = SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_T: t, CONTROL_DAE_Y: q, CONTROL_DAE_P: p, CONTROL_DAE_U: [], CONTROL_DAE_U_INTERP: [],  CONTROL_DAE_YDOT: dp, CONTROL_DAE_T0: t0 , CONTROL_DAE_TF: tf_, CONTROL_DAE_Y_MAJOR: qm},[[q],[t],[p],[dp],[t0],[tf_],[qm]])
+    out = SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_T: t, CONTROL_DAE_X: q, CONTROL_DAE_P: p, CONTROL_DAE_U: [], CONTROL_DAE_U_INTERP: [],  CONTROL_DAE_XDOT: dp, CONTROL_DAE_T0: t0 , CONTROL_DAE_TF: tf_, CONTROL_DAE_X_MAJOR: qm},[[q],[t],[p],[dp],[t0],[tf_],[qm]])
     out.init()
     
-    f=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_T: t, CONTROL_DAE_Y: q, CONTROL_DAE_P: p, CONTROL_DAE_YDOT: dp, CONTROL_DAE_Y_MAJOR: qm},[q/p*t**2-dp])
+    f=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_T: t, CONTROL_DAE_X: q, CONTROL_DAE_P: p, CONTROL_DAE_XDOT: dp, CONTROL_DAE_X_MAJOR: qm},[q/p*t**2-dp])
     f.init()
     sim = ControlSimulator(f,out,tc)
     sim.setOption('nf',4)
@@ -264,7 +264,7 @@ class Simulatortests(casadiTestCase):
     
     
     #CasadiOptions.setCatchErrorsPython(False)
-    f=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_T: t, CONTROL_DAE_Y: q, CONTROL_DAE_P: p, CONTROL_DAE_Y_MAJOR: qm},[q/p*t**2])
+    f=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_T: t, CONTROL_DAE_X: q, CONTROL_DAE_P: p, CONTROL_DAE_X_MAJOR: qm},[q/p*t**2])
     f.init()
     sim = ControlSimulator(f,out,tc)
     sim.setOption('nf',4)
@@ -285,10 +285,10 @@ class Simulatortests(casadiTestCase):
     self.checkarray(sim.output(5),DMatrix([0.08,0.08,0.08,0.08,0.16,0.16,0.16,0.16,0.24,0.24,0.24,0.24,0.32,0.32,0.32,0.32,0.32]),"Evaluation output mismatch")
     self.checkarray(sim.output(6),num['q0']*exp(sim.output(4)**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
     
-    out = SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_T: t, CONTROL_DAE_Y: q, CONTROL_DAE_P: [], CONTROL_DAE_U: [], CONTROL_DAE_U_INTERP: [],  CONTROL_DAE_YDOT: dp, CONTROL_DAE_T0: t0 , CONTROL_DAE_TF: tf_, CONTROL_DAE_Y_MAJOR: qm},[[q],[t],[dp],[t0],[tf_],[qm]])
+    out = SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_T: t, CONTROL_DAE_X: q, CONTROL_DAE_P: [], CONTROL_DAE_U: [], CONTROL_DAE_U_INTERP: [],  CONTROL_DAE_XDOT: dp, CONTROL_DAE_T0: t0 , CONTROL_DAE_TF: tf_, CONTROL_DAE_X_MAJOR: qm},[[q],[t],[dp],[t0],[tf_],[qm]])
     out.init()
     
-    f=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_T: t, CONTROL_DAE_Y: q, CONTROL_DAE_Y_MAJOR: qm},[q/num['p']*t**2])
+    f=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_T: t, CONTROL_DAE_X: q, CONTROL_DAE_X_MAJOR: qm},[q/num['p']*t**2])
     f.init()
     sim = ControlSimulator(f,out,tc)
     sim.setOption('nf',4)
@@ -305,7 +305,7 @@ class Simulatortests(casadiTestCase):
     self.checkarray(sim.output(4),DMatrix([0.08,0.08,0.08,0.08,0.16,0.16,0.16,0.16,0.24,0.24,0.24,0.24,0.32,0.32,0.32,0.32,0.32]),"Evaluation output mismatch")
     self.checkarray(sim.output(5),num['q0']*exp(sim.output(3)**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
     
-    f=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_Y: q, CONTROL_DAE_Y_MAJOR: qm},[-q])
+    f=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_X: q, CONTROL_DAE_X_MAJOR: qm},[-q])
     f.init()
     sim = ControlSimulator(f,out,tc)
     sim.setOption('nf',4)
@@ -337,10 +337,10 @@ class Simulatortests(casadiTestCase):
     
     q0=2.3
 
-    out = SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_Y: q, CONTROL_DAE_YDOT: dq, CONTROL_DAE_U:u, CONTROL_DAE_U_INTERP: ui},[[q],[u],[ui]])
+    out = SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_X: q, CONTROL_DAE_XDOT: dq, CONTROL_DAE_U:u, CONTROL_DAE_U_INTERP: ui},[[q],[u],[ui]])
     out.init()
     
-    f=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_Y: q, CONTROL_DAE_U:u},[-q])
+    f=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_X: q, CONTROL_DAE_U:u},[-q])
     f.init()
     sim = ControlSimulator(f,out,tc)
     sim.setOption('nf',4)
@@ -348,10 +348,10 @@ class Simulatortests(casadiTestCase):
     sim.setOption('integrator_options', {"reltol":1e-15,"abstol":1e-15,"fsens_err_con": True})
     self.assertRaises(Exception,lambda : sim.init())
     
-    out = SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_Y: q, CONTROL_DAE_YDOT: dq, CONTROL_DAE_U:u},[[q],[u]])
+    out = SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_X: q, CONTROL_DAE_XDOT: dq, CONTROL_DAE_U:u},[[q],[u]])
     out.init()
     
-    f=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_Y: q},[-q])
+    f=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_X: q},[-q])
     f.init()
     sim = ControlSimulator(f,out,tc)
     sim.setOption('nf',4)
@@ -360,10 +360,10 @@ class Simulatortests(casadiTestCase):
     self.assertRaises(Exception,lambda : sim.init())
 
 
-    out = SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_Y: q, CONTROL_DAE_YDOT: dq, CONTROL_DAE_U: u , CONTROL_DAE_U_INTERP: ui},[[q],[u],[ui]])
+    out = SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_X: q, CONTROL_DAE_XDOT: dq, CONTROL_DAE_U: u , CONTROL_DAE_U_INTERP: ui},[[q],[u],[ui]])
     out.init()
     
-    f=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_Y: q,CONTROL_DAE_U:u, CONTROL_DAE_U_INTERP: ui},[-q])
+    f=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_X: q,CONTROL_DAE_U:u, CONTROL_DAE_U_INTERP: ui},[-q])
     f.init()
     sim = ControlSimulator(f,out,tc)
     sim.setOption('nf',4)
@@ -380,10 +380,10 @@ class Simulatortests(casadiTestCase):
     self.checkarray(sim.output(1),DMatrix([0,0,0,0,0.1,0.1,0.1,0.1,0,0,0,0,0.2,0.2,0.2,0.2,0.2]),"Evaluation output mismatch")
     self.checkarray(sim.output(2),DMatrix([0,0.025,0.05,0.075,0.1,0.075,0.05,0.025,0,0.05,0.1,0.15,0.2,0.2,0.2,0.2,0.2]),"Evaluation output mismatch")
 
-    out = SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_Y: q, CONTROL_DAE_YDOT: dq, CONTROL_DAE_U: u , CONTROL_DAE_U_INTERP: ui},[[q],[u],[ui]])
+    out = SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_X: q, CONTROL_DAE_XDOT: dq, CONTROL_DAE_U: u , CONTROL_DAE_U_INTERP: ui},[[q],[u],[ui]])
     out.init()
     
-    f=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_Y: q,CONTROL_DAE_U:u, CONTROL_DAE_U_INTERP: ui},[-q])
+    f=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_X: q,CONTROL_DAE_U:u, CONTROL_DAE_U_INTERP: ui},[-q])
     f.init()
     sim = ControlSimulator(f,out,tc)
     sim.setOption('control_endpoint',True)
@@ -409,7 +409,7 @@ class Simulatortests(casadiTestCase):
     q=ssym("q")
     p=ssym("p")
     dp=ssym("dp")
-    f=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_T: t, CONTROL_DAE_Y: q, CONTROL_DAE_P: p, CONTROL_DAE_YDOT: dp},[q/p*t**2-dp])
+    f=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_T: t, CONTROL_DAE_X: q, CONTROL_DAE_P: p, CONTROL_DAE_XDOT: dp},[q/p*t**2-dp])
     f.init()
     sim = ControlSimulator(f,tc)
     sim.setOption('nf',4)
@@ -459,10 +459,10 @@ class Simulatortests(casadiTestCase):
     
 
     rhs = vertcat([v - dx, ( -  b*v - k*x) - dv ])
-    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_YDOT: [dx,dv], DAE_Y: [x,v], DAE_P: [b,k]},[rhs])
+    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_XDOT: [dx,dv], DAE_X: [x,v], DAE_P: [b,k]},[rhs])
     f.init()
     
-    cf=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_T: t, CONTROL_DAE_YDOT: [dx,dv], CONTROL_DAE_Y: [x,v], CONTROL_DAE_P: [b,k]},[rhs])
+    cf=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_T: t, CONTROL_DAE_XDOT: [dx,dv], CONTROL_DAE_X: [x,v], CONTROL_DAE_P: [b,k]},[rhs])
     cf.init()
 
     x0 = SX("x0")

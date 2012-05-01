@@ -91,7 +91,7 @@ void dae_res_c(double tt, const double *yy, const double* yydot, const double* p
 // Wrap the function to allow creating an CasADi function
 void dae_res_c_wrapper(CFunction &f, int nfwd, int nadj, void* user_data){
   casadi_assert(nfwd==0 && nadj==0);
-  dae_res_c(f.input(DAE_T).front(), &f.input(DAE_Y).front(), &f.input(DAE_YDOT).front(), &f.input(DAE_P).front(), &f.output(DAE_RES).front());
+  dae_res_c(f.input(DAE_T).front(), &f.input(DAE_X).front(), &f.input(DAE_XDOT).front(), &f.input(DAE_P).front(), &f.output(DAE_RES).front());
 }
 
 // Create an IDAS instance (fully implicit integrator)
@@ -130,15 +130,12 @@ Integrator create_Sundials(){
   res[1] = (u-0.02*v*v)/m - vdot;
   res[2] = -0.01*u*u - mdot;
 
-  // Input of the DAE residual function
-  vector<SXMatrix> ffcn_in(DAE_NUM_IN);
-  ffcn_in[DAE_T] = t;
-  ffcn_in[DAE_Y] = y;
-  ffcn_in[DAE_YDOT] = ydot;
-  ffcn_in[DAE_P] = u;
+  // Input/output of the DAE residual function
+  vector<SXMatrix> ffcn_in = daeIn<SXMatrix>(ydot,y,SXMatrix(),u,t);
+  vector<SXMatrix> ffcn_out = daeOut<SXMatrix>(res,SXMatrix(),u_dev);
 
   // DAE residual function
-  FX ffcn = SXFunction(ffcn_in,res);
+  FX ffcn = SXFunction(ffcn_in,ffcn_out);
 
   // Overwrite ffcn with a plain c function (avoid this!)
   if(plain_c){
@@ -151,8 +148,8 @@ Integrator create_Sundials(){
     
     // Specify dimensions of inputs and outputs
     ffcn.input(DAE_T)    = DMatrix(1,1,0);
-    ffcn.input(DAE_Y)    = DMatrix(3,1,0);
-    ffcn.input(DAE_YDOT) = DMatrix(3,1,0);
+    ffcn.input(DAE_X)    = DMatrix(3,1,0);
+    ffcn.input(DAE_XDOT) = DMatrix(3,1,0);
     ffcn.input(DAE_P)    = DMatrix(1,1,0);
     ffcn.output(DAE_RES) = DMatrix(3,1,0);
   }
