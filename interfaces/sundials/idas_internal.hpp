@@ -249,10 +249,10 @@ class IdasInternal : public SundialsInternal{
   virtual void setLinearSolver(const LinearSolver& linsol, const FX& jac);
   
   // Copy n-vectors to Matrix<double>
-  void copyNV(const Matrix<double>& x, const Matrix<double>& xp, N_Vector& yz, N_Vector& yP, N_Vector& yQ);
+  void copyNV(const Matrix<double>& x, N_Vector& yz, N_Vector& yP, N_Vector& yQ);
   
   // Copy Matrix<double> to n-vectors
-  void copyNV(const N_Vector& yz, const N_Vector& yP, const N_Vector& yQ, Matrix<double>& x, Matrix<double>& xp);
+  void copyNV(const N_Vector& yz, const N_Vector& yP, const N_Vector& yQ, Matrix<double>& x);
   
   // Get the initial state
   void getInitialState();

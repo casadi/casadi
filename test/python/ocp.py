@@ -103,7 +103,7 @@ class OCPtests(casadiTestCase):
     
     q0   = vertcat([var[0],par])
     par  = var[1]
-    [qend,_] =integrator.call([q0,par,MX(2,1)])
+    [qend] =integrator.call([q0,par])
     
     parc = MX(0)
     
@@ -160,7 +160,7 @@ class OCPtests(casadiTestCase):
     
     q0   = vertcat([var[0],par])
     parl  = var[1]
-    [qend,_] =integrator.call([q0,parl,MX(2,1)])
+    [qend] =integrator.call([q0,parl])
     
     parc = MX(dy0)
     

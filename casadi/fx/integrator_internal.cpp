@@ -92,13 +92,11 @@ void IntegratorInternal::init(){
   // Allocate space for inputs
   input_.resize(INTEGRATOR_NUM_IN);
   input(INTEGRATOR_X0)  = DMatrix(nx_+nq_,1,0);
-  input(INTEGRATOR_XP0) = input(INTEGRATOR_X0);
   input(INTEGRATOR_P)   = f_.input(DAE_P);
   
   // Allocate space for outputs
   output_.resize(INTEGRATOR_NUM_OUT);
   output(INTEGRATOR_XF) = input(INTEGRATOR_X0);
-  output(INTEGRATOR_XPF)= input(INTEGRATOR_X0);
   
   // Call the base class method
   FXInternal::init();

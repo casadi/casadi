@@ -88,7 +88,7 @@ public:
   double t_;
   
   /// Differential states and quadrature states
-  int ny_;
+  int nxq_;
 
 };
   

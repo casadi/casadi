@@ -142,9 +142,9 @@ void IdasInternal::init(){
   if(mem_==0) throw CasadiException("IDACreate(): Creation failed");
 
   // Allocate n-vectors for ivp
-  y_ = N_VNew_Serial(ny_);
-  yP_ = N_VNew_Serial(ny_);
-  id_ = N_VNew_Serial(ny_);
+  y_ = N_VNew_Serial(nx_);
+  yP_ = N_VNew_Serial(nx_);
+  id_ = N_VNew_Serial(nx_);
 
   // Initialize Idas
   double t0 = 0;
@@ -200,7 +200,7 @@ void IdasInternal::init(){
     copy(is_differential.begin(),is_differential.end(),NV_DATA_S(id_));
   } else {
     // By default all components are differential
-    fill_n(NV_DATA_S(id_),ny_,1);
+    fill_n(NV_DATA_S(id_),nx_,1);
   }
   
   // Pass this information to IDAS
@@ -210,7 +210,7 @@ void IdasInternal::init(){
   // attach a linear solver
   if(getOption("linear_solver")=="dense"){
     // Dense jacobian
-    flag = IDADense(mem_, ny_);
+    flag = IDADense(mem_, nx_);
     if(flag != IDA_SUCCESS) idas_error("IDADense",flag);
     if(exact_jacobian_){
       // Generate jacobians if not already provided
@@ -225,7 +225,7 @@ void IdasInternal::init(){
     }
   } else if(getOption("linear_solver")=="banded") {
     // Banded jacobian
-    flag = IDABand(mem_, ny_, getOption("upper_bandwidth").toInt(), getOption("lower_bandwidth").toInt());
+    flag = IDABand(mem_, nx_, getOption("upper_bandwidth").toInt(), getOption("lower_bandwidth").toInt());
     if(flag != IDA_SUCCESS) idas_error("IDABand",flag);
     
     // Banded Jacobian information
@@ -301,8 +301,8 @@ void IdasInternal::init(){
       yPS_.resize(nfdir_,0);
       yQS_.resize(nfdir_,0);
       for(int i=0; i<nfdir_; ++i){
-        yS_[i] = N_VNew_Serial(ny_);
-        yPS_[i] = N_VNew_Serial(ny_);
+        yS_[i] = N_VNew_Serial(nx_);
+        yPS_[i] = N_VNew_Serial(nx_);
       }
 
       // Allocate n-vectors for quadratures
@@ -319,7 +319,7 @@ void IdasInternal::init(){
 
     // Copy the forward seeds
     for(int i=0; i<nfdir_; ++i){
-      copyNV(fwdSeed(INTEGRATOR_X0,i),fwdSeed(INTEGRATOR_XP0,i),yS_[i],yPS_[i],yQS_[i]);
+      copyNV(fwdSeed(INTEGRATOR_X0,i),yS_[i],yPS_[i],yQS_[i]);
     }
 
     // Initialize forward sensitivities
@@ -410,8 +410,8 @@ void IdasInternal::init(){
       yB_.resize(nadir_);
       yPB_.resize(nadir_);
       for(int i=0; i<nadir_; ++i){
-        yB_[i] = N_VNew_Serial(ny_);
-        yPB_[i] = N_VNew_Serial(ny_);
+        yB_[i] = N_VNew_Serial(nx_);
+        yPB_[i] = N_VNew_Serial(nx_);
       }
 
       // Allocate n-vectors for the adjoint sensitivities of the parameters
@@ -486,11 +486,11 @@ void IdasInternal::initAdj(){
     // attach linear solver
     if(getOption("asens_linear_solver")=="dense"){
       // Dense jacobian
-      flag = IDADenseB(mem_, whichB_[dir], ny_);
+      flag = IDADenseB(mem_, whichB_[dir], nx_);
       if(flag != IDA_SUCCESS) idas_error("IDADenseB",flag);
     } else if(getOption("asens_linear_solver")=="banded") {
       // Banded jacobian
-      flag = IDABandB(mem_, whichB_[dir], ny_, getOption("asens_upper_bandwidth").toInt(), getOption("asens_lower_bandwidth").toInt());
+      flag = IDABandB(mem_, whichB_[dir], nx_, getOption("asens_upper_bandwidth").toInt(), getOption("asens_lower_bandwidth").toInt());
       if(flag != IDA_SUCCESS) idas_error("IDABand",flag);
     } else if(getOption("asens_linear_solver")=="iterative") {
       // Sparse solver  
@@ -554,7 +554,7 @@ void IdasInternal::res(double t, const double* yz, const double* yp, double* r){
   }
 
   // Check the result for consistency
-  for(int i=0; i<ny_; ++i){
+  for(int i=0; i<nx_; ++i){
     if(isnan(r[i]) || isinf(r[i])){
       if(verbose_){
         stringstream ss;
@@ -619,7 +619,7 @@ void IdasInternal::jtimes(double t, const double *yz, const double *yp, const do
    f_.setFwdSeed(v,DAE_X);
    
    // Pass seeds of the state derivative
-   for(int i=0; i<ny_; ++i) tmp1[i] = cj*v[i];
+   for(int i=0; i<nx_; ++i) tmp1[i] = cj*v[i];
    f_.setFwdSeed(tmp1,DAE_XDOT);
    
    // Evaluate the AD forward algorithm
@@ -720,7 +720,7 @@ void IdasInternal::reset(int nfdir, int nadir){
   int flag;
   
   // Copy to N_Vectors
-  copyNV(input(INTEGRATOR_X0),input(INTEGRATOR_XP0),y_,yP_,yQ_);
+  copyNV(input(INTEGRATOR_X0),y_,yP_,yQ_);
   
   // Re-initialize
   flag = IDAReInit(mem_, t0_, y_, yP_);
@@ -738,7 +738,7 @@ void IdasInternal::reset(int nfdir, int nadir){
   if(fsens_order_>0){
     // Get the forward seeds
     for(int i=0; i<nfdir_; ++i){
-      copyNV(fwdSeed(INTEGRATOR_X0,i),fwdSeed(INTEGRATOR_XP0,i),yS_[i],yPS_[i],yQS_[i]);
+      copyNV(fwdSeed(INTEGRATOR_X0,i),yS_[i],yPS_[i],yQS_[i]);
     }
     
     // Re-initialize sensitivities
@@ -776,13 +776,11 @@ void IdasInternal::correctInitialConditions(){
     cout << "initial guess: " << endl;
     cout << "p = " << input(INTEGRATOR_P) << endl;
     cout << "x0 = " << input(INTEGRATOR_X0) << endl;
-    cout << "xp0 = " << input(INTEGRATOR_XP0) << endl;
     if(fsens_order_>0){
       for(int dir=0; dir<nfdir_; ++dir){
         cout << "forward seed guess, direction " << dir << ": " << endl;
         cout << "p_seed = " << fwdSeed(INTEGRATOR_P,dir) << endl;
         cout << "x0_seed = " << fwdSeed(INTEGRATOR_X0,dir) << endl;
-        cout << "xp0_seed = " << fwdSeed(INTEGRATOR_XP0,dir) << endl;
       }
     }
   }
@@ -799,10 +797,10 @@ void IdasInternal::correctInitialConditions(){
   if(flag != IDA_SUCCESS) idas_error("IDAGetConsistentIC",flag);
 
   // Save the corrected input to the function arguments
-  copyNV(y_,yP_,yQ_,input(INTEGRATOR_X0),input(INTEGRATOR_XP0));
+  copyNV(y_,yP_,yQ_,input(INTEGRATOR_X0));
   if(fsens_order_>0){
     for(int i=0; i<nfdir_; ++i){
-      copyNV(yS_[i],yPS_[i],yQS_[i],fwdSeed(INTEGRATOR_X0,i),fwdSeed(INTEGRATOR_XP0,i));
+      copyNV(yS_[i],yPS_[i],yQS_[i],fwdSeed(INTEGRATOR_X0,i));
     }
   }
   
@@ -811,13 +809,11 @@ void IdasInternal::correctInitialConditions(){
   if(monitored("correctInitialConditions")){
     cout << "p = " << input(INTEGRATOR_P) << endl;
     cout << "x0 = " << input(INTEGRATOR_X0) << endl;
-    cout << "xp0 = " << input(INTEGRATOR_XP0) << endl;
     if(fsens_order_>0){
       for(int dir=0; dir<nfdir_; ++dir){
         cout << "forward seed, direction " << dir << ": " << endl;
         cout << "p_seed = " << fwdSeed(INTEGRATOR_P,dir) << endl;
         cout << "x0_seed = " << fwdSeed(INTEGRATOR_X0,dir) << endl;
-        cout << "xp0_seed = " << fwdSeed(INTEGRATOR_XP0,dir) << endl;
       }
     }
   }
@@ -870,10 +866,10 @@ void IdasInternal::integrate(double t_out){
   }
   
   // Save the final state
-  copyNV(y_,yP_,yQ_,output(INTEGRATOR_XF),output(INTEGRATOR_XPF));
+  copyNV(y_,yP_,yQ_,output(INTEGRATOR_XF));
   if(fsens_order_>0){
     for(int i=0; i<nfdir_; ++i){
-      copyNV(yS_[i],yPS_[i],yQS_[i],fwdSens(INTEGRATOR_XF,i),fwdSens(INTEGRATOR_XPF,i));
+      copyNV(yS_[i],yPS_[i],yQS_[i],fwdSens(INTEGRATOR_XF,i));
     }
   }
     
@@ -946,9 +942,9 @@ void IdasInternal::integrateAdj(double t_out){
     
     // Quadrature sensitivities are trivial
     if(nq_>0){
-      copy(adjSeed(INTEGRATOR_XF,dir).begin()+ny_,
+      copy(adjSeed(INTEGRATOR_XF,dir).begin()+nx_,
            adjSeed(INTEGRATOR_XF,dir).end(),
-           adjSens(INTEGRATOR_X0,dir).begin()+ny_);
+           adjSens(INTEGRATOR_X0,dir).begin()+nx_);
     }
   }
   
@@ -1152,21 +1148,21 @@ void IdasInternal::resB(double t, const double* yz, const double* yp, const doub
 
   // Save to output
   const vector<double>& asens_ydot = f_.adjSens(DAE_XDOT).data();
-  for(int i=0; i<ny_; ++i)
+  for(int i=0; i<nx_; ++i)
     resvalB[i] -= asens_ydot[i];
   
   // If quadratures are included
   if(nq_>0){
     // Pass adjoint seeds
     f_.adjSeed(DAE_ODE).setZero();
-    f_.setAdjSeed(&adjSeed(INTEGRATOR_XF).at(ny_),DAE_QUAD);
+    f_.setAdjSeed(&adjSeed(INTEGRATOR_XF).at(nx_),DAE_QUAD);
 
     // Evaluate
     f_.evaluate(0,1);
     
     // Get the input seeds
     const vector<double>& asens_y = f_.adjSens(DAE_X).data();
-    for(int i=0; i<ny_; ++i)
+    for(int i=0; i<nx_; ++i)
       resvalB[i] += asens_y[i];
   }
   log("IdasInternal::resB","end");
@@ -1194,7 +1190,7 @@ void IdasInternal::rhsQB(double t, const double* yz, const double* yp, const dou
   // Pass adjoint seeds
   f_.setAdjSeed(yB,DAE_ODE);
   if(nq_>0){
-    f_.setAdjSeed(&adjSeed(INTEGRATOR_XF).at(ny_),DAE_QUAD);
+    f_.setAdjSeed(&adjSeed(INTEGRATOR_XF).at(nx_),DAE_QUAD);
   }
 
   // Evaluate
@@ -1548,55 +1544,47 @@ LinearSolver IdasInternal::getLinearSolver(){
   return linsol_;
 }
   
-void IdasInternal::copyNV(const Matrix<double>& x, const Matrix<double>& xp, N_Vector& yz, N_Vector& yP, N_Vector& yQ){
+void IdasInternal::copyNV(const Matrix<double>& x, N_Vector& yz, N_Vector& yP, N_Vector& yQ){
   double *yzd = NV_DATA_S(yz);
   double *yPd = NV_DATA_S(yP);
   
-  copy(x.begin(), x.begin()+ny_, yzd);
-  copy(xp.begin(), xp.begin()+ny_, yPd);
+  copy(x.begin(), x.begin()+nx_, yzd);
+  fill_n(yPd,nx_,0);
 
   if(nq_>0){
     double *yQd = NV_DATA_S(yQ);
-    copy(x.begin()+ny_, x.end(), yQd);
+    copy(x.begin()+nx_, x.end(), yQd);
   }
 }
   
-void IdasInternal::copyNV(const N_Vector& yz, const N_Vector& yP, const N_Vector& yQ, Matrix<double>& x, Matrix<double>& xp){
+void IdasInternal::copyNV(const N_Vector& yz, const N_Vector& yP, const N_Vector& yQ, Matrix<double>& x){
   const double *yzd = NV_DATA_S(yz);
   const double *ypd = NV_DATA_S(yP);
   
-  copy(yzd,yzd+ny_,x.begin());
-  copy(ypd,ypd+ny_,xp.begin());
+  copy(yzd,yzd+nx_,x.begin());
   
   if(nq_>0){
     const double *yQd = NV_DATA_S(yQ);
-    copy(yQd,yQd+nq_, x.begin()+ny_);
+    copy(yQd,yQd+nq_, x.begin()+nx_);
   }
 }
 
 void IdasInternal::getAdjointSeeds(){
   for(int i=0; i<nadir_; ++i){
     const double *x0 = &adjSeed(INTEGRATOR_XF,i).front();
-    const double *xp0 = &adjSeed(INTEGRATOR_XPF,i).front();
 
     double *yz = NV_DATA_S(yB_[i]);
     double *yp = NV_DATA_S(yPB_[i]);
 
-    copy(x0,x0+ny_,yz);
-    copy(xp0,xp0+ny_,yp);
+    copy(x0,x0+nx_,yz);
   }
 }
 
 void IdasInternal::setAdjointSensitivities(){
   for(int i=0; i<nadir_; ++i){
     double *xf = &adjSens(INTEGRATOR_X0,i).front();
-    double *xpf = &adjSens(INTEGRATOR_XP0,i).front();
-    
     const double *yz = NV_DATA_S(yB_[i]);
-    const double *yp = NV_DATA_S(yPB_[i]);
-  
-    copy(yz,yz+ny_,xf);
-    copy(yp,yp+ny_,xpf);
+    copy(yz,yz+nx_,xf);
   }
 }
 

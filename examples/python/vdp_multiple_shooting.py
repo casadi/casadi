@@ -90,9 +90,6 @@ VMIN[nv-2] = VMAX[nv-2] = 0
 # Initial solution guess
 VINIT = NP.zeros(nv)
 
-# State derivative (only relevant for DAEs)
-Xp = msym([0,0,0])
-
 # Constraint function with bounds
 g = [];  g_min = []; g_max = []
 
@@ -103,7 +100,7 @@ for k in range(nk):
   Xk_next = vertcat((X0[k+1],X1[k+1],X2[k+1]))
   
   # Call the integrator
-  [Xk_end,Xp] = f_d.call([Xk,U[k],Xp])
+  [Xk_end] = f_d.call([Xk,U[k]])
   
   # append continuity constraints
   g.append(Xk_next - Xk_end)

@@ -256,10 +256,6 @@ integrator.setInput(u_init,INTEGRATOR_P)
 # Set inital state
 integrator.setInput(x0,INTEGRATOR_X0)
 
-# Set initial state derivative (if not to be calculated)
-if not calc_ic:
-  integrator.setInput([0,1,-0.01,0],INTEGRATOR_XP0)
-  
 # Integrate
 integrator.evaluate()
 

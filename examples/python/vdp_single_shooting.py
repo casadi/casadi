@@ -54,12 +54,9 @@ U = msym("U",nk) # nk-by-1 symbolic variable
 # The initial state (x_0=0, x_1=1, x_2=0)
 X  = msym([0,1,0])
 
-# State derivative (only relevant for DAEs)
-Xp = msym([0,0,0])
-
 # Build a graph of integrator calls
 for k in range(nk):
-  [X,Xp] = f_d.call([X,U[k],Xp])
+  [X] = f_d.call([X,U[k]])
   
 # Objective function: x_2(T)
 F = MXFunction([U],[X[2]])

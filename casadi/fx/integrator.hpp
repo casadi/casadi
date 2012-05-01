@@ -132,24 +132,17 @@ std::vector<M> daeOut(const M& ode, const M& alg=M(), const M& quad=M()){
 
 /// Input arguments of an integrator
 enum IntegratorInput{
-  /** Differential or algebraic state at t0  (dimension nx-by-1) */
+  /** Differential state at the initial time */
   INTEGRATOR_X0, 
-  /** Parameters p  (dimension np-by-1) */
-  INTEGRATOR_P,  
-  /** State derivative at t0  (dimension nx-by-1)
-  * Only relevant for implicit intergators.
-  * This input may be changed during an IDASIntegrator::evaluate()
-  */
-  INTEGRATOR_XP0, 
+  /** Parameters */
+  INTEGRATOR_P,
   /** Number of input arguments of an integrator */
   INTEGRATOR_NUM_IN};
 
 /// Output arguments of an integrator
 enum IntegratorOutput{
- /**  State at tf */
- INTEGRATOR_XF, 
- /**  State derivative at tf */
- INTEGRATOR_XPF, 
+ /**  Differential state at final time */
+ INTEGRATOR_XF,
   /** Number of output arguments of an integrator */
  INTEGRATOR_NUM_OUT
 };

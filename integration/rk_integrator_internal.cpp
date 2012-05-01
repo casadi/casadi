@@ -197,11 +197,7 @@ FX RKIntegratorInternal::jacobian(const std::vector<std::pair<int,int> >& jblock
 }
 
 CRSSparsity RKIntegratorInternal::getJacSparsity(int iind, int oind){
-  if(iind==INTEGRATOR_XP0 || oind==INTEGRATOR_XPF){
-    return CRSSparsity();
-  } else {
-    return yf_fun_.jacSparsity(iind, oind, true);
-  }
+  return yf_fun_.jacSparsity(iind, oind, true);
 }
 
 } // namespace CasADi

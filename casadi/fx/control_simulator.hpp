@@ -59,10 +59,6 @@ enum ControlSimulatorInput{
   CONTROLSIMULATOR_P, 
   /** Parameters that change over the integration intervals (dimension (ns-1)-by-nu) */
   CONTROLSIMULATOR_U, 
-  /** State derivative at t0  (dimension nx-by-1)
-  * Only relevant for implicit integrators.
-  */
-  CONTROLSIMULATOR_XP0, 
   /** Number of input arguments of a piecewise simulator */
   CONTROLSIMULATOR_NUM_IN};
   

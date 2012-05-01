@@ -106,7 +106,7 @@ void CVodesInternal::init(){
     if(!f.isNull()){
       // Get the Jacobian in the Newton iteration
       SX gamma("gamma");
-      SXMatrix jac = SXMatrix::eye(ny_) - gamma * f.jac(DAE_X,DAE_ODE);
+      SXMatrix jac = SXMatrix::eye(nx_) - gamma * f.jac(DAE_X,DAE_ODE);
       
       // Jacobian function
       vector<vector<SX> > jac_in(Sundials::M_NUM_IN);
@@ -152,8 +152,8 @@ void CVodesInternal::init(){
   if(mem_==0) throw CasadiException("CVodeCreate: Creation failed");
 
   // Allocate n-vectors for ivp
-  y0_ = N_VMake_Serial(ny_,&input(INTEGRATOR_X0).front());
-  y_ = N_VMake_Serial(ny_,&output(INTEGRATOR_XF).front());
+  y0_ = N_VMake_Serial(nx_,&input(INTEGRATOR_X0).front());
+  y_ = N_VMake_Serial(nx_,&output(INTEGRATOR_XF).front());
 
   // Disable internal warning messages?
   disable_internal_warnings_ = getOption("disable_internal_warnings");
@@ -178,7 +178,7 @@ void CVodesInternal::init(){
   // attach a linear solver
   if(getOption("linear_solver")=="dense"){
     // Dense jacobian
-    flag = CVDense(mem_, ny_);
+    flag = CVDense(mem_, nx_);
     if(flag!=CV_SUCCESS) cvodes_error("CVDense",flag);
     if(exact_jacobian_){
       // Create jacobian if it does not exist
@@ -192,7 +192,7 @@ void CVodesInternal::init(){
     }
   } else if(getOption("linear_solver")=="banded") {
     // Banded jacobian
-    flag = CVBand(mem_, ny_, getOption("upper_bandwidth").toInt(), getOption("lower_bandwidth").toInt());
+    flag = CVBand(mem_, nx_, getOption("upper_bandwidth").toInt(), getOption("lower_bandwidth").toInt());
     if(flag!=CV_SUCCESS) cvodes_error("CVBand",flag);
     if(exact_jacobian_){
       flag = CVDlsSetBandJacFn(mem_, bjac_wrapper);
@@ -253,8 +253,8 @@ void CVodesInternal::init(){
   // Quadrature equations
   if(nq_>0){
     // Allocate n-vectors for quadratures
-    yQ0_ = N_VMake_Serial(nq_,&input(INTEGRATOR_X0).data()[ny_]);
-    yQ_ = N_VMake_Serial(nq_,&output(INTEGRATOR_XF).data()[ny_]);
+    yQ0_ = N_VMake_Serial(nq_,&input(INTEGRATOR_X0).data()[nx_]);
+    yQ_ = N_VMake_Serial(nq_,&output(INTEGRATOR_XF).data()[nx_]);
 
     // Initialize quadratures in CVodes
     flag = CVodeQuadInit(mem_, rhsQ_wrapper, yQ0_);
@@ -277,8 +277,8 @@ void CVodesInternal::init(){
       yS0_.resize(nfdir_,0);
       yS_.resize(nfdir_,0);
       for(int i=0; i<nfdir_; ++i){
-        yS0_[i] = N_VMake_Serial(ny_,&fwdSeed(INTEGRATOR_X0,i).data()[0]);
-        yS_[i] = N_VMake_Serial(ny_,&fwdSens(INTEGRATOR_XF,i).data()[0]);
+        yS0_[i] = N_VMake_Serial(nx_,&fwdSeed(INTEGRATOR_X0,i).data()[0]);
+        yS_[i] = N_VMake_Serial(nx_,&fwdSens(INTEGRATOR_XF,i).data()[0]);
       }
 
       // Allocate n-vectors for quadratures
@@ -286,8 +286,8 @@ void CVodesInternal::init(){
         yQS0_.resize(nfdir_,0);
         yQS_.resize(nfdir_,0);
         for(int i=0; i<nfdir_; ++i){
-          yQS0_[i] = N_VMake_Serial(nq_,&fwdSeed(INTEGRATOR_X0,i).data()[ny_]);
-          yQS_[i] = N_VMake_Serial(nq_,&fwdSens(INTEGRATOR_XF,i).data()[ny_]);
+          yQS0_[i] = N_VMake_Serial(nq_,&fwdSeed(INTEGRATOR_X0,i).data()[nx_]);
+          yQS_[i] = N_VMake_Serial(nq_,&fwdSens(INTEGRATOR_XF,i).data()[nx_]);
         }
       }
       
@@ -356,8 +356,8 @@ void CVodesInternal::init(){
   yB0_.resize(nadir_,0);
   yB_.resize(nadir_,0);
   for(int i=0; i<nadir_; ++i){
-    yB0_[i] = N_VMake_Serial(ny_,&adjSeed(INTEGRATOR_XF,i).data()[0]);
-    yB_[i] = N_VMake_Serial(ny_,&adjSens(INTEGRATOR_X0,i).data()[0]);
+    yB0_[i] = N_VMake_Serial(nx_,&adjSeed(INTEGRATOR_XF,i).data()[0]);
+    yB_[i] = N_VMake_Serial(nx_,&adjSens(INTEGRATOR_X0,i).data()[0]);
   }
 
   // Allocate n-vectors for quadratures
@@ -414,11 +414,11 @@ void CVodesInternal::initAdj(){
       // attach linear solver to backward problem
       if(getOption("asens_linear_solver")=="dense"){
       // Dense jacobian
-      flag = CVDenseB(mem_, whichB_[dir], ny_);
+      flag = CVDenseB(mem_, whichB_[dir], nx_);
       if(flag!=CV_SUCCESS) cvodes_error("CVDenseB",flag);
       } else if(getOption("asens_linear_solver")=="banded") {
       // Banded jacobian
-      flag = CVBandB(mem_, whichB_[dir], ny_, getOption("asens_upper_bandwidth").toInt(), getOption("asens_lower_bandwidth").toInt());
+      flag = CVBandB(mem_, whichB_[dir], nx_, getOption("asens_upper_bandwidth").toInt(), getOption("asens_lower_bandwidth").toInt());
       if(flag!=CV_SUCCESS) cvodes_error("CVBandB",flag);
     } else if(getOption("asens_linear_solver")=="iterative") {
       // Sparse jacobian
@@ -646,9 +646,9 @@ void CVodesInternal::integrateAdj(double t_out){
    
     // Quadrature sensitivities are trivial
     if(nq_>0){
-      copy(adjSeed(INTEGRATOR_XF,dir).begin()+ny_,
+      copy(adjSeed(INTEGRATOR_XF,dir).begin()+nx_,
            adjSeed(INTEGRATOR_XF,dir).end(),
-           adjSens(INTEGRATOR_X0,dir).begin()+ny_);
+           adjSens(INTEGRATOR_X0,dir).begin()+nx_);
     }
   }
 }
@@ -938,7 +938,7 @@ void CVodesInternal::rhsB(double t, const double* y, const double *yB, double* y
   // Pass adjoint seeds
   f_.setAdjSeed(yB,DAE_ODE);
   if(nq_>0){
-    f_.setAdjSeed(&adjSeed(INTEGRATOR_XF).data()[ny_],DAE_QUAD);
+    f_.setAdjSeed(&adjSeed(INTEGRATOR_XF).data()[nx_],DAE_QUAD);
   }
 
   if(monitor_rhsB_){
@@ -957,7 +957,7 @@ void CVodesInternal::rhsB(double t, const double* y, const double *yB, double* y
   
   // Save to output
   const vector<double>& fres = f_.adjSens(DAE_X).data();
-  for(int i=0; i<ny_; ++i)
+  for(int i=0; i<nx_; ++i)
     yBdot[i] = -fres[i];
 
   if(monitor_rhsB_){
@@ -1012,7 +1012,7 @@ void CVodesInternal::rhsQB(double t, const double* y, const double* yB, double* 
   // Pass adjoint seeds
   f_.setAdjSeed(yB,DAE_ODE);
   if(nq_>0){
-    f_.setAdjSeed(&adjSeed(INTEGRATOR_XF).data()[ny_],DAE_QUAD);
+    f_.setAdjSeed(&adjSeed(INTEGRATOR_XF).data()[nx_],DAE_QUAD);
   }
   
   if(monitor_rhsQB_) {
@@ -1042,9 +1042,9 @@ int CVodesInternal::jtimes_wrapper(N_Vector v, N_Vector Jv, double t, N_Vector y
   try{
     casadi_assert(user_data);
     CVodesInternal *this_ = (CVodesInternal*)user_data;
-    casadi_assert(this_->f_.fwdSens(DAE_ODE).size() == this_->ny_);
-    casadi_assert(NV_LENGTH_S(v) == this_->ny_);
-    casadi_assert(NV_LENGTH_S(Jv) == this_->ny_);
+    casadi_assert(this_->f_.fwdSens(DAE_ODE).size() == this_->nx_);
+    casadi_assert(NV_LENGTH_S(v) == this_->nx_);
+    casadi_assert(NV_LENGTH_S(Jv) == this_->nx_);
     this_->jtimes(NV_DATA_S(v),NV_DATA_S(Jv),t,NV_DATA_S(y),NV_DATA_S(fy),NV_DATA_S(tmp));
     return 0;
   } catch(exception& e){

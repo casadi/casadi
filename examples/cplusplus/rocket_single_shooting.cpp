@@ -147,9 +147,6 @@ int main(){
     input[INTEGRATOR_X0] = X;
     input[INTEGRATOR_P] = U[k];
 
-    vector<double> xp(X.numel());
-    input[INTEGRATOR_XP0] = xp;
-    
     // Integrate
     X = integrator.call(input).at(0);
   }

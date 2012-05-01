@@ -209,11 +209,10 @@ void ControlSimulatorInternal::init(){
     
     vector<SXMatrix> out(INTEGRATOR_NUM_OUT);
     out[INTEGRATOR_XF] = x;
-    out[INTEGRATOR_XPF] = xdot;
 
     // Create the output function
     output_fcn_ = SXFunction(arg,out);
-    output_fcn_.setOption("name","output function");
+    output_fcn_.setOption("name","output ");
   } else {
     output_fcn_ = orig_output_fcn_;
   }
@@ -289,7 +288,6 @@ void ControlSimulatorInternal::init(){
   input(CONTROLSIMULATOR_X0)  = DMatrix(dae_.input(DAE_X));
   input(CONTROLSIMULATOR_P)   = control_dae_.input(CONTROL_DAE_P);
   input(CONTROLSIMULATOR_U)   = DMatrix(ns_ - 1 + (control_endpoint ? 1 : 0) ,nu_,0);
-  input(CONTROLSIMULATOR_XP0) = DMatrix(dae_.input(DAE_X));
 
   // Allocate outputs
   output_.resize(output_fcn_->output_.size()-2);
@@ -301,14 +299,12 @@ void ControlSimulatorInternal::init(){
   
   // Variables on which the chain of simulator calls (all_output_) depend
   MX Xk("Xk", input(CONTROLSIMULATOR_X0).size());
-  MX XPk("XPk", input(CONTROLSIMULATOR_XP0).size());
   MX P("P",input(CONTROLSIMULATOR_P).size());
   MX U("U",input(CONTROLSIMULATOR_U).sparsity());
  
   // Group these variables as an input list for all_output_
   vector<MX> all_output_in(CONTROLSIMULATOR_NUM_IN);
   all_output_in[CONTROLSIMULATOR_X0] = Xk;
-  all_output_in[CONTROLSIMULATOR_XP0] = XPk;
   all_output_in[CONTROLSIMULATOR_P] = P;
   all_output_in[CONTROLSIMULATOR_U] = U;
   
@@ -327,7 +323,6 @@ void ControlSimulatorInternal::init(){
   for(int k=0; k<ns_-1; ++k){
     // Set the appropriate inputs for the k'th simulator call
     simulator_in[INTEGRATOR_X0] = Xk;
-    simulator_in[INTEGRATOR_XP0] = XPk;
     P_eval[0] = MX(gridc_[k]);
     P_eval[1] = MX(gridc_[k+1]);
     if (nu_>0) {
@@ -348,7 +343,6 @@ void ControlSimulatorInternal::init(){
     
     // Remember the end state and dstate for next iteration in this loop
     Xk = trans(simulator_out[0](simulator_out[0].size1()-1,range(simulator_out[0].size2())));
-    XPk = trans(simulator_out[1](simulator_out[1].size1()-1,range(simulator_out[1].size2())));  
     
     // Copy all the outputs (but not those 2 extra we introduced)
     for (int i=0;i<simulator_out.size()-2;++i) {

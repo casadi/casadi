@@ -53,7 +53,7 @@ void SimulatorInternal::init(){
   if(output_fcn_.isNull()){
     SXMatrix t = ssym("t");
     SXMatrix x = ssym("x",integrator_.input(INTEGRATOR_X0).sparsity());
-    SXMatrix xdot = ssym("xp",integrator_.input(INTEGRATOR_XP0).sparsity());
+    SXMatrix xdot = ssym("xp",integrator_.input(INTEGRATOR_X0).sparsity());
     SXMatrix p = ssym("p",integrator_.input(INTEGRATOR_P).sparsity());
 
     vector<SXMatrix> arg(DAE_NUM_IN);
@@ -64,7 +64,6 @@ void SimulatorInternal::init(){
 
     vector<SXMatrix> out(INTEGRATOR_NUM_OUT);
     out[INTEGRATOR_XF] = x;
-    out[INTEGRATOR_XPF] = xdot;
 
     // Create the output function
     output_fcn_ = SXFunction(arg,out);
@@ -98,20 +97,17 @@ void SimulatorInternal::init(){
 void SimulatorInternal::evaluate(int nfdir, int nadir){
   // Pass the parameters and initial state
   integrator_.setInput(input(INTEGRATOR_X0),INTEGRATOR_X0);
-  integrator_.setInput(input(INTEGRATOR_XP0),INTEGRATOR_XP0);
   integrator_.setInput(input(INTEGRATOR_P),INTEGRATOR_P);
   
   if (monitored("initial")) {
     std::cout << "SimulatorInternal::evaluate: initial condition:" << std::endl;
     std::cout << " y0     = "  << input(INTEGRATOR_X0) << std::endl;
-    std::cout << " dy0    = " << input(INTEGRATOR_XP0) << std::endl;
     std::cout << " p      = "   << input(INTEGRATOR_P) << std::endl;
   }
     
   // Pass sensitivities if fsens
   for(int dir=0; dir<nfdir; ++dir){
     integrator_.setFwdSeed(fwdSeed(INTEGRATOR_X0,dir),INTEGRATOR_X0,dir);
-    integrator_.setFwdSeed(fwdSeed(INTEGRATOR_XP0,dir),INTEGRATOR_XP0,dir);
     integrator_.setFwdSeed(fwdSeed(INTEGRATOR_P,dir),INTEGRATOR_P,dir);
   }
   
@@ -124,7 +120,6 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
     if (monitored("step")) {
       std::cout << "SimulatorInternal::evaluate: integrating up to: " <<  grid_[k] << std::endl;
       std::cout << " y0       = "  << integrator_.input(INTEGRATOR_X0) << std::endl;
-      std::cout << " dy0      = " << integrator_.input(INTEGRATOR_XP0) << std::endl;
       std::cout << " p        = "   << integrator_.input(INTEGRATOR_P) << std::endl;
     }
   
@@ -133,7 +128,6 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
 
     if (monitored("step")) {
       std::cout << " y_final  = "  << integrator_.output(INTEGRATOR_XF) << std::endl;
-      std::cout << " dy_final = " << integrator_.output(INTEGRATOR_XPF) << std::endl;
     }
     
     // Pass integrator output to the output function
@@ -141,8 +135,6 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
       output_fcn_.setInput(grid_[k],DAE_T);
     if(output_fcn_.input(DAE_X).size()!=0)
       output_fcn_.setInput(integrator_.output(INTEGRATOR_XF),DAE_X);
-    if(output_fcn_.input(DAE_XDOT).size()!=0)
-      output_fcn_.setInput(integrator_.output(INTEGRATOR_XPF),DAE_XDOT);
     if(output_fcn_.input(DAE_P).size()!=0)
       output_fcn_.setInput(input(INTEGRATOR_P),DAE_P);
 
@@ -150,8 +142,6 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
       // Pass the forward seed to the output function
       output_fcn_.setFwdSeed(0.0,DAE_T,dir);
       output_fcn_.setFwdSeed(integrator_.fwdSens(INTEGRATOR_XF,dir),DAE_X,dir);
-      if(output_fcn_.input(DAE_XDOT).size()!=0)
-        output_fcn_.setFwdSeed(integrator_.fwdSens(INTEGRATOR_XPF,dir),DAE_XDOT,dir);
       output_fcn_.setFwdSeed(fwdSeed(INTEGRATOR_P,dir),DAE_P,dir);
     }
     

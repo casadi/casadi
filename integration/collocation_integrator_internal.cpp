@@ -503,8 +503,7 @@ void CollocationIntegratorInternal::reset(int nfdir, int nadir){
     // Check if an integrator for the startup trajectory has been supplied
     if(!startup_integrator_.isNull()){
       // Use supplied integrator, if any
-      startup_integrator_.input(INTEGRATOR_X0).setArray(&input(INTEGRATOR_X0).front(),ny_); // only the ny_ first elements
-      startup_integrator_.input(INTEGRATOR_XP0).setArray(&input(INTEGRATOR_XP0).front(),ny_); // only the ny_ first elements
+      startup_integrator_.input(INTEGRATOR_X0).setArray(&input(INTEGRATOR_X0).front(),ny_);
       startup_integrator_.input(INTEGRATOR_P).set(input(INTEGRATOR_P));
       
       // Reset the integrator
