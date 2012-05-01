@@ -35,7 +35,7 @@ using namespace std;
 namespace CasADi{
 namespace Sundials{
   
-SundialsInternal::SundialsInternal(const FX& fd, const FX& fq) : IntegratorInternal(fd,fq){
+SundialsInternal::SundialsInternal(const FX& f) : IntegratorInternal(f){
   addOption("max_num_steps",               OT_INTEGER, 10000); // maximum number of steps
   addOption("reltol",                      OT_REAL,    1e-6); // relative tolerence for the IVP solution
   addOption("abstol",                      OT_REAL,    1e-8); // absolute tolerence  for the IVP solution
@@ -98,20 +98,20 @@ void SundialsInternal::init(){
   stop_at_end_ = getOption("stop_at_end");
   
   // If time was not specified, initialise it.
-  if(fd_.input(DAE_T).numel()==0) {
+  if(f_.input(DAE_T).numel()==0) {
     std::vector<MX> in1(DAE_NUM_IN);
     in1[DAE_T] = MX("T");
-    in1[DAE_X] = MX("Y",fd_.input(DAE_X).size1(),fd_.input(DAE_X).size2());
-    in1[DAE_XDOT] = MX("YDOT",fd_.input(DAE_XDOT).size1(),fd_.input(DAE_XDOT).size2());
-    in1[DAE_P] = MX("P",fd_.input(DAE_P).size1(),fd_.input(DAE_P).size2());
+    in1[DAE_X] = MX("Y",f_.input(DAE_X).size1(),f_.input(DAE_X).size2());
+    in1[DAE_XDOT] = MX("YDOT",f_.input(DAE_XDOT).size1(),f_.input(DAE_XDOT).size2());
+    in1[DAE_P] = MX("P",f_.input(DAE_P).size1(),f_.input(DAE_P).size2());
     std::vector<MX> in2(in1);
     in2[DAE_T] = MX();
-    fd_ = MXFunction(in1,fd_.call(in2));
-    fd_.init();
+    f_ = MXFunction(in1,f_.call(in2));
+    f_.init();
   }
   
   // We only allow for 0-D time
-  casadi_assert_message(fd_.input(DAE_T).numel()==1, "IntegratorInternal: time must be zero-dimensional, not (" <<  fd_.input(DAE_T).size1() << 'x' << fd_.input(DAE_T).size2() << ")");
+  casadi_assert_message(f_.input(DAE_T).numel()==1, "IntegratorInternal: time must be zero-dimensional, not (" <<  f_.input(DAE_T).size1() << 'x' << f_.input(DAE_T).size2() << ")");
   
   // Get the linear solver creator function
   if(linsol_.isNull() && hasSetOption("linear_solver_creator")){
@@ -139,14 +139,11 @@ SundialsIntegrator SundialsInternal::jac(bool with_x, bool with_p){
   casadi_assert(with_x || with_p);
   
   // Type cast to SXMatrix (currently supported)
-  SXFunction f = shared_cast<SXFunction>(fd_);
-  if(f.isNull() != fd_.isNull()) return SundialsIntegrator();
+  SXFunction f = shared_cast<SXFunction>(f_);
+  if(f.isNull() != f_.isNull()) return SundialsIntegrator();
   
-  SXFunction q = shared_cast<SXFunction>(fq_);
-  if(q.isNull() != fq_.isNull()) return SundialsIntegrator();
-    
   // Number of state derivatives
-  int nyp = fd_.input(DAE_XDOT).numel();
+  int nyp = f_.input(DAE_XDOT).numel();
   
   // Number of sensitivities
   int ns_x = with_x*nx_;
@@ -173,38 +170,28 @@ SundialsIntegrator SundialsInternal::jac(bool with_x, bool with_p){
   if(nyp>0) faug_in[DAE_XDOT] = vec(horzcat(f.inputSX(DAE_XDOT),ypsens));
   faug_in[DAE_P] = f.inputSX(DAE_P);
   
-  // Create augmented DAE function
-  SXFunction ffcn_aug(faug_in,daeOut(faug));
-  
   // Augmented quadratures
-  SXFunction qfcn_aug;
+  SXMatrix qaug;
   
   // Now lets do the same for the quadrature states
-  if(!q.isNull()){
+  if(!f.output(DAE_QUAD).empty()){
     
     // Sensitivity quadratures
-    SXMatrix q_s = mul(q.jac(DAE_X,DAE_ODE),ysens);
-    if(nyp>0) q_s += mul(q.jac(DAE_XDOT,DAE_ODE),ypsens);
-    if(with_p) q_s += horzcat(SXMatrix(nq_,ns_x),q.jac(DAE_P,DAE_ODE));
+    SXMatrix q_s = mul(f.jac(DAE_X,DAE_QUAD),ysens);
+    if(nyp>0) q_s += mul(f.jac(DAE_XDOT,DAE_QUAD),ypsens);
+    if(with_p) q_s += horzcat(SXMatrix(nq_,ns_x),f.jac(DAE_P,DAE_QUAD));
 
     // Augmented quadratures
-    SXMatrix qaug = vec(horzcat(q.outputSX(INTEGRATOR_XF),q_s));
+    qaug = vec(horzcat(f.outputSX(DAE_QUAD),q_s));
     makeDense(qaug); // NOTE: se above
-
-    // Input to the augmented DAE (start with old)
-    vector<SXMatrix> qaug_in(DAE_NUM_IN);
-    qaug_in[DAE_T] = q.inputSX(DAE_T);
-    qaug_in[DAE_X] = vec(horzcat(q.inputSX(DAE_X),ysens));
-    if(nyp>0) qaug_in[DAE_XDOT] = vec(horzcat(q.inputSX(DAE_XDOT),ypsens));
-    qaug_in[DAE_P] = q.inputSX(DAE_P);
-
-    // Create augmented DAE function
-    qfcn_aug = SXFunction(qaug_in,daeOut(qaug));
   }
-  
+
+  // Create augmented DAE function
+  SXFunction ffcn_aug(faug_in,daeOut(faug,SXMatrix(),qaug));
+
   // Create integrator instance
   SundialsIntegrator integrator;
-  integrator.assignNode(create(ffcn_aug,qfcn_aug));
+  integrator.assignNode(create(ffcn_aug));
 
   // Set options
   integrator.setOption(dictionary());

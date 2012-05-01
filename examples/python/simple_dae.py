@@ -56,7 +56,7 @@ acado_in[ACADO_FCN_U] = [u]     # Control
 acado_in[ACADO_FCN_P] = []      # Parameter
 
 # The DAE function
-ffcn = SXFunction(acado_in,[f])
+ffcn = SXFunction(acado_in,daeOut(f))
 
 ## Objective function
 mfcn = SXFunction(acado_in,[[l]])
@@ -112,8 +112,8 @@ zdot = SX("zdot")
 # The residual of the IDAS dae
 dae_in = DAE_NUM_IN * [[]]
 dae_in[DAE_T] = [t]     # Time
-dae_in[DAE_Y] = [x,l,z]   # States
-dae_in[DAE_YDOT] = [xdot,ldot,zdot]   # State derivatives
+dae_in[DAE_X] = [x,l,z]   # States
+dae_in[DAE_XDOT] = [xdot,ldot,zdot]   # State derivatives
 dae_in[DAE_P] = [u]     # Control
 
 # The DAE residual
@@ -125,7 +125,7 @@ dae_res[1] -= ldot
 #dae_res[2] -= 0.43*exp(z)
 
 # The DAE residual function
-dae = SXFunction(dae_in,[dae_res])
+dae = SXFunction(dae_in,daeOut(dae_res))
 
 # Create an integrator
 integrator = IdasIntegrator(dae)

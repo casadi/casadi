@@ -72,8 +72,8 @@ f = substitute(f,u,u_opt)
 # Create the right hand side function
 rhs_in = DAE_NUM_IN*[[]]
 rhs_in[DAE_T] = t
-rhs_in[DAE_Y] = vertcat((x,lam))
-rhs = SXFunction(rhs_in,[f])
+rhs_in[DAE_X] = vertcat((x,lam))
+rhs = SXFunction(rhs_in,daeOut(f))
 
 # Create an integrator (CVodes)
 I = CVodesIntegrator(rhs)

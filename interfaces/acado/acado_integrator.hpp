@@ -60,7 +60,7 @@ public:
   AcadoIntegrator();
   
   /// Create an integrator for a fully implicit DAE with quadrature states (nz is the number of states not to be included in the state vector)
-  explicit AcadoIntegrator(const FX& fd, const FX& fq=FX());
+  explicit AcadoIntegrator(const FX& f);
 
   /// Access functions of the node
   AcadoIntegratorInternal* operator->();
@@ -81,7 +81,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static Integrator creator(const FX& f, const FX& q){ return AcadoIntegrator(f,q); }
+  static Integrator creator(const FX& f){ return AcadoIntegrator(f); }
   #ifdef SWIG
   %nocallback;
   #endif

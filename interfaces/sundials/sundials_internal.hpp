@@ -32,7 +32,7 @@ namespace Sundials{
 class SundialsInternal : public IntegratorInternal{
 public:
   /** \brief  Constructor */
-  SundialsInternal(const FX& fd, const FX& fq);
+  SundialsInternal(const FX& f);
 
   /** \brief  Destructor */
   virtual ~SundialsInternal()=0;

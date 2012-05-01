@@ -34,10 +34,10 @@ x  = ssym("x",3)  # state
 xp = ssym("xd",3) # state derivative
 
 # ODE/DAE residual function
-res = [(1 - x[1]*x[1])*x[0] - x[1] + u, \
+res = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, \
        x[0], \
-       x[0]*x[0] + x[1]*x[1] + u*u] - xp
-f = SXFunction([t,x,u,xp],[res])
+       x[0]*x[0] + x[1]*x[1] + u*u]) - xp
+f = SXFunction(daeIn(xp,x,[],u,t),daeOut(res))
 
 # Create an integrator
 if coll:

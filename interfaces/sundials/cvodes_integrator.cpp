@@ -30,8 +30,8 @@ namespace Sundials{
 CVodesIntegrator::CVodesIntegrator(){ 
 }
 
-CVodesIntegrator::CVodesIntegrator(const FX& fd,const FX& fq){
-  assignNode(new CVodesInternal(fd,fq));
+CVodesIntegrator::CVodesIntegrator(const FX& f){
+  assignNode(new CVodesInternal(f));
 }
 
 CVodesInternal* CVodesIntegrator::operator->(){

@@ -38,7 +38,7 @@ rhs = vertcat( [(1 - x[1]*x[1])*x[0] - x[1] + u, \
                 x[0]*x[0] + x[1]*x[1] + u*u] )
 
 # DAE residual function
-f = SXFunction([t,x,u,xd],[rhs-xd])
+f = SXFunction(daeIn(xd,x,[],u,t),daeOut(rhs-xd))
 
 # Create an integrator
 f_d = CVodesIntegrator(f)

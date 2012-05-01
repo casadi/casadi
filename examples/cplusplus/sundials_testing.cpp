@@ -74,7 +74,7 @@ const bool sparse_direct = true;
 const bool second_order = true;
 
 // The DAE residual in plain c (for IDAS)
-void dae_res_c(double tt, const double *yy, const double* yydot, const double* pp, double* res){
+void dae_res_c(double tt, const double *yy, const double* yydot, const double* pp, double* ode, double* quad){
   // Get the arguments
   //double s = yy[0];
   double v = yy[1];
@@ -83,15 +83,19 @@ void dae_res_c(double tt, const double *yy, const double* yydot, const double* p
   double sdot = yydot[0], vdot = yydot[1], mdot = yydot[2];
 
   // Calculate the DAE residual
-  res[0] = sdot - v;
-  res[1] = vdot - (u-0.02*v*v)/m;
-  res[2] = mdot - (-0.01*u*u);
+  ode[0] = sdot - v;
+  ode[1] = vdot - (u-0.02*v*v)/m;
+  ode[2] = mdot - (-0.01*u*u);
+  
+  double u_ref = 3-sin(tt);
+  double u_dev = u-u_dev;
+  quad[0] = u_dev*u_dev;
 }
 
 // Wrap the function to allow creating an CasADi function
 void dae_res_c_wrapper(CFunction &f, int nfwd, int nadj, void* user_data){
   casadi_assert(nfwd==0 && nadj==0);
-  dae_res_c(f.input(DAE_T).front(), &f.input(DAE_X).front(), &f.input(DAE_XDOT).front(), &f.input(DAE_P).front(), &f.output(DAE_ODE).front());
+  dae_res_c(f.input(DAE_T).front(), &f.input(DAE_X).front(), &f.input(DAE_XDOT).front(), &f.input(DAE_P).front(), &f.output(DAE_ODE).front(), &f.output(DAE_QUAD).front());
 }
 
 // Create an IDAS instance (fully implicit integrator)
@@ -152,14 +156,12 @@ Integrator create_Sundials(){
     ffcn.input(DAE_XDOT) = DMatrix(3,1,0);
     ffcn.input(DAE_P)    = DMatrix(1,1,0);
     ffcn.output(DAE_ODE) = DMatrix(3,1,0);
+    ffcn.output(DAE_QUAD) = DMatrix(1,1,0);
   }
   
-  // Quadrature function
-  SXFunction qfcn(ffcn_in,daeOut<SXMatrix>(u_dev));
-
   if(implicit_integrator){
     // Create an IDAS instance
-    Sundials::IdasIntegrator integrator(ffcn,qfcn);
+    Sundials::IdasIntegrator integrator(ffcn);
     
     // Set IDAS specific options
     integrator.setOption("calc_ic",calc_ic);
@@ -169,7 +171,7 @@ Integrator create_Sundials(){
     return integrator;
   } else {
     // Create an CVodes instance
-    Sundials::CVodesIntegrator integrator(ffcn,qfcn);
+    Sundials::CVodesIntegrator integrator(ffcn);
 
     // Return the integrator
     return integrator;

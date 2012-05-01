@@ -36,7 +36,7 @@ OUTPUTSCHEME(IntegratorOutput)
 using namespace std;
 namespace CasADi{
 
-IntegratorInternal::IntegratorInternal(const FX& fd, const FX& fq) : fd_(fd), fq_(fq){
+IntegratorInternal::IntegratorInternal(const FX& f) : f_(f){
   // set default options
   setOption("name","unnamed_integrator"); // name of the function 
   
@@ -109,8 +109,7 @@ void IntegratorInternal::init(){
 
 void IntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
   FXInternal::deepCopyMembers(already_copied);
-  fd_ = deepcopy(fd_,already_copied);
-  fq_ = deepcopy(fq_,already_copied);
+  f_ = deepcopy(f_,already_copied);
 }
 
 } // namespace CasADi

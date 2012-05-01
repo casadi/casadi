@@ -48,7 +48,7 @@ class CVodesInternal : public SundialsInternal{
   friend class CVodesIntegrator;
 public:
   /** \brief  Constructor */
-  explicit CVodesInternal(const FX& fd, const FX& fq);
+  explicit CVodesInternal(const FX& f);
 
   /** \brief  Deep copy data members */
   virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
@@ -57,7 +57,7 @@ public:
   virtual CVodesInternal* clone() const;
   
   /** \brief  Create a new integrator */
-  virtual CVodesInternal* create(const FX& fd, const FX& fq) const{ return new CVodesInternal(fd,fq);}
+  virtual CVodesInternal* create(const FX& f) const{ return new CVodesInternal(f);}
 
   /** \brief  Destructor */
   virtual ~CVodesInternal();
@@ -183,7 +183,7 @@ public:
   int fsens_order_, asens_order_; 
 
   // Number of forward and adjoint seeds for the functions f and q
-  int nfdir_f_, nadir_f_, nfdir_q_, nadir_q_;
+  int nfdir_f_, nadir_f_;
 
   // Set the user defined linear solver
   void initUserDefinedLinearSolver();

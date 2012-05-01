@@ -85,7 +85,7 @@ class IdasInternal : public SundialsInternal{
   public:
   
   /** \brief  Constructor */
-  explicit IdasInternal(const FX& fd, const FX& fq);
+  explicit IdasInternal(const FX& f);
 
   /** \brief  Copy constructor */
 //  IdasInternal(const IdasInternal& integrator);
@@ -94,7 +94,7 @@ class IdasInternal : public SundialsInternal{
   virtual IdasInternal* clone() const;
   
   /** \brief  Create a new integrator */
-  virtual IdasInternal* create(const FX& fd, const FX& fq) const{ return new IdasInternal(fd,fq);}
+  virtual IdasInternal* create(const FX& f) const{ return new IdasInternal(f);}
 
   /** \brief  Deep copy data members */
   virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
@@ -240,7 +240,7 @@ class IdasInternal : public SundialsInternal{
   bool isInitTaping_;
   
   // Number of forward and adjoint seeds for the functions f and q
-  int nfdir_f_, nadir_f_, nfdir_q_, nadir_q_;
+  int nfdir_f_, nadir_f_;
   
   // Scaling of cj
   bool cj_scaling_;

@@ -111,15 +111,15 @@ def create_IDAS():
   # Input of the DAE residual function
   ffcn_in = DAE_NUM_IN * [[]]
   ffcn_in[DAE_T] = [t]
-  ffcn_in[DAE_Y] = y
-  ffcn_in[DAE_YDOT] = ydot
+  ffcn_in[DAE_X] = y
+  ffcn_in[DAE_XDOT] = ydot
   ffcn_in[DAE_P] = [u]
 
   # DAE residual function
-  ffcn = SXFunction(ffcn_in,[res])
+  ffcn = SXFunction(ffcn_in,daeOut(res))
   
   # Quadrature function
-  qfcn = SXFunction(ffcn_in,[[u_dev]])
+  qfcn = SXFunction(ffcn_in,daeOut(u_dev))
 
   if collocation_integrator:
     # Create a collocation integrator
@@ -147,16 +147,16 @@ def create_IDAS():
 # Create an CVODES instance (ODE integrator)
 def create_CVODES():
   # Time 
-  t = SX("t")
+  t = ssym("t")
 
   # Differential states
-  s = SX("s")
-  v = SX("v")
-  m = SX("m")
-  y = [s,v,m]
+  s = ssym("s")
+  v = ssym("v")
+  m = ssym("m")
+  y = vertcat([s,v,m])
   
   # Control
-  u = SX("u")
+  u = ssym("u")
   
   # Reference trajectory
   u_ref = 3-sin(t)
@@ -166,23 +166,20 @@ def create_CVODES():
   u_dev *= u_dev
   
   # Differential equation (fully implicit form)
-  rhs = [v, (u-0.02*v*v)/m, -0.01*u*u]
+  rhs = vertcat([v, (u-0.02*v*v)/m, -0.01*u*u])
 
   # Input of the DAE residual function
   ffcn_in = DAE_NUM_IN * [[]]
-  ffcn_in[DAE_T] = [t]
-  ffcn_in[DAE_Y] = y
-  ffcn_in[DAE_P] = [u]
+  ffcn_in[DAE_T] = t
+  ffcn_in[DAE_X] = y
+  ffcn_in[DAE_P] = u
 
   # DAE residual function
-  ffcn = SXFunction(ffcn_in,[rhs])
+  ffcn = SXFunction(ffcn_in,daeOut(rhs,[],u_dev))
   
-  # Quadrature function
-  qfcn = SXFunction(ffcn_in,[[u_dev]])
-
   if collocation_integrator:
     # Create a collocation integrator
-    integrator = CollocationIntegrator(ffcn,qfcn)
+    integrator = CollocationIntegrator(ffcn)
   
     # Set some options
     integrator.setOption("implicit_solver",KinsolSolver)
@@ -194,7 +191,7 @@ def create_CVODES():
     
   else:
     # Create an integrator
-    integrator = CVodesIntegrator(ffcn,qfcn)
+    integrator = CVodesIntegrator(ffcn)
   
   # Return the integrator
   return integrator
