@@ -80,7 +80,7 @@ clock_t time1, time2;
 DMatrix x0(int n){
   DMatrix A0(n,n,0);
   for(int i=0; i<n*n; ++i)
-    A0[i] = 0.1 + sqrt(i*1323 % 124);
+    A0[i] = 0.1 + sqrt(double(i*1323 % 124));
     
   return A0;
 }
@@ -225,8 +225,9 @@ void test_sx(){
   // Generate c-code
   g.generateCode("det_minor_generated.c");
   time1 = clock();
-  system("time gcc -fPIC -shared det_minor_generated.c -o det_minor_generated_no_opt.so");
-  system("time gcc -fPIC -shared -O3 det_minor_generated.c -o det_minor_generated_O3.so");
+  int flag;
+  flag = system("time gcc -fPIC -shared det_minor_generated.c -o det_minor_generated_no_opt.so");
+  flag = system("time gcc -fPIC -shared -O3 det_minor_generated.c -o det_minor_generated_O3.so");
   time2 = clock();
   t = double(time2 - time1)/CLOCKS_PER_SEC;
   cout << "compilation took: " << (t*1e3) << " ms, " << endl;
@@ -281,7 +282,7 @@ void test_sx_mx(){
   
   time1 = clock();
   SXFunction f(x,detx);
-  f.setOption("number_of_fwd_dir",true);
+  f.setOption("number_of_fwd_dir",1);
   f.setOption("live_variables",true);
   f.setOption("topological_sorting","depth-first");
   f.init();

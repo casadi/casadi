@@ -39,12 +39,6 @@ public:
   /** \brief  Constructor */
   IntegratorInternal(const FX& fd, const FX& fq);
 
-  /** \brief  Constructor, new, not yet ready implementation */
-  IntegratorInternal(const FX& f, const FX& g, const FX& h);
-
-  /** \brief  Common to both constructors */
-  void ctorInit();  
-  
   /** \brief  Destructor */
   virtual ~IntegratorInternal()=0;
 

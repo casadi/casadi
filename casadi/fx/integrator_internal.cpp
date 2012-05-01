@@ -37,16 +37,6 @@ using namespace std;
 namespace CasADi{
 
 IntegratorInternal::IntegratorInternal(const FX& fd, const FX& fq) : fd_(fd), fq_(fq){
-  new_design_ = false;
-  ctorInit();
-}
-
-IntegratorInternal::IntegratorInternal(const FX& f, const FX& g, const FX& h) : f_(f), g_(g), h_(h){
-  new_design_ = true;
-  ctorInit();
-}
-
-void IntegratorInternal::ctorInit(){
   // set default options
   setOption("name","unnamed_integrator"); // name of the function 
   
@@ -103,61 +93,6 @@ void IntegratorInternal::evaluate(int nfdir, int nadir){
 
 void IntegratorInternal::init(){
   
-  // Initialize the functions and get dimensions
-  if(new_design_){
-    
-    // Initialize the functions
-    casadi_assert(!f_.isNull());
-    
-    // Initialize, get and assert dimensions of the forward integration
-    if(!f_.isInit()) f_.init();
-    nx_ = f_.input(NEW_DAE_X).numel();
-    nz_ = f_.input(NEW_DAE_Z).numel();
-    np_  = f_.input(NEW_DAE_P).numel();
-    nq_ = f_.output(NEW_DAE_QUAD).numel();
-    casadi_assert_message(f_.output(NEW_DAE_ODE).numel()==nx_,"Inconsistent dimensions");
-    casadi_assert_message(f_.output(NEW_DAE_ALG).numel()==nz_,"Inconsistent dimensions");
-    
-    // Make sure that both h and g are given, or neither
-    casadi_assert_message(h_.isNull()==g_.isNull(),"Either both h and g should be given, or neither of them");
-    if(h_.isNull()){
-      nrx_ = 0;
-      nrq_ = 0;
-      nrz_ = 0;
-    } else {
-      // Initialize, get and assert dimensions of the terminal constraint function
-      if(!h_.isInit()) h_.init();
-      casadi_assert_message(h_.input(TERM_X).numel()==nx_,"Inconsistent dimensions");
-      casadi_assert_message(h_.input(TERM_P).numel()==np_,"Inconsistent dimensions");
-      nrx_ = h_.output(TERM_RX).numel();
-      
-      // Initialize and assert the dimensions of the backward integration
-      if(!g_.isInit()) g_.init();
-      nrz_ = g_.output(RDAE_ALG).numel();
-      nrq_ = g_.output(RDAE_QUAD).numel();
-      casadi_assert_message(g_.input(RDAE_X).numel()==nx_,"Inconsistent dimensions");
-      casadi_assert_message(g_.input(RDAE_Z).numel()==nz_,"Inconsistent dimensions");
-      casadi_assert_message(g_.input(RDAE_RX).numel()==nrx_,"Inconsistent dimensions");
-      casadi_assert_message(g_.input(RDAE_RZ).numel()==nrz_,"Inconsistent dimensions");
-      casadi_assert_message(g_.input(RDAE_P).numel()==np_,"Inconsistent dimensions");
-      casadi_assert_message(g_.output(RDAE_ODE).numel()==nrx_,"Inconsistent dimensions");
-    }
-    
-    // Allocate space for inputs
-    input_.resize(NEW_INTEGRATOR_NUM_IN);
-    input(NEW_INTEGRATOR_X0) = f_.output(NEW_DAE_ODE);
-    input(NEW_INTEGRATOR_P) = f_.input(NEW_DAE_P);
-  
-    // Allocate space for outputs
-    output_.resize(NEW_INTEGRATOR_NUM_OUT);
-    output(NEW_INTEGRATOR_XF) = f_.output(NEW_DAE_ODE);
-    output(NEW_INTEGRATOR_QF) = f_.output(NEW_DAE_QUAD);
-    if(!g_.isNull()){
-      output(NEW_INTEGRATOR_RX0) = g_.output(RDAE_ODE);
-      output(NEW_INTEGRATOR_RQ0) = g_.output(RDAE_QUAD);
-    }
-  }
-  
   // Make sure that the dimensions have been set
   casadi_assert_message(np_>=0, "\"setDimensions\" has not been called.");
   
@@ -174,14 +109,8 @@ void IntegratorInternal::init(){
 
 void IntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
   FXInternal::deepCopyMembers(already_copied);
-  if(new_design_){
-    f_ = deepcopy(f_,already_copied);
-    g_ = deepcopy(g_,already_copied);
-    h_ = deepcopy(h_,already_copied);
-  } else {
-    fd_ = deepcopy(fd_,already_copied);
-    fq_ = deepcopy(fq_,already_copied);
-  }
+  fd_ = deepcopy(fd_,already_copied);
+  fq_ = deepcopy(fq_,already_copied);
 }
 
 } // namespace CasADi
