@@ -1059,10 +1059,6 @@ Get the Jacobian. ";
 
 Get the Linear solver. ";
 
-%feature("docstring")  CasADi::AcadoIntegratorInternal::ctorInit "
-
-Common to both constructors. ";
-
 %feature("docstring")  CasADi::AcadoIntegratorInternal::deepCopyMembers "
 
 Deep copy data members. ";
@@ -6138,10 +6134,6 @@ Print statistics. ";
 %feature("docstring")  CasADi::CollocationIntegratorInternal::setStopTime "
 
 Set the stop time of the forward integration. ";
-
-%feature("docstring")  CasADi::CollocationIntegratorInternal::ctorInit "
-
-Common to both constructors. ";
 
 %feature("docstring")  CasADi::CollocationIntegratorInternal::create "
 
@@ -13246,10 +13238,6 @@ Set initial time (to be removed) ";
 
 Set final time (to be removed) ";
 
-%feature("docstring")  CasADi::Sundials::CVodesInternal::ctorInit "
-
-Common to both constructors. ";
-
 %feature("docstring")  CasADi::Sundials::CVodesInternal::create "
 
 Create a new integrator, new, not yet ready implementation. ";
@@ -18503,10 +18491,6 @@ Set initial time (to be removed) ";
 
 Set final time (to be removed) ";
 
-%feature("docstring")  CasADi::Sundials::IdasInternal::ctorInit "
-
-Common to both constructors. ";
-
 %feature("docstring")  CasADi::Sundials::IdasInternal::create "
 
 Create a new integrator, new, not yet ready implementation. ";
@@ -20307,18 +20291,21 @@ Integrator abstract base class Solves the following initial value problem
 F(t,x,der(x),z,p) == 0   x(t0) = x0   over a time interval [t0, tf].
 
 NOTE: The ODE/DAE initial-value problem formulation in CasADi is being
-replaced with a new two-point boundary value problem with the differential
-equation given as a semi-explicit DAE with quadrature states:   Initial
-conditions at t=t0     x(t0)  = x_0     q(t0)  = 0 Forward integration from
-t=t0 to t=tf     der(x) = fx(x,z,p,t) Forward ODE          0 = fz(x,z,p,t)
-Forward algebraic equations     der(q) = fq(x,z,p,t)           Forward
-quadratures Terminal conditions at t=tf     rx(tf)  = h(x(tf),q(tf),p)
-rq(tf) = 0      Backward integration from t=tf to t=t0     der(rx) =
-gx(x,z,rx,rz,p,t)   Backward ODE           0 = gz(x,z,rx,rz,p,t) Backward
-algebraic equations     der(rq) = gq(x,z,rx,rz,p,t) Backward quadratures
-Where we assume that both the forward and backwards integrations are index-1
-(i.e. fz/dz and dgz/drz are invertible) and furthermore that    gx, gz and
-gq have a linear dependency on rx and rz.
+replaced with a new formulation which solves an initial value problem (IVP)
+coupled to a terminal value problem with differential equation given as an
+implicit ODE coupled to an algebraic equation and a set of quadratures:
+Initial conditions at t=t0     x(t0)  = x_0     q(t0)  = 0 Forward
+integration from t=t0 to t=tf          0 = fx(x,z,p,t,der(x)) Forward ODE
+0 = fz(x,z,p,t)           Forward algebraic equations     der(q) =
+fq(x,z,p,t)           Forward quadratures Terminal conditions at t=tf
+rx(tf)  = h(x(tf),q(tf),p)     rq(tf) = 0      Backward integration from
+t=tf to t=t0           0 = gx(x,z,rx,rz,p,t,der(rx)) Backward ODE
+0 = gz(x,z,rx,rz,p,t) Backward algebraic equations     der(rq) =
+gq(x,z,rx,rz,p,t) Backward quadratures    where we assume that both the
+forward and backwards integrations are index-1   (i.e. dfx/dxdot, dfz/dz,
+dgz/drz, dgx/drxdot are invertible) and furthermore that    gx, gz and gq
+have a linear dependency on rx and rz and that f_x and g_x have a    linear
+dependence on xdot and rxdot respectively.
 
 The Integrator class provides some additional functionality, such as getting
 the value of the state and/or sensitivities at certain time points. Controls
@@ -20998,18 +20985,21 @@ Solves the following initial value problem (IVP):
 F(t,x,der(x),z,p) == 0   x(t0) = x0   over a time interval [t0, tf].
 
 NOTE: The ODE/DAE initial-value problem formulation in CasADi is being
-replaced with a new two-point boundary value problem with the differential
-equation given as a semi-explicit DAE with quadrature states:   Initial
-conditions at t=t0     x(t0)  = x_0     q(t0)  = 0 Forward integration from
-t=t0 to t=tf     der(x) = fx(x,z,p,t) Forward ODE          0 = fz(x,z,p,t)
-Forward algebraic equations     der(q) = fq(x,z,p,t)           Forward
-quadratures Terminal conditions at t=tf     rx(tf)  = h(x(tf),q(tf),p)
-rq(tf) = 0      Backward integration from t=tf to t=t0     der(rx) =
-gx(x,z,rx,rz,p,t)   Backward ODE           0 = gz(x,z,rx,rz,p,t) Backward
-algebraic equations     der(rq) = gq(x,z,rx,rz,p,t) Backward quadratures
-Where we assume that both the forward and backwards integrations are index-1
-(i.e. fz/dz and dgz/drz are invertible) and furthermore that    gx, gz and
-gq have a linear dependency on rx and rz.
+replaced with a new formulation which solves an initial value problem (IVP)
+coupled to a terminal value problem with differential equation given as an
+implicit ODE coupled to an algebraic equation and a set of quadratures:
+Initial conditions at t=t0     x(t0)  = x_0     q(t0)  = 0 Forward
+integration from t=t0 to t=tf          0 = fx(x,z,p,t,der(x)) Forward ODE
+0 = fz(x,z,p,t)           Forward algebraic equations     der(q) =
+fq(x,z,p,t)           Forward quadratures Terminal conditions at t=tf
+rx(tf)  = h(x(tf),q(tf),p)     rq(tf) = 0      Backward integration from
+t=tf to t=t0           0 = gx(x,z,rx,rz,p,t,der(rx)) Backward ODE
+0 = gz(x,z,rx,rz,p,t) Backward algebraic equations     der(rq) =
+gq(x,z,rx,rz,p,t) Backward quadratures    where we assume that both the
+forward and backwards integrations are index-1   (i.e. dfx/dxdot, dfz/dz,
+dgz/drz, dgx/drxdot are invertible) and furthermore that    gx, gz and gq
+have a linear dependency on rx and rz and that f_x and g_x have a    linear
+dependence on xdot and rxdot respectively.
 
 Joel Andersson
 
@@ -21194,14 +21184,6 @@ C++ includes: integrator_internal.hpp ";
 %feature("docstring")  CasADi::IntegratorInternal::IntegratorInternal "
 
 Constructor. ";
-
-%feature("docstring")  CasADi::IntegratorInternal::IntegratorInternal "
-
-Constructor, new, not yet ready implementation. ";
-
-%feature("docstring")  CasADi::IntegratorInternal::ctorInit "
-
-Common to both constructors. ";
 
 %feature("docstring")  CasADi::IntegratorInternal::~IntegratorInternal "
 
@@ -57255,10 +57237,6 @@ Jacobian of the integrator. ";
 
 Generate the sparsity of a Jacobian block. ";
 
-%feature("docstring")  CasADi::RKIntegratorInternal::ctorInit "
-
-Common to both constructors. ";
-
 %feature("docstring")  CasADi::RKIntegratorInternal::create "
 
 Create a new integrator, new, not yet ready implementation. ";
@@ -62277,10 +62255,6 @@ Set initial time (to be removed) ";
 %feature("docstring")  CasADi::Sundials::SundialsInternal::setFinalTime "
 
 Set final time (to be removed) ";
-
-%feature("docstring")  CasADi::Sundials::SundialsInternal::ctorInit "
-
-Common to both constructors. ";
 
 %feature("docstring")  CasADi::Sundials::SundialsInternal::clone "
 
@@ -70413,28 +70387,8 @@ arguments. ";
 
 %feature("docstring")  CasADi::Interfaces::daeOut "
 
-Helper function to create ODE/DAE forward integration function output
-arguments. ";
-
-%feature("docstring")  CasADi::Interfaces::termIn "
-
-Helper function to create ODE/DAE terminal constraint function input
-arguments. ";
-
-%feature("docstring")  CasADi::Interfaces::termOut "
-
-Helper function to create ODE/DAE terminal constraint function output
-arguments. ";
-
-%feature("docstring")  CasADi::Interfaces::rdaeIn "
-
-Helper function to create ODE/DAE backward integration function input
-arguments. ";
-
-%feature("docstring")  CasADi::Interfaces::rdaeOut "
-
-Helper function to create ODE/DAE backward integration function output
-arguments. ";
+Helper function to create DAE forward integration function output arguments.
+";
 
 %feature("docstring")  CasADi::Interfaces::getptr "";
 
