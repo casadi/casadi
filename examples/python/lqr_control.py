@@ -288,7 +288,7 @@ P = ssym("P",ns,ns)
 
 ric = (Q + mul(A.T,P) + mul(P,A) - mul([P,B,inv(R),B.T,P]))
 
-dae = SXFunction({'NUM':DAE_NUM_IN, DAE_X: flatten(P)},daeOut(ric))
+dae = SXFunction({'NUM':DAE_NUM_IN, DAE_X: flatten(P)},daeOut(flatten(ric)))
 dae.init()
 
 # We solve the ricatti equation by simulating backwards in time until steady state is reached.
