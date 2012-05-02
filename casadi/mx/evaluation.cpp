@@ -48,15 +48,18 @@ Evaluation::Evaluation(const FX& fcn, const std::vector<MX> &arg, const std::vec
   
   // Add arguments
   d.insert(d.end(),arg.begin(),arg.end());
+  d.resize(d.size()+num_in-arg.size()); // Add empty matrices
 
   // Add forward seeds
   for(int dir=0; dir<nfwd_f_; ++dir){
     d.insert(d.end(),fseed[dir].begin(),fseed[dir].end());
+    d.resize(d.size()+num_in-fseed[dir].size()); // Add empty matrices
   }
     
   // Add adjoint seeds
   for(int dir=0; dir<nadj_f_; ++dir){
     d.insert(d.end(),aseed[dir].begin(),aseed[dir].end());
+    d.resize(d.size()+num_out-aseed[dir].size()); // Add empty matrices
   }
   
   setDependencies(d);
