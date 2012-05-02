@@ -533,7 +533,7 @@ void IdasInternal::res(double t, const double* yz, const double* yp, double* r){
   time1 = clock();
   
   // Pass input
-  f_.setInput(t,DAE_T);
+  f_.setInput(&t,DAE_T);
   f_.setInput(yz,DAE_X);
   f_.setInput(yp,DAE_XDOT);
   f_.setInput(input(INTEGRATOR_P),DAE_P);
@@ -609,7 +609,7 @@ void IdasInternal::jtimes(double t, const double *yz, const double *yp, const do
   time1 = clock();
   
    // Pass input
-   f_.setInput(t,DAE_T);
+   f_.setInput(&t,DAE_T);
    f_.setInput(yz,DAE_X);
    f_.setInput(yp,DAE_XDOT);
    f_.setInput(input(INTEGRATOR_P),DAE_P);
@@ -652,7 +652,7 @@ void IdasInternal::resS(int Ns, double t, const double* yz, const double* yp, co
   time1 = clock();
   
   // Pass input
-  f_.setInput(t,DAE_T);
+  f_.setInput(&t,DAE_T);
   f_.setInput(yz,DAE_X);
   f_.setInput(yp,DAE_XDOT);
   f_.setInput(input(INTEGRATOR_P),DAE_P);
@@ -661,10 +661,9 @@ void IdasInternal::resS(int Ns, double t, const double* yz, const double* yp, co
   for(int offset=0; offset<nfdir_; offset += nfdir_f_){
     // Number of directions in this batch
     int nfdir_batch = std::min(nfdir_-offset, nfdir_f_);
-    
     for(int dir=0; dir<nfdir_batch; ++dir){
-      // Pass forward seeds 
-      f_.setFwdSeed(0.0,DAE_T,dir);
+      // Pass forward seeds
+      f_.fwdSeed(DAE_T,dir).setZero();
       f_.setFwdSeed(NV_DATA_S(yS[offset+dir]),DAE_X,dir);
       f_.setFwdSeed(NV_DATA_S(ypS[offset+dir]),DAE_XDOT,dir);
       f_.setFwdSeed(fwdSeed(INTEGRATOR_P,offset+dir),DAE_P,dir);
@@ -1054,7 +1053,7 @@ int IdasInternal::rhsQ_wrapper(double t, N_Vector yz, N_Vector yp, N_Vector rhsQ
 void IdasInternal::rhsQ(double t, const double* yz, const double* yp, double* rhsQ){
    log("IdasInternal::rhsQ","begin");
    // Pass input
-   f_.setInput(t,DAE_T);
+   f_.setInput(&t,DAE_T);
    f_.setInput(yz,DAE_X);
    f_.setInput(yp,DAE_XDOT);
    f_.setInput(input(INTEGRATOR_P),DAE_P);
@@ -1073,14 +1072,14 @@ void IdasInternal::rhsQS(int Ns, double t, N_Vector yz, N_Vector yp, N_Vector *y
   log("IdasInternal::rhsQS","enter");
   casadi_assert(Ns==nfdir_);
   // Pass input
-   f_.setInput(t,DAE_T);
+   f_.setInput(&t,DAE_T);
    f_.setInput(NV_DATA_S(yz),DAE_X);
    f_.setInput(NV_DATA_S(yp),DAE_XDOT);
    f_.setInput(input(INTEGRATOR_P),DAE_P);
      
    // Pass forward seeds
   for(int i=0; i<nfdir_; ++i){
-    f_.setFwdSeed(0.0,DAE_T);
+    f_.fwdSeed(DAE_T).setZero();
     f_.setFwdSeed(NV_DATA_S(yzS[i]),DAE_X);
     f_.setFwdSeed(NV_DATA_S(ypS[i]),DAE_XDOT);
     f_.setFwdSeed(fwdSeed(INTEGRATOR_P,i),DAE_P);
@@ -1110,7 +1109,7 @@ int IdasInternal::rhsQS_wrapper(int Ns, double t, N_Vector yz, N_Vector yp, N_Ve
 void IdasInternal::resB(double t, const double* yz, const double* yp, const double* yB, const double* ypB, double* resvalB){
   log("IdasInternal::resB","begin");
   // Pass input
-  f_.setInput(t,DAE_T);
+  f_.setInput(&t,DAE_T);
   f_.setInput(yz,DAE_X);
   f_.setInput(yp,DAE_XDOT);
   f_.setInput(input(INTEGRATOR_P),DAE_P);
@@ -1169,7 +1168,7 @@ int IdasInternal::resB_wrapper(double t, N_Vector y, N_Vector yp, N_Vector yB, N
 void IdasInternal::rhsQB(double t, const double* yz, const double* yp, const double* yB, const double* ypB, double *rhsvalBQ){
   log("IdasInternal::rhsQB","begin");
   // Pass input
-  f_.setInput(t,DAE_T);
+  f_.setInput(&t,DAE_T);
   f_.setInput(yz,DAE_X);
   f_.setInput(yp,DAE_XDOT);
   f_.setInput(input(INTEGRATOR_P),DAE_P);

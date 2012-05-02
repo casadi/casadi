@@ -6,21 +6,6 @@
 <tr><td>INTEGRATOR_XPF</td><td>State derivative at tf</td></tr>
 </table>
 */
-/** \defgroup scheme_MUSCOD_FCN_Output
-<table>
-<caption>Output scheme: CasADi::MUSCOD_FCN_Output  (MUSCOD_FCN_NUM_OUT = 2) </caption>
-<tr><th>Name</th><th>Description</th></tr>
-<tr><td>MUSCOD_FCN_RHS</td><td></td></tr>
-<tr><td>MUSCOD_FCN_RES</td><td></td></tr>
-</table>
-*/
-/** \defgroup scheme_TermOutput
-<table>
-<caption>Output scheme: CasADi::TermOutput  (TERM_NUM_OUT = 1) </caption>
-<tr><th>Name</th><th>Description</th></tr>
-<tr><td>TERM_RX</td><td>Initial conditions for the backwards integration, differential states.</td></tr>
-</table>
-*/
 /** \defgroup scheme_QPInput
 <table>
 <caption>Input scheme: CasADi::QPInput  (QP_NUM_IN = 9) </caption>
@@ -71,23 +56,12 @@
 <tr><td>ACADO_FCN_XDOT</td><td></td></tr>
 </table>
 */
-/** \defgroup scheme_RDAEInput
+/** \defgroup scheme_MUSCOD_FCN_Output
 <table>
-<caption>Input scheme: CasADi::RDAEInput  (RDAE_NUM_IN = 6) </caption>
+<caption>Output scheme: CasADi::MUSCOD_FCN_Output  (MUSCOD_FCN_NUM_OUT = 2) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>RDAE_X</td><td>Forward differential state</td></tr>
-<tr><td>RDAE_Z</td><td>Forward algebraic state</td></tr>
-<tr><td>RDAE_RX</td><td>Backward differential state</td></tr>
-<tr><td>RDAE_RZ</td><td>Backward algebraic state</td></tr>
-<tr><td>RDAE_P</td><td>Parameter vector</td></tr>
-<tr><td>RDAE_T</td><td>Explicit time dependence</td></tr>
-</table>
-*/
-/** \defgroup scheme_DAEOutput
-<table>
-<caption>Output scheme: CasADi::DAEOutput  (DAE_NUM_OUT = 1) </caption>
-<tr><th>Name</th><th>Description</th></tr>
-<tr><td>DAE_RES</td><td>Right hand side of ODE. Should have same amount of non-zeros as DAEInput:DAE_Y</td></tr>
+<tr><td>MUSCOD_FCN_RHS</td><td></td></tr>
+<tr><td>MUSCOD_FCN_RES</td><td></td></tr>
 </table>
 */
 /** \defgroup scheme_QPOutput
@@ -98,14 +72,6 @@
 <tr><td>QP_COST</td><td>The optimal cost.</td></tr>
 <tr><td>QP_LAMBDA_A</td><td>The dual solution corresponding to linear bounds.</td></tr>
 <tr><td>QP_LAMBDA_X</td><td>The dual solution corresponding to simple bounds.</td></tr>
-</table>
-*/
-/** \defgroup scheme_NewIntegratorInput
-<table>
-<caption>Input scheme: CasADi::NewIntegratorInput  (NEW_INTEGRATOR_NUM_IN = 2) </caption>
-<tr><th>Name</th><th>Description</th></tr>
-<tr><td>NEW_INTEGRATOR_X0</td><td>Differential state at t0</td></tr>
-<tr><td>NEW_INTEGRATOR_P</td><td>Parameters p</td></tr>
 </table>
 */
 /** \defgroup scheme_NLPOutput
@@ -119,23 +85,14 @@
 <tr><td>NLP_G</td><td>The constraints evaluated at the optimal solution (m x 1)</td></tr>
 </table>
 */
-/** \defgroup scheme_NEW_DAEOutput
-<table>
-<caption>Output scheme: CasADi::NEW_DAEOutput  (NEW_DAE_NUM_OUT = 3) </caption>
-<tr><th>Name</th><th>Description</th></tr>
-<tr><td>NEW_DAE_ODE</td><td>Right hand side of ODE.</td></tr>
-<tr><td>NEW_DAE_ALG</td><td>Right hand side of algebraic equations.</td></tr>
-<tr><td>NEW_DAE_QUAD</td><td>Right hand side of quadratures.</td></tr>
-</table>
-*/
 /** \defgroup scheme_DAEInput
 <table>
 <caption>Input scheme: CasADi::DAEInput  (DAE_NUM_IN = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>DAE_T</td><td>Time. (1-by-1)</td></tr>
-<tr><td>DAE_Y</td><td>State vector (matrix). Should have same amount of non-zeros as DAEOutput:DAE_RES</td></tr>
-<tr><td>DAE_P</td><td>Parameter vector (matrix).</td></tr>
-<tr><td>DAE_YDOT</td><td>State derivative vector (matrix). Should have same amount of non-zeros as DAEOutput:DAE_RES</td></tr>
+<tr><td>DAE_T</td><td>Explicit time dependence</td></tr>
+<tr><td>DAE_Y</td><td>Differential and algebraic states. NOTE: To be replaced by DAE_X and DAE_Z</td></tr>
+<tr><td>DAE_P</td><td>Parameter</td></tr>
+<tr><td>DAE_YDOT</td><td>Time derivative of differential and algebraic states. NOTE: To be replaced by DAE_XDOT</td></tr>
 </table>
 */
 /** \defgroup scheme_ACADO_Output
@@ -148,14 +105,11 @@
 <tr><td>ACADO_COST</td><td></td></tr>
 </table>
 */
-/** \defgroup scheme_NewIntegratorOutput
+/** \defgroup scheme_DAEOutput
 <table>
-<caption>Output scheme: CasADi::NewIntegratorOutput  (NEW_INTEGRATOR_NUM_OUT = 4) </caption>
+<caption>Output scheme: CasADi::DAEOutput  (DAE_NUM_OUT = 1) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>NEW_INTEGRATOR_XF</td><td>Differential state at tf</td></tr>
-<tr><td>NEW_INTEGRATOR_QF</td><td>Quadrature state at tf</td></tr>
-<tr><td>NEW_INTEGRATOR_RX0</td><td>Backward differential state at t0</td></tr>
-<tr><td>NEW_INTEGRATOR_RQ0</td><td>Backward quadrature state at t0</td></tr>
+<tr><td>DAE_RES</td><td>DAE residual</td></tr>
 </table>
 */
 /** \defgroup scheme_MayerInput
@@ -181,15 +135,6 @@
 <tr><td>CONTROL_DAE_TF</td><td>Time at end of control interval (1-by-1)</td></tr>
 </table>
 */
-/** \defgroup scheme_TermInput
-<table>
-<caption>Input scheme: CasADi::TermInput  (TERM_NUM_IN = 3) </caption>
-<tr><th>Name</th><th>Description</th></tr>
-<tr><td>TERM_X</td><td>Differential state</td></tr>
-<tr><td>TERM_Q</td><td>Quadrature state</td></tr>
-<tr><td>TERM_P</td><td>Parameter vector</td></tr>
-</table>
-*/
 /** \defgroup scheme_NLPInput
 <table>
 <caption>Input scheme: CasADi::NLPInput  (NLP_NUM_IN = 7) </caption>
@@ -212,33 +157,15 @@
 <tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) Only relevant for implicit intergators. This input may be changed during an IDASIntegrator::evaluate()</td></tr>
 </table>
 */
-/** \defgroup scheme_NEW_DAEInput
+/** \defgroup scheme_MUSCOD_FCN_Input
 <table>
-<caption>Input scheme: CasADi::NEW_DAEInput  (NEW_DAE_NUM_IN = 4) </caption>
+<caption>Input scheme: CasADi::MUSCOD_FCN_Input  (MUSCOD_FCN_NUM_IN = 5) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>NEW_DAE_X</td><td>Differential state</td></tr>
-<tr><td>NEW_DAE_Z</td><td>Algebraic state</td></tr>
-<tr><td>NEW_DAE_P</td><td>Parameter vector</td></tr>
-<tr><td>NEW_DAE_T</td><td>Explicit time dependence</td></tr>
-</table>
-*/
-/** \defgroup scheme_OCPOutput
-<table>
-<caption>Output scheme: CasADi::OCPOutput  (OCP_NUM_OUT = 4) </caption>
-<tr><th>Name</th><th>Description</th></tr>
-<tr><td>OCP_X_OPT</td><td>Optimal state trajectory.</td></tr>
-<tr><td>OCP_U_OPT</td><td>Optimal control trajectory.</td></tr>
-<tr><td>OCP_XP_OPT</td><td>Optimal state derivative trajectory.</td></tr>
-<tr><td>OCP_P_OPT</td><td>Optimal parameters.</td></tr>
-</table>
-*/
-/** \defgroup scheme_RDAEOutput
-<table>
-<caption>Output scheme: CasADi::RDAEOutput  (RDAE_NUM_OUT = 3) </caption>
-<tr><th>Name</th><th>Description</th></tr>
-<tr><td>RDAE_ODE</td><td>Right hand side of ODE.</td></tr>
-<tr><td>RDAE_ALG</td><td>Right hand side of algebraic equations.</td></tr>
-<tr><td>RDAE_QUAD</td><td>Right hand side of quadratures.</td></tr>
+<tr><td>MUSCOD_FCN_T</td><td></td></tr>
+<tr><td>MUSCOD_FCN_XD</td><td></td></tr>
+<tr><td>MUSCOD_FCN_XA</td><td></td></tr>
+<tr><td>MUSCOD_FCN_U</td><td></td></tr>
+<tr><td>MUSCOD_FCN_P</td><td></td></tr>
 </table>
 */
 /** \defgroup scheme_OCPInput
@@ -274,15 +201,14 @@
 <tr><td>CONTROLSIMULATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) Only relevant for implicit integrators.</td></tr>
 </table>
 */
-/** \defgroup scheme_MUSCOD_FCN_Input
+/** \defgroup scheme_OCPOutput
 <table>
-<caption>Input scheme: CasADi::MUSCOD_FCN_Input  (MUSCOD_FCN_NUM_IN = 5) </caption>
+<caption>Output scheme: CasADi::OCPOutput  (OCP_NUM_OUT = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>MUSCOD_FCN_T</td><td></td></tr>
-<tr><td>MUSCOD_FCN_XD</td><td></td></tr>
-<tr><td>MUSCOD_FCN_XA</td><td></td></tr>
-<tr><td>MUSCOD_FCN_U</td><td></td></tr>
-<tr><td>MUSCOD_FCN_P</td><td></td></tr>
+<tr><td>OCP_X_OPT</td><td>Optimal state trajectory.</td></tr>
+<tr><td>OCP_U_OPT</td><td>Optimal control trajectory.</td></tr>
+<tr><td>OCP_XP_OPT</td><td>Optimal state derivative trajectory.</td></tr>
+<tr><td>OCP_P_OPT</td><td>Optimal parameters.</td></tr>
 </table>
 */
 /** \class CasADi::NLPSolverInternal

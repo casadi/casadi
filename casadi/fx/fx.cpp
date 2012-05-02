@@ -69,10 +69,10 @@ void FX::call(const MXVector& arg, MXVector& res,  const MXVectorVector& fseed, 
   assertInit();
   
   // Argument checking
-  casadi_assert_message(arg.size()==getNumInputs(), "Evaluation::Evaluation: number of passed-in dependencies (" << arg.size() << ") should match number of inputs of function (" << getNumInputs() << ").");
+  casadi_assert_message(arg.size()<=getNumInputs(), "Evaluation::Evaluation: number of passed-in dependencies (" << arg.size() << ") should not exceed the number of inputs of the function (" << getNumInputs() << ").");
 
   // Assumes initialised
-  for(int i=0; i<getNumInputs(); ++i){
+  for(int i=0; i<arg.size(); ++i){
     if(arg[i].isNull() || arg[i].empty()) continue;
     casadi_assert_message(arg[i].size1()==input(i).size1() && arg[i].size2()==input(i).size2(),
 			  "Evaluation::shapes of passed-in dependencies should match shapes of inputs of function." << 
@@ -112,6 +112,7 @@ vector<vector<MX> > FX::call(const vector<vector<MX> > &x, const Dictionary& par
   p_in.reserve(x.size() * getNumInputs());
   for(int i=0; i<x.size(); ++i){
     p_in.insert(p_in.end(),x[i].begin(),x[i].end());
+    p_in.resize(p_in.size()+getNumInputs()-x[i].size());
   }
   
   // Call the parallelizer

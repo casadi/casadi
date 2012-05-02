@@ -470,12 +470,12 @@ void CVodesInternal::rhs(double t, const double* y, double* ydot){
   time1 = clock();
 
   // Pass input
-  f_.setInput(t,DAE_T);
+  f_.setInput(&t,DAE_T);
   f_.setInput(y,DAE_X);
   f_.setInput(input(INTEGRATOR_P),DAE_P);
 
   if(monitor_rhs_) {
-    cout << "t       = " << f_.input(DAE_T) << endl;
+    cout << "t       = " << t << endl;
     cout << "y       = " << f_.input(DAE_X) << endl;
     cout << "p       = " << f_.input(DAE_P) << endl;
   }
@@ -781,7 +781,7 @@ void CVodesInternal::rhsS(int Ns, double t, N_Vector y, N_Vector ydot, N_Vector 
   time1 = clock();
   
     // Pass input
-  f_.setInput(t,DAE_T);
+  f_.setInput(&t,DAE_T);
   f_.setInput(NV_DATA_S(y),DAE_X);
   f_.setInput(input(INTEGRATOR_P),DAE_P);
 
@@ -789,7 +789,7 @@ void CVodesInternal::rhsS(int Ns, double t, N_Vector y, N_Vector ydot, N_Vector 
    for(int j=0; j<nfdir_; j += nfdir_f_){
      for(int dir=0; dir<nfdir_f_ && j+dir<nfdir_; ++dir){
        // Pass forward seeds 
-       f_.setFwdSeed(0.0,DAE_T,dir);
+       f_.fwdSeed(DAE_T,dir).setZero();
        f_.setFwdSeed(NV_DATA_S(yS[j+dir]),DAE_X,dir);
        f_.setFwdSeed(fwdSeed(INTEGRATOR_P,j+dir),DAE_P,dir);
      }
@@ -824,12 +824,12 @@ void CVodesInternal::rhsS1(int Ns, double t, N_Vector y, N_Vector ydot, int iS, 
   casadi_assert(Ns==nfdir_);
   
     // Pass input
-  f_.setInput(t,DAE_T);
+  f_.setInput(&t,DAE_T);
   f_.setInput(NV_DATA_S(y),DAE_X);
   f_.setInput(input(INTEGRATOR_P),DAE_P);
 
   // Pass forward seeds
-  f_.setFwdSeed(0.0,DAE_T);
+  f_.fwdSeed(DAE_T).setZero();
   f_.setFwdSeed(NV_DATA_S(yS),DAE_X);
   f_.setFwdSeed(fwdSeed(INTEGRATOR_P,iS),DAE_P);
     
@@ -866,7 +866,7 @@ try{
 
 void CVodesInternal::rhsQ(double t, const double* yy, double* rhsQ){
   // Pass input
-  f_.setInput(t,DAE_T);
+  f_.setInput(&t,DAE_T);
   f_.setInput(yy,DAE_X);
   f_.setInput(input(INTEGRATOR_P),DAE_P);
 
@@ -881,13 +881,13 @@ void CVodesInternal::rhsQS(int Ns, double t, N_Vector y, N_Vector *yS, N_Vector 
   casadi_assert(Ns==nfdir_);
   
   // Pass input
-  f_.setInput(t,DAE_T);
+  f_.setInput(&t,DAE_T);
   f_.setInput(NV_DATA_S(y),DAE_X);
   f_.setInput(input(INTEGRATOR_P),DAE_P);
 
   for(int i=0; i<nfdir_; ++i){
     // Pass forward seeds
-    f_.setFwdSeed(0.0,DAE_T);
+    f_.fwdSeed(DAE_T).setZero();
     f_.setFwdSeed(NV_DATA_S(yS[i]),DAE_X);
     f_.setFwdSeed(fwdSeed(INTEGRATOR_P,i),DAE_P);
 
@@ -922,7 +922,7 @@ void CVodesInternal::rhsB(double t, const double* y, const double *yB, double* y
   }
     
   // Pass input
-  f_.setInput(t,DAE_T);
+  f_.setInput(&t,DAE_T);
   f_.setInput(y,DAE_X);
   f_.setInput(input(INTEGRATOR_P),DAE_P);
 
@@ -933,7 +933,7 @@ void CVodesInternal::rhsB(double t, const double* y, const double *yB, double* y
   }
 
   if(monitor_rhsB_){
-    cout << "t       = " << f_.input(DAE_T) << endl;
+    cout << "t       = " << t << endl;
     cout << "y       = " << f_.input(DAE_X) << endl;
     cout << "p       = " << f_.input(DAE_P) << endl;
     cout << "aseed   = " << f_.adjSeed(DAE_ODE) << endl;
@@ -986,16 +986,13 @@ void CVodesInternal::rhsQB(double t, const double* y, const double* yB, double* 
       cout << "CVodesInternal::rhsQB: begin" << endl;
   }
 
-
-
-  
   // Pass input
-  f_.setInput(t,DAE_T);
+  f_.setInput(&t,DAE_T);
   f_.setInput(y,DAE_X);
   f_.setInput(input(INTEGRATOR_P),DAE_P);
   
   if(monitor_rhs_) {
-    cout << "t       = " << f_.input(DAE_T) << endl;
+    cout << "t       = " << t << endl;
     cout << "y       = " << f_.input(DAE_X) << endl;
     cout << "p       = " << f_.input(DAE_P) << endl;
   }
@@ -1005,7 +1002,6 @@ void CVodesInternal::rhsQB(double t, const double* y, const double* yB, double* 
   if(nq_>0){
     f_.setAdjSeed(adjSeed(INTEGRATOR_QF),DAE_QUAD);
   }
-  
   if(monitor_rhsQB_) {
     cout << "adjSeed       = " << f_.adjSeed(DAE_ODE) << endl;
   }
@@ -1049,12 +1045,12 @@ void CVodesInternal::jtimes(const double *v, double* Jv, double t, const double*
   time1 = clock();
 
   // Pass input
-  f_.setInput(t,DAE_T);
+  f_.setInput(&t,DAE_T);
   f_.setInput(y,DAE_X);
   f_.setInput(input(INTEGRATOR_P),DAE_P);
 
   // Pass input seeds
-  f_.setFwdSeed(0.0,DAE_T);
+  f_.fwdSeed(DAE_T).setZero();
   f_.setFwdSeed(v,DAE_X);
   fill_n(f_.fwdSeed(DAE_P).begin(),np_,0.0);
   
@@ -1086,7 +1082,7 @@ void CVodesInternal::djac(int N, double t, N_Vector y, N_Vector fy, DlsMat Jac, 
   time1 = clock();
 
   // Pass inputs to the jacobian function
-  jac_f_.setInput(t,DAE_T);
+  jac_f_.setInput(&t,DAE_T);
   jac_f_.setInput(NV_DATA_S(y),DAE_X);
   jac_f_.setInput(f_.input(DAE_P),DAE_P);
 
@@ -1133,7 +1129,7 @@ void CVodesInternal::bjac(int N, int mupper, int mlower, double t, N_Vector y, N
   time1 = clock();
 
   // Pass inputs to the jacobian function
-  jac_f_.setInput(t,DAE_T);
+  jac_f_.setInput(&t,DAE_T);
   jac_f_.setInput(NV_DATA_S(y),DAE_X);
   jac_f_.setInput(f_.input(DAE_P),DAE_P);
 
