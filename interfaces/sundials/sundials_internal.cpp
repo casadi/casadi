@@ -97,22 +97,6 @@ void SundialsInternal::init(){
   asens_reltol_ = hasSetOption("asens_reltol") ? double(getOption("asens_reltol")) : reltol_;
   stop_at_end_ = getOption("stop_at_end");
   
-  // If time was not specified, initialise it.
-  if(fd_.input(DAE_T).numel()==0) {
-    std::vector<MX> in1(DAE_NUM_IN);
-    in1[DAE_T] = MX("T");
-    in1[DAE_Y] = MX("Y",fd_.input(DAE_Y).size1(),fd_.input(DAE_Y).size2());
-    in1[DAE_YDOT] = MX("YDOT",fd_.input(DAE_YDOT).size1(),fd_.input(DAE_YDOT).size2());
-    in1[DAE_P] = MX("P",fd_.input(DAE_P).size1(),fd_.input(DAE_P).size2());
-    std::vector<MX> in2(in1);
-    in2[DAE_T] = MX();
-    fd_ = MXFunction(in1,fd_.call(in2));
-    fd_.init();
-  }
-  
-  // We only allow for 0-D time
-  casadi_assert_message(fd_.input(DAE_T).numel()==1, "IntegratorInternal: time must be zero-dimensional, not (" <<  fd_.input(DAE_T).size1() << 'x' << fd_.input(DAE_T).size2() << ")");
-  
   // Get the linear solver creator function
   if(linsol_.isNull() && hasSetOption("linear_solver_creator")){
     linearSolverCreator linear_solver_creator = getOption("linear_solver_creator");

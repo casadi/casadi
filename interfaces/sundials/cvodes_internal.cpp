@@ -510,12 +510,12 @@ void CVodesInternal::rhs(double t, const double* y, double* ydot){
   time1 = clock();
 
   // Pass input
-  fd_.setInput(t,DAE_T);
+  fd_.setInput(&t,DAE_T);
   fd_.setInput(y,DAE_Y);
   fd_.setInput(input(INTEGRATOR_P),DAE_P);
 
   if(monitor_rhs_) {
-    cout << "t       = " << fd_.input(DAE_T) << endl;
+    cout << "t       = " << t << endl;
     cout << "y       = " << fd_.input(DAE_Y) << endl;
     cout << "p       = " << fd_.input(DAE_P) << endl;
   }
@@ -826,7 +826,7 @@ void CVodesInternal::rhsS(int Ns, double t, N_Vector y, N_Vector ydot, N_Vector 
   time1 = clock();
   
     // Pass input
-  fd_.setInput(t,DAE_T);
+  fd_.setInput(&t,DAE_T);
   fd_.setInput(NV_DATA_S(y),DAE_Y);
   fd_.setInput(input(INTEGRATOR_P),DAE_P);
 
@@ -834,7 +834,7 @@ void CVodesInternal::rhsS(int Ns, double t, N_Vector y, N_Vector ydot, N_Vector 
    for(int j=0; j<nfdir_; j += nfdir_f_){
      for(int dir=0; dir<nfdir_f_ && j+dir<nfdir_; ++dir){
        // Pass forward seeds 
-       fd_.setFwdSeed(0.0,DAE_T,dir);
+       fd_.fwdSeed(DAE_T,dir).setZero();
        fd_.setFwdSeed(NV_DATA_S(yS[j+dir]),DAE_Y,dir);
        fd_.setFwdSeed(fwdSeed(INTEGRATOR_P,j+dir),DAE_P,dir);
      }
@@ -869,12 +869,12 @@ void CVodesInternal::rhsS1(int Ns, double t, N_Vector y, N_Vector ydot, int iS, 
   casadi_assert(Ns==nfdir_);
   
     // Pass input
-  fd_.setInput(t,DAE_T);
+  fd_.setInput(&t,DAE_T);
   fd_.setInput(NV_DATA_S(y),DAE_Y);
   fd_.setInput(input(INTEGRATOR_P),DAE_P);
 
   // Pass forward seeds
-  fd_.setFwdSeed(0.0,DAE_T);
+  fd_.fwdSeed(DAE_T).setZero();
   fd_.setFwdSeed(NV_DATA_S(yS),DAE_Y);
   fd_.setFwdSeed(fwdSeed(INTEGRATOR_P,iS),DAE_P);
     
@@ -911,7 +911,7 @@ try{
 
 void CVodesInternal::rhsQ(double t, const double* yy, double* rhsQ){
 // Pass input
-  fq_.setInput(t,DAE_T);
+  fq_.setInput(&t,DAE_T);
   fq_.setInput(yy,DAE_Y);
   fq_.setInput(input(INTEGRATOR_P),DAE_P);
 
@@ -926,13 +926,13 @@ void CVodesInternal::rhsQS(int Ns, double t, N_Vector y, N_Vector *yS, N_Vector 
   casadi_assert(Ns==nfdir_);
   
   // Pass input
-  fq_.setInput(t,DAE_T);
+  fq_.setInput(&t,DAE_T);
   fq_.setInput(NV_DATA_S(y),DAE_Y);
   fq_.setInput(input(INTEGRATOR_P),DAE_P);
 
   for(int i=0; i<nfdir_; ++i){
     // Pass forward seeds
-    fq_.setFwdSeed(0.0,DAE_T);
+    fq_.fwdSeed(DAE_T).setZero();
     fq_.setFwdSeed(NV_DATA_S(yS[i]),DAE_Y);
     fq_.setFwdSeed(fwdSeed(INTEGRATOR_P,i),DAE_P);
 
@@ -967,7 +967,7 @@ void CVodesInternal::rhsB(double t, const double* y, const double *yB, double* y
   }
     
   // Pass input
-  fd_.setInput(t,DAE_T);
+  fd_.setInput(&t,DAE_T);
   fd_.setInput(y,DAE_Y);
   fd_.setInput(input(INTEGRATOR_P),DAE_P);
 
@@ -975,7 +975,7 @@ void CVodesInternal::rhsB(double t, const double* y, const double *yB, double* y
   fd_.setAdjSeed(yB,DAE_RES);
 
   if(monitor_rhsB_){
-    cout << "t       = " << fd_.input(DAE_T) << endl;
+    cout << "t       = " << t << endl;
     cout << "y       = " << fd_.input(DAE_Y) << endl;
     cout << "p       = " << fd_.input(DAE_P) << endl;
     cout << "aseed   = " << fd_.adjSeed(DAE_RES) << endl;
@@ -996,7 +996,7 @@ void CVodesInternal::rhsB(double t, const double* y, const double *yB, double* y
   // If quadratures are included
   if(nq_>0){
     // Pass input to quadratures
-    fq_.setInput(t,DAE_T);
+    fq_.setInput(&t,DAE_T);
     fq_.setInput(y,DAE_Y);
     fq_.setInput(input(INTEGRATOR_P),DAE_P);
 
@@ -1053,29 +1053,23 @@ void CVodesInternal::rhsQB(double t, const double* y, const double* yB, double* 
       cout << "CVodesInternal::rhsQB: begin" << endl;
   }
 
-
-
-  
   // Pass input
-  fd_.setInput(t,DAE_T);
+  fd_.setInput(&t,DAE_T);
   fd_.setInput(y,DAE_Y);
   fd_.setInput(input(INTEGRATOR_P),DAE_P);
   
   if(monitor_rhs_) {
-    cout << "t       = " << fd_.input(DAE_T) << endl;
+    cout << "t       = " << t << endl;
     cout << "y       = " << fd_.input(DAE_Y) << endl;
     cout << "p       = " << fd_.input(DAE_P) << endl;
   }
-  
 
   // Pass adjoint seeds
   fd_.setAdjSeed(yB,DAE_RES);
-  
 
   if(monitor_rhsQB_) {
     cout << "adjSeed       = " << fd_.adjSeed(DAE_RES) << endl;
   }
-    
 
   // Evaluate
   fd_.evaluate(0,1);
@@ -1087,11 +1081,10 @@ void CVodesInternal::rhsQB(double t, const double* y, const double* yB, double* 
     cout << "adjSens       = " << fd_.adjSens(DAE_P) << endl;
   }
     
-    
   // If quadratures are included
   if(nq_>0){
     // Pass input to quadratures
-    fq_.setInput(t,DAE_T);
+    fq_.setInput(&t,DAE_T);
     fq_.setInput(y,DAE_Y);
     fq_.setInput(input(INTEGRATOR_P),DAE_P);
 
@@ -1148,12 +1141,12 @@ void CVodesInternal::jtimes(const double *v, double* Jv, double t, const double*
   time1 = clock();
 
   // Pass input
-  fd_.setInput(t,DAE_T);
+  fd_.setInput(&t,DAE_T);
   fd_.setInput(y,DAE_Y);
   fd_.setInput(input(INTEGRATOR_P),DAE_P);
 
   // Pass input seeds
-  fd_.setFwdSeed(0.0,DAE_T);
+  fd_.fwdSeed(DAE_T).setZero();
   fd_.setFwdSeed(v,DAE_Y);
   fill_n(fd_.fwdSeed(DAE_P).begin(),np_,0.0);
   
@@ -1185,7 +1178,7 @@ void CVodesInternal::djac(int N, double t, N_Vector y, N_Vector fy, DlsMat Jac, 
   time1 = clock();
 
   // Pass inputs to the jacobian function
-  jac_f_.setInput(t,DAE_T);
+  jac_f_.setInput(&t,DAE_T);
   jac_f_.setInput(NV_DATA_S(y),DAE_Y);
   jac_f_.setInput(fd_.input(DAE_P),DAE_P);
 
@@ -1232,7 +1225,7 @@ void CVodesInternal::bjac(int N, int mupper, int mlower, double t, N_Vector y, N
   time1 = clock();
 
   // Pass inputs to the jacobian function
-  jac_f_.setInput(t,DAE_T);
+  jac_f_.setInput(&t,DAE_T);
   jac_f_.setInput(NV_DATA_S(y),DAE_Y);
   jac_f_.setInput(fd_.input(DAE_P),DAE_P);
 
