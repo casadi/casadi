@@ -206,12 +206,8 @@ u_ub = 1.3
 u_init = 1
 
 # Initial conditions
-y0 = [0,0,1]
+x0 = [0,0,1]
   
-# Full state including quadratures
-x0 = list(y0)
-x0.append(0)
-
 # Integrator
 if implicit_integrator:
   integrator = create_IDAS()

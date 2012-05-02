@@ -85,8 +85,6 @@ void SundialsInternal::init(){
   // Call the base class method
   IntegratorInternal::init();
   
-  nxq_ = nx_+nq_;
-  
   // Read options
   abstol_ = getOption("abstol");
   reltol_ = getOption("reltol");
@@ -148,7 +146,7 @@ SundialsIntegrator SundialsInternal::jac(bool with_x, bool with_p){
   int nyp = f_.input(DAE_XDOT).numel();
   
   // Number of sensitivities
-  int ns_x = with_x*nxq_;
+  int ns_x = with_x*nx_;
   int ns_p = with_p*np_;
   int ns = ns_x + ns_p;
 
@@ -246,7 +244,7 @@ FX SundialsInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks){
     fwdint.init();
 
     // Number of sensitivities
-    int ns_x = with_x*nxq_;
+    int ns_x = with_x*nx_;
     int ns_p = with_p*np_;
     int ns = ns_x + ns_p;
     
@@ -262,77 +260,55 @@ FX SundialsInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks){
     // Get the state
     MX x0 = jac_in[INTEGRATOR_X0];
     
-    // Separate the quadrature states from the rest of the states
-    MX y0 = x0[range(nx_)];
-    MX q0 = x0[range(nx_,nxq_)];
-    
     // Initial condition for the sensitivitiy equations
-    DMatrix y0_sens(ns*nx_,1,0);
-    DMatrix q0_sens(ns*nq_,1,0);
+    DMatrix x0_sens(ns*nx_,1,0);
     
     if(with_x){
-        for(int i=0; i<nx_; ++i)
-          y0_sens.data()[i + i*ns_x] = 1;
-      
-      for(int i=0; i<nq_; ++i)
-        q0_sens.data()[nx_ + i + i*ns_x] = 1;
+      for(int i=0; i<nx_; ++i){
+	x0_sens.data()[i + i*ns_x] = 1;
+      }
     }
-    
-    // Augmented initial condition
-    MX y0_aug = vertcat(y0,MX(y0_sens));
-    MX q0_aug = vertcat(q0,MX(q0_sens));
 
     // Finally, we are ready to pass the initial condition for the state and state derivative
-    fwdint_in[INTEGRATOR_X0] = vertcat(y0_aug,q0_aug);
+    fwdint_in[INTEGRATOR_X0] = vertcat(x0,MX(x0_sens));
     
     // Call the integrator with the constructed input (in fact, create a call node)
     vector<MX> fwdint_out = fwdint.call(fwdint_in);
     MX xf_aug = fwdint_out[INTEGRATOR_XF];
+    MX qf_aug = fwdint_out[INTEGRATOR_QF];
     
-    // Separate the quadrature states from the rest of the states
-    MX yf_aug = xf_aug[range((ns+1)*nx_)];
-    MX qf_aug = xf_aug[range((ns+1)*nx_,(ns+1)*nxq_)];
-    
-    // Get the state and state derivative at the final time
-    MX yf = yf_aug[range(nx_)];
+    // Get the state and quadrature at the final time
+    MX xf = xf_aug[range(nx_)];
     MX qf = qf_aug[range(nq_)];
-    MX xf = vertcat(yf,qf);
     
     // Get the sensitivitiy equations state at the final time
-    MX yf_sens = yf_aug[range(nx_,(ns+1)*nx_)];
+    MX xf_sens = xf_aug[range(nx_,(ns+1)*nx_)];
     MX qf_sens = qf_aug[range(nq_,(ns+1)*nq_)];
-    MX ypf_sens = yf_aug[range(nx_,(ns+1)*nx_)];
-    MX qpf_sens = qf_aug[range(nq_,(ns+1)*nq_)];
 
     // Reshape the sensitivity state and state derivatives
-    yf_sens = trans(reshape(yf_sens,ns,nx_));
-    ypf_sens = trans(reshape(ypf_sens,ns,nx_));
+    xf_sens = trans(reshape(xf_sens,ns,nx_));
     qf_sens = trans(reshape(qf_sens,ns,nq_));
-    qpf_sens = trans(reshape(qpf_sens,ns,nq_));
     
-    // We are now able to get the Jacobian
-    MX J_xf = vertcat(yf_sens,qf_sens);
-    MX J_xpf = vertcat(ypf_sens,qpf_sens);
-
     // Split up the Jacobians in parts for x0 and p
-    MX J_xf_x0 = J_xf(range(J_xf.size1()),range(ns_x));
-    MX J_xpf_x0 = J_xpf(range(J_xpf.size1()),range(ns_x));
-    MX J_xf_p = J_xf(range(J_xf.size1()),range(ns_x,ns));
-    MX J_xpf_p = J_xpf(range(J_xpf.size1()),range(ns_x,ns));
+    MX J_xf_x0 = xf_sens(range(xf_sens.size1()),range(ns_x));
+    MX J_xf_p  = xf_sens(range(xf_sens.size1()),range(ns_x,ns));
+    MX J_qf_x0 = qf_sens(range(qf_sens.size1()),range(ns_x));
+    MX J_qf_p  = qf_sens(range(qf_sens.size1()),range(ns_x,ns));
     
     // Output of the Jacobian
     vector<MX> jac_out(jblocks.size());
     for(int i=0; i<jblocks.size(); ++i){
       bool is_jac = jblocks[i].second >=0;
       bool is_x0 = jblocks[i].second==INTEGRATOR_X0;
+      bool is_xf = jblocks[i].first==INTEGRATOR_XF;
       if(is_jac){
         if(is_x0){
-          jac_out[i] = J_xf_x0;
+          jac_out[i] = is_xf ? J_xf_x0 : J_qf_x0;
         } else {
-          jac_out[i] = J_xf_p;
+          jac_out[i] = is_xf ? J_xf_p : J_qf_p;
         }
       } else {
-        jac_out[i] = xf;
+        jac_out[i] = is_xf ? xf : qf;
       }
     }
     MXFunction intjac(jac_in,jac_out);

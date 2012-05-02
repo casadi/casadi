@@ -186,15 +186,11 @@ int main(){
   double /*u_lb = -0.5, u_ub = 1.3,*/ u_init = 1;
 
   // Initial conditions
-  vector<double> y0(3);
-  y0[0] = 0;
-  y0[1] = 0;
-  y0[2] = 1;
+  vector<double> x0(3);
+  x0[0] = 0;
+  x0[1] = 0;
+  x0[2] = 1;
   
-  // Full state (includes quadratures)
-  vector<double> x0=y0;
-  x0.push_back(0);
-
   // Integrator
   Integrator integrator = create_Sundials();
   
@@ -239,7 +235,8 @@ int main(){
   integrator.evaluate();
 
   // Save the result
-  Matrix<double> res0 = integrator.output();
+  Matrix<double> res0_xf = integrator.output(INTEGRATOR_XF);
+  Matrix<double> res0_qf = integrator.output(INTEGRATOR_QF);
 
   // Perturb in some direction
   if(perturb_u){
@@ -258,11 +255,12 @@ int main(){
   integrator.printStats();
 
   // Calculate finite difference approximation
-  Matrix<double> fd = (integrator.output() - res0)/0.01;
+  Matrix<double> fd_xf = (integrator.output(INTEGRATOR_XF) - res0_xf)/0.01;
+  Matrix<double> fd_qf = (integrator.output(INTEGRATOR_QF) - res0_qf)/0.01;
 
-  cout << "unperturbed                     " << res0 << endl;
-  cout << "perturbed                       " << integrator.output() << endl;
-  cout << "finite_difference approximation " << fd << endl;
+  cout << "unperturbed                     " << res0_xf << "; " << res0_qf << endl;
+  cout << "perturbed                       " << integrator.output(INTEGRATOR_XF) << "; " << integrator.output(INTEGRATOR_QF) << endl;
+  cout << "finite_difference approximation " << fd_xf << "; " << fd_qf << endl;
 
   if(perturb_u){
     integrator.setFwdSeed(1.0,INTEGRATOR_P);
@@ -291,8 +289,9 @@ int main(){
     integrator.evaluate(1,0);
   }
     
-  Matrix<double> fsens = integrator.fwdSens();
-  cout << "forward sensitivities           " << fsens << endl;
+  Matrix<double> fsens_xf = integrator.fwdSens(INTEGRATOR_XF);
+  Matrix<double> fsens_qf = integrator.fwdSens(INTEGRATOR_QF);
+  cout << "forward sensitivities           " << fsens_xf << "; " << fsens_qf << endl;
 
   if(with_asens){
     cout << "adjoint sensitivities           ";
@@ -315,13 +314,18 @@ int main(){
     // evaluate again with forward sensitivities
     integrator.evaluate(1,0);
 
-    vector<double> fsens_pret = integrator.fwdSens().data();
-    cout << "forward sensitivities preturbed " << fsens_pret << endl;
+    vector<double> fsens_pret_xf = integrator.fwdSens(INTEGRATOR_XF).data();
+    vector<double> fsens_pret_qf = integrator.fwdSens(INTEGRATOR_QF).data();
+    cout << "forward sensitivities preturbed " << fsens_pret_xf << "; " << fsens_pret_qf << endl;
 
-    vector<double> fd2(fsens.size());
-    for(int i=0; i<fd2.size(); ++i)
-      fd2[i] = (fsens_pret.at(i)-fsens.at(i))/0.001;
-    cout << "finite differences, 2nd order   " << fd2 << endl;
+    vector<double> fd2_xf(fsens_xf.size());
+    vector<double> fd2_qf(fsens_qf.size());
+    for(int i=0; i<fd2_xf.size(); ++i)
+      fd2_xf[i] = (fsens_pret_xf.at(i)-fsens_xf.at(i))/0.001;
+    for(int i=0; i<fd2_qf.size(); ++i)
+      fd2_qf[i] = (fsens_pret_qf.at(i)-fsens_qf.at(i))/0.001;
+    
+    cout << "finite differences, 2nd order   " << fd2_xf << "; " << fd2_qf << endl;
     
     // Generate the jacobian by creating a new integrator for the sensitivity equations by source transformation
     FX intjac  = integrator.jacobian(INTEGRATOR_P,INTEGRATOR_XF);
@@ -343,7 +347,7 @@ int main(){
     intjac2.setInput(x0,INTEGRATOR_X0);
     
     // Set adjoint seed
-    vector<double> jacseed(4*1);
+    vector<double> jacseed(3*1,0);
     jacseed[0] = 1;
     intjac.setAdjSeed(jacseed);
     

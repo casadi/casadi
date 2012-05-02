@@ -143,6 +143,8 @@ enum IntegratorInput{
 enum IntegratorOutput{
  /**  Differential state at final time */
  INTEGRATOR_XF,
+ /**  Quadrature state at final time */
+ INTEGRATOR_QF,
   /** Number of output arguments of an integrator */
  INTEGRATOR_NUM_OUT
 };

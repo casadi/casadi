@@ -86,10 +86,6 @@ public:
   
   /// Current time (to be removed)
   double t_;
-  
-  /// Differential states and quadrature states
-  int nxq_;
-
 };
   
 } // namespace Sundials

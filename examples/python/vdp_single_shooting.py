@@ -56,7 +56,7 @@ X  = msym([0,1,0])
 
 # Build a graph of integrator calls
 for k in range(nk):
-  [X] = f_d.call([X,U[k]])
+  [X,_] = f_d.call([X,U[k]])
   
 # Objective function: x_2(T)
 F = MXFunction([U],[X[2]])

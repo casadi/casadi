@@ -154,13 +154,13 @@ public:
   double t_lsetup_fac; // preconditioner setup function, factorize jacobian
   
   // N-vectors for the ODE integration
-  N_Vector y0_, y_, yQ0_, yQ_;
+  N_Vector y0_, y_, yQ_;
 
   // N-vectors for the forward and adjoint sensitivities
-  std::vector<N_Vector> yS0_, yS_, yQS0_, yQS_;
+  std::vector<N_Vector> yS0_, yS_, yQS_;
 
   // N-vectors for the adjoint sensitivities
-  std::vector<N_Vector> yB0_, yB_, /*yQB0_, */ yQB_;
+  std::vector<N_Vector> yB0_, yB_, yQB_;
   
   
   bool is_init;

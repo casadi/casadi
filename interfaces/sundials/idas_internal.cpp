@@ -275,9 +275,10 @@ void IdasInternal::init(){
   if(nq_>0){
 
     // Allocate n-vectors for quadratures
-    yQ_ = N_VNew_Serial(nq_);
+    yQ_ = N_VMake_Serial(nq_,&output(INTEGRATOR_QF).front());
 
     // Initialize quadratures in IDAS
+    N_VConst(0.0, yQ_);
     flag = IDAQuadInit(mem_, rhsQ_wrapper, yQ_);
     if(flag != IDA_SUCCESS) idas_error("IDAQuadInit",flag);
     
@@ -303,13 +304,9 @@ void IdasInternal::init(){
       for(int i=0; i<nfdir_; ++i){
         yS_[i] = N_VNew_Serial(nx_);
         yPS_[i] = N_VNew_Serial(nx_);
-      }
-
-      // Allocate n-vectors for quadratures
-      if(nq_>0){
-        for(int i=0; i<nfdir_; ++i){
-          yQS_[i] = N_VNew_Serial(nq_);
-        }
+	if(nq_>0){
+	  yQS_[i] = N_VMake_Serial(nq_,&fwdSens(INTEGRATOR_QF,i).front());
+	}
       }
       
     // Get the sensitivity method
@@ -319,7 +316,7 @@ void IdasInternal::init(){
 
     // Copy the forward seeds
     for(int i=0; i<nfdir_; ++i){
-      copyNV(fwdSeed(INTEGRATOR_X0,i),yS_[i],yPS_[i],yQS_[i]);
+      copyNV(fwdSeed(INTEGRATOR_X0,i),yS_[i],yPS_[i]);
     }
 
     // Initialize forward sensitivities
@@ -391,6 +388,7 @@ void IdasInternal::init(){
 
     // Quadrature equations
     if(nq_>0){
+      for(vector<N_Vector>::iterator it=yQS_.begin(); it!=yQS_.end(); ++it) N_VConst(0.0,*it);
       flag = IDAQuadSensInit(mem_, rhsQS_wrapper, getPtr(yQS_));
       if(flag != IDA_SUCCESS) idas_error("IDAQuadSensInit",flag);
       
@@ -509,6 +507,7 @@ void IdasInternal::initAdj(){
     } else throw CasadiException("Unknown linear solver for backward problem");
       
     // Quadratures for the adjoint problem
+    N_VConst(0.0,yBB_[dir]);
     flag = IDAQuadInitB(mem_,whichB_[dir],rhsQB_wrapper,yBB_[dir]);
     if(flag!=IDA_SUCCESS) idas_error("IDAQuadInitB",flag);
   
@@ -720,7 +719,7 @@ void IdasInternal::reset(int nfdir, int nadir){
   int flag;
   
   // Copy to N_Vectors
-  copyNV(input(INTEGRATOR_X0),y_,yP_,yQ_);
+  copyNV(input(INTEGRATOR_X0),y_,yP_);
   
   // Re-initialize
   flag = IDAReInit(mem_, t0_, y_, yP_);
@@ -730,6 +729,7 @@ void IdasInternal::reset(int nfdir, int nadir){
 
   // Re-initialize quadratures
   if(nq_>0){
+    N_VConst(0.0,yQ_);
     flag = IDAQuadReInit(mem_, yQ_);
     if(flag != IDA_SUCCESS) idas_error("IDAQuadReInit",flag);
     log("IdasInternal::reset","re-initialized quadratures");
@@ -738,7 +738,7 @@ void IdasInternal::reset(int nfdir, int nadir){
   if(fsens_order_>0){
     // Get the forward seeds
     for(int i=0; i<nfdir_; ++i){
-      copyNV(fwdSeed(INTEGRATOR_X0,i),yS_[i],yPS_[i],yQS_[i]);
+      copyNV(fwdSeed(INTEGRATOR_X0,i),yS_[i],yPS_[i]);
     }
     
     // Re-initialize sensitivities
@@ -747,6 +747,7 @@ void IdasInternal::reset(int nfdir, int nadir){
     log("IdasInternal::reset","re-initialized forward sensitivity solution");
 
     if(nq_>0){
+      for(vector<N_Vector>::iterator it=yQS_.begin(); it!=yQS_.end(); ++it) N_VConst(0.0,*it);
       flag = IDAQuadSensReInit(mem_, getPtr(yQS_));
       if(flag != IDA_SUCCESS) idas_error("IDAQuadSensReInit",flag);
       log("IdasInternal::reset","re-initialized forward sensitivity dependent quadratures");
@@ -795,14 +796,6 @@ void IdasInternal::correctInitialConditions(){
   // Retrieve the initial values
   flag = IDAGetConsistentIC(mem_, y_, yP_);
   if(flag != IDA_SUCCESS) idas_error("IDAGetConsistentIC",flag);
-
-  // Save the corrected input to the function arguments
-  copyNV(y_,yP_,yQ_,input(INTEGRATOR_X0));
-  if(fsens_order_>0){
-    for(int i=0; i<nfdir_; ++i){
-      copyNV(yS_[i],yPS_[i],yQS_[i],fwdSeed(INTEGRATOR_X0,i));
-    }
-  }
   
   // Print progress
   log("IdasInternal::correctInitialConditions","found consistent initial values");
@@ -895,6 +888,7 @@ void IdasInternal::resetAdj(){
       if(flag != IDA_SUCCESS) idas_error("IDAReInitB",flag);
       
       if(np_>0){
+	N_VConst(0.0,yBB_[dir]);
         flag = IDAQuadReInit(IDAGetAdjIDABmem(mem_, whichB_[dir]),yBB_[dir]);
         // flag = IDAQuadReInitB(mem_,whichB_[dir],yBB_[dir]); // BUG in Sundials - do not use this!
       }
@@ -939,13 +933,6 @@ void IdasInternal::integrateAdj(double t_out){
 
     flag = IDAGetQuadB(mem_, whichB_[dir], &tret, yBB_[dir]);
     if(flag!=IDA_SUCCESS) idas_error("IDAGetQuadB",flag);
-    
-    // Quadrature sensitivities are trivial
-    if(nq_>0){
-      copy(adjSeed(INTEGRATOR_XF,dir).begin()+nx_,
-           adjSeed(INTEGRATOR_XF,dir).end(),
-           adjSens(INTEGRATOR_X0,dir).begin()+nx_);
-    }
   }
   
   // Save the adjoint sensitivities
@@ -1155,7 +1142,7 @@ void IdasInternal::resB(double t, const double* yz, const double* yp, const doub
   if(nq_>0){
     // Pass adjoint seeds
     f_.adjSeed(DAE_ODE).setZero();
-    f_.setAdjSeed(&adjSeed(INTEGRATOR_XF).at(nx_),DAE_QUAD);
+    f_.setAdjSeed(adjSeed(INTEGRATOR_QF).data(),DAE_QUAD);
 
     // Evaluate
     f_.evaluate(0,1);
@@ -1190,7 +1177,7 @@ void IdasInternal::rhsQB(double t, const double* yz, const double* yp, const dou
   // Pass adjoint seeds
   f_.setAdjSeed(yB,DAE_ODE);
   if(nq_>0){
-    f_.setAdjSeed(&adjSeed(INTEGRATOR_XF).at(nx_),DAE_QUAD);
+    f_.setAdjSeed(adjSeed(INTEGRATOR_QF),DAE_QUAD);
   }
 
   // Evaluate
@@ -1544,17 +1531,12 @@ LinearSolver IdasInternal::getLinearSolver(){
   return linsol_;
 }
   
-void IdasInternal::copyNV(const Matrix<double>& x, N_Vector& yz, N_Vector& yP, N_Vector& yQ){
+void IdasInternal::copyNV(const Matrix<double>& x, N_Vector& yz, N_Vector& yP){
   double *yzd = NV_DATA_S(yz);
   double *yPd = NV_DATA_S(yP);
   
   copy(x.begin(), x.begin()+nx_, yzd);
   fill_n(yPd,nx_,0);
-
-  if(nq_>0){
-    double *yQd = NV_DATA_S(yQ);
-    copy(x.begin()+nx_, x.end(), yQd);
-  }
 }
   
 void IdasInternal::copyNV(const N_Vector& yz, const N_Vector& yP, const N_Vector& yQ, Matrix<double>& x){
@@ -1562,11 +1544,6 @@ void IdasInternal::copyNV(const N_Vector& yz, const N_Vector& yP, const N_Vector
   const double *ypd = NV_DATA_S(yP);
   
   copy(yzd,yzd+nx_,x.begin());
-  
-  if(nq_>0){
-    const double *yQd = NV_DATA_S(yQ);
-    copy(yQd,yQd+nq_, x.begin()+nx_);
-  }
 }
 
 void IdasInternal::getAdjointSeeds(){

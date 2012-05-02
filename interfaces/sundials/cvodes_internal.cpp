@@ -50,7 +50,7 @@ CVodesInternal::CVodesInternal(const FX& f) : SundialsInternal(f){
   mem_ = 0;
 
   y0_ = y_ = 0;
-  yQ0_ = yQ_ = 0;
+  yQ_ = 0;
 
   is_init = false;
   isInitAdj_ = false;
@@ -63,19 +63,16 @@ void CVodesInternal::freeCVodes(){
   // ODE integration
   if(y0_) N_VDestroy_Serial(y0_);
   if(y_) N_VDestroy_Serial(y_);
-  if(yQ0_) N_VDestroy_Serial(yQ0_);
   if(yQ_) N_VDestroy_Serial(yQ_);
   
   // Forward problem
   for(vector<N_Vector>::iterator it=yS0_.begin(); it != yS0_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
   for(vector<N_Vector>::iterator it=yS_.begin(); it != yS_.end(); ++it)     if(*it) N_VDestroy_Serial(*it);
-  for(vector<N_Vector>::iterator it=yQS0_.begin(); it != yQS0_.end(); ++it) if(*it) N_VDestroy_Serial(*it);
   for(vector<N_Vector>::iterator it=yQS_.begin(); it != yQS_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
   
   // Adjoint problem
   for(vector<N_Vector>::iterator it=yB0_.begin(); it != yB0_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
   for(vector<N_Vector>::iterator it=yB_.begin(); it != yB_.end(); ++it)     if(*it) N_VDestroy_Serial(*it);
-//  for(vector<N_Vector>::iterator it=yQB0_.begin(); it != yQB0_.end(); ++it) if(*it) N_VDestroy_Serial(*it);
   for(vector<N_Vector>::iterator it=yQB_.begin(); it != yQB_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
 }
 
@@ -253,11 +250,11 @@ void CVodesInternal::init(){
   // Quadrature equations
   if(nq_>0){
     // Allocate n-vectors for quadratures
-    yQ0_ = N_VMake_Serial(nq_,&input(INTEGRATOR_X0).data()[nx_]);
-    yQ_ = N_VMake_Serial(nq_,&output(INTEGRATOR_XF).data()[nx_]);
+    yQ_ = N_VMake_Serial(nq_,&output(INTEGRATOR_QF).front());
 
     // Initialize quadratures in CVodes
-    flag = CVodeQuadInit(mem_, rhsQ_wrapper, yQ0_);
+    N_VConst(0.0, yQ_);
+    flag = CVodeQuadInit(mem_, rhsQ_wrapper, yQ_);
     if(flag != CV_SUCCESS) cvodes_error("CVodeQuadInit",flag);
     
     // Should the quadrature errors be used for step size control?
@@ -283,11 +280,9 @@ void CVodesInternal::init(){
 
       // Allocate n-vectors for quadratures
       if(nq_>0){
-        yQS0_.resize(nfdir_,0);
         yQS_.resize(nfdir_,0);
         for(int i=0; i<nfdir_; ++i){
-          yQS0_[i] = N_VMake_Serial(nq_,&fwdSeed(INTEGRATOR_X0,i).data()[nx_]);
-          yQS_[i] = N_VMake_Serial(nq_,&fwdSens(INTEGRATOR_XF,i).data()[nx_]);
+          yQS_[i] = N_VMake_Serial(nq_,&fwdSens(INTEGRATOR_QF,i).front());
         }
       }
       
@@ -340,7 +335,8 @@ void CVodesInternal::init(){
     
     // Quadrature equations
     if(nq_>0){
-      flag = CVodeQuadSensInit(mem_, rhsQS_wrapper, getPtr(yQS0_));
+      for(vector<N_Vector>::iterator it=yQS_.begin(); it!=yQS_.end(); ++it) N_VConst(0.0,*it);
+      flag = CVodeQuadSensInit(mem_, rhsQS_wrapper, getPtr(yQS_));
       if(flag != CV_SUCCESS) cvodes_error("CVodeQuadSensInit",flag);
 
       // Set tolerances
@@ -356,15 +352,15 @@ void CVodesInternal::init(){
   yB0_.resize(nadir_,0);
   yB_.resize(nadir_,0);
   for(int i=0; i<nadir_; ++i){
-    yB0_[i] = N_VMake_Serial(nx_,&adjSeed(INTEGRATOR_XF,i).data()[0]);
-    yB_[i] = N_VMake_Serial(nx_,&adjSens(INTEGRATOR_X0,i).data()[0]);
+    yB0_[i] = N_VMake_Serial(nx_,&adjSeed(INTEGRATOR_XF,i).front());
+    yB_[i] = N_VMake_Serial(nx_,&adjSens(INTEGRATOR_X0,i).front());
   }
 
   // Allocate n-vectors for quadratures
   yQB_.resize(nadir_,0);
   for(int i=0; i<nadir_; ++i){
     casadi_assert(adjSens(INTEGRATOR_P,i).size()==np_);
-    yQB_[i] = N_VMake_Serial(np_,&adjSens(INTEGRATOR_P,i).data()[0]);
+    yQB_[i] = N_VMake_Serial(np_,&adjSens(INTEGRATOR_P,i).front());
   }
   
   if(nadir_>0){
@@ -537,7 +533,8 @@ void CVodesInternal::reset(int nfdir, int nadir){
   
   // Re-initialize quadratures
   if(nq_>0){
-    flag = CVodeQuadReInit(mem_, yQ0_);
+    N_VConst(0.0,yQ_);
+    flag = CVodeQuadReInit(mem_, yQ_);
     if(flag != CV_SUCCESS) cvodes_error("CVodeQuadReInit",flag);
   }
   
@@ -547,7 +544,8 @@ void CVodesInternal::reset(int nfdir, int nadir){
     if(flag != CV_SUCCESS) cvodes_error("CVodeSensReInit",flag);
     
     if(nq_>0){
-      flag = CVodeQuadSensReInit(mem_, getPtr(yQS0_));
+      for(vector<N_Vector>::iterator it=yQS_.begin(); it!=yQS_.end(); ++it) N_VConst(0.0,*it);
+      flag = CVodeQuadSensReInit(mem_, getPtr(yQS_));
       if(flag != CV_SUCCESS) cvodes_error("CVodeQuadSensReInit",flag);
     }
   } else {
@@ -643,13 +641,6 @@ void CVodesInternal::integrateAdj(double t_out){
 
     flag = CVodeGetQuadB(mem_, whichB_[dir], &tret, yQB_[dir]);
     if(flag!=CV_SUCCESS) cvodes_error("CVodeGetQuadB",flag);
-   
-    // Quadrature sensitivities are trivial
-    if(nq_>0){
-      copy(adjSeed(INTEGRATOR_XF,dir).begin()+nx_,
-           adjSeed(INTEGRATOR_XF,dir).end(),
-           adjSens(INTEGRATOR_X0,dir).begin()+nx_);
-    }
   }
 }
 
@@ -938,7 +929,7 @@ void CVodesInternal::rhsB(double t, const double* y, const double *yB, double* y
   // Pass adjoint seeds
   f_.setAdjSeed(yB,DAE_ODE);
   if(nq_>0){
-    f_.setAdjSeed(&adjSeed(INTEGRATOR_XF).data()[nx_],DAE_QUAD);
+    f_.setAdjSeed(adjSeed(INTEGRATOR_QF),DAE_QUAD);
   }
 
   if(monitor_rhsB_){
@@ -1012,7 +1003,7 @@ void CVodesInternal::rhsQB(double t, const double* y, const double* yB, double* 
   // Pass adjoint seeds
   f_.setAdjSeed(yB,DAE_ODE);
   if(nq_>0){
-    f_.setAdjSeed(&adjSeed(INTEGRATOR_XF).data()[nx_],DAE_QUAD);
+    f_.setAdjSeed(adjSeed(INTEGRATOR_QF),DAE_QUAD);
   }
   
   if(monitor_rhsQB_) {
