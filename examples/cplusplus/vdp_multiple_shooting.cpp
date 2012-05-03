@@ -39,7 +39,7 @@ int main(){
   
   // DAE residual
   SXMatrix xxdot = ssym("xxdot",xx.size());
-  vector<SXMatrix> res_in = daeIn<SXMatrix>(xxdot,xx,SXMatrix(),u,t);
+  vector<SXMatrix> res_in = daeIn<SXMatrix>(xx,SXMatrix(),u,t,xxdot);
   SXFunction res(res_in,daeOut<SXMatrix>(f-xxdot));
   
   Dictionary integrator_options;

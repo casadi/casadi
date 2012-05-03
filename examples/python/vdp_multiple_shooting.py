@@ -37,7 +37,7 @@ xp = ssym("xd",3) # state derivative
 res = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, \
        x[0], \
        x[0]*x[0] + x[1]*x[1] + u*u]) - xp
-f = SXFunction(daeIn(xp,x,[],u,t),daeOut(res))
+f = SXFunction(daeIn(x,[],u,t,xp),daeOut(res))
 
 # Create an integrator
 if coll:

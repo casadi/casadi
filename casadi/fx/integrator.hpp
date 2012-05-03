@@ -46,18 +46,18 @@
     q(t0)  = 0
   
   Forward integration from t=t0 to t=tf
-         0 = fx(der(x),x,z,p,t)           Forward ODE
-         0 = fz(       x,z,p,t)           Forward algebraic equations
-    der(q) = fq(       x,z,p,t)           Forward quadratures
+         0 = fx(x,z,p,t,der(x))           Forward ODE
+         0 = fz(x,z,p,t)                  Forward algebraic equations
+    der(q) = fq(x,z,p,t)                  Forward quadratures
   
   Terminal conditions at t=tf
     rx(tf)  = rx0
     rq(tf)  = 0
   
   Backward integration from t=tf to t=t0
-          0 = gx(der(rx),rx,rz,x,z,p,t)   Backward ODE
-          0 = gz(        rx,rz,x,z,p,t)   Backward algebraic equations
-    der(rq) = gq(        rx,rz,x,z,p,t)   Backward quadratures
+          0 = gx(rx,rz,x,z,p,t,der(rx))   Backward ODE
+          0 = gz(rx,rz,x,z,p,t)           Backward algebraic equations
+    der(rq) = gq(rx,rz,x,z,p,t)           Backward quadratures
 
   where we assume that both the forward and backwards integrations are index-1
   (i.e. dfx/dxdot, dfz/dz, dgz/drz, dgx/drxdot are invertible) and furthermore that 
@@ -82,8 +82,6 @@ namespace CasADi{
 
 /// Input arguments of an ODE/DAE function
 enum DAEInput{
-  /** Time derivative of differential states */
-  DAE_XDOT,
   /** Differential state */
   DAE_X,
   /** Algebraic state */
@@ -92,14 +90,16 @@ enum DAEInput{
   DAE_P,
   /** Explicit time dependence */
   DAE_T,
+  /** Time derivative of differential states */
+  DAE_XDOT,
   /** Number of arguments. */
   DAE_NUM_IN
 };
 
 /// Helper function to create ODE/DAE forward integration function input arguments
 template<class M>
-std::vector<M> daeIn(const M& xdot, const M& x, const M& z=M(), const M& p=M(), const M& t=M()){
-  M ret[DAE_NUM_IN] = {xdot,x,z,p,t};
+std::vector<M> daeIn(const M& x, const M& z=M(), const M& p=M(), const M& t=M(), const M& xdot=M()){
+  M ret[DAE_NUM_IN] = {x,z,p,t,xdot};
   return std::vector<M>(ret,ret+DAE_NUM_IN);
 }
 #ifdef SWIG
@@ -132,8 +132,6 @@ std::vector<M> daeOut(const M& ode, const M& alg=M(), const M& quad=M()){
 
 /// Input arguments of an ODE/DAE backward integration function 
 enum RDAEInput{
-  /** Time derivative of backward differential state */
-  RDAE_RXDOT,
   /** Backward differential state */
   RDAE_RX,
   /** Backward algebraic state */
@@ -146,14 +144,16 @@ enum RDAEInput{
   RDAE_P,
   /** Explicit time dependence */
   RDAE_T,
+  /** Time derivative of backward differential state */
+  RDAE_RXDOT,
   /** Number of arguments. */
   RDAE_NUM_IN
 };
 
 /// Helper function to create ODE/DAE backward integration function input arguments
 template<class M>
-std::vector<M> rdaeIn(const M& rxdot, const M& rx=M(), const M& rz=M(), const M& x=M(), const M& z=M(), const M& p=M(), const M& t=M()){
-  M ret[RDAE_NUM_IN] = {rxdot,rx,rz,x,z,p,t};
+std::vector<M> rdaeIn(const M& rx, const M& rz=M(), const M& x=M(), const M& z=M(), const M& p=M(), const M& t=M(), const M& rxdot=M()){
+  M ret[RDAE_NUM_IN] = {rx,rz,x,z,p,t,rxdot};
   return std::vector<M>(ret,ret+RDAE_NUM_IN);
 }
 #ifdef SWIG
@@ -197,16 +197,16 @@ enum IntegratorInput{
 
 /// Output arguments of an integrator
 enum IntegratorOutput{
- /**  Differential state at the final time */
- INTEGRATOR_XF,
- /**  Quadrature state at the final time */
- INTEGRATOR_QF,
- /**  Backward differential state at the initial time */
- INTEGRATOR_RXF,
- /**  Backward quadrature state at the initial time */
- INTEGRATOR_RQF,
-  /** Number of output arguments of an integrator */
- INTEGRATOR_NUM_OUT
+  /**  Differential state at the final time */
+  INTEGRATOR_XF,
+  /**  Quadrature state at the final time */
+  INTEGRATOR_QF,
+  /**  Backward differential state at the initial time */
+  INTEGRATOR_RXF,
+  /**  Backward quadrature state at the initial time */
+  INTEGRATOR_RQF,
+    /** Number of output arguments of an integrator */
+  INTEGRATOR_NUM_OUT
 };
 
 /// Forward declaration of internal class

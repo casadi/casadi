@@ -84,7 +84,7 @@ class OCPtests(casadiTestCase):
     p=ssym("p",1,1)
     # y
     # y'
-    f=SXFunction(daeIn([],q,[],p,t),daeOut(vertcat([q[1],p[0]+q[1]**2 ])))
+    f=SXFunction(daeIn(q,[],p,t),daeOut(vertcat([q[1],p[0]+q[1]**2 ])))
     f.init()
     
     integrator = CVodesIntegrator(f)
@@ -142,7 +142,7 @@ class OCPtests(casadiTestCase):
     p=ssym("p",1,1)
     # y
     # y'
-    f=SXFunction(daeIn([],q,[],p,t),daeOut(vertcat([q[1],p[0]+q[1]**2 ])))
+    f=SXFunction(daeIn(q,[],p,t),daeOut(vertcat([q[1],p[0]+q[1]**2 ])))
     f.init()
     
     integrator = CVodesIntegrator(f)

@@ -99,7 +99,7 @@ int main(){
   int ns = 50;
 
   // Input to the ODE/DAE functions
-  vector<SXMatrix> rhs_in = daeIn<SXMatrix>(SXMatrix(),x,SXMatrix(),u,t);
+  vector<SXMatrix> rhs_in = daeIn<SXMatrix>(x,SXMatrix(),u,t);
 
   // ODE right hand side
   vector<SX> f(3);
