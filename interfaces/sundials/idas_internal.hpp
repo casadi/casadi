@@ -85,7 +85,7 @@ class IdasInternal : public SundialsInternal{
   public:
   
   /** \brief  Constructor */
-  explicit IdasInternal(const FX& f);
+  explicit IdasInternal(const FX& f, const FX& g);
 
   /** \brief  Copy constructor */
 //  IdasInternal(const IdasInternal& integrator);
@@ -94,7 +94,7 @@ class IdasInternal : public SundialsInternal{
   virtual IdasInternal* clone() const;
   
   /** \brief  Create a new integrator */
-  virtual IdasInternal* create(const FX& f) const{ return new IdasInternal(f);}
+  virtual IdasInternal* create(const FX& f, const FX& g) const{ return new IdasInternal(f,g);}
 
   /** \brief  Deep copy data members */
   virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);

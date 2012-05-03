@@ -138,7 +138,7 @@ void ControlSimulatorInternal::init(){
  
   // Create an integrator instance
   integratorCreator integrator_creator = getOption("integrator");
-  integrator_ = integrator_creator(dae_);
+  integrator_ = integrator_creator(dae_,FX());
   if(hasSetOption("integrator_options")){
     integrator_.setOption(getOption("integrator_options"));
   }

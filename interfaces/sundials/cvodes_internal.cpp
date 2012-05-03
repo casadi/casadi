@@ -32,7 +32,7 @@ namespace Sundials{
 
 CVodesInternal* CVodesInternal::clone() const{
   // Return a deep copy
-  CVodesInternal* node = new CVodesInternal(f_);
+  CVodesInternal* node = new CVodesInternal(f_,g_);
   node->setOption(dictionary());
   node->jac_f_ = jac_f_;
   node->jac_ = jac_;
@@ -40,7 +40,7 @@ CVodesInternal* CVodesInternal::clone() const{
   return node;
 }
 
-CVodesInternal::CVodesInternal(const FX& f) : SundialsInternal(f){
+CVodesInternal::CVodesInternal(const FX& f, const FX& g) : SundialsInternal(f,g){
   addOption("linear_multistep_method",     OT_STRING,  "bdf","bdf|adams");
   addOption("nonlinear_solver_iteration",  OT_STRING,  "newton","","newton|functional");
   addOption("fsens_all_at_once",           OT_BOOLEAN,true); // calculate all right hand sides of the sensitivity equations at once

@@ -29,8 +29,8 @@ namespace CasADi{
 RKIntegrator::RKIntegrator(){
 }
   
-RKIntegrator::RKIntegrator(const FX& f){
-  assignNode(new RKIntegratorInternal(f));
+RKIntegrator::RKIntegrator(const FX& f, const FX& g){
+  assignNode(new RKIntegratorInternal(f,g));
 }
 
 RKIntegratorInternal* RKIntegrator::operator->(){

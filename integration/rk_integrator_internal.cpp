@@ -31,7 +31,7 @@
 using namespace std;
 namespace CasADi{
 
-RKIntegratorInternal::RKIntegratorInternal(const FX& f) : IntegratorInternal(f){
+RKIntegratorInternal::RKIntegratorInternal(const FX& f, const FX& g) : IntegratorInternal(f,g){
   addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
   addOption("interpolation_order",           OT_INTEGER,  4,  "Order of the interpolating polynomials");
   addOption("expand_f",                      OT_BOOLEAN,  false, "Expand the ODE/DAE residual function in an SX graph");

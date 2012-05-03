@@ -51,7 +51,7 @@ void CollocationInternal::init(){
 
   // Create an integrator instance
   integratorCreator integrator_creator = getOption("integrator");
-  integrator_ = integrator_creator(ffcn_);
+  integrator_ = integrator_creator(ffcn_,FX());
   if(hasSetOption("integrator_options")){
     integrator_.setOption(getOption("integrator_options"));
   }

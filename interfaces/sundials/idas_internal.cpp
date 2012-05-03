@@ -32,7 +32,7 @@ namespace Sundials{
 
 IdasInternal* IdasInternal::clone() const{
   // Return a deep copy
-  IdasInternal* node = new IdasInternal(f_);
+  IdasInternal* node = new IdasInternal(f_,g_);
   node->setOption(dictionary());
   node->jac_ = jac_;
   node->linsol_ = linsol_;
@@ -43,7 +43,7 @@ void IdasInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& alr
   SundialsInternal::deepCopyMembers(already_copied);
 }
 
-IdasInternal::IdasInternal(const FX& f) : SundialsInternal(f){
+IdasInternal::IdasInternal(const FX& f, const FX& g) : SundialsInternal(f,g){
   addOption("suppress_algebraic",          OT_BOOLEAN, false, "supress algebraic variables in the error testing");
   addOption("calc_ic",                     OT_BOOLEAN, true,  "use IDACalcIC to get consistent initial conditions. This only works for semi-explicit index-one systems. Else, you must provide consistent initial conditions yourself.");
   addOption("calc_icB",                    OT_BOOLEAN, false, "use IDACalcIC to get consistent initial conditions. This only works for semi-explicit index-one systems. Else, you must provide consistent initial conditions yourself.");

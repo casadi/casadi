@@ -49,7 +49,7 @@ class RKIntegrator : public Integrator {
     * \copydoc scheme_DAEOutput
     *
     */
-    explicit RKIntegrator(const FX& f);
+    explicit RKIntegrator(const FX& f, const FX& g=FX());
 
     /// Access functions of the node
     RKIntegratorInternal* operator->();
@@ -62,7 +62,7 @@ class RKIntegrator : public Integrator {
     #ifdef SWIG
     %callback("%s_cb");
     #endif
-    static Integrator creator(const FX& f){ return RKIntegrator(f);}
+    static Integrator creator(const FX& f, const FX& g){ return RKIntegrator(f,g);}
     #ifdef SWIG
     %nocallback;
     #endif

@@ -35,7 +35,7 @@ using namespace std;
 namespace CasADi{
 namespace Sundials{
   
-SundialsInternal::SundialsInternal(const FX& f) : IntegratorInternal(f){
+SundialsInternal::SundialsInternal(const FX& f, const FX& g) : IntegratorInternal(f,g){
   addOption("max_num_steps",               OT_INTEGER, 10000); // maximum number of steps
   addOption("reltol",                      OT_REAL,    1e-6); // relative tolerence for the IVP solution
   addOption("abstol",                      OT_REAL,    1e-8); // absolute tolerence  for the IVP solution
@@ -175,7 +175,7 @@ SundialsIntegrator SundialsInternal::jac(bool with_x, bool with_p){
 
   // Create integrator instance
   SundialsIntegrator integrator;
-  integrator.assignNode(create(ffcn_aug));
+  integrator.assignNode(create(ffcn_aug,FX()));
 
   // Set options
   integrator.setOption(dictionary());

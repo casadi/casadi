@@ -48,7 +48,7 @@ class CVodesInternal : public SundialsInternal{
   friend class CVodesIntegrator;
 public:
   /** \brief  Constructor */
-  explicit CVodesInternal(const FX& f);
+  explicit CVodesInternal(const FX& f, const FX& g);
 
   /** \brief  Deep copy data members */
   virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
@@ -57,7 +57,7 @@ public:
   virtual CVodesInternal* clone() const;
   
   /** \brief  Create a new integrator */
-  virtual CVodesInternal* create(const FX& f) const{ return new CVodesInternal(f);}
+  virtual CVodesInternal* create(const FX& f, const FX& g) const{ return new CVodesInternal(f,g);}
 
   /** \brief  Destructor */
   virtual ~CVodesInternal();

@@ -36,7 +36,7 @@ OUTPUTSCHEME(IntegratorOutput)
 using namespace std;
 namespace CasADi{
 
-IntegratorInternal::IntegratorInternal(const FX& f) : f_(f){
+IntegratorInternal::IntegratorInternal(const FX& f, const FX& g) : f_(f), g_(g){
   // set default options
   setOption("name","unnamed_integrator"); // name of the function 
   
@@ -82,22 +82,49 @@ void IntegratorInternal::init(){
   
   // Initialize, get and assert dimensions of the forward integration
   if(!f_.isInit()) f_.init();
+  casadi_assert_message(f_.getNumInputs()==DAE_NUM_IN,"Wrong number of inputs for the DAE callback function");
+  casadi_assert_message(f_.getNumOutputs()==DAE_NUM_OUT,"Wrong number of outputs for the DAE callback function");
   nx_ = f_.input(DAE_X).numel();
   nz_ = f_.input(DAE_Z).numel();
-  np_  = f_.input(DAE_P).numel();
   nq_ = f_.output(DAE_QUAD).numel();
+  np_  = f_.input(DAE_P).numel();
   casadi_assert_message(f_.output(DAE_ODE).numel()==nx_,"Inconsistent dimensions");
   casadi_assert_message(f_.output(DAE_ALG).numel()==nz_,"Inconsistent dimensions");
+  
+  // Initialize, get and assert dimensions of the backwards integration
+  if(g_.isNull()){
+    // No backwards integration
+    nrx_ = nrz_ = nrq_ = 0;
+  } else {
+    if(!g_.isInit()) g_.init();
+    casadi_assert_message(g_.getNumInputs()==RDAE_NUM_IN,"Wrong number of inputs for the backwards DAE callback function");
+    casadi_assert_message(g_.getNumOutputs()==RDAE_NUM_OUT,"Wrong number of outputs for the backwards DAE callback function");
+    nrx_ = f_.input(RDAE_RX).numel();
+    nrz_ = f_.input(RDAE_RZ).numel();
+    nrq_ = f_.output(RDAE_QUAD).numel();
+    casadi_assert_message(g_.input(RDAE_P).numel()==np_,"Inconsistent dimensions");
+    casadi_assert_message(g_.input(RDAE_X).numel()==nx_,"Inconsistent dimensions");
+    casadi_assert_message(g_.input(RDAE_Z).numel()==nz_,"Inconsistent dimensions");
+    casadi_assert_message(g_.output(RDAE_ODE).numel()==nrx_,"Inconsistent dimensions");
+    casadi_assert_message(g_.output(RDAE_ALG).numel()==nrz_,"Inconsistent dimensions");
+  }
   
   // Allocate space for inputs
   input_.resize(INTEGRATOR_NUM_IN);
   input(INTEGRATOR_X0)  = f_.input(DAE_X);
   input(INTEGRATOR_P)   = f_.input(DAE_P);
+  if(!g_.isNull()){
+    input(INTEGRATOR_RX0)  = g_.input(RDAE_RX);
+  }
   
   // Allocate space for outputs
   output_.resize(INTEGRATOR_NUM_OUT);
   output(INTEGRATOR_XF) = f_.output(DAE_ODE);
   output(INTEGRATOR_QF) = f_.output(DAE_QUAD);
+  if(!g_.isNull()){
+    output(INTEGRATOR_RXF)  = g_.output(RDAE_ODE);
+    output(INTEGRATOR_RQF)  = g_.output(RDAE_QUAD);
+  }
   
   // Call the base class method
   FXInternal::init();

@@ -31,7 +31,7 @@ using namespace std;
 namespace CasADi{
 
   
-AcadoIntegratorInternal::AcadoIntegratorInternal(const FX& f) : IntegratorInternal(f){
+AcadoIntegratorInternal::AcadoIntegratorInternal(const FX& f, const FX& g) : IntegratorInternal(f,g){
   addOption("time_dependence",   OT_BOOLEAN,  true, "Explicit depencency of time in the DAE");
   addOption("num_algebraic",     OT_INTEGER,  0,    "Number of algebraic states");
   addOption("num_grid_points",   OT_INTEGER,  2,  "Number of uniformly distributed grid points for obtaining the solution, does not influence the integration steps");
@@ -77,7 +77,7 @@ void AcadoIntegratorInternal::freeMem(){
 
 AcadoIntegratorInternal* AcadoIntegratorInternal::clone() const{
   // Return a deep copy
-  AcadoIntegratorInternal* node = new AcadoIntegratorInternal(f_);
+  AcadoIntegratorInternal* node = new AcadoIntegratorInternal(f_,g_);
   node->setOption(dictionary());
   return node;
 }

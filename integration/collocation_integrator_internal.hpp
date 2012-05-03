@@ -35,7 +35,7 @@ class CollocationIntegratorInternal : public IntegratorInternal{
 public:
   
   /// Constructor
-  explicit CollocationIntegratorInternal(const FX& f);
+  explicit CollocationIntegratorInternal(const FX& f, const FX& g);
 
   /// Deep copy data members
   virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
@@ -44,7 +44,7 @@ public:
   virtual CollocationIntegratorInternal* clone() const{ return new CollocationIntegratorInternal(*this);}
 
   /// Create a new integrator
-  virtual CollocationIntegratorInternal* create(const FX& f) const{ return new CollocationIntegratorInternal(f);}
+  virtual CollocationIntegratorInternal* create(const FX& f, const FX& g) const{ return new CollocationIntegratorInternal(f,g);}
   
   /// Destructor
   virtual ~CollocationIntegratorInternal();

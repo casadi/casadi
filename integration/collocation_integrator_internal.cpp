@@ -31,7 +31,7 @@
 using namespace std;
 namespace CasADi{
 
-CollocationIntegratorInternal::CollocationIntegratorInternal(const FX& f) : IntegratorInternal(f){
+CollocationIntegratorInternal::CollocationIntegratorInternal(const FX& f, const FX& g) : IntegratorInternal(f,g){
   addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
   addOption("interpolation_order",           OT_INTEGER,  3,  "Order of the interpolating polynomials");
   addOption("collocation_scheme",            OT_STRING,  "radau",  "Collocation scheme","radau|legendre");
@@ -401,7 +401,7 @@ void CollocationIntegratorInternal::init(){
     integratorCreator startup_integrator_creator = getOption("startup_integrator");
     
     // Allocate an NLP solver
-    startup_integrator_ = startup_integrator_creator(f_);
+    startup_integrator_ = startup_integrator_creator(f_,g_);
     
     // Pass options
     startup_integrator_.setOption("number_of_fwd_dir",0); // not needed

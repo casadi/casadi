@@ -29,8 +29,8 @@ namespace CasADi{
 CollocationIntegrator::CollocationIntegrator(){
 }
   
-CollocationIntegrator::CollocationIntegrator(const FX& f){
-  assignNode(new CollocationIntegratorInternal(f));
+CollocationIntegrator::CollocationIntegrator(const FX& f, const FX& g){
+  assignNode(new CollocationIntegratorInternal(f,g));
 }
 
 CollocationIntegratorInternal* CollocationIntegrator::operator->(){
