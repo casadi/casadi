@@ -100,38 +100,38 @@ public:
   protected:
 
   // Sundials callback functions
-  void rhs(double t, const double* y, double* ydot);
+  void rhs(double t, const double* x, double* xdot);
   void ehfun(int error_code, const char *module, const char *function, char *msg);
-  void rhsS(int Ns, double t, N_Vector y, N_Vector ydot, N_Vector *yS, N_Vector *ySdot, N_Vector tmp1, N_Vector tmp2);
-  void rhsS1(int Ns, double t, N_Vector y, N_Vector ydot, int iS, N_Vector yS, N_Vector ySdot, N_Vector tmp1, N_Vector tmp2);
-  void rhsQ(double t, const double* yy, double* rhsQ);
-  void rhsQS(int Ns, double t, N_Vector y, N_Vector *yS, N_Vector yQdot, N_Vector *rhsvalQS, N_Vector tmp1, N_Vector tmp2);
-  void rhsB(double t, const double* y, const double *yB, double* yBdot);
-  void rhsQB(double t, const double* y, const double* yB, double* qBdot);
-  void jtimes(const double *v, double* Jv, double t, const double* y, const double* fy, double* tmp);
-  void djac(int N, double t, N_Vector y, N_Vector fy, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-  void bjac(int N, int mupper, int mlower, double t, N_Vector y, N_Vector fy, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-  void psolve(double t, N_Vector y, N_Vector fy, N_Vector r, N_Vector z, double gamma, double delta, int lr, N_Vector tmp);
-  void psetup(double t, N_Vector y, N_Vector fy, booleantype jok, booleantype *jcurPtr, double gamma, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  void rhsS(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF, N_Vector *xdotF, N_Vector tmp1, N_Vector tmp2);
+  void rhsS1(int Ns, double t, N_Vector x, N_Vector xdot, int iS, N_Vector xF, N_Vector xdotF, N_Vector tmp1, N_Vector tmp2);
+  void rhsQ(double t, const double* x, double* qdot);
+  void rhsQS(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot, N_Vector *qFdot, N_Vector tmp1, N_Vector tmp2);
+  void rhsB(double t, const double* x, const double *xA, double* xdotA);
+  void rhsQB(double t, const double* x, const double* xA, double* qAdot);
+  void jtimes(const double *v, double* Jv, double t, const double* x, const double* fy, double* tmp);
+  void djac(int N, double t, N_Vector x, N_Vector fy, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  void bjac(int N, int mupper, int mlower, double t, N_Vector x, N_Vector fy, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  void psolve(double t, N_Vector x, N_Vector fy, N_Vector r, N_Vector z, double gamma, double delta, int lr, N_Vector tmp);
+  void psetup(double t, N_Vector x, N_Vector fy, booleantype jok, booleantype *jcurPtr, double gamma, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
   void lsetup(CVodeMem cv_mem, int convfail, N_Vector ypred, N_Vector fpred, booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
   void lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector ycur, N_Vector fcur);
   
   // Static wrappers to be passed to Sundials
-  static int rhs_wrapper(double t, N_Vector y, N_Vector ydot, void *user_data);
+  static int rhs_wrapper(double t, N_Vector x, N_Vector xdot, void *user_data);
   static void ehfun_wrapper(int error_code, const char *module, const char *function, char *msg, void *eh_data);
-  static int rhsS_wrapper(int Ns, double t, N_Vector y, N_Vector ydot, N_Vector *yS, N_Vector *ySdot, void *user_data, N_Vector tmp1, N_Vector tmp2);
-  static int rhsS1_wrapper(int Ns, double t, N_Vector y, N_Vector ydot, int iS, N_Vector yS, N_Vector ySdot, void *user_data, N_Vector tmp1, N_Vector tmp2);
-  static int rhsQ_wrapper(double t, N_Vector yy, N_Vector rhsQ, void *user_data);
-  static int rhsQS_wrapper(int Ns, double t, N_Vector y, N_Vector *yS, N_Vector yQdot, N_Vector *rhsvalQS, void *user_data, N_Vector tmp1, N_Vector tmp2);
-  static int rhsB_wrapper(double t, N_Vector y, N_Vector yB, N_Vector yBdot, void *user_dataB);
-  static int rhsQB_wrapper(double t, N_Vector y, N_Vector yB, N_Vector qBdot, void *user_dataB);
-  static int jtimes_wrapper(N_Vector v, N_Vector Jv, double t, N_Vector y, N_Vector fy, void *user_data, N_Vector tmp);
-  static int djac_wrapper(int N, double t, N_Vector y, N_Vector fy, DlsMat Jac, void *user_data,N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-  static int bjac_wrapper(int N, int mupper, int mlower, double t, N_Vector y, N_Vector fy, DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-  static int psolve_wrapper(double t, N_Vector y, N_Vector fy, N_Vector r, N_Vector z, double gamma, double delta, int lr, void *user_data, N_Vector tmp);
-  static int psetup_wrapper(double t, N_Vector y, N_Vector fy, booleantype jok, booleantype *jcurPtr, double gamma, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-  static int lsetup_wrapper(CVodeMem cv_mem, int convfail, N_Vector ypred, N_Vector fpred, booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
-  static int lsolve_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector ycur, N_Vector fcur);
+  static int rhsS_wrapper(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF, N_Vector *xdotF, void *user_data, N_Vector tmp1, N_Vector tmp2);
+  static int rhsS1_wrapper(int Ns, double t, N_Vector x, N_Vector xdot, int iS, N_Vector xF, N_Vector xdotF, void *user_data, N_Vector tmp1, N_Vector tmp2);
+  static int rhsQ_wrapper(double t, N_Vector x, N_Vector qdot, void *user_data);
+  static int rhsQS_wrapper(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot, N_Vector *qdotF, void *user_data, N_Vector tmp1, N_Vector tmp2);
+  static int rhsB_wrapper(double t, N_Vector x, N_Vector xA, N_Vector xdotA, void *user_data);
+  static int rhsQB_wrapper(double t, N_Vector x, N_Vector xA, N_Vector qdotA, void *user_data);
+  static int jtimes_wrapper(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector xdot, void *user_data, N_Vector tmp);
+  static int djac_wrapper(int N, double t, N_Vector x, N_Vector xdot, DlsMat Jac, void *user_data,N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  static int bjac_wrapper(int N, int mupper, int mlower, double t, N_Vector x, N_Vector xdot, DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  static int psolve_wrapper(double t, N_Vector x, N_Vector xdot, N_Vector r, N_Vector z, double gamma, double delta, int lr, void *user_data, N_Vector tmp);
+  static int psetup_wrapper(double t, N_Vector x, N_Vector xdot, booleantype jok, booleantype *jcurPtr, double gamma, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  static int lsetup_wrapper(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot, booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+  static int lsolve_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector x, N_Vector xdot);
  
   
   virtual void printStats(std::ostream &stream) const;
@@ -154,14 +154,13 @@ public:
   double t_lsetup_fac; // preconditioner setup function, factorize jacobian
   
   // N-vectors for the ODE integration
-  N_Vector y0_, y_, yQ_;
+  N_Vector x0_, x_, q_;
 
-  // N-vectors for the forward and adjoint sensitivities
-  std::vector<N_Vector> yS0_, yS_, yQS_;
+  // N-vectors for the forward sensitivities
+  std::vector<N_Vector> xF0_, xF_, qF_;
 
   // N-vectors for the adjoint sensitivities
-  std::vector<N_Vector> yB0_, yB_, yQB_;
-  
+  std::vector<N_Vector> xA0_, xA_, qA_;  
   
   bool is_init;
   bool isInitAdj_;

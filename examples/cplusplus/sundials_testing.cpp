@@ -74,20 +74,20 @@ const bool sparse_direct = true;
 const bool second_order = true;
 
 // The DAE residual in plain c (for IDAS)
-void dae_res_c(double tt, const double *yy, const double* yydot, const double* pp, double* ode, double* quad){
+void dae_res_c(double t, const double *x, const double* xdot, const double* p, double* ode, double* quad){
   // Get the arguments
-  //double s = yy[0];
-  double v = yy[1];
-  double m = yy[2];
-  double u = pp[0];
-  double sdot = yydot[0], vdot = yydot[1], mdot = yydot[2];
+  //double s = x[0];
+  double v = x[1];
+  double m = x[2];
+  double u = p[0];
+  double sdot = xdot[0], vdot = xdot[1], mdot = xdot[2];
 
   // Calculate the DAE residual
   ode[0] = sdot - v;
   ode[1] = vdot - (u-0.02*v*v)/m;
   ode[2] = mdot - (-0.01*u*u);
   
-  double u_ref = 3-sin(tt);
+  double u_ref = 3-sin(t);
   double u_dev = u-u_dev;
   quad[0] = u_dev*u_dev;
 }
@@ -100,23 +100,22 @@ void dae_res_c_wrapper(CFunction &f, int nfwd, int nadj, void* user_data){
 
 // Create an IDAS instance (fully implicit integrator)
 Integrator create_Sundials(){
-  
   // Time 
   SX t("t");
 
   // Differential states
   SX s("s"), v("v"), m("m");
-  vector<SX> y(3); 
-  y[0] = s;
-  y[1] = v;
-  y[2] = m;
+  vector<SX> x(3); 
+  x[0] = s;
+  x[1] = v;
+  x[2] = m;
   
   // State derivatives
   SX sdot("sdot"), vdot("vdot"), mdot("mdot");
-  vector<SX> ydot(3); 
-  ydot[0] = sdot;
-  ydot[1] = vdot;
-  ydot[2] = mdot;
+  vector<SX> xdot(3); 
+  xdot[0] = sdot;
+  xdot[1] = vdot;
+  xdot[2] = mdot;
 
   // Control
   SX u("u");
@@ -135,7 +134,7 @@ Integrator create_Sundials(){
   res[2] = -0.01*u*u - mdot;
 
   // Input/output of the DAE residual function
-  vector<SXMatrix> ffcn_in = daeIn<SXMatrix>(y,SXMatrix(),u,t,ydot);
+  vector<SXMatrix> ffcn_in = daeIn<SXMatrix>(x,SXMatrix(),u,t,xdot);
   vector<SXMatrix> ffcn_out = daeOut<SXMatrix>(res,SXMatrix(),u_dev);
 
   // DAE residual function

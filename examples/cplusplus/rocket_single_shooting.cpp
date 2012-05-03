@@ -61,17 +61,17 @@ int main(){
 
   // Differential states
   SX s("s"), v("v"), m("m");
-  vector<SX> y(3); 
-  y[0] = s;
-  y[1] = v;
-  y[2] = m;
+  vector<SX> x(3); 
+  x[0] = s;
+  x[1] = v;
+  x[2] = m;
 
   // State derivative
   SX sdot("sdot"), vdot("vdot"), mdot("mdot");
-  vector<SX> ydot(3); 
-  ydot[0] = sdot;
-  ydot[1] = vdot;
-  ydot[2] = mdot;
+  vector<SX> xdot(3); 
+  xdot[0] = sdot;
+  xdot[1] = vdot;
+  xdot[2] = mdot;
 
   // Control
   SX u("u");
@@ -85,20 +85,14 @@ int main(){
   res[1] = (u-alpha*v*v)/m - vdot;
   res[2] = -beta*u*u       - mdot;
 
-  if(!explicit_integrator){
-    res[0] = -res[0];
-    res[1] = -res[1];
-    res[2] = -res[2];
-  }
-  
   // Initial conditions
-  vector<double> y0(3);
-  y0[0] = 0;
-  y0[1] = 0;
-  y0[2] = 1;
+  vector<double> x0(3);
+  x0[0] = 0;
+  x0[1] = 0;
+  x0[2] = 1;
 
   // DAE residual function
-  SXFunction daefcn(daeIn<SXMatrix>(y,SXMatrix(),u,t,ydot),daeOut<SXMatrix>(res));
+  SXFunction daefcn(daeIn<SXMatrix>(x,SXMatrix(),u,t,xdot),daeOut<SXMatrix>(res));
   daefcn.setOption("name","DAE residual");
 
   // Integrator
@@ -111,11 +105,9 @@ int main(){
       // integrator.setOption("linear_multistep_method","bdf"); // adams or bdf
       // integrator.setOption("nonlinear_solver_iteration","newton"); // newton or functional
     } else {
-        // Implicit integrator (IDAS)
-
-        // Create an integrator
-        integrator = Sundials::IdasIntegrator(daefcn);
-        integrator.setOption("calc_ic",false);
+      // Implicit integrator (IDAS)
+      integrator = Sundials::IdasIntegrator(daefcn);
+      integrator.setOption("calc_ic",false);
     }
     integrator.setOption("fsens_err_con",true);
     integrator.setOption("quad_err_con",true);
@@ -162,7 +154,7 @@ int main(){
   MXFunction gfcn(U,G); // constraint function
 
   // Allocate an NLP solver
-//  LiftedNewtonSolver solver(ffcn,gfcn);
+  // LiftedNewtonSolver solver(ffcn,gfcn);
   IpoptSolver solver(ffcn,gfcn);
   
   // Set options
@@ -198,6 +190,4 @@ int main(){
   cout << "optimal solution: " << Usol << endl;
 
   return 0;
-
 }
-
