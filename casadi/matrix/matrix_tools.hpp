@@ -351,6 +351,10 @@ T* getPtr(Matrix<T> &v);
 template<typename T>
 const T* getPtr(const Matrix<T> &v);
 
+/** \brief Create a new matrix with a given sparsity pattern but with the nonzeros taken from an existing matrix */
+template<typename T>
+Matrix<T> project(const Matrix<T>& A, const CRSSparsity& sparsity);
+
 } // namespace CasADi
 
 // Global namespace
@@ -1178,6 +1182,34 @@ void addMultiple(const Matrix<T>& A, const std::vector<T>& v, std::vector<T>& re
       return &v.front();
   }
 
+  template<typename T>
+  Matrix<T> project(const Matrix<T>& A, const CRSSparsity& sparsity){
+    // Check dimensions
+    if(!(A.empty() && sparsity.numel()==0)){
+      casadi_assert_message(A.size1()==sparsity.size1() && A.size2()==sparsity.size2(),
+			    "Shape mismatch. Expecting " << A.size1() << "-by-" << A.size2() << ", but got " << 
+			    sparsity.size1() << "-by-" << sparsity.size2() << " instead.");
+    }
+    
+    // Return value
+    Matrix<T> ret(sparsity,0);
+    
+    // Get the elements of the known matrix
+    std::vector<int> known_ind = A.sparsity().getElements(false);
+      
+    // Find the corresponding nonzeros in the return matrix
+    sparsity.getNZInplace(known_ind);
+      
+    // Set the element values
+    const std::vector<T>& A_data = A.data();
+    std::vector<T>& ret_data = ret.data();
+    for(int k=0; k<known_ind.size(); ++k){
+      if(known_ind[k]!=-1){
+	ret_data[known_ind[k]] = A_data[k];
+      }
+    }
+    return ret;
+  }
 
 // template<class T>
 // Matrix<T> operator==(const Matrix<T>& a, const Matrix<T>& b){
@@ -1250,6 +1282,7 @@ MTT_INST(T,polyval) \
 MTT_INST(T,addMultiple) \
 MTT_INST(T,veccat) \
 MTT_INST(T,vecNZcat) \
+MTT_INST(T,project) \
 
 #endif //SWIG
 

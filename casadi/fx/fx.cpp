@@ -25,6 +25,7 @@
 #include "../fx/mx_function.hpp"
 #include <typeinfo> 
 #include "../stl_vector_tools.hpp"
+#include "../matrix/matrix_tools.hpp"
 #include "jacobian.hpp"
 #include "parallelizer.hpp"
 
@@ -69,7 +70,7 @@ void FX::call(const MXVector& arg, MXVector& res,  const MXVectorVector& fseed, 
   assertInit();
   
   // Argument checking
-  casadi_assert_message(arg.size()<=getNumInputs(), "Evaluation::Evaluation: number of passed-in dependencies (" << arg.size() << ") should not exceed the number of inputs of the function (" << getNumInputs() << ").");
+  casadi_assert_message(arg.size()<=getNumInputs(), "FX::call: number of passed-in dependencies (" << arg.size() << ") should not exceed the number of inputs of the function (" << getNumInputs() << ").");
 
   // Assumes initialised
   for(int i=0; i<arg.size(); ++i){
@@ -311,32 +312,13 @@ vector<SXMatrix> FX::evalSX(const vector<SXMatrix>& arg){
   casadi_assert_message(isInit(),"Function has not been initialized");
   
   // Copy the arguments into a new vector with the right sparsity
-  casadi_assert_message(arg.size()==getNumInputs(),"FX::evalSX: mismatch in number of arguments. Expecting " << getNumInputs() << ", but got " << arg.size() << " instead.");
+  casadi_assert_message(arg.size()<=getNumInputs(), "FX::evalSX: number of passed-in dependencies (" << arg.size() << ") should not exceed the number of inputs of the function (" << getNumInputs() << ").");
   vector<SXMatrix> arg2 = arg;
+  arg2.resize(getNumInputs());
   for(int iind=0; iind<arg.size(); ++iind){
-    // If sparsities do not match, we need to map the nonzeros
+    // If sparsities do not match, we need to map the nonzeros onto the new pattern
     if(!(arg2[iind].sparsity()==input(iind).sparsity())){
-      // The sparsity should be that of the inputs
-      arg2[iind] = SXMatrix(input(iind).sparsity(),0);
-
-      if (!arg2[iind].empty() || !arg[iind].empty()) {
-        // Make sure that the dimensions match
-        casadi_assert_message(arg[iind].size1()==arg2[iind].size1(),"FX::evalSX: shape mismatch of argument #" << iind <<  ". Expecting " << arg2[iind].size1() << "-by-" << arg2[iind].size2() << ", but got " << arg[iind].size1() << "-by-" << arg[iind].size2() << " instead.");
-        casadi_assert_message(arg[iind].size2()==arg2[iind].size2(),"FX::evalSX: shape mismatch of argument #" << iind <<  ". Expecting " << arg2[iind].size1() << "-by-" << arg2[iind].size2() << ", but got " << arg[iind].size1() << "-by-" << arg[iind].size2() << " instead.");
-      }
-
-      // Get the indices of the known supplied arguments
-      vector<int> known_ind = arg[iind].sparsity().getElements(false);
-      
-      // Find the corresponding nonzeros of the argument matrix
-      arg2[iind].sparsity().getNZInplace(known_ind);
-      
-      // Set the element values
-      for(int k=0; k<known_ind.size(); ++k){
-        if(known_ind[k]!=-1){
-          arg2[iind].at(known_ind[k]) = arg[iind].at(k);
-        }
-      }
+      arg2[iind] = project(arg2[iind],input(iind).sparsity());
     }
   }
 
