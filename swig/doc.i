@@ -5427,27 +5427,25 @@ f:  dynamical system >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| DAE_T                              | Time. (1-by-1)                     |
+| DAE_T                              | Explicit time dependence           |
 +------------------------------------+------------------------------------+
-| DAE_Y                              | State vector (matrix). Should have |
-|                                    | same amount of non-zeros as        |
-|                                    | DAEOutput:DAE_RES                  |
+| DAE_Y                              | Differential and algebraic states. |
+|                                    | NOTE: To be replaced by DAE_X and  |
+|                                    | DAE_Z                              |
 +------------------------------------+------------------------------------+
-| DAE_P                              | Parameter vector (matrix).         |
+| DAE_P                              | Parameter                          |
 +------------------------------------+------------------------------------+
-| DAE_YDOT                           | State derivative vector (matrix).  |
-|                                    | Should have same amount of non-    |
-|                                    | zeros as DAEOutput:DAE_RES         |
+| DAE_YDOT                           | Time derivative of differential    |
+|                                    | and algebraic states. NOTE: To be  |
+|                                    | replaced by DAE_XDOT               |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 1)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| DAE_RES                            | Right hand side of ODE. Should     |
-|                                    | have same amount of non-zeros as   |
-|                                    | DAEInput:DAE_Y                     |
-+------------------------------------+------------------------------------+
++---------+--------------+
+|  Name   | Description  |
++=========+==============+
+| DAE_RES | DAE residual |
++---------+--------------+
 ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::checkNode "
@@ -7576,30 +7574,28 @@ ffcn:  Continuous time dynamics, an CasADi::FX with the folowing mapping:
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 1)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| DAE_RES                            | Right hand side of ODE. Should     |
-|                                    | have same amount of non-zeros as   |
-|                                    | DAEInput:DAE_Y                     |
-+------------------------------------+------------------------------------+
++---------+--------------+
+|  Name   | Description  |
++=========+==============+
+| DAE_RES | DAE residual |
++---------+--------------+
 
 output_fcn:  output function which maps ControlledDAEInput or DAEInput to n
 outputs. >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| DAE_T                              | Time. (1-by-1)                     |
+| DAE_T                              | Explicit time dependence           |
 +------------------------------------+------------------------------------+
-| DAE_Y                              | State vector (matrix). Should have |
-|                                    | same amount of non-zeros as        |
-|                                    | DAEOutput:DAE_RES                  |
+| DAE_Y                              | Differential and algebraic states. |
+|                                    | NOTE: To be replaced by DAE_X and  |
+|                                    | DAE_Z                              |
 +------------------------------------+------------------------------------+
-| DAE_P                              | Parameter vector (matrix).         |
+| DAE_P                              | Parameter                          |
 +------------------------------------+------------------------------------+
-| DAE_YDOT                           | State derivative vector (matrix).  |
-|                                    | Should have same amount of non-    |
-|                                    | zeros as DAEOutput:DAE_RES         |
+| DAE_YDOT                           | Time derivative of differential    |
+|                                    | and algebraic states. NOTE: To be  |
+|                                    | replaced by DAE_XDOT               |
 +------------------------------------+------------------------------------+
 
 >Input scheme: CasADi::ControlledDAEInput (CONTROL_DAE_NUM_IN = 9)
@@ -12302,27 +12298,25 @@ f:  dynamical system >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| DAE_T                              | Time. (1-by-1)                     |
+| DAE_T                              | Explicit time dependence           |
 +------------------------------------+------------------------------------+
-| DAE_Y                              | State vector (matrix). Should have |
-|                                    | same amount of non-zeros as        |
-|                                    | DAEOutput:DAE_RES                  |
+| DAE_Y                              | Differential and algebraic states. |
+|                                    | NOTE: To be replaced by DAE_X and  |
+|                                    | DAE_Z                              |
 +------------------------------------+------------------------------------+
-| DAE_P                              | Parameter vector (matrix).         |
+| DAE_P                              | Parameter                          |
 +------------------------------------+------------------------------------+
-| DAE_YDOT                           | State derivative vector (matrix).  |
-|                                    | Should have same amount of non-    |
-|                                    | zeros as DAEOutput:DAE_RES         |
+| DAE_YDOT                           | Time derivative of differential    |
+|                                    | and algebraic states. NOTE: To be  |
+|                                    | replaced by DAE_XDOT               |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 1)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| DAE_RES                            | Right hand side of ODE. Should     |
-|                                    | have same amount of non-zeros as   |
-|                                    | DAEInput:DAE_Y                     |
-+------------------------------------+------------------------------------+
++---------+--------------+
+|  Name   | Description  |
++=========+==============+
+| DAE_RES | DAE residual |
++---------+--------------+
 ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::checkNode "
@@ -17452,27 +17446,25 @@ f:  dynamical system >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| DAE_T                              | Time. (1-by-1)                     |
+| DAE_T                              | Explicit time dependence           |
 +------------------------------------+------------------------------------+
-| DAE_Y                              | State vector (matrix). Should have |
-|                                    | same amount of non-zeros as        |
-|                                    | DAEOutput:DAE_RES                  |
+| DAE_Y                              | Differential and algebraic states. |
+|                                    | NOTE: To be replaced by DAE_X and  |
+|                                    | DAE_Z                              |
 +------------------------------------+------------------------------------+
-| DAE_P                              | Parameter vector (matrix).         |
+| DAE_P                              | Parameter                          |
 +------------------------------------+------------------------------------+
-| DAE_YDOT                           | State derivative vector (matrix).  |
-|                                    | Should have same amount of non-    |
-|                                    | zeros as DAEOutput:DAE_RES         |
+| DAE_YDOT                           | Time derivative of differential    |
+|                                    | and algebraic states. NOTE: To be  |
+|                                    | replaced by DAE_XDOT               |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 1)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| DAE_RES                            | Right hand side of ODE. Should     |
-|                                    | have same amount of non-zeros as   |
-|                                    | DAEInput:DAE_Y                     |
-+------------------------------------+------------------------------------+
++---------+--------------+
+|  Name   | Description  |
++=========+==============+
+| DAE_RES | DAE residual |
++---------+--------------+
 ";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::checkNode "
@@ -42538,27 +42530,25 @@ ffcn:  Continuous time dynamics, an CasADi::FX with the folowing mapping:
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| DAE_T                              | Time. (1-by-1)                     |
+| DAE_T                              | Explicit time dependence           |
 +------------------------------------+------------------------------------+
-| DAE_Y                              | State vector (matrix). Should have |
-|                                    | same amount of non-zeros as        |
-|                                    | DAEOutput:DAE_RES                  |
+| DAE_Y                              | Differential and algebraic states. |
+|                                    | NOTE: To be replaced by DAE_X and  |
+|                                    | DAE_Z                              |
 +------------------------------------+------------------------------------+
-| DAE_P                              | Parameter vector (matrix).         |
+| DAE_P                              | Parameter                          |
 +------------------------------------+------------------------------------+
-| DAE_YDOT                           | State derivative vector (matrix).  |
-|                                    | Should have same amount of non-    |
-|                                    | zeros as DAEOutput:DAE_RES         |
+| DAE_YDOT                           | Time derivative of differential    |
+|                                    | and algebraic states. NOTE: To be  |
+|                                    | replaced by DAE_XDOT               |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 1)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| DAE_RES                            | Right hand side of ODE. Should     |
-|                                    | have same amount of non-zeros as   |
-|                                    | DAEInput:DAE_Y                     |
-+------------------------------------+------------------------------------+
++---------+--------------+
+|  Name   | Description  |
++=========+==============+
+| DAE_RES | DAE residual |
++---------+--------------+
 
 Important notes: In the above table, INTEGRATOR_P input is not really of
 shape (np x 1), but rather ( (np+nu) x 1 ).
@@ -42585,17 +42575,17 @@ CasADi::DAEInput (DAE_NUM_IN = 4)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| DAE_T                              | Time. (1-by-1)                     |
+| DAE_T                              | Explicit time dependence           |
 +------------------------------------+------------------------------------+
-| DAE_Y                              | State vector (matrix). Should have |
-|                                    | same amount of non-zeros as        |
-|                                    | DAEOutput:DAE_RES                  |
+| DAE_Y                              | Differential and algebraic states. |
+|                                    | NOTE: To be replaced by DAE_X and  |
+|                                    | DAE_Z                              |
 +------------------------------------+------------------------------------+
-| DAE_P                              | Parameter vector (matrix).         |
+| DAE_P                              | Parameter                          |
 +------------------------------------+------------------------------------+
-| DAE_YDOT                           | State derivative vector (matrix).  |
-|                                    | Should have same amount of non-    |
-|                                    | zeros as DAEOutput:DAE_RES         |
+| DAE_YDOT                           | Time derivative of differential    |
+|                                    | and algebraic states. NOTE: To be  |
+|                                    | replaced by DAE_XDOT               |
 +------------------------------------+------------------------------------+
 
 rfcn:  Initial value constraints ";
@@ -56574,27 +56564,25 @@ f:  dynamical system >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| DAE_T                              | Time. (1-by-1)                     |
+| DAE_T                              | Explicit time dependence           |
 +------------------------------------+------------------------------------+
-| DAE_Y                              | State vector (matrix). Should have |
-|                                    | same amount of non-zeros as        |
-|                                    | DAEOutput:DAE_RES                  |
+| DAE_Y                              | Differential and algebraic states. |
+|                                    | NOTE: To be replaced by DAE_X and  |
+|                                    | DAE_Z                              |
 +------------------------------------+------------------------------------+
-| DAE_P                              | Parameter vector (matrix).         |
+| DAE_P                              | Parameter                          |
 +------------------------------------+------------------------------------+
-| DAE_YDOT                           | State derivative vector (matrix).  |
-|                                    | Should have same amount of non-    |
-|                                    | zeros as DAEOutput:DAE_RES         |
+| DAE_YDOT                           | Time derivative of differential    |
+|                                    | and algebraic states. NOTE: To be  |
+|                                    | replaced by DAE_XDOT               |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 1)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| DAE_RES                            | Right hand side of ODE. Should     |
-|                                    | have same amount of non-zeros as   |
-|                                    | DAEInput:DAE_Y                     |
-+------------------------------------+------------------------------------+
++---------+--------------+
+|  Name   | Description  |
++=========+==============+
+| DAE_RES | DAE residual |
++---------+--------------+
 ";
 
 %feature("docstring")  CasADi::RKIntegrator::checkNode "
@@ -58240,17 +58228,17 @@ CasADi::DAEInput (DAE_NUM_IN = 4)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| DAE_T                              | Time. (1-by-1)                     |
+| DAE_T                              | Explicit time dependence           |
 +------------------------------------+------------------------------------+
-| DAE_Y                              | State vector (matrix). Should have |
-|                                    | same amount of non-zeros as        |
-|                                    | DAEOutput:DAE_RES                  |
+| DAE_Y                              | Differential and algebraic states. |
+|                                    | NOTE: To be replaced by DAE_X and  |
+|                                    | DAE_Z                              |
 +------------------------------------+------------------------------------+
-| DAE_P                              | Parameter vector (matrix).         |
+| DAE_P                              | Parameter                          |
 +------------------------------------+------------------------------------+
-| DAE_YDOT                           | State derivative vector (matrix).  |
-|                                    | Should have same amount of non-    |
-|                                    | zeros as DAEOutput:DAE_RES         |
+| DAE_YDOT                           | Time derivative of differential    |
+|                                    | and algebraic states. NOTE: To be  |
+|                                    | replaced by DAE_XDOT               |
 +------------------------------------+------------------------------------+
 ";
 
@@ -65738,17 +65726,17 @@ following scheme:
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| DAE_T                              | Time. (1-by-1)                     |
+| DAE_T                              | Explicit time dependence           |
 +------------------------------------+------------------------------------+
-| DAE_Y                              | State vector (matrix). Should have |
-|                                    | same amount of non-zeros as        |
-|                                    | DAEOutput:DAE_RES                  |
+| DAE_Y                              | Differential and algebraic states. |
+|                                    | NOTE: To be replaced by DAE_X and  |
+|                                    | DAE_Z                              |
 +------------------------------------+------------------------------------+
-| DAE_P                              | Parameter vector (matrix).         |
+| DAE_P                              | Parameter                          |
 +------------------------------------+------------------------------------+
-| DAE_YDOT                           | State derivative vector (matrix).  |
-|                                    | Should have same amount of non-    |
-|                                    | zeros as DAEOutput:DAE_RES         |
+| DAE_YDOT                           | Time derivative of differential    |
+|                                    | and algebraic states. NOTE: To be  |
+|                                    | replaced by DAE_XDOT               |
 +------------------------------------+------------------------------------+
 ";
 
@@ -72970,12 +72958,6 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__IntegratorOutput.xml
 
 
-// File: group__scheme__MUSCOD__FCN__Output.xml
-
-
-// File: group__scheme__TermOutput.xml
-
-
 // File: group__scheme__QPInput.xml
 
 
@@ -72985,22 +72967,13 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__ACADO__FCN__Input.xml
 
 
-// File: group__scheme__RDAEInput.xml
-
-
-// File: group__scheme__DAEOutput.xml
+// File: group__scheme__MUSCOD__FCN__Output.xml
 
 
 // File: group__scheme__QPOutput.xml
 
 
-// File: group__scheme__NewIntegratorInput.xml
-
-
 // File: group__scheme__NLPOutput.xml
-
-
-// File: group__scheme__NEW__DAEOutput.xml
 
 
 // File: group__scheme__DAEInput.xml
@@ -73009,7 +72982,7 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__ACADO__Output.xml
 
 
-// File: group__scheme__NewIntegratorOutput.xml
+// File: group__scheme__DAEOutput.xml
 
 
 // File: group__scheme__MayerInput.xml
@@ -73018,22 +72991,13 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__ControlledDAEInput.xml
 
 
-// File: group__scheme__TermInput.xml
-
-
 // File: group__scheme__NLPInput.xml
 
 
 // File: group__scheme__IntegratorInput.xml
 
 
-// File: group__scheme__NEW__DAEInput.xml
-
-
-// File: group__scheme__OCPOutput.xml
-
-
-// File: group__scheme__RDAEOutput.xml
+// File: group__scheme__MUSCOD__FCN__Input.xml
 
 
 // File: group__scheme__OCPInput.xml
@@ -73042,7 +73006,7 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__ControlSimulatorInput.xml
 
 
-// File: group__scheme__MUSCOD__FCN__Input.xml
+// File: group__scheme__OCPOutput.xml
 
 
 // File: chapter1.xml
