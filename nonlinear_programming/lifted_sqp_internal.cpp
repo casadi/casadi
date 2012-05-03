@@ -60,7 +60,14 @@ LiftedSQPInternal::~LiftedSQPInternal(){
 void LiftedSQPInternal::init(){
   // Call the init method of the base class
   NLPSolverInternal::init();
-    
+
+  // Number of lifted variables
+  nv = getOption("num_lifted");
+  if(verbose_){
+    cout << "Initializing SQP method with " << n_ << " variables and " << m_ << " constraints." << endl;
+    cout << "Lifting " << nv << " variables." << endl;
+  }
+  
   // Read options
   maxiter_ = getOption("maxiter");
   maxiter_ls_ = getOption("maxiter_ls");
@@ -77,9 +84,6 @@ void LiftedSQPInternal::init(){
   casadi_assert(!ffcn.isNull());
   SXFunction gfcn = shared_cast<SXFunction>(G_);
   casadi_assert(!gfcn.isNull());
- 
-  // Number of lifted variables
-  nv = getOption("num_lifted");
   
   // Extract the free variables and split into independent and dependent variables
   SXMatrix x = ffcn.inputSX();
@@ -113,18 +117,26 @@ void LiftedSQPInternal::init(){
   // Lagrange multipliers for the nonlinear constraints that aren't eliminated
   SXMatrix lam_g = ssym("lam_g",ng);
 
+  if(verbose_){
+    cout << "Allocated intermediate variables." << endl;
+  }
+  
   // Lagrange multipliers for constraints
   SXMatrix lam_hg = vertcat(lam_h,lam_g);
+  
   
   // Lagrangian function
   SXMatrix lag = f + inner_prod(lam_x,x);
   if(!g.empty()) lag += inner_prod(lam_g,g);
   if(!v.empty()) lag += inner_prod(lam_h,v_def);
   
-  // Gradient of the lagrangian
+  // Gradient of the Lagrangian
   SXMatrix lgrad = gradient(lag,x);
   if(!v.empty()) lgrad -= vertcat(SXMatrix::zeros(nu),lam_h); // Put here to ensure that lgrad is of the form "h_extended -v_extended"
   makeDense(lgrad);
+  if(verbose_){
+    cout << "Generated the gradient of the Lagrangian." << endl;
+  }
 
   // Condensed gradient of the Lagrangian
   SXMatrix lgrad_u = lgrad[Slice(0,nu)];
@@ -154,8 +166,11 @@ void LiftedSQPInternal::init(){
   G_out[G_HG] = hg;
   G_out[G_F] = f;
 
-  rfcn = SXFunction(G_in,G_out);
-  rfcn.init();
+  rfcn_ = SXFunction(G_in,G_out);
+  rfcn_.init();
+  if(verbose_){
+    cout << "Generated residual function ( " << shared_cast<SXFunction>(rfcn_).getAlgorithmSize() << " nodes)." << endl;
+  }
   
   // Difference vector d
   SXMatrix d = ssym("d",2*nv);
@@ -188,11 +203,18 @@ void LiftedSQPInternal::init(){
   
   SXFunction zfcn(zfcn_in,zfcn_out);
   zfcn.init();
+  if(verbose_){
+    cout << "Generated reconstruction function ( " << zfcn.getAlgorithmSize() << " nodes)." << endl;
+  }
 
   // Matrix A and B in lifted Newton
   SXMatrix B = zfcn.jac(Z_U,Z_LGRADG);
   SXMatrix B1 = B(Slice(0,nu),Slice(0,B.size2()));
   SXMatrix B2 = B(Slice(nu,B.size1()),Slice(0,B.size2()));
+  if(verbose_){
+    cout << "Formed B1 (dimension " << B1.size1() << "-by-" << B1.size2() << ", "<< B1.size() << " nonzeros) " <<
+    "and B2 (dimension " << B2.size1() << "-by-" << B2.size2() << ", "<< B2.size() << " nonzeros)." << endl;
+  }
   
   // Step in u
   SXMatrix du = ssym("du",nu);
@@ -225,6 +247,9 @@ void LiftedSQPInternal::init(){
     b2 += Z_fwdSens[0][Z_LGRADG](Slice(nu,B.size1()));
     e = Z_fwdSens[1][Z_D_DEF];
   }
+  if(verbose_){
+    cout << "Formed b1 and b2." << endl;
+  }
   
   // Quadratic approximation
   SXMatrixVector lfcn_in(LIN_NUM_IN);
@@ -238,15 +263,25 @@ void LiftedSQPInternal::init(){
   lfcn_out[LIN_LGRAD] = b1;
   lfcn_out[LIN_GJAC] = B2;
   lfcn_out[LIN_GLIN] = b2;
-  lfcn = SXFunction(lfcn_in,lfcn_out);
-  lfcn.init();
+  lfcn_ = SXFunction(lfcn_in,lfcn_out);
+  lfcn_.setOption("verbose",true);
+  lfcn_.setOption("number_of_fwd_dir",0);
+  lfcn_.setOption("number_of_adj_dir",0);
+  lfcn_.setOption("live_variables",true);
+  lfcn_.init();
+  if(verbose_){
+    cout << "Generated linearization function ( " << shared_cast<SXFunction>(lfcn_).getAlgorithmSize() << " nodes)." << endl;
+  }
     
   // Step expansion
   SXMatrixVector efcn_in = lfcn_in;
   efcn_in.push_back(du);
   efcn_in.push_back(dlam_g);
-  efcn = SXFunction(efcn_in,e);
-  efcn.init();
+  efcn_ = SXFunction(efcn_in,e);
+  efcn_.init();
+  if(verbose_){
+    cout << "Generated step expansion function ( " << shared_cast<SXFunction>(efcn_).getAlgorithmSize() << " nodes)." << endl;
+  }
   
   // Current guess for the primal solution
   DMatrix &x_k = output(NLP_X_OPT);
@@ -267,6 +302,9 @@ void LiftedSQPInternal::init(){
   
   // Initialize the QP solver
   qp_solver_.init();
+  if(verbose_){
+    cout << "Allocated QP solver." << endl;
+  }
 
   // Residual
   d_k_ = DMatrix(d.sparsity(),0);
@@ -306,24 +344,24 @@ void LiftedSQPInternal::evaluate(int nfdir, int nadir){
   int k=0;
   while(true){
     // Evaluate residual
-    rfcn.setInput(x_k,G_X);
-    rfcn.setInput(lam_x_k,G_LAM_X);
-    rfcn.setInput(lam_hg_k,G_LAM_HG);
-    rfcn.evaluate();
-    rfcn.getOutput(d_k_,G_H);
-    f_k = rfcn.output(G_F).toScalar();
-    const DMatrix& hg_k = rfcn.output(G_HG);
+    rfcn_.setInput(x_k,G_X);
+    rfcn_.setInput(lam_x_k,G_LAM_X);
+    rfcn_.setInput(lam_hg_k,G_LAM_HG);
+    rfcn_.evaluate();
+    rfcn_.getOutput(d_k_,G_H);
+    f_k = rfcn_.output(G_F).toScalar();
+    const DMatrix& hg_k = rfcn_.output(G_HG);
     
     // Construct the QP
-    lfcn.setInput(x_k,LIN_X);
-    lfcn.setInput(lam_x_k,LIN_LAM_X);
-    lfcn.setInput(lam_hg_k,LIN_LAM_HG);
-    lfcn.setInput(d_k_,LIN_D);
-    lfcn.evaluate();
-    const DMatrix& B1_k = lfcn.output(LIN_LHESS);
-    const DMatrix& b1_k = lfcn.output(LIN_LGRAD);
-    const DMatrix& B2_k = lfcn.output(LIN_GJAC);
-    const DMatrix& b2_k = lfcn.output(LIN_GLIN);
+    lfcn_.setInput(x_k,LIN_X);
+    lfcn_.setInput(lam_x_k,LIN_LAM_X);
+    lfcn_.setInput(lam_hg_k,LIN_LAM_HG);
+    lfcn_.setInput(d_k_,LIN_D);
+    lfcn_.evaluate();
+    const DMatrix& B1_k = lfcn_.output(LIN_LHESS);
+    const DMatrix& b1_k = lfcn_.output(LIN_LGRAD);
+    const DMatrix& B2_k = lfcn_.output(LIN_GJAC);
+    const DMatrix& b2_k = lfcn_.output(LIN_GLIN);
 
     // Solve the QP
     qp_solver_.setInput(B1_k,QP_H);
@@ -340,12 +378,12 @@ void LiftedSQPInternal::evaluate(int nfdir, int nadir){
     
     // Expand the step
     for(int i=0; i<LIN_NUM_IN; ++i){
-      efcn.setInput(lfcn.input(i),i);
+      efcn_.setInput(lfcn_.input(i),i);
     }
-    efcn.setInput(du_k,LIN_NUM_IN);
-    efcn.setInput(dlam_g_k,LIN_NUM_IN+1);
-    efcn.evaluate();
-    const DMatrix& dv_k = efcn.output();
+    efcn_.setInput(du_k,LIN_NUM_IN);
+    efcn_.setInput(dlam_g_k,LIN_NUM_IN+1);
+    efcn_.evaluate();
+    const DMatrix& dv_k = efcn_.output();
     
     // Expanded primal step
     copy(du_k.begin(),du_k.end(),dx_k_.begin());

@@ -78,13 +78,13 @@ public:
    enum LinOut{LIN_LHESS,LIN_LGRAD,LIN_GJAC,LIN_GLIN,LIN_NUM_OUT};
 
    /// Residual function
-   FX rfcn;
+   FX rfcn_;
    
    /// Quadratic approximation
-   FX lfcn;
+   FX lfcn_;
    
    /// Step expansion
-   FX efcn;
+   FX efcn_;
    
    /// Dimensions
    int nu, nv;
