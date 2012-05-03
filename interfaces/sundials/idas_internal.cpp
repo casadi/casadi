@@ -25,6 +25,7 @@
 #include "casadi/fx/linear_solver_internal.hpp"
 #include "casadi/fx/mx_function.hpp"
 #include "casadi/sx/sx_tools.hpp"
+#include "casadi/mx/mx_tools.hpp"
 
 using namespace std;
 namespace CasADi{
@@ -1503,16 +1504,19 @@ FX IdasInternal::getJacobian(){
   if(!jac_.isNull())
     return jac_;
 
-  casadi_assert_message(nz_==0,"Algbraic states not supported");
-  
   // If SXFunction
   SXFunction f_sx = shared_cast<SXFunction>(f_);
   if(!f_sx.isNull()){
     // Get the Jacobian in the Newton iteration
     SX cj("cj");
-    SXMatrix jac = f_sx.jac(DAE_X,DAE_ODE) + cj*f_sx.jac(DAE_XDOT,DAE_ODE);
+    SXMatrix jac_ode_x = f_sx.jac(DAE_X,DAE_ODE);
+    SXMatrix jac_ode_xdot = f_sx.jac(DAE_XDOT,DAE_ODE);
+    SXMatrix jac = jac_ode_x + cj*jac_ode_xdot;
     if(nz_>0){
-      jac = horzcat(jac,f_sx.jac(DAE_Z,DAE_ODE));
+      SXMatrix jac_alg_x = f_sx.jac(DAE_X,DAE_ALG);
+      SXMatrix jac_alg_z = f_sx.jac(DAE_Z,DAE_ALG);
+      SXMatrix jac_ode_z = f_sx.jac(DAE_Z,DAE_ALG);
+      jac = horzcat(vertcat(jac,jac_alg_x),vertcat(jac_ode_z,jac_alg_z));
     }
     
     // Jacobian function
@@ -1535,8 +1539,14 @@ FX IdasInternal::getJacobian(){
   if(!f_mx.isNull()){
     // Get the Jacobian in the Newton iteration
     MX cj("cj");
-    MX jac = f_mx.jac(DAE_X).at(DAE_ODE) + cj*f_mx.jac(DAE_XDOT).at(DAE_ODE);
-
+    vector<MX> jac_x = f_mx.jac(DAE_X);
+    vector<MX> jac_xdot = f_mx.jac(DAE_XDOT);
+    MX jac = jac_x[DAE_ODE] + cj*jac_xdot[DAE_ODE];
+    if(nz_>0){
+      vector<MX> jac_z = f_mx.jac(DAE_Z);
+      jac = horzcat(vertcat(jac,jac_x[DAE_ALG]),vertcat(jac_z[DAE_ODE],jac_z[DAE_ALG]));
+    }
+    
     // Jacobian function
     vector<MX> jac_in(JAC_NUM_IN);
     jac_in[JAC_T] = f_mx.inputMX(DAE_T);
