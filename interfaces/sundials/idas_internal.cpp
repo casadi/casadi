@@ -1219,7 +1219,7 @@ int IdasInternal::rhsQB_wrapper(double t, N_Vector y, N_Vector yp, N_Vector yB, 
   }
 }
 
-void IdasInternal::djac(int Neq, double t, double cj, N_Vector xz, N_Vector yp, N_Vector rr, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
+void IdasInternal::djac(int Neq, double t, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
   log("IdasInternal::djac","begin");
 
   // Get time
@@ -1227,8 +1227,9 @@ void IdasInternal::djac(int Neq, double t, double cj, N_Vector xz, N_Vector yp, 
   
   // Pass input to the Jacobian function
   jac_.setInput(t,JAC_T);
-  jac_.setInput(NV_DATA_S(xz),JAC_Y);
-  jac_.setInput(NV_DATA_S(yp),JAC_YDOT);
+  jac_.setInput(NV_DATA_S(xz),JAC_X);
+  jac_.setInput(NV_DATA_S(xz)+nx_,JAC_Z);
+  jac_.setInput(NV_DATA_S(xzdot),JAC_XDOT);
   jac_.setInput(input(INTEGRATOR_P),JAC_P);
   jac_.setInput(cj,JAC_CJ);
     
@@ -1273,15 +1274,16 @@ int IdasInternal::djac_wrapper(int Neq, double t, double cj, N_Vector xz, N_Vect
   }
 }
 
-void IdasInternal::bjac(int Neq, int mupper, int mlower, double tt, double cj, N_Vector xz, N_Vector yp, N_Vector rr, DlsMat Jac, N_Vector tmp1, N_Vector tmp2,N_Vector tmp3){
+void IdasInternal::bjac(int Neq, int mupper, int mlower, double tt, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, N_Vector tmp1, N_Vector tmp2,N_Vector tmp3){
   log("IdasInternal::bjac","begin");
   // Get time
   time1 = clock();
 
   // Pass input to the jacobian function
   jac_.setInput(tt,JAC_T);
-  jac_.setInput(NV_DATA_S(xz),JAC_Y);
-  jac_.setInput(NV_DATA_S(yp),JAC_YDOT);
+  jac_.setInput(NV_DATA_S(xz),JAC_X);
+  jac_.setInput(NV_DATA_S(xz)+nx_,JAC_Z);
+  jac_.setInput(NV_DATA_S(xzdot),JAC_XDOT);
   jac_.setInput(input(INTEGRATOR_P),JAC_P);
   jac_.setInput(cj,JAC_CJ);
 
@@ -1374,7 +1376,7 @@ void IdasInternal::psolve(double t, N_Vector xz, N_Vector yp, N_Vector rr, N_Vec
   log("IdasInternal::psolve","end");
 }
 
-void IdasInternal::psetup(double t, N_Vector xz, N_Vector yp, N_Vector rr, double cj, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
+void IdasInternal::psetup(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, double cj, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
   log("IdasInternal::psetup","begin");
   
   // Get time
@@ -1382,8 +1384,9 @@ void IdasInternal::psetup(double t, N_Vector xz, N_Vector yp, N_Vector rr, doubl
 
   // Pass input to the jacobian function
   jac_.setInput(t,JAC_T);
-  jac_.setInput(NV_DATA_S(xz),JAC_Y);
-  jac_.setInput(NV_DATA_S(yp),JAC_YDOT);
+  jac_.setInput(NV_DATA_S(xz),JAC_X);
+  jac_.setInput(NV_DATA_S(xz)+nx_,JAC_Z);
+  jac_.setInput(NV_DATA_S(xzdot),JAC_XDOT);
   jac_.setInput(input(INTEGRATOR_P),JAC_P);
   jac_.setInput(cj,JAC_CJ);
 
@@ -1500,6 +1503,8 @@ FX IdasInternal::getJacobian(){
   if(!jac_.isNull())
     return jac_;
 
+  casadi_assert_message(nz_==0,"Algbraic states not supported");
+  
   // If SXFunction
   SXFunction f_sx = shared_cast<SXFunction>(f_);
   if(!f_sx.isNull()){
@@ -1513,8 +1518,9 @@ FX IdasInternal::getJacobian(){
     // Jacobian function
     vector<Matrix<SX> > jac_in(JAC_NUM_IN);
     jac_in[JAC_T] = f_sx.inputSX(DAE_T);
-    jac_in[JAC_Y] = f_sx.inputSX(DAE_X);
-    jac_in[JAC_YDOT] = f_sx.inputSX(DAE_XDOT);
+    jac_in[JAC_X] = f_sx.inputSX(DAE_X);
+    jac_in[JAC_Z] = f_sx.inputSX(DAE_Z);
+    jac_in[JAC_XDOT] = f_sx.inputSX(DAE_XDOT);
     jac_in[JAC_P] = f_sx.inputSX(DAE_P);
     jac_in[JAC_CJ] = cj;
     SXFunction J(jac_in,jac);
@@ -1534,8 +1540,9 @@ FX IdasInternal::getJacobian(){
     // Jacobian function
     vector<MX> jac_in(JAC_NUM_IN);
     jac_in[JAC_T] = f_mx.inputMX(DAE_T);
-    jac_in[JAC_Y] = f_mx.inputMX(DAE_X);
-    jac_in[JAC_YDOT] = f_mx.inputMX(DAE_XDOT);
+    jac_in[JAC_X] = f_mx.inputMX(DAE_X);
+    jac_in[JAC_Z] = f_mx.inputMX(DAE_Z);
+    jac_in[JAC_XDOT] = f_mx.inputMX(DAE_XDOT);
     jac_in[JAC_P] = f_mx.inputMX(DAE_P);
     jac_in[JAC_CJ] = cj;
     MXFunction J(jac_in,jac);
