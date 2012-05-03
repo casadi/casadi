@@ -165,7 +165,6 @@ Integrator create_Sundials(){
     
     // Set IDAS specific options
     integrator.setOption("calc_ic",calc_ic);
-    integrator.setOption("is_differential",vector<int>(3,1));
 
     // Return the integrator
     return integrator;

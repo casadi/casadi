@@ -185,7 +185,7 @@ class IdasInternal : public SundialsInternal{
   void* mem_;
 
   // N-vectors for the DAE integration
-  N_Vector y_, yP_, yQ_;
+  N_Vector xz_, xzdot_, q_;
 
   // N-vectors for the forward and adjoint sensitivities
   std::vector<N_Vector> yS_, yPS_, yQS_;
@@ -249,7 +249,7 @@ class IdasInternal : public SundialsInternal{
   void copyNV(const Matrix<double>& x, N_Vector& yz, N_Vector& yP);
   
   // Copy Matrix<double> to n-vectors
-  void copyNV(const N_Vector& yz, const N_Vector& yP, const N_Vector& yQ, Matrix<double>& x);
+  void copyNV(const N_Vector& xz, Matrix<double>& x);
   
   // Get the initial state
   void getInitialState();

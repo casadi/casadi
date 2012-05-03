@@ -35,31 +35,31 @@ except:
   sys.exit(0)
   
 # Variables
-t = SX("t")
-x = SX("x")
-l = SX("l")
-z = SX("z")
-u = SX("u")
+t = ssym("t")
+x = ssym("x")
+l = ssym("l")
+z = ssym("z")
+u = ssym("u")
 
 # Differential equation
-f = [0,0,0]
-f[0] = -x + 0.5*x*x + u + 0.5*z
-f[1] =  x*x + 3.0*u*u
-f[2] =  z + exp(z) - 1.0 + x
+f = vertcat([
+  -x + 0.5*x*x + u + 0.5*z,
+  x*x + 3.0*u*u,
+  z + exp(z) - 1.0 + x
+  ])
 
 # The right hand side of the ACADO functions
 acado_in = ACADO_FCN_NUM_IN * [[]]
-acado_in[ACADO_FCN_T] = [t]     # Time
-acado_in[ACADO_FCN_XD] = [x,l]  # Differential states
-acado_in[ACADO_FCN_XA] = [z]    # Algebraic state
-acado_in[ACADO_FCN_U] = [u]     # Control
-acado_in[ACADO_FCN_P] = []      # Parameter
+acado_in[ACADO_FCN_T] = t     # Time
+acado_in[ACADO_FCN_XD] = vertcat((x,l))  # Differential states
+acado_in[ACADO_FCN_XA] = z    # Algebraic state
+acado_in[ACADO_FCN_U] = u     # Control
 
 # The DAE function
 ffcn = SXFunction(acado_in,daeOut(f))
 
 ## Objective function
-mfcn = SXFunction(acado_in,[[l]])
+mfcn = SXFunction(acado_in,[l])
 
 # Create ACADO solver
 ocp_solver = AcadoOCP(ffcn,mfcn)
@@ -105,27 +105,23 @@ x_opt = x_opt.reshape(num_nodes+1, 3)
 u_opt = ocp_solver.output(ACADO_U_OPT)
 
 # State derivatives
-xdot = SX("xdot")
-ldot = SX("ldot")
-zdot = SX("zdot")
+xdot = ssym("xdot")
+ldot = ssym("ldot")
 
 # The residual of the IDAS dae
 dae_in = DAE_NUM_IN * [[]]
-dae_in[DAE_T] = [t]     # Time
-dae_in[DAE_X] = [x,l,z]   # States
-dae_in[DAE_XDOT] = [xdot,ldot,zdot]   # State derivatives
-dae_in[DAE_P] = [u]     # Control
+dae_in[DAE_T] = t     # Time
+dae_in[DAE_X] = vertcat((x,l))   # States
+dae_in[DAE_Z] = z   # States
+dae_in[DAE_XDOT] = vertcat((xdot,ldot))   # State derivatives
+dae_in[DAE_P] = u     # Control
 
 # The DAE residual
-dae_res = list(f)
-dae_res[0] -= xdot
-dae_res[1] -= ldot
-
-# To make it work with a direct solver
-#dae_res[2] -= 0.43*exp(z)
+ode_res = vertcat((f[0]-xdot,f[1]-ldot))
+alg_res = f[2]
 
 # The DAE residual function
-dae = SXFunction(dae_in,daeOut(dae_res))
+dae = SXFunction(dae_in,daeOut(ode_res,alg_res))
 
 # Create an integrator
 integrator = IdasIntegrator(dae)
@@ -138,7 +134,6 @@ integrator.setOption("stop_at_end",True)
 #integrator.setOption("suppress_algebraic",True)
 #integrator.setOption("linear_solver","dense")
 integrator.setOption("linear_solver","iterative")
-integrator.setOption("is_differential",[True,True,False])
 integrator.setOption("t0",t_opt[0])
 integrator.setOption("tf",t_opt[1])
 
@@ -146,7 +141,7 @@ integrator.setOption("tf",t_opt[1])
 integrator.init()
 
 # Initial state
-xi = (1.0,0.0,0.0)
+xi = (1.0,0.0)
 
 # Simulated trajectory
 x_opt2 = array((num_nodes+1)*[xi])
@@ -168,7 +163,6 @@ for i in range(num_nodes):
   xi = integrator.output(INTEGRATOR_XF)
   x_opt2[i+1] = xi.data()
 
-
 plt.figure(1)
 plt.clf()
 plt.hold(True)
@@ -181,9 +175,9 @@ plt.figure(2)
 plt.clf()
 plt.hold(True)
 plt.plot(t_opt,x_opt[:,2],'*')
-plt.plot(t_opt,x_opt2[:,2],'-')
+#plt.plot(t_opt,x_opt2[:,2],'-')
 plt.title("ALGEBRAIC STATE  z")
-plt.legend(('ACADO','IDAS'))
+#plt.legend(('ACADO','IDAS'))
 
 plt.figure(3)
 plt.clf()

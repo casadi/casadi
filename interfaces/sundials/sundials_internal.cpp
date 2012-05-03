@@ -46,7 +46,6 @@ SundialsInternal::SundialsInternal(const FX& f, const FX& g) : IntegratorInterna
   addOption("iterative_solver",            OT_STRING, "gmres","","gmres|bcgstab|tfqmr");
   addOption("pretype",                     OT_STRING, "none","","none|left|right|both");
   addOption("max_krylov",                  OT_INTEGER,  10);        // maximum krylov subspace size
-  addOption("is_differential",             OT_INTEGERVECTOR, GenericType(), "A vector with a boolean describing the nature for each state.");
   addOption("sensitivity_method",          OT_STRING,  "simultaneous","","simultaneous|staggered");
   addOption("max_multistep_order",         OT_INTEGER, 5);
   addOption("use_preconditioner",          OT_BOOLEAN, false); // precondition an iterative solver
@@ -127,7 +126,7 @@ SundialsIntegrator SundialsInternal::jac(bool with_x, bool with_p){
   if(f.isNull() != f_.isNull()) return SundialsIntegrator();
   
   // Number of state derivatives
-  int nyp = f_.input(DAE_XDOT).numel();
+  int n_xdot = f_.input(DAE_XDOT).numel();
   
   // Number of sensitivities
   int ns_x = with_x*nx_;
@@ -135,43 +134,58 @@ SundialsIntegrator SundialsInternal::jac(bool with_x, bool with_p){
   int ns = ns_x + ns_p;
 
   // Sensitivities and derivatives of sensitivities
-  SXMatrix ysens = ssym("ysens",nx_,ns);
-  SXMatrix ypsens = ssym("ypsens",nyp,ns);
+  SXMatrix x_sens = ssym("x_sens",nx_,ns);
+  SXMatrix z_sens = ssym("z_sens",nz_,ns);
+  SXMatrix xdot_sens = ssym("xdot_sens",n_xdot,ns);
     
-  // Sensitivity equation
-  SXMatrix res_s = mul(f.jac(DAE_X,DAE_ODE),ysens);
-  if(nyp>0) res_s += mul(f.jac(DAE_XDOT,DAE_ODE),ypsens);
-  if(with_p) res_s += horzcat(SXMatrix(nx_,ns_x),f.jac(DAE_P,DAE_ODE));
+  // Sensitivity equation (ODE)
+  SXMatrix ode_s = mul(f.jac(DAE_X,DAE_ODE),x_sens);
+  if(n_xdot>0) ode_s += mul(f.jac(DAE_XDOT,DAE_ODE),xdot_sens);
+  if(with_p) ode_s += horzcat(SXMatrix(nx_,ns_x),f.jac(DAE_P,DAE_ODE));
 
-  // Augmented DAE
-  SXMatrix faug = vec(horzcat(f.outputSX(INTEGRATOR_XF),res_s));
-  makeDense(faug); // NOTE: possible alternative: skip structural zeros (messes up the sparsity pattern of the augmented system)
+  // Sensitivity equation (ALG)
+  SXMatrix alg_s;
+  if(nz_>0){
+    alg_s = mul(f.jac(DAE_X,DAE_ALG),x_sens);
+    if(with_p) alg_s += horzcat(SXMatrix(nz_,ns_x),f.jac(DAE_P,DAE_ALG));
+  }
+
+  // Sensitivity equation (QUAD)
+  SXMatrix quad_s;
+  if(nq_>0){
+    quad_s = mul(f.jac(DAE_X,DAE_QUAD),x_sens);
+    if(n_xdot>0) quad_s += mul(f.jac(DAE_XDOT,DAE_QUAD),xdot_sens);
+    if(with_p)   quad_s += horzcat(SXMatrix(nq_,ns_x),f.jac(DAE_P,DAE_QUAD));
+  }
+  
+  // Augmented ODE
+  SXMatrix ode_aug = vec(horzcat(f.outputSX(DAE_ODE),ode_s));
+  makeDense(ode_aug); // NOTE: possible alternative: skip structural zeros (messes up the sparsity pattern of the augmented system)
+  
+  // Augmented algebraic states
+  SXMatrix alg_aug;
+  if(nz_>0){
+    SXMatrix alg_aug = vec(horzcat(f.outputSX(DAE_ALG),ode_s));
+    makeDense(alg_aug);
+  }
+
+  // Augmented quadratures
+  SXMatrix quad_aug;
+  if(nq_>0){
+    quad_aug = vec(horzcat(f.outputSX(DAE_QUAD),quad_s));
+    makeDense(quad_aug);
+  }
 
   // Input arguments for the augmented DAE
   vector<SXMatrix> faug_in(DAE_NUM_IN);
   faug_in[DAE_T] = f.inputSX(DAE_T);
-  faug_in[DAE_X] = vec(horzcat(f.inputSX(DAE_X),ysens));
-  if(nyp>0) faug_in[DAE_XDOT] = vec(horzcat(f.inputSX(DAE_XDOT),ypsens));
+  faug_in[DAE_X] = vec(horzcat(f.inputSX(DAE_X),x_sens));
+  if(nz_>0)    faug_in[DAE_Z] = vec(horzcat(f.inputSX(DAE_Z),z_sens));
+  if(n_xdot>0) faug_in[DAE_XDOT] = vec(horzcat(f.inputSX(DAE_XDOT),xdot_sens));
   faug_in[DAE_P] = f.inputSX(DAE_P);
   
-  // Augmented quadratures
-  SXMatrix qaug;
-  
-  // Now lets do the same for the quadrature states
-  if(!f.output(DAE_QUAD).empty()){
-    
-    // Sensitivity quadratures
-    SXMatrix q_s = mul(f.jac(DAE_X,DAE_QUAD),ysens);
-    if(nyp>0) q_s += mul(f.jac(DAE_XDOT,DAE_QUAD),ypsens);
-    if(with_p) q_s += horzcat(SXMatrix(nq_,ns_x),f.jac(DAE_P,DAE_QUAD));
-
-    // Augmented quadratures
-    qaug = vec(horzcat(f.outputSX(DAE_QUAD),q_s));
-    makeDense(qaug); // NOTE: se above
-  }
-
   // Create augmented DAE function
-  SXFunction ffcn_aug(faug_in,daeOut(faug,SXMatrix(),qaug));
+  SXFunction ffcn_aug(faug_in,daeOut(ode_aug,alg_aug,quad_aug));
 
   // Create integrator instance
   SundialsIntegrator integrator;
@@ -180,17 +194,6 @@ SundialsIntegrator SundialsInternal::jac(bool with_x, bool with_p){
   // Set options
   integrator.setOption(dictionary());
   integrator.setOption("nrhs",1+ns);
-  
-  // Transmit information on derivative states
-  if(hasSetOption("is_differential")){
-    vector<int> is_diff = getOption("is_differential");
-    casadi_assert_message(is_diff.size()==nx_,"is_differential has incorrect length");
-    vector<int> is_diff_aug(nx_*(1+ns));
-    for(int i=0; i<1+ns; ++i)
-      for(int j=0; j<nx_; ++j)
-        is_diff_aug[j+i*nx_] = is_diff[j];
-    integrator.setOption("is_differential",is_diff_aug);
-  }
   
   // Pass linear solver
   if(!linsol_.isNull()){

@@ -982,8 +982,8 @@ int CVodesInternal::rhsQB_wrapper(double t, N_Vector y, N_Vector yB, N_Vector qB
 }
 
 void CVodesInternal::rhsQB(double t, const double* y, const double* yB, double* qBdot){
- if(monitor_rhsQB_){
-      cout << "CVodesInternal::rhsQB: begin" << endl;
+  if(monitor_rhsQB_){
+    cout << "CVodesInternal::rhsQB: begin" << endl;
   }
 
   // Pass input

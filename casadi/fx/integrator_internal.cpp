@@ -140,6 +140,7 @@ void IntegratorInternal::init(){
 void IntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
   FXInternal::deepCopyMembers(already_copied);
   f_ = deepcopy(f_,already_copied);
+  g_ = deepcopy(g_,already_copied);
 }
 
 } // namespace CasADi
