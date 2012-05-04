@@ -238,6 +238,7 @@ void IpoptInternal::evaluate(int nfdir, int nadir){
     stats_["return_status"] = "NonIpopt_Exception_Thrown";
   if (status == Insufficient_Memory)
     stats_["return_status"] = "Insufficient_Memory";
+  
 
 }
 
@@ -289,7 +290,7 @@ bool IpoptInternal::intermediate_callback(const double* x, const double* z_L, co
   }
 }
 
-void IpoptInternal::finalize_solution(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value){
+void IpoptInternal::finalize_solution(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value, int iter_count){
   try {
     // Get primal solution
     copy(x,x+n_,output(NLP_X_OPT).begin());
@@ -309,6 +310,9 @@ void IpoptInternal::finalize_solution(const double* x, const double* z_L, const 
     // Get the constraints
     copy(g,g+m_,output(NLP_G).begin());
     
+    // Get statistics
+    stats_["iter_count"] = iter_count;
+
   } catch (exception& ex){
     cerr << "finalize_solution failed: " << ex.what() << endl;
   }

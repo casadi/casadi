@@ -264,7 +264,7 @@ void LiftedSQPInternal::init(){
   lfcn_out[LIN_GJAC] = B2;
   lfcn_out[LIN_GLIN] = b2;
   lfcn_ = SXFunction(lfcn_in,lfcn_out);
-  lfcn_.setOption("verbose",true);
+//   lfcn_.setOption("verbose",true);
   lfcn_.setOption("number_of_fwd_dir",0);
   lfcn_.setOption("number_of_adj_dir",0);
   lfcn_.setOption("live_variables",true);
@@ -442,6 +442,9 @@ void LiftedSQPInternal::evaluate(int nfdir, int nadir){
   
   // Store optimal value
   output(NLP_COST).set(f_k);
+  
+  // Save statistics
+  stats_["iter_count"] = k;
 }
 
 } // namespace CasADi

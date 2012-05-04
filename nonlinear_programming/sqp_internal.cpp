@@ -504,6 +504,9 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   
   output(NLP_COST).set(fk);
   output(NLP_X_OPT).set(x);
+  
+  // Save statistics
+  stats_["iter_count"] = k;
 }
 
 } // namespace CasADi

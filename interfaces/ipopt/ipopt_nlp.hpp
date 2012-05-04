@@ -26,6 +26,7 @@
 #include "ipopt_solver.hpp"
 #include <coin/IpTNLP.hpp>
 #include <coin/IpIpoptCalculatedQuantities.hpp>
+#include <coin/IpIpoptData.hpp>
 
 #ifdef WITH_IPOPT_CALLBACK
 #define private public

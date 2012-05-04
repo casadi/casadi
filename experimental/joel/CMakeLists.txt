@@ -102,5 +102,8 @@ endif(WITH_LLVM)
 IF(IPOPT_FOUND AND ACADO_FOUND AND ACADO_SHARED_LIBRARIES)
   add_executable(vdp_lifted_newton vdp_lifted_newton.cpp)
   target_link_libraries(vdp_lifted_newton integration nonlinear_programming qpoases_interface ipopt_interface casadi ${CASADI_DEPENDENCIES} ${IPOPT_LIBRARIES} ${ACADO_SHARED_LIBRARIES})
+
+  add_executable(albersmeyer_toy_example albersmeyer_toy_example.cpp)
+  target_link_libraries(albersmeyer_toy_example integration nonlinear_programming qpoases_interface ipopt_interface casadi ${CASADI_DEPENDENCIES} ${IPOPT_LIBRARIES} ${ACADO_SHARED_LIBRARIES})
 ENDIF(IPOPT_FOUND AND ACADO_FOUND AND ACADO_SHARED_LIBRARIES)
 
