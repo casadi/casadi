@@ -203,7 +203,7 @@ SXFunction SXFunction::operator[](int k) const {
   return ret;
 }
 
-SXMatrix SXFunction::getFree() const{
+std::vector<SX> SXFunction::getFree() const{
   return (*this)->free_vars_;
 }
 

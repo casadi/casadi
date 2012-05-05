@@ -30,33 +30,9 @@ namespace CasADi{
 class LiftedSQPInternal;
   
 /**
-  \brief Sequential Quadratic Programming method
-  The algorithm is a Quasi-Newton method with damped BFGS updating to that
-  assures positive definitenes of the Hessian approximation. Line search is
-  carried out via backtracking until with the Armijo condition applied to
-  the T1 (in Nocedal phi1) merit function is satisfied.
-  
-  The method solved can be written in the form:
-  \verbatim
-  min          F(x1,x2)
-  x1,x2
-  
-  subject to
-            LBG1 <= G1(x1,x2) <= UBG1
-              x2 == G2(x1,x2)
-            LBX1 <=     x1    <= UBX1
-            LBX2 <=     x2    <= UBX2
-  \endverbatim
-  
-  We thus assume that the variable vector x can be divided into two parts,
-  where the second part is given recursively by the equations x2 == G2(x1,x2).
-  That is x2 is given recursively means that we assume that the Jacobian of 
-  G2 with respect to x2 is lower triangular with zeros along the diagonal.
-  
-  The method is still under development
-  
+  \brief Sequential Quadratic Programming method implementing the Lifted Newton approach symbolically
   \author Joel Andersson
-  \date 2011
+  \date 2012
 */
 class LiftedSQP : public NLPSolver {
   public:

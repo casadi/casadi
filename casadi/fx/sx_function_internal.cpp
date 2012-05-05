@@ -1262,13 +1262,7 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
   // Get the number of forward and adjoint sweeps
   int nfwd = fwdSens.size();
   int nadj = adjSeed.size();
-  
-/*  std::cout << "nfwd = " <<  nfwd << std::endl;
-  std::cout << "nadj = " <<  nadj << std::endl;*/
-  
-
-  
-  
+    
   // Quick return if no sensitivities
   if(nfwd==0 && nadj==0) return;
   

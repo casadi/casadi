@@ -953,5 +953,14 @@ std::vector<int> MX::getDepInd() const {
   casadi_assert_message(m!=0, "mapping: argument MX should point to a Mapping node");
   return m->getDepInd();
 }
+
+int MX::getTemp() const{
+  return (*this)->temp;
+}
+    
+void MX::setTemp(int t){
+  (*this)->temp = t;
+}
+
  	  
 } // namespace CasADi

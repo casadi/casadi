@@ -29,6 +29,7 @@
 #include "../matrix/matrix_tools.hpp"
 #include "../stl_vector_tools.hpp"
 #include "densification.hpp"
+#include "../fx/mx_function_internal.hpp"
 
 using namespace std;
 
@@ -578,6 +579,83 @@ std::string getOperatorRepresentation(const MX& x, const std::vector<std::string
   casadi_math<double>::print(x.getOp(),s,args[0],args[1]);
   return s.str();
 }
+
+void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, bool reverse, bool eliminate_constants){
+  // Empty vector
+  vector<MX> ex;
+  substituteInPlace(v,vdef,ex,reverse,eliminate_constants);
+}
+
+void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, std::vector<MX>& ex, bool reverse, bool eliminate_constants){
+  casadi_assert_message(v.size()==vdef.size(),"Mismatch in the number of expression to substitute.");
+  for(int k=0; k<v.size(); ++k){
+    casadi_assert_message(isSymbolic(v[k]),"Variable " << k << " is not symbolic");
+    casadi_assert_message(v[k].sparsity() == vdef[k].sparsity(), "Inconsistent sparsity for variable " << k << ".");
+  }
+  
+  // quick return if nothing to replace
+  if(v.empty()) return;
+
+  // Function outputs
+  std::vector<MX> f_out = vdef;
+  f_out.insert(f_out.end(),ex.begin(),ex.end());
+  
+  // Write the mapping function
+  MXFunction f(v,f_out);
+  f.setOption("topological_sorting","depth-first");
+  f.init();
+
+  // Get references to the internal data structures
+  const std::vector<int>& input_ind = f->input_ind_;
+  std::vector<int>& output_ind = f->output_ind_;
+  std::vector<MXAlgEl>& algorithm = f->algorithm_;
+  
+  // Create the filter
+  vector<int> filter = range(f->work_.size());
+
+  // Replace expression
+  for(int k=0; k<v.size(); ++k){
+    if(reverse){
+      filter[output_ind[k]] = input_ind[k];
+    } else {
+      output_ind[k] = filter[output_ind[k]];
+      filter[input_ind[k]] = output_ind[k];
+    }
+  }
+
+  // Now filter out the variables from the algorithm
+  for(vector<MXAlgEl>::iterator it=algorithm.begin(); it!=algorithm.end(); ++it){
+    for(vector<int>::iterator it2=it->arg.begin(); it2!=it->arg.end(); ++it2){
+      *it2 = filter[*it2];
+    }
+  }
+
+  // Filter the variables from the dependent expressions
+  for(int i=0; i<ex.size(); ++i){
+    int& ex_ind = f->output_ind_.at(i+v.size());
+    ex_ind = filter[ex_ind];
+  }
+
+  // No sensitivities
+  vector<vector<MX> > dummy;
+
+  // Replace expression
+  std::vector<MX> outputv = f->outputv_;
+  f->eval(f->inputv_, outputv, dummy, dummy, dummy, dummy, false, eliminate_constants);
+  
+  // Replace the result
+  std::vector<MX>::iterator outputv_it = outputv.begin();
+  for(vector<MX>::iterator it=vdef.begin(); it!=vdef.end(); ++it){
+    *it = *outputv_it++;
+  }
+  
+  // Get the replaced expressions
+  for(vector<MX>::iterator it=ex.begin(); it!=ex.end(); ++it){
+    *it = *outputv_it++;
+  }
+}
+
+
 
 
 } // namespace CasADi

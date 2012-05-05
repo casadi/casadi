@@ -38,7 +38,8 @@ NLPSolverInternal::NLPSolverInternal(const FX& F, const FX& G, const FX& H, cons
   setOption("name",            "unnamed NLP solver"); // name of the function
   addOption("expand_f",         OT_BOOLEAN,     false,         "Expand the objective function in terms of scalar operations, i.e. MX->SX");
   addOption("expand_g",         OT_BOOLEAN,     false,         "Expand the constraint function in terms of scalar operations, i.e. MX->SX");
-  addOption("generate_hessian", OT_BOOLEAN,     false,         "Generate an exact Hessian of the Lagrangian");
+  addOption("generate_hessian", OT_BOOLEAN,     false,         "Generate an exact Hessian of the Lagrangian if not supplied");
+  addOption("generate_jacobian", OT_BOOLEAN,     true,         "Generate an exact Jacobian of the constraints if not supplied");
   addOption("iteration_callback", OT_FX,     FX(),            "A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.");
   addOption("iteration_callback_step", OT_INTEGER,     1,       "Only call the callback function every few iterations.");
   addOption("iteration_callback_ignore_errors", OT_BOOLEAN,     false,      "If set to true, errors thrown by iteration_callback will be ignored.");
@@ -332,7 +333,8 @@ void NLPSolverInternal::init(){
   }
 
   // Create a Jacobian if it does not already exists
-  if(!G_.isNull() && J_.isNull()){
+  bool generate_jacobian = getOption("generate_jacobian");
+  if(generate_jacobian && !G_.isNull() && J_.isNull()){
     J_ = G_.jacobian();
     
     // Use live variables if SXFunction

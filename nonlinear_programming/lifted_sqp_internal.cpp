@@ -51,6 +51,9 @@ LiftedSQPInternal::LiftedSQPInternal(const FX& F, const FX& G, const FX& H, cons
   
   // Monitors
   addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp", true);
+  
+  // Set default options
+  setOption("generate_jacobian", false);
 }
 
 

@@ -299,6 +299,12 @@ class MX : public GenericMatrix<MX>, public CachedObject{
   */
   long __hash__() const;
     
+  /// Get the temporary variable
+  int getTemp() const;
+  
+  /// Set the temporary variable
+  void setTemp(int t);
+  
   //@{
     /** \brief  Create nodes by their ID */
     static MX binary(int op, const MX &x, const MX &y);

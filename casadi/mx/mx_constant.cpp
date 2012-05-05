@@ -61,20 +61,23 @@ void MXConstant::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, con
 }
 
 void MXConstant::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
-  casadi_assert_message(output_given,"not implemented");
 
+  // Evaluate nondifferentiated
+  if(!output_given){
+    if(output[0]){
+      *output[0] = x_;
+    }
+  }
+  
   // Number of derivative directions
   int nfwd = fwdSens.size();
-  //int nadj = adjSeed.size();
+  if(nfwd==0) return; // Quick return
   
-  if(nfwd>0){
-    for(int i=0; i<output.size(); ++i){
-      if(fwdSens[0][i]!=0){
-        *fwdSens[0][i] = MX::sparse(size1(),size2());
-        for(int d=1; d<nfwd; ++d){
-          *fwdSens[d][i] = *fwdSens[0][i];
-        }
-      }
+  // Derivatives
+  MX zero_sens = MX::sparse(size1(),size2());
+  for(int d=0; d<nfwd; ++d){
+    if(fwdSens[d][0]){
+      *fwdSens[d][0] = zero_sens;
     }
   }
 }

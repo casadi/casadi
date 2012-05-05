@@ -46,7 +46,10 @@ int main(){
   string solver_name[] = {"IPOPT","LIFTED_SQP","FULLSPACE_SQP","OLD_SQP_METHOD"};
 
   // Iteration counts
-  int iter_count[ntests][NUM_SOLVERS] = {{0}};
+  int iter_count[ntests][NUM_SOLVERS];
+  
+  // Lifting?
+  bool lifting = true;
   
   // Tests for different initial values for x
   for(int test=0; test<ntests; ++test){
@@ -89,18 +92,20 @@ int main(){
       F.push_back(u[k]);
       F.push_back(x);
       
-      // Lift x
-      SX x_def = x;
-      v_init.push_back(x_init);
-      v_min.push_back(x_min);
-      v_max.push_back(x_max);
-      
-      // Allocate intermediate variable
-      stringstream ss;
-      ss << "v_" << k;
-      x = SX(ss.str());
-      v.push_back(x);
-      v_eq.push_back(x_def-x);
+      if(lifting){
+	// Lift x
+	SX x_def = x;
+	v_init.push_back(x_init);
+	v_min.push_back(x_min);
+	v_max.push_back(x_max);
+	
+	// Allocate intermediate variable
+	stringstream ss;
+	ss << "v_" << k;
+	x = SX(ss.str());
+	v.push_back(x);
+	v_eq.push_back(x_def-x);
+      }
     }
       
     // Objective
@@ -142,6 +147,7 @@ int main(){
     // Solve using multiple NLP solvers
     for(int solver=0; solver<NUM_SOLVERS; ++solver){
       cout << "Testing " << solver_name[solver] << endl;
+      iter_count[test][solver] = 9999;
 	
       // Get the nlp solver and NLP solver options
       NLPSolver nlp_solver;
@@ -149,25 +155,28 @@ int main(){
 	case IPOPT:
 	  nlp_solver = IpoptSolver(ffcn,gfcn);
 	  nlp_solver.setOption("generate_hessian",true);
-	  nlp_solver.setOption("tol",1e-10);
+	  nlp_solver.setOption("tol",1e-9);
 	  break;
 	case LIFTED_SQP:
+	  if(!lifting && x0>=0.10) continue;;
 	  nlp_solver = LiftedSQP(ffcn,gfcn);
 	  nlp_solver.setOption("qp_solver",Interfaces::QPOasesSolver::creator);
 	  nlp_solver.setOption("qp_solver_options",qp_solver_options);
 	  nlp_solver.setOption("num_lifted",nv);
-	  nlp_solver.setOption("toldx",1e-10);
+	  nlp_solver.setOption("toldx",1e-9);
 // 	  nlp_solver.setOption("verbose",true);
 	  break;
 	case FULLSPACE_SQP:
+	  if(!lifting && x0>=0.10) continue;;
 	  nlp_solver = LiftedSQP(ffcn,gfcn);
 	  nlp_solver.setOption("qp_solver",Interfaces::QPOasesSolver::creator);
 	  nlp_solver.setOption("qp_solver_options",qp_solver_options);
 	  nlp_solver.setOption("num_lifted",0);
-	  nlp_solver.setOption("toldx",1e-10);
+	  nlp_solver.setOption("toldx",1e-9);
 // 	  nlp_solver.setOption("verbose",true);
 	  break;
 	case OLD_SQP_METHOD:
+	  if(!lifting && x0>=0.07) continue;;
 	  nlp_solver = SQPMethod(ffcn,gfcn);
 	  nlp_solver.setOption("qp_solver",Interfaces::QPOasesSolver::creator);
 	  nlp_solver.setOption("qp_solver_options",qp_solver_options);

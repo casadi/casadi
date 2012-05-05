@@ -273,9 +273,25 @@ MX msym(const std::string& name, const CRSSparsity& sp);
 /** \brief  Check if two expressions are equal */
 bool isEqual(const MX& ex1,const MX &ex2);
 
-
 /** \brief Get a string representation for a binary MX, using custom arguments */
 std::string getOperatorRepresentation(const MX& x, const std::vector<std::string>& args);
+
+/** \brief Inplace substitution
+ * Substitute variables v out of the expressions vdef sequentially 
+ */
+#ifndef SWIG
+void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, bool reverse=false, bool eliminate_constants=false);
+#else // SWIG
+void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& INOUT, bool reverse=false, bool eliminate_constants=false);
+#endif // SWIG
+
+/** \brief Inplace substitution with piggyback expressions
+ * Substitute variables v out of the expressions vdef sequentially, as well as out of a number of other expressions piggyback */
+#ifndef SWIG
+void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, std::vector<MX>& ex, bool reverse=false, bool eliminate_constants=false);
+#else // SWIG
+void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& INOUT, std::vector<MX>& INOUT, bool reverse=false, bool eliminate_constants=false);
+#endif // SWIG
 
 #ifndef SWIG
 template<>
