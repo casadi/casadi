@@ -211,10 +211,10 @@ class MX : public GenericMatrix<MX>, public CachedObject{
 
   //@{
   /** \brief  Operators */
-    friend MX operator+(const MX &x, const MX &y);
-    friend MX operator-(const MX &x, const MX &y);
-    friend MX operator*(const MX &x, const MX &y);
-    friend MX operator/(const MX &x, const MX &y);
+    friend MX operator+(const MX &x, const MX &y){ return x.__add__(y);}
+    friend MX operator-(const MX &x, const MX &y){ return x.__sub__(y);}
+    friend MX operator*(const MX &x, const MX &y){ return x.__mul__(y);}
+    friend MX operator/(const MX &x, const MX &y){ return x.__div__(y);}
 
   //@}
   #endif // SWIG
@@ -397,10 +397,10 @@ class MX : public GenericMatrix<MX>, public CachedObject{
   std::string dimString() const;
   
   // all binary operations
-  MX __add__(const MX& b) const;
-  MX __sub__(const MX& b) const;
-  MX __mul__(const MX& b) const;
-  MX __div__(const MX& b) const;
+  MX __add__(const MX& y) const;
+  MX __sub__(const MX& y) const;
+  MX __mul__(const MX& y) const;
+  MX __div__(const MX& y) const;
   MX __pow__(const MX& b) const;
   MX __constpow__(const MX& b) const;
   MX __mrdivide__  (const MX& b) const;

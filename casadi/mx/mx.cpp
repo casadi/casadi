@@ -436,36 +436,6 @@ NonZeros<MX,int> MX::at(int k) {
   return NonZeros<MX,int>(*this,k);
 }
 
-MX operator+(const MX &x, const MX &y){
-  bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
-  if((samedim || x.scalar()) && isZero(x)){
-    return y;
-  } else if((samedim || y.scalar()) && isZero(y)){
-    return x;
-  } else if(y->isOperation(NEG)){
-    return x - y->dep(0);
-  } else if(x->isOperation(NEG)){
-    return y - x->dep(0);
-  } else {
-    return MX::binary(ADD,x,y);
-  }
-}
-
-MX operator-(const MX &x, const MX &y){
-  bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
-  if((samedim || x.scalar()) && isZero(x)){
-    return -y;
-  } else if((samedim || y.scalar()) && isZero(y)){
-    return x;
-  } else if(y->isOperation(NEG)){
-    return x+y->dep(0);
-  } else if(y.get()==x.get()){
-    return MX::sparse(x.size1(),x.size2());
-  } else {
-    return MX::binary(SUB,x,y);
-  }
-}
-
 MX MX::binary(int op, const MX &x, const MX &y){
   // Make sure that dimensions match
   casadi_assert_message((x.scalar() || y.scalar() || (x.size1()==y.size1() && x.size2()==y.size2())),"Dimension mismatch." << "lhs is " << x.dimString() << ", while rhs is " << y.dimString());
@@ -535,30 +505,6 @@ MX MX::matrix_matrix(int op, const MX &x, const MX &y){
   } else {
     // Sparse matrix-matrix operation necessary
     return create(new SparseSparseOp(Operation(op),x,y)); 
-  }
-}
-
-MX operator*(const MX &x, const MX &y){
-  bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
-  if((samedim || x.scalar()) && isOne(x)){
-    return y;
-  } else if((samedim || x.scalar()) && isMinusOne(x)){
-    return -y;
-  } else if((samedim || y.scalar()) && isOne(y)){
-    return x;
-  } else if((samedim || y.scalar()) && isMinusOne(y)){
-    return -x;
-  } else {
-    return MX::binary(MUL,x,y);
-  }
-}
-
-MX operator/(const MX &x, const MX &y){
-  bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
-  if((samedim || y.scalar()) && isOne(y)){
-    return x;
-  } else {
-    return MX::binary(DIV,x,y);
   }
 }
 
@@ -859,10 +805,64 @@ MX MX::erf() const{
   return unary(ERF,*this);
 }
 
-MX MX::__add__(const MX& b) const{    return *this + b;}
-MX MX::__sub__(const MX& b) const{    return *this - b;}
-MX MX::__mul__(const MX& b) const{    return *this * b;}
-MX MX::__div__(const MX& b) const{    return *this / b;}
+MX MX::__add__(const MX& y) const{
+  const MX& x = *this;
+  bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
+  if((samedim || x.scalar()) && isZero(x)){
+    return y;
+  } else if((samedim || y.scalar()) && isZero(y)){
+    return x;
+  } else if(y->isOperation(NEG)){
+    return x - y->dep(0);
+  } else if(x->isOperation(NEG)){
+    return y - x->dep(0);
+  } else {
+    return MX::binary(ADD,x,y);
+  }
+}
+
+MX MX::__sub__(const MX& y) const{
+  const MX& x = *this;
+  bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
+  if((samedim || x.scalar()) && isZero(x)){
+    return -y;
+  } else if((samedim || y.scalar()) && isZero(y)){
+    return x;
+  } else if(y->isOperation(NEG)){
+    return x+y->dep(0);
+  } else if(y.get()==x.get()){
+    return MX::sparse(x.size1(),x.size2());
+  } else {
+    return MX::binary(SUB,x,y);
+  }
+}
+
+MX MX::__mul__(const MX& y) const{
+  const MX& x = *this;
+  bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
+  if((samedim || x.scalar()) && isOne(x)){
+    return y;
+  } else if((samedim || x.scalar()) && isMinusOne(x)){
+    return -y;
+  } else if((samedim || y.scalar()) && isOne(y)){
+    return x;
+  } else if((samedim || y.scalar()) && isMinusOne(y)){
+    return -x;
+  } else {
+    return MX::binary(MUL,x,y);
+  }
+}
+
+MX MX::__div__(const MX& y) const{
+  const MX& x = *this;
+  bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
+  if((samedim || y.scalar()) && isOne(y)){
+    return x;
+  } else {
+    return MX::binary(DIV,x,y);
+  }
+}
+
 MX MX::__constpow__(const MX& b) const { return (*this).constpow(b);}
 MX MX::__mrdivide__(const MX& b) const { if (b.scalar()) return *this/b; throw CasadiException("mrdivide: Not implemented");}
 MX MX::__mldivide__(const MX& b) const { return b.__mrdivide__(*this);}
