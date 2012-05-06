@@ -185,6 +185,9 @@ bool isOne(const MX& ex);
 /** \brief  Simplify a mapping, if possible */
 void simplifyMapping(MX& ex);
 
+/** \brief  Is the expression a transpose? */
+bool isTranspose(const MX& ex);
+
 /** \brief  check if zero (note that false negative answers are possible) */
 bool isMinusOne(const MX& ex);
 

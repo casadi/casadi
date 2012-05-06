@@ -150,24 +150,32 @@ void Mapping::printPart(std::ostream &stream, int part) const{
         stream << "[" << output_sorted_[0][0].inz << "]";
   } else {
     if(part==0){
-      stream << "mapping(";
-      if(sparsity().dense())            stream << "dense";
-      else if(sparsity().diagonal())    stream << "diagonal";
-      else                              stream << "sparse";
-      stream << " " << size1() << "-by-" << size2() << " matrix, dependencies: [";
-    } else if(part==ndep()){
-      stream << "], nonzeros: [";
-      for(int k=0; k<output_sorted_.size(); ++k){
-        for(int kk=0; kk<output_sorted_[k].size(); ++kk){
-          if(ndep()>1){
-            stream << output_sorted_[k][kk].inz << "(" << output_sorted_[k][kk].iind << ")";
-          } else {
-            stream << output_sorted_[k][kk].inz;
-          }
-          stream << ",";
-        }
+      if(isTranspose()){
+	stream << "trans(";
+      } else {
+	stream << "mapping(";
+	if(sparsity().dense())            stream << "dense";
+	else if(sparsity().diagonal())    stream << "diagonal";
+	else                              stream << "sparse";
+	stream << " " << size1() << "-by-" << size2() << " matrix, dependencies: [";
       }
-      stream << "])";
+    } else if(part==ndep()){
+      if(isTranspose()){
+	stream << ")";
+      } else {
+	stream << "], nonzeros: [";
+	for(int k=0; k<output_sorted_.size(); ++k){
+	  for(int kk=0; kk<output_sorted_[k].size(); ++kk){
+	    if(ndep()>1){
+	      stream << output_sorted_[k][kk].inz << "(" << output_sorted_[k][kk].iind << ")";
+	    } else {
+	      stream << output_sorted_[k][kk].inz;
+	    }
+	    stream << ",";
+	  }
+	}
+	stream << "])";
+      }
     } else {
       stream << ",";
     }
@@ -591,5 +599,50 @@ bool Mapping::isIdentity() const{
   return true;
 }
 
+bool Mapping::isTranspose() const{
+  // Make sure that there is at least one dependency
+  if(ndep()!=1) return false;
+  
+  // Get the dependency
+  const MX& d = dep(0);
+  
+  // First check if sparsity patterns are transposes of each other
+  if(!d.sparsity().isTranspose(sparsity()))
+    return false;
+  
+  // Get all the elements of the transpose
+  vector<int> d_elements = d.sparsity().getElements(false);
+  
+  // Sparsity pattern of the transpose
+  int sz1 = size1();
+  int sz2 = size2();
+  const vector<int>& rowind = sparsity().rowind();
+  const vector<int>& col = sparsity().col();
+  
+  // Loop over the rows of the matrix
+  for(int i=0; i<sz1; ++i){
+    
+    // Loop over the nonzeros of the row
+    for(int k=rowind[i]; k<rowind[i+1]; ++k){
+      
+      // Get the column
+      int j=col[k];
+      
+      // Make sure that there is a single output
+      if(output_sorted_[k].size()!=1) return false;
+      const OutputNZ &e = output_sorted_[k].front();
+      if(e.iind !=0) return false;
+      
+      // Get the element
+      int el = d_elements[e.inz];
+      
+      // Make sure that it is the transpose
+      if(el!=j+i*sz2) return false;
+    }
+  }
+  
+  // True if reached this point
+  return true;
+}
 
 } // namespace CasADi

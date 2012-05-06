@@ -113,6 +113,9 @@ class Mapping : public MXNode{
     
     /// Check if the mapping is in fact an identity mapping
     bool isIdentity() const;
+    
+    /// Check if the mapping is in fact a transpose
+    bool isTranspose() const;
 };
 
 } // namespace CasADi

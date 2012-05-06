@@ -206,6 +206,15 @@ void simplifyMapping(MX& ex){
   }
 }
 
+bool isTranspose(const MX& ex){
+  // Make sure that we have a mapping 
+  const Mapping* n = dynamic_cast<const Mapping*>(ex.get());
+  if(n==0) return false;
+  
+  // Check if transpose
+  return n->isTranspose();
+}
+
 MX trans(const MX &x){
   // Quick return if null or scalar
   if(x.isNull() || x.numel()==1)

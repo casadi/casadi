@@ -111,6 +111,9 @@ class CRSSparsity : public CachedObject{
     /// Check if two sparsity patterns are the same
     bool operator==(const CRSSparsity& y) const;
     
+    /// Check if two sparsity patterns are difference
+    bool operator!=(const CRSSparsity& y) const{return !operator==(y);}
+    
     /// Take the union of two sparsity patterns
     CRSSparsity operator+(const CRSSparsity& b) const;
 
@@ -216,6 +219,9 @@ class CRSSparsity : public CachedObject{
     
     /// Transpose the matrix and get the reordering of the non-zero entries, i.e. the non-zeros of the original matrix for each non-zero of the new matrix
     CRSSparsity transpose() const;
+    
+    /// Check if the sparsity is the transpose of another
+    bool isTranspose(const CRSSparsity& y) const;
 
     /** \brief Union of two sparsity patterns
     Returns the new sparsity pattern as well as a mapping with the same length as the number of non-zero elements
