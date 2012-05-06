@@ -23,6 +23,7 @@
 %{
 #include "casadi/matrix/crs_sparsity.hpp"
 #include "casadi/matrix/slice.hpp"
+#include "casadi/matrix/generic_expression.hpp"
 #include "casadi/matrix/generic_matrix.hpp"
 #include "casadi/matrix/matrix.hpp"
 #include "casadi/matrix/matrix_tools.hpp"
@@ -40,18 +41,23 @@
 %include "typemaps.i"
 %include "casadi/matrix/crs_sparsity.hpp"
 %include "casadi/matrix/slice.hpp"
-%include "casadi/matrix/generic_matrix.hpp"
 
+%include "casadi/matrix/generic_expression.hpp"
+%template(ExpIMatrix)        CasADi::GenericExpression<CasADi::Matrix<int> >;
+%template(ExpDMatrix)        CasADi::GenericExpression<CasADi::Matrix<double> >;
+%template(ExpSXMatrix)       CasADi::GenericExpression<CasADi::Matrix<CasADi::SX> >;
+%template(ExpMX)             CasADi::GenericExpression<CasADi::MX>;
+%template(ExpSX)             CasADi::GenericExpression<CasADi::SX>;
+
+%include "casadi/matrix/generic_matrix.hpp"
 %template(GenIMatrix)        CasADi::GenericMatrix<CasADi::Matrix<int> >;
 %template(GenDMatrix)        CasADi::GenericMatrix<CasADi::Matrix<double> >;
 %template(GenSXMatrix)       CasADi::GenericMatrix<CasADi::Matrix<CasADi::SX> >;
 %template(GenMX)             CasADi::GenericMatrix<CasADi::MX>;
-%include "casadi/matrix/matrix.hpp"
 
+%include "casadi/matrix/matrix.hpp"
 %template(IMatrix)           CasADi::Matrix<int>;
 %template(DMatrix)           CasADi::Matrix<double>;
-%template()                  CasADi::Matrix<int>;
-%template()                  CasADi::Matrix<double>;
 
 %include "casadi/sx/sx.hpp"
 

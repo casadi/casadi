@@ -27,6 +27,7 @@
 #include "../casadi_exception.hpp"
 #include "../casadi_limits.hpp"
 #include "../matrix/matrix.hpp"
+#include "../matrix/generic_expression.hpp"
 
 /** \brief  C/C++ */
 #include <iostream>
@@ -53,7 +54,7 @@ class SXNode; // include will follow in the end
 #endif // SWIG
 
 
-class SX{
+class SX : public GenericExpression<SX>{
   friend class SXNode;
   friend class BinarySXNode;
 
@@ -103,22 +104,6 @@ class SX{
 
     // Convert to a 1-by-1 Matrix
     operator Matrix<SX>() const;
-
-    //@{
-    /** \brief  Operators that change the object */
-    friend SX& operator+=(SX &ex, const SX &scalar);
-    friend SX& operator-=(SX &ex, const SX &scalar);
-    friend SX& operator*=(SX &ex, const SX &scalar);
-    friend SX& operator/=(SX &ex, const SX &scalar);
-    //@}
-      
-    //@{
-    /** \brief  Operators that create new objects (SX on the left hand side) */
-    friend SX operator+(const SX &x, const SX &y){ return x.__add__(y);}
-    friend SX operator-(const SX &x, const SX &y){ return x.__sub__(y);}
-    friend SX operator*(const SX &x, const SX &y){ return x.__mul__(y);}
-    friend SX operator/(const SX &x, const SX &y){ return x.__div__(y);}
-    //@}
     
     //@ {
     /** \brief  Conditional operators */
@@ -215,7 +200,6 @@ class SX{
     SX __pow__(const SX& b) const;
     SX __constpow__(const SX& b) const;
     
-    SX __mldivide__(const SX& b) const{  return b.__mrdivide__(*this);}
     SX __mrdivide__(const SX& b) const{  return *this / b;}
     SX __mpower__(const SX& b) const {return (*this).__pow__(b);}
     SX trans() const{ return *this;}

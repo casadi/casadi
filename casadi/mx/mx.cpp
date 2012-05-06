@@ -516,22 +516,6 @@ const MXNode* MX::operator->() const{
   return (const MXNode*)SharedObject::operator->();
 }
 
-MX& MX::operator+=(const MX &y){
-  return *this = *this + y;
-}
-
-MX& MX::operator-=(const MX &y){
-  return *this = *this - y;
-}
-
-MX& MX::operator*=(const MX &y){
-  return *this = *this * y;
-}
-
-MX& MX::operator/=(const MX &y){
-  return *this = *this / y;
-}
-
 MX MX::repmat(const MX& x, const std::pair<int, int> &nm){
   return repmat(x,nm.first,nm.second);
 }
@@ -865,7 +849,6 @@ MX MX::__div__(const MX& y) const{
 
 MX MX::__constpow__(const MX& b) const { return (*this).constpow(b);}
 MX MX::__mrdivide__(const MX& b) const { if (b.scalar()) return *this/b; throw CasadiException("mrdivide: Not implemented");}
-MX MX::__mldivide__(const MX& b) const { return b.__mrdivide__(*this);}
 MX MX::__mpower__(const MX& b) const   { return pow(*this,b); throw CasadiException("mpower: Not implemented");}
 
 void MX::append(const MX& y){

@@ -129,14 +129,6 @@ void SX::print(std::ostream &stream, long& remaining_calls) const{
   }
 }
 
-SX& operator+=(SX &ex, const SX &el){
-  return ex = ex + el;
-}
-
-SX& operator-=(SX &ex, const SX &el){
-  return ex = ex - el;
-}
-
 SX SX::operator-() const{
   if(node->hasDep() && node->getOp() == NEG)
     return node->dep(0);
@@ -148,14 +140,6 @@ SX SX::operator-() const{
     return -1;
   else
    return BinarySXNode::createT<NEG>( *this);
-}
-
-SX& operator*=(SX &ex, const SX &el){
- return ex = ex * el;
-}
-
-SX& operator/=(SX &ex, const SX &el){
-  return ex = ex / el;
 }
 
 SX SX::sign() const{

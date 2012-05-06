@@ -25,6 +25,7 @@
 
 #include "../cached_object.hpp"
 #include "../matrix/matrix.hpp"
+#include "../matrix/generic_expression.hpp"
 #include <vector>
 namespace CasADi{
   
@@ -48,7 +49,7 @@ class FX;
   \author Joel Andersson 
   \date 2010-2011
 */
-class MX : public GenericMatrix<MX>, public CachedObject{
+class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public CachedObject{
   public:
   
     /** \brief  Default constructor */
@@ -199,27 +200,8 @@ class MX : public GenericMatrix<MX>, public CachedObject{
     Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros */
     void enlarge(int nrow, int ncol, const std::vector<int>& ii, const std::vector<int>& jj);
 
-  #ifndef SWIG  
-  //@{
-  /** \brief  Operators that changes the object */
-    MX& operator+=(const MX &y);
-    MX& operator-=(const MX &y);
-    MX& operator*=(const MX &y);
-    MX& operator/=(const MX &y);
-  //@}
 
-
-  //@{
-  /** \brief  Operators */
-    friend MX operator+(const MX &x, const MX &y){ return x.__add__(y);}
-    friend MX operator-(const MX &x, const MX &y){ return x.__sub__(y);}
-    friend MX operator*(const MX &x, const MX &y){ return x.__mul__(y);}
-    friend MX operator/(const MX &x, const MX &y){ return x.__div__(y);}
-
-  //@}
-  #endif // SWIG
-  
-  MX operator-() const;
+    MX operator-() const;
   
   //@{
   /** \brief  Access a member of the node */
@@ -404,7 +386,6 @@ class MX : public GenericMatrix<MX>, public CachedObject{
   MX __pow__(const MX& b) const;
   MX __constpow__(const MX& b) const;
   MX __mrdivide__  (const MX& b) const;
-  MX __mldivide__   (const MX& b) const;
   MX __mpower__(const MX& b) const;
   MX mul(const MX& y) const;
   MX inner_prod(const MX& y) const;

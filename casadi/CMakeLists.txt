@@ -18,7 +18,8 @@ SET(CASADI_SRCS
   stl_vector_tools.hpp        stl_vector_tools.cpp      # Set of useful functions for the vector template class in STL
 
   # Template class Matrix<>, implements a sparse Matrix with row compressed storage, designed to work well with symbolic data types (SX)
-  matrix/generic_matrix.hpp                             # Base class for both Matrix<> and MX
+  matrix/generic_expression.hpp                         # Base class for SX MX and Matrix<>
+  matrix/generic_matrix.hpp                             # Base class for Matrix<> and MX
   matrix/generic_matrix_tools.hpp                       # Tools for both Matrix<> and MX
   matrix/matrix.hpp           matrix/matrix_impl.hpp    # The Matrix template class
   matrix/crs_sparsity.hpp     matrix/crs_sparsity.cpp   matrix/crs_sparsity_internal.hpp   matrix/crs_sparsity_internal.cpp    # reference counted sparsity pattern

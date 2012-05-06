@@ -30,6 +30,7 @@
 #include "../casadi_limits.hpp"
 #include "../stl_vector_tools.hpp"
 #include "generic_matrix.hpp"
+#include "generic_expression.hpp"
 
 namespace CasADi{
     
@@ -61,7 +62,7 @@ namespace CasADi{
   \date 2010	
 */
 template<class T>
-class Matrix : public GenericMatrix<Matrix<T> >, public PrintableObject{
+class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix<T> >, public PrintableObject{
   public:
     
     /** \brief  constructors */
@@ -399,7 +400,6 @@ class Matrix : public GenericMatrix<Matrix<T> >, public PrintableObject{
     Matrix<T> __constpow__(const Matrix<T> &y) const;
     Matrix<T> __mpower__(const Matrix<T> &y) const;
     Matrix<T> __mrdivide__  (const Matrix<T> &y) const;
-    Matrix<T> __mldivide__   (const Matrix<T> &y) const;
     //@}
     
     /// Matrix product
@@ -419,32 +419,7 @@ class Matrix : public GenericMatrix<Matrix<T> >, public PrintableObject{
     
     /// Matrix transpose
     Matrix<T> trans() const;
-
-#ifndef SWIG
-    /// Addition
-    friend Matrix<T> operator+(const Matrix<T> &x, const Matrix<T> &y){ return x.__add__(y); }
     
-    /// Subtraction
-    friend Matrix<T> operator-(const Matrix<T> &x, const Matrix<T> &y){ return x.__sub__(y); }
-    
-    /// Elementwise multiplication
-    friend Matrix<T> operator*(const Matrix<T> &x, const Matrix<T> &y){ return x.__mul__(y); }
-
-    /// Elementwise division
-    friend Matrix<T> operator/(const Matrix<T> &x, const Matrix<T> &y){ return x.__div__(y); }
-
-    /// In-place addition
-    Matrix<T>& operator+=(const Matrix<T> &y){return *this = this->__add__(y);}
-
-    /// In-place subtraction
-    Matrix<T>& operator-=(const Matrix<T> &y){return *this = this->__sub__(y);}
-
-    /// In-place elementwise multiplication
-    Matrix<T>& operator*=(const Matrix<T> &y){return *this = this->__mul__(y);}
-
-    /// In-place elementwise division
-    Matrix<T>& operator/=(const Matrix<T> &y){return *this = this->__div__(y);}
-#endif // SWIG
     //@{
     
     //@{
