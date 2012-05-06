@@ -195,29 +195,15 @@ MX outer_prod(const MX &x, const MX &y){
 }
 
 void simplifyMapping(MX& ex){
-  return;
-#if 0  
-  // Make sure that we have a mapping with one dependency
-  if(!(ex->isMapping() && ex->ndep()==1))
-    return;
-  
-  // Check sparsity
-  if(!(ex.sparsity() == ex->dep(0).sparsity()))
-    return;
-      
-  // Get the mapping matrix nonzeros
-  const vector<int>& nzmap = ex.mapping().data();
-    
-  // Check if the nonzeros follow in increasing order
-  for(int el=0; el<nzmap.size(); ++el){
-    if(el != nzmap[el]){
-      return;
-    }
+  // Make sure that we have a mapping 
+  const Mapping* n = dynamic_cast<const Mapping*>(ex.get());
+  if(n==0) return;
+
+  // Simplify if identity
+  if(n->isIdentity()){
+    MX tmp = ex->dep(0);
+    ex = tmp;
   }
-    
-  // Identity transformation if we reached this point
-  ex = ex->dep(0);
-#endif
 }
 
 MX trans(const MX &x){

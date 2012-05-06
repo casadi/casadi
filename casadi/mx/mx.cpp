@@ -145,7 +145,7 @@ const MX MX::getSub(int i, int j) const{
     ret.assignNode(new Mapping(sp));
     ret->assign(*this,vector<int>(0));
   }
-//  simplifyMapping(ret);
+  simplifyMapping(ret);
   return ret;
 }
 
@@ -371,7 +371,7 @@ MX MX::getNZ(const vector<int>& k) const{
   
   ret.assignNode(new Mapping(sp));
   ret->assign(*this,k);
-  //simplifyMapping(ret);
+  simplifyMapping(ret);
   return ret;
 }
 
@@ -800,6 +800,10 @@ MX MX::__add__(const MX& y) const{
     return x - y->dep(0);
   } else if(x->isOperation(NEG)){
     return y - x->dep(0);
+  } else if(x->isOperation(SUB) && y.get()==x->dep(1).get()){
+    return x->dep(0);
+  } else if(y->isOperation(SUB) && x.get()==y->dep(1).get()){
+    return y->dep(0);
   } else {
     return MX::binary(ADD,x,y);
   }

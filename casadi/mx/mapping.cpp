@@ -572,4 +572,24 @@ std::vector<int> Mapping::getDepInd() const {
   return ret;
 }
 
+bool Mapping::isIdentity() const{
+  // Make sure that there is at least one dependency
+  if(ndep()<1) return false;
+  
+  // Check sparsity
+  if(!(sparsity() == dep(0).sparsity()))
+    return false;
+      
+  // Check if the nonzeros follow in increasing order
+  for(int k=0; k<output_sorted_.size(); ++k){
+    if(output_sorted_[k].size()!=1) return false;
+    const OutputNZ &e = output_sorted_[k].front();
+    if(e.inz != k || e.iind !=0) return false;
+  }
+    
+  // True if reached this point
+  return true;
+}
+
+
 } // namespace CasADi
