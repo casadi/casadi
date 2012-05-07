@@ -7,8 +7,8 @@ html: pdf
 	
 	
 pdf: casadi-users_guide.tex
-  rm pytex_*
+	rm -f pytex_*
 	pdflatex -interaction=nonstopmode $<
 	python pytex.py
 	pdflatex -interaction=nonstopmode $<
-	rm *.aux *.out *.toc #pytex_*
+	rm -f *.aux *.out *.toc #pytex_*
