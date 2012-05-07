@@ -68,12 +68,6 @@ public:
     /// Throw error
     static void qpoases_error(const std::string& module, int flag);
     
-    /// Calculate the error message map
-    static std::map<int,std::string> calc_flagmap();
-    
-    /// Error message map
-    static std::map<int,std::string> flagmap;
-    
     /// Has qpOASES been called once?
     bool called_once_;
     
@@ -83,6 +77,9 @@ public:
     
     /// Temporary vector holding the dual solution
     std::vector<double> dual_;
+    
+    /// Get qpOASES error message
+    static std::string getErrorMessage(int flag);
 };
 
 
