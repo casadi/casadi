@@ -41,7 +41,7 @@ bool with_ipopt = false;
 bool gauss_newton = true;
 
 // Lifted
-bool lifted = false;
+bool lifted = true;
 
 using namespace CasADi;
 using namespace std;
@@ -58,8 +58,8 @@ int main(){
   double endtime = 1.0;
 
   // Discretization
-  int numboxes = 3;
-  int num_eulersteps = 20;
+  int numboxes = 20;
+  int num_eulersteps = 25;
   int num_measurements = 20;
 
   // Plotting
@@ -307,6 +307,7 @@ int main(){
     nlp_solver.setOption("qp_solver_options",qp_solver_options);
     if(lifted) nlp_solver.setOption("num_lifted",nlp_g.size());
     nlp_solver.setOption("toldx",1e-9);
+    nlp_solver.setOption("verbose",true);
   }
   nlp_solver.init();
   
@@ -330,7 +331,7 @@ int main(){
 //   nlp_solver.input(NLP_LBX)[1] = 0;
   nlp_solver.solve();
 
-  cout << "x_opt = " << nlp_solver.output(NLP_X_OPT) << endl;
+//  cout << "x_opt = " << nlp_solver.output(NLP_X_OPT) << endl;
   cout << "f_opt = " << nlp_solver.output(NLP_COST) << endl;
   return 0;
 }

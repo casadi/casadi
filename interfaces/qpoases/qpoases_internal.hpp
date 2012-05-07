@@ -57,7 +57,9 @@ public:
   protected:
     
     /// QP Solver
-    qpOASES::SQProblem *qp_;
+    union{
+      qpOASES::QProblemB *qp_;
+    };
     	
     /// Number of working set recalculations
     int max_nWSR_;

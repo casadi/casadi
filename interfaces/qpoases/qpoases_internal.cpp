@@ -25,6 +25,8 @@
 #include "../../casadi/stl_vector_tools.hpp"
 #include "../../casadi/matrix/matrix_tools.hpp"
 
+const bool ALLOW_QPROBLEMB = true;
+
 using namespace std;
 namespace CasADi {
 namespace Interfaces {
@@ -79,7 +81,11 @@ void QPOasesInternal::init(){
   
   // Create qpOASES instance
   if(qp_) delete qp_;
-  qp_ = new qpOASES::SQProblem(nx_,nc_);
+  if(ALLOW_QPROBLEMB && nc_==0){
+    qp_ = new qpOASES::QProblemB(nx_);
+  } else {
+    qp_ = new qpOASES::SQProblem(nx_,nc_);
+  }
   called_once_ = false;
 
   // Set options
@@ -155,10 +161,20 @@ void QPOasesInternal::evaluate(int nfdir, int nadir) {
 
   int flag;
   if(!called_once_){
-    flag = qp_->init(h,g,a,lb,ub,lbA,ubA,nWSR,cputime_ptr);
+    if(ALLOW_QPROBLEMB && nc_==0){
+      flag = static_cast<qpOASES::QProblemB*>(qp_)->init(h,g,lb,ub,nWSR,cputime_ptr);
+    } else {
+      flag = static_cast<qpOASES::SQProblem*>(qp_)->init(h,g,a,lb,ub,lbA,ubA,nWSR,cputime_ptr);
+    }
     called_once_ = true;
   } else {
-    flag = qp_->hotstart(h,g,a,lb,ub,lbA,ubA,nWSR, cputime_ptr);
+    if(ALLOW_QPROBLEMB && nc_==0){
+      static_cast<qpOASES::QProblemB*>(qp_)->reset();
+      flag = static_cast<qpOASES::QProblemB*>(qp_)->init(h,g,lb,ub,nWSR,cputime_ptr);
+      //flag = static_cast<qpOASES::QProblemB*>(qp_)->hotstart(g,lb,ub,nWSR,cputime_ptr);
+    } else {
+      flag = static_cast<qpOASES::SQProblem*>(qp_)->hotstart(h,g,a,lb,ub,lbA,ubA,nWSR, cputime_ptr);
+    }
   }
   if(flag!=qpOASES::SUCCESSFUL_RETURN && flag!=qpOASES::RET_MAX_NWSR_REACHED){
     throw CasadiException("qpOASES failed: " + getErrorMessage(flag));
