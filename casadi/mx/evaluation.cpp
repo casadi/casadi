@@ -302,8 +302,8 @@ void Evaluation::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& alrea
   fcn_ = deepcopy(fcn_,already_copied);
 }
 
-void Evaluation::propagateSparsity(DMatrixPtrV& arg, DMatrixPtrV& res, bool fwd){
-  if(false && fcn_.spCanEvaluate(fwd)){
+void Evaluation::propagateSparsity(DMatrixPtrV& arg, DMatrixPtrV& res, bool use_fwd){
+  if(false && fcn_.spCanEvaluate(use_fwd)){
     // Propagating sparsity pattern supported
     
     // Pass/clear forward seeds/adjoint sensitivities
@@ -343,11 +343,11 @@ void Evaluation::propagateSparsity(DMatrixPtrV& arg, DMatrixPtrV& res, bool fwd)
     }
     
     // Propagate seedsfcn_.
-    fcn_.spInit(fwd); // NOTE: should only be done once
-    fcn_.spEvaluate(fwd);
+    fcn_.spInit(use_fwd); // NOTE: should only be done once
+    fcn_.spEvaluate(use_fwd);
     
     // Get the sensitivities
-  if(fwd){
+  if(use_fwd){
       for(int oind=0; oind<res.size(); ++oind){
 	vector<double> &v = fcn_.output(oind).data();
 	if(res[oind]!=0){
@@ -378,7 +378,7 @@ void Evaluation::propagateSparsity(DMatrixPtrV& arg, DMatrixPtrV& res, bool fwd)
   } else {
     // Propagating sparsity pattern not supported
   
-    if(fwd){
+    if(use_fwd){
       // Clear the outputs
       for(int oind=0; oind<res.size(); ++oind){
 	// Skip of not used
@@ -396,7 +396,7 @@ void Evaluation::propagateSparsity(DMatrixPtrV& arg, DMatrixPtrV& res, bool fwd)
       if(arg[iind]==0) continue;
     
       // Skip if no seeds
-      if(fwd && arg[iind]->empty()) continue;
+      if(use_fwd && arg[iind]->empty()) continue;
 
       // Get data array for input
       bvec_t *inputd = get_bvec_t(arg[iind]->data());
@@ -408,7 +408,7 @@ void Evaluation::propagateSparsity(DMatrixPtrV& arg, DMatrixPtrV& res, bool fwd)
 	if(res[oind]==0) continue;
 
 	// Skip if no seeds
-	if(!fwd && res[oind]->empty()) continue;
+	if(!use_fwd && res[oind]->empty()) continue;
 
 	// Get the sparsity of the Jacobian block
 	CRSSparsity& sp = fcn_.jacSparsity(iind,oind,true);
@@ -428,7 +428,7 @@ void Evaluation::propagateSparsity(DMatrixPtrV& arg, DMatrixPtrV& res, bool fwd)
 	    int j=col[el];
 	    
 	    // Propagate dependencies
-	    if(fwd){
+	    if(use_fwd){
 	      outputd[i] |= inputd[j];
 	    } else {
 	      inputd[j] |= outputd[i];

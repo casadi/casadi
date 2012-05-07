@@ -1296,7 +1296,7 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
     // Pass the forward seeds
     for(int iind=0; iind<input.size(); ++iind){
       // Assert sparsity
-      casadi_assert_message(input[iind].sparsity()==fwdSeed[dir][iind].sparsity(), "SXFunctionInternal::eval: sparsity inconsistent");
+      casadi_assert_message(input[iind].sparsity()==fwdSeed[dir][iind].sparsity(), "SXFunctionInternal::eval: sparsity inconsistent for input " << iind << " and forward direction " << dir << ".");
 
       // Copy seeds to work vector
       const vector<SX>& fdata = fwdSeed[dir][iind].data();

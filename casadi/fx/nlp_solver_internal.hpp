@@ -54,6 +54,9 @@ public:
   /// use exact hessian
   bool exact_hessian_; 
   
+  /// use Gauss-Newton Hessian
+  bool gauss_newton_; 
+  
   /// use parametric NLP formulation
   bool parametric_; 
 

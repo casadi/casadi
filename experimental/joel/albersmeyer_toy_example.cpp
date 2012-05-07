@@ -51,6 +51,9 @@ int main(){
   // Lifting?
   bool lifting = true;
   
+  // Gauss-Newton
+  bool gauss_newton = false;
+  
   // Tests for different initial values for x
   for(int test=0; test<ntests; ++test){
     double x0 = x0_test[test];
@@ -138,7 +141,12 @@ int main(){
     g_max.insert(g_max.begin(),v_bnd.begin(),v_bnd.end());
     
     // Formulate the full-space NLP
-    SXFunction ffcn(u,f);
+    SXFunction ffcn;
+    if(gauss_newton){
+      ffcn = SXFunction(u,F);
+    } else {
+      ffcn = SXFunction(u,f);
+    }
     SXFunction gfcn(u,g);
 
     Dictionary qp_solver_options;
@@ -153,13 +161,20 @@ int main(){
       NLPSolver nlp_solver;
       switch(solver){
 	case IPOPT:
+	  if(gauss_newton) continue; // not supported
 	  nlp_solver = IpoptSolver(ffcn,gfcn);
-	  nlp_solver.setOption("generate_hessian",true);
+	  if(gauss_newton){
+	    nlp_solver.setOption("gauss_newton",true);
+	  } else {
+	    nlp_solver.setOption("generate_hessian",true);
+	  }
 	  nlp_solver.setOption("tol",1e-9);
 	  break;
 	case LIFTED_SQP:
 	  if(!lifting && x0>=0.10) continue;;
 	  nlp_solver = LiftedSQP(ffcn,gfcn);
+	  if(gauss_newton)
+	    nlp_solver.setOption("gauss_newton",true);
 	  nlp_solver.setOption("qp_solver",Interfaces::QPOasesSolver::creator);
 	  nlp_solver.setOption("qp_solver_options",qp_solver_options);
 	  nlp_solver.setOption("num_lifted",nv);
@@ -169,6 +184,8 @@ int main(){
 	case FULLSPACE_SQP:
 	  if(!lifting && x0>=0.10) continue;;
 	  nlp_solver = LiftedSQP(ffcn,gfcn);
+	  if(gauss_newton)
+	    nlp_solver.setOption("gauss_newton",true);
 	  nlp_solver.setOption("qp_solver",Interfaces::QPOasesSolver::creator);
 	  nlp_solver.setOption("qp_solver_options",qp_solver_options);
 	  nlp_solver.setOption("num_lifted",0);
@@ -176,11 +193,16 @@ int main(){
 // 	  nlp_solver.setOption("verbose",true);
 	  break;
 	case OLD_SQP_METHOD:
+	  if(gauss_newton) continue; // not supported
 	  if(!lifting && x0>=0.07) continue;;
 	  nlp_solver = SQPMethod(ffcn,gfcn);
 	  nlp_solver.setOption("qp_solver",Interfaces::QPOasesSolver::creator);
 	  nlp_solver.setOption("qp_solver_options",qp_solver_options);
-	  nlp_solver.setOption("generate_hessian",true);
+	  if(gauss_newton){
+	    nlp_solver.setOption("gauss_newton",true);
+	  } else {
+	    nlp_solver.setOption("generate_hessian",true);
+	  }
       }
       
       // initialize the solver

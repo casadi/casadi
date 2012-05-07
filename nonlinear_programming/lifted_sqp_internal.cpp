@@ -69,6 +69,9 @@ void LiftedSQPInternal::init(){
   if(verbose_){
     cout << "Initializing SQP method with " << n_ << " variables and " << m_ << " constraints." << endl;
     cout << "Lifting " << nv << " variables." << endl;
+    if(gauss_newton_){
+      cout << "Gauss-Newton objective with " << F_.input().numel() << " terms." << endl;
+    }
   }
   
   // Read options
@@ -96,77 +99,93 @@ void LiftedSQPInternal::init(){
   SXMatrix v = x[Slice(nu,nu+nv)];
 
   // Extract the constraint equations and split into constraints and definitions of dependent variables
-  SXMatrix f = ffcn.outputSX();
-  SXMatrix hg = gfcn.outputSX();
-  int ng = hg.numel()-nv;
-  SXMatrix h = hg(Slice(0,nv));
-  SXMatrix g = hg(Slice(nv,nv+ng));
+  SXMatrix f1 = ffcn.outputSX();
+  int nf1 = f1.numel();
+  SXMatrix g = gfcn.outputSX();
+  int nf2 = g.numel()-nv;
+  SXMatrix v_eq = g(Slice(0,nv));
+  SXMatrix f2 = g(Slice(nv,nv+nf2));
   
   // Definition of v
-  SXMatrix v_def = h+v;
+  SXMatrix v_def = v_eq + v;
 
-  // Lagrange multipliers for the simple bounds on u
-  SXMatrix lam_u = ssym("lam_u",nu);
+  // Objective function
+  SXMatrix f;
   
-  // Lagrange multipliers for the simple bounds on v
-  SXMatrix lam_v = ssym("lam_v",nv);
-  
-  // Lagrange multipliers for the simple bounds on x
-  SXMatrix lam_x = vertcat(lam_u,lam_v);
+  // Multipliers
+  SXMatrix lam_x, lam_g, lam_f2;
+  if(gauss_newton_){
+    
+    // Least square objective
+    f = inner_prod(f1,f1);
+    
+  } else {
+    
+    // Scalar objective function
+    f = f1;
+    
+    // Lagrange multipliers for the simple bounds on u
+    SXMatrix lam_u = ssym("lam_u",nu);
+    
+    // Lagrange multipliers for the simple bounds on v
+    SXMatrix lam_v = ssym("lam_v",nv);
+    
+    // Lagrange multipliers for the simple bounds on x
+    lam_x = vertcat(lam_u,lam_v);
 
-  // Lagrange multipliers corresponding to the definition of the dependent variables
-  SXMatrix lam_h = ssym("lam_h",nv);
+    // Lagrange multipliers corresponding to the definition of the dependent variables
+    SXMatrix lam_v_eq = ssym("lam_v_eq",nv);
 
-  // Lagrange multipliers for the nonlinear constraints that aren't eliminated
-  SXMatrix lam_g = ssym("lam_g",ng);
+    // Lagrange multipliers for the nonlinear constraints that aren't eliminated
+    lam_f2 = ssym("lam_f2",nf2);
 
-  if(verbose_){
-    cout << "Allocated intermediate variables." << endl;
+    if(verbose_){
+      cout << "Allocated intermediate variables." << endl;
+    }
+    
+    // Lagrange multipliers for constraints
+    lam_g = vertcat(lam_v_eq,lam_f2);
+    
+    // Lagrangian function
+    SXMatrix lag = f + inner_prod(lam_x,x);
+    if(!f2.empty()) lag += inner_prod(lam_f2,f2);
+    if(!v.empty()) lag += inner_prod(lam_v_eq,v_def);
+    
+    // Gradient of the Lagrangian
+    SXMatrix lgrad = gradient(lag,x);
+    if(!v.empty()) lgrad -= vertcat(SXMatrix::zeros(nu),lam_v_eq); // Put here to ensure that lgrad is of the form "h_extended -v_extended"
+    makeDense(lgrad);
+    if(verbose_){
+      cout << "Generated the gradient of the Lagrangian." << endl;
+    }
+
+    // Condensed gradient of the Lagrangian
+    f1 = lgrad[Slice(0,nu)];
+    nf1 = nu;
+    
+    // Gradient of h
+    SXMatrix v_eq_grad = lgrad[Slice(nu,nu+nv)];
+    
+    // Reverse lam_v_eq and v_eq_grad
+    SXMatrix v_eq_grad_reversed = v_eq_grad;
+    copy(v_eq_grad.rbegin(),v_eq_grad.rend(),v_eq_grad_reversed.begin());
+    SXMatrix lam_v_eq_reversed = lam_v_eq;
+    copy(lam_v_eq.rbegin(),lam_v_eq.rend(),lam_v_eq_reversed.begin());
+    
+    // Augment h and lam_v_eq
+    v_eq.append(v_eq_grad_reversed);
+    v.append(lam_v_eq_reversed);
   }
-  
-  // Lagrange multipliers for constraints
-  SXMatrix lam_hg = vertcat(lam_h,lam_g);
-  
-  
-  // Lagrangian function
-  SXMatrix lag = f + inner_prod(lam_x,x);
-  if(!g.empty()) lag += inner_prod(lam_g,g);
-  if(!v.empty()) lag += inner_prod(lam_h,v_def);
-  
-  // Gradient of the Lagrangian
-  SXMatrix lgrad = gradient(lag,x);
-  if(!v.empty()) lgrad -= vertcat(SXMatrix::zeros(nu),lam_h); // Put here to ensure that lgrad is of the form "h_extended -v_extended"
-  makeDense(lgrad);
-  if(verbose_){
-    cout << "Generated the gradient of the Lagrangian." << endl;
-  }
-
-  // Condensed gradient of the Lagrangian
-  SXMatrix lgrad_u = lgrad[Slice(0,nu)];
-  
-  // Gradient of h
-  SXMatrix hgrad = lgrad[Slice(nu,nu+nv)];
-  
-  // Reverse lam_h and hgrad
-  SXMatrix hgrad_reversed = hgrad;
-  copy(hgrad.rbegin(),hgrad.rend(),hgrad_reversed.begin());
-  SXMatrix lam_h_reversed = lam_h;
-  copy(lam_h.rbegin(),lam_h.rend(),lam_h_reversed.begin());
-  
-  // Augment h and lam_h
-  SXMatrix h_extended = vertcat(h,hgrad_reversed);
-  SXMatrix v_extended = vertcat(v,lam_h_reversed);
 
   // Residual function G
   SXMatrixVector G_in(G_NUM_IN);
   G_in[G_X] = x;
   G_in[G_LAM_X] = lam_x;
-  G_in[G_LAM_HG] = lam_hg;
+  G_in[G_LAM_G] = lam_g;
 
   SXMatrixVector G_out(G_NUM_OUT);
-  G_out[G_H] = h_extended;
-  G_out[G_LGRAD] = lgrad_u;
-  G_out[G_HG] = hg;
+  G_out[G_D] = v_eq;
+  G_out[G_G] = g;
   G_out[G_F] = f;
 
   rfcn_ = SXFunction(G_in,G_out);
@@ -176,33 +195,36 @@ void LiftedSQPInternal::init(){
   }
   
   // Difference vector d
-  SXMatrix d = ssym("d",2*nv);
-  SXMatrix dg = ssym("dg",nv);
-  copy(dg.begin(),dg.end(),d.rbegin());
-  
+  SXMatrix d = ssym("d",nv);
+  if(!gauss_newton_){
+    vector<SX> dg = ssym("dg",nv).data();
+    reverse(dg.begin(),dg.end());
+    d.append(dg);
+  }
+
   // Substitute out the v from the h
-  SXMatrix d_def = (h_extended+v_extended)-d;
+  SXMatrix d_def = (v_eq + v)-d;
   SXMatrixVector ex(3);
-  ex[0] = lgrad_u;
-  ex[1] = f;
-  ex[2] = g;
-  substituteInPlace(v_extended, d_def, ex, false, false);
-  SXMatrix lgrad_u_z = ex[0];
-  SXMatrix f_z = ex[1];
-  SXMatrix g_z = ex[2];
+  ex[0] = f1;
+  ex[1] = f2;
+  ex[2] = f;
+  substituteInPlace(v, d_def, ex, false, false);
+  SXMatrix f1_z = ex[0];
+  SXMatrix f2_z = ex[1];
+  SXMatrix f_z = ex[2];
   
   // Modified function Z
-  enum ZIn{Z_U,Z_D,Z_LAM_X,Z_LAM_G,Z_NUM_IN};
+  enum ZIn{Z_U,Z_D,Z_LAM_X,Z_LAM_F2,Z_NUM_IN};
   SXMatrixVector zfcn_in(Z_NUM_IN);
   zfcn_in[Z_U] = u;
   zfcn_in[Z_D] = d;
   zfcn_in[Z_LAM_X] = lam_x;
-  zfcn_in[Z_LAM_G] = lam_g;
+  zfcn_in[Z_LAM_F2] = lam_f2;
   
-  enum ZOut{Z_D_DEF,Z_LGRADG,Z_NUM_OUT};
+  enum ZOut{Z_D_DEF,Z_F12,Z_NUM_OUT};
   SXMatrixVector zfcn_out(Z_NUM_OUT);
   zfcn_out[Z_D_DEF] = d_def;
-  zfcn_out[Z_LGRADG] = vertcat(lgrad_u_z,g_z);
+  zfcn_out[Z_F12] = vertcat(f1_z,f2_z);
   
   SXFunction zfcn(zfcn_in,zfcn_out);
   zfcn.init();
@@ -211,9 +233,9 @@ void LiftedSQPInternal::init(){
   }
 
   // Matrix A and B in lifted Newton
-  SXMatrix B = zfcn.jac(Z_U,Z_LGRADG);
-  SXMatrix B1 = B(Slice(0,nu),Slice(0,B.size2()));
-  SXMatrix B2 = B(Slice(nu,B.size1()),Slice(0,B.size2()));
+  SXMatrix B = zfcn.jac(Z_U,Z_F12);
+  SXMatrix B1 = B(Slice(0,nf1),Slice(0,B.size2()));
+  SXMatrix B2 = B(Slice(nf1,B.size1()),Slice(0,B.size2()));
   if(verbose_){
     cout << "Formed B1 (dimension " << B1.size1() << "-by-" << B1.size2() << ", "<< B1.size() << " nonzeros) " <<
     "and B2 (dimension " << B2.size1() << "-by-" << B2.size2() << ", "<< B2.size() << " nonzeros)." << endl;
@@ -221,12 +243,12 @@ void LiftedSQPInternal::init(){
   
   // Step in u
   SXMatrix du = ssym("du",nu);
-  SXMatrix dlam_g = ssym("dlam_g",ng);
+  SXMatrix dlam_f2 = ssym("dlam_f2",lam_f2.sparsity());
   
-  SXMatrix b1 = lgrad_u_z;
-  SXMatrix b2 = g_z;
+  SXMatrix b1 = f1_z;
+  SXMatrix b2 = f2_z;
   SXMatrix e;
-  if(!v.empty()){
+  if(nv > 0){
     
     // Directional derivative of Z
     vector<vector<SXMatrix> > Z_fwdSeed(2,zfcn_in);
@@ -237,35 +259,49 @@ void LiftedSQPInternal::init(){
     Z_fwdSeed[0][Z_U].setZero();
     Z_fwdSeed[0][Z_D] = -d;
     Z_fwdSeed[0][Z_LAM_X].setZero();
-    Z_fwdSeed[0][Z_LAM_G].setZero();
+    Z_fwdSeed[0][Z_LAM_F2].setZero();
     
     Z_fwdSeed[1][Z_U] = du;
     Z_fwdSeed[1][Z_D] = -d;
     Z_fwdSeed[1][Z_LAM_X].setZero();
-    Z_fwdSeed[1][Z_LAM_G] = dlam_g;
+    Z_fwdSeed[1][Z_LAM_F2] = dlam_f2;
     
     zfcn.eval(zfcn_in,zfcn_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true,false);
     
-    b1 += Z_fwdSens[0][Z_LGRADG](Slice(0,nu));
-    b2 += Z_fwdSens[0][Z_LGRADG](Slice(nu,B.size1()));
+    b1 += Z_fwdSens[0][Z_F12](Slice(0,nf1));
+    b2 += Z_fwdSens[0][Z_F12](Slice(nf1,B.size1()));
     e = Z_fwdSens[1][Z_D_DEF];
   }
   if(verbose_){
-    cout << "Formed b1 and b2." << endl;
+    cout << "Formed b1 (dimension " << b1.size1() << "-by-" << b1.size2() << ", "<< b1.size() << " nonzeros) " <<
+    "and b2 (dimension " << b2.size1() << "-by-" << b2.size2() << ", "<< b2.size() << " nonzeros)." << endl;
   }
+  
+  // Generate Gauss-Newton Hessian
+  if(gauss_newton_){
+    b1 = mul(trans(B1),b1);
+    B1 = mul(trans(B1),B1);
+    if(verbose_){
+      cout << "Gauss Newton Hessian (dimension " << B1.size1() << "-by-" << B1.size2() << ", "<< B1.size() << " nonzeros)." << endl;
+    }
+  }
+  
+  // Make sure b1 and b2 are dense vectors
+  makeDense(b1);
+  makeDense(b2);
   
   // Quadratic approximation
   SXMatrixVector lfcn_in(LIN_NUM_IN);
   lfcn_in[LIN_X] = x;
   lfcn_in[LIN_D] = d;
   lfcn_in[LIN_LAM_X] = lam_x;
-  lfcn_in[LIN_LAM_HG] = lam_hg;
+  lfcn_in[LIN_LAM_G] = lam_g;
   
   SXMatrixVector lfcn_out(LIN_NUM_OUT);
-  lfcn_out[LIN_LHESS] = B1;
-  lfcn_out[LIN_LGRAD] = b1;
-  lfcn_out[LIN_GJAC] = B2;
-  lfcn_out[LIN_GLIN] = b2;
+  lfcn_out[LIN_F1] = b1;
+  lfcn_out[LIN_J1] = B1;
+  lfcn_out[LIN_F2] = b2;
+  lfcn_out[LIN_J2] = B2;
   lfcn_ = SXFunction(lfcn_in,lfcn_out);
 //   lfcn_.setOption("verbose",true);
   lfcn_.setOption("number_of_fwd_dir",0);
@@ -277,9 +313,10 @@ void LiftedSQPInternal::init(){
   }
     
   // Step expansion
-  SXMatrixVector efcn_in = lfcn_in;
-  efcn_in.push_back(du);
-  efcn_in.push_back(dlam_g);
+  SXMatrixVector efcn_in(EXP_NUM_IN);
+  copy(lfcn_in.begin(),lfcn_in.end(),efcn_in.begin());
+  efcn_in[EXP_DU] = du;
+  efcn_in[EXP_DLAM_F2] = dlam_f2;
   efcn_ = SXFunction(efcn_in,e);
   efcn_.init();
   if(verbose_){
@@ -291,7 +328,7 @@ void LiftedSQPInternal::init(){
   
   // Current guess for the dual solution
   DMatrix &lam_x_k = output(NLP_LAMBDA_X);
-  DMatrix &lam_hg_k = output(NLP_LAMBDA_G);
+  DMatrix &lam_g_k = output(NLP_LAMBDA_G);
 
   // Allocate a QP solver
   QPSolverCreator qp_solver_creator = getOption("qp_solver");
@@ -317,7 +354,7 @@ void LiftedSQPInternal::init(){
 
   // Dual step
   dlam_x_k_ = DMatrix(lam_x_k.sparsity());
-  dlam_hg_k_ = DMatrix(lam_hg_k.sparsity());
+  dlam_g_k_ = DMatrix(lam_g_k.sparsity());
   
 }
 
@@ -335,7 +372,7 @@ void LiftedSQPInternal::evaluate(int nfdir, int nadir){
   
   // Current guess for the dual solution
   DMatrix &lam_x_k = output(NLP_LAMBDA_X);
-  DMatrix &lam_hg_k = output(NLP_LAMBDA_G);
+  DMatrix &lam_g_k = output(NLP_LAMBDA_G);
 
   // Bounds
   const DMatrix &x_min = input(NLP_LBX);
@@ -343,28 +380,33 @@ void LiftedSQPInternal::evaluate(int nfdir, int nadir){
   
   const DMatrix &g_min = input(NLP_LBG);
   const DMatrix &g_max = input(NLP_UBG);
-  
   int k=0;
+  
+  // Does G depend on the multipliers?
+  bool has_lam_x =  !rfcn_.input(G_LAM_X).empty();
+  bool has_lam_g =  !rfcn_.input(G_LAM_G).empty();
+  bool has_lam_f2 = !efcn_.input(EXP_DLAM_F2).empty();
+  
   while(true){
     // Evaluate residual
     rfcn_.setInput(x_k,G_X);
-    rfcn_.setInput(lam_x_k,G_LAM_X);
-    rfcn_.setInput(lam_hg_k,G_LAM_HG);
+    if(has_lam_x) rfcn_.setInput(lam_x_k,G_LAM_X);
+    if(has_lam_g) rfcn_.setInput(lam_g_k,G_LAM_G);
     rfcn_.evaluate();
-    rfcn_.getOutput(d_k_,G_H);
+    rfcn_.getOutput(d_k_,G_D);
     f_k = rfcn_.output(G_F).toScalar();
-    const DMatrix& hg_k = rfcn_.output(G_HG);
+    const DMatrix& g_k = rfcn_.output(G_G);
     
     // Construct the QP
     lfcn_.setInput(x_k,LIN_X);
-    lfcn_.setInput(lam_x_k,LIN_LAM_X);
-    lfcn_.setInput(lam_hg_k,LIN_LAM_HG);
+    if(has_lam_x) lfcn_.setInput(lam_x_k,LIN_LAM_X);
+    if(has_lam_g) lfcn_.setInput(lam_g_k,LIN_LAM_G);
     lfcn_.setInput(d_k_,LIN_D);
     lfcn_.evaluate();
-    const DMatrix& B1_k = lfcn_.output(LIN_LHESS);
-    const DMatrix& b1_k = lfcn_.output(LIN_LGRAD);
-    const DMatrix& B2_k = lfcn_.output(LIN_GJAC);
-    const DMatrix& b2_k = lfcn_.output(LIN_GLIN);
+    const DMatrix& B1_k = lfcn_.output(LIN_J1);
+    const DMatrix& b1_k = lfcn_.output(LIN_F1);
+    const DMatrix& B2_k = lfcn_.output(LIN_J2);
+    const DMatrix& b2_k = lfcn_.output(LIN_F2);
 
     // Solve the QP
     qp_solver_.setInput(B1_k,QP_H);
@@ -377,14 +419,14 @@ void LiftedSQPInternal::evaluate(int nfdir, int nadir){
     qp_solver_.evaluate();
     const DMatrix& du_k = qp_solver_.output(QP_PRIMAL);
     const DMatrix& dlam_u_k = qp_solver_.output(QP_LAMBDA_X);
-    const DMatrix& dlam_g_k = qp_solver_.output(QP_LAMBDA_A);    
+    const DMatrix& dlam_f2_k = qp_solver_.output(QP_LAMBDA_A);    
     
     // Expand the step
     for(int i=0; i<LIN_NUM_IN; ++i){
       efcn_.setInput(lfcn_.input(i),i);
     }
-    efcn_.setInput(du_k,LIN_NUM_IN);
-    efcn_.setInput(dlam_g_k,LIN_NUM_IN+1);
+    efcn_.setInput(du_k,EXP_DU);
+    if(has_lam_f2) efcn_.setInput(dlam_f2_k,EXP_DLAM_F2);
     efcn_.evaluate();
     const DMatrix& dv_k = efcn_.output();
     
@@ -394,18 +436,20 @@ void LiftedSQPInternal::evaluate(int nfdir, int nadir){
 
     // Expanded dual step
     copy(dlam_u_k.begin(),dlam_u_k.end(),dlam_x_k_.begin());
-    copy(dlam_g_k.begin(),dlam_g_k.end(),dlam_hg_k_.begin()+nv);
-    copy(dv_k.rbegin(),dv_k.rbegin()+nv,dlam_hg_k_.begin());
+    copy(dlam_f2_k.begin(),dlam_f2_k.end(),dlam_g_k_.begin()+nv);
+    copy(dv_k.rbegin(),dv_k.rbegin()+nv,dlam_g_k_.begin());
     
     // Take a full step
     transform(dx_k_.begin(),dx_k_.end(),x_k.begin(),x_k.begin(),plus<double>());
     copy(dlam_x_k_.begin(),dlam_x_k_.end(),lam_x_k.begin());
-    transform(dlam_hg_k_.begin(),dlam_hg_k_.end(),lam_hg_k.begin(),lam_hg_k.begin(),plus<double>());
+    transform(dlam_g_k_.begin(),dlam_g_k_.end(),lam_g_k.begin(),lam_g_k.begin(),plus<double>());
 
     // Step size
     double norm_step=0;
     for(vector<double>::const_iterator it=dx_k_.begin(); it!=dx_k_.end(); ++it)  norm_step += *it**it;
-    for(vector<double>::const_iterator it=dlam_hg_k_.begin(); it!=dlam_hg_k_.end(); ++it) norm_step += *it**it;
+    if(!gauss_newton_){
+      for(vector<double>::const_iterator it=dlam_g_k_.begin(); it!=dlam_g_k_.end(); ++it) norm_step += *it**it;
+    }
     norm_step = sqrt(norm_step);
     
     // Constraint violation
@@ -414,8 +458,8 @@ void LiftedSQPInternal::evaluate(int nfdir, int nadir){
       double d = fmax(x_k.at(i)-x_max.at(i),0.) + fmax(x_min.at(i)-x_k.at(i),0.);
       norm_viol += d*d;
     }
-    for(int i=0; i<hg_k.size(); ++i){
-      double d = fmax(hg_k.at(i)-g_max.at(i),0.) + fmax(g_min.at(i)-hg_k.at(i),0.);
+    for(int i=0; i<g_k.size(); ++i){
+      double d = fmax(g_k.at(i)-g_max.at(i),0.) + fmax(g_min.at(i)-g_k.at(i),0.);
       norm_viol += d*d;
     }
     norm_viol = sqrt(norm_viol);

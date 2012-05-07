@@ -46,7 +46,8 @@ NLPSolverInternal::NLPSolverInternal(const FX& F, const FX& G, const FX& H, cons
   addOption("ignore_check_vec", OT_BOOLEAN,     false,            "If set to true, the input shape of F will not be checked.");
   addOption("warn_initial_bounds", OT_BOOLEAN,     false,       "Warn if the initial guess does not satisfy LBX and UBX");
   addOption("parametric", OT_BOOLEAN, false, "Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.");
-  
+  addOption("gauss_newton",      OT_BOOLEAN,  false,           "Use Gauss Newton Hessian approximation");
+
   n_ = 0;
   m_ = 0;
 
@@ -56,8 +57,9 @@ NLPSolverInternal::~NLPSolverInternal(){
 }
 
 void NLPSolverInternal::init(){
-  // Read the verbosity option already now
+  // Read options
   verbose_ = getOption("verbose");
+  gauss_newton_ = getOption("gauss_newton");
   
   // Initialize the functions
   casadi_assert_message(!F_.isNull(),"No objective function");
@@ -86,7 +88,7 @@ void NLPSolverInternal::init(){
   casadi_assert_message(F_.getNumInputs()==1 || F_.getNumInputs()==2, "Wrong number of input arguments to F. Must be 1 or 2");
   
   if (F_.getNumInputs()==2) parametric_=true;
-  casadi_assert_message(getOption("ignore_check_vec") || F_.input().size2()==1,
+  casadi_assert_message(getOption("ignore_check_vec") || gauss_newton_ || F_.input().size2()==1,
      "To avoid confusion, the input argument to F must be vector. You supplied " << F_.input().dimString() << endl <<
      " We suggest you make the following changes:" << endl <<
      "   -  F is an SXFunction:  SXFunction([X],[rhs]) -> SXFunction([vec(X)],[rhs])" << endl <<
@@ -99,7 +101,8 @@ void NLPSolverInternal::init(){
   );
   
   casadi_assert_message(F_.getNumOutputs()>=1, "Wrong number of output arguments to F");
-  casadi_assert_message(F_.output().scalar() && F_.output().dense(), "Output argument of F not dense scalar.");
+  casadi_assert_message(gauss_newton_  || F_.output().scalar(), "Output argument of F not scalar.");
+  casadi_assert_message(F_.output().dense(), "Output argument of F not dense.");
   casadi_assert_message(F_.input().dense(), "Input argument of F must be dense. You supplied " << F_.input().dimString());
   
   if(!G_.isNull()) {
@@ -169,6 +172,7 @@ void NLPSolverInternal::init(){
   // Find out if we are to expand the constraint function in terms of scalar operations
   bool generate_hessian = getOption("generate_hessian");
   if(generate_hessian && H_.isNull()){
+    casadi_assert_message(!gauss_newton_,"Automatic generation of Gauss-Newton Hessian not yet supported");
     log("generating hessian");
     
     // Simple if unconstrained
@@ -343,14 +347,7 @@ void NLPSolverInternal::init(){
     }
     log("Jacobian function generated");
   }
-  
-  // Create an empty Jacobian if it does not already exists
-  //if ( G_.isNull() && J_.isNull() ) {
-  //  J_ = MXFunction(F_.symbolicInput(),MX(DMatrix::zeros(G_.output().size(),0)));
     
-  //  log("Jacobian function generated");
-  //}
-  
   if(!J_.isNull() && !J_.isInit()){
     J_.init();
     log("Jacobian function initialized");
