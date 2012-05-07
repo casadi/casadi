@@ -41,22 +41,22 @@ for N in range(1,11):
   #tau_root = [0, 0.155051, 0.644949, 1]
 
   # Time
-  t = SX("t")
+  t = ssym("t")
   
   # Differential equation
-  z = SX("z")
-  F = SXFunction([[z]],[[z*z - 2*z + 1]])
+  z = ssym("z")
+  F = SXFunction([z],[z*z - 2*z + 1])
   F.setOption("name","dz/dt")
   F.init()
   
   z0 = -3
   
   # Analytic solution
-  z_analytic = SXFunction([[t]], [[(4*t-3)/(3*t+1)]])
+  z_analytic = SXFunction([t], [(4*t-3)/(3*t+1)])
   z_analytic.setOption("name","analytic solution")
   
   # Collocation point
-  tau = SX("tau")
+  tau = ssym("tau")
 
   # Step size
   h = 1.0/N
@@ -71,7 +71,7 @@ for N in range(1,11):
 
     print "l(", j, ") = ", L
 
-    f = SXFunction([[tau]],[[L]])
+    f = SXFunction([tau],[L])
     f.setOption("name", "l(" + str(j) + ")")
     
     # initialize
@@ -79,64 +79,45 @@ for N in range(1,11):
     l.append(f)
   
   # Get the coefficients of the continuity equation
-  D = []
+  D = DMatrix.zeros(K+1)
   for j in range(K+1):
     l[j].setInput(1.)
     l[j].evaluate()
-    D.append(float(l[j].output()))
-
+    D[j] = l[j].output()
   print "D = ", D
 
   # Get the coefficients of the collocation equation using AD
-  C = []
+  C = DMatrix.zeros(K+1,K+1)
   for j in range(K+1):
-    Cj = []
     for k in range(K+1):
       l[j].setInput(tau_root[k])
       l[j].setFwdSeed(1.0)
       l[j].evaluate(1,0)
-      Cj.append(float(l[j].fwdSens()))
-    C.append(Cj)
-  
+      C[j,k] = l[j].fwdSens()
   print "C = ", C
   
   # Collocated states
-  Z = []
-  for i in range(N):
-    Zi = []
-    for j in range(K+1):
-      Zi.append( SX("Z_"+str(i)+"_"+str(j)))
-    Z.append(Zi)
-  print "Z = ", Z
+  Z = ssym("Z",N,K+1)
     
-  # State at final time
-  ZF = SX("ZF")
-  
-  # All variables
-  x = []
-  for i in range(N):
-    for j in range(K+1):
-      x.append(Z[i][j])
-  print "x = ", x
-  
-  # Construct the "NLP"
-  g = []
+  # Construct the NLP
+  x = vec(Z.T)
+  g = SXMatrix()
   for i in range(N):
     for k in range(1,K+1):
       # Add collocation equations to NLP
       rhs = 0
       for j in range(K+1):
-        rhs += Z[i][j]*C[j][k]
-      FF = F.eval([[Z[i][k]]])
-      g.append(h*FF[0][0]- rhs)
+        rhs += Z[i,j]*C[j,k]
+      [FF] = F.eval([Z[i,k]])
+      g.append(h*FF-rhs)
 
     # Add continuity equation to NLP
     rhs = 0
     for j in range(K+1):
-      rhs += D[j]*Z[i][j]
+      rhs += D[j]*Z[i,j]
 
     if(i<N-1):
-      g.append(Z[i+1][0] - rhs)
+      g.append(Z[i+1,0] - rhs)
 
   print "g = ", g
   
@@ -144,7 +125,7 @@ for N in range(1,11):
   gfcn = SXFunction([x],[g])
 
   # Dummy objective function
-  obj = SXFunction([x], [[x[0]*x[0]]])
+  obj = SXFunction([x], [x[0]*x[0]])
   
   ## ----
   ## SOLVE THE NLP
@@ -155,24 +136,23 @@ for N in range(1,11):
 
   # Set options
   solver.setOption("tol",1e-10)
-  solver.setOption("hessian_approximation","limited-memory")
 
   # initialize the solver
   solver.init()
 
   # Initial condition
-  xinit = len(x) * [0]
+  xinit = x.size() * [0]
   solver.setInput(xinit,NLP_X_INIT)
 
   # Bounds on x
-  lbx = len(x)*[-100]
-  ubx = len(x)*[100]
+  lbx = x.size()*[-100]
+  ubx = x.size()*[100]
   lbx[0] = ubx[0] = z0
   solver.setInput(lbx,NLP_LBX)
   solver.setInput(ubx,NLP_UBX)
   
   # Bounds on the constraints
-  lubg = len(g)*[0]
+  lubg = g.size()*[0]
   solver.setInput(lubg,NLP_LBG)
   solver.setInput(lubg,NLP_UBG)
   
