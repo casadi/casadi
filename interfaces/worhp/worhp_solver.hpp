@@ -32,10 +32,10 @@ class WorhpInternal;
 // List from worhp_internal.cpp
 /**
 *
-*  Worhp is less flexible then Ipopt:
+*  NOTE: The WORHP interface currently has some limitations, as compared to e.g. Ipopt:
 *   -  You may not set LBX and UBX to the same value, making parametric NLPs a must. 
-*   -  You cannot have a degenerate (constant) objective value
 *   -  You cannot have both bounds LBG and UBG infinity
+*   -  You cannot have a degenerate (constant) objective value (workaround possible, please notify the CasADi developers if you need this feature)
 *
 * \brief interface to WORHP NLP solver
 * @copydoc NLPSolver_doc
