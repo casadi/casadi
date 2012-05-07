@@ -11,13 +11,56 @@
 \usepackage{html}
 %\usepackage{hyperref}
 \usepackage{verbatim}
+\usepackage{pytex}
 
 % \#c4ebff;
 
 \begin{htmlonly}
+\newcounter{pytexcount}
+\newcounter{pytexsubcount}
+\newcounter{pytexlinecountstart}
+\newcounter{pytexlinecountend}
+
+\setcounter{pytexcount}{0}
+\setcounter{pytexlinecountstart}{0}
+\setcounter{pytexlinecountend}{0}
+
+% Assign a new header
+\newenvironment{pytexTemplate}[1]{
+\begin{rawhtml}
+<div style="display:none">
+\end{rawhtml}
+}{
+\begin{rawhtml}
+</div>
+\end{rawhtml}
+}
+
+\newcommand{\pytexStart}[1]{
+  \addtocounter{pytexcount}{1}%   pytexcoun++
+  \setcounter{pytexsubcount}{0}%  reset pytexsubcount
+}
+
+\renewenvironment{pytex}
+{\addtocounter{pytexsubcount}{1}%                                             pytexsubcount++
+  %                                                                            each line is added to accumulator
+\begin{rawhtml}
+<div style="color: black; background-color: \#b9c8db;  border-style: dotted; border-width: 1px; padding:2px;padding-left:1em" >
+<pre>
+\end{rawhtml}
+}%
+{\begin{rawhtml}
+</pre>
+</div>
+<div style="color: black; background-color: \#fffff;  border-style: solid; border-width: 1px; padding:2px;padding-left:1em;margin-left:1em;" >\end{rawhtml}
+\verbatiminput{pytex_\alph{pytexcount}_\arabic{pytexsubcount}.log}%
+\begin{rawhtml}
+</div>
+\end{rawhtml}
+}
 \newcommand{\codebegin}{
 \begin{rawhtml}
-<div style="color: black; background-color: \#a9b8cb;  border-style: dotted; border-width: 1px;" >
+<div style="color: black; background-color: \#b9c8db;  border-style: dotted; border-width: 1px;padding:2px;padding-left:1em" >
 \end{rawhtml}
 }
 \newcommand{\codeend}{
@@ -163,34 +206,42 @@ Though it is possible and somtimes benificial, we shall not work with the \textt
 
 To see how it works in practice, start an interactive Python shell (e.g. by typing \texttt{ipython} from a Linux terminal or inside a integrated development environment such as Spyder) and import CasADi using the command:\footnote{In C++, include the core header files through ''\texttt{\#include "casadi/casadi.hpp"}''. Classes and functions are defined in the namespace \texttt{CasADi}. In Octave, the CasADi module is imported by simply invoking \texttt{casadi}}
 
-\begin{verbatim}
-  from casadi import *
-\end{verbatim}
+\begin{pytexTemplate}{main}
+from casadi import *
+\end{pytexTemplate}
+
+\pytexStart{empty}
+
+\begin{pytex}
+from casadi import *
+\end{pytex}
 
 Now create the variable \texttt{x} using the syntax (cf. the function \texttt{sym} in Matlab's Symbolic Toolbox)\footnote{In C++, since it is statically typed, you need to specify the return type, here \texttt{SXMatrix}. To find the return types for a CasADi function, use the C++ API docs on the website}:
-\begin{verbatim}
-  x = ssym("x")
-\end{verbatim}
-Note that the string passed is only the display name, not the identifier. Multiple variables can have the same name, but still be different. You can also create vectors or matrices of variables using by supplying additional arguments to \texttt{ssym}:
-\begin{verbatim}
-  y = ssym("y",5)   # A 5-by-1 matrix, i.e. a vector, with symbolic variables
-  Z = ssym("Z",4,2) # A 4-by-2 matrix with symbolic variables
-\end{verbatim}
 
-Note that \texttt{ssym} is a function which returns an \texttt{SXMatrix} instance. When variables have been declared, expressions can now be formed in an intuitive way: 
-\begin{verbatim}
-  f = x**2 + 10  # "x**y" corresponds to "pow(x,y)" in C++
-  f = sqrt(f)
-  print "f = ", f
-\end{verbatim}
+\begin{pytex}
+x = ssym("x")
+\end{pytex}
+
+Note that the string passed is only the display name, not the identifier. Multiple variables can have the same name, but still be different. You can also create vectors or matrices of variables using by supplying additional arguments to \texttt{ssym}:
+\begin{pytex}
+y = ssym("y",5)   # A 5-by-1 matrix, i.e. a vector, with symbolic variables
+Z = ssym("Z",4,2) # A 4-by-2 matrix with symbolic variables
+\end{pytex}
+
+Note that \texttt{ssym} is a function which returns an \texttt{SXMatrix} instance. When variables have been declared, expressions can now be formed in an intuitive way:
+\begin{pytex}
+f = x**2 + 10  # "x**y" corresponds to "pow(x,y)" in C++
+f = sqrt(f)
+print "f = ", f
+\end{pytex}
 
 You can also create \texttt{SXMatrix} instances \emph{without} any symbolic variables\footnote{In C++, class}:
-\begin{verbatim}
- B1 = SXMatrix.zeros(4,5)  # a dense 4-by-5 empty matrix with all zeros
- B2 = SXMatrix.sparse(4,5) # a sparse 4-by-5 empty matrix with all zeros
- B3 = SXMatrix.ones(4,5)   # a dense 4-by-5 matrix filled with ones
- B4 = SXMatrix.eye(4)      # a sparse 4-by-4 matrix with ones on the diagonal
-\end{verbatim}
+\begin{pytex} 
+B1 = SXMatrix.zeros(4,5)  # a dense 4-by-5 empty matrix with all zeros
+B2 = SXMatrix.sparse(4,5) # a sparse 4-by-5 empty matrix with all zeros
+B3 = SXMatrix.ones(4,5)   # a dense 4-by-5 matrix filled with ones
+B4 = SXMatrix.eye(4)      # a sparse 4-by-4 matrix with ones on the diagonal
+\end{pytex}
 
 Note the difference between a sparse matrix with \emph{structural} zeros and a dense matrix with \emph{actual} zeros. When printing an expression with structural zeros, these will be represented as $00$ to distinguish them from actual zeros $0$.
 
@@ -560,7 +611,7 @@ There are several options to build sparse CasADi matrix types:
  print DMatrix(sp_tril(3),range(6))  # [[0,  00,  00 ], [1,  2,  00 ], [3,  4,  5 ]]
 \end{verbatim}
 
-
+\paragraph{diagonal}
 \begin{verbatim}
  sp_diag(3).spy()
 \end{verbatim}
@@ -570,6 +621,8 @@ There are several options to build sparse CasADi matrix types:
 .*.
 ..*
 \end{verbatim}
+
+\paragraph{triangular}
 
 \begin{verbatim}
  sp_tril(3).spy()
@@ -581,7 +634,7 @@ There are several options to build sparse CasADi matrix types:
 ***
 \end{verbatim}
 
-
+\paragraph{banded}
 \begin{verbatim}
  sp_band(3,1).spy()
  sp_band(3,-1).spy()
@@ -597,7 +650,7 @@ There are several options to build sparse CasADi matrix types:
 .*.
 \end{verbatim}
 
-
+\paragraph{row and columsn slices}
 \begin{verbatim}
 sp_rowcol([0,3],[1,2],4,4).spy()
 \end{verbatim}
@@ -607,6 +660,16 @@ sp_rowcol([0,3],[1,2],4,4).spy()
 ....
 ....
 .**.
+\end{verbatim}
+
+\paragraph{(row,col) pairs}
+\begin{verbatim}
+sp_triplet(2,4,[0,1,0,0],[0,1,2,3])
+\end{verbatim}
+
+\begin{verbatim}
+*.**
+.*..
 \end{verbatim}
 
 \subsection{Sparsity operators}
