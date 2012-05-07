@@ -339,6 +339,7 @@ void NLPSolverInternal::init(){
   // Create a Jacobian if it does not already exists
   bool generate_jacobian = getOption("generate_jacobian");
   if(generate_jacobian && !G_.isNull() && J_.isNull()){
+    log("Generating Jacobian");
     J_ = G_.jacobian();
     
     // Use live variables if SXFunction

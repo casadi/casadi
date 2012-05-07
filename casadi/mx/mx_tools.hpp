@@ -266,10 +266,29 @@ The "msym" function is intended to work in a similar way as "sym" used in the Sy
 The MX expression graph is more general but also have considerably more overhead than the alternative SX expression graph.
 */
 //@{
+/** \brief Create a matrix symbolic variable of given sparsity */
 MX msym(const std::string& name, int n=1, int m=1);
+
+/** \brief Create a matrix symbolic variable of given sparsity */
 MX msym(const std::string& name, const std::pair<int,int> & nm);
+
+/** \brief Create a matrix variable from a constant matrix */
 MX msym(const Matrix<double>& x);
+
+/** \brief Create a matrix symbolic variable of given sparsity */
 MX msym(const std::string& name, const CRSSparsity& sp);
+
+/** \brief Create a vector of length p with with matrix symbolic variables of given sparsity */
+std::vector<MX> msym(const std::string& name, const CRSSparsity& sp, int p);
+
+/** \brief Create a vector of length p with n-by-m matrix symbolic variables */
+std::vector<MX> msym(const std::string& name, int n, int m, int p);
+
+/** \brief Create a vector of length r of vectors of length p with matrix symbolic variables with given sparsity*/
+std::vector<std::vector<MX> > msym(const std::string& name, const CRSSparsity& sp, int p, int r);
+
+/** \brief Create a vector of length r of vectors of length p with n-by-m matrices with symbolic variables */
+std::vector<std::vector<MX> > msym(const std::string& name, int n, int m, int p, int r);
 
 //@}
 

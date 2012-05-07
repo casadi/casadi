@@ -748,24 +748,33 @@ Matrix<SX> ssym(const std::string& name, const CRSSparsity& sp){
   return ret;
 }
 
-std::vector<Matrix<SX> > ssym(const std::string& name, int n, int m, int p){
+
+std::vector<Matrix<SX> > ssym(const std::string& name, const CRSSparsity& sp, int p){
   std::vector<Matrix<SX> > ret(p);
   for(int k=0; k<p; ++k){
     stringstream ss;
     ss << name << "_" << k;
-    ret[k] = ssym(ss.str(),n,m);
+    ret[k] = ssym(ss.str(),sp);
   }
   return ret;
 }
 
-std::vector<std::vector<Matrix<SX> > > ssym(const std::string& name, int n, int m, int p, int r){
+std::vector<std::vector<Matrix<SX> > > ssym(const std::string& name, const CRSSparsity& sp, int p, int r){
   std::vector<std::vector<Matrix<SX> > > ret(r);
   for(int k=0; k<r; ++k){
     stringstream ss;
     ss << name << "_" << k;
-    ret[k] = ssym(ss.str(),n,m,p);
+    ret[k] = ssym(ss.str(),sp,p);
   }
   return ret;
+}
+
+std::vector<Matrix<SX> > ssym(const std::string& name, int n, int m, int p){
+  return  ssym(name,sp_dense(n,m),p);
+}
+
+std::vector<std::vector<Matrix<SX> > > ssym(const std::string& name, int n, int m, int p, int r){
+  return ssym(name,sp_dense(n,m),p,r);
 }
 
 Matrix<SX> taylor(const Matrix<SX>& ex,const SX& x, const SX& a, int order) {

@@ -31,6 +31,18 @@
 #include <casadi/stl_vector_tools.hpp>
 #include <nonlinear_programming/lifted_sqp.hpp>
 
+// Initialize the NLP at the optimal solution
+bool inititialize_at_solution = false;
+
+// Initialize the NLP at the optimal solution
+bool with_ipopt = false;
+
+// Use Gauss-Newton
+bool gauss_newton = true;
+
+// Lifted
+bool lifted = false;
+
 using namespace CasADi;
 using namespace std;
 
@@ -46,9 +58,9 @@ int main(){
   double endtime = 1.0;
 
   // Discretization
-  int numboxes = 30;
-  int num_eulersteps = 100;
-  int num_measurements = 100;
+  int numboxes = 3;
+  int num_eulersteps = 20;
+  int num_measurements = 20;
 
   // Plotting
   bool plot_progress = false;
@@ -187,9 +199,9 @@ int main(){
     cout << "generated discrete dynamics, SX (" << shared_cast<SXFunction>(f).getAlgorithmSize() << " nodes)" << endl;
   }
 
-  // Measurement
-  vector<double> h_meas;
-  h_meas.reserve(numboxes*numboxes*num_measurements);
+  // Measurements
+  vector<DMatrix> H_meas;
+  H_meas.reserve(num_measurements);
 
   // Simulate once to generate "measurements"
   f.setInput(p0,0);
@@ -207,83 +219,118 @@ int main(){
     f.setInput(h,3);
     
     // Save a copy of h
-    h_meas.insert(h_meas.end(),h.begin(),h.end());
+    H_meas.push_back(h);
   }
   clock_t time2 = clock();
   double t_elapsed = double(time2-time1)/CLOCKS_PER_SEC;
   cout << "measurements generated in " << t_elapsed << " seconds." << endl;
   
-  // Difference vector d
-  MX d = msym("d",numboxes*numboxes*num_measurements);
+  // Lifted quantitites
+  vector<MX> H_lifted = msym("h_lifted",numboxes,numboxes,num_measurements);
 
-  // Generate reconstruction function
-  vector<MX> H_sim;
+  // Generate full-space NLP
+  vector<MX> H_eq;
   MX U = u0;
   MX V = v0;
   MX H = h0;
   int offset = 0;
   for(int k=0; k<num_measurements; ++k){
-    // Get the local difference vector
-    int offset_next = offset+numboxes*numboxes;
-    MX dk = reshape(d[range(offset,offset_next)],H.sparsity());
-    offset = offset_next;
-    
     // Take a step
     MX f_arg[4] = {P,U,V,H};
     vector<MX> f_res = f.call(vector<MX>(f_arg,f_arg+4));
     U = f_res[0];
     V = f_res[1];
     H = f_res[2];
-    H -= dk;
-    H_sim.push_back(H);
+    
+    // Lift the variable
+    MX H_def = H;
+    H = H_lifted[k];
+    H_eq.push_back(H_def-H);
   }
-  MX zfcn_in[2] = {P,d};
-  MX zfcn_out[1] = {vertcat(H_sim)};
-  MXFunction zfcn(vector<MX>(zfcn_in,zfcn_in+2),vector<MX>(zfcn_out,zfcn_out+1));
-  zfcn.init();
-  cout << "generated zfcn, MX (" << shared_cast<MXFunction>(zfcn).countNodes() << " nodes)" << endl;
+  
+  // Lifted NLP function
+  vector<MX> fff_in;
+  fff_in.push_back(P);
+  fff_in.insert(fff_in.end(),H_lifted.begin(),H_lifted.end());
+  vector<MX> fff_out = H_eq;
+  MXFunction fff(fff_in,fff_out);
+  fff.init();
+  cout << "Generated lifted problem" << endl;
+  SXFunction fff_sx(fff);
+  fff_sx.init();
+  cout << "generated lifted problem, SX (" << fff_sx.getAlgorithmSize() << " nodes)" << endl;
+  
+  // NLP variables
+  SXMatrix nlp_x;
+  for(int k=0; k<fff_sx.getNumInputs(); ++k){
+    nlp_x.append(flatten(fff_sx.inputSX(k)));
+  }
+  
+  // NLP objective function terms
+  SXMatrix nlp_f;
+  for(int k=0; k<num_measurements; ++k){
+    nlp_f.append(flatten(fff_sx.inputSX(1+k)-SXMatrix(H_meas[k])));
+  }
+  
+  // NLP constraint function terms
+  SXMatrix nlp_g;
+  for(int k=0; k<num_measurements; ++k){
+    nlp_g.append(flatten(fff_sx.outputSX(k)));
+  }
+  
+  // Objective term
+  if(!gauss_newton){
+    nlp_f = inner_prod(nlp_f,nlp_f);
+  }
+  
+  // Formulate the NLP
+  SXFunction ffcn(nlp_x,nlp_f);
+  SXFunction gfcn(nlp_x,nlp_g);
+  
+  // Gauss-Newton Hessian approximation for Ipopt
+//   SXMatrix JF = jacobian(nlp_f,nlp_x);
+//   SXFunction hfcn(nlp_x,mul(trans(JF),JF));
+  
+  // Solve with IPOPT
+  NLPSolver nlp_solver;
+  if(with_ipopt){
+    casadi_assert(!gauss_newton);
+    nlp_solver = IpoptSolver(ffcn,gfcn);
+    nlp_solver.setOption("generate_hessian",true);
+  } else {
+    nlp_solver = LiftedSQP(ffcn,gfcn);
+    if(gauss_newton) nlp_solver.setOption("gauss_newton",true);
+    nlp_solver.setOption("qp_solver",Interfaces::QPOasesSolver::creator);
+    Dictionary qp_solver_options;
+    qp_solver_options["printLevel"] = "none";
+    //qp_solver_options["verbose"] = true;
+    nlp_solver.setOption("qp_solver_options",qp_solver_options);
+    if(lifted) nlp_solver.setOption("num_lifted",nlp_g.size());
+    nlp_solver.setOption("toldx",1e-9);
+  }
+  nlp_solver.init();
+  
+  if(inititialize_at_solution){
+    nlp_solver.input(NLP_X_INIT)[0] = drag0;
+    nlp_solver.input(NLP_X_INIT)[1] = depth0;
+    vector<double>::iterator it=nlp_solver.input(NLP_X_INIT).begin()+2;
+    for(int k=0; k<num_measurements; ++k){
+      copy(H_meas[k].begin(),H_meas[k].end(),it);
+      it += numboxes*numboxes;
+    }
+  } else {
+    nlp_solver.input(NLP_X_INIT)[0] = 0.5;
+    nlp_solver.input(NLP_X_INIT)[1] = 0.01;
+  }
+  nlp_solver.input(NLP_LBG).setZero();
+  nlp_solver.input(NLP_UBG).setZero();
+//   nlp_solver.input(NLP_LBX).setAll(-1000.);
+//   nlp_solver.input(NLP_UBX).setAll( 1000.);
+//   nlp_solver.input(NLP_LBX)[0] = 0;
+//   nlp_solver.input(NLP_LBX)[1] = 0;
+  nlp_solver.solve();
 
-  time1 = clock();
-  zfcn.evaluate(0,1);
-  time2 = clock();
-  t_elapsed = double(time2-time1)/CLOCKS_PER_SEC;
-  cout << "zfcn evaluated in " << t_elapsed << " seconds." << endl;
-  
-  
-//   vector<MX> f_in(4);
-// 
-//   
-//   MX 
-//   f.setInput(p0,0);
-//   f.setInput(u0,1);
-//   f.setInput(v0,2);
-//   f.setInput(h0,3);
-//   clock_t time1 = clock();
-//     f.evaluate();
-//     const DMatrix& u = f.output(0);
-//     const DMatrix& v = f.output(1);
-//     const DMatrix& h = f.output(2);
-//     f.setInput(u,1);
-//     f.setInput(v,2);
-//     f.setInput(h,3);
-//     
-//     // Save a copy of h
-//     h_meas.insert(h_meas.end(),h.begin(),h.end());
-//   }
-//   
-//   
-//   
-//   
-  
-  
-  
-  cout << "numboxes*numboxes*num_measurements = " << numboxes*numboxes*num_measurements << endl;
-  cout << "numboxes*numboxes*num_measurements = " << numboxes*numboxes*num_measurements << endl;
-  
-  
-  // Now construct the
-
-  
+  cout << "x_opt = " << nlp_solver.output(NLP_X_OPT) << endl;
+  cout << "f_opt = " << nlp_solver.output(NLP_COST) << endl;
   return 0;
-
 }

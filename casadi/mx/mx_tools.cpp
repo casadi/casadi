@@ -650,8 +650,33 @@ void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, std::vec
   }
 }
 
+std::vector<MX> msym(const std::string& name, const CRSSparsity& sp, int p){
+  std::vector<MX> ret(p);
+  for(int k=0; k<p; ++k){
+    stringstream ss;
+    ss << name << "_" << k;
+    ret[k] = msym(ss.str(),sp);
+  }
+  return ret;
+}
 
+std::vector<std::vector<MX> > msym(const std::string& name, const CRSSparsity& sp, int p, int r){
+  std::vector<std::vector<MX> > ret(r);
+  for(int k=0; k<r; ++k){
+    stringstream ss;
+    ss << name << "_" << k;
+    ret[k] = msym(ss.str(),sp,p);
+  }
+  return ret;
+}
 
+std::vector<MX> msym(const std::string& name, int n, int m, int p){
+  return msym(name,sp_dense(n,m),p);
+}
+
+std::vector<std::vector<MX> > msym(const std::string& name, int n, int m, int p, int r){
+  return msym(name,sp_dense(n,m),p,r);
+}
 
 } // namespace CasADi
 
