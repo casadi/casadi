@@ -1,3 +1,21 @@
+/** \class CasADi::LiftedSQPInternal
+\n
+\par
+<table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>iter_count</td><td>CasADi::LiftedSQPInternal</td></tr>
+</table>
+*/
+/** \class CasADi::LiftedSQP
+\n
+\par
+<table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>iter_count</td><td>CasADi::LiftedSQPInternal</td></tr>
+</table>
+*/
 /** \class CasADi::IpoptInternal
 \n
 \par
@@ -10,6 +28,7 @@
 <tr><td>inf_du</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>inf_pr</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>iter</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>iter_count</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>ls_trials</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>mu</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>regularization_size</td><td>CasADi::IpoptInternal</td></tr>
@@ -28,6 +47,7 @@
 <tr><td>inf_du</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>inf_pr</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>iter</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>iter_count</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>ls_trials</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>mu</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>regularization_size</td><td>CasADi::IpoptInternal</td></tr>
@@ -72,6 +92,7 @@
 <tr><th>Id</th><th>Used in</th></tr>
 <tr><td>eq_viol</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>iter</td><td>CasADi::SQPInternal</td></tr>
+<tr><td>iter_count</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>lsiter</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>normdx</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>normgradL</td><td>CasADi::SQPInternal</td></tr>
@@ -85,6 +106,7 @@
 <tr><th>Id</th><th>Used in</th></tr>
 <tr><td>eq_viol</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>iter</td><td>CasADi::SQPInternal</td></tr>
+<tr><td>iter_count</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>lsiter</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>normdx</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>normgradL</td><td>CasADi::SQPInternal</td></tr>

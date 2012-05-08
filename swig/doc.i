@@ -10129,6 +10129,10 @@ the non-zeros of the original matrix for each non-zero of the new matrix. ";
 Transpose the matrix and get the reordering of the non-zero entries, i.e.
 the non-zeros of the original matrix for each non-zero of the new matrix. ";
 
+%feature("docstring")  CasADi::CRSSparsity::isTranspose "
+
+Check if the sparsity is the transpose of another. ";
+
 %feature("docstring")  CasADi::CRSSparsity::patternUnion "
 
 Union of two sparsity patterns Returns the new sparsity pattern as well as a
@@ -10367,6 +10371,10 @@ Transpose the matrix. ";
 
 Transpose the matrix and get the reordering of the non-zero entries, i.e.
 the non-zeros of the original matrix for each non-zero of the new matrix. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::isTranspose "
+
+Check if the sparsity is the transpose of another. ";
 
 %feature("docstring")  CasADi::CRSSparsityInternal::breadthFirstSearch "
 
@@ -16469,6 +16477,22 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::FXInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+
+// File: classCasADi_1_1GenericExpression.xml
+%feature("docstring") CasADi::GenericExpression "
+
+Expression interface This is a common base class for SX, MX and Matrix<>,
+introducing a uniform syntax and implementing common functionality using the
+curiously recurring template pattern (CRTP) idiom. .
+
+Joel Andersson
+
+C++ includes: generic_expression.hpp ";
+
+%feature("docstring")  CasADi::GenericExpression::__mldivide__ "
+
+Matrix division from left. ";
 
 
 // File: classCasADi_1_1GenericMatrix.xml
@@ -36855,23 +36879,8 @@ Assert that the object has been initialized. ";
 // File: classCasADi_1_1LiftedSQP.xml
 %feature("docstring") CasADi::LiftedSQP "
 
-Sequential Quadratic Programming method The algorithm is a Quasi- Newton
-method with damped BFGS updating to that assures positive definitenes of the
-Hessian approximation. Line search is carried out via backtracking until
-with the Armijo condition applied to the T1 (in Nocedal phi1) merit function
-is satisfied.
-
-The method solved can be written in the form:   min          F(x1,x2)
-x1,x2      subject to             LBG1 <= G1(x1,x2) <= UBG1               x2
-== G2(x1,x2)             LBX1 <= x1    <= UBX1             LBX2 <=     x2
-<= UBX2
-
-We thus assume that the variable vector x can be divided into two parts,
-where the second part is given recursively by the equations x2 == G2(x1,x2).
-That is x2 is given recursively means that we assume that the Jacobian of G2
-with respect to x2 is lower triangular with zeros along the diagonal.
-
-The method is still under development
+Sequential Quadratic Programming method implementing the Lifted Newton
+approach symbolically.
 
 Joel Andersson
 
@@ -40902,6 +40911,14 @@ Construct the IMatrix that maps from the iind'th input to the output. ";
 
 Get mapping from the output non-zero index of the dependency index. ";
 
+%feature("docstring")  CasADi::Mapping::isIdentity "
+
+Check if the mapping is in fact an identity mapping. ";
+
+%feature("docstring")  CasADi::Mapping::isTranspose "
+
+Check if the mapping is in fact a transpose. ";
+
 %feature("docstring")  CasADi::Mapping::evaluateBlock "";
 
 %feature("docstring")  CasADi::Mapping::deepCopyMembers "
@@ -41276,8 +41293,6 @@ Elementwise operations -- Octave/Python naming. ";
 
 %feature("docstring")  CasADi::Matrix::__mrdivide__ "";
 
-%feature("docstring")  CasADi::Matrix::__mldivide__ "";
-
 %feature("docstring")  CasADi::Matrix::sin "
 
 Operations defined in the standard namespace for unambigous access and Numpy
@@ -41651,6 +41666,10 @@ ldres: The leading dimension in res res: The number of superdiagonals. ";
 
 The following function is used to ensure similarity to MX, which is
 reference counted. ";
+
+%feature("docstring")  CasADi::Matrix::__mldivide__ "
+
+Matrix division from left. ";
 
 %feature("docstring")  CasADi::Matrix::size "
 
@@ -44642,6 +44661,14 @@ Get operation type. ";
 Returns a number that is unique for a given MXNode. If the MX does not point
 to any node, 0 is returned. ";
 
+%feature("docstring")  CasADi::MX::getTemp "
+
+Get the temporary variable. ";
+
+%feature("docstring")  CasADi::MX::setTemp "
+
+Set the temporary variable. ";
+
 %feature("docstring")  CasADi::MX::getSub "";
 
 %feature("docstring")  CasADi::MX::getSub "";
@@ -44721,8 +44748,6 @@ Get string representation of dimensions. The representation is (nrow x ncol
 
 %feature("docstring")  CasADi::MX::__mrdivide__ "";
 
-%feature("docstring")  CasADi::MX::__mldivide__ "";
-
 %feature("docstring")  CasADi::MX::__mpower__ "";
 
 %feature("docstring")  CasADi::MX::mul "";
@@ -44786,6 +44811,10 @@ Returns the IMatrix that represents the mapping of a Mapping node. ";
 %feature("docstring")  CasADi::MX::getDepInd "
 
 Get mapping from the output non-zero index of the dependency index. ";
+
+%feature("docstring")  CasADi::MX::__mldivide__ "
+
+Matrix division from left. ";
 
 %feature("docstring")  CasADi::MX::size "
 
@@ -45460,6 +45489,10 @@ outputs. ";
 
 Expand the matrix valued graph into a scalar valued graph. ";
 
+%feature("docstring")  CasADi::MXFunction::getFree "
+
+Get all the free variables of the function. ";
+
 %feature("docstring")  CasADi::MXFunction::getNumInputs "
 
 Get number of inputs. ";
@@ -45992,6 +46025,10 @@ Jacobian via source code transformation. ";
 
 Gradient via source code transformation (identity matrix seed in a
 particular direction) ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::collectFree "
+
+Collect the free variables. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::hessian "
 
@@ -63922,18 +63959,18 @@ to any node, 0 is returned. ";
 
 %feature("docstring")  CasADi::SX::__constpow__ "";
 
-%feature("docstring")  CasADi::SX::__mldivide__ "";
-
 %feature("docstring")  CasADi::SX::__mrdivide__ "";
 
 %feature("docstring")  CasADi::SX::__mpower__ "";
 
 %feature("docstring")  CasADi::SX::trans "";
 
-%feature("docstring")  CasADi::SX::exp "
+%feature("docstring")  CasADi::SX::mul "
 
 The following functions serves two purposes: Numpy compatibility and to
 allow unambigous access. ";
+
+%feature("docstring")  CasADi::SX::exp "";
 
 %feature("docstring")  CasADi::SX::log "";
 
@@ -63961,14 +63998,6 @@ allow unambigous access. ";
 
 %feature("docstring")  CasADi::SX::fabs "";
 
-%feature("docstring")  CasADi::SX::add "";
-
-%feature("docstring")  CasADi::SX::sub "";
-
-%feature("docstring")  CasADi::SX::mul "";
-
-%feature("docstring")  CasADi::SX::div "";
-
 %feature("docstring")  CasADi::SX::fmin "";
 
 %feature("docstring")  CasADi::SX::fmax "";
@@ -63991,13 +64020,13 @@ allow unambigous access. ";
 
 %feature("docstring")  CasADi::SX::constpow "";
 
-%feature("docstring")  CasADi::SX::add "";
+%feature("docstring")  CasADi::SX::__add__ "";
 
-%feature("docstring")  CasADi::SX::sub "";
+%feature("docstring")  CasADi::SX::__sub__ "";
 
-%feature("docstring")  CasADi::SX::mul "";
+%feature("docstring")  CasADi::SX::__mul__ "";
 
-%feature("docstring")  CasADi::SX::div "";
+%feature("docstring")  CasADi::SX::__div__ "";
 
 %feature("docstring")  CasADi::SX::fmin "";
 
@@ -64015,6 +64044,10 @@ allow unambigous access. ";
 
 Assign the node to something, without invoking the deletion of the node, if
 the count reaches 0. ";
+
+%feature("docstring")  CasADi::SX::__mldivide__ "
+
+Matrix division from left. ";
 
 
 // File: structCasADi_1_1SXAlgEl.xml
@@ -67989,12 +68022,14 @@ Assert that the object has been initialized. ";
 
 interface to WORHP NLP solver
 
-Worhp is less flexible then Ipopt: You may not set LBX and UBX to the same
-value, making parametric NLPs a must.
-
-You cannot have a degenerate (constant) objective value
+NOTE: The WORHP interface currently has some limitations, as compared to
+e.g. Ipopt: You may not set LBX and UBX to the same value, making parametric
+NLPs a must.
 
 You cannot have both bounds LBG and UBG infinity
+
+You cannot have a degenerate (constant) objective value (workaround
+possible, please notify the CasADi developers if you need this feature)
 
 Solves the following nonlinear optimization problem:   min          F(x,p)
 x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
@@ -70217,13 +70252,40 @@ Construct symbolic arrays and variables using CasADi's MX expression graph
 representation The \"msym\" function is intended to work in a similar way as
 \"sym\" used in the Symbolic Toolbox for Matlab but instead creating an MX
 object. The MX expression graph is more general but also have considerably
-more overhead than the alternative SX expression graph. ";
+more overhead than the alternative SX expression graph.
 
-%feature("docstring")  CasADi::Interfaces::msym "";
+Create a matrix symbolic variable of given sparsity ";
 
-%feature("docstring")  CasADi::Interfaces::msym "";
+%feature("docstring")  CasADi::Interfaces::msym "
 
-%feature("docstring")  CasADi::Interfaces::msym "";
+Create a matrix symbolic variable of given sparsity. ";
+
+%feature("docstring")  CasADi::Interfaces::msym "
+
+Create a matrix variable from a constant matrix. ";
+
+%feature("docstring")  CasADi::Interfaces::msym "
+
+Create a matrix symbolic variable of given sparsity. ";
+
+%feature("docstring")  CasADi::Interfaces::msym "
+
+Create a vector of length p with with matrix symbolic variables of given
+sparsity. ";
+
+%feature("docstring")  CasADi::Interfaces::msym "
+
+Create a vector of length r of vectors of length p with matrix symbolic
+variables with given sparsity. ";
+
+%feature("docstring")  CasADi::Interfaces::msym "
+
+Create a vector of length p with n-by-m matrix symbolic variables. ";
+
+%feature("docstring")  CasADi::Interfaces::msym "
+
+Create a vector of length r of vectors of length p with n-by-m matrices with
+symbolic variables. ";
 
 %feature("docstring")  CasADi::Interfaces::deepcopy "
 
@@ -70256,6 +70318,16 @@ Create an n-by-m matrix with symbolic variables. ";
 %feature("docstring")  CasADi::Interfaces::ssym "
 
 Create an matrix with symbolic variables, given a sparsity pattern. ";
+
+%feature("docstring")  CasADi::Interfaces::ssym "
+
+Create a vector of length p with with matrices with symbolic variables of
+given sparsity. ";
+
+%feature("docstring")  CasADi::Interfaces::ssym "
+
+Create a vector of length r of vectors of length p with matrices with
+symbolic variables with given sparsity. ";
 
 %feature("docstring")  CasADi::Interfaces::ssym "
 
@@ -70796,6 +70868,10 @@ with x and y vectors ";
 
 Simplify a mapping, if possible. ";
 
+%feature("docstring")  CasADi::Interfaces::isTranspose "
+
+Is the expression a transpose? ";
+
 %feature("docstring")  CasADi::Interfaces::trans "
 
 Take the transpose of a MX Internally represented by Transpose. ";
@@ -70955,6 +71031,17 @@ Check if two expressions are equal. ";
 %feature("docstring")  CasADi::Interfaces::getOperatorRepresentation "
 
 Get a string representation for a binary MX, using custom arguments. ";
+
+%feature("docstring")  CasADi::Interfaces::substituteInPlace "
+
+Inplace substitution Substitute variables v out of the expressions vdef
+sequentially. ";
+
+%feature("docstring")  CasADi::Interfaces::substituteInPlace "
+
+Inplace substitution with piggyback expressions Substitute variables v out
+of the expressions vdef sequentially, as well as out of a number of other
+expressions piggyback. ";
 
 %feature("docstring")  CasADi::Interfaces::vertcat "
 
@@ -72222,6 +72309,9 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: generateCode_8hpp.xml
+
+
+// File: generic__expression_8hpp.xml
 
 
 // File: generic__matrix_8hpp.xml
