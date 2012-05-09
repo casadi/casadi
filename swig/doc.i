@@ -8625,11 +8625,26 @@ Assert that the object has been initialized. ";
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
 | _vec         |              |              | true, the    | olverInterna |
@@ -9259,11 +9274,26 @@ Carlo Savorgnan
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
 | _vec         |              |              | true, the    | olverInterna |
@@ -22314,11 +22344,26 @@ number of constraints (A)
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | False        | Use Gauss    | CasADi::Ipop |
+|              |              |              | Newton       | tInternal    |
+|              |              |              | Hessian appr |              |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | False        | Generate an  | CasADi::Ipop |
 | sian         |              |              | exact        | tInternal    |
 |              |              |              | Hessian of   |              |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | True         | Generate an  | CasADi::Ipop |
+| obian        |              |              | exact        | tInternal    |
+|              |              |              | Jacobian of  |              |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | hessian_appr | OT_STRING    | exact        | Indicates    | CasADi::Ipop |
 | oximation    |              |              | what Hessian | tInternal    |
@@ -24410,6 +24455,8 @@ number of constraints (A)
 | inf_pr              | CasADi::IpoptInternal |
 +---------------------+-----------------------+
 | iter                | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| iter_count          | CasADi::IpoptInternal |
 +---------------------+-----------------------+
 | ls_trials           | CasADi::IpoptInternal |
 +---------------------+-----------------------+
@@ -27647,11 +27694,26 @@ Yorktown, USA
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | False        | Use Gauss    | CasADi::Ipop |
+|              |              |              | Newton       | tInternal    |
+|              |              |              | Hessian appr |              |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | False        | Generate an  | CasADi::Ipop |
 | sian         |              |              | exact        | tInternal    |
 |              |              |              | Hessian of   |              |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | True         | Generate an  | CasADi::Ipop |
+| obian        |              |              | exact        | tInternal    |
+|              |              |              | Jacobian of  |              |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | hessian_appr | OT_STRING    | exact        | Indicates    | CasADi::Ipop |
 | oximation    |              |              | what Hessian | tInternal    |
@@ -29743,6 +29805,8 @@ Yorktown, USA
 | inf_pr              | CasADi::IpoptInternal |
 +---------------------+-----------------------+
 | iter                | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| iter_count          | CasADi::IpoptInternal |
 +---------------------+-----------------------+
 | ls_trials           | CasADi::IpoptInternal |
 +---------------------+-----------------------+
@@ -33187,11 +33251,26 @@ number of constraints (A)
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
 | _vec         |              |              | true, the    | olverInterna |
@@ -33885,11 +33964,26 @@ number of constraints (A)
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
 | _vec         |              |              | true, the    | olverInterna |
@@ -36980,11 +37074,26 @@ Joel Andersson
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | hessian_appr | OT_STRING    | \"BFGS\"       | BFGS|exact   | CasADi::Lift |
 | oximation    |              |              |              | edSQPInterna |
@@ -37226,6 +37335,13 @@ Joel Andersson
 +-------------+---------------------------+
 | qp          | CasADi::LiftedSQPInternal |
 +-------------+---------------------------+
+
+>List of available stats
++------------+---------------------------+
+|     Id     |          Used in          |
++============+===========================+
+| iter_count | CasADi::LiftedSQPInternal |
++------------+---------------------------+
 
 C++ includes: lifted_sqp.hpp ";
 
@@ -37807,11 +37923,26 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | hessian_appr | OT_STRING    | \"BFGS\"       | BFGS|exact   | CasADi::Lift |
 | oximation    |              |              |              | edSQPInterna |
@@ -38053,6 +38184,13 @@ Return a string with a destription (for SWIG) ";
 +-------------+---------------------------+
 | qp          | CasADi::LiftedSQPInternal |
 +-------------+---------------------------+
+
+>List of available stats
++------------+---------------------------+
+|     Id     |          Used in          |
++============+===========================+
+| iter_count | CasADi::LiftedSQPInternal |
++------------+---------------------------+
 
 C++ includes: lifted_sqp_internal.hpp ";
 
@@ -38474,11 +38612,26 @@ number of constraints (A)
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
 | _vec         |              |              | true, the    | olverInterna |
@@ -39082,11 +39235,26 @@ number of constraints (A)
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
 | _vec         |              |              | true, the    | olverInterna |
@@ -46728,11 +46896,26 @@ Joel Andersson
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
 | _vec         |              |              | true, the    | olverInterna |
@@ -47473,11 +47656,26 @@ Joel Andersson
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
 | _vec         |              |              | true, the    | olverInterna |
@@ -59484,11 +59682,26 @@ Assert that the object has been initialized. ";
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | hessian_appr | OT_STRING    | \"BFGS\"       | BFGS|exact   | CasADi::SQPI |
 | oximation    |              |              |              | nternal      |
@@ -59724,19 +59937,21 @@ Assert that the object has been initialized. ";
 +-------------+---------------------+
 
 >List of available stats
-+-----------+---------------------+
-|    Id     |       Used in       |
-+===========+=====================+
-| eq_viol   | CasADi::SQPInternal |
-+-----------+---------------------+
-| iter      | CasADi::SQPInternal |
-+-----------+---------------------+
-| lsiter    | CasADi::SQPInternal |
-+-----------+---------------------+
-| normdx    | CasADi::SQPInternal |
-+-----------+---------------------+
-| normgradL | CasADi::SQPInternal |
-+-----------+---------------------+
++------------+---------------------+
+|     Id     |       Used in       |
++============+=====================+
+| eq_viol    | CasADi::SQPInternal |
++------------+---------------------+
+| iter       | CasADi::SQPInternal |
++------------+---------------------+
+| iter_count | CasADi::SQPInternal |
++------------+---------------------+
+| lsiter     | CasADi::SQPInternal |
++------------+---------------------+
+| normdx     | CasADi::SQPInternal |
++------------+---------------------+
+| normgradL  | CasADi::SQPInternal |
++------------+---------------------+
 
 C++ includes: sqp_internal.hpp ";
 
@@ -60178,11 +60393,26 @@ Joel Andersson
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | hessian_appr | OT_STRING    | \"BFGS\"       | BFGS|exact   | CasADi::SQPI |
 | oximation    |              |              |              | nternal      |
@@ -60418,19 +60648,21 @@ Joel Andersson
 +-------------+---------------------+
 
 >List of available stats
-+-----------+---------------------+
-|    Id     |       Used in       |
-+===========+=====================+
-| eq_viol   | CasADi::SQPInternal |
-+-----------+---------------------+
-| iter      | CasADi::SQPInternal |
-+-----------+---------------------+
-| lsiter    | CasADi::SQPInternal |
-+-----------+---------------------+
-| normdx    | CasADi::SQPInternal |
-+-----------+---------------------+
-| normgradL | CasADi::SQPInternal |
-+-----------+---------------------+
++------------+---------------------+
+|     Id     |       Used in       |
++============+=====================+
+| eq_viol    | CasADi::SQPInternal |
++------------+---------------------+
+| iter       | CasADi::SQPInternal |
++------------+---------------------+
+| iter_count | CasADi::SQPInternal |
++------------+---------------------+
+| lsiter     | CasADi::SQPInternal |
++------------+---------------------+
+| normdx     | CasADi::SQPInternal |
++------------+---------------------+
+| normgradL  | CasADi::SQPInternal |
++------------+---------------------+
 
 C++ includes: sqp_method.hpp ";
 
@@ -67498,11 +67730,26 @@ number of constraints (A)
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
 | _vec         |              |              | true, the    | olverInterna |
@@ -68827,11 +69074,26 @@ number of constraints (A)
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
 | _vec         |              |              | true, the    | olverInterna |
