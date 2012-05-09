@@ -20,8 +20,8 @@
 
 \definecolor{bg}{RGB}{220,220,220}
 
-\lstdefinestyle{python}{language=Python,backgroundcolor=\color{bg},frame=leftline}
-\lstdefinestyle{text}{}
+\lstdefinestyle{python}{columns=flexible,language=Python,showstringspaces=false,basicstyle=\ttfamily,commentstyle=\ttfamily}
+\lstdefinestyle{text}{columns=flexible,basicstyle=\ttfamily}
 
 \def\@enamedef#1{\expandafter\def\csname #1\expandafter\endcsname\expandafter}
 
@@ -61,15 +61,36 @@
  \verbatim%
 }%
 {\endverbatim%
- \let\verbatim@processline\verbatim@processlinebackup
- \immediate\closeout\PYTEX@tempfile
+ \let\verbatim@processline\verbatim@processlinebackup%
+ \immediate\closeout\PYTEX@tempfile%
   \IfFileExists{pytex_\alph{pytexcount}_\arabic{pytexsubcount}.log}{%
     \lstset{style=python} %
-    \VerbatimInput[]{temp_pytex.py}%
+    \lstinputlisting[]{temp_pytex.py}%
     \lstset{style=text} %
-    \VerbatimInput[frame=leftline,xleftmargin=5mm]{pytex_\alph{pytexcount}_\arabic{pytexsubcount}.log}%
+    \lstinputlisting[frame=leftline,xleftmargin=5mm]{pytex_\alph{pytexcount}_\arabic{pytexsubcount}.log}%
  }{%
     \lstset{style=python}%
-    \VerbatimInput[]{temp_pytex.py}%
+    \lstinputlisting[]{temp_pytex.py}%
+ }% 
+}
+
+\newenvironment{pytexoutput}
+{%
+  \addtocounter{pytexsubcount}{1}%                                             pytexsubcount++
+  \immediate\write\PYTEX@sf{print "pytex snippet::\arabic{pytexsubcount}"}%    print separator to stdout
+  \global\PYTEX@acc={}%                                                        clear accumulator
+  %                                                                            each line is added to accumulator
+  \let\verbatim@processlinebackup\verbatim@processline%
+  \immediate\openout\PYTEX@tempfile=temp_pytex.py\relax%  open file for writing
+  \def\verbatim@processline{\immediate\write\PYTEX@sf{\the\verbatim@line}\immediate\write\PYTEX@tempfile{\the\verbatim@line}}%
+ \verbatim%
+}%
+{\endverbatim%
+ \let\verbatim@processline\verbatim@processlinebackup%
+ \immediate\closeout\PYTEX@tempfile%
+  \IfFileExists{pytex_\alph{pytexcount}_\arabic{pytexsubcount}.log}{%
+    \lstset{style=text} %
+    \lstinputlisting[frame=leftline,xleftmargin=5mm]{pytex_\alph{pytexcount}_\arabic{pytexsubcount}.log}%
+ }{%
  }% 
 }

@@ -52,7 +52,7 @@ tutorials:
 	python internal/test_py.py '../documentation/tutorials/python/src' $(MEMCHECK)
 
 users_guide:
-	cd '../documentation/users_guide/' && pdflatex -interaction=nonstopmode casadi-users_guide.tex && cd ..
+	cd '../documentation/users_guide/' && make snippets && cd ..
 
 user_guide_snippets_py: users_guide
 	python internal/test_py.py '../documentation/users_guide' -skipfiles="pytex.py temp_pytex.py"

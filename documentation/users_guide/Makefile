@@ -5,6 +5,9 @@ default: html pdf
 html: pdf
 	latex2html -local_icons -info "" -bottom_navigation -no_math -show_section_numbers -scalable_fonts -split 3 casadi-users_guide.tex
 	
+snippets:
+	rm -f pytex_*
+	pdflatex -interaction=nonstopmode casadi-users_guide.tex
 	
 pdf: casadi-users_guide.tex
 	rm -f pytex_*
