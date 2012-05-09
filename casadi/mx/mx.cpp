@@ -145,7 +145,7 @@ const MX MX::getSub(int i, int j) const{
     ret.assignNode(new Mapping(sp));
     ret->assign(*this,vector<int>(0));
   }
-//  simplifyMapping(ret);
+  simplifyMapping(ret);
   return ret;
 }
 
@@ -371,7 +371,7 @@ MX MX::getNZ(const vector<int>& k) const{
   
   ret.assignNode(new Mapping(sp));
   ret->assign(*this,k);
-  //simplifyMapping(ret);
+  simplifyMapping(ret);
   return ret;
 }
 
@@ -434,36 +434,6 @@ const MX MX::at(int k) const {
 /// Access a non-zero element
 NonZeros<MX,int> MX::at(int k) {
   return NonZeros<MX,int>(*this,k);
-}
-
-MX operator+(const MX &x, const MX &y){
-  bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
-  if((samedim || x.scalar()) && isZero(x)){
-    return y;
-  } else if((samedim || y.scalar()) && isZero(y)){
-    return x;
-  } else if(y->isOperation(NEG)){
-    return x - y->dep(0);
-  } else if(x->isOperation(NEG)){
-    return y - x->dep(0);
-  } else {
-    return MX::binary(ADD,x,y);
-  }
-}
-
-MX operator-(const MX &x, const MX &y){
-  bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
-  if((samedim || x.scalar()) && isZero(x)){
-    return -y;
-  } else if((samedim || y.scalar()) && isZero(y)){
-    return x;
-  } else if(y->isOperation(NEG)){
-    return x+y->dep(0);
-  } else if(y.get()==x.get()){
-    return MX::sparse(x.size1(),x.size2());
-  } else {
-    return MX::binary(SUB,x,y);
-  }
 }
 
 MX MX::binary(int op, const MX &x, const MX &y){
@@ -538,52 +508,12 @@ MX MX::matrix_matrix(int op, const MX &x, const MX &y){
   }
 }
 
-MX operator*(const MX &x, const MX &y){
-  bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
-  if((samedim || x.scalar()) && isOne(x)){
-    return y;
-  } else if((samedim || x.scalar()) && isMinusOne(x)){
-    return -y;
-  } else if((samedim || y.scalar()) && isOne(y)){
-    return x;
-  } else if((samedim || y.scalar()) && isMinusOne(y)){
-    return -x;
-  } else {
-    return MX::binary(MUL,x,y);
-  }
-}
-
-MX operator/(const MX &x, const MX &y){
-  bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
-  if((samedim || y.scalar()) && isOne(y)){
-    return x;
-  } else {
-    return MX::binary(DIV,x,y);
-  }
-}
-
 MXNode* MX::operator->(){
   return (MXNode*)SharedObject::operator->();
 }
 
 const MXNode* MX::operator->() const{
   return (const MXNode*)SharedObject::operator->();
-}
-
-MX& MX::operator+=(const MX &y){
-  return *this = *this + y;
-}
-
-MX& MX::operator-=(const MX &y){
-  return *this = *this - y;
-}
-
-MX& MX::operator*=(const MX &y){
-  return *this = *this * y;
-}
-
-MX& MX::operator/=(const MX &y){
-  return *this = *this / y;
 }
 
 MX MX::repmat(const MX& x, const std::pair<int, int> &nm){
@@ -859,13 +789,70 @@ MX MX::erf() const{
   return unary(ERF,*this);
 }
 
-MX MX::__add__(const MX& b) const{    return *this + b;}
-MX MX::__sub__(const MX& b) const{    return *this - b;}
-MX MX::__mul__(const MX& b) const{    return *this * b;}
-MX MX::__div__(const MX& b) const{    return *this / b;}
+MX MX::__add__(const MX& y) const{
+  const MX& x = *this;
+  bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
+  if((samedim || x.scalar()) && isZero(x)){
+    return y;
+  } else if((samedim || y.scalar()) && isZero(y)){
+    return x;
+  } else if(y->isOperation(NEG)){
+    return x - y->dep(0);
+  } else if(x->isOperation(NEG)){
+    return y - x->dep(0);
+  } else if(x->isOperation(SUB) && y.get()==x->dep(1).get()){
+    return x->dep(0);
+  } else if(y->isOperation(SUB) && x.get()==y->dep(1).get()){
+    return y->dep(0);
+  } else {
+    return MX::binary(ADD,x,y);
+  }
+}
+
+MX MX::__sub__(const MX& y) const{
+  const MX& x = *this;
+  bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
+  if((samedim || x.scalar()) && isZero(x)){
+    return -y;
+  } else if((samedim || y.scalar()) && isZero(y)){
+    return x;
+  } else if(y->isOperation(NEG)){
+    return x+y->dep(0);
+  } else if(y.get()==x.get()){
+    return MX::sparse(x.size1(),x.size2());
+  } else {
+    return MX::binary(SUB,x,y);
+  }
+}
+
+MX MX::__mul__(const MX& y) const{
+  const MX& x = *this;
+  bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
+  if((samedim || x.scalar()) && isOne(x)){
+    return y;
+  } else if((samedim || x.scalar()) && isMinusOne(x)){
+    return -y;
+  } else if((samedim || y.scalar()) && isOne(y)){
+    return x;
+  } else if((samedim || y.scalar()) && isMinusOne(y)){
+    return -x;
+  } else {
+    return MX::binary(MUL,x,y);
+  }
+}
+
+MX MX::__div__(const MX& y) const{
+  const MX& x = *this;
+  bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
+  if((samedim || y.scalar()) && isOne(y)){
+    return x;
+  } else {
+    return MX::binary(DIV,x,y);
+  }
+}
+
 MX MX::__constpow__(const MX& b) const { return (*this).constpow(b);}
 MX MX::__mrdivide__(const MX& b) const { if (b.scalar()) return *this/b; throw CasadiException("mrdivide: Not implemented");}
-MX MX::__mldivide__(const MX& b) const { return b.__mrdivide__(*this);}
 MX MX::__mpower__(const MX& b) const   { return pow(*this,b); throw CasadiException("mpower: Not implemented");}
 
 void MX::append(const MX& y){
@@ -953,5 +940,14 @@ std::vector<int> MX::getDepInd() const {
   casadi_assert_message(m!=0, "mapping: argument MX should point to a Mapping node");
   return m->getDepInd();
 }
+
+int MX::getTemp() const{
+  return (*this)->temp;
+}
+    
+void MX::setTemp(int t){
+  (*this)->temp = t;
+}
+
  	  
 } // namespace CasADi

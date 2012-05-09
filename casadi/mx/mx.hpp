@@ -25,6 +25,7 @@
 
 #include "../cached_object.hpp"
 #include "../matrix/matrix.hpp"
+#include "../matrix/generic_expression.hpp"
 #include <vector>
 namespace CasADi{
   
@@ -48,7 +49,7 @@ class FX;
   \author Joel Andersson 
   \date 2010-2011
 */
-class MX : public GenericMatrix<MX>, public CachedObject{
+class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public CachedObject{
   public:
   
     /** \brief  Default constructor */
@@ -199,27 +200,8 @@ class MX : public GenericMatrix<MX>, public CachedObject{
     Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros */
     void enlarge(int nrow, int ncol, const std::vector<int>& ii, const std::vector<int>& jj);
 
-  #ifndef SWIG  
-  //@{
-  /** \brief  Operators that changes the object */
-    MX& operator+=(const MX &y);
-    MX& operator-=(const MX &y);
-    MX& operator*=(const MX &y);
-    MX& operator/=(const MX &y);
-  //@}
 
-
-  //@{
-  /** \brief  Operators */
-    friend MX operator+(const MX &x, const MX &y);
-    friend MX operator-(const MX &x, const MX &y);
-    friend MX operator*(const MX &x, const MX &y);
-    friend MX operator/(const MX &x, const MX &y);
-
-  //@}
-  #endif // SWIG
-  
-  MX operator-() const;
+    MX operator-() const;
   
   //@{
   /** \brief  Access a member of the node */
@@ -299,6 +281,12 @@ class MX : public GenericMatrix<MX>, public CachedObject{
   */
   long __hash__() const;
     
+  /// Get the temporary variable
+  int getTemp() const;
+  
+  /// Set the temporary variable
+  void setTemp(int t);
+  
   //@{
     /** \brief  Create nodes by their ID */
     static MX binary(int op, const MX &x, const MX &y);
@@ -391,14 +379,13 @@ class MX : public GenericMatrix<MX>, public CachedObject{
   std::string dimString() const;
   
   // all binary operations
-  MX __add__(const MX& b) const;
-  MX __sub__(const MX& b) const;
-  MX __mul__(const MX& b) const;
-  MX __div__(const MX& b) const;
+  MX __add__(const MX& y) const;
+  MX __sub__(const MX& y) const;
+  MX __mul__(const MX& y) const;
+  MX __div__(const MX& y) const;
   MX __pow__(const MX& b) const;
   MX __constpow__(const MX& b) const;
   MX __mrdivide__  (const MX& b) const;
-  MX __mldivide__   (const MX& b) const;
   MX __mpower__(const MX& b) const;
   MX mul(const MX& y) const;
   MX inner_prod(const MX& y) const;

@@ -110,6 +110,12 @@ class Mapping : public MXNode{
     
     /// Get mapping from the output non-zero index of the dependency index
     std::vector<int> getDepInd() const;
+    
+    /// Check if the mapping is in fact an identity mapping
+    bool isIdentity() const;
+    
+    /// Check if the mapping is in fact a transpose
+    bool isTranspose() const;
 };
 
 } // namespace CasADi

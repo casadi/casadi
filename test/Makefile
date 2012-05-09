@@ -6,7 +6,7 @@ all: unittests
 
 # Each of these targets will be tested by CasADi's trunktesterbot as individual tests.
 # These targets must all go on one line
-trunktesterbot: unittests_py unittests_oct examples_indoc_py examples_indoc_oct examples_indoc_cpp tutorials examples_code_py examples_code_cpp
+trunktesterbot: unittests_py unittests_oct examples_indoc_py examples_indoc_oct examples_indoc_cpp tutorials examples_code_py examples_code_cpp users_guide user_guide_snippets_py
 
 # Set to -memcheck if you want to include a check for memory leaks
 MEMCHECK = 
@@ -50,3 +50,9 @@ examples_indoc_oct:
 
 tutorials:
 	python internal/test_py.py '../documentation/tutorials/python/src' $(MEMCHECK)
+
+users_guide:
+	cd '../documentation/users_guide/' && make snippets && cd ..
+
+user_guide_snippets_py: users_guide
+	python internal/test_py.py '../documentation/users_guide' -skipfiles="pytex.py temp_pytex.py"

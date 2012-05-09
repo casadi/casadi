@@ -1208,7 +1208,7 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
   
   casadi_assert_message(inputv_.size() == input.size(),"SXFunctionInternal::eval: wrong number of inputs." << std::endl << "Expecting " << inputv_.size() << " inputs, but got " << input.size() << " instead.");
   for(int i=0; i<input.size(); ++i){
-    casadi_assert_message(input[i].sparsity()==inputv_[i].sparsity(), "SXFunctionInternal::eval: argument sparsity inconsistent");
+    casadi_assert_message(input[i].sparsity()==inputv_[i].sparsity() || (input[i].empty() && inputv_[i].empty()), "SXFunctionInternal::eval: sparsity of argument " << i << " inconsistent");
   }
   
   casadi_assert_message(outputv_.size() == output.size(),"SXFunctionInternal::eval: wrong number of outputs." << std::endl << "Expecting " << outputv_.size() << " inputs, but got " << output.size() << " instead.");
@@ -1262,13 +1262,7 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
   // Get the number of forward and adjoint sweeps
   int nfwd = fwdSens.size();
   int nadj = adjSeed.size();
-  
-/*  std::cout << "nfwd = " <<  nfwd << std::endl;
-  std::cout << "nadj = " <<  nadj << std::endl;*/
-  
-
-  
-  
+    
   // Quick return if no sensitivities
   if(nfwd==0 && nadj==0) return;
   
@@ -1302,7 +1296,7 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
     // Pass the forward seeds
     for(int iind=0; iind<input.size(); ++iind){
       // Assert sparsity
-      casadi_assert_message(input[iind].sparsity()==fwdSeed[dir][iind].sparsity(), "SXFunctionInternal::eval: sparsity inconsistent");
+      casadi_assert_message(input[iind].sparsity()==fwdSeed[dir][iind].sparsity(), "SXFunctionInternal::eval: sparsity inconsistent for input " << iind << " and forward direction " << dir << ".");
 
       // Copy seeds to work vector
       const vector<SX>& fdata = fwdSeed[dir][iind].data();

@@ -86,16 +86,23 @@ class MXFunctionInternal : public XFunctionInternal<MXFunctionInternal,MX,MXNode
     typedef MXAlgEl AlgEl;
 
     /** \brief  All the runtime elements in the order of evaluation */
-    std::vector<AlgEl> alg;
+    std::vector<AlgEl> algorithm_;
 
     /** \brief  Working vector for numeric calculation */
-    std::vector<FunctionIO> work;
+    std::vector<FunctionIO> work_;
     
     /** \brief  Dependent expressions */
     std::vector<int> input_ind_;
 
     /** \brief  Matrix expressions that are to be evaluated */
     std::vector<int> output_ind_;
+
+    /// Free variables
+    std::vector<MX> free_vars_;
+    std::vector<int> free_vars_ind_;
+    
+    /// Collect the free variables
+    void collectFree();
     
     // Lifting function
     LiftingFunction liftfun_;

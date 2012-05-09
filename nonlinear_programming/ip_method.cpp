@@ -20,15 +20,29 @@
  *
  */
 
-%{
-#include "nonlinear_programming/symbolic_nlp.hpp"
-#include "nonlinear_programming/sqp_method.hpp"
-#include "nonlinear_programming/ip_method.hpp"
-#include "nonlinear_programming/lifted_sqp.hpp"
-%}
+#include "ip_internal.hpp"
 
-%include "nonlinear_programming/symbolic_nlp.hpp"
-%include "nonlinear_programming/sqp_method.hpp"
-%include "nonlinear_programming/ip_method.hpp"
-%include "nonlinear_programming/lifted_sqp.hpp"
+using namespace std;
 
+namespace CasADi{
+
+IPMethod::IPMethod(){
+}
+  
+IPMethod::IPMethod(const FX& F, const FX& G, const FX& H, const FX& J){
+  assignNode(new IPInternal(F,G,H,J));
+}
+
+IPInternal* IPMethod::operator->(){
+  return (IPInternal*)(NLPSolver::operator->());
+}
+
+const IPInternal* IPMethod::operator->() const{
+  return (const IPInternal*)(NLPSolver::operator->());
+}
+    
+bool IPMethod::checkNode() const{
+  return dynamic_cast<const IPInternal*>(get());
+}
+
+} // namespace CasADi

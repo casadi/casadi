@@ -20,15 +20,34 @@
  *
  */
 
-%{
-#include "nonlinear_programming/symbolic_nlp.hpp"
-#include "nonlinear_programming/sqp_method.hpp"
-#include "nonlinear_programming/ip_method.hpp"
-#include "nonlinear_programming/lifted_sqp.hpp"
-%}
+#ifndef IP_INTERNAL_HPP
+#define IP_INTERNAL_HPP
 
-%include "nonlinear_programming/symbolic_nlp.hpp"
-%include "nonlinear_programming/sqp_method.hpp"
-%include "nonlinear_programming/ip_method.hpp"
-%include "nonlinear_programming/lifted_sqp.hpp"
+#include "ip_method.hpp"
+#include "casadi/fx/nlp_solver_internal.hpp"
+#include "casadi/fx/linear_solver.hpp"
 
+namespace CasADi{
+    
+class IPInternal : public NLPSolverInternal{
+
+public:
+  explicit IPInternal(const FX& F, const FX& G, const FX& H, const FX& J);
+  virtual ~IPInternal();
+  virtual IPInternal* clone() const{ return new IPInternal(*this);}
+  
+  virtual void init();
+  virtual void evaluate(int nfdir, int nadir);
+  
+  /// Function which forms the KKT system
+  enum KIn{K_x,K_t,K_NUM_IN};
+  enum KOut{K_K,K_k,K_NUM_OUT};
+  FX kfcn_;
+  
+  /// Linear solver for the KKT system
+  LinearSolver linear_solver_;
+};
+
+} // namespace CasADi
+
+#endif //IP_INTERNAL_HPP

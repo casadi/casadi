@@ -129,14 +129,6 @@ void SX::print(std::ostream &stream, long& remaining_calls) const{
   }
 }
 
-SX& operator+=(SX &ex, const SX &el){
-  return ex = ex + el;
-}
-
-SX& operator-=(SX &ex, const SX &el){
-  return ex = ex - el;
-}
-
 SX SX::operator-() const{
   if(node->hasDep() && node->getOp() == NEG)
     return node->dep(0);
@@ -150,14 +142,6 @@ SX SX::operator-() const{
    return BinarySXNode::createT<NEG>( *this);
 }
 
-SX& operator*=(SX &ex, const SX &el){
- return ex = ex * el;
-}
-
-SX& operator/=(SX &ex, const SX &el){
-  return ex = ex / el;
-}
-
 SX SX::sign() const{
   if(isConstant())
     return CasADi::sign(getValue());
@@ -169,7 +153,7 @@ SX SX::erfinv() const{
   return BinarySXNode::createT<ERFINV>( *this);
 }
 
-SX SX::add(const SX& y) const{
+SX SX::__add__(const SX& y) const{
   // NOTE: Only simplifications that do not result in extra nodes area allowed
     
   if(node->isZero())
@@ -177,9 +161,9 @@ SX SX::add(const SX& y) const{
   else if(y->isZero()) // term2 is zero
     return *this;
   else if(y.isBinary() && y.getOp()==NEG) // x + (-y) -> x - y
-    return sub(-y);
+    return __sub__(-y);
   else if(isBinary() && getOp()==NEG) // (-x) + y -> y - x
-    return y.sub(getDep());
+    return y.__sub__(getDep());
   else if(isBinary() && getOp()==MUL && 
           y.isBinary() && y.getOp()==MUL && 
           getDep(0).isConstant() && getDep(0).getValue()==0.5 && 
@@ -200,7 +184,7 @@ SX SX::add(const SX& y) const{
     return BinarySXNode::createT<ADD>( *this, y);
 }
 
-SX SX::sub(const SX& y) const{
+SX SX::__sub__(const SX& y) const{
   // Only simplifications that do not result in extra nodes area allowed
     
   if(y->isZero()) // term2 is zero
@@ -210,7 +194,7 @@ SX SX::sub(const SX& y) const{
   if(isEquivalent(y)) // the terms are equal
     return 0;
   else if(y.isBinary() && y.getOp()==NEG) // x - (-y) -> x + y
-    return add(-y);
+    return __add__(-y);
   else if(isBinary() && getOp()==ADD && getDep(1).isEquivalent(y))
     return getDep(0);
   else if(isBinary() && getOp()==ADD && getDep(0).isEquivalent(y))
@@ -223,10 +207,10 @@ SX SX::sub(const SX& y) const{
     return BinarySXNode::createT<SUB>( *this, y);
 }
 
-SX SX::mul(const SX& y) const{
+SX SX::__mul__(const SX& y) const{
   // Only simplifications that do not result in extra nodes area allowed
   if(!isConstant() && y.isConstant())
-    return y.mul(*this);
+    return y.__mul__(*this);
   else if(node->isZero() || y->isZero()) // one of the terms is zero
     return 0;
   else if(node->isOne()) // term1 is one
@@ -273,7 +257,7 @@ bool SX::isEquivalent(const SX&y, int depth) const{
   return false;
 }
 
-SX SX::div(const SX& y) const{
+SX SX::__div__(const SX& y) const{
   // Only simplifications that do not result in extra nodes area allowed
 
   if(y->isZero()) // term2 is zero
@@ -320,16 +304,16 @@ SX SX::inv() const{
   }
 }
 
-Matrix<SX> SX::add(const Matrix<SX>& y) const {
+Matrix<SX> SX::__add__(const Matrix<SX>& y) const {
  return Matrix<SX>(*this)+y;
 }
-Matrix<SX> SX::sub(const Matrix<SX>& y) const {
+Matrix<SX> SX::__sub__(const Matrix<SX>& y) const {
  return Matrix<SX>(*this)-y;
 }
-Matrix<SX> SX::mul(const Matrix<SX>& y) const {
+Matrix<SX> SX::__mul__(const Matrix<SX>& y) const {
  return Matrix<SX>(*this)*y;
 }
-Matrix<SX> SX::div(const Matrix<SX>& y) const { 
+Matrix<SX> SX::__div__(const Matrix<SX>& y) const { 
   return Matrix<SX>(*this)/y;
 }
 Matrix<SX> SX::fmin(const Matrix<SX>& b) const { 
@@ -344,23 +328,6 @@ Matrix<SX> SX::constpow(const Matrix<SX>& n) const {
 
 Matrix<SX> SX::arctan2(const Matrix<SX>& b) const { 
   return Matrix<SX>(*this).arctan2(b);
-}
-
-SX operator+(const SX &x, const SX &y){
-  return x.add(y);
-}
-
-SX operator-(const SX &x, const SX &y){
-  return x.sub(y);
-}
-
-SX operator*(const SX &x, const SX &y){
-  return x.mul(y);
-}
-
-
-SX operator/(const SX &x, const SX &y){
-  return x.div(y);
 }
 
 SX operator<=(const SX &a, const SX &b){

@@ -2577,7 +2577,7 @@ void CRSSparsityInternal::getElements(std::vector<int>& loc, bool row_major) con
       // Get column
       int j = col_[el];
         
-      // Get the column of the jacobian
+      // Get the element
       if(row_major){
         loc[el] = j+i*ncol_;
       } else {
@@ -2909,6 +2909,47 @@ CRSSparsity CRSSparsityInternal::pmult(const std::vector<int>& p, bool permute_r
   return sp_triplet(nrow_,ncol_,new_row,new_col);
 }
 
+bool CRSSparsityInternal::isTranspose(const CRSSparsityInternal& y) const{
+  // Assert dimensions and number of nonzeros
+  if(nrow_!=y.ncol_ || ncol_!=y.nrow_ || size()!=y.size())
+    return false;
+  
+  // Quick return if empty or dense
+  if(size()==0 || dense())
+    return true;
+    
+  // Run algorithm on the pattern with the least number of columns
+  if(ncol_>nrow_) return y.isTranspose(*this);
+
+  // Index counter for row of the possible transpose
+  vector<int> y_row_count(y.nrow_,0);
+  
+  // Loop over the rows
+  for(int i=0; i<nrow_; ++i){
+    
+    // Loop over the nonzeros
+    for(int el=rowind_[i]; el<rowind_[i+1]; ++el){
+     
+      // Get the column
+      int j=col_[el];
+      
+      // Get the element of the possible transpose
+      int el_y = y.rowind_[j] + y_row_count[j]++;
+      
+      // Quick return if element doesn't exist
+      if(el_y>=y.rowind_[j+1]) return false;
+      
+      // Get the column of the possible transpose
+      int j_y = y.col_[el_y];
+      
+      // Quick return if mismatch
+      if(j_y != i) return false;
+    }
+  }
+  
+  // Transpose if reached this point
+  return true;
+}
 
 } // namespace CasADi
 

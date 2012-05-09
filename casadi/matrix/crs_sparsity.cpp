@@ -433,5 +433,8 @@ void CRSSparsity::spy(std::ostream &stream) const {
   }
 }
 
+bool CRSSparsity::isTranspose(const CRSSparsity& y) const{
+  return (*this)->isTranspose(*static_cast<const CRSSparsityInternal*>(y.get()));
+}
 
 } // namespace CasADi

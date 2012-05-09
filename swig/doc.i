@@ -5427,27 +5427,25 @@ f:  dynamical system >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| DAE_T                              | Time. (1-by-1)                     |
+| DAE_T                              | Explicit time dependence           |
 +------------------------------------+------------------------------------+
-| DAE_Y                              | State vector (matrix). Should have |
-|                                    | same amount of non-zeros as        |
-|                                    | DAEOutput:DAE_RES                  |
+| DAE_Y                              | Differential and algebraic states. |
+|                                    | NOTE: To be replaced by DAE_X and  |
+|                                    | DAE_Z                              |
 +------------------------------------+------------------------------------+
-| DAE_P                              | Parameter vector (matrix).         |
+| DAE_P                              | Parameter                          |
 +------------------------------------+------------------------------------+
-| DAE_YDOT                           | State derivative vector (matrix).  |
-|                                    | Should have same amount of non-    |
-|                                    | zeros as DAEOutput:DAE_RES         |
+| DAE_YDOT                           | Time derivative of differential    |
+|                                    | and algebraic states. NOTE: To be  |
+|                                    | replaced by DAE_XDOT               |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 1)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| DAE_RES                            | Right hand side of ODE. Should     |
-|                                    | have same amount of non-zeros as   |
-|                                    | DAEInput:DAE_Y                     |
-+------------------------------------+------------------------------------+
++---------+--------------+
+|  Name   | Description  |
++=========+==============+
+| DAE_RES | DAE residual |
++---------+--------------+
 ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::checkNode "
@@ -7576,30 +7574,28 @@ ffcn:  Continuous time dynamics, an CasADi::FX with the folowing mapping:
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 1)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| DAE_RES                            | Right hand side of ODE. Should     |
-|                                    | have same amount of non-zeros as   |
-|                                    | DAEInput:DAE_Y                     |
-+------------------------------------+------------------------------------+
++---------+--------------+
+|  Name   | Description  |
++=========+==============+
+| DAE_RES | DAE residual |
++---------+--------------+
 
 output_fcn:  output function which maps ControlledDAEInput or DAEInput to n
 outputs. >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| DAE_T                              | Time. (1-by-1)                     |
+| DAE_T                              | Explicit time dependence           |
 +------------------------------------+------------------------------------+
-| DAE_Y                              | State vector (matrix). Should have |
-|                                    | same amount of non-zeros as        |
-|                                    | DAEOutput:DAE_RES                  |
+| DAE_Y                              | Differential and algebraic states. |
+|                                    | NOTE: To be replaced by DAE_X and  |
+|                                    | DAE_Z                              |
 +------------------------------------+------------------------------------+
-| DAE_P                              | Parameter vector (matrix).         |
+| DAE_P                              | Parameter                          |
 +------------------------------------+------------------------------------+
-| DAE_YDOT                           | State derivative vector (matrix).  |
-|                                    | Should have same amount of non-    |
-|                                    | zeros as DAEOutput:DAE_RES         |
+| DAE_YDOT                           | Time derivative of differential    |
+|                                    | and algebraic states. NOTE: To be  |
+|                                    | replaced by DAE_XDOT               |
 +------------------------------------+------------------------------------+
 
 >Input scheme: CasADi::ControlledDAEInput (CONTROL_DAE_NUM_IN = 9)
@@ -8629,11 +8625,26 @@ Assert that the object has been initialized. ";
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
 | _vec         |              |              | true, the    | olverInterna |
@@ -9263,11 +9274,26 @@ Carlo Savorgnan
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
 | _vec         |              |              | true, the    | olverInterna |
@@ -10133,6 +10159,10 @@ the non-zeros of the original matrix for each non-zero of the new matrix. ";
 Transpose the matrix and get the reordering of the non-zero entries, i.e.
 the non-zeros of the original matrix for each non-zero of the new matrix. ";
 
+%feature("docstring")  CasADi::CRSSparsity::isTranspose "
+
+Check if the sparsity is the transpose of another. ";
+
 %feature("docstring")  CasADi::CRSSparsity::patternUnion "
 
 Union of two sparsity patterns Returns the new sparsity pattern as well as a
@@ -10371,6 +10401,10 @@ Transpose the matrix. ";
 
 Transpose the matrix and get the reordering of the non-zero entries, i.e.
 the non-zeros of the original matrix for each non-zero of the new matrix. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::isTranspose "
+
+Check if the sparsity is the transpose of another. ";
 
 %feature("docstring")  CasADi::CRSSparsityInternal::breadthFirstSearch "
 
@@ -12302,27 +12336,25 @@ f:  dynamical system >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| DAE_T                              | Time. (1-by-1)                     |
+| DAE_T                              | Explicit time dependence           |
 +------------------------------------+------------------------------------+
-| DAE_Y                              | State vector (matrix). Should have |
-|                                    | same amount of non-zeros as        |
-|                                    | DAEOutput:DAE_RES                  |
+| DAE_Y                              | Differential and algebraic states. |
+|                                    | NOTE: To be replaced by DAE_X and  |
+|                                    | DAE_Z                              |
 +------------------------------------+------------------------------------+
-| DAE_P                              | Parameter vector (matrix).         |
+| DAE_P                              | Parameter                          |
 +------------------------------------+------------------------------------+
-| DAE_YDOT                           | State derivative vector (matrix).  |
-|                                    | Should have same amount of non-    |
-|                                    | zeros as DAEOutput:DAE_RES         |
+| DAE_YDOT                           | Time derivative of differential    |
+|                                    | and algebraic states. NOTE: To be  |
+|                                    | replaced by DAE_XDOT               |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 1)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| DAE_RES                            | Right hand side of ODE. Should     |
-|                                    | have same amount of non-zeros as   |
-|                                    | DAEInput:DAE_Y                     |
-+------------------------------------+------------------------------------+
++---------+--------------+
+|  Name   | Description  |
++=========+==============+
+| DAE_RES | DAE residual |
++---------+--------------+
 ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::checkNode "
@@ -16477,6 +16509,22 @@ Check if the object has been initialized. ";
 Assert that the object has been initialized. ";
 
 
+// File: classCasADi_1_1GenericExpression.xml
+%feature("docstring") CasADi::GenericExpression "
+
+Expression interface This is a common base class for SX, MX and Matrix<>,
+introducing a uniform syntax and implementing common functionality using the
+curiously recurring template pattern (CRTP) idiom. .
+
+Joel Andersson
+
+C++ includes: generic_expression.hpp ";
+
+%feature("docstring")  CasADi::GenericExpression::__mldivide__ "
+
+Matrix division from left. ";
+
+
 // File: classCasADi_1_1GenericMatrix.xml
 %feature("docstring") CasADi::GenericMatrix "
 
@@ -17452,27 +17500,25 @@ f:  dynamical system >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| DAE_T                              | Time. (1-by-1)                     |
+| DAE_T                              | Explicit time dependence           |
 +------------------------------------+------------------------------------+
-| DAE_Y                              | State vector (matrix). Should have |
-|                                    | same amount of non-zeros as        |
-|                                    | DAEOutput:DAE_RES                  |
+| DAE_Y                              | Differential and algebraic states. |
+|                                    | NOTE: To be replaced by DAE_X and  |
+|                                    | DAE_Z                              |
 +------------------------------------+------------------------------------+
-| DAE_P                              | Parameter vector (matrix).         |
+| DAE_P                              | Parameter                          |
 +------------------------------------+------------------------------------+
-| DAE_YDOT                           | State derivative vector (matrix).  |
-|                                    | Should have same amount of non-    |
-|                                    | zeros as DAEOutput:DAE_RES         |
+| DAE_YDOT                           | Time derivative of differential    |
+|                                    | and algebraic states. NOTE: To be  |
+|                                    | replaced by DAE_XDOT               |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 1)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| DAE_RES                            | Right hand side of ODE. Should     |
-|                                    | have same amount of non-zeros as   |
-|                                    | DAEInput:DAE_Y                     |
-+------------------------------------+------------------------------------+
++---------+--------------+
+|  Name   | Description  |
++=========+==============+
+| DAE_RES | DAE residual |
++---------+--------------+
 ";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::checkNode "
@@ -22298,11 +22344,26 @@ number of constraints (A)
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | False        | Use Gauss    | CasADi::Ipop |
+|              |              |              | Newton       | tInternal    |
+|              |              |              | Hessian appr |              |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | False        | Generate an  | CasADi::Ipop |
 | sian         |              |              | exact        | tInternal    |
 |              |              |              | Hessian of   |              |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | True         | Generate an  | CasADi::Ipop |
+| obian        |              |              | exact        | tInternal    |
+|              |              |              | Jacobian of  |              |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | hessian_appr | OT_STRING    | exact        | Indicates    | CasADi::Ipop |
 | oximation    |              |              | what Hessian | tInternal    |
@@ -24394,6 +24455,8 @@ number of constraints (A)
 | inf_pr              | CasADi::IpoptInternal |
 +---------------------+-----------------------+
 | iter                | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| iter_count          | CasADi::IpoptInternal |
 +---------------------+-----------------------+
 | ls_trials           | CasADi::IpoptInternal |
 +---------------------+-----------------------+
@@ -27631,11 +27694,26 @@ Yorktown, USA
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | False        | Use Gauss    | CasADi::Ipop |
+|              |              |              | Newton       | tInternal    |
+|              |              |              | Hessian appr |              |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | False        | Generate an  | CasADi::Ipop |
 | sian         |              |              | exact        | tInternal    |
 |              |              |              | Hessian of   |              |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | True         | Generate an  | CasADi::Ipop |
+| obian        |              |              | exact        | tInternal    |
+|              |              |              | Jacobian of  |              |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | hessian_appr | OT_STRING    | exact        | Indicates    | CasADi::Ipop |
 | oximation    |              |              | what Hessian | tInternal    |
@@ -29727,6 +29805,8 @@ Yorktown, USA
 | inf_pr              | CasADi::IpoptInternal |
 +---------------------+-----------------------+
 | iter                | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| iter_count          | CasADi::IpoptInternal |
 +---------------------+-----------------------+
 | ls_trials           | CasADi::IpoptInternal |
 +---------------------+-----------------------+
@@ -33171,11 +33251,26 @@ number of constraints (A)
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
 | _vec         |              |              | true, the    | olverInterna |
@@ -33869,11 +33964,26 @@ number of constraints (A)
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
 | _vec         |              |              | true, the    | olverInterna |
@@ -36863,23 +36973,8 @@ Assert that the object has been initialized. ";
 // File: classCasADi_1_1LiftedSQP.xml
 %feature("docstring") CasADi::LiftedSQP "
 
-Sequential Quadratic Programming method The algorithm is a Quasi- Newton
-method with damped BFGS updating to that assures positive definitenes of the
-Hessian approximation. Line search is carried out via backtracking until
-with the Armijo condition applied to the T1 (in Nocedal phi1) merit function
-is satisfied.
-
-The method solved can be written in the form:   min          F(x1,x2)
-x1,x2      subject to             LBG1 <= G1(x1,x2) <= UBG1               x2
-== G2(x1,x2)             LBX1 <= x1    <= UBX1             LBX2 <=     x2
-<= UBX2
-
-We thus assume that the variable vector x can be divided into two parts,
-where the second part is given recursively by the equations x2 == G2(x1,x2).
-That is x2 is given recursively means that we assume that the Jacobian of G2
-with respect to x2 is lower triangular with zeros along the diagonal.
-
-The method is still under development
+Sequential Quadratic Programming method implementing the Lifted Newton
+approach symbolically.
 
 Joel Andersson
 
@@ -36979,11 +37074,26 @@ Joel Andersson
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | hessian_appr | OT_STRING    | \"BFGS\"       | BFGS|exact   | CasADi::Lift |
 | oximation    |              |              |              | edSQPInterna |
@@ -37225,6 +37335,13 @@ Joel Andersson
 +-------------+---------------------------+
 | qp          | CasADi::LiftedSQPInternal |
 +-------------+---------------------------+
+
+>List of available stats
++------------+---------------------------+
+|     Id     |          Used in          |
++============+===========================+
+| iter_count | CasADi::LiftedSQPInternal |
++------------+---------------------------+
 
 C++ includes: lifted_sqp.hpp ";
 
@@ -37806,11 +37923,26 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | hessian_appr | OT_STRING    | \"BFGS\"       | BFGS|exact   | CasADi::Lift |
 | oximation    |              |              |              | edSQPInterna |
@@ -38052,6 +38184,13 @@ Return a string with a destription (for SWIG) ";
 +-------------+---------------------------+
 | qp          | CasADi::LiftedSQPInternal |
 +-------------+---------------------------+
+
+>List of available stats
++------------+---------------------------+
+|     Id     |          Used in          |
++============+===========================+
+| iter_count | CasADi::LiftedSQPInternal |
++------------+---------------------------+
 
 C++ includes: lifted_sqp_internal.hpp ";
 
@@ -38473,11 +38612,26 @@ number of constraints (A)
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
 | _vec         |              |              | true, the    | olverInterna |
@@ -39081,11 +39235,26 @@ number of constraints (A)
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
 | _vec         |              |              | true, the    | olverInterna |
@@ -40910,6 +41079,14 @@ Construct the IMatrix that maps from the iind'th input to the output. ";
 
 Get mapping from the output non-zero index of the dependency index. ";
 
+%feature("docstring")  CasADi::Mapping::isIdentity "
+
+Check if the mapping is in fact an identity mapping. ";
+
+%feature("docstring")  CasADi::Mapping::isTranspose "
+
+Check if the mapping is in fact a transpose. ";
+
 %feature("docstring")  CasADi::Mapping::evaluateBlock "";
 
 %feature("docstring")  CasADi::Mapping::deepCopyMembers "
@@ -41284,8 +41461,6 @@ Elementwise operations -- Octave/Python naming. ";
 
 %feature("docstring")  CasADi::Matrix::__mrdivide__ "";
 
-%feature("docstring")  CasADi::Matrix::__mldivide__ "";
-
 %feature("docstring")  CasADi::Matrix::sin "
 
 Operations defined in the standard namespace for unambigous access and Numpy
@@ -41659,6 +41834,10 @@ ldres: The leading dimension in res res: The number of superdiagonals. ";
 
 The following function is used to ensure similarity to MX, which is
 reference counted. ";
+
+%feature("docstring")  CasADi::Matrix::__mldivide__ "
+
+Matrix division from left. ";
 
 %feature("docstring")  CasADi::Matrix::size "
 
@@ -42538,27 +42717,25 @@ ffcn:  Continuous time dynamics, an CasADi::FX with the folowing mapping:
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| DAE_T                              | Time. (1-by-1)                     |
+| DAE_T                              | Explicit time dependence           |
 +------------------------------------+------------------------------------+
-| DAE_Y                              | State vector (matrix). Should have |
-|                                    | same amount of non-zeros as        |
-|                                    | DAEOutput:DAE_RES                  |
+| DAE_Y                              | Differential and algebraic states. |
+|                                    | NOTE: To be replaced by DAE_X and  |
+|                                    | DAE_Z                              |
 +------------------------------------+------------------------------------+
-| DAE_P                              | Parameter vector (matrix).         |
+| DAE_P                              | Parameter                          |
 +------------------------------------+------------------------------------+
-| DAE_YDOT                           | State derivative vector (matrix).  |
-|                                    | Should have same amount of non-    |
-|                                    | zeros as DAEOutput:DAE_RES         |
+| DAE_YDOT                           | Time derivative of differential    |
+|                                    | and algebraic states. NOTE: To be  |
+|                                    | replaced by DAE_XDOT               |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 1)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| DAE_RES                            | Right hand side of ODE. Should     |
-|                                    | have same amount of non-zeros as   |
-|                                    | DAEInput:DAE_Y                     |
-+------------------------------------+------------------------------------+
++---------+--------------+
+|  Name   | Description  |
++=========+==============+
+| DAE_RES | DAE residual |
++---------+--------------+
 
 Important notes: In the above table, INTEGRATOR_P input is not really of
 shape (np x 1), but rather ( (np+nu) x 1 ).
@@ -42585,17 +42762,17 @@ CasADi::DAEInput (DAE_NUM_IN = 4)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| DAE_T                              | Time. (1-by-1)                     |
+| DAE_T                              | Explicit time dependence           |
 +------------------------------------+------------------------------------+
-| DAE_Y                              | State vector (matrix). Should have |
-|                                    | same amount of non-zeros as        |
-|                                    | DAEOutput:DAE_RES                  |
+| DAE_Y                              | Differential and algebraic states. |
+|                                    | NOTE: To be replaced by DAE_X and  |
+|                                    | DAE_Z                              |
 +------------------------------------+------------------------------------+
-| DAE_P                              | Parameter vector (matrix).         |
+| DAE_P                              | Parameter                          |
 +------------------------------------+------------------------------------+
-| DAE_YDOT                           | State derivative vector (matrix).  |
-|                                    | Should have same amount of non-    |
-|                                    | zeros as DAEOutput:DAE_RES         |
+| DAE_YDOT                           | Time derivative of differential    |
+|                                    | and algebraic states. NOTE: To be  |
+|                                    | replaced by DAE_XDOT               |
 +------------------------------------+------------------------------------+
 
 rfcn:  Initial value constraints ";
@@ -44652,6 +44829,14 @@ Get operation type. ";
 Returns a number that is unique for a given MXNode. If the MX does not point
 to any node, 0 is returned. ";
 
+%feature("docstring")  CasADi::MX::getTemp "
+
+Get the temporary variable. ";
+
+%feature("docstring")  CasADi::MX::setTemp "
+
+Set the temporary variable. ";
+
 %feature("docstring")  CasADi::MX::getSub "";
 
 %feature("docstring")  CasADi::MX::getSub "";
@@ -44731,8 +44916,6 @@ Get string representation of dimensions. The representation is (nrow x ncol
 
 %feature("docstring")  CasADi::MX::__mrdivide__ "";
 
-%feature("docstring")  CasADi::MX::__mldivide__ "";
-
 %feature("docstring")  CasADi::MX::__mpower__ "";
 
 %feature("docstring")  CasADi::MX::mul "";
@@ -44796,6 +44979,10 @@ Returns the IMatrix that represents the mapping of a Mapping node. ";
 %feature("docstring")  CasADi::MX::getDepInd "
 
 Get mapping from the output non-zero index of the dependency index. ";
+
+%feature("docstring")  CasADi::MX::__mldivide__ "
+
+Matrix division from left. ";
 
 %feature("docstring")  CasADi::MX::size "
 
@@ -45470,6 +45657,10 @@ outputs. ";
 
 Expand the matrix valued graph into a scalar valued graph. ";
 
+%feature("docstring")  CasADi::MXFunction::getFree "
+
+Get all the free variables of the function. ";
+
 %feature("docstring")  CasADi::MXFunction::getNumInputs "
 
 Get number of inputs. ";
@@ -46002,6 +46193,10 @@ Jacobian via source code transformation. ";
 
 Gradient via source code transformation (identity matrix seed in a
 particular direction) ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::collectFree "
+
+Collect the free variables. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::hessian "
 
@@ -46701,11 +46896,26 @@ Joel Andersson
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
 | _vec         |              |              | true, the    | olverInterna |
@@ -47446,11 +47656,26 @@ Joel Andersson
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
 | _vec         |              |              | true, the    | olverInterna |
@@ -56574,27 +56799,25 @@ f:  dynamical system >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| DAE_T                              | Time. (1-by-1)                     |
+| DAE_T                              | Explicit time dependence           |
 +------------------------------------+------------------------------------+
-| DAE_Y                              | State vector (matrix). Should have |
-|                                    | same amount of non-zeros as        |
-|                                    | DAEOutput:DAE_RES                  |
+| DAE_Y                              | Differential and algebraic states. |
+|                                    | NOTE: To be replaced by DAE_X and  |
+|                                    | DAE_Z                              |
 +------------------------------------+------------------------------------+
-| DAE_P                              | Parameter vector (matrix).         |
+| DAE_P                              | Parameter                          |
 +------------------------------------+------------------------------------+
-| DAE_YDOT                           | State derivative vector (matrix).  |
-|                                    | Should have same amount of non-    |
-|                                    | zeros as DAEOutput:DAE_RES         |
+| DAE_YDOT                           | Time derivative of differential    |
+|                                    | and algebraic states. NOTE: To be  |
+|                                    | replaced by DAE_XDOT               |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 1)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| DAE_RES                            | Right hand side of ODE. Should     |
-|                                    | have same amount of non-zeros as   |
-|                                    | DAEInput:DAE_Y                     |
-+------------------------------------+------------------------------------+
++---------+--------------+
+|  Name   | Description  |
++=========+==============+
+| DAE_RES | DAE residual |
++---------+--------------+
 ";
 
 %feature("docstring")  CasADi::RKIntegrator::checkNode "
@@ -58240,17 +58463,17 @@ CasADi::DAEInput (DAE_NUM_IN = 4)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| DAE_T                              | Time. (1-by-1)                     |
+| DAE_T                              | Explicit time dependence           |
 +------------------------------------+------------------------------------+
-| DAE_Y                              | State vector (matrix). Should have |
-|                                    | same amount of non-zeros as        |
-|                                    | DAEOutput:DAE_RES                  |
+| DAE_Y                              | Differential and algebraic states. |
+|                                    | NOTE: To be replaced by DAE_X and  |
+|                                    | DAE_Z                              |
 +------------------------------------+------------------------------------+
-| DAE_P                              | Parameter vector (matrix).         |
+| DAE_P                              | Parameter                          |
 +------------------------------------+------------------------------------+
-| DAE_YDOT                           | State derivative vector (matrix).  |
-|                                    | Should have same amount of non-    |
-|                                    | zeros as DAEOutput:DAE_RES         |
+| DAE_YDOT                           | Time derivative of differential    |
+|                                    | and algebraic states. NOTE: To be  |
+|                                    | replaced by DAE_XDOT               |
 +------------------------------------+------------------------------------+
 ";
 
@@ -59459,11 +59682,26 @@ Assert that the object has been initialized. ";
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | hessian_appr | OT_STRING    | \"BFGS\"       | BFGS|exact   | CasADi::SQPI |
 | oximation    |              |              |              | nternal      |
@@ -59699,19 +59937,21 @@ Assert that the object has been initialized. ";
 +-------------+---------------------+
 
 >List of available stats
-+-----------+---------------------+
-|    Id     |       Used in       |
-+===========+=====================+
-| eq_viol   | CasADi::SQPInternal |
-+-----------+---------------------+
-| iter      | CasADi::SQPInternal |
-+-----------+---------------------+
-| lsiter    | CasADi::SQPInternal |
-+-----------+---------------------+
-| normdx    | CasADi::SQPInternal |
-+-----------+---------------------+
-| normgradL | CasADi::SQPInternal |
-+-----------+---------------------+
++------------+---------------------+
+|     Id     |       Used in       |
++============+=====================+
+| eq_viol    | CasADi::SQPInternal |
++------------+---------------------+
+| iter       | CasADi::SQPInternal |
++------------+---------------------+
+| iter_count | CasADi::SQPInternal |
++------------+---------------------+
+| lsiter     | CasADi::SQPInternal |
++------------+---------------------+
+| normdx     | CasADi::SQPInternal |
++------------+---------------------+
+| normgradL  | CasADi::SQPInternal |
++------------+---------------------+
 
 C++ includes: sqp_internal.hpp ";
 
@@ -60153,11 +60393,26 @@ Joel Andersson
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | hessian_appr | OT_STRING    | \"BFGS\"       | BFGS|exact   | CasADi::SQPI |
 | oximation    |              |              |              | nternal      |
@@ -60393,19 +60648,21 @@ Joel Andersson
 +-------------+---------------------+
 
 >List of available stats
-+-----------+---------------------+
-|    Id     |       Used in       |
-+===========+=====================+
-| eq_viol   | CasADi::SQPInternal |
-+-----------+---------------------+
-| iter      | CasADi::SQPInternal |
-+-----------+---------------------+
-| lsiter    | CasADi::SQPInternal |
-+-----------+---------------------+
-| normdx    | CasADi::SQPInternal |
-+-----------+---------------------+
-| normgradL | CasADi::SQPInternal |
-+-----------+---------------------+
++------------+---------------------+
+|     Id     |       Used in       |
++============+=====================+
+| eq_viol    | CasADi::SQPInternal |
++------------+---------------------+
+| iter       | CasADi::SQPInternal |
++------------+---------------------+
+| iter_count | CasADi::SQPInternal |
++------------+---------------------+
+| lsiter     | CasADi::SQPInternal |
++------------+---------------------+
+| normdx     | CasADi::SQPInternal |
++------------+---------------------+
+| normgradL  | CasADi::SQPInternal |
++------------+---------------------+
 
 C++ includes: sqp_method.hpp ";
 
@@ -63934,18 +64191,18 @@ to any node, 0 is returned. ";
 
 %feature("docstring")  CasADi::SX::__constpow__ "";
 
-%feature("docstring")  CasADi::SX::__mldivide__ "";
-
 %feature("docstring")  CasADi::SX::__mrdivide__ "";
 
 %feature("docstring")  CasADi::SX::__mpower__ "";
 
 %feature("docstring")  CasADi::SX::trans "";
 
-%feature("docstring")  CasADi::SX::exp "
+%feature("docstring")  CasADi::SX::mul "
 
 The following functions serves two purposes: Numpy compatibility and to
 allow unambigous access. ";
+
+%feature("docstring")  CasADi::SX::exp "";
 
 %feature("docstring")  CasADi::SX::log "";
 
@@ -63973,14 +64230,6 @@ allow unambigous access. ";
 
 %feature("docstring")  CasADi::SX::fabs "";
 
-%feature("docstring")  CasADi::SX::add "";
-
-%feature("docstring")  CasADi::SX::sub "";
-
-%feature("docstring")  CasADi::SX::mul "";
-
-%feature("docstring")  CasADi::SX::div "";
-
 %feature("docstring")  CasADi::SX::fmin "";
 
 %feature("docstring")  CasADi::SX::fmax "";
@@ -64003,13 +64252,13 @@ allow unambigous access. ";
 
 %feature("docstring")  CasADi::SX::constpow "";
 
-%feature("docstring")  CasADi::SX::add "";
+%feature("docstring")  CasADi::SX::__add__ "";
 
-%feature("docstring")  CasADi::SX::sub "";
+%feature("docstring")  CasADi::SX::__sub__ "";
 
-%feature("docstring")  CasADi::SX::mul "";
+%feature("docstring")  CasADi::SX::__mul__ "";
 
-%feature("docstring")  CasADi::SX::div "";
+%feature("docstring")  CasADi::SX::__div__ "";
 
 %feature("docstring")  CasADi::SX::fmin "";
 
@@ -64027,6 +64276,10 @@ allow unambigous access. ";
 
 Assign the node to something, without invoking the deletion of the node, if
 the count reaches 0. ";
+
+%feature("docstring")  CasADi::SX::__mldivide__ "
+
+Matrix division from left. ";
 
 
 // File: structCasADi_1_1SXAlgEl.xml
@@ -65738,17 +65991,17 @@ following scheme:
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| DAE_T                              | Time. (1-by-1)                     |
+| DAE_T                              | Explicit time dependence           |
 +------------------------------------+------------------------------------+
-| DAE_Y                              | State vector (matrix). Should have |
-|                                    | same amount of non-zeros as        |
-|                                    | DAEOutput:DAE_RES                  |
+| DAE_Y                              | Differential and algebraic states. |
+|                                    | NOTE: To be replaced by DAE_X and  |
+|                                    | DAE_Z                              |
 +------------------------------------+------------------------------------+
-| DAE_P                              | Parameter vector (matrix).         |
+| DAE_P                              | Parameter                          |
 +------------------------------------+------------------------------------+
-| DAE_YDOT                           | State derivative vector (matrix).  |
-|                                    | Should have same amount of non-    |
-|                                    | zeros as DAEOutput:DAE_RES         |
+| DAE_YDOT                           | Time derivative of differential    |
+|                                    | and algebraic states. NOTE: To be  |
+|                                    | replaced by DAE_XDOT               |
 +------------------------------------+------------------------------------+
 ";
 
@@ -67477,11 +67730,26 @@ number of constraints (A)
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
 | _vec         |              |              | true, the    | olverInterna |
@@ -68001,12 +68269,14 @@ Assert that the object has been initialized. ";
 
 interface to WORHP NLP solver
 
-Worhp is less flexible then Ipopt: You may not set LBX and UBX to the same
-value, making parametric NLPs a must.
-
-You cannot have a degenerate (constant) objective value
+NOTE: The WORHP interface currently has some limitations, as compared to
+e.g. Ipopt: You may not set LBX and UBX to the same value, making parametric
+NLPs a must.
 
 You cannot have both bounds LBG and UBG infinity
+
+You cannot have a degenerate (constant) objective value (workaround
+possible, please notify the CasADi developers if you need this feature)
 
 Solves the following nonlinear optimization problem:   min          F(x,p)
 x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
@@ -68804,11 +69074,26 @@ number of constraints (A)
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
 | generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
 | sian         |              |              | exact        | olverInterna |
 |              |              |              | Hessian of   | l            |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
 | _vec         |              |              | true, the    | olverInterna |
@@ -70229,13 +70514,40 @@ Construct symbolic arrays and variables using CasADi's MX expression graph
 representation The \"msym\" function is intended to work in a similar way as
 \"sym\" used in the Symbolic Toolbox for Matlab but instead creating an MX
 object. The MX expression graph is more general but also have considerably
-more overhead than the alternative SX expression graph. ";
+more overhead than the alternative SX expression graph.
 
-%feature("docstring")  CasADi::Interfaces::msym "";
+Create a matrix symbolic variable of given sparsity ";
 
-%feature("docstring")  CasADi::Interfaces::msym "";
+%feature("docstring")  CasADi::Interfaces::msym "
 
-%feature("docstring")  CasADi::Interfaces::msym "";
+Create a matrix symbolic variable of given sparsity. ";
+
+%feature("docstring")  CasADi::Interfaces::msym "
+
+Create a matrix variable from a constant matrix. ";
+
+%feature("docstring")  CasADi::Interfaces::msym "
+
+Create a matrix symbolic variable of given sparsity. ";
+
+%feature("docstring")  CasADi::Interfaces::msym "
+
+Create a vector of length p with with matrix symbolic variables of given
+sparsity. ";
+
+%feature("docstring")  CasADi::Interfaces::msym "
+
+Create a vector of length r of vectors of length p with matrix symbolic
+variables with given sparsity. ";
+
+%feature("docstring")  CasADi::Interfaces::msym "
+
+Create a vector of length p with n-by-m matrix symbolic variables. ";
+
+%feature("docstring")  CasADi::Interfaces::msym "
+
+Create a vector of length r of vectors of length p with n-by-m matrices with
+symbolic variables. ";
 
 %feature("docstring")  CasADi::Interfaces::deepcopy "
 
@@ -70268,6 +70580,16 @@ Create an n-by-m matrix with symbolic variables. ";
 %feature("docstring")  CasADi::Interfaces::ssym "
 
 Create an matrix with symbolic variables, given a sparsity pattern. ";
+
+%feature("docstring")  CasADi::Interfaces::ssym "
+
+Create a vector of length p with with matrices with symbolic variables of
+given sparsity. ";
+
+%feature("docstring")  CasADi::Interfaces::ssym "
+
+Create a vector of length r of vectors of length p with matrices with
+symbolic variables with given sparsity. ";
 
 %feature("docstring")  CasADi::Interfaces::ssym "
 
@@ -70808,6 +71130,10 @@ with x and y vectors ";
 
 Simplify a mapping, if possible. ";
 
+%feature("docstring")  CasADi::Interfaces::isTranspose "
+
+Is the expression a transpose? ";
+
 %feature("docstring")  CasADi::Interfaces::trans "
 
 Take the transpose of a MX Internally represented by Transpose. ";
@@ -70967,6 +71293,17 @@ Check if two expressions are equal. ";
 %feature("docstring")  CasADi::Interfaces::getOperatorRepresentation "
 
 Get a string representation for a binary MX, using custom arguments. ";
+
+%feature("docstring")  CasADi::Interfaces::substituteInPlace "
+
+Inplace substitution Substitute variables v out of the expressions vdef
+sequentially. ";
+
+%feature("docstring")  CasADi::Interfaces::substituteInPlace "
+
+Inplace substitution with piggyback expressions Substitute variables v out
+of the expressions vdef sequentially, as well as out of a number of other
+expressions piggyback. ";
 
 %feature("docstring")  CasADi::Interfaces::vertcat "
 
@@ -72236,6 +72573,9 @@ This file does absolutely nothing but including all headers ";
 // File: generateCode_8hpp.xml
 
 
+// File: generic__expression_8hpp.xml
+
+
 // File: generic__matrix_8hpp.xml
 
 
@@ -72970,12 +73310,6 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__IntegratorOutput.xml
 
 
-// File: group__scheme__MUSCOD__FCN__Output.xml
-
-
-// File: group__scheme__TermOutput.xml
-
-
 // File: group__scheme__QPInput.xml
 
 
@@ -72985,22 +73319,13 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__ACADO__FCN__Input.xml
 
 
-// File: group__scheme__RDAEInput.xml
-
-
-// File: group__scheme__DAEOutput.xml
+// File: group__scheme__MUSCOD__FCN__Output.xml
 
 
 // File: group__scheme__QPOutput.xml
 
 
-// File: group__scheme__NewIntegratorInput.xml
-
-
 // File: group__scheme__NLPOutput.xml
-
-
-// File: group__scheme__NEW__DAEOutput.xml
 
 
 // File: group__scheme__DAEInput.xml
@@ -73009,7 +73334,7 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__ACADO__Output.xml
 
 
-// File: group__scheme__NewIntegratorOutput.xml
+// File: group__scheme__DAEOutput.xml
 
 
 // File: group__scheme__MayerInput.xml
@@ -73018,22 +73343,13 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__ControlledDAEInput.xml
 
 
-// File: group__scheme__TermInput.xml
-
-
 // File: group__scheme__NLPInput.xml
 
 
 // File: group__scheme__IntegratorInput.xml
 
 
-// File: group__scheme__NEW__DAEInput.xml
-
-
-// File: group__scheme__OCPOutput.xml
-
-
-// File: group__scheme__RDAEOutput.xml
+// File: group__scheme__MUSCOD__FCN__Input.xml
 
 
 // File: group__scheme__OCPInput.xml
@@ -73042,7 +73358,7 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__ControlSimulatorInput.xml
 
 
-// File: group__scheme__MUSCOD__FCN__Input.xml
+// File: group__scheme__OCPOutput.xml
 
 
 // File: chapter1.xml

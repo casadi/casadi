@@ -699,38 +699,8 @@ Matrix<T> Matrix<T>::__div__(const Matrix<T> &y) const{
   return binary(DIV,*this,y);
 }
 
-// template<class T>
-// Matrix<T>& Matrix<T>::operator+=(const double &y){
-//   Matrix<T> x = *this;
-//   binary_old(casadi_operators<T>::add,x,y);
-//   return *this;
-// }
-// 
-// template<class T>
-// Matrix<T>& Matrix<T>::operator-=(const double &y){
-//   Matrix<T> x = *this;
-//   binary_old(casadi_operators<T>::sub,x,y);
-//   return *this;
-// }
-// 
-// template<class T>
-// Matrix<T>& Matrix<T>::operator*=(const double &y){
-//   Matrix<T> x = *this;
-//   binary_old(casadi_operators<T>::mul,x,y);
-//   return *this;
-// }
-// 
-// template<class T>
-// Matrix<T>& Matrix<T>::operator/=(const double &y){
-//   Matrix<T> x = *this;
-//   binary_old(casadi_operators<T>::div,x,y);
-//   return *this;
-// }
 template<class T>
 Matrix<T> Matrix<T>::__mrdivide__(const Matrix<T>& b) const { if (b.numel()==1) return *this/b; throw CasadiException("mrdivide: Not implemented");}
-
-template<class T>
-Matrix<T> Matrix<T>::__mldivide__(const Matrix<T>& b) const { return b.__mldivide__(*this);}
 
 template<class T>
 Matrix<T> Matrix<T>::__mpower__(const Matrix<T>& b) const { if (b.numel()==1) return (*this).__pow__(b); throw CasadiException("mpower: Not implemented");}

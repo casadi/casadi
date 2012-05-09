@@ -68,23 +68,26 @@ public:
    DMatrix dx_k_;
    
    /// Dual step
-   DMatrix dlam_x_k_, dlam_hg_k_;
+   DMatrix dlam_x_k_, dlam_g_k_;
 
    /// Indices
-   enum GIn{G_X,G_LAM_X,G_LAM_HG,G_NUM_IN};
-   enum GOut{G_H,G_LGRAD,G_HG,G_F,G_NUM_OUT};
+   enum GIn{G_X,G_LAM_X,G_LAM_G,G_NUM_IN};
+   enum GOut{G_D,G_G,G_F,G_NUM_OUT};
    
-   enum LinIn{LIN_X,LIN_LAM_X,LIN_LAM_HG,LIN_D,LIN_NUM_IN};
-   enum LinOut{LIN_LHESS,LIN_LGRAD,LIN_GJAC,LIN_GLIN,LIN_NUM_OUT};
+   enum LinIn{LIN_X,LIN_LAM_X,LIN_LAM_G,LIN_D,LIN_NUM_IN};
+   enum LinOut{LIN_F1,LIN_J1,LIN_F2,LIN_J2,LIN_NUM_OUT};
+
+   enum ExpIn{ERR_X,EXP_EXP_X,EXP_LAM_G,EXP_D,EXP_DU,EXP_DLAM_F2,EXP_NUM_IN};
+   enum ExpOut{EXP_E,EXP_NUM_OUT};
 
    /// Residual function
-   FX rfcn;
+   FX rfcn_;
    
    /// Quadratic approximation
-   FX lfcn;
+   FX lfcn_;
    
    /// Step expansion
-   FX efcn;
+   FX efcn_;
    
    /// Dimensions
    int nu, nv;

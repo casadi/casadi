@@ -53,6 +53,9 @@ class CRSSparsityInternal : public CachedObjectNode{
     /// Transpose the matrix and get the reordering of the non-zero entries, i.e. the non-zeros of the original matrix for each non-zero of the new matrix
     CRSSparsity transpose(std::vector<int>& mapping, bool invert_mapping=false) const;
 
+    /// Check if the sparsity is the transpose of another
+    bool isTranspose(const CRSSparsityInternal& y) const;
+
     /// Breadth-first search for coarse decomposition: see cs_bfs in CSparse
     void breadthFirstSearch(int n, std::vector<int>& wi, std::vector<int>& wj, std::vector<int>& queue, const std::vector<int>& imatch, const std::vector<int>& jmatch, int mark) const;
     

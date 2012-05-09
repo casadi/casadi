@@ -446,7 +446,7 @@ CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
 
     // Print
     if(verbose()){
-      std::cout << "XFunctionInternal::getJacSparsity: using " << (use_fwd ? "forward" : "adjoint") << " mode: ";
+      std::cout << "FXInternal::getJacSparsity: using " << (use_fwd ? "forward" : "adjoint") << " mode: ";
       std::cout << nsweep << " sweeps needed for " << nz_seed << " directions" << std::endl;
     }
     
@@ -523,7 +523,10 @@ CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
     CRSSparsity ret = sp_triplet(nz_out, nz_in,use_fwd ? jrow : jcol, use_fwd ? jcol : jrow);
     
     // Return sparsity pattern
-    if(verbose()) std::cout << "XFunctionInternal::getJacSparsity end " << std::endl;
+    if(verbose()){
+      std::cout << "Formed Jacobian sparsity pattern (" << 100*double(ret.size())/ret.numel() << " \% nonzeros)." << endl;
+      std::cout << "FXInternal::getJacSparsity end " << std::endl;
+    }
     return ret;
 
   } else {

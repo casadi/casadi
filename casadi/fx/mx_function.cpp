@@ -88,7 +88,7 @@ const std::vector<MX>& MXFunction::outputsMX() const {
 }
 
 const std::vector<MXAlgEl>& MXFunction::algorithm() const{
-  return (*this)->alg;
+  return (*this)->algorithm_;
 }
 
 int MXFunction::countNodes() const{
@@ -116,6 +116,9 @@ SXFunction MXFunction::expand(const std::vector<SXMatrix>& inputv){
   return (*this)->expand(inputv);
 }
 
+std::vector<MX> MXFunction::getFree() const{
+  return (*this)->free_vars_;
+}
 
 } // namespace CasADi
 

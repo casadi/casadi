@@ -173,7 +173,7 @@ public:
   void clearSymbolic();
  
   /** \brief Get all the free variables of the function */
-  SXMatrix getFree() const;
+  std::vector<SX> getFree() const;
   
 #ifndef SWIG 
   /// Construct a function that has only the k'th output

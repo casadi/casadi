@@ -58,9 +58,15 @@ The SX expression graph has much less overhead, but is also more restricted than
   /** \brief Create an n-by-m matrix with symbolic variables */
   Matrix<SX> ssym(const std::string& name, const std::pair<int,int> & nm); 
 
+  /** \brief Create a vector of length p with with matrices with symbolic variables of given sparsity */
+  std::vector<Matrix<SX> > ssym(const std::string& name, const CRSSparsity& sp, int p);
+
   /** \brief Create a vector of length p with n-by-m matrices with symbolic variables */
   std::vector<Matrix<SX> > ssym(const std::string& name, int n, int m, int p);
 
+  /** \brief Create a vector of length r of vectors of length p with matrices with symbolic variables with given sparsity */
+  std::vector<std::vector<Matrix<SX> > > ssym(const std::string& name, const CRSSparsity& sp, int p, int r);
+  
   /** \brief Create a vector of length r of vectors of length p with n-by-m matrices with symbolic variables */
   std::vector<std::vector<Matrix<SX> > > ssym(const std::string& name, int n, int m, int p, int r);
 

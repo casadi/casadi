@@ -27,6 +27,7 @@
 #include "../casadi_exception.hpp"
 #include "../casadi_limits.hpp"
 #include "../matrix/matrix.hpp"
+#include "../matrix/generic_expression.hpp"
 
 /** \brief  C/C++ */
 #include <iostream>
@@ -53,7 +54,7 @@ class SXNode; // include will follow in the end
 #endif // SWIG
 
 
-class SX{
+class SX : public GenericExpression<SX>{
   friend class SXNode;
   friend class BinarySXNode;
 
@@ -103,22 +104,6 @@ class SX{
 
     // Convert to a 1-by-1 Matrix
     operator Matrix<SX>() const;
-
-    //@{
-    /** \brief  Operators that change the object */
-    friend SX& operator+=(SX &ex, const SX &scalar);
-    friend SX& operator-=(SX &ex, const SX &scalar);
-    friend SX& operator*=(SX &ex, const SX &scalar);
-    friend SX& operator/=(SX &ex, const SX &scalar);
-    //@}
-      
-    //@{
-    /** \brief  Operators that create new objects (SX on the left hand side) */
-    friend SX operator+(const SX &x, const SX &y);
-    friend SX operator-(const SX &x, const SX &y);
-    friend SX operator*(const SX &x, const SX &y);
-    friend SX operator/(const SX &x, const SX &y);
-    //@}
     
     //@ {
     /** \brief  Conditional operators */
@@ -208,19 +193,19 @@ class SX{
     SX operator-() const;
 
     //  all binary operations
-    SX __add__(const SX& b) const{  return *this + b;}
-    SX __sub__(const SX& b) const{  return *this - b;}
-    SX __mul__(const SX& b) const{  return *this * b;}
-    SX __div__(const SX& b) const{  return *this / b;}
+    SX __add__(const SX& y) const;
+    SX __sub__(const SX& y) const;
+    SX __mul__(const SX& y) const;
+    SX __div__(const SX& y) const;
     SX __pow__(const SX& b) const;
     SX __constpow__(const SX& b) const;
     
-    SX __mldivide__(const SX& b) const{  return b.__mrdivide__(*this);}
     SX __mrdivide__(const SX& b) const{  return *this / b;}
     SX __mpower__(const SX& b) const {return (*this).__pow__(b);}
     SX trans() const{ return *this;}
     
     /// The following functions serves two purposes: Numpy compatibility and to allow unambigous access
+    SX mul(const SX& y) const{ return __mul__(y);}
     SX exp() const;
     SX log() const;
     SX sqrt() const;
@@ -235,26 +220,22 @@ class SX{
     SX erf() const;
     SX erfinv() const;
     SX fabs() const;
-    SX add(const SX& y) const;
-    SX sub(const SX& y) const;
-    SX mul(const SX& y) const;
-    SX div(const SX& y) const;
-    SX fmin(const SX &b) const;
-    SX fmax(const SX &b) const;
+    SX fmin(const SX &y) const;
+    SX fmax(const SX &y) const;
     SX inv() const;
     SX sinh() const;
     SX cosh() const;
     SX tanh() const;
-    SX arctan2(const SX &b) const;
+    SX arctan2(const SX &y) const;
     SX log10() const;
-    SX printme(const SX &b) const;
+    SX printme(const SX &y) const;
     SX sign() const;
-    SX constpow(const SX& n) const;
+    SX constpow(const SX& y) const;
     
-    Matrix<SX> add(const Matrix<SX>& y) const;
-    Matrix<SX> sub(const Matrix<SX>& y) const;
-    Matrix<SX> mul(const Matrix<SX>& y) const;
-    Matrix<SX> div(const Matrix<SX>& y) const;
+    Matrix<SX> __add__(const Matrix<SX>& y) const;
+    Matrix<SX> __sub__(const Matrix<SX>& y) const;
+    Matrix<SX> __mul__(const Matrix<SX>& y) const;
+    Matrix<SX> __div__(const Matrix<SX>& y) const;
     Matrix<SX> fmin(const Matrix<SX>& b) const;
     Matrix<SX> fmax(const Matrix<SX>& b) const;
     Matrix<SX> constpow(const Matrix<SX>& n) const;

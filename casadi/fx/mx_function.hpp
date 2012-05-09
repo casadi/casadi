@@ -34,13 +34,13 @@ namespace CasADi{
 /** \brief  An elemenent of the algorithm, namely an MX node */
 struct MXAlgEl{
   // Function to be evaluated
-  MX mx;
+  MX op;
   
   // Indices of the children nodes
-  std::vector<int> i_arg;
+  std::vector<int> arg;
 
   // Indices of the children nodes
-  std::vector<int> i_res;
+  std::vector<int> res;
 };
 
 } // namespace CasADi
@@ -126,6 +126,8 @@ public:
   /** \brief Expand the matrix valued graph into a scalar valued graph */
   SXFunction expand(const std::vector<SXMatrix>& inputv = std::vector<SXMatrix>());
   
+  /** \brief Get all the free variables of the function */
+  std::vector<MX> getFree() const;
 };
 
 } // namespace CasADi

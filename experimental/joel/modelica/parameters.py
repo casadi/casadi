@@ -21,8 +21,10 @@
 # 
 import casadi
 ocp = casadi.SymbolicOCP()
-ocp.parseFMI('modelDescription.xml')
+#ocp.parseFMI('modelDescription.xml')
+ocp.parseFMI('modelDescription.xml',{'sort_equations':False,'eliminate_dependent':False})
 ocp.sortType(True) # temporary solution: enables the new sorting
+print ocp
 
 x = ocp.variable('x')
 x_start = ocp.variable('x_start')

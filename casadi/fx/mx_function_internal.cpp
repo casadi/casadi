@@ -70,11 +70,11 @@ void MXFunctionInternal::init(){
   stack<MXNode*> s;
 
   // Add the inputs to the stack
-  for(vector<MX>::iterator it = inputv_.begin(); it!=inputv_.end(); ++it)
+  for(vector<MX>::reverse_iterator it = inputv_.rbegin(); it!=inputv_.rend(); ++it)
     if(it->get()) s.push(static_cast<MXNode*>(it->get()));
 
   // Add the outputs to the stack
-  for(vector<MX>::iterator it = outputv_.begin(); it!=outputv_.end(); ++it)
+  for(vector<MX>::reverse_iterator it = outputv_.rbegin(); it!=outputv_.rend(); ++it)
     if(it->get()) s.push(static_cast<MXNode*>(it->get()));
 
   // All evaluation nodes in the order of evaluation
@@ -127,12 +127,12 @@ void MXFunctionInternal::init(){
   place_in_alg.reserve(nodes.size());
   
   // Work vector for the virtual machine
-  work.resize(0);
-  work.reserve(nodes.size());
+  work_.resize(0);
+  work_.reserve(nodes.size());
   
   // The sequence of instructions for the virtual machine
-  alg.resize(0);
-  alg.reserve(nodes.size());
+  algorithm_.resize(0);
+  algorithm_.reserve(nodes.size());
   
   // Process nodes
   for(vector<MXNode*>::iterator it=nodes.begin(); it!=nodes.end(); ++it){
@@ -149,10 +149,10 @@ void MXFunctionInternal::init(){
       int pind = place_in_alg[n->dep(0)->temp];
       
       // Save output to the parent node
-      alg[pind].i_res.at(oind) = work.size();
+      algorithm_[pind].res.at(oind) = work_.size();
       
       // Save place in work vector
-      place_in_work.push_back(work.size());
+      place_in_work.push_back(work_.size());
 
       // Not in algorithm
       place_in_alg.push_back(-1);
@@ -194,10 +194,10 @@ void MXFunctionInternal::init(){
       int pind = place_in_alg[n->dep(0)->dep(0)->temp];
       
       // Save output to the parent node (note that we add to the end, which is not the ultimate position, therefore a sorting takes place later in the code
-      alg[pind].i_res.insert(alg[pind].i_res.begin()+place,work.size());
+      algorithm_[pind].res.insert(algorithm_[pind].res.begin()+place,work_.size());
       
       // Save place in work vector
-      place_in_work.push_back(work.size());
+      place_in_work.push_back(work_.size());
 
       // Not in algorithm
       place_in_alg.push_back(-1);
@@ -205,7 +205,7 @@ void MXFunctionInternal::init(){
 /*    } else if(n->isSymbolic()){
       
       // Save place in work vector
-      place_in_work.push_back(work.size());
+      place_in_work.push_back(work_.size());
 
       // Not in algorithm
       place_in_alg.push_back(-1);*/
@@ -213,14 +213,14 @@ void MXFunctionInternal::init(){
     } else {
       
       // Add an element to the algorithm
-      place_in_alg.push_back(alg.size());
-      alg.resize(alg.size()+1);
-      alg.back().mx.assignNode(n);
+      place_in_alg.push_back(algorithm_.size());
+      algorithm_.resize(algorithm_.size()+1);
+      algorithm_.back().op.assignNode(n);
 
       // Save the indices of the arguments
-      alg.back().i_arg.resize(n->ndep());
+      algorithm_.back().arg.resize(n->ndep());
       for(int i=0; i<n->ndep(); ++i){
-        alg.back().i_arg[i] = n->dep(i).isNull() ? -1 : place_in_work[n->dep(i)->temp];
+        algorithm_.back().arg[i] = n->dep(i).isNull() ? -1 : place_in_work[n->dep(i)->temp];
       }
       
       if(n->isMultipleOutput()){
@@ -229,23 +229,23 @@ void MXFunctionInternal::init(){
         place_in_work.push_back(-1);
        
         // Allocate space for outputs indices
-        alg.back().i_res.resize(n->getNumOutputs(),-1);
+        algorithm_.back().res.resize(n->getNumOutputs(),-1);
         
         // No element in the work vector needed, thus continue
         continue;
       } else {
         
         // Save place in work vector
-        place_in_work.push_back(work.size());
+        place_in_work.push_back(work_.size());
 
         // Allocate space for the outputs index
-        alg.back().i_res.resize(1,work.size());
+        algorithm_.back().res.resize(1,work_.size());
       }
     }
     
     // Allocate memory for an element in the work vector
-    work.resize(work.size()+1);
-    work.back().data = Matrix<double>(n->sparsity(),0);
+    work_.resize(work_.size()+1);
+    work_.back().data = Matrix<double>(n->sparsity(),0);
   }
   
   // Allocate memory for directional derivatives
@@ -267,6 +267,9 @@ void MXFunctionInternal::init(){
   for(int i=0; i<nodes.size(); ++i){
     nodes[i]->temp = 0;
   }
+  
+  // Get the free variables
+  collectFree();
   
   // Eliminate Jacobian if the computational graph contains jacobians
   if(m.empty()) return;
@@ -302,12 +305,12 @@ void MXFunctionInternal::init(){
   }
 
   // Loop over the nodes again, replacing nodes
-  for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++){
+  for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
 
     // Get the old references to the function and evaluation node (since they will change)
-    if(it->mx->isEvaluation()){
-      void *fcn_ref = it->mx->getFunction().get();
-      void *eval_ref = it->mx.get();
+    if(it->op->isEvaluation()){
+      void *fcn_ref = it->op->getFunction().get();
+      void *eval_ref = it->op.get();
     
       // Check if the function should be replaced
       evmap::const_iterator ii=m.find(fcn_ref);
@@ -318,19 +321,19 @@ void MXFunctionInternal::init(){
         if(jj!=ii->second.end()){
           
           // Make the pointer unique so that other expressions won't be affected
-          it->mx.makeUnique(false);
+          it->op.makeUnique(false);
           
           // Replace the function if its an evaluation node
-          it->mx->getFunction() = jac[fcn_ref][jj->second];
+          it->op->getFunction() = jac[fcn_ref][jj->second];
           
           // Make a copy of the result indices
-          vector<int> i_res = it->i_res;
+          vector<int> res = it->res;
           
           // Update the index of the undifferentiated outputs
           int oind_old=0, oind_new=0;
           for(jblocks::const_iterator kk=jj->second.begin(); kk!=jj->second.end(); ++kk){
             if(kk->second<0){
-              i_res[oind_new] = it->i_res[oind_old++];
+              res[oind_new] = it->res[oind_old++];
             }
             oind_new++;
           }
@@ -339,13 +342,13 @@ void MXFunctionInternal::init(){
           oind_new=0;
           for(jblocks::const_iterator kk=jj->second.begin(); kk!=jj->second.end(); ++kk){
             if(kk->second>=0){
-              i_res[oind_new] = it->i_res[oind_old++];
+              res[oind_new] = it->res[oind_old++];
             }
             oind_new++;
           }
           
-          // Update i_res
-          i_res.swap(it->i_res);
+          // Update res
+          res.swap(it->res);
         }
       }
     }
@@ -364,7 +367,7 @@ void MXFunctionInternal::updateNumSens(bool recursive){
   if(recursive) XFunctionInternal<MXFunctionInternal,MX,MXNode>::updateNumSens(recursive);
   
   // Allocate work for directional derivatives
-  for(vector<FunctionIO>::iterator it=work.begin(); it!=work.end(); it++){
+  for(vector<FunctionIO>::iterator it=work_.begin(); it!=work_.end(); it++){
     it->dataF.resize(nfdir_,it->data);
     it->dataA.resize(nadir_,it->data);
   }
@@ -376,8 +379,8 @@ void MXFunctionInternal::setLiftingFunction(LiftingFunction liftfun, void* user_
 }
 
 void MXFunctionInternal::updatePointers(const AlgEl& el, int nfwd, int nadj){
-  mx_input_.resize(el.i_arg.size());
-  mx_output_.resize(el.i_res.size());
+  mx_input_.resize(el.arg.size());
+  mx_output_.resize(el.res.size());
 
   mx_fwdSeed_.resize(nfwd);
   mx_fwdSens_.resize(nfwd);
@@ -394,10 +397,10 @@ void MXFunctionInternal::updatePointers(const AlgEl& el, int nfwd, int nadj){
   }
   
   for(int i=0; i<mx_input_.size(); ++i){
-    if(el.i_arg[i]>=0){
-      mx_input_[i] = &work[el.i_arg[i]].data;
-      for(int d=0; d<nfwd; ++d) mx_fwdSeed_[d][i] = &work[el.i_arg[i]].dataF[d];
-      for(int d=0; d<nadj; ++d) mx_adjSens_[d][i] = &work[el.i_arg[i]].dataA[d];
+    if(el.arg[i]>=0){
+      mx_input_[i] = &work_[el.arg[i]].data;
+      for(int d=0; d<nfwd; ++d) mx_fwdSeed_[d][i] = &work_[el.arg[i]].dataF[d];
+      for(int d=0; d<nadj; ++d) mx_adjSens_[d][i] = &work_[el.arg[i]].dataA[d];
     } else {
       mx_input_[i] = 0;
       for(int d=0; d<nfwd; ++d) mx_fwdSeed_[d][i] = 0;
@@ -406,10 +409,10 @@ void MXFunctionInternal::updatePointers(const AlgEl& el, int nfwd, int nadj){
   }
   
   for(int i=0; i<mx_output_.size(); ++i){
-    if(el.i_res[i]>=0){
-      mx_output_[i] = &work[el.i_res[i]].data;
-      for(int d=0; d<nfwd; ++d) mx_fwdSens_[d][i] = &work[el.i_res[i]].dataF[d];
-      for(int d=0; d<nadj; ++d) mx_adjSeed_[d][i] = &work[el.i_res[i]].dataA[d];
+    if(el.res[i]>=0){
+      mx_output_[i] = &work_[el.res[i]].data;
+      for(int d=0; d<nfwd; ++d) mx_fwdSens_[d][i] = &work_[el.res[i]].dataF[d];
+      for(int d=0; d<nadj; ++d) mx_adjSeed_[d][i] = &work_[el.res[i]].dataA[d];
     } else {
       mx_output_[i] = 0;
       for(int d=0; d<nfwd; ++d) mx_fwdSens_[d][i] = 0;
@@ -423,27 +426,27 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
 
   // Pass the inputs
   for(int ind=0; ind<input_.size(); ++ind){
-    work[input_ind_[ind]].data.set(input(ind));
+    work_[input_ind_[ind]].data.set(input(ind));
   }
 
   // Pass the forward seeds
   for(int dir=0; dir<nfdir; ++dir)
     for(int ind=0; ind<input_.size(); ++ind){
-      work[input_ind_[ind]].dataF.at(dir).set(fwdSeed(ind,dir));
+      work_[input_ind_[ind]].dataF.at(dir).set(fwdSeed(ind,dir));
     }
   
   // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
-  for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++){
+  for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
     
     // Point pointers to the data corresponding to the element
     updatePointers(*it,nfdir,0);
 
     // Evaluate
-    it->mx->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_);
+    it->op->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_);
     // Lifting
-    if(liftfun_ && it->mx->isNonLinear()){
-      for(int i=0; i<it->i_res.size(); ++i){
-        liftfun_(&mx_output_[i]->front(),it->mx.size(),liftfun_ud_);
+    if(liftfun_ && it->op->isNonLinear()){
+      for(int i=0; i<it->res.size(); ++i){
+        liftfun_(&mx_output_[i]->front(),it->op.size(),liftfun_ud_);
       }
     }
   }
@@ -452,20 +455,20 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
   
   // Get the outputs
   for(int ind=0; ind<outputv_.size(); ++ind){
-    work[output_ind_[ind]].data.get(output(ind));
+    work_[output_ind_[ind]].data.get(output(ind));
   }
 
   // Get the forward sensitivities
   for(int dir=0; dir<nfdir; ++dir)
     for(int ind=0; ind<outputv_.size(); ++ind){
-      work[output_ind_[ind]].dataF.at(dir).get(fwdSens(ind,dir));
+      work_[output_ind_[ind]].dataF.at(dir).get(fwdSens(ind,dir));
     }
           
   if(nadir>0){
     log("MXFunctionInternal::evaluate evaluating adjoint");
 
     // Clear the adjoint seeds
-    for(vector<FunctionIO>::iterator it=work.begin(); it!=work.end(); it++)
+    for(vector<FunctionIO>::iterator it=work_.begin(); it!=work_.end(); it++)
       for(int dir=0; dir<nadir; ++dir){
         fill(it->dataA.at(dir).begin(),it->dataA.at(dir).end(),0.0);
       }
@@ -473,23 +476,23 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
     // Pass the adjoint seeds
     for(int ind=0; ind<outputv_.size(); ++ind)
       for(int dir=0; dir<nadir; ++dir){
-        work[output_ind_[ind]].dataA.at(dir).set(adjSeed(ind,dir));
+        work_[output_ind_[ind]].dataA.at(dir).set(adjSeed(ind,dir));
       }
 
     // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
-    for(vector<AlgEl>::reverse_iterator it=alg.rbegin(); it!=alg.rend(); it++){
+    for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); it++){
       
       // Point pointers to the data corresponding to the element
       updatePointers(*it,0,nadir);
       
       // Evaluate
-      it->mx->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_);
+      it->op->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_);
     }
 
     // Get the adjoint sensitivities
     for(int ind=0; ind<input_.size(); ++ind)
       for(int dir=0; dir<nadir; ++dir){
-        work[input_ind_[ind]].dataA.at(dir).get(adjSens(ind,dir));
+        work_[input_ind_[ind]].dataA.at(dir).get(adjSens(ind,dir));
       }
     
     log("MXFunctionInternal::evaluate evaluated adjoint");
@@ -499,16 +502,16 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
 
 void MXFunctionInternal::print(ostream &stream) const{
   FXInternal::print(stream);
-  for(int i=0; i<alg.size(); ++i){
+  for(int i=0; i<algorithm_.size(); ++i){
     stream << "i_" << i<< " =  ";
-    alg[i].mx->printPart(stream,0);
-    for(int j=0; j<alg[i].mx->ndep(); ++j){
-      if(alg[i].i_arg[j]>=0){
-        stream << "i_" << alg[i].i_arg[j];
+    algorithm_[i].op->printPart(stream,0);
+    for(int j=0; j<algorithm_[i].op->ndep(); ++j){
+      if(algorithm_[i].arg[j]>=0){
+        stream << "i_" << algorithm_[i].arg[j];
       } else {
         stream << "[]";
       }
-      alg[i].mx->printPart(stream,j+1);
+      algorithm_[i].op->printPart(stream,j+1);
     }
     stream << endl;
   }
@@ -520,17 +523,17 @@ MXFunctionInternal* MXFunctionInternal::clone() const{
 
 void MXFunctionInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
   XFunctionInternal<MXFunctionInternal,MX,MXNode>::deepCopyMembers(already_copied);
-  for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); ++it){
-    if(it->mx->isEvaluation()){
-      it->mx.makeUnique(already_copied,false);
-      it->mx->getFunction() = deepcopy(it->mx->getFunction(),already_copied);
+  for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
+    if(it->op->isEvaluation()){
+      it->op.makeUnique(already_copied,false);
+      it->op->getFunction() = deepcopy(it->op->getFunction(),already_copied);
     }
   }
 }
 
 void MXFunctionInternal::spInit(bool fwd){
   // Start by setting all elements of the work vector to zero
-  for(vector<FunctionIO>::iterator it=work.begin(); it!=work.end(); ++it){
+  for(vector<FunctionIO>::iterator it=work_.begin(); it!=work_.end(); ++it){
     //Get a pointer to the int array
     bvec_t *iwork = get_bvec_t(it->data.data());
     fill_n(iwork,it->data.size(),0);
@@ -542,7 +545,7 @@ void MXFunctionInternal::spEvaluate(bool fwd){
     
     // Pass input seeds
     for(int ind=0; ind<input_ind_.size(); ++ind){
-      vector<double> &w = work[input_ind_[ind]].data.data();
+      vector<double> &w = work_[input_ind_[ind]].data.data();
       bvec_t* iwork = get_bvec_t(w);
       bvec_t* swork = get_bvec_t(input(ind).data());
       for(int k=0; k<w.size(); ++k){
@@ -551,19 +554,19 @@ void MXFunctionInternal::spEvaluate(bool fwd){
     }
     
     // Propagate sparsity forward
-    for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++){
-      if(it->mx->isSymbolic()) continue;
+    for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
+      if(it->op->isSymbolic()) continue;
       
       // Point pointers to the data corresponding to the element
       updatePointers(*it,0,0);
 
       // Propagate sparsity forwards
-      it->mx->propagateSparsity(mx_input_, mx_output_,true);
+      it->op->propagateSparsity(mx_input_, mx_output_,true);
     }
     
     // Get the output seeds
     for(int ind=0; ind<output_ind_.size(); ++ind){
-      vector<double> &w = work[output_ind_[ind]].data.data();
+      vector<double> &w = work_[output_ind_[ind]].data.data();
       bvec_t* iwork = get_bvec_t(w);
       bvec_t* swork = get_bvec_t(output(ind).data());
       for(int k=0; k<w.size(); ++k){
@@ -575,7 +578,7 @@ void MXFunctionInternal::spEvaluate(bool fwd){
 
     // Pass output seeds
     for(int ind=0; ind<output_ind_.size(); ++ind){
-      vector<double> &w = work[output_ind_[ind]].data.data();
+      vector<double> &w = work_[output_ind_[ind]].data.data();
       bvec_t* iwork = get_bvec_t(w);
       bvec_t* swork = get_bvec_t(output(ind).data());
       for(int k=0; k<w.size(); ++k){
@@ -584,14 +587,14 @@ void MXFunctionInternal::spEvaluate(bool fwd){
     }
 
     // Propagate sparsity backwards
-    for(vector<AlgEl>::reverse_iterator it=alg.rbegin(); it!=alg.rend(); it++){
-      if(it->mx->isSymbolic()) continue;
+    for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); it++){
+      if(it->op->isSymbolic()) continue;
       
       // Point pointers to the data corresponding to the element
       updatePointers(*it,0,0);
       
       // Propagate sparsity backwards
-      it->mx->propagateSparsity(mx_input_, mx_output_,false);
+      it->op->propagateSparsity(mx_input_, mx_output_,false);
       
       // Clear the seeds for the next sweep
       for(DMatrixPtrV::iterator it=mx_output_.begin(); it!=mx_output_.end(); ++it){
@@ -605,7 +608,7 @@ void MXFunctionInternal::spEvaluate(bool fwd){
     
     // Get the input seeds and clear it from the work vector
     for(int ind=0; ind<input_ind_.size(); ++ind){
-      vector<double> &w = work[input_ind_[ind]].data.data();
+      vector<double> &w = work_[input_ind_[ind]].data.data();
       bvec_t* iwork = get_bvec_t(w);
       bvec_t* swork = get_bvec_t(input(ind).data());
       for(int k=0; k<w.size(); ++k){
@@ -804,9 +807,16 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
                                 const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
                                 bool output_given, bool eliminate_constants){
   assertInit();
+  casadi_assert_message(arg.size()==getNumInputs(),"Wrong number of input arguments");
+  casadi_assert_message(res.size()==getNumOutputs(),"Wrong number of output arguments");
   
   // Symbolic work, non-differentiated
-  std::vector<MX> swork(work.size());
+  std::vector<MX> swork(work_.size());
+  
+  // Pass free variables
+  for(int k=0; k<free_vars_.size(); ++k){
+    swork[free_vars_ind_[k]] = free_vars_[k];
+  }
 
   // Get the number of directions
   const int nfwd = fseed.size();
@@ -819,7 +829,7 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
   MXPtrVV dummy_p;
 
   // Work vector, forward derivatives
-  std::vector<std::vector<MX> > dwork(work.size());
+  std::vector<std::vector<MX> > dwork(work_.size());
   fill(dwork.begin(),dwork.end(),std::vector<MX>(nfwd));
 
   // Pass the inputs
@@ -837,33 +847,33 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
   }
     
   // Loop over computational nodes in forward order
-  for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); ++it){
+  for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
     
     // Pointers to the arguments of the evaluation
-    input_p.resize(it->i_arg.size());
+    input_p.resize(it->arg.size());
     for(int i=0; i<input_p.size(); ++i){
-      int el = it->i_arg[i]; // index of the argument
+      int el = it->arg[i]; // index of the argument
       input_p[i] = el<0 ? 0 : &swork[el];
     }
         
     // Pointers to the result of the evaluation
-    output_p.resize(it->i_res.size());
+    output_p.resize(it->res.size());
     for(int i=0; i<output_p.size(); ++i){
-      int el = it->i_res[i]; // index of the output
+      int el = it->res[i]; // index of the output
       output_p[i] = el<0 ? 0 : &swork[el];
     }
 
     // Copy answer of the evaluation, if known
     if(output_given){
-      if(it->mx->isMultipleOutput()){
+      if(it->op->isMultipleOutput()){
         for(int oind=0; oind<output_p.size(); ++oind){
-          if(output_p[oind]!=0){
-            *output_p[oind] = MX::create(new OutputNode(it->mx,oind));
+          if(output_p[oind]){
+            *output_p[oind] = MX::create(new OutputNode(it->op,oind));
           }
         }
       } else {
-        if(output_p[0]!=0){
-          *output_p[0] = it->mx;
+        if(output_p[0]){
+          *output_p[0] = it->op;
         }
       }
       
@@ -872,13 +882,15 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
     }
     
     // Skip node if it is given
-    if(it->mx->isSymbolic()) continue; 
+    if(it->op->isSymbolic()){
+      continue;
+    }
 
     // Forward seeds and sensitivities
     for(int d=0; d<nfwd; ++d){
-      fseed_p[d].resize(it->i_arg.size());
-      for(int iind=0; iind<it->i_arg.size(); ++iind){
-        int el = it->i_arg[iind];
+      fseed_p[d].resize(it->arg.size());
+      for(int iind=0; iind<it->arg.size(); ++iind){
+        int el = it->arg[iind];
         fseed_p[d][iind] = el<0 ? 0 : &dwork[el][d];
         
         // Give zero seed if null
@@ -891,15 +903,15 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
         }
       }
 
-      fsens_p[d].resize(it->i_res.size());
-      for(int oind=0; oind<it->i_res.size(); ++oind){
-        int el = it->i_res[oind];
+      fsens_p[d].resize(it->res.size());
+      for(int oind=0; oind<it->res.size(); ++oind){
+        int el = it->res[oind];
         fsens_p[d][oind] = el<0 ? 0 : &dwork[el][d];
       }
     }
 
     // Call the evaluation function
-    it->mx->evaluateMX(input_p,output_p,fseed_p,fsens_p,dummy_p,dummy_p,output_given);
+    it->op->evaluateMX(input_p,output_p,fseed_p,fsens_p,dummy_p,dummy_p,output_given);
   }
   
   // Collect the results
@@ -937,27 +949,27 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
   
   // Loop over computational nodes in reverse order
   if(nadj>0){
-    for(vector<AlgEl>::reverse_iterator it=alg.rbegin(); it!=alg.rend(); ++it){
+    for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it){
       
       // Get the arguments of the evaluation
-      input_p.resize(it->i_arg.size());
+      input_p.resize(it->arg.size());
       for(int i=0; i<input_p.size(); ++i){
-        int el = it->i_arg[i]; // index of the argument
+        int el = it->arg[i]; // index of the argument
         input_p[i] = el<0 ? 0 : &swork[el];
       }
           
       // Result of the evaluation
-      output_p.resize(it->i_res.size());
+      output_p.resize(it->res.size());
       for(int i=0; i<output_p.size(); ++i){
-        int el = it->i_res[i]; // index of the output
+        int el = it->res[i]; // index of the output
         output_p[i] = el<0 ? 0 : &swork[el];
       }
 
       // Sensitivity arguments
       for(int d=0; d<nadj; ++d){
-        aseed_p[d].resize(it->i_res.size());
-        for(int oind=0; oind<it->i_res.size(); ++oind){
-          int el = it->i_res[oind];
+        aseed_p[d].resize(it->res.size());
+        for(int oind=0; oind<it->res.size(); ++oind){
+          int el = it->res[oind];
           aseed_p[d][oind] = el<0 ? 0 : &dwork[el][d];
           
           // Provide a zero seed if no seed exists
@@ -966,9 +978,9 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
           }
         }
 
-        asens_p[d].resize(it->i_arg.size());
-        for(int iind=0; iind<it->i_arg.size(); ++iind){
-          int el = it->i_arg[iind];
+        asens_p[d].resize(it->arg.size());
+        for(int iind=0; iind<it->arg.size(); ++iind){
+          int el = it->arg[iind];
           asens_p[d][iind] = el<0 ? 0 : &dwork[el][d];
           
           // Set sensitivities to zero if not yet used
@@ -979,7 +991,7 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
       }
 
       // Call the evaluation function
-      it->mx->evaluateMX(input_p,output_p,dummy_p,dummy_p,aseed_p,asens_p,true);
+      it->op->evaluateMX(input_p,output_p,dummy_p,dummy_p,aseed_p,asens_p,true);
     }
   }
   
@@ -1021,11 +1033,11 @@ void MXFunctionInternal::evalSX(const std::vector<SXMatrix>& input_s, std::vecto
   casadi_assert_message(adjSeed.empty(),"Not implemented");
   
   // Create a work array
-  vector<SXMatrix> swork(work.size());
-  for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++){
-    for(int i=0; i<it->i_res.size(); ++i){
-      if (it->i_res[i]>=0)
-        swork[it->i_res[i]] = SXMatrix(it->mx->sparsity(i));
+  vector<SXMatrix> swork(work_.size());
+  for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
+    for(int i=0; i<it->res.size(); ++i){
+      if (it->res[i]>=0)
+        swork[it->res[i]] = SXMatrix(it->op->sparsity(i));
     }
   }
   
@@ -1037,18 +1049,18 @@ void MXFunctionInternal::evalSX(const std::vector<SXMatrix>& input_s, std::vecto
   // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
   vector<SXMatrix*> sxarg;
   vector<SXMatrix*> sxres;
-  for(vector<AlgEl>::iterator it=alg.begin(); it!=alg.end(); it++){
-    sxarg.resize(it->i_arg.size());
+  for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
+    sxarg.resize(it->arg.size());
     for(int c=0; c<sxarg.size(); ++c){
-      int ind = it->i_arg[c];
+      int ind = it->arg[c];
       sxarg[c] = ind<0 ? 0 : &swork[ind];
     }
-    sxres.resize(it->i_res.size());
+    sxres.resize(it->res.size());
     for(int c=0; c<sxres.size(); ++c){
-      int ind = it->i_res[c];
+      int ind = it->res[c];
       sxres[c] = ind<0 ? 0 : &swork[ind];
     }
-    it->mx->evaluateSX(sxarg,sxres);
+    it->op->evaluateSX(sxarg,sxres);
   }
   
   // Get the outputs
@@ -1093,6 +1105,29 @@ SXFunction MXFunctionInternal::expand(const std::vector<SXMatrix>& inputvsx ){
   // Create function
   SXFunction f(arg,res);
   return f;
+}
+
+void MXFunctionInternal::collectFree(){
+  
+  // Mark all the inputs
+  for(vector<MX>::iterator i=inputv_.begin(); i!=inputv_.end(); ++i){
+    i->setTemp(1);
+  }
+  
+  // Collect free varables
+  free_vars_.clear();
+  free_vars_ind_.clear();
+  for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
+    if(it->op->isSymbolic() && it->op.getTemp()!=1){
+      free_vars_.push_back(it->op);
+      free_vars_ind_.push_back(it->res.front());
+    }
+  }
+
+  // Unmark inputs
+  for(vector<MX>::iterator i=inputv_.begin(); i!=inputv_.end(); ++i){
+    i->setTemp(0);
+  }
 }
 
 

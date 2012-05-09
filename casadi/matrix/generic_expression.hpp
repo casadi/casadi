@@ -1,0 +1,80 @@
+/*
+ *    This file is part of CasADi.
+ *
+ *    CasADi -- A symbolic framework for dynamic optimization.
+ *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *
+ *    CasADi is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    CasADi is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with CasADi; if not, write to the Free Software
+ *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+
+#ifndef GENERIC_EXPRESSION_HPP
+#define GENERIC_EXPRESSION_HPP
+
+#include "../casadi_math.hpp"
+
+namespace CasADi{
+
+  /** \brief Expression interface
+  This is a common base class for SX, MX and Matrix<>, introducing a uniform syntax and implementing
+  common functionality using the curiously recurring template pattern (CRTP) idiom.\n
+  
+  \author Joel Andersson 
+  \date 2012    
+*/
+template<typename ExType>
+class GenericExpression{
+  public:
+    
+#ifndef SWIG
+    /// Addition
+    inline friend ExType operator+(const ExType &x, const ExType &y){ return x.__add__(y); }
+    
+    /// Subtraction
+    inline friend ExType operator-(const ExType &x, const ExType &y){ return x.__sub__(y); }
+    
+    /// Elementwise multiplication
+    inline friend ExType operator*(const ExType &x, const ExType &y){ return x.__mul__(y); }
+
+    /// Elementwise division
+    inline friend ExType operator/(const ExType &x, const ExType &y){ return x.__div__(y); }
+
+    /// In-place addition
+    inline ExType& operator+=(const ExType &y){return static_cast<ExType&>(*this) = static_cast<ExType*>(this)->__add__(y);}
+
+    /// In-place subtraction
+    inline ExType& operator-=(const ExType &y){return static_cast<ExType&>(*this) = static_cast<ExType*>(this)->__sub__(y);}
+
+    /// In-place elementwise multiplication
+    inline ExType& operator*=(const ExType &y){return static_cast<ExType&>(*this) = static_cast<ExType*>(this)->__mul__(y);}
+
+    /// In-place elementwise division
+    inline ExType& operator/=(const ExType &y){return static_cast<ExType&>(*this) = static_cast<ExType*>(this)->__div__(y);}
+#endif // SWIG
+
+    /// Matrix division from left
+    ExType __mldivide__(const ExType& y) const{ return y.__mrdivide__(static_cast<const ExType&>(*this));}
+
+};
+
+#ifndef SWIG
+// Implementations
+#endif // SWIG
+
+
+} // namespace CasADi
+
+#endif // GENERIC_EXPRESSION_HPP
+
