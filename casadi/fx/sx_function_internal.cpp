@@ -1208,7 +1208,7 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
   
   casadi_assert_message(inputv_.size() == input.size(),"SXFunctionInternal::eval: wrong number of inputs." << std::endl << "Expecting " << inputv_.size() << " inputs, but got " << input.size() << " instead.");
   for(int i=0; i<input.size(); ++i){
-    casadi_assert_message(input[i].sparsity()==inputv_[i].sparsity(), "SXFunctionInternal::eval: argument sparsity inconsistent");
+    casadi_assert_message(input[i].sparsity()==inputv_[i].sparsity() || (input[i].empty() && inputv_[i].empty()), "SXFunctionInternal::eval: sparsity of argument " << i << " inconsistent");
   }
   
   casadi_assert_message(outputv_.size() == output.size(),"SXFunctionInternal::eval: wrong number of outputs." << std::endl << "Expecting " << outputv_.size() << " inputs, but got " << output.size() << " instead.");

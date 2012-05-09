@@ -189,6 +189,9 @@ void LiftedSQPInternal::init(){
   G_out[G_F] = f;
 
   rfcn_ = SXFunction(G_in,G_out);
+  rfcn_.setOption("number_of_fwd_dir",0);
+  rfcn_.setOption("number_of_adj_dir",0);
+  rfcn_.setOption("live_variables",true);
   rfcn_.init();
   if(verbose_){
     cout << "Generated residual function ( " << shared_cast<SXFunction>(rfcn_).getAlgorithmSize() << " nodes)." << endl;
@@ -318,6 +321,9 @@ void LiftedSQPInternal::init(){
   efcn_in[EXP_DU] = du;
   efcn_in[EXP_DLAM_F2] = dlam_f2;
   efcn_ = SXFunction(efcn_in,e);
+  efcn_.setOption("number_of_fwd_dir",0);
+  efcn_.setOption("number_of_adj_dir",0);
+  efcn_.setOption("live_variables",true);
   efcn_.init();
   if(verbose_){
     cout << "Generated step expansion function ( " << shared_cast<SXFunction>(efcn_).getAlgorithmSize() << " nodes)." << endl;

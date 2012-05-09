@@ -58,9 +58,12 @@ int main(){
   double endtime = 1.0;
 
   // Discretization
-  int numboxes = 20;
-  int num_eulersteps = 25;
+  int numboxes = 15; // 10 fails: Initial QP could not be solved due to unboundedness
+  int num_eulersteps = 20;
   int num_measurements = 20;
+//   int numboxes = 20;
+//   int num_eulersteps = 25;
+//   int num_measurements = 20;
 
   // Plotting
   bool plot_progress = false;
@@ -150,20 +153,23 @@ int main(){
     }
   }
   
-  // Create an integrator function
-  vector<SXMatrix> f_step_in(4);
-  f_step_in[0] = p;
-  f_step_in[1] = uk;
-  f_step_in[2] = vk;
-  f_step_in[3] = hk;
-  vector<SXMatrix> f_step_out(3);
-  f_step_out[0] = u;
-  f_step_out[1] = v;
-  f_step_out[2] = h;
-  SXFunction f_step(f_step_in,f_step_out);
-  f_step.setOption("live_variables",true);
-  f_step.init();
-  cout << "generated single step dynamics (" << f_step.getAlgorithmSize() << " nodes)" << endl;
+  SXFunction f_step;
+  {
+    // Create an integrator function
+    vector<SXMatrix> f_step_in(4);
+    f_step_in[0] = p;
+    f_step_in[1] = uk;
+    f_step_in[2] = vk;
+    f_step_in[3] = hk;
+    vector<SXMatrix> f_step_out(3);
+    f_step_out[0] = u;
+    f_step_out[1] = v;
+    f_step_out[2] = h;
+    f_step = SXFunction(f_step_in,f_step_out);
+    f_step.setOption("live_variables",true);
+    f_step.init();
+    cout << "generated single step dynamics (" << f_step.getAlgorithmSize() << " nodes)" << endl;
+  }
 
   // Integrate over one interval
   vector<MX> f_in(4);
@@ -277,6 +283,7 @@ int main(){
   for(int k=0; k<num_measurements; ++k){
     nlp_g.append(flatten(fff_sx.outputSX(k)));
   }
+  int nv = nlp_g.size();
   
   // Objective term
   if(!gauss_newton){
@@ -290,6 +297,14 @@ int main(){
   // Gauss-Newton Hessian approximation for Ipopt
 //   SXMatrix JF = jacobian(nlp_f,nlp_x);
 //   SXFunction hfcn(nlp_x,mul(trans(JF),JF));
+  
+  // Free some memory
+//   fff = MXFunction();
+//   fff_sx = SXFunction();
+//   nlp_x = SXMatrix();
+//   nlp_g = SXMatrix();
+//   nlp_f = SXMatrix();
+//   f = FX();
   
   // Solve with IPOPT
   NLPSolver nlp_solver;
@@ -305,7 +320,7 @@ int main(){
     qp_solver_options["printLevel"] = "none";
     //qp_solver_options["verbose"] = true;
     nlp_solver.setOption("qp_solver_options",qp_solver_options);
-    if(lifted) nlp_solver.setOption("num_lifted",nlp_g.size());
+    if(lifted) nlp_solver.setOption("num_lifted",nv);
     nlp_solver.setOption("toldx",1e-9);
     nlp_solver.setOption("verbose",true);
   }
@@ -331,7 +346,7 @@ int main(){
 //   nlp_solver.input(NLP_LBX)[1] = 0;
   nlp_solver.solve();
 
-//  cout << "x_opt = " << nlp_solver.output(NLP_X_OPT) << endl;
+  cout << "x_opt[0:2] = " << nlp_solver.output(NLP_X_OPT)[Slice(0,2)] << endl;
   cout << "f_opt = " << nlp_solver.output(NLP_COST) << endl;
   return 0;
 }
