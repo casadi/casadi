@@ -267,6 +267,20 @@
 <br/>
 @copydoc scheme_OCPOutput
 */
+/** \class CasADi::IPInternal
+\n
+\par
+@copydoc scheme_NLPInput
+<br/>
+@copydoc scheme_NLPOutput
+*/
+/** \class CasADi::IPMethod
+\n
+\par
+@copydoc scheme_NLPInput
+<br/>
+@copydoc scheme_NLPOutput
+*/
 /** \class CasADi::Sundials::SundialsInternal
 \n
 \par

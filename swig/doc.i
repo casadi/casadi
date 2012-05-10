@@ -21573,6 +21573,820 @@ Check if the object has been initialized. ";
 Assert that the object has been initialized. ";
 
 
+// File: classCasADi_1_1IPInternal.xml
+%feature("docstring") CasADi::IPInternal "C++ includes: ip_internal.hpp ";
+
+%feature("docstring")  CasADi::IPInternal::IPInternal "";
+
+%feature("docstring")  CasADi::IPInternal::~IPInternal "";
+
+%feature("docstring")  CasADi::IPInternal::clone "
+
+Make a deep copy of the instance. ";
+
+%feature("docstring")  CasADi::IPInternal::init "
+
+Initialize Initialize and make the object ready for setting arguments and
+evaluation. This method is typically called after setting options but before
+evaluating. If passed to another class (in the constructor), this class
+should invoke this function when initialized. ";
+
+%feature("docstring")  CasADi::IPInternal::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::IPInternal::reportConstraints "
+
+Prints out a human readable report about possible constraint violations -
+all constraints. ";
+
+%feature("docstring")  CasADi::IPInternal::checkInitialBounds "
+
+Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
+";
+
+%feature("docstring")  CasADi::IPInternal::evaluate_switch "
+
+Evaluate switch. ";
+
+%feature("docstring")  CasADi::IPInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
+%feature("docstring")  CasADi::IPInternal::jacobian "
+
+Calculate the jacobian of a number of function outputs with respect to a
+number of function inputs, optionally include the function outputs. ";
+
+%feature("docstring")  CasADi::IPInternal::jacobian_switch "
+
+Switch between numeric and symbolic jacobian. ";
+
+%feature("docstring")  CasADi::IPInternal::numeric_jacobian "
+
+Numeric Jacobian. ";
+
+%feature("docstring")  CasADi::IPInternal::hessian "
+
+Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::IPInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::IPInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::IPInternal::spInit "
+
+Reset the sparsity propagation. ";
+
+%feature("docstring")  CasADi::IPInternal::evalSX "
+
+Evaluate symbolically, SX type. ";
+
+%feature("docstring")  CasADi::IPInternal::evalMX "
+
+Evaluate symbolically, MX type. ";
+
+%feature("docstring")  CasADi::IPInternal::eval "
+
+Evaluate symbolically, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::IPInternal::eval "
+
+Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::IPInternal::iStruct "
+
+Access an input. ";
+
+%feature("docstring")  CasADi::IPInternal::iStruct "
+
+Const access an input. ";
+
+%feature("docstring")  CasADi::IPInternal::oStruct "
+
+Access an output. ";
+
+%feature("docstring")  CasADi::IPInternal::oStruct "
+
+Const access an output. ";
+
+%feature("docstring")  CasADi::IPInternal::print "
+
+Print. ";
+
+%feature("docstring")  CasADi::IPInternal::repr "
+
+Print. ";
+
+%feature("docstring")  CasADi::IPInternal::getPartition "
+
+Get the unidirectional or bidirectional partition. ";
+
+%feature("docstring")  CasADi::IPInternal::verbose "
+
+Verbose mode? ";
+
+%feature("docstring")  CasADi::IPInternal::monitored "
+
+Is function fcn being monitored. ";
+
+%feature("docstring")  CasADi::IPInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::IPInternal::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::IPInternal::output "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::IPInternal::output "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::IPInternal::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::IPInternal::fwdSeed "
+
+Const access forward seed. ";
+
+%feature("docstring")  CasADi::IPInternal::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::IPInternal::fwdSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::IPInternal::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::IPInternal::adjSeed "
+
+Const access adjoint seed. ";
+
+%feature("docstring")  CasADi::IPInternal::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::IPInternal::adjSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::IPInternal::setNumInputs "
+
+Set the number of function inputs. ";
+
+%feature("docstring")  CasADi::IPInternal::setNumOutputs "
+
+Set the number of function outputs. ";
+
+%feature("docstring")  CasADi::IPInternal::getNumInputs "
+
+Get the number of function inputs. ";
+
+%feature("docstring")  CasADi::IPInternal::getNumOutputs "
+
+Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::IPInternal::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::IPInternal::getStat "
+
+Get single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::IPInternal::getJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::IPInternal::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::IPInternal::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::IPInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::IPInternal::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::IPInternal::getFullJacobian "
+
+Get the Jacobian of all outputs with respect to all inputs. ";
+
+%feature("docstring")  CasADi::IPInternal::log "
+
+Log the status of the solver. ";
+
+%feature("docstring")  CasADi::IPInternal::log "
+
+Log the status of the solver, function given. ";
+
+%feature("docstring")  CasADi::IPInternal::setOption "
+
+set an option. The setOptions are in general only considered before the init
+function, if any. If properties changes, the init function should be called
+again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::IPInternal::setOption "
+
+set a set of options. The setOptions are in general only considered before
+the init function, if any. If properties changes, the init function should
+be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::IPInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::IPInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::IPInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::IPInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::IPInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::IPInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::IPInternal::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::IPInternal::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::IPInternal::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::IPInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
+%feature("docstring")  CasADi::IPInternal::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::IPInternal::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::IPInternal::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::IPInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::IPInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::IPInternal::unregRef "
+
+Unregister a weak reference. ";
+
+%feature("docstring")  CasADi::IPInternal::deepCopyMembers "
+
+Deep copy data members. ";
+
+%feature("docstring")  CasADi::IPInternal::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::IPInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::IPInternal::assertInit "
+
+Assert that the object has been initialized. ";
+
+
+// File: classCasADi_1_1IPMethod.xml
+%feature("docstring") CasADi::IPMethod "
+
+Interior point method This method is experimental only. Do not attempt to
+use if you do not intend to dive into the source code. The current purpose
+of the class is to show how an IP method can be implemeted in CasADi. If
+someone wants to take responsibility for this class and make it work, then
+please contact the CasADi developers.
+
+Joel Andersson
+
+C++ includes: ip_method.hpp ";
+
+/*  Setters  */
+
+/* Set an input, output, forward seed/sensitivity or adjoint
+seed/sensitivity  T can be double&, double*, std::vector<double>&,
+Matrix<double> &  Assumes a properly allocated val.
+
+*/
+
+%feature("docstring")  CasADi::IPMethod::setInput "
+
+Reads in the input argument from val. ";
+
+%feature("docstring")  CasADi::IPMethod::setOutput "
+
+Reads in the output argument from val. ";
+
+%feature("docstring")  CasADi::IPMethod::setFwdSeed "
+
+Reads in the forward seed from val. ";
+
+%feature("docstring")  CasADi::IPMethod::setFwdSens "
+
+Reads in the forward sensitivity from val. ";
+
+%feature("docstring")  CasADi::IPMethod::setAdjSeed "
+
+Reads in the adjoint seed from val. ";
+
+%feature("docstring")  CasADi::IPMethod::setAdjSens "
+
+Reads in the adjoint sensitivity from val. ";
+
+/*  Getters  */
+
+/* A group of accessor for numerical data that operate on preallocated data.
+get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
+T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
+properly allocated val.
+
+*/
+
+%feature("docstring")  CasADi::IPMethod::getInput "
+
+Writes out the input argument into val. ";
+
+%feature("docstring")  CasADi::IPMethod::getOutput "
+
+Writes out the output argument into val. ";
+
+%feature("docstring")  CasADi::IPMethod::getFwdSeed "
+
+Writes out the forward seed into val. ";
+
+%feature("docstring")  CasADi::IPMethod::getFwdSens "
+
+Writes out the forward sensitivity into val. ";
+
+%feature("docstring")  CasADi::IPMethod::getAdjSeed "
+
+Writes out the adjoint seed into val. ";
+
+%feature("docstring")  CasADi::IPMethod::getAdjSens "
+
+Writes out the adjoint sensitivity into val. ";
+
+/*  Option Functionality  */
+
+%feature("docstring")  CasADi::IPMethod::setOption "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::IPMethod::setOption "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::IPMethod::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::IPMethod::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::IPMethod::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::IPMethod::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::IPMethod::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::IPMethod::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::IPMethod::makeUnique "
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object. ";
+
+%feature("docstring")  CasADi::IPMethod::makeUnique "";
+
+%feature("docstring")  CasADi::IPMethod::IPMethod "
+
+Default constructor. ";
+
+%feature("docstring")  CasADi::IPMethod::IPMethod "
+
+Constuct an NLP with non-linear constraints and provided hessian
+approximation. ";
+
+%feature("docstring")  CasADi::IPMethod::checkNode "
+
+Check if the node is pointing to the right type of object. ";
+
+%feature("docstring")  CasADi::IPMethod::reportConstraints "";
+
+%feature("docstring")  CasADi::IPMethod::getReportConstraints "";
+
+%feature("docstring")  CasADi::IPMethod::getF "
+
+Access the objective function F. ";
+
+%feature("docstring")  CasADi::IPMethod::getG "
+
+Access the objective function G. ";
+
+%feature("docstring")  CasADi::IPMethod::getH "
+
+Access the hessian of the Lagrangian function H. ";
+
+%feature("docstring")  CasADi::IPMethod::getJ "
+
+Access the jacobian of the constraint function J. ";
+
+%feature("docstring")  CasADi::IPMethod::getNumInputs "
+
+Get number of inputs. ";
+
+%feature("docstring")  CasADi::IPMethod::getNumOutputs "
+
+Get number of outputs. ";
+
+%feature("docstring")  CasADi::IPMethod::setNumInputs "
+
+Set number of inputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::IPMethod::setNumOutputs "
+
+Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::IPMethod::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
+%feature("docstring")  CasADi::IPMethod::evaluate_old "
+
+Evaluate (old style) ";
+
+%feature("docstring")  CasADi::IPMethod::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::IPMethod::solve "
+
+the same as evaluate(0,0) ";
+
+%feature("docstring")  CasADi::IPMethod::jacobian "
+
+Calculate jacobian of output oind with respect to input iind.
+
+This method calls the method jacobian on the internal twin of this class.
+The default behaviour for FX is to use CasADi::Jacobian, which uses
+(numerical) directional derivatives (i.e. operator overloading) to form the
+Jacobian. ";
+
+%feature("docstring")  CasADi::IPMethod::jacobian "
+
+Calculate the jacobian of a number of function outputs with respect to a
+number of function inputs, optionally include the function outputs. ";
+
+%feature("docstring")  CasADi::IPMethod::hessian "
+
+Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::IPMethod::call "
+
+Create a function call (single input) ";
+
+%feature("docstring")  CasADi::IPMethod::call "
+
+Create a function call. ";
+
+%feature("docstring")  CasADi::IPMethod::call "
+
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
+
+%feature("docstring")  CasADi::IPMethod::call "
+
+Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
+be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::IPMethod::eval "
+
+evaluate symbolically, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::IPMethod::eval "
+
+evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::IPMethod::eval "
+
+Evaluate symbolically with with directional derivatives, SX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The first
+boolean argument allows the second argument to the functions to be used as
+an input instead of output, assuming it is already known and the second
+boolean arguments allows constants to be eliminated during the evaluations
+(as the treatment of constants in CasADi will get more efficient, this will
+become unnecessary). ";
+
+%feature("docstring")  CasADi::IPMethod::eval "
+
+Evaluate symbolically with with directional derivatives, MX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The first
+boolean argument allows the second argument to the functions to be used as
+an input instead of output, assuming it is already known and the second
+boolean arguments allows constants to be eliminated during the evaluations
+(as the treatment of constants in CasADi will get more efficient, this will
+become unnecessary). ";
+
+%feature("docstring")  CasADi::IPMethod::eval "
+
+evaluate symbolically, single input, single output ";
+
+%feature("docstring")  CasADi::IPMethod::evalMX "
+
+evaluate symbolically, MX type (unambiguous) ";
+
+%feature("docstring")  CasADi::IPMethod::evalMX "
+
+Evaluate symbolically with with directional derivatives, MX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The first
+boolean argument allows the second argument to the functions to be used as
+an input instead of output, assuming it is already known and the second
+boolean arguments allows constants to be eliminated during the evaluations
+(as the treatment of constants in CasADi will get more efficient, this will
+become unnecessary). ";
+
+%feature("docstring")  CasADi::IPMethod::evalSX "
+
+evaluate symbolically, SX type (unambiguous) ";
+
+%feature("docstring")  CasADi::IPMethod::evalSX "
+
+Evaluate symbolically with with directional derivatives, SX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The first
+boolean argument allows the second argument to the functions to be used as
+an input instead of output, assuming it is already known and the second
+boolean arguments allows constants to be eliminated during the evaluations
+(as the treatment of constants in CasADi will get more efficient, this will
+become unnecessary). ";
+
+%feature("docstring")  CasADi::IPMethod::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::IPMethod::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::IPMethod::indexed_one_based "";
+
+%feature("docstring")  CasADi::IPMethod::indexed_zero_based "";
+
+%feature("docstring")  CasADi::IPMethod::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::IPMethod::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::IPMethod::output "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::IPMethod::output "
+
+Access output argument Note that copies in Python are shallow by default and
+fx.output() gives a reference/pointer to an internal data structure. So if
+you want save fx.output(), you need to make a deep copy using for example
+DMatrix(fx.output()). ";
+
+%feature("docstring")  CasADi::IPMethod::fwdSeed "
+
+Const access forward seed. ";
+
+%feature("docstring")  CasADi::IPMethod::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::IPMethod::fwdSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::IPMethod::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::IPMethod::adjSeed "
+
+Const access adjoint seed. ";
+
+%feature("docstring")  CasADi::IPMethod::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::IPMethod::adjSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::IPMethod::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::IPMethod::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::IPMethod::getStat "
+
+Get a single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::IPMethod::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::IPMethod::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
+%feature("docstring")  CasADi::IPMethod::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::IPMethod::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::IPMethod::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::IPMethod::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::IPMethod::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::IPMethod::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::IPMethod::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::IPMethod::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::IPMethod::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::IPMethod::clone "
+
+Deep copy. ";
+
+%feature("docstring")  CasADi::IPMethod::assignNode "
+
+Assign the node to a node class pointer (or null) ";
+
+%feature("docstring")  CasADi::IPMethod::assignNodeNoCount "
+
+Assign the node to a node class pointer without reference counting: inproper
+use will cause memory leaks! ";
+
+%feature("docstring")  CasADi::IPMethod::get "
+
+Get a const pointer to the node. ";
+
+%feature("docstring")  CasADi::IPMethod::get "
+
+Get a pointer to the node. ";
+
+%feature("docstring")  CasADi::IPMethod::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::IPMethod::swap "
+
+Swap content with another instance. ";
+
+%feature("docstring")  CasADi::IPMethod::repr "
+
+Print a representation of the object. ";
+
+%feature("docstring")  CasADi::IPMethod::print "
+
+Print a destription of the object. ";
+
+%feature("docstring")  CasADi::IPMethod::init "
+
+Initialize the object: more documentation in the node class (
+SharedObjectNode and derived classes) ";
+
+%feature("docstring")  CasADi::IPMethod::isInit "
+
+Is initialized? ";
+
+%feature("docstring")  CasADi::IPMethod::assertInit "
+
+Assert that it is initialized. ";
+
+%feature("docstring")  CasADi::IPMethod::isNull "
+
+Is a null pointer? ";
+
+%feature("docstring")  CasADi::IPMethod::getRepresentation "
+
+Return a string with a representation (for SWIG) ";
+
+%feature("docstring")  CasADi::IPMethod::getDescription "
+
+Return a string with a destription (for SWIG) ";
+
+
 // File: classCasADi_1_1IpoptInternal.xml
 %feature("docstring") CasADi::IpoptInternal "
 
@@ -72641,6 +73455,18 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: integrator__internal_8hpp.xml
+
+
+// File: ip__internal_8cpp.xml
+
+
+// File: ip__internal_8hpp.xml
+
+
+// File: ip__method_8cpp.xml
+
+
+// File: ip__method_8hpp.xml
 
 
 // File: ipopt_8hpp.xml
