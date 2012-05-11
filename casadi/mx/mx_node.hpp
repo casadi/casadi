@@ -224,6 +224,14 @@ class MXNode : public CachedObjectNode{
     /// Get size
     int size2() const;
     
+    /// Convert vector of pointers to vector of objects
+    template<typename T>
+    static std::vector<T> getVector(const std::vector<T*> v);
+
+    /// Convert vector of vectors of pointers to vector of vectors of objects
+    template<typename T>
+    static std::vector<std::vector<T> > getVector(const std::vector<std::vector<T*> > v);
+
     /** Temporary variables to be used in user algorithms like sorting, 
     the user is resposible of making sure that use is thread-safe
     The variable is initialized to zero
@@ -236,6 +244,28 @@ class MXNode : public CachedObjectNode{
     /** \brief  The sparsity pattern */
     CRSSparsity sparsity_;
 };
+
+// Implementations
+
+template<typename T>
+std::vector<T> MXNode::getVector(const std::vector<T*> v){
+	std::vector<T> ret(v.size());
+	for(int i=0; i<v.size(); i++){
+		if(v[i]!=0){
+			ret[i] = *v[i];
+		}
+	}
+	return ret;
+}
+
+template<typename T>
+std::vector<std::vector<T> > MXNode::getVector(const std::vector<std::vector<T*> > v){
+	std::vector<std::vector<T> > ret(v.size());
+	for(int i=0; i<v.size(); i++){
+		ret[i] = getVector(v[i]);
+	}
+	return ret;
+}
 
 
 } // namespace CasADi

@@ -757,5 +757,14 @@ void FXInternal::spEvaluate(bool fwd){
   casadi_error("FXInternal::spEvaluate not defined for class " << typeid(*this).name());
 }
 
+FX FXInternal::derivative(int nfwd, int nadj){
+	// No caching yet
+	return getDerivative(nfwd,nadj);
+}
+
+FX FXInternal::getDerivative(int nfwd, int nadj){
+	casadi_error("FXInternal::getDerivative not defined for class " << typeid(*this).name());
+}
+
 } // namespace CasADi
 

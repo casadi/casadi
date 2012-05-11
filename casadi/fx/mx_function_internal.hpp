@@ -82,6 +82,9 @@ class MXFunctionInternal : public XFunctionInternal<MXFunctionInternal,MX,MXNode
     /** \brief Gradient via source code transformation (identity matrix seed in a particular direction) */
     std::vector<MX> grad(int oind);
     
+    /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
+    virtual FX getDerivative(int nfwd, int nadj);
+
     /** \brief  An elemenent of the algorithm, namely an MX node */
     typedef MXAlgEl AlgEl;
 

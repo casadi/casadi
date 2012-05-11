@@ -35,13 +35,22 @@
 bool inititialize_at_solution = false;
 
 // Initialize the NLP at the optimal solution
+bool inititialize_at_measurements = true;
+
+// Initialize the NLP at the optimal solution
 bool with_ipopt = false;
 
 // Use Gauss-Newton
-bool gauss_newton = true;
+// bool gauss_newton = true;
 
 // Lifted
 bool lifted = true;
+
+// Single-shooting
+bool single_shooting = true;
+
+// Expand MX->SX
+// bool expand = true;
 
 using namespace CasADi;
 using namespace std;
@@ -51,19 +60,30 @@ int main(){
   // Physical parameters
   double g = 9.81; // gravity
   double poolwidth = 0.2;
-  double drag0 = 2.0; // => u(0)
-  double depth0 = 0.01; // => u(1)
   double sprad = 0.03;
   double spheight = 0.01;
   double endtime = 1.0;
 
+  // Optimization parameters
+  double drag_true = 2.0; // => u(0)
+  double depth_true = 0.01; // => u(1)
+  
   // Discretization
-  int numboxes = 15; // 10 fails: Initial QP could not be solved due to unboundedness
-  int num_eulersteps = 20;
-  int num_measurements = 20;
-//   int numboxes = 20;
-//   int num_eulersteps = 25;
+
+  // The largest dimensions which work with SX and IPOPT
+//   int numboxes = 3;
+//   int num_eulersteps = 20;
 //   int num_measurements = 20;
+
+  // The largest dimensions which work with SX and exact Hessian
+  int numboxes = 15; // (but e.g. 10 fails with the error message "Initial QP could not be solved due to unboundedness"
+  int num_eulersteps = 10;
+  int num_measurements = 25;
+
+  // The largest dimensions which work with SX and Gauss-Newton Hessian
+  //   int numboxes = 20;
+  //   int num_eulersteps = 10;
+  //   int num_measurements = 50;
 
   // Plotting
   bool plot_progress = false;
@@ -92,33 +112,17 @@ int main(){
       }
     }
   }
-  //   h0.printDense();
   
   // Free parameters
   SX drag("b");
   SX depth("H");
   vector<SX> p(2); p[0]=drag; p[1]=depth;
-  vector<double> p0(2); p0[0]=drag0; p0[1]=depth0;
+  vector<double> p_true(2); p_true[0]=drag_true; p_true[1]=depth_true;
   
   // The state at a measurement
   SXMatrix uk = ssym("uk",numboxes+1, numboxes);
   SXMatrix vk = ssym("vk",numboxes  , numboxes+1);
   SXMatrix hk = ssym("hk",numboxes  , numboxes);
-
-  // Mayer term
-  SXMatrix hmeas = ssym("h_meas",numboxes  , numboxes);
-  vector<SXMatrix> m_in(2);
-  m_in[0] = hk;
-  m_in[1] = hmeas;
-  SX mterm = 0;
-  for(int i=0; i<numboxes; ++i){
-    for(int j=0; j<numboxes; ++j){
-      SX dev = hk.elem(i,j) - hmeas.elem(i,j);
-      mterm += dev*dev;
-    }
-  }
-  SXFunction m(m_in,mterm);
-  m.init();
   
   // Take one step of the integrator
   SXMatrix u = uk;
@@ -166,7 +170,7 @@ int main(){
     f_step_out[1] = v;
     f_step_out[2] = h;
     f_step = SXFunction(f_step_in,f_step_out);
-    f_step.setOption("live_variables",true);
+//     f_step.setOption("live_variables",true);
     f_step.init();
     cout << "generated single step dynamics (" << f_step.getAlgorithmSize() << " nodes)" << endl;
   }
@@ -210,7 +214,7 @@ int main(){
   H_meas.reserve(num_measurements);
 
   // Simulate once to generate "measurements"
-  f.setInput(p0,0);
+  f.setInput(p_true,0);
   f.setInput(u0,1);
   f.setInput(v0,2);
   f.setInput(h0,3);
@@ -230,123 +234,240 @@ int main(){
   clock_t time2 = clock();
   double t_elapsed = double(time2-time1)/CLOCKS_PER_SEC;
   cout << "measurements generated in " << t_elapsed << " seconds." << endl;
-  
-  // Lifted quantitites
-  vector<MX> H_lifted = msym("h_lifted",numboxes,numboxes,num_measurements);
 
-  // Generate full-space NLP
-  vector<MX> H_eq;
-  MX U = u0;
-  MX V = v0;
-  MX H = h0;
-  int offset = 0;
-  for(int k=0; k<num_measurements; ++k){
-    // Take a step
-    MX f_arg[4] = {P,U,V,H};
-    vector<MX> f_res = f.call(vector<MX>(f_arg,f_arg+4));
-    U = f_res[0];
-    V = f_res[1];
-    H = f_res[2];
+  // Initial guesses
+  vector<double> drag_guess, depth_guess;
+  drag_guess.push_back( 0.5); depth_guess.push_back(0.01);
+  drag_guess.push_back( 5.0); depth_guess.push_back(0.01);
+  drag_guess.push_back(15.0); depth_guess.push_back(0.01);
+  drag_guess.push_back(30.0); depth_guess.push_back(0.01);
+  drag_guess.push_back( 2.0); depth_guess.push_back(0.005);
+  drag_guess.push_back( 2.0); depth_guess.push_back(0.02);
+  drag_guess.push_back( 2.0); depth_guess.push_back(0.1);
+  drag_guess.push_back( 0.2); depth_guess.push_back(0.001);
+  drag_guess.push_back( 1.0); depth_guess.push_back(0.005);
+  drag_guess.push_back( 4.0); depth_guess.push_back(0.02);
+  drag_guess.push_back( 1.0); depth_guess.push_back(0.02);
+  drag_guess.push_back(20.0); depth_guess.push_back(0.001);
+  
+  // Number of tests
+  const int n_tests = drag_guess.size();
+
+  // Number of iterations
+  vector<int> iter_count_gn(n_tests,-1);
+  vector<int> iter_count_eh(n_tests,-1);
+  
+  // Solution time
+  vector<double> sol_time_gn(n_tests,-1);
+  vector<double> sol_time_eh(n_tests,-1);
+  
+  // Estimated drag and depth
+  vector<double> drag_est_gn(n_tests,-1);
+  vector<double> depth_est_gn(n_tests,-1);
+  vector<double> drag_est_eh(n_tests,-1);
+  vector<double> depth_est_eh(n_tests,-1);
+  
+  for(int sol=0; sol<2; ++sol){
+    bool gauss_newton = sol==0;
+  
+    // Number of NLP variables
+    int nX = 2;
+    if(!single_shooting) 
+      nX += numboxes*numboxes*num_measurements;
     
-    // Lift the variable
-    MX H_def = H;
-    H = H_lifted[k];
-    H_eq.push_back(H_def-H);
-  }
-  
-  // Lifted NLP function
-  vector<MX> fff_in;
-  fff_in.push_back(P);
-  fff_in.insert(fff_in.end(),H_lifted.begin(),H_lifted.end());
-  vector<MX> fff_out = H_eq;
-  MXFunction fff(fff_in,fff_out);
-  fff.init();
-  cout << "Generated lifted problem" << endl;
-  SXFunction fff_sx(fff);
-  fff_sx.init();
-  cout << "generated lifted problem, SX (" << fff_sx.getAlgorithmSize() << " nodes)" << endl;
-  
-  // NLP variables
-  SXMatrix nlp_x;
-  for(int k=0; k<fff_sx.getNumInputs(); ++k){
-    nlp_x.append(flatten(fff_sx.inputSX(k)));
-  }
-  
-  // NLP objective function terms
-  SXMatrix nlp_f;
-  for(int k=0; k<num_measurements; ++k){
-    nlp_f.append(flatten(fff_sx.inputSX(1+k)-SXMatrix(H_meas[k])));
-  }
-  
-  // NLP constraint function terms
-  SXMatrix nlp_g;
-  for(int k=0; k<num_measurements; ++k){
-    nlp_g.append(flatten(fff_sx.outputSX(k)));
-  }
-  int nv = nlp_g.size();
-  
-  // Objective term
-  if(!gauss_newton){
-    nlp_f = inner_prod(nlp_f,nlp_f);
-  }
-  
-  // Formulate the NLP
-  SXFunction ffcn(nlp_x,nlp_f);
-  SXFunction gfcn(nlp_x,nlp_g);
-  
-  // Gauss-Newton Hessian approximation for Ipopt
-//   SXMatrix JF = jacobian(nlp_f,nlp_x);
-//   SXFunction hfcn(nlp_x,mul(trans(JF),JF));
-  
-  // Free some memory
-//   fff = MXFunction();
-//   fff_sx = SXFunction();
-//   nlp_x = SXMatrix();
-//   nlp_g = SXMatrix();
-//   nlp_f = SXMatrix();
-//   f = FX();
-  
-  // Solve with IPOPT
-  NLPSolver nlp_solver;
-  if(with_ipopt){
-    casadi_assert(!gauss_newton);
-    nlp_solver = IpoptSolver(ffcn,gfcn);
-    nlp_solver.setOption("generate_hessian",true);
-  } else {
-    nlp_solver = LiftedSQP(ffcn,gfcn);
-    if(gauss_newton) nlp_solver.setOption("gauss_newton",true);
-    nlp_solver.setOption("qp_solver",Interfaces::QPOasesSolver::creator);
-    Dictionary qp_solver_options;
-    qp_solver_options["printLevel"] = "none";
-    //qp_solver_options["verbose"] = true;
-    nlp_solver.setOption("qp_solver_options",qp_solver_options);
-    if(lifted) nlp_solver.setOption("num_lifted",nv);
-    nlp_solver.setOption("toldx",1e-9);
-    nlp_solver.setOption("verbose",true);
-  }
-  nlp_solver.init();
-  
-  if(inititialize_at_solution){
-    nlp_solver.input(NLP_X_INIT)[0] = drag0;
-    nlp_solver.input(NLP_X_INIT)[1] = depth0;
-    vector<double>::iterator it=nlp_solver.input(NLP_X_INIT).begin()+2;
-    for(int k=0; k<num_measurements; ++k){
-      copy(H_meas[k].begin(),H_meas[k].end(),it);
-      it += numboxes*numboxes;
-    }
-  } else {
-    nlp_solver.input(NLP_X_INIT)[0] = 0.5;
-    nlp_solver.input(NLP_X_INIT)[1] = 0.01;
-  }
-  nlp_solver.input(NLP_LBG).setZero();
-  nlp_solver.input(NLP_UBG).setZero();
-//   nlp_solver.input(NLP_LBX).setAll(-1000.);
-//   nlp_solver.input(NLP_UBX).setAll( 1000.);
-//   nlp_solver.input(NLP_LBX)[0] = 0;
-//   nlp_solver.input(NLP_LBX)[1] = 0;
-  nlp_solver.solve();
+    // Variables in the lifted NLP
+    MX X = msym("X",nX);
+    P = X[Slice(0,2)];
+    int X_offset = 2;
 
-  cout << "x_opt[0:2] = " << nlp_solver.output(NLP_X_OPT)[Slice(0,2)] << endl;
-  cout << "f_opt = " << nlp_solver.output(NLP_COST) << endl;
+    // Least-squares objective function
+    MX F;
+    
+    // Constraint function
+    MX G = MX::sparse(0,1);
+    
+    // Generate full-space NLP
+    MX U = u0;
+    MX V = v0;
+    MX H = h0;
+    int offset = 0;
+    for(int k=0; k<num_measurements; ++k){
+      // Take a step
+      MX f_arg[4] = {P,U,V,H};
+      vector<MX> f_res = f.call(vector<MX>(f_arg,f_arg+4));
+      U = f_res[0];
+      V = f_res[1];
+      H = f_res[2];
+      
+      if(!single_shooting){
+	// Lift the variable
+	MX H_def = H;
+	H = X[Slice(X_offset,X_offset+numboxes*numboxes)];
+	H = reshape(H,h0.sparsity());
+	X_offset += H.size();
+	
+	// Constraint function term
+	G.append(flatten(H_def-H));
+      }
+
+      // Objective function term
+      F.append(flatten(H-H_meas[k]));
+    }
+
+    // Number of lifted
+    int nv = G.size();
+
+    // Append variables
+//     G.append(P);
+
+	// Least-squares objective
+    if(!gauss_newton){
+      F = inner_prod(F,F)/2;
+    }
+
+    // Function which calculates the objective terms and constraints
+    vector<MX> fg_out;
+    fg_out.push_back(F);
+    fg_out.push_back(G);
+    MXFunction fg(X,fg_out);
+    fg.init();
+    cout << "Generated lifted NLP (" << fg.countNodes() << " nodes)" << endl;
+    
+    // Expand NLP
+    SXFunction fg_expanded(fg);
+    fg_expanded.init();
+    cout << "expanded lifted NLP (" << fg_expanded.getAlgorithmSize() << " nodes)" << endl;
+    
+    // Formulate the NLP
+    SXMatrix nlp_x = fg_expanded.inputSX();
+    SXMatrix nlp_f = fg_expanded.outputSX(0);
+    SXMatrix nlp_g = fg_expanded.outputSX(1);
+    SXFunction ffcn(nlp_x,nlp_f);
+    SXFunction gfcn(nlp_x,nlp_g);
+
+    // Solve with IPOPT
+    NLPSolver nlp_solver;
+    if(with_ipopt){
+      SXFunction hfcn;
+      if(gauss_newton){
+	// Scalar objective function
+	ffcn = SXFunction(nlp_x,inner_prod(nlp_f,nlp_f)/2);
+	
+	// Gauss-Newton Hessian approximation for Ipopt
+	SXMatrix JF = jacobian(nlp_f,nlp_x);
+	hfcn = SXFunction(nlp_x,mul(trans(JF),JF));
+	hfcn.setOption("live_variables",true);
+      }
+      nlp_solver = IpoptSolver(ffcn,gfcn,hfcn);
+      //     if(!gauss_newton) nlp_solver.setOption("generate_hessian",true);
+    } else {
+      nlp_solver = LiftedSQP(ffcn,gfcn);
+      if(gauss_newton) nlp_solver.setOption("gauss_newton",true);
+      nlp_solver.setOption("qp_solver",Interfaces::QPOasesSolver::creator);
+      Dictionary qp_solver_options;
+      qp_solver_options["printLevel"] = "none";
+      //qp_solver_options["verbose"] = true;
+      nlp_solver.setOption("qp_solver_options",qp_solver_options);
+      if(lifted) nlp_solver.setOption("num_lifted",nv);
+      nlp_solver.setOption("maxiter",200);
+      nlp_solver.setOption("toldx",1e-9);
+      nlp_solver.setOption("verbose",true);
+    }
+    nlp_solver.init();
+    
+    // Run tests
+    for(int test=0; test<n_tests; ++test){
+      // Print progress
+      cout << "test " << test << endl;
+      try{
+      
+	// Initial guess for the parameters
+	nlp_solver.input(NLP_X_INIT).setZero();
+	if(inititialize_at_solution){
+	  nlp_solver.setInput(p_true,NLP_X_INIT);
+	} else {
+	  nlp_solver.input(NLP_X_INIT)[0] = drag_guess[test];
+	  nlp_solver.input(NLP_X_INIT)[1] = depth_guess[test];
+	}
+
+	// Initial guess for the heights
+	if(!single_shooting && (inititialize_at_measurements || inititialize_at_solution)){
+	  vector<double>::iterator it=nlp_solver.input(NLP_X_INIT).begin()+2;
+	  for(int k=0; k<num_measurements; ++k){
+	    copy(H_meas[k].begin(),H_meas[k].end(),it);
+	    it += numboxes*numboxes;
+	  }
+	}
+	nlp_solver.input(NLP_LBG).setZero();
+	nlp_solver.input(NLP_UBG).setZero();
+// 	nlp_solver.input(NLP_UBG)[nv] = numeric_limits<double>::infinity();
+// 	nlp_solver.input(NLP_UBG)[nv+1] = numeric_limits<double>::infinity();
+// 	nlp_solver.input(NLP_LBG)[nv] = -numeric_limits<double>::infinity();
+// 	nlp_solver.input(NLP_LBG)[nv+1] = -numeric_limits<double>::infinity();
+	
+      //   nlp_solver.input(NLP_LBX).setAll(-1000.);
+      //   nlp_solver.input(NLP_UBX).setAll( 1000.);
+        nlp_solver.input(NLP_LBX)[0] = 0;
+        nlp_solver.input(NLP_LBX)[1] = 0;
+
+	time1 = clock();
+	nlp_solver.solve();
+	time2 = clock();
+	
+	// Solution statistics
+	int& iter_count   = gauss_newton ? iter_count_gn[test] : iter_count_eh[test];
+	double& sol_time  = gauss_newton ? sol_time_gn[test] : sol_time_eh[test];
+	double& drag_est  = gauss_newton ? drag_est_gn[test] : drag_est_eh[test];
+	double& depth_est = gauss_newton ? depth_est_gn[test] : depth_est_eh[test];
+	
+	iter_count = nlp_solver.getStat("iter_count");
+	sol_time = double(time2-time1)/CLOCKS_PER_SEC;
+	drag_est = nlp_solver.output(NLP_X_OPT).at(0);
+	depth_est = nlp_solver.output(NLP_X_OPT).at(1);
+	
+	// Estimated drag
+      } catch(exception& ex){
+	cout << "Test " << test << " failed: " << ex.what() << endl;
+      }
+    }
+  }
+
+  // Tolerance 
+  double tol=1e-3;
+  
+  cout << 
+  setw(10) << "drag" <<  "  &" <<
+  setw(10) << "depth" << "  &" << 
+  setw(10) << "iter_gn" << "  &" << 
+  setw(10) << "time_gn" << "  &" <<
+  setw(10) << "iter_en" << "  &" << 
+  setw(10) << "time_eh" << "  \\\\ \%" <<
+  setw(10) << "edrag_gn" << 
+  setw(10) << "edepth_gn" <<
+  setw(10) << "edrag_eh" << 
+  setw(10) << "edepth_eh" << endl;
+  for(int test=0; test<n_tests; ++test){
+    cout << setw(10) << drag_guess[test] << "  &";
+    cout << setw(10) << depth_guess[test] << "  &";
+    if(fabs(drag_est_gn[test]-drag_true) + fabs(depth_est_gn[test]-depth_true)<tol){
+      cout << setw(10) << iter_count_gn[test] << "  &";
+      cout << setw(10) << sol_time_gn[test] << "  &";
+    } else {
+      cout << setw(10) << "$\\infty$" << "  &";
+      cout << setw(10) << "$\\infty$" << "  &";
+    }
+    if(fabs(drag_est_eh[test]-drag_true) + fabs(depth_est_eh[test]-depth_true)<tol){
+      cout << setw(10) << iter_count_eh[test] << "  &";
+      cout << setw(10) << sol_time_eh[test] << "  \\\\ \%";
+    } else {
+      cout << setw(10) << "$\\infty$" << "  &";
+      cout << setw(10) << "$\\infty$" << "  \\\\ \%";
+    }
+    cout << setw(10) << drag_est_gn[test];
+    cout << setw(10) << depth_est_gn[test];
+    cout << setw(10) << drag_est_eh[test];
+    cout << setw(10) << depth_est_eh[test] << endl;
+  }
+  
   return 0;
 }

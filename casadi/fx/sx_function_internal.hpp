@@ -85,6 +85,9 @@ class SXFunctionInternal : public XFunctionInternal<SXFunctionInternal,Matrix<SX
   /** \brief Calculate the expression for the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs */
   std::vector<Matrix<SX> > jac(const std::vector<std::pair<int,int> >& jblocks, bool compact=false, const std::vector<bool>& symmetric_block=std::vector<bool>());
   
+  /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
+  virtual FX getDerivative(int nfwd, int nadj);
+
   /** \brief  DATA MEMBERS */
   
   /** \brief  Indices of the nodes corresponding to the inputs */

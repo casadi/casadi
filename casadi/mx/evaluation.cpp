@@ -29,6 +29,8 @@
 
 using namespace std;
 
+const bool NEW_EVAL = false;
+
 namespace CasADi{
 
 Evaluation::Evaluation(const FX& fcn, const std::vector<MX> &arg, const std::vector<std::vector<MX> > &fseed,
@@ -219,7 +221,28 @@ void Evaluation::evaluateSX(const SXMatrixPtrV& arg, SXMatrixPtrV& res, const SX
 }
 
 void Evaluation::evaluateMX(const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens, bool output_given){
-  // Evaluate function
+	// Number of sensitivity directions
+	int nfwd = fsens.size();
+	int nadj = aseed.size();
+
+#if 0
+	if(NEW_EVAL && fcn_.spCanEvaluate(true) && fcn_.spCanEvaluate(false)){
+		// Collect the inputs and seeds
+		vector<MX> argv = getVector(arg);
+		vector<vector<MX> > fseedv = getVector(fseed);
+		vector<vector<MX> > aseedv = getVector(aseed);
+
+		// Results of the evaluation
+		vector<MX> resv;
+		vector<vector<MX> > fsensv, asensv;
+
+		// Create a function for evaluating
+		return;
+	}
+#endif
+
+
+	// Evaluate function
   if(!output_given){
     // Evaluate the function symbolically
     vector<MX> argv(arg.size());
@@ -235,8 +258,6 @@ void Evaluation::evaluateMX(const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed
   }
 
   // Sensitivities
-  int nfwd = fsens.size();
-  int nadj = aseed.size();
   if(nfwd>0 || nadj>0){
     // Loop over outputs
     for(int oind=0; oind<res.size(); ++oind){
@@ -303,7 +324,7 @@ void Evaluation::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& alrea
 }
 
 void Evaluation::propagateSparsity(DMatrixPtrV& arg, DMatrixPtrV& res, bool use_fwd){
-  if(false && fcn_.spCanEvaluate(use_fwd)){
+  if(NEW_EVAL && fcn_.spCanEvaluate(use_fwd)){
     // Propagating sparsity pattern supported
     
     // Pass/clear forward seeds/adjoint sensitivities
