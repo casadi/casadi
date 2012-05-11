@@ -224,9 +224,9 @@ class FXtests(casadiTestCase):
     A = DMatrix(1,1,4)
     f.getFwdSeed(A,0)
     A = DMatrix(1,1)
-    self.assertRaises(RuntimeError,lambda : f.getFwdSeed(A,0))
+    #self.assertRaises(RuntimeError,lambda : f.getFwdSeed(A,0)) # This is now o.k. syntax
     B = DMatrix(1,2,2)
-    self.assertRaises(RuntimeError,lambda : f.getFwdSeed(A,0))
+    #self.assertRaises(RuntimeError,lambda : f.getFwdSeed(A,0)) # This is now o.k. syntax
     
   def test_issue304(self):
     self.message("regression test for #304") # this code used to segfault

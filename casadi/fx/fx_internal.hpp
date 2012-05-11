@@ -247,6 +247,9 @@ class FXInternal : public OptionsFunctionalityNode{
     bool store_jacobians_;
     std::vector<std::vector<FX> > jacs_;
     
+    // Functions to evaluate directional derivatives
+    std::vector<std::vector<WeakRef> > derivative_fcn_;
+
     /// Sparsity of the Jacobian blocks
     std::vector<std::vector<CRSSparsity> > jac_sparsity_, jac_sparsity_compact_;
 

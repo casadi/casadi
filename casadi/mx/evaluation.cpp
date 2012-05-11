@@ -107,7 +107,7 @@ void Evaluation::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res, const DMatr
   // Pass the inputs to the function
   for(int i=0; i<num_in; ++i){
     if(arg[i] != 0 && arg[i]->size() !=0 ){
-      fcn_.setInput(arg[i]->data(),i);
+      fcn_.setInput(*arg[i],i);
     }
   }
 
@@ -224,19 +224,59 @@ void Evaluation::evaluateMX(const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed
 	// Number of sensitivity directions
 	int nfwd = fsens.size();
 	int nadj = aseed.size();
+	bool no_diff = nfwd==0 && nadj==0; // no differentiation
 
-#if 0
-	if(NEW_EVAL && fcn_.spCanEvaluate(true) && fcn_.spCanEvaluate(false)){
-		// Collect the inputs and seeds
-		vector<MX> argv = getVector(arg);
-		vector<vector<MX> > fseedv = getVector(fseed);
-		vector<vector<MX> > aseedv = getVector(aseed);
+#if 1
+	if(NEW_EVAL && !no_diff && fcn_.spCanEvaluate(true) && fcn_.spCanEvaluate(false)){
+		// Get/generate the derivative function
+		FX d = fcn_.derivative(nfwd,nadj);
 
-		// Results of the evaluation
-		vector<MX> resv;
-		vector<vector<MX> > fsensv, asensv;
+		// Temporary
+		vector<MX> tmp;
 
-		// Create a function for evaluating
+		// Assemble inputs
+		vector<MX> d_arg;
+		d_arg.reserve(d.getNumInputs());
+
+		// Nondifferentiated inputs
+		tmp = getVector(arg);
+		d_arg.insert(d_arg.end(),tmp.begin(),tmp.end());
+		for(MXPtrVV::const_iterator i=fseed.begin(); i!=fseed.end(); ++i){
+			tmp = getVector(*i);
+			d_arg.insert(d_arg.end(),tmp.begin(),tmp.end());
+		}
+		for(MXPtrVV::const_iterator i=aseed.begin(); i!=aseed.end(); ++i){
+			tmp = getVector(*i);
+			d_arg.insert(d_arg.end(),tmp.begin(),tmp.end());
+		}
+
+		// Evaluate symbolically
+		vector<MX> d_res = d.call(d_arg);
+		vector<MX>::const_iterator d_res_it = d_res.begin();
+
+		// Collect the nondifferentiated results
+		for(MXPtrV::iterator i=res.begin(); i!=res.end(); ++i, ++d_res_it){
+			if(*i) **i = *d_res_it;
+		}
+
+		// Collect the forward sensitivities
+		for(MXPtrVV::iterator j=fsens.begin(); j!=fsens.end(); ++j){
+			for(MXPtrV::iterator i=j->begin(); i!=j->end(); ++i, ++d_res_it){
+				if(*i) **i = *d_res_it;
+			}
+		}
+
+		// Collect the adjoint sensitivities
+		for(MXPtrVV::iterator j=asens.begin(); j!=asens.end(); ++j){
+			for(MXPtrV::iterator i=j->begin(); i!=j->end(); ++i, ++d_res_it){
+				if(*i) **i = *d_res_it;
+			}
+		}
+
+		// Make sure that we've got to the end of the outputs
+		casadi_assert(d_res_it==d_res.end());
+
+		// Quick return
 		return;
 	}
 #endif
@@ -498,9 +538,9 @@ void Evaluation::create(const FX& fcn,
     fsens[dir].resize(num_out);
     for(int i=0; i<num_out; ++i, ++ind){
       if(fcn.output(i).numel()>0){
-	fsens[dir][i].assignNode(new OutputNode(ev,ind));
+    	  fsens[dir][i].assignNode(new OutputNode(ev,ind));
       } else {
-	fsens[dir][i] = MX();
+    	  fsens[dir][i] = MX();
       }
     }
   }
@@ -511,9 +551,9 @@ void Evaluation::create(const FX& fcn,
     asens[dir].resize(num_in);
     for(int i=0; i<num_in; ++i, ++ind){
       if(fcn.input(i).numel()>0){
-	asens[dir][i].assignNode(new OutputNode(ev,ind));
+    	  asens[dir][i].assignNode(new OutputNode(ev,ind));
       } else {
-	asens[dir][i] = MX();
+    	  asens[dir][i] = MX();
       }
     }
   }

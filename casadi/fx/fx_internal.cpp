@@ -758,8 +758,39 @@ void FXInternal::spEvaluate(bool fwd){
 }
 
 FX FXInternal::derivative(int nfwd, int nadj){
-	// No caching yet
-	return getDerivative(nfwd,nadj);
+	// Quick return if 0x0
+	if(nfwd==0 && nadj==0) return shared_from_this<FX>();
+
+	// Check if there are enough forward directions allocated
+	if(nfwd>=derivative_fcn_.size()){
+		derivative_fcn_.resize(nfwd+1);
+	}
+
+	// Check if there are enough adjoint directions allocated
+	if(nadj>=derivative_fcn_[nfwd].size()){
+		derivative_fcn_[nfwd].resize(nadj+1);
+	}
+
+	// Weak reference
+	WeakRef& ref = derivative_fcn_[nfwd][nadj];
+
+	// Return value
+	FX ret;
+
+	// Check if already cached
+	if(ref.isNull()){
+		// Generate a new function
+		ret = getDerivative(nfwd,nadj);
+
+		// Cache function for later reference
+		ref = ret;
+	} else {
+		// Retrieve cached function
+		ret = ref;
+	}
+
+	// Return cached or generated function
+	return ret;
 }
 
 FX FXInternal::getDerivative(int nfwd, int nadj){
