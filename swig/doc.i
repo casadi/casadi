@@ -552,6 +552,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::AcadoIntegrator::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::AcadoIntegrator::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -1129,6 +1147,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::AcadoIntegratorInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::AcadoIntegratorInternal::iStruct "
 
@@ -1839,6 +1867,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::AcadoOCP::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::AcadoOCP::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -2293,6 +2339,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::AcadoOCPInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::AcadoOCPInternal::iStruct "
 
@@ -3656,6 +3712,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::CFunction::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::CFunction::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -4056,6 +4130,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::CFunctionInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::CFunctionInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::CFunctionInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::CFunctionInternal::iStruct "
 
@@ -4845,6 +4929,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::OptimalControl::Collocation::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::OptimalControl::Collocation::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -5630,6 +5732,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::CollocationIntegrator::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::CollocationIntegrator::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -6201,6 +6321,17 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::CollocationIntegratorInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::getDerivative
+"
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::CollocationIntegratorInternal::iStruct "
 
@@ -6779,6 +6910,18 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::OptimalControl::CollocationInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")
+CasADi::OptimalControl::CollocationInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")
+CasADi::OptimalControl::CollocationInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::OptimalControl::CollocationInternal::iStruct
 "
@@ -7807,6 +7950,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::ControlSimulator::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::ControlSimulator::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -8294,6 +8455,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::ControlSimulatorInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::ControlSimulatorInternal::iStruct "
 
@@ -8899,6 +9070,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::CplexInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::CplexInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::CplexInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::CplexInternal::iStruct "
 
@@ -9764,6 +9945,24 @@ an input instead of output, assuming it is already known and the second
 boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
+
+%feature("docstring")  CasADi::CplexSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
 
 %feature("docstring")  CasADi::CplexSolver::jacSparsity "
 
@@ -11098,6 +11297,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::Interfaces::CSparse::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::Interfaces::CSparse::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -11523,6 +11740,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::iStruct "
 
@@ -12563,6 +12790,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::Sundials::CVodesIntegrator::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -13326,6 +13571,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::Sundials::CVodesInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesInternal::iStruct "
 
@@ -14458,6 +14713,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::ExternalFunction::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::ExternalFunction::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -14856,6 +15129,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::ExternalFunctionInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::ExternalFunctionInternal::iStruct "
 
@@ -15848,6 +16131,24 @@ become unnecessary). ";
 
 evaluate symbolically, single input, single output ";
 
+%feature("docstring")  CasADi::FX::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::FX::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -16269,6 +16570,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::FXInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::FXInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::FXInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::FXInternal::iStruct "
 
@@ -17732,6 +18043,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::Sundials::IdasIntegrator::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -18593,6 +18922,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::Sundials::IdasInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::Sundials::IdasInternal::iStruct "
 
@@ -19474,6 +19813,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::ImplicitFunction::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::ImplicitFunction::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -19879,6 +20236,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::ImplicitFunctionInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::iStruct "
 
@@ -20842,6 +21209,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::Integrator::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::Integrator::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -21341,6 +21726,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::IntegratorInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::IntegratorInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::IntegratorInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::IntegratorInternal::iStruct "
 
@@ -21943,6 +22338,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::IPInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::IPInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::IPInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::IPInternal::iStruct "
 
@@ -22769,6 +23174,24 @@ an input instead of output, assuming it is already known and the second
 boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
+
+%feature("docstring")  CasADi::IPMethod::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
 
 %feature("docstring")  CasADi::IPMethod::jacSparsity "
 
@@ -25935,6 +26358,16 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
+%feature("docstring")  CasADi::IpoptInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::IpoptInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
+
 %feature("docstring")  CasADi::IpoptInternal::iStruct "
 
 Access an input. ";
@@ -26920,6 +27353,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::iStruct "
 
@@ -28101,6 +28544,24 @@ an input instead of output, assuming it is already known and the second
 boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::jacSparsity "
 
@@ -31497,6 +31958,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::IpoptSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::IpoptSolver::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -32159,6 +32638,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::Jacobian::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::Jacobian::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -32550,6 +33047,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::JacobianInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::JacobianInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::JacobianInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::JacobianInternal::iStruct "
 
@@ -33348,6 +33855,16 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
+%feature("docstring")  CasADi::Sundials::KinsolInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::Sundials::KinsolInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
+
 %feature("docstring")  CasADi::Sundials::KinsolInternal::iStruct "
 
 Access an input. ";
@@ -34118,6 +34635,24 @@ an input instead of output, assuming it is already known and the second
 boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
+
+%feature("docstring")  CasADi::Sundials::KinsolSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolSolver::jacSparsity "
 
@@ -34903,6 +35438,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::KnitroInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::KnitroInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::KnitroInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::KnitroInternal::iStruct "
 
@@ -35835,6 +36380,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::KnitroSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::KnitroSolver::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -36487,6 +37050,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::Interfaces::LapackLUDense::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -36928,6 +37509,18 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::derivative
+"
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackLUDenseInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::iStruct "
 
@@ -37653,6 +38246,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::Interfaces::LapackQRDense::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -38084,6 +38695,18 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::derivative
+"
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackQRDenseInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::iStruct "
 
@@ -39021,6 +39644,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::LiftedSQP::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::LiftedSQP::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -39658,6 +40299,16 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
+%feature("docstring")  CasADi::LiftedSQPInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
+
 %feature("docstring")  CasADi::LiftedSQPInternal::iStruct "
 
 Access an input. ";
@@ -40273,6 +40924,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::iStruct "
 
@@ -41113,6 +41774,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::Interfaces::LiftoptSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -41733,6 +42412,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::LinearSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::LinearSolver::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -42146,6 +42843,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::LinearSolverInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::LinearSolverInternal::iStruct "
 
@@ -44348,6 +45055,25 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::OptimalControl::MultipleShooting::derivative
+"
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::OptimalControl::MultipleShooting::jacSparsity
 "
 
@@ -44894,6 +45620,18 @@ Evaluate symbolically, SX type (overloaded) ";
 CasADi::OptimalControl::MultipleShootingInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")
 CasADi::OptimalControl::MultipleShootingInternal::iStruct "
@@ -47190,6 +47928,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::MXFunction::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::MXFunction::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -47574,6 +48330,11 @@ Jacobian via source code transformation. ";
 Gradient via source code transformation (identity matrix seed in a
 particular direction) ";
 
+%feature("docstring")  CasADi::MXFunctionInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
+
 %feature("docstring")  CasADi::MXFunctionInternal::collectFree "
 
 Collect the free variables. ";
@@ -47636,6 +48397,11 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::MXFunctionInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::iStruct "
 
@@ -48750,6 +49516,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::NLPSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::NLPSolver::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -49298,6 +50082,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::NLPSolverInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::NLPSolverInternal::iStruct "
 
@@ -51623,6 +52417,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::OCPSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::OCPSolver::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -52118,6 +52930,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::OCPSolverInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::OCPSolverInternal::iStruct "
 
@@ -52741,6 +53563,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::iStruct "
 
@@ -53484,6 +54316,24 @@ an input instead of output, assuming it is already known and the second
 boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::jacSparsity "
 
@@ -54650,6 +55500,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::Parallelizer::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::Parallelizer::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -55089,6 +55957,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::ParallelizerInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::ParallelizerInternal::iStruct "
 
@@ -55660,6 +56538,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::iStruct "
 
@@ -56409,6 +57297,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::Interfaces::QPOasesSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -57067,6 +57973,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::QPSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::QPSolver::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -57513,6 +58437,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::QPSolverInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::QPSolverInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::QPSolverInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::QPSolverInternal::iStruct "
 
@@ -58382,6 +59316,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::RKIntegrator::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::RKIntegrator::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -58897,6 +59849,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::RKIntegratorInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::RKIntegratorInternal::iStruct "
 
@@ -60018,6 +60980,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::Simulator::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::Simulator::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -60448,6 +61428,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::SimulatorInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::SimulatorInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::SimulatorInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::SimulatorInternal::iStruct "
 
@@ -61419,6 +62409,16 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
+%feature("docstring")  CasADi::SQPInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::SQPInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
+
 %feature("docstring")  CasADi::SQPInternal::iStruct "
 
 Access an input. ";
@@ -62341,6 +63341,24 @@ an input instead of output, assuming it is already known and the second
 boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
+
+%feature("docstring")  CasADi::SQPMethod::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
 
 %feature("docstring")  CasADi::SQPMethod::jacSparsity "
 
@@ -63265,6 +64283,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::Sundials::SundialsIntegrator::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::Sundials::SundialsIntegrator::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -63987,6 +65023,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::Sundials::SundialsInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::Sundials::SundialsInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::Sundials::SundialsInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::Sundials::SundialsInternal::iStruct "
 
@@ -64721,6 +65767,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::SuperLU::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::SuperLU::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -65183,6 +66247,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::SuperLUInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::SuperLUInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::SuperLUInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::SuperLUInternal::iStruct "
 
@@ -66221,6 +67295,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::SXFunction::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::SXFunction::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -66601,6 +67693,11 @@ Calculate the expression for the jacobian of a number of function outputs
 with respect to a number of function inputs, optionally include the function
 outputs. ";
 
+%feature("docstring")  CasADi::SXFunctionInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
+
 %feature("docstring")  CasADi::SXFunctionInternal::init "
 
 Initialize. ";
@@ -66662,6 +67759,11 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::SXFunctionInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::iStruct "
 
@@ -69409,6 +70511,16 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
+%feature("docstring")  CasADi::WorhpInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::WorhpInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
+
 %feature("docstring")  CasADi::WorhpInternal::iStruct "
 
 Access an input. ";
@@ -70961,6 +72073,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::WorhpSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::WorhpSolver::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -71375,6 +72505,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::XFunctionInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::XFunctionInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::XFunctionInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::XFunctionInternal::iStruct "
 
