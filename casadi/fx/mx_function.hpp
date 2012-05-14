@@ -113,10 +113,10 @@ public:
   virtual bool checkNode() const;
   
   /** \brief Jacobian via source code transformation */
-  MX jac(int iind, int oind, bool compact=false, bool symmetric=false);
+  MX jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
 
   /** \brief Gradient via source code transformation */
-  MX grad(int iind, int oind);
+  MX grad(int iind=0, int oind=0);
   
   /** \brief Jacobian via source code transformation (new, experimental implementation)
       Calculate the expression for the jacobian of a number of function outputs with 

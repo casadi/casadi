@@ -201,7 +201,7 @@ int main(){
     lfcn.init();
     
     // Gradient of the lagrangian
-    MX lgrad = lfcn.grad(0,0);
+    MX lgrad = lfcn.grad();
     MXFunction lgfcn(lfcn_in,lgrad);
     lgfcn.init();
 
