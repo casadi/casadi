@@ -859,7 +859,7 @@ FX MXFunctionInternal::hessian(int iind, int oind) {
   //casadi_assert_message(output(oind).numel()==1,"Can only create hessians for scalar valued functions");
   
   // Get the Jacobian of the function
-  MX J = jac(iind).at(oind);
+  MX J = jac(iind,oind);
   // MX J = grad(oind).at(iind);
   
   // Construct the gradient function
