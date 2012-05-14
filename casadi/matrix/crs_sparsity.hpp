@@ -345,16 +345,168 @@ class CRSSparsity : public CachedObject{
     */
     CRSSparsity pmult(const std::vector<int>& p, bool permute_rows=true, bool permute_columns=true, bool invert_permutation=false) const;
       
+    /// Get the dimension as a string
     std::string dimString() 	const;
     
-    
-      
     /* \brief print a textual representation of sparsity
     */
     void spy(std::ostream &stream=std::cout) const;
 
+    #ifndef SWIG
+    /* \brief Assign the nonzero entries of one sparsity pattern to the nonzero entries of another sparsity pattern */
+    template<typename T>
+    void set(T* data, const T* val_data, CRSSparsity val_sp) const;
 
+    /* \brief Add the nonzero entries of one sparsity pattern to the nonzero entries of another sparsity pattern */
+    template<typename T>
+    void add(T* data, const T* val_data, CRSSparsity val_sp) const;
+    #endif //SWIG
 };
+
+// Template instantiations
+#ifndef SWIG
+template<typename T>
+void CRSSparsity::set(T* data, const T* val_data, CRSSparsity val_sp) const{
+  // Get dimensions of this
+  const int sz = size();
+  const int sz1 = size1();
+  const int sz2 = size2();
+  const int nel = sz1*sz2;
+
+  // Get dimensions of assigning matrix
+  const int val_sz = val_sp.size();
+  const int val_sz1 = val_sp.size1();
+  const int val_sz2 = val_sp.size2();
+  const int val_nel = val_sz1*val_sz2;
+
+  // Check if sparsity matches
+  if(val_sp==*this){
+    std::copy(val_data,val_data+sz,data);
+  } else if(val_nel==1){ // if scalar
+    std::fill(data,data+sz,val_sz==0 ? T(0) : val_data[0]);
+  } else {
+    // Quick return if empty
+    if(nel==0 && val_nel==0) return;
+    
+    // Make sure that dimension matches
+    casadi_assert_message(sz1==val_sz1 && sz2==val_sz2,"CRSSparsity::set<T>: shape mismatch. lhs is matrix of shape " << dimString() << ", while rhs is shape " << val_sp.dimString() << ".");
+    
+    // Sparsity
+    const std::vector<int>& c = col();
+    const std::vector<int>& rind = rowind();
+    const std::vector<int>& v_c = val_sp.col();
+    const std::vector<int>& v_rind = val_sp.rowind();
+    
+    // For all rows
+    for(int i=0; i<sz1; ++i){
+      
+      // Nonzero of the assigning matrix
+      int v_el = v_rind[i];
+      
+      // First nonzero of the following row
+      int v_el_end = v_rind[i+1];
+      
+      // Next column of the assigning matrix
+      int v_j = v_el<v_el_end ? v_c[v_el] : sz2;
+      
+      // Assign all nonzeros
+      for(int el=rind[i]; el!=rind[i+1]; ++el){
+	
+	//  Get column
+	int j=c[el];
+	
+	// Forward the assigning nonzero
+	while(v_j<j){
+	  v_el++;
+	  v_j = v_el<v_el_end ? v_c[v_el] : sz2;
+	}
+
+	// Assign nonzero
+	if(v_j==j){
+	  data[el] = val_data[v_el++];
+	  v_j = v_el<v_el_end ? v_c[v_el] : sz2;
+	} else {
+	  data[el] = 0;
+	}
+      }
+    }
+  }
+}
+
+template<typename T>
+void CRSSparsity::add(T* data, const T* val_data, CRSSparsity val_sp) const{
+  // Get dimensions of this
+  const int sz = size();
+  const int sz1 = size1();
+  const int sz2 = size2();
+  const int nel = sz1*sz2;
+
+  // Get dimensions of assigning matrix
+  const int val_sz = val_sp.size();
+  const int val_sz1 = val_sp.size1();
+  const int val_sz2 = val_sp.size2();
+  const int val_nel = val_sz1*val_sz2;
+
+  // Check if sparsity matches
+  if(val_sp==*this){
+    for(int k=0; k<sz; ++k){
+      data[k] += val_data[k];
+    }
+  } else if(val_nel==1){ // if scalar
+    if(val_sz!=0){
+      for(int k=0; k<sz; ++k){
+	data[k] += val_data[0];
+      }
+    }
+  } else {
+    // Quick return if empty
+    if(nel==0 && val_nel==0) return;
+    
+    // Make sure that dimension matches
+    casadi_assert_message(sz1==val_sz1 && sz2==val_sz2,"CRSSparsity::set<T>: shape mismatch. lhs is matrix of shape " << dimString() << ", while rhs is shape " << val_sp.dimString() << ".");
+    
+    // Sparsity
+    const std::vector<int>& c = col();
+    const std::vector<int>& rind = rowind();
+    const std::vector<int>& v_c = val_sp.col();
+    const std::vector<int>& v_rind = val_sp.rowind();
+    
+    // For all rows
+    for(int i=0; i<sz1; ++i){
+      
+      // Nonzero of the assigning matrix
+      int v_el = v_rind[i];
+      
+      // First nonzero of the following row
+      int v_el_end = v_rind[i+1];
+      
+      // Next column of the assigning matrix
+      int v_j = v_el<v_el_end ? v_c[v_el] : sz2;
+      
+      // Assign all nonzeros
+      for(int el=rind[i]; el!=rind[i+1]; ++el){
+	
+	//  Get column
+	int j=c[el];
+	
+	// Forward the assigning nonzero
+	while(v_j<j){
+	  v_el++;
+	  v_j = v_el<v_el_end ? v_c[v_el] : sz2;
+	}
+
+	// Assign nonzero
+	if(v_j==j){
+	  data[el] += val_data[v_el++];
+	  v_j = v_el<v_el_end ? v_c[v_el] : sz2;
+	}
+      }
+    }
+  }
+}
+#endif //SWIG
+
+
 
 } // namespace CasADi
 

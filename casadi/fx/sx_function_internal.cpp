@@ -208,28 +208,8 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   }
 }
 
-vector<SXMatrix> SXFunctionInternal::jac(const vector<pair<int,int> >& jblocks, bool compact, const vector<bool>& symmetric_block){
-
-  // Create return object
-  std::vector<SXMatrix> ret(jblocks.size());
-  
-  // Add the information we already know
-  for(int i=0; i<ret.size(); ++i){
-    // Get input/output indices for the block
-    int oind = jblocks[i].first;
-    int iind = jblocks[i].second;
-
-    // Check if nondifferentiated variable
-    if(iind<0){
-      // Nondifferentiated variable
-      ret[i] = outputv_.at(oind);
-    } else { // Jacobian block
-      // Get Jacobian
-      ret[i] = jacGen(iind,oind,compact,!symmetric_block.empty() && symmetric_block[i]);
-    }
-  }
-
-  return ret;
+SXMatrix SXFunctionInternal::jac(int iind, int oind, bool compact, bool symmetric){
+  return jacGen(iind,oind,compact,symmetric);
 }
 
 bool SXFunctionInternal::isSmooth() const{
@@ -1409,8 +1389,7 @@ FX SXFunctionInternal::jacobian(const vector<pair<int,int> >& jblocks){
       jac_out[el] = outputv_.at(oind);
     } else {
       // Jacobian (workaround)
-      vector<pair<int,int> > jblocks_local(1,jblocks[el]);
-      jac_out[el] = jac(jblocks_local).front();
+      jac_out[el] = jac(iind,oind);
     }
   }
   

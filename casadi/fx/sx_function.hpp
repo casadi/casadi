@@ -125,9 +125,6 @@ public:
   /// Hessian (forward over adjoint) via source code transformation
   SXMatrix hess(int iind=0, int oind=0);
   
-  /** \brief Calculate the expression for the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs */
-  std::vector<Matrix<SX> > jac(const std::vector<std::pair<int,int> >& jblocks, bool compact=false, const std::vector<bool>& symmetric_block=std::vector<bool>());
-  
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
 

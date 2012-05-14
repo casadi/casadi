@@ -762,62 +762,7 @@ void Matrix<T>::get(std::vector<T>& val, Sparsity sp) const{
 
 template<class T>
 void Matrix<T>::set(const Matrix<T>& val, Sparsity sp){
-
-	// Check if sparsity matches
-	if(val.sparsity()==sparsity()){
-		set(val.data(),sp);
-	} else if(val.scalar()) {
-		setAll(val.toScalar());
-	} else {
-		// Quick return if empty
-		if(numel()==0 && val.numel()==0) return;
-
-		// Make sure that dimension matches
-		casadi_assert_message(size1()==val.size1() && size2()==val.size2(),"Matrix<T>::set(Matrix<T>): shape mismatch. lhs is matrix of shape " << dimString() << ", while rhs is shape " << val.dimString() << ".");
-
-		// Sparsity
-		const int nrow = size1();
-		const int ncol = size2();
-		const std::vector<int>& c = col();
-		const std::vector<int>& rind = rowind();
-		std::vector<T>& d = data();
-		const std::vector<int>& v_c = val.col();
-		const std::vector<int>& v_rind = val.rowind();
-		const std::vector<T>& v_d = val.data();
-
-		// For all rows
-		for(int i=0; i<nrow; ++i){
-
-			// Nonzero of the assigning matrix
-			int v_el = v_rind[i];
-
-			// First nonzero of the following row
-			int v_el_end = v_rind[i+1];
-
-			// Next column of the assigning matrix
-			int v_j = v_el<v_el_end ? v_c[v_el] : ncol;
-
-			// Assign all nonzeros
-			for(int el=rind[i]; el!=rind[i+1]; ++el){
-				//  Get column
-				int j=c[el];
-
-				// Forward the assigning nonzero
-				while(v_j<j){
-					v_el++;
-					v_j = v_el<v_el_end ? v_c[v_el] : ncol;
-				}
-
-				// Assign nonzero
-				if(v_j==j){
-					d[el] = v_d[v_el++];
-					v_j = v_el<v_el_end ? v_c[v_el] : ncol;
-				} else {
-					d[el] = 0;
-				}
-			}
-		}
-	}
+	sparsity().set(getPtr(data()),getPtr(val.data()),val.sparsity());
 }
 
 template<class T>
