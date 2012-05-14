@@ -552,6 +552,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::AcadoIntegrator::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::AcadoIntegrator::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -1129,6 +1147,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::AcadoIntegratorInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::AcadoIntegratorInternal::iStruct "
 
@@ -1839,6 +1867,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::AcadoOCP::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::AcadoOCP::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -2293,6 +2339,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::AcadoOCPInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::AcadoOCPInternal::iStruct "
 
@@ -3656,6 +3712,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::CFunction::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::CFunction::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -4056,6 +4130,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::CFunctionInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::CFunctionInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::CFunctionInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::CFunctionInternal::iStruct "
 
@@ -4845,6 +4929,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::OptimalControl::Collocation::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::OptimalControl::Collocation::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -5630,6 +5732,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::CollocationIntegrator::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::CollocationIntegrator::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -6201,6 +6321,17 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::CollocationIntegratorInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::getDerivative
+"
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::CollocationIntegratorInternal::iStruct "
 
@@ -6779,6 +6910,18 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::OptimalControl::CollocationInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")
+CasADi::OptimalControl::CollocationInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")
+CasADi::OptimalControl::CollocationInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::OptimalControl::CollocationInternal::iStruct
 "
@@ -7807,6 +7950,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::ControlSimulator::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::ControlSimulator::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -8294,6 +8455,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::ControlSimulatorInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::ControlSimulatorInternal::iStruct "
 
@@ -8899,6 +9070,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::CplexInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::CplexInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::CplexInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::CplexInternal::iStruct "
 
@@ -9764,6 +9945,24 @@ an input instead of output, assuming it is already known and the second
 boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
+
+%feature("docstring")  CasADi::CplexSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
 
 %feature("docstring")  CasADi::CplexSolver::jacSparsity "
 
@@ -11098,6 +11297,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::Interfaces::CSparse::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::Interfaces::CSparse::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -11523,6 +11740,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::iStruct "
 
@@ -12563,6 +12790,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::Sundials::CVodesIntegrator::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -13326,6 +13571,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::Sundials::CVodesInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesInternal::iStruct "
 
@@ -14458,6 +14713,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::ExternalFunction::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::ExternalFunction::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -14856,6 +15129,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::ExternalFunctionInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::ExternalFunctionInternal::iStruct "
 
@@ -15848,6 +16131,24 @@ become unnecessary). ";
 
 evaluate symbolically, single input, single output ";
 
+%feature("docstring")  CasADi::FX::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::FX::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -16269,6 +16570,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::FXInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::FXInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::FXInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::FXInternal::iStruct "
 
@@ -17732,6 +18043,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::Sundials::IdasIntegrator::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -18593,6 +18922,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::Sundials::IdasInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::Sundials::IdasInternal::iStruct "
 
@@ -19474,6 +19813,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::ImplicitFunction::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::ImplicitFunction::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -19879,6 +20236,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::ImplicitFunctionInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::iStruct "
 
@@ -20842,6 +21209,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::Integrator::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::Integrator::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -21342,6 +21727,16 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
+%feature("docstring")  CasADi::IntegratorInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::IntegratorInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
+
 %feature("docstring")  CasADi::IntegratorInternal::iStruct "
 
 Access an input. ";
@@ -21571,6 +21966,1414 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::IntegratorInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+
+// File: classCasADi_1_1IPInternal.xml
+%feature("docstring") CasADi::IPInternal "
+
+>Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| NLP_X_INIT                         | Decision variables initial guess   |
+|                                    | (n x 1)                            |
++------------------------------------+------------------------------------+
+| NLP_LBX                            | Decision variables lower bound (n  |
+|                                    | x 1), default -inf.                |
++------------------------------------+------------------------------------+
+| NLP_UBX                            | Decision variables upper bound (n  |
+|                                    | x 1), default +inf.                |
++------------------------------------+------------------------------------+
+| NLP_LBG                            | Constraints lower bound (m x 1),   |
+|                                    | default -inf.                      |
++------------------------------------+------------------------------------+
+| NLP_UBG                            | Constraints upper bound (m x 1),   |
+|                                    | default +inf.                      |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
+|                                    | with G, initial guess (m x 1)      |
++------------------------------------+------------------------------------+
+| NLP_P                              | Only for parametric NLP - static   |
+|                                    | parameters on which the objective  |
+|                                    | and constraints might depend.      |
++------------------------------------+------------------------------------+
+
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| NLP_X_OPT                          | Decision variables for optimal     |
+|                                    | solution (n x 1)                   |
++------------------------------------+------------------------------------+
+| NLP_COST                           | Objective/cost function for        |
+|                                    | optimal solution (1 x 1)           |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_G                       | Lagrange multipliers associated    |
+|                                    | with G at the solution (m x 1)     |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_X                       | Lagrange multipliers associated    |
+|                                    | with bounds on X at the solution   |
+|                                    | (n x 1) When in warmstart mode,    |
+|                                    | this output may be used as input ( |
++------------------------------------+------------------------------------+
+| NLP_G                              | The constraints evaluated at the   |
+|                                    | optimal solution (m x 1)           |
++------------------------------------+------------------------------------+
+
+>List of available options
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
+|              |              |              | calculate    | ternal       |
+|              |              |              | the          |              |
+|              |              |              | Jacobians:   |              |
+|              |              |              | \"forward\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | forward      |              |
+|              |              |              | mode)        |              |
+|              |              |              | \"reverse\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | adjoint      |              |
+|              |              |              | mode) or     |              |
+|              |              |              | \"automatic\"  |              |
+|              |              |              | (a heuristic |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
+|              |              |              | (forward|rev |              |
+|              |              |              | erse|automat |              |
+|              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | objective    | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| expand_g     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | constraint   | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
+| sian         |              |              | exact        | olverInterna |
+|              |              |              | Hessian of   | l            |
+|              |              |              | the          |              |
+|              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| _vec         |              |              | true, the    | olverInterna |
+|              |              |              | input shape  | l            |
+|              |              |              | of F will    |              |
+|              |              |              | not be       |              |
+|              |              |              | checked.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_FX        | FX()         | A function   | CasADi::NLPS |
+| llback       |              |              | that will be | olverInterna |
+|              |              |              | called at    | l            |
+|              |              |              | each         |              |
+|              |              |              | iteration.   |              |
+|              |              |              | Input scheme |              |
+|              |              |              | is the same  |              |
+|              |              |              | as           |              |
+|              |              |              | NLPSolver's  |              |
+|              |              |              | output       |              |
+|              |              |              | scheme.      |              |
+|              |              |              | Output is    |              |
+|              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| llback_ignor |              |              | true, errors | olverInterna |
+| e_errors     |              |              | thrown by it | l            |
+|              |              |              | eration_call |              |
+|              |              |              | back will be |              |
+|              |              |              | ignored.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_INTEGER   | 1            | Only call    | CasADi::NLPS |
+| llback_step  |              |              | the callback | olverInterna |
+|              |              |              | function     | l            |
+|              |              |              | every few    |              |
+|              |              |              | iterations.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
+|              |              |              | Jacobian     | ternal       |
+|              |              |              | function and |              |
+|              |              |              | use this to  |              |
+|              |              |              | calculate    |              |
+|              |              |              | forward sens |              |
+|              |              |              | itivities    |              |
++--------------+--------------+--------------+--------------+--------------+
+| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | pointer that | ternal       |
+|              |              |              | returns a    |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | function     |              |
+|              |              |              | given a set  |              |
+|              |              |              | of desired   |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | blocks,      |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | The linear   | CasADi::IPIn |
+| r            | VER          | )            | solver to be | ternal       |
+|              |              |              | used by the  |              |
+|              |              |              | IP method    |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::IPIn |
+| r_options    | Y            | )            | be passed to | ternal       |
+|              |              |              | the linear   |              |
+|              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| j_dir        |              |              | adjoint      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| d_dir        |              |              | forward      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| ian          |              |              | Hessians     | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| bian         |              |              | Jacobians    | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| parametric   | OT_BOOLEAN   | false        | Expect F, G, | CasADi::NLPS |
+|              |              |              | H, J to have | olverInterna |
+|              |              |              | an           | l            |
+|              |              |              | additional   |              |
+|              |              |              | input        |              |
+|              |              |              | argument     |              |
+|              |              |              | appended at  |              |
+|              |              |              | the end,     |              |
+|              |              |              | denoting     |              |
+|              |              |              | fixed        |              |
+|              |              |              | parameters.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
+|              |              |              | sparse       | ternal       |
++--------------+--------------+--------------+--------------+--------------+
+| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | that         | ternal       |
+|              |              |              | provides     |              |
+|              |              |              | sparsity for |              |
+|              |              |              | a given      |              |
+|              |              |              | input output |              |
+|              |              |              | block,       |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
+| ans          |              |              | references   | ternal       |
+|              |              |              | to generated |              |
+|              |              |              | Jacobians in |              |
+|              |              |              | order to     |              |
+|              |              |              | avoid        |              |
+|              |              |              | generating   |              |
+|              |              |              | identical    |              |
+|              |              |              | Jacobians    |              |
+|              |              |              | multiple     |              |
+|              |              |              | times        |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
+|              |              | )            | defined      | ternal       |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
+|              |              |              | evaluation   | ternal       |
+|              |              |              | -- for       |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+| warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
+| _bounds      |              |              | initial      | olverInterna |
+|              |              |              | guess does   | l            |
+|              |              |              | not satisfy  |              |
+|              |              |              | LBX and UBX  |              |
++--------------+--------------+--------------+--------------+--------------+
+
+C++ includes: ip_internal.hpp ";
+
+%feature("docstring")  CasADi::IPInternal::IPInternal "";
+
+%feature("docstring")  CasADi::IPInternal::~IPInternal "";
+
+%feature("docstring")  CasADi::IPInternal::clone "
+
+Make a deep copy of the instance. ";
+
+%feature("docstring")  CasADi::IPInternal::init "
+
+Initialize Initialize and make the object ready for setting arguments and
+evaluation. This method is typically called after setting options but before
+evaluating. If passed to another class (in the constructor), this class
+should invoke this function when initialized. ";
+
+%feature("docstring")  CasADi::IPInternal::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::IPInternal::reportConstraints "
+
+Prints out a human readable report about possible constraint violations -
+all constraints. ";
+
+%feature("docstring")  CasADi::IPInternal::checkInitialBounds "
+
+Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
+";
+
+%feature("docstring")  CasADi::IPInternal::evaluate_switch "
+
+Evaluate switch. ";
+
+%feature("docstring")  CasADi::IPInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
+%feature("docstring")  CasADi::IPInternal::jacobian "
+
+Calculate the jacobian of a number of function outputs with respect to a
+number of function inputs, optionally include the function outputs. ";
+
+%feature("docstring")  CasADi::IPInternal::jacobian_switch "
+
+Switch between numeric and symbolic jacobian. ";
+
+%feature("docstring")  CasADi::IPInternal::numeric_jacobian "
+
+Numeric Jacobian. ";
+
+%feature("docstring")  CasADi::IPInternal::hessian "
+
+Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::IPInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::IPInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::IPInternal::spInit "
+
+Reset the sparsity propagation. ";
+
+%feature("docstring")  CasADi::IPInternal::evalSX "
+
+Evaluate symbolically, SX type. ";
+
+%feature("docstring")  CasADi::IPInternal::evalMX "
+
+Evaluate symbolically, MX type. ";
+
+%feature("docstring")  CasADi::IPInternal::eval "
+
+Evaluate symbolically, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::IPInternal::eval "
+
+Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::IPInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::IPInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
+
+%feature("docstring")  CasADi::IPInternal::iStruct "
+
+Access an input. ";
+
+%feature("docstring")  CasADi::IPInternal::iStruct "
+
+Const access an input. ";
+
+%feature("docstring")  CasADi::IPInternal::oStruct "
+
+Access an output. ";
+
+%feature("docstring")  CasADi::IPInternal::oStruct "
+
+Const access an output. ";
+
+%feature("docstring")  CasADi::IPInternal::print "
+
+Print. ";
+
+%feature("docstring")  CasADi::IPInternal::repr "
+
+Print. ";
+
+%feature("docstring")  CasADi::IPInternal::getPartition "
+
+Get the unidirectional or bidirectional partition. ";
+
+%feature("docstring")  CasADi::IPInternal::verbose "
+
+Verbose mode? ";
+
+%feature("docstring")  CasADi::IPInternal::monitored "
+
+Is function fcn being monitored. ";
+
+%feature("docstring")  CasADi::IPInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::IPInternal::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::IPInternal::output "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::IPInternal::output "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::IPInternal::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::IPInternal::fwdSeed "
+
+Const access forward seed. ";
+
+%feature("docstring")  CasADi::IPInternal::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::IPInternal::fwdSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::IPInternal::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::IPInternal::adjSeed "
+
+Const access adjoint seed. ";
+
+%feature("docstring")  CasADi::IPInternal::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::IPInternal::adjSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::IPInternal::setNumInputs "
+
+Set the number of function inputs. ";
+
+%feature("docstring")  CasADi::IPInternal::setNumOutputs "
+
+Set the number of function outputs. ";
+
+%feature("docstring")  CasADi::IPInternal::getNumInputs "
+
+Get the number of function inputs. ";
+
+%feature("docstring")  CasADi::IPInternal::getNumOutputs "
+
+Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::IPInternal::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::IPInternal::getStat "
+
+Get single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::IPInternal::getJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::IPInternal::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::IPInternal::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::IPInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::IPInternal::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::IPInternal::getFullJacobian "
+
+Get the Jacobian of all outputs with respect to all inputs. ";
+
+%feature("docstring")  CasADi::IPInternal::log "
+
+Log the status of the solver. ";
+
+%feature("docstring")  CasADi::IPInternal::log "
+
+Log the status of the solver, function given. ";
+
+%feature("docstring")  CasADi::IPInternal::setOption "
+
+set an option. The setOptions are in general only considered before the init
+function, if any. If properties changes, the init function should be called
+again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::IPInternal::setOption "
+
+set a set of options. The setOptions are in general only considered before
+the init function, if any. If properties changes, the init function should
+be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::IPInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::IPInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::IPInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::IPInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::IPInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::IPInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::IPInternal::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::IPInternal::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::IPInternal::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::IPInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
+%feature("docstring")  CasADi::IPInternal::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::IPInternal::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::IPInternal::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::IPInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::IPInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::IPInternal::unregRef "
+
+Unregister a weak reference. ";
+
+%feature("docstring")  CasADi::IPInternal::deepCopyMembers "
+
+Deep copy data members. ";
+
+%feature("docstring")  CasADi::IPInternal::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::IPInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::IPInternal::assertInit "
+
+Assert that the object has been initialized. ";
+
+
+// File: classCasADi_1_1IPMethod.xml
+%feature("docstring") CasADi::IPMethod "
+
+Interior point method This method is experimental only. Do not attempt to
+use if you do not intend to dive into the source code. The current purpose
+of the class is to show how an IP method can be implemeted in CasADi. If
+someone wants to take responsibility for this class and make it work, then
+please contact the CasADi developers.
+
+Joel Andersson
+
+>Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| NLP_X_INIT                         | Decision variables initial guess   |
+|                                    | (n x 1)                            |
++------------------------------------+------------------------------------+
+| NLP_LBX                            | Decision variables lower bound (n  |
+|                                    | x 1), default -inf.                |
++------------------------------------+------------------------------------+
+| NLP_UBX                            | Decision variables upper bound (n  |
+|                                    | x 1), default +inf.                |
++------------------------------------+------------------------------------+
+| NLP_LBG                            | Constraints lower bound (m x 1),   |
+|                                    | default -inf.                      |
++------------------------------------+------------------------------------+
+| NLP_UBG                            | Constraints upper bound (m x 1),   |
+|                                    | default +inf.                      |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
+|                                    | with G, initial guess (m x 1)      |
++------------------------------------+------------------------------------+
+| NLP_P                              | Only for parametric NLP - static   |
+|                                    | parameters on which the objective  |
+|                                    | and constraints might depend.      |
++------------------------------------+------------------------------------+
+
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| NLP_X_OPT                          | Decision variables for optimal     |
+|                                    | solution (n x 1)                   |
++------------------------------------+------------------------------------+
+| NLP_COST                           | Objective/cost function for        |
+|                                    | optimal solution (1 x 1)           |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_G                       | Lagrange multipliers associated    |
+|                                    | with G at the solution (m x 1)     |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_X                       | Lagrange multipliers associated    |
+|                                    | with bounds on X at the solution   |
+|                                    | (n x 1) When in warmstart mode,    |
+|                                    | this output may be used as input ( |
++------------------------------------+------------------------------------+
+| NLP_G                              | The constraints evaluated at the   |
+|                                    | optimal solution (m x 1)           |
++------------------------------------+------------------------------------+
+
+>List of available options
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
+|              |              |              | calculate    | ternal       |
+|              |              |              | the          |              |
+|              |              |              | Jacobians:   |              |
+|              |              |              | \"forward\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | forward      |              |
+|              |              |              | mode)        |              |
+|              |              |              | \"reverse\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | adjoint      |              |
+|              |              |              | mode) or     |              |
+|              |              |              | \"automatic\"  |              |
+|              |              |              | (a heuristic |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
+|              |              |              | (forward|rev |              |
+|              |              |              | erse|automat |              |
+|              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | objective    | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| expand_g     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
+|              |              |              | constraint   | olverInterna |
+|              |              |              | function in  | l            |
+|              |              |              | terms of     |              |
+|              |              |              | scalar       |              |
+|              |              |              | operations,  |              |
+|              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
+|              |              |              | Newton       | olverInterna |
+|              |              |              | Hessian appr | l            |
+|              |              |              | oximation    |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
+| sian         |              |              | exact        | olverInterna |
+|              |              |              | Hessian of   | l            |
+|              |              |              | the          |              |
+|              |              |              | Lagrangian   |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
+| obian        |              |              | exact        | olverInterna |
+|              |              |              | Jacobian of  | l            |
+|              |              |              | the          |              |
+|              |              |              | constraints  |              |
+|              |              |              | if not       |              |
+|              |              |              | supplied     |              |
++--------------+--------------+--------------+--------------+--------------+
+| ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| _vec         |              |              | true, the    | olverInterna |
+|              |              |              | input shape  | l            |
+|              |              |              | of F will    |              |
+|              |              |              | not be       |              |
+|              |              |              | checked.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_FX        | FX()         | A function   | CasADi::NLPS |
+| llback       |              |              | that will be | olverInterna |
+|              |              |              | called at    | l            |
+|              |              |              | each         |              |
+|              |              |              | iteration.   |              |
+|              |              |              | Input scheme |              |
+|              |              |              | is the same  |              |
+|              |              |              | as           |              |
+|              |              |              | NLPSolver's  |              |
+|              |              |              | output       |              |
+|              |              |              | scheme.      |              |
+|              |              |              | Output is    |              |
+|              |              |              | scalar.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
+| llback_ignor |              |              | true, errors | olverInterna |
+| e_errors     |              |              | thrown by it | l            |
+|              |              |              | eration_call |              |
+|              |              |              | back will be |              |
+|              |              |              | ignored.     |              |
++--------------+--------------+--------------+--------------+--------------+
+| iteration_ca | OT_INTEGER   | 1            | Only call    | CasADi::NLPS |
+| llback_step  |              |              | the callback | olverInterna |
+|              |              |              | function     | l            |
+|              |              |              | every few    |              |
+|              |              |              | iterations.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
+|              |              |              | Jacobian     | ternal       |
+|              |              |              | function and |              |
+|              |              |              | use this to  |              |
+|              |              |              | calculate    |              |
+|              |              |              | forward sens |              |
+|              |              |              | itivities    |              |
++--------------+--------------+--------------+--------------+--------------+
+| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | pointer that | ternal       |
+|              |              |              | returns a    |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | function     |              |
+|              |              |              | given a set  |              |
+|              |              |              | of desired   |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | blocks,      |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | The linear   | CasADi::IPIn |
+| r            | VER          | )            | solver to be | ternal       |
+|              |              |              | used by the  |              |
+|              |              |              | IP method    |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::IPIn |
+| r_options    | Y            | )            | be passed to | ternal       |
+|              |              |              | the linear   |              |
+|              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| j_dir        |              |              | adjoint      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| d_dir        |              |              | forward      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| ian          |              |              | Hessians     | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| bian         |              |              | Jacobians    | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| parametric   | OT_BOOLEAN   | false        | Expect F, G, | CasADi::NLPS |
+|              |              |              | H, J to have | olverInterna |
+|              |              |              | an           | l            |
+|              |              |              | additional   |              |
+|              |              |              | input        |              |
+|              |              |              | argument     |              |
+|              |              |              | appended at  |              |
+|              |              |              | the end,     |              |
+|              |              |              | denoting     |              |
+|              |              |              | fixed        |              |
+|              |              |              | parameters.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
+|              |              |              | sparse       | ternal       |
++--------------+--------------+--------------+--------------+--------------+
+| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | that         | ternal       |
+|              |              |              | provides     |              |
+|              |              |              | sparsity for |              |
+|              |              |              | a given      |              |
+|              |              |              | input output |              |
+|              |              |              | block,       |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
+| ans          |              |              | references   | ternal       |
+|              |              |              | to generated |              |
+|              |              |              | Jacobians in |              |
+|              |              |              | order to     |              |
+|              |              |              | avoid        |              |
+|              |              |              | generating   |              |
+|              |              |              | identical    |              |
+|              |              |              | Jacobians    |              |
+|              |              |              | multiple     |              |
+|              |              |              | times        |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
+|              |              | )            | defined      | ternal       |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
+|              |              |              | evaluation   | ternal       |
+|              |              |              | -- for       |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+| warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
+| _bounds      |              |              | initial      | olverInterna |
+|              |              |              | guess does   | l            |
+|              |              |              | not satisfy  |              |
+|              |              |              | LBX and UBX  |              |
++--------------+--------------+--------------+--------------+--------------+
+
+C++ includes: ip_method.hpp ";
+
+/*  Setters  */
+
+/* Set an input, output, forward seed/sensitivity or adjoint
+seed/sensitivity  T can be double&, double*, std::vector<double>&,
+Matrix<double> &  Assumes a properly allocated val.
+
+*/
+
+%feature("docstring")  CasADi::IPMethod::setInput "
+
+Reads in the input argument from val. ";
+
+%feature("docstring")  CasADi::IPMethod::setOutput "
+
+Reads in the output argument from val. ";
+
+%feature("docstring")  CasADi::IPMethod::setFwdSeed "
+
+Reads in the forward seed from val. ";
+
+%feature("docstring")  CasADi::IPMethod::setFwdSens "
+
+Reads in the forward sensitivity from val. ";
+
+%feature("docstring")  CasADi::IPMethod::setAdjSeed "
+
+Reads in the adjoint seed from val. ";
+
+%feature("docstring")  CasADi::IPMethod::setAdjSens "
+
+Reads in the adjoint sensitivity from val. ";
+
+/*  Getters  */
+
+/* A group of accessor for numerical data that operate on preallocated data.
+get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
+T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
+properly allocated val.
+
+*/
+
+%feature("docstring")  CasADi::IPMethod::getInput "
+
+Writes out the input argument into val. ";
+
+%feature("docstring")  CasADi::IPMethod::getOutput "
+
+Writes out the output argument into val. ";
+
+%feature("docstring")  CasADi::IPMethod::getFwdSeed "
+
+Writes out the forward seed into val. ";
+
+%feature("docstring")  CasADi::IPMethod::getFwdSens "
+
+Writes out the forward sensitivity into val. ";
+
+%feature("docstring")  CasADi::IPMethod::getAdjSeed "
+
+Writes out the adjoint seed into val. ";
+
+%feature("docstring")  CasADi::IPMethod::getAdjSens "
+
+Writes out the adjoint sensitivity into val. ";
+
+/*  Option Functionality  */
+
+%feature("docstring")  CasADi::IPMethod::setOption "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::IPMethod::setOption "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::IPMethod::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::IPMethod::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::IPMethod::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::IPMethod::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::IPMethod::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::IPMethod::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::IPMethod::makeUnique "
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object. ";
+
+%feature("docstring")  CasADi::IPMethod::makeUnique "";
+
+%feature("docstring")  CasADi::IPMethod::IPMethod "
+
+Default constructor. ";
+
+%feature("docstring")  CasADi::IPMethod::IPMethod "
+
+Constuct an NLP with non-linear constraints and provided hessian
+approximation. ";
+
+%feature("docstring")  CasADi::IPMethod::checkNode "
+
+Check if the node is pointing to the right type of object. ";
+
+%feature("docstring")  CasADi::IPMethod::reportConstraints "";
+
+%feature("docstring")  CasADi::IPMethod::getReportConstraints "";
+
+%feature("docstring")  CasADi::IPMethod::getF "
+
+Access the objective function F. ";
+
+%feature("docstring")  CasADi::IPMethod::getG "
+
+Access the objective function G. ";
+
+%feature("docstring")  CasADi::IPMethod::getH "
+
+Access the hessian of the Lagrangian function H. ";
+
+%feature("docstring")  CasADi::IPMethod::getJ "
+
+Access the jacobian of the constraint function J. ";
+
+%feature("docstring")  CasADi::IPMethod::getNumInputs "
+
+Get number of inputs. ";
+
+%feature("docstring")  CasADi::IPMethod::getNumOutputs "
+
+Get number of outputs. ";
+
+%feature("docstring")  CasADi::IPMethod::setNumInputs "
+
+Set number of inputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::IPMethod::setNumOutputs "
+
+Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::IPMethod::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
+%feature("docstring")  CasADi::IPMethod::evaluate_old "
+
+Evaluate (old style) ";
+
+%feature("docstring")  CasADi::IPMethod::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::IPMethod::solve "
+
+the same as evaluate(0,0) ";
+
+%feature("docstring")  CasADi::IPMethod::jacobian "
+
+Calculate jacobian of output oind with respect to input iind.
+
+This method calls the method jacobian on the internal twin of this class.
+The default behaviour for FX is to use CasADi::Jacobian, which uses
+(numerical) directional derivatives (i.e. operator overloading) to form the
+Jacobian. ";
+
+%feature("docstring")  CasADi::IPMethod::jacobian "
+
+Calculate the jacobian of a number of function outputs with respect to a
+number of function inputs, optionally include the function outputs. ";
+
+%feature("docstring")  CasADi::IPMethod::hessian "
+
+Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::IPMethod::call "
+
+Create a function call (single input) ";
+
+%feature("docstring")  CasADi::IPMethod::call "
+
+Create a function call. ";
+
+%feature("docstring")  CasADi::IPMethod::call "
+
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
+
+%feature("docstring")  CasADi::IPMethod::call "
+
+Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
+be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::IPMethod::eval "
+
+evaluate symbolically, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::IPMethod::eval "
+
+evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::IPMethod::eval "
+
+Evaluate symbolically with with directional derivatives, SX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The first
+boolean argument allows the second argument to the functions to be used as
+an input instead of output, assuming it is already known and the second
+boolean arguments allows constants to be eliminated during the evaluations
+(as the treatment of constants in CasADi will get more efficient, this will
+become unnecessary). ";
+
+%feature("docstring")  CasADi::IPMethod::eval "
+
+Evaluate symbolically with with directional derivatives, MX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The first
+boolean argument allows the second argument to the functions to be used as
+an input instead of output, assuming it is already known and the second
+boolean arguments allows constants to be eliminated during the evaluations
+(as the treatment of constants in CasADi will get more efficient, this will
+become unnecessary). ";
+
+%feature("docstring")  CasADi::IPMethod::eval "
+
+evaluate symbolically, single input, single output ";
+
+%feature("docstring")  CasADi::IPMethod::evalMX "
+
+evaluate symbolically, MX type (unambiguous) ";
+
+%feature("docstring")  CasADi::IPMethod::evalMX "
+
+Evaluate symbolically with with directional derivatives, MX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The first
+boolean argument allows the second argument to the functions to be used as
+an input instead of output, assuming it is already known and the second
+boolean arguments allows constants to be eliminated during the evaluations
+(as the treatment of constants in CasADi will get more efficient, this will
+become unnecessary). ";
+
+%feature("docstring")  CasADi::IPMethod::evalSX "
+
+evaluate symbolically, SX type (unambiguous) ";
+
+%feature("docstring")  CasADi::IPMethod::evalSX "
+
+Evaluate symbolically with with directional derivatives, SX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The first
+boolean argument allows the second argument to the functions to be used as
+an input instead of output, assuming it is already known and the second
+boolean arguments allows constants to be eliminated during the evaluations
+(as the treatment of constants in CasADi will get more efficient, this will
+become unnecessary). ";
+
+%feature("docstring")  CasADi::IPMethod::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
+%feature("docstring")  CasADi::IPMethod::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::IPMethod::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::IPMethod::indexed_one_based "";
+
+%feature("docstring")  CasADi::IPMethod::indexed_zero_based "";
+
+%feature("docstring")  CasADi::IPMethod::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::IPMethod::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::IPMethod::output "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::IPMethod::output "
+
+Access output argument Note that copies in Python are shallow by default and
+fx.output() gives a reference/pointer to an internal data structure. So if
+you want save fx.output(), you need to make a deep copy using for example
+DMatrix(fx.output()). ";
+
+%feature("docstring")  CasADi::IPMethod::fwdSeed "
+
+Const access forward seed. ";
+
+%feature("docstring")  CasADi::IPMethod::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::IPMethod::fwdSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::IPMethod::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::IPMethod::adjSeed "
+
+Const access adjoint seed. ";
+
+%feature("docstring")  CasADi::IPMethod::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::IPMethod::adjSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::IPMethod::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::IPMethod::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::IPMethod::getStat "
+
+Get a single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::IPMethod::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::IPMethod::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph. ";
+
+%feature("docstring")  CasADi::IPMethod::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::IPMethod::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::IPMethod::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::IPMethod::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::IPMethod::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::IPMethod::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::IPMethod::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::IPMethod::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::IPMethod::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::IPMethod::clone "
+
+Deep copy. ";
+
+%feature("docstring")  CasADi::IPMethod::assignNode "
+
+Assign the node to a node class pointer (or null) ";
+
+%feature("docstring")  CasADi::IPMethod::assignNodeNoCount "
+
+Assign the node to a node class pointer without reference counting: inproper
+use will cause memory leaks! ";
+
+%feature("docstring")  CasADi::IPMethod::get "
+
+Get a const pointer to the node. ";
+
+%feature("docstring")  CasADi::IPMethod::get "
+
+Get a pointer to the node. ";
+
+%feature("docstring")  CasADi::IPMethod::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::IPMethod::swap "
+
+Swap content with another instance. ";
+
+%feature("docstring")  CasADi::IPMethod::repr "
+
+Print a representation of the object. ";
+
+%feature("docstring")  CasADi::IPMethod::print "
+
+Print a destription of the object. ";
+
+%feature("docstring")  CasADi::IPMethod::init "
+
+Initialize the object: more documentation in the node class (
+SharedObjectNode and derived classes) ";
+
+%feature("docstring")  CasADi::IPMethod::isInit "
+
+Is initialized? ";
+
+%feature("docstring")  CasADi::IPMethod::assertInit "
+
+Assert that it is initialized. ";
+
+%feature("docstring")  CasADi::IPMethod::isNull "
+
+Is a null pointer? ";
+
+%feature("docstring")  CasADi::IPMethod::getRepresentation "
+
+Return a string with a representation (for SWIG) ";
+
+%feature("docstring")  CasADi::IPMethod::getDescription "
+
+Return a string with a destription (for SWIG) ";
 
 
 // File: classCasADi_1_1IpoptInternal.xml
@@ -24555,6 +26358,16 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
+%feature("docstring")  CasADi::IpoptInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::IpoptInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
+
 %feature("docstring")  CasADi::IpoptInternal::iStruct "
 
 Access an input. ";
@@ -25540,6 +27353,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::iStruct "
 
@@ -26721,6 +28544,24 @@ an input instead of output, assuming it is already known and the second
 boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::jacSparsity "
 
@@ -30117,6 +31958,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::IpoptSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::IpoptSolver::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -30779,6 +32638,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::Jacobian::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::Jacobian::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -31170,6 +33047,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::JacobianInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::JacobianInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::JacobianInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::JacobianInternal::iStruct "
 
@@ -31968,6 +33855,16 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
+%feature("docstring")  CasADi::Sundials::KinsolInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::Sundials::KinsolInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
+
 %feature("docstring")  CasADi::Sundials::KinsolInternal::iStruct "
 
 Access an input. ";
@@ -32738,6 +34635,24 @@ an input instead of output, assuming it is already known and the second
 boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
+
+%feature("docstring")  CasADi::Sundials::KinsolSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolSolver::jacSparsity "
 
@@ -33523,6 +35438,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::KnitroInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::KnitroInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::KnitroInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::KnitroInternal::iStruct "
 
@@ -34455,6 +36380,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::KnitroSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::KnitroSolver::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -35107,6 +37050,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::Interfaces::LapackLUDense::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -35548,6 +37509,18 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::derivative
+"
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackLUDenseInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::iStruct "
 
@@ -36273,6 +38246,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::Interfaces::LapackQRDense::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -36704,6 +38695,18 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::derivative
+"
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackQRDenseInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::iStruct "
 
@@ -37641,6 +39644,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::LiftedSQP::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::LiftedSQP::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -38278,6 +40299,16 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
+%feature("docstring")  CasADi::LiftedSQPInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
+
 %feature("docstring")  CasADi::LiftedSQPInternal::iStruct "
 
 Access an input. ";
@@ -38893,6 +40924,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::iStruct "
 
@@ -39733,6 +41774,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::Interfaces::LiftoptSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -40353,6 +42412,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::LinearSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::LinearSolver::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -40766,6 +42843,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::LinearSolverInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::LinearSolverInternal::iStruct "
 
@@ -42968,6 +45055,25 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::OptimalControl::MultipleShooting::derivative
+"
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::OptimalControl::MultipleShooting::jacSparsity
 "
 
@@ -43514,6 +45620,18 @@ Evaluate symbolically, SX type (overloaded) ";
 CasADi::OptimalControl::MultipleShootingInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")
 CasADi::OptimalControl::MultipleShootingInternal::iStruct "
@@ -45810,6 +47928,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::MXFunction::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::MXFunction::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -46194,6 +48330,11 @@ Jacobian via source code transformation. ";
 Gradient via source code transformation (identity matrix seed in a
 particular direction) ";
 
+%feature("docstring")  CasADi::MXFunctionInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
+
 %feature("docstring")  CasADi::MXFunctionInternal::collectFree "
 
 Collect the free variables. ";
@@ -46256,6 +48397,11 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::MXFunctionInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::iStruct "
 
@@ -47370,6 +49516,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::NLPSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::NLPSolver::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -47918,6 +50082,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::NLPSolverInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::NLPSolverInternal::iStruct "
 
@@ -50243,6 +52417,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::OCPSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::OCPSolver::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -50738,6 +52930,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::OCPSolverInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::OCPSolverInternal::iStruct "
 
@@ -51361,6 +53563,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::iStruct "
 
@@ -52104,6 +54316,24 @@ an input instead of output, assuming it is already known and the second
 boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::jacSparsity "
 
@@ -53270,6 +55500,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::Parallelizer::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::Parallelizer::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -53709,6 +55957,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::ParallelizerInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::ParallelizerInternal::iStruct "
 
@@ -54280,6 +56538,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::iStruct "
 
@@ -55029,6 +57297,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::Interfaces::QPOasesSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -55687,6 +57973,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::QPSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::QPSolver::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -56133,6 +58437,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::QPSolverInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::QPSolverInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::QPSolverInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::QPSolverInternal::iStruct "
 
@@ -57002,6 +59316,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::RKIntegrator::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::RKIntegrator::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -57517,6 +59849,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::RKIntegratorInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::RKIntegratorInternal::iStruct "
 
@@ -58638,6 +60980,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::Simulator::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::Simulator::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -59068,6 +61428,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::SimulatorInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::SimulatorInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::SimulatorInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::SimulatorInternal::iStruct "
 
@@ -60039,6 +62409,16 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
+%feature("docstring")  CasADi::SQPInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::SQPInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
+
 %feature("docstring")  CasADi::SQPInternal::iStruct "
 
 Access an input. ";
@@ -60961,6 +63341,24 @@ an input instead of output, assuming it is already known and the second
 boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
+
+%feature("docstring")  CasADi::SQPMethod::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
 
 %feature("docstring")  CasADi::SQPMethod::jacSparsity "
 
@@ -61885,6 +64283,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::Sundials::SundialsIntegrator::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::Sundials::SundialsIntegrator::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -62607,6 +65023,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::Sundials::SundialsInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::Sundials::SundialsInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::Sundials::SundialsInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::Sundials::SundialsInternal::iStruct "
 
@@ -63341,6 +65767,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::SuperLU::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::SuperLU::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -63803,6 +66247,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::SuperLUInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::SuperLUInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::SuperLUInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::SuperLUInternal::iStruct "
 
@@ -64841,6 +67295,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::SXFunction::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::SXFunction::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -65221,6 +67693,11 @@ Calculate the expression for the jacobian of a number of function outputs
 with respect to a number of function inputs, optionally include the function
 outputs. ";
 
+%feature("docstring")  CasADi::SXFunctionInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
+
 %feature("docstring")  CasADi::SXFunctionInternal::init "
 
 Initialize. ";
@@ -65282,6 +67759,11 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::SXFunctionInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::iStruct "
 
@@ -68029,6 +70511,16 @@ Evaluate symbolically, SX type (overloaded) ";
 
 Evaluate symbolically, MX type (overloaded) ";
 
+%feature("docstring")  CasADi::WorhpInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::WorhpInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
+
 %feature("docstring")  CasADi::WorhpInternal::iStruct "
 
 Access an input. ";
@@ -69581,6 +72073,24 @@ boolean arguments allows constants to be eliminated during the evaluations
 (as the treatment of constants in CasADi will get more efficient, this will
 become unnecessary). ";
 
+%feature("docstring")  CasADi::WorhpSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
 %feature("docstring")  CasADi::WorhpSolver::jacSparsity "
 
 Get, if necessary generate, the sparsity of a Jacobian block. ";
@@ -69995,6 +72505,16 @@ Evaluate symbolically, SX type (overloaded) ";
 %feature("docstring")  CasADi::XFunctionInternal::eval "
 
 Evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::XFunctionInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::XFunctionInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::XFunctionInternal::iStruct "
 
@@ -72641,6 +75161,18 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: integrator__internal_8hpp.xml
+
+
+// File: ip__internal_8cpp.xml
+
+
+// File: ip__internal_8hpp.xml
+
+
+// File: ip__method_8cpp.xml
+
+
+// File: ip__method_8hpp.xml
 
 
 // File: ipopt_8hpp.xml

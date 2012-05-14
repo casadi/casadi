@@ -114,6 +114,12 @@ class FXInternal : public OptionsFunctionalityNode{
       evalMX(arg,res,fseed,fsens,aseed,asens,output_given,eliminate_constants);
     }
     
+    /// Get a function that calculates nfwd forward derivatives and nadj adjoint derivatives (cached)
+    FX derivative(int nfwd, int nadj);
+
+    /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
+    virtual FX getDerivative(int nfwd, int nadj);
+
     /** \brief  Access an input */
     FunctionIO& iStruct(int i=0);
 
@@ -241,6 +247,9 @@ class FXInternal : public OptionsFunctionalityNode{
     bool store_jacobians_;
     std::vector<std::vector<FX> > jacs_;
     
+    // Functions to evaluate directional derivatives
+    std::vector<std::vector<WeakRef> > derivative_fcn_;
+
     /// Sparsity of the Jacobian blocks
     std::vector<std::vector<CRSSparsity> > jac_sparsity_, jac_sparsity_compact_;
 

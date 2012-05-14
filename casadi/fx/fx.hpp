@@ -258,6 +258,23 @@ class FX : public OptionsFunctionality{
   SXMatrix eval(const SXMatrix& arg){ return eval(std::vector<SXMatrix>(1,arg)).at(0);}
 #endif // SWIG
   
+  /** \brief Get a function that calculates nfwd forward derivatives and nadj adjoint derivatives
+   * 	Returns a function with (1+nfwd)*n_in+nadj*n_out inputs
+   * 	and (1+nfwd)*n_out + nadj*n_in outputs.
+   * 	The first n_in inputs corresponds to nondifferentiated inputs. The next nfwd*n_in inputs
+   * 	corresponds to forward seeds, one direction at a time and the last nadj*n_out inputs
+   * 	corresponds to adjoint seeds, one direction at a time.
+   * 	The first n_out outputs corresponds to nondifferentiated outputs. The next nfwd*n_out outputs
+   * 	corresponds to forward sensitivities, one direction at a time and the last nadj*n_in outputs
+   * 	corresponds to  adjoint sensitivties, one direction at a time.
+   *
+   * 	(n_in = getNumInputs(), n_out = getNumOutputs())
+   *
+   *	The functions returned are cached, meaning that if called multiple timed with the same value,
+   *	then multiple references to the same function will be returned.
+   */
+  FX derivative(int nfwd, int nadj);
+
   /// Get, if necessary generate, the sparsity of a Jacobian block
   CRSSparsity& jacSparsity(int iind=0, int oind=0, bool compact=false);
 

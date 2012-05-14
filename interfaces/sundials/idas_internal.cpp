@@ -587,7 +587,7 @@ int IdasInternal::res_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr
   } catch(int flag){ // recoverable error
     return flag;
   } catch(exception& e){ // non-recoverable error
-    cerr << "res failed: " << e.what() << endl;;
+    cerr << "res failed: " << e.what() << endl;
     return -1;
   }
 }
@@ -597,7 +597,7 @@ void IdasInternal::ehfun_wrapper(int error_code, const char *module, const char 
     IdasInternal *this_ = (IdasInternal*)eh_data;
     this_->ehfun(error_code,module,function,msg);        
   } catch(exception& e){
-    cerr << "ehfun failed: " << e.what() << endl;;
+    cerr << "ehfun failed: " << e.what() << endl;
   }
 }
   
@@ -643,7 +643,7 @@ int IdasInternal::jtimes_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector
     this_->jtimes(t,NV_DATA_S(xz),NV_DATA_S(xzdot),NV_DATA_S(rr),NV_DATA_S(v),NV_DATA_S(Jv),cj,NV_DATA_S(tmp1),NV_DATA_S(tmp2));
     return 0;
   } catch(exception& e){
-    cerr << "jtimes failed: " << e.what() << endl;;
+    cerr << "jtimes failed: " << e.what() << endl;
     return 1;
   }
 }
@@ -697,7 +697,7 @@ int IdasInternal::resS_wrapper(int Ns, double t, N_Vector xz, N_Vector xzdot, N_
     this_->resS(Ns,t,NV_DATA_S(xz),NV_DATA_S(xzdot),NV_DATA_S(resval),xzF,xzdotF,rrF,NV_DATA_S(tmp1),NV_DATA_S(tmp2),NV_DATA_S(tmp3));
     return 0;
   } catch(exception& e){
-    cerr << "resS failed: " << e.what() << endl;;
+    cerr << "resS failed: " << e.what() << endl;
     return 1;
   }
 }
@@ -1062,7 +1062,7 @@ int IdasInternal::rhsQ_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector r
     this_->rhsQ(t,NV_DATA_S(xz),NV_DATA_S(xzdot),NV_DATA_S(rhsQ));
     return 0;
   } catch(exception& e){
-    cerr << "rhsQ failed: " << e.what() << endl;;
+    cerr << "rhsQ failed: " << e.what() << endl;
     return 1;
   }
 }
@@ -1121,7 +1121,7 @@ int IdasInternal::rhsQS_wrapper(int Ns, double t, N_Vector xz, N_Vector xzdot, N
     this_->rhsQS(Ns,t,xz,xzdot,xzF,xzdotF,rrQ,qdotF,tmp1,tmp2,tmp3);
     return 0;
   } catch(exception& e){
-    cerr << "rhsQS failed: " << e.what() << endl;;
+    cerr << "rhsQS failed: " << e.what() << endl;
     return 1;
   }
 }
@@ -1186,7 +1186,7 @@ int IdasInternal::resB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector x
     this_->resB(t,NV_DATA_S(xz),NV_DATA_S(xzdot),NV_DATA_S(xzA),NV_DATA_S(xzdotA),NV_DATA_S(rrA));
     return 0;
   } catch(exception& e){
-    cerr << "resB failed: " << e.what() << endl;;
+    cerr << "resB failed: " << e.what() << endl;
     return 1;
   }
 }
@@ -1227,7 +1227,7 @@ int IdasInternal::rhsQB_wrapper(double t, N_Vector y, N_Vector xzdot, N_Vector x
     this_->rhsQB(t,NV_DATA_S(y),NV_DATA_S(xzdot),NV_DATA_S(xzA),NV_DATA_S(xzdotA),NV_DATA_S(qdotA));
     return 0;
   } catch(exception& e){
-    cerr << "resQB failed: " << e.what() << endl;;
+    cerr << "resQB failed: " << e.what() << endl;
     return 1;
   }
 }
@@ -1282,7 +1282,7 @@ int IdasInternal::djac_wrapper(int Neq, double t, double cj, N_Vector xz, N_Vect
     this_->djac(Neq, t, cj, xz, xzdot, rr, Jac, tmp1, tmp2, tmp3);
     return 0;
   } catch(exception& e){
-    cerr << "djac failed: " << e.what() << endl;;
+    cerr << "djac failed: " << e.what() << endl;
     return 1;
   }
 }
@@ -1333,7 +1333,7 @@ int IdasInternal::bjac_wrapper(int Neq, int mupper, int mlower, double tt, doubl
     this_->bjac(Neq, mupper, mlower, tt, cj, xz, xzdot, rr, Jac, tmp1, tmp2, tmp3);
     return 0;
   } catch(exception& e){
-    cerr << "bjac failed: " << e.what() << endl;;
+    cerr << "bjac failed: " << e.what() << endl;
     return 1;
   }
 }
@@ -1351,7 +1351,7 @@ int IdasInternal::psolve_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector
     this_->psolve(t, xz, xzdot, rr, rvec, zvec, cj, delta, tmp);
     return 0;
   } catch(exception& e){
-    cerr << "psolve failed: " << e.what() << endl;;
+    cerr << "psolve failed: " << e.what() << endl;
     return 1;
   }
 }
@@ -1363,7 +1363,7 @@ int IdasInternal::psetup_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector
     this_->psetup(t, xz, xzdot, rr, cj, tmp1, tmp2, tmp3);
     return 0;
   } catch(exception& e){
-    cerr << "psetup failed: " << e.what() << endl;;
+    cerr << "psetup failed: " << e.what() << endl;
     return 1;
   }
 }
@@ -1431,7 +1431,7 @@ int IdasInternal::lsetup_wrapper(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_
     this_->lsetup(IDA_mem,xz,xzdot,resp,vtemp1,vtemp2,vtemp3);
     return 0;
   } catch(exception& e){
-    cerr << "lsetup failed: " << e.what() << endl;;
+    cerr << "lsetup failed: " << e.what() << endl;
     return -1;
   }
 }
@@ -1443,10 +1443,10 @@ int IdasInternal::lsolve_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_
    this_->lsolve(IDA_mem,b,weight,xz,xzdot,rr);
    return 0;
   } catch(int wrn){
-/*    cerr << "warning: " << wrn << endl;;*/
+/*    cerr << "warning: " << wrn << endl;*/
     return wrn;
   } catch(exception& e){
-    cerr << "lsolve failed: " << e.what() << endl;;
+    cerr << "lsolve failed: " << e.what() << endl;
     return -1;
   }
 }
@@ -1551,12 +1551,9 @@ FX IdasInternal::getJacobian(){
   if(!f_mx.isNull()){
     // Get the Jacobian in the Newton iteration
     MX cj("cj");
-    vector<MX> jac_x = f_mx.jac(DAE_X);
-    vector<MX> jac_xdot = f_mx.jac(DAE_XDOT);
-    MX jac = jac_x[DAE_ODE] + cj*jac_xdot[DAE_ODE];
+    MX jac = f_mx.jac(DAE_X,DAE_ODE) + cj*f_mx.jac(DAE_XDOT,DAE_ODE);
     if(nz_>0){
-      vector<MX> jac_z = f_mx.jac(DAE_Z);
-      jac = horzcat(vertcat(jac,jac_x[DAE_ALG]),vertcat(jac_z[DAE_ODE],jac_z[DAE_ALG]));
+      jac = horzcat(vertcat(jac,f_mx.jac(DAE_X,DAE_ALG)),vertcat(f_mx.jac(DAE_Z,DAE_ODE),f_mx.jac(DAE_Z,DAE_ALG)));
     }
     
     // Jacobian function

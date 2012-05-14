@@ -23,6 +23,7 @@
 #include "mx_function_internal.hpp"
 #include "../mx/mx_node.hpp"
 #include "../stl_vector_tools.hpp"
+#include "../mx/mx_tools.hpp"
 
 #include <stack>
 #include <typeinfo>
@@ -100,16 +101,12 @@ void MXFunction::setLiftingFunction(LiftingFunction liftfun, void* user_data){
   (*this)->setLiftingFunction(liftfun,user_data);
 }
 
-std::vector<MX> MXFunction::jac(int iind){
-  return (*this)->jac(iind);
+MX MXFunction::jac(int iind, int oind, bool compact, bool symmetric){
+  return (*this)->jac(iind,oind,compact,symmetric);
 }
 
-std::vector<MX> MXFunction::grad(int oind){
-  return (*this)->grad(oind);
-}
-
-std::vector<MX> MXFunction::jac(const std::vector<std::pair<int,int> >& jblocks, bool compact){
-  return (*this)->jac(jblocks,compact);
+MX MXFunction::grad(int iind, int oind){
+  return trans(jac(iind,oind));
 }
 
 SXFunction MXFunction::expand(const std::vector<SXMatrix>& inputv){

@@ -70,18 +70,15 @@ class MXFunctionInternal : public XFunctionInternal<MXFunctionInternal,MX,MXNode
     /** \brief Set the lifting function */
     void setLiftingFunction(LiftingFunction liftfun, void* user_data);
 
-    /** \brief Jacobian via source code transformation (identity matrix seed in a particular direction) */
-    std::vector<MX> jac(int iind);
-
     /** \brief Calculate the expression for the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs */
-    std::vector<MX> jac(const std::vector<std::pair<int,int> >& jblocks, bool compact=false, const std::vector<bool>& symmetric_block=std::vector<bool>());
+    MX jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
 
     /** \brief Jacobian via source code transformation */
     virtual FX jacobian(const std::vector<std::pair<int,int> >& jblocks);
     
-    /** \brief Gradient via source code transformation (identity matrix seed in a particular direction) */
-    std::vector<MX> grad(int oind);
-    
+    /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
+    virtual FX getDerivative(int nfwd, int nadj);
+
     /** \brief  An elemenent of the algorithm, namely an MX node */
     typedef MXAlgEl AlgEl;
 

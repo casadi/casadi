@@ -25,19 +25,10 @@ void trivial(){
   f.init();
   
   // Jacobians
-  vector<MX> jacX = f.jac(0);
-  vector<MX> jacV = f.jac(1);
-  cout << "jacX = " << jacX << endl;
-  cout << "jacV = " << jacV << endl;
-  
-  // Gradients
-  vector<MX> grad0 = f.grad(0);
-  vector<MX> grad1 = f.grad(1);
-  cout << "grad0 = " << grad0 << endl;
-  cout << "grad1 = " << grad1 << endl;
-  
-  
-  
+  cout << "jacX0 = " << f.jac(0,0) << endl;
+  cout << "jacV0 = " << f.jac(1,0) << endl;
+  cout << "jacX1 = " << f.jac(0,1) << endl;
+  cout << "jacV1 = " << f.jac(1,1) << endl;
 }
 
 void subtraction(){
@@ -49,23 +40,19 @@ void subtraction(){
   f_in[1] = V;
   MXFunction f(f_in,X-V);
   f.init();
-  vector<MX> jacX = f.jac(0);
-  vector<MX> jacV = f.jac(1);
-  cout << "jacX = " << jacX << endl;
-  cout << "jacV = " << jacV << endl;
+  cout << "jacX0 = " << f.jac(0,0) << endl;
+  cout << "jacV0 = " << f.jac(1,0) << endl;
 
-  vector<MX> g = f.grad(0);
-  cout << "g = " << g << endl;
+  cout << "g(0,0) = " << f.grad(0,0) << endl;
+  cout << "g(1,0) = " << f.grad(1,0) << endl;
   
   MXFunction f2(f_in,V-X);
   f2.init();
-  vector<MX> jacX2 = f2.jac(0);
-  vector<MX> jacV2 = f2.jac(1);
-  cout << "jacX2 = " << jacX2 << endl;
-  cout << "jacV2 = " << jacV2 << endl;
+  cout << "jacX0 (2) = " << f2.jac(0,0) << endl;
+  cout << "jacV0 (2) = " << f2.jac(1,0) << endl;
   
-  vector<MX> g2 = f2.grad(0);
-  cout << "g2 = " << g2 << endl;
+  cout << "g2(0,0) = " << f2.grad(0,0) << endl;
+  cout << "g2(1,0) = " << f2.grad(1,0) << endl;
   
 }
 
@@ -90,7 +77,7 @@ void evaluation(){
   Fcn.init();
     
   // Get the symbolic Jacobian
-  vector<MX> J = Fcn.jac();
+  MX J = Fcn.jac(0,0);
   cout << J << endl;
   
   // Create a symbolic Jacobian function
@@ -106,10 +93,10 @@ void evaluation(){
   Jac_sx.init();
 
   // Calculate the gradient via adjoint mode AD, source code transformation
-  MX G = Fcn.grad().at(0);
+  MX G = Fcn.grad(0,0);
 
   // Create a symbolic Jacobian function using the gradient
-  MXFunction Jac_adj(XY,trans(G));
+  MXFunction Jac_adj(XY,G);
   Jac_adj.init();
   
   // Give arguments to x and y
@@ -158,13 +145,13 @@ void mapping(){
   Fcn.init();
     
   // Get the symbolic Jacobian
-  MX J = Fcn.jac()[0];
+  MX J = Fcn.jac(0,0);
   cout << J << endl;
   IMatrix JJ(J.sparsity(),1);
   JJ.printDense();
   
   // Get the symbolic Jacobian
-  MX G = Fcn.grad()[0];
+  MX G = Fcn.grad(0,0);
   cout << G << endl;
   IMatrix GG(G.sparsity(),1);
   GG.printDense();
@@ -182,7 +169,7 @@ void multiplication(){
   Fcn.init();
   
   // Generate Jacobian
-  MX J1 = Fcn.jac()[0];
+  MX J1 = Fcn.jac(0,0);
   cout << "J1 = " << J1 << endl;
   MXFunction Jfcn1(XY,J1);
   Jfcn1.init();
@@ -191,7 +178,7 @@ void multiplication(){
   cout << "nnz(J) = " << Jfcn2.outputSX().size() << endl;
   
   // Via adjoint mode
-  MX G1 = Fcn.grad()[0];
+  MX G1 = Fcn.grad(0,0);
   cout << "G1 = " << G1 << endl;
   MXFunction Gfcn1(XY,G1);
   Gfcn1.init();

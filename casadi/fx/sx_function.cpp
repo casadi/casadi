@@ -99,9 +99,7 @@ bool SXFunction::checkNode() const{
 
 SXMatrix SXFunction::jac(int iind, int oind, bool compact, bool symmetric){
   if(input(iind).empty() || output(oind).empty()) return Matrix<SX>(); // quick return
-  vector<pair<int,int> > jblocks(1,pair<int,int>(oind,iind));
-  if(!isInit()) init();
-  return jac(jblocks,compact,vector<bool>(1,symmetric)).front();
+  return (*this)->jac(iind,oind,compact,symmetric);
 }
 
 SXMatrix SXFunction::grad(int iind, int oind){
@@ -176,10 +174,6 @@ int SXFunction::countNodes() const{
 
 void SXFunction::clearSymbolic(){
   (*this)->clearSymbolic();
-}
-
-vector<Matrix<SX> > SXFunction::jac(const vector<pair<int,int> >& jblocks, bool compact, const std::vector<bool>& symmetric_block){
-  return (*this)->jac(jblocks,compact,symmetric_block);
 }
 
 SXFunction::SXFunction(const MXFunction& f){

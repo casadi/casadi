@@ -385,5 +385,10 @@ void FX::spInit(bool fwd){
     (*this)->spInit(fwd);
 }
 
+FX FX::derivative(int nfwd, int nadj){
+	  return (*this)->derivative(nfwd,nadj);
+}
+
+
 } // namespace CasADi
 

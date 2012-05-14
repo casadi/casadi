@@ -117,7 +117,7 @@ void LiftedSQPInternal::init(){
   if(gauss_newton_){
     
     // Least square objective
-    f = inner_prod(f1,f1);
+    f = inner_prod(f1,f1)/2;
     
   } else {
     
