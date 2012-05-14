@@ -620,186 +620,31 @@ void MXFunctionInternal::spEvaluate(bool fwd){
 }
 
 FX MXFunctionInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks){
-  // Make sure initialized
-  assertInit();
+  // Jacobian blocks
+  vector<MX> jac_out(jblocks.size());
+  jac_out.reserve(jblocks.size());
   
-  // Outputs of the Jacobian function
-  vector<MX> j_out;
-  j_out.reserve(jblocks.size());
-
-  // The jacobians for each input
-  vector<vector<MX> > jacs(getNumInputs());
-  
-  for(vector<pair<int,int> >::const_iterator it=jblocks.begin(); it!=jblocks.end(); ++it){
-    // Get the block
-    int iind = it->second;
-    int oind = it->first;
+  for(int el=0; el<jac_out.size(); ++el){
+    int oind = jblocks[el].first;
+    int iind = jblocks[el].second;
     
-    // If variable index is -1, we want nondifferentiated function output
     if(iind==-1){
-      // Nondifferentiated function
-      j_out.push_back(outputv_.at(oind));
-      
+      // Undifferentiated function
+      jac_out[el] = outputv_.at(oind);
     } else {
-      
-      // Create a Jacobian symbolically, if not already created
-      if(jacs.at(iind).empty()){
-        jacs.at(iind) = jac(iind);
-      }
-      
-      // Add to outputs
-      j_out.push_back(jacs.at(iind).at(oind));
+      // Jacobian (workaround)
+      jac_out[el] = jac(iind,oind);
     }
   }
   
-  // Create function
-  return MXFunction(inputv_,j_out);
+  vector<MX> inputv_v(inputv_);
+  
+  // Return function
+  return MXFunction(inputv_v,jac_out);
 }
 
-vector<MX> MXFunctionInternal::jac(const vector<pair<int,int> >& jblocks, bool compact, const std::vector<bool>& symmetric_block){
-  // Create return object
-  std::vector<MX> ret(jblocks.size());
-  
-  // Add the information we already know
-  for(int i=0; i<ret.size(); ++i){
-    // Get input/output indices for the block
-    int oind = jblocks[i].first;
-    int iind = jblocks[i].second;
-
-    // Check if nondifferentiated variable
-    if(iind<0){
-      // Nondifferentiated variable
-      ret[i] = outputv_.at(oind);
-    } else { // Jacobian block
-      // Get Jacobian
-      ret[i] = jacGen(iind,oind,compact,!symmetric_block.empty() && symmetric_block[i]);
-    }
-  }
-
-  return ret;
-}
-
-std::vector<MX> MXFunctionInternal::jac(int ider){
-  assertInit();
-  
-  for (int i=0;i<inputv_.size();i++) {
-    if (!inputv_[i].dense()) {
-      casadi_error("MXFunctionInternal::jac is currently unsupported for sparse inputs.");
-    }
-  }
-  
-  casadi_assert_message(ider<input_.size(),"Index out of bounds");
-
-  // Variable with respect to which we differentiate
-  const MX& sder = inputv_[ider];
-
-  // Number of forward directions
-  int nfwd = sder.size();
-  
-  // Get the seed matrices
-  vector<vector<MX> > fseed(nfwd);
-  
-  // Give zero seeds in all directions
-  for(int d=0; d<nfwd; ++d){
-    fseed[d].resize(input_.size());
-    for(int iind=0; iind<input_.size(); ++iind){
-      
-      // Access the input expression
-      const MX& s = inputv_[iind];
-      if(d==0){
-        fseed[d][iind] = MX::sparse(s.size1(),s.size2());
-      } else {
-        fseed[d][iind] = fseed[0][iind];
-      }
-    }
-  }
-  
-  // Loop over the rows of the input
-  for(int i=0; i<sder.size1(); ++i){
-    // loop over the nonzeros of the input (i.e. derivative directions)
-    for(int d=sder.sparsity().rowind(i); d<sder.sparsity().rowind(i+1); ++d){
-      // get the column in the input matrix
-      int j=sder.sparsity().col(d); 
-  
-      // Give a seed in the (i,j) direction
-      fseed[d][ider](i,j) = 1;
-    }
-  }
-  
-  // Forward mode automatic differentiation, symbolically
-  vector<vector<MX> > fsens;
-  std::vector<std::vector<MX> > dummy;
-  evalMX(inputv_,outputv_,fseed,fsens,dummy,dummy,true,false);
-
-  // Collect the directions
-  vector<MX> ret(outputv_.size());
-  vector<MX> tmp(nfwd);
-  for(int oind=0; oind<outputv_.size(); ++oind){
-    for(int d=0; d<nfwd; ++d){
-      tmp[d] = flatten(fsens[d][oind]);
-    }
-    ret[oind] = horzcat(tmp);
-  }
-  
-  return ret;
-}
-
-std::vector<MX> MXFunctionInternal::grad(int igrad){
-  assertInit();
-  casadi_assert_message(igrad<output_.size(),"Index out of bounds");
-
-  // Variable with respect to which we differentiate
-  const MX& sgrad = outputv_[igrad];
-
-  // Number of adjoint directions
-  int nadj = sgrad.size();
-  
-  // Get the seed matrices
-  vector<vector<MX> > aseed(nadj);
-  
-  // Give zero seeds in all directions
-  for(int d=0; d<nadj; ++d){
-    aseed[d].resize(output_.size());
-    for(int oind=0; oind<output_.size(); ++oind){
-      
-      // Access the input expression
-      const MX& s = outputv_[oind];
-      if(d==0){
-        aseed[d][oind] = MX::sparse(s.size1(),s.size2());
-      } else {
-        aseed[d][oind] = aseed[0][oind];
-      }
-    }
-  }
-  
-  // Loop over the rows of the output
-  for(int i=0; i<sgrad.size1(); ++i){
-    // loop over the nonzeros of the output (i.e. derivative directions)
-    for(int d=sgrad.sparsity().rowind(i); d<sgrad.sparsity().rowind(i+1); ++d){
-      // get the column in the input matrix
-      int j=sgrad.sparsity().col(d); 
-  
-      // Give a seed in the (i,j) direction
-      aseed[d][igrad](i,j) = 1;
-    }
-  }
-  
-  // Forward mode automatic differentiation, symbolically
-  vector<vector<MX> > asens;
-  std::vector<std::vector<MX> > dummy;
-  evalMX(inputv_,outputv_,dummy,dummy,aseed,asens,true,false);
-
-  // Collect the sensitivities
-  vector<MX> ret(inputv_.size());
-  vector<MX> tmp(nadj);
-  for(int iind=0; iind<inputv_.size(); ++iind){
-    for(int d=0; d<nadj; ++d){
-      tmp[d] = trans(flatten(asens[d][iind]));
-    }
-    ret[iind] = vertcat(tmp);
-  }
-  
-  return ret;
+MX MXFunctionInternal::jac(int iind, int oind, bool compact, bool symmetric){
+  return jacGen(iind,oind,compact,symmetric);
 }
 
 void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 

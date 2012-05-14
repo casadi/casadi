@@ -102,15 +102,11 @@ void MXFunction::setLiftingFunction(LiftingFunction liftfun, void* user_data){
 }
 
 MX MXFunction::jac(int iind, int oind, bool compact, bool symmetric){
-  return (*this)->jac(iind).at(oind);
+  return (*this)->jac(iind,oind,compact,symmetric);
 }
 
 MX MXFunction::grad(int iind, int oind){
-  return trans((*this)->grad(oind).at(iind));
-}
-
-std::vector<MX> MXFunction::jac(const std::vector<std::pair<int,int> >& jblocks, bool compact){
-  return (*this)->jac(jblocks,compact);
+  return trans(jac(iind,oind));
 }
 
 SXFunction MXFunction::expand(const std::vector<SXMatrix>& inputv){
