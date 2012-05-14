@@ -339,7 +339,7 @@ class ADtests(casadiTestCase):
               if "sparse" in inputtype: # known bug
                 self.assertRaises(Exception, lambda : f.jac(0))
                 continue
-              Jf=MXFunction(self.mxinputs[inputshape][inputtype],[f.jac(0)[0]])
+              Jf=MXFunction(self.mxinputs[inputshape][inputtype],[f.jac(0,0)])
               Jf.init()
               Jf.input().set(n)
               Jf.evaluate()

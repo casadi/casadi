@@ -291,7 +291,7 @@ void NLPSolverInternal::init(){
           if(adjoint_mode){
           
             // Gradient of the lagrangian
-            MX gL = trans(lfcn.grad().at(0));
+            MX gL = trans(lfcn.grad(0,0));
             log("MX Lagrangian gradient generated");
 
             MXFunction glfcn(lfcn_in,gL);

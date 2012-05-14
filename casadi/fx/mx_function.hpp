@@ -113,11 +113,11 @@ public:
   virtual bool checkNode() const;
   
   /** \brief Jacobian via source code transformation */
-  std::vector<MX> jac(int iind=0);
+  MX jac(int iind, int oind, bool compact=false, bool symmetric=false);
 
   /** \brief Gradient via source code transformation */
-  std::vector<MX> grad(int oind=0);
-
+  MX grad(int iind, int oind);
+  
   /** \brief Jacobian via source code transformation (new, experimental implementation)
       Calculate the expression for the jacobian of a number of function outputs with 
       respect to a number of function inputs, optionally include the function outputs */
