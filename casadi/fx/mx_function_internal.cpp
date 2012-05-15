@@ -667,7 +667,6 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
   const int nfwd = fseed.size();
   const int nadj = aseed.size();
 
-  // Arguments for the function evaluation
   MXPtrV input_p, output_p;
   MXPtrVV fseed_p(nfwd), fsens_p(nfwd);
   MXPtrVV aseed_p(nadj), asens_p(nadj);
@@ -836,6 +835,7 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
       }
 
       // Call the evaluation function
+//       cout << "evaluating " << typeid(*it->op.get()).name() << endl;
       it->op->evaluateMX(input_p,output_p,dummy_p,dummy_p,aseed_p,asens_p,true);
     }
   }
@@ -859,7 +859,7 @@ FX MXFunctionInternal::hessian(int iind, int oind) {
   //casadi_assert_message(output(oind).numel()==1,"Can only create hessians for scalar valued functions");
   
   // Get the Jacobian of the function
-  MX J = jac(iind).at(oind);
+  MX J = jac(iind,oind);
   // MX J = grad(oind).at(iind);
   
   // Construct the gradient function
