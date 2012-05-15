@@ -29,8 +29,8 @@
 
 using namespace std;
 
-const bool NEW_EVAL = false;
-const bool NEW_EVAL_SP = false;
+const bool NEW_EVAL = true;
+const bool NEW_EVAL_SP = true;
 
 namespace CasADi {
 
@@ -237,9 +237,8 @@ void Evaluation::evaluateSX(const SXMatrixPtrV& arg, SXMatrixPtrV& res,
   }
 }
 
-void Evaluation::evaluateMX(const MXPtrV& arg, MXPtrV& res,
-    const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed,
-    MXPtrVV& asens, bool output_given) {
+void Evaluation::evaluateMX(const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens, bool output_given) {
+  
   // Number of sensitivity directions
   int nfwd = fsens.size();
   int nadj = aseed.size();
@@ -274,27 +273,23 @@ void Evaluation::evaluateMX(const MXPtrV& arg, MXPtrV& res,
     vector<MX>::const_iterator d_res_it = d_res.begin();
 
     // Collect the nondifferentiated results
-    for (MXPtrV::iterator i = res.begin(); i != res.end();
-        ++i, ++d_res_it) {
-      if (*i)
-        **i = *d_res_it;
+    for (MXPtrV::iterator i = res.begin(); i != res.end(); ++i, ++d_res_it) {
+      if (*i) **i = *d_res_it;
     }
 
     // Collect the forward sensitivities
     for (MXPtrVV::iterator j = fsens.begin(); j != fsens.end(); ++j) {
-      for (MXPtrV::iterator i = j->begin(); i != j->end();
-          ++i, ++d_res_it) {
-        if (*i)
-          **i = *d_res_it;
+      for (MXPtrV::iterator i = j->begin(); i != j->end(); ++i, ++d_res_it) {
+        if (*i) **i = *d_res_it;
       }
     }
 
     // Collect the adjoint sensitivities
     for (MXPtrVV::iterator j = asens.begin(); j != asens.end(); ++j) {
-      for (MXPtrV::iterator i = j->begin(); i != j->end();
-          ++i, ++d_res_it) {
-        if (*i)
-          **i += *d_res_it;
+      for (MXPtrV::iterator i = j->begin(); i != j->end(); ++i, ++d_res_it) {
+        if(*i && !d_res_it->isNull()){
+	  **i += *d_res_it;
+	}
       }
     }
 
