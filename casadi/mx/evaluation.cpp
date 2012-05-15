@@ -294,7 +294,7 @@ void Evaluation::evaluateMX(const MXPtrV& arg, MXPtrV& res,
       for (MXPtrV::iterator i = j->begin(); i != j->end();
           ++i, ++d_res_it) {
         if (*i)
-          **i = *d_res_it;
+          **i += *d_res_it;
       }
     }
 

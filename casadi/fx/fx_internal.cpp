@@ -461,12 +461,12 @@ CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
       
       // Print progress
       if(verbose()){
-	int progress_new = (s*100)/nsweep;
-	// Print when entering a new decade
-	if(progress_new / 10 > progress / 10){
-	  progress = progress_new;
-	  std::cout << progress << " %"  << std::endl;
-	}
+  int progress_new = (s*100)/nsweep;
+  // Print when entering a new decade
+  if(progress_new / 10 > progress / 10){
+    progress = progress_new;
+    std::cout << progress << " %"  << std::endl;
+  }
       }
       
       // Nonzero offset
@@ -476,42 +476,42 @@ CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
       int ndir_local = std::min(bvec_size,nz_seed-offset);
 
       for(int i=0; i<ndir_local; ++i){
-	seed_v[offset+i] |= bvec_t(1)<<i;
+  seed_v[offset+i] |= bvec_t(1)<<i;
       }
       
       // Propagate the dependencies
       spEvaluate(use_fwd);
-	    
+      
       // Loop over the nonzeros of the output
       for(int el=0; el<nz_sens; ++el){
 
-	// Get the sparsity sensitivity
-	bvec_t spsens = sens_v[el];
+  // Get the sparsity sensitivity
+  bvec_t spsens = sens_v[el];
 
-	// Clear the sensitivities for the next sweep
-	if(!use_fwd){
-	  sens_v[el] = 0;
-	}
-	
-	// If there is a dependency in any of the directions
-	if(0!=spsens){
-	  
-	  // Loop over seed directions
-	  for(int i=0; i<ndir_local; ++i){
-	    
-	    // If dependents on the variable
-	    if((bvec_t(1) << i) & spsens){
-	      // Add to pattern
-	      jrow.push_back(el);
-	      jcol.push_back(i+offset);
-	    }
-	  }
-	}
+  // Clear the sensitivities for the next sweep
+  if(!use_fwd){
+    sens_v[el] = 0;
+  }
+  
+  // If there is a dependency in any of the directions
+  if(0!=spsens){
+    
+    // Loop over seed directions
+    for(int i=0; i<ndir_local; ++i){
+      
+      // If dependents on the variable
+      if((bvec_t(1) << i) & spsens){
+        // Add to pattern
+        jrow.push_back(el);
+        jcol.push_back(i+offset);
+      }
+    }
+  }
       }
       
       // Remove the seeds
       for(int i=0; i<bvec_size && offset+i<nz_seed; ++i){
-	seed_v[offset+i] = 0;
+  seed_v[offset+i] = 0;
       }
     }
     
@@ -740,16 +740,16 @@ void FXInternal::evaluate_switch(int nfdir, int nadir){
 }
 
 void FXInternal::evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
-			const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
-			const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
-			bool output_given, bool eliminate_constants){
+      const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
+      const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
+      bool output_given, bool eliminate_constants){
   casadi_error("FXInternal::evalSX not defined for class " << typeid(*this).name());
 }
 
 void FXInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 
-			const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
-			const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
-			bool output_given, bool eliminate_constants){
+      const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
+      const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
+      bool output_given, bool eliminate_constants){
   casadi_error("FXInternal::evalMX not defined for class " << typeid(*this).name());
 }
 
@@ -758,43 +758,52 @@ void FXInternal::spEvaluate(bool fwd){
 }
 
 FX FXInternal::derivative(int nfwd, int nadj){
-	// Quick return if 0x0
-	if(nfwd==0 && nadj==0) return shared_from_this<FX>();
+  // Quick return if 0x0
+  if(nfwd==0 && nadj==0) return shared_from_this<FX>();
 
-	// Check if there are enough forward directions allocated
-	if(nfwd>=derivative_fcn_.size()){
-		derivative_fcn_.resize(nfwd+1);
-	}
+  // Check if there are enough forward directions allocated
+  if(nfwd>=derivative_fcn_.size()){
+    derivative_fcn_.resize(nfwd+1);
+  }
 
-	// Check if there are enough adjoint directions allocated
-	if(nadj>=derivative_fcn_[nfwd].size()){
-		derivative_fcn_[nfwd].resize(nadj+1);
-	}
+  // Check if there are enough adjoint directions allocated
+  if(nadj>=derivative_fcn_[nfwd].size()){
+    derivative_fcn_[nfwd].resize(nadj+1);
+  }
 
-	// Weak reference
-	WeakRef& ref = derivative_fcn_[nfwd][nadj];
+  // Weak reference
+  WeakRef& ref = derivative_fcn_[nfwd][nadj];
 
-	// Return value
-	FX ret;
+  // Return value
+  FX ret;
 
-	// Check if already cached
-	if(ref.isNull()){
-		// Generate a new function
-		ret = getDerivative(nfwd,nadj);
+  // Check if already cached
+  if(ref.isNull()){
+    // Generate a new function
+    ret = getDerivative(nfwd,nadj);
+    
+    // Give it a suitable name
+    stringstream ss;
+    ss << "derivative[" << nfwd << "," << nadj << "](" << getOption("name") << ")";
+    ret.setOption("name",ss.str());
+    
+    // Initialize it
+    ret.init();
 
-		// Cache function for later reference
-		ref = ret;
-	} else {
-		// Retrieve cached function
-		ret = ref;
-	}
+    // Cache function for later reference
+    ref = ret;
+    
+  } else {
+    // Retrieve cached function
+    ret = ref;
+  }
 
-	// Return cached or generated function
-	return ret;
+  // Return cached or generated function
+  return ret;
 }
 
 FX FXInternal::getDerivative(int nfwd, int nadj){
-	casadi_error("FXInternal::getDerivative not defined for class " << typeid(*this).name());
+  casadi_error("FXInternal::getDerivative not defined for class " << typeid(*this).name());
 }
 
 } // namespace CasADi
