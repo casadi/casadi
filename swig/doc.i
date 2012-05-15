@@ -10494,9 +10494,15 @@ from the left and/or from the right P * A * trans(P), A * trans(P) or A *
 trans(P) with P defined by an index vector containing the column for each
 row. As an alternative, P can be transposed (inverted). ";
 
-%feature("docstring")  CasADi::CRSSparsity::dimString "";
+%feature("docstring")  CasADi::CRSSparsity::dimString "
+
+Get the dimension as a string. ";
 
 %feature("docstring")  CasADi::CRSSparsity::spy "";
+
+%feature("docstring")  CasADi::CRSSparsity::set "";
+
+%feature("docstring")  CasADi::CRSSparsity::add "";
 
 %feature("docstring")  CasADi::CRSSparsity::clone "
 
@@ -47764,13 +47770,6 @@ Jacobian via source code transformation. ";
 
 Gradient via source code transformation. ";
 
-%feature("docstring")  CasADi::MXFunction::jac "
-
-Jacobian via source code transformation (new, experimental implementation)
-Calculate the expression for the jacobian of a number of function outputs
-with respect to a number of function inputs, optionally include the function
-outputs. ";
-
 %feature("docstring")  CasADi::MXFunction::expand "
 
 Expand the matrix valued graph into a scalar valued graph. ";
@@ -48312,11 +48311,6 @@ Set the lifting function. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::jac "
 
-Jacobian via source code transformation (identity matrix seed in a
-particular direction) ";
-
-%feature("docstring")  CasADi::MXFunctionInternal::jac "
-
 Calculate the expression for the jacobian of a number of function outputs
 with respect to a number of function inputs, optionally include the function
 outputs. ";
@@ -48324,11 +48318,6 @@ outputs. ";
 %feature("docstring")  CasADi::MXFunctionInternal::jacobian "
 
 Jacobian via source code transformation. ";
-
-%feature("docstring")  CasADi::MXFunctionInternal::grad "
-
-Gradient via source code transformation (identity matrix seed in a
-particular direction) ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::getDerivative "
 
@@ -67087,12 +67076,6 @@ Gradient via source code transformation. ";
 %feature("docstring")  CasADi::SXFunction::hess "
 
 Hessian (forward over adjoint) via source code transformation. ";
-
-%feature("docstring")  CasADi::SXFunction::jac "
-
-Calculate the expression for the jacobian of a number of function outputs
-with respect to a number of function inputs, optionally include the function
-outputs. ";
 
 %feature("docstring")  CasADi::SXFunction::checkNode "
 
