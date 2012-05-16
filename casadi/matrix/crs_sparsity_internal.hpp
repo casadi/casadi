@@ -247,6 +247,9 @@ class CRSSparsityInternal : public CachedObjectNode{
 
     /// Permute rows and/or columns
     CRSSparsity pmult(const std::vector<int>& p, bool permute_rows=true, bool permute_columns=true, bool invert_permutation=false) const;
+    
+    /// Generate a script for Matlab or Octave which visualizes the sparsity using the spy command
+    void spyMatlab(const std::string& mfile) const;
 };
 
 } // namespace CasADi
