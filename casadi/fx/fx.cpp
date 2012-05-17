@@ -21,7 +21,8 @@
  */
 
 #include "fx_internal.hpp"
-#include "../mx/evaluation.hpp"
+#include "../mx/evaluation_mx.hpp"
+#include "../sx/evaluation_sx.hpp"
 #include "../fx/mx_function.hpp"
 #include <typeinfo> 
 #include "../stl_vector_tools.hpp"
@@ -50,6 +51,39 @@ const FXInternal* FX::operator->() const{
 
 FXInternal* FX::operator->(){
   return (FXInternal*)OptionsFunctionality::operator->();
+}
+
+vector<SXMatrix> FX::callSX(const std::vector<SXMatrix> &arg){
+  casadi_warning("FX::callSX is currently only experimental.");
+  
+  // Make sure that the number of inputs matches
+  casadi_assert_message(arg.size()<=getNumInputs(),"Too many input arguments.");
+  casadi_assert_message(arg.size()==getNumInputs(),"Too short input argument vectors not yet implemented.");
+  
+  // Assemble all the scalar inputs
+  vector<SX> f_in;
+  f_in.reserve(getNumScalarInputs());
+  for(int iind=0; iind<getNumInputs(); ++iind){
+    // Mismatching sparsity not yet supported
+    casadi_assert_message(arg[iind].sparsity()==input(iind).sparsity(),"Inputs with mismatching sparsity not yet implemented.");
+    
+    // Add to list of scalar inputs
+    f_in.insert(f_in.end(),arg[iind].begin(),arg[iind].end());
+  }
+  
+  // Create call node
+  vector<SX> f_out = EvaluationSX::create(*this,f_in);
+  
+  // Return value
+  vector<SX>::const_iterator f_out_this = f_out.begin(), f_out_next;
+  vector<SXMatrix> ret(getNumOutputs());
+  for(int oind=0; oind<getNumOutputs(); ++oind){
+    f_out_next = f_out_this+output(oind).size();
+    ret[oind] = SXMatrix(output(oind).sparsity(),vector<SX>(f_out_this,f_out_next));
+    f_out_this = f_out_next;
+  }
+  
+  return ret;
 }
 
 vector<MX> FX::call(const MX &arg){
@@ -81,7 +115,7 @@ void FX::call(const MXVector& arg, MXVector& res,  const MXVectorVector& fseed, 
 			  ") was supplied.");
   }
   
-  Evaluation::create(*this,arg,res,fseed,fsens,aseed,asens);
+  EvaluationMX::create(*this,arg,res,fseed,fsens,aseed,asens);
 }
 
 vector<vector<MX> > FX::call(const vector<vector<MX> > &x, const Dictionary& paropt){
@@ -151,6 +185,23 @@ int FX::getNumInputs() const{
 int FX::getNumOutputs() const{
   return (*this)->getNumOutputs();  
 }
+
+int FX::getNumScalarInputs() const{
+  int ret=0;
+  for(int iind=0; iind<getNumInputs(); ++iind){
+    ret += input(iind).size();
+  }
+  return ret;
+}
+
+int FX::getNumScalarOutputs() const{
+  int ret=0;
+  for(int oind=0; oind<getNumOutputs(); ++oind){
+    ret += output(oind).size();
+  }
+  return ret;
+}
+
 
 void FX::setNumInputs(int num_in){
   return (*this)->setNumInputs(num_in);

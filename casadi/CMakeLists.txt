@@ -32,21 +32,23 @@ SET(CASADI_SRCS
   # Directed, acyclic graph representation with scalar expressions
   sx/sx.hpp                  sx/sx.cpp                  # Public, smart pointer class, 
   sx/sx_node.hpp             sx/sx_node.cpp             # Base class for all the nodes
-  sx/symbolic_sx_node.hpp                               # A symbolic SX variable 
-  sx/constant_sx_node.hpp                               # A constant SX node
-#   sx/unary_sx_node.hpp                                  # A unary operation
-  sx/binary_sx_node.hpp                                 # A binary operation
+  sx/symbolic_sx.hpp                                    # A symbolic SX variable 
+  sx/constant_sx.hpp                                    # A constant SX node
+  sx/unary_sx.hpp                                       # A unary operation
+  sx/binary_sx.hpp                                      # A binary operation
+  sx/output_sx.hpp                                      # An auxillary output
+  sx/evaluation_sx.hpp                                  # A function call node
   sx/sx_tools.cpp            sx/sx_tools.hpp            # Set of functions
 
   # More general graph representation with sparse matrix expressions and function evaluations
   mx/mx.cpp                  mx/mx.hpp                  # Public, smart pointer class, 
   mx/mx_node.cpp             mx/mx_node.hpp             # Base class for all the MX nodes
-  mx/mx_constant.cpp         mx/mx_constant.hpp         # A constant MX node
-  mx/symbolic_mx_node.cpp    mx/symbolic_mx_node.hpp    # A symbolic MX variable
-  mx/unary_op.cpp            mx/unary_op.hpp            # Unary operation
-  mx/binary_op.cpp           mx/binary_op.hpp           # Binary operation
+  mx/constant_mx.cpp         mx/constant_mx.hpp         # A constant MX node
+  mx/symbolic_mx.cpp         mx/symbolic_mx.hpp         # A symbolic MX variable
+  mx/unary_mx.cpp            mx/unary_mx.hpp            # Unary operation
+  mx/binary_mx.cpp           mx/binary_mx.hpp           # Binary operation
   mx/multiplication.cpp      mx/multiplication.hpp      # Matrix multiplication
-  mx/evaluation.cpp          mx/evaluation.hpp          # FX function evaluation
+  mx/evaluation_mx.cpp       mx/evaluation_mx.hpp       # FX function evaluation
   mx/norm.cpp                mx/norm.hpp                # 1-norm, 2-norm and infinity-norm
   mx/mapping.cpp             mx/mapping.hpp             # Maps non-zeros
   mx/densification.cpp       mx/densification.hpp       # Makes a matrix dense

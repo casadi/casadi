@@ -20,7 +20,7 @@
  *
  */
 
-#include "evaluation.hpp"
+#include "evaluation_mx.hpp"
 #include "../fx/fx_internal.hpp"
 #include "../stl_vector_tools.hpp"
 #include "../mx/mx_tools.hpp"
@@ -34,7 +34,7 @@ const bool NEW_EVAL_SP = true;
 
 namespace CasADi {
 
-Evaluation::Evaluation(const FX& fcn, const std::vector<MX> &arg,
+EvaluationMX::EvaluationMX(const FX& fcn, const std::vector<MX> &arg,
     const std::vector<std::vector<MX> > &fseed,
     const std::vector<std::vector<MX> > &aseed, bool output_given) :
     fcn_(fcn), output_given_f_(output_given) {
@@ -71,11 +71,11 @@ Evaluation::Evaluation(const FX& fcn, const std::vector<MX> &arg,
   setSparsity(CRSSparsity(1, 1, true));
 }
 
-Evaluation* Evaluation::clone() const {
-  return new Evaluation(*this);
+EvaluationMX* EvaluationMX::clone() const {
+  return new EvaluationMX(*this);
 }
 
-void Evaluation::printPart(std::ostream &stream, int part) const {
+void EvaluationMX::printPart(std::ostream &stream, int part) const {
   if (part == 0) {
     stream << fcn_ << ".call([";
   } else if (part == ndep()) {
@@ -85,7 +85,7 @@ void Evaluation::printPart(std::ostream &stream, int part) const {
   }
 }
 
-void Evaluation::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res,
+void EvaluationMX::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res,
     const DMatrixPtrVV& fseed, DMatrixPtrVV& fsens,
     const DMatrixPtrVV& aseed, DMatrixPtrVV& asens) {
   // Check if the function is differentiated
@@ -200,13 +200,13 @@ void Evaluation::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res,
   }
 }
 
-int Evaluation::getNumOutputs() const {
+int EvaluationMX::getNumOutputs() const {
   int num_in = fcn_.getNumInputs();
   int num_out = fcn_.getNumOutputs();
   return num_out + nfwd_f_ * num_out + nadj_f_ * num_in;
 }
 
-const CRSSparsity& Evaluation::sparsity(int oind) {
+const CRSSparsity& EvaluationMX::sparsity(int oind) {
   int num_in = fcn_.getNumInputs();
   int num_out = fcn_.getNumOutputs();
   int num_out_and_fsens = num_out + num_out * nfwd_f_; // number of outputs _and_ forward sensitivities combined
@@ -217,11 +217,11 @@ const CRSSparsity& Evaluation::sparsity(int oind) {
   }
 }
 
-FX& Evaluation::getFunction() {
+FX& EvaluationMX::getFunction() {
   return fcn_;
 }
 
-void Evaluation::evaluateSX(const SXMatrixPtrV& arg, SXMatrixPtrV& res,
+void EvaluationMX::evaluateSX(const SXMatrixPtrV& arg, SXMatrixPtrV& res,
     const SXMatrixPtrVV& fseed, SXMatrixPtrVV& fsens,
     const SXMatrixPtrVV& aseed, SXMatrixPtrVV& asens) {
   // Create input arguments
@@ -237,7 +237,7 @@ void Evaluation::evaluateSX(const SXMatrixPtrV& arg, SXMatrixPtrV& res,
   }
 }
 
-void Evaluation::evaluateMX(const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens, bool output_given) {
+void EvaluationMX::evaluateMX(const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens, bool output_given) {
   
   // Number of sensitivity directions
   int nfwd = fsens.size();
@@ -382,13 +382,13 @@ void Evaluation::evaluateMX(const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed
   }
 }
 
-void Evaluation::deepCopyMembers(
+void EvaluationMX::deepCopyMembers(
   std::map<SharedObjectNode*, SharedObject>& already_copied) {
   MXNode::deepCopyMembers(already_copied);
   fcn_ = deepcopy(fcn_, already_copied);
 }
 
-void Evaluation::propagateSparsity(DMatrixPtrV& arg, DMatrixPtrV& res,bool use_fwd) {
+void EvaluationMX::propagateSparsity(DMatrixPtrV& arg, DMatrixPtrV& res,bool use_fwd) {
   if (NEW_EVAL_SP && fcn_.spCanEvaluate(use_fwd)) {
     // Propagating sparsity pattern supported
     
@@ -534,7 +534,7 @@ void Evaluation::propagateSparsity(DMatrixPtrV& arg, DMatrixPtrV& res,bool use_f
   }
 }
 
-void Evaluation::create(const FX& fcn, const std::vector<MX> &arg,
+void EvaluationMX::create(const FX& fcn, const std::vector<MX> &arg,
     std::vector<MX> &res, const std::vector<std::vector<MX> > &fseed,
     std::vector<std::vector<MX> > &fsens,
     const std::vector<std::vector<MX> > &aseed,
@@ -550,7 +550,7 @@ void Evaluation::create(const FX& fcn, const std::vector<MX> &arg,
 
   // Create the evaluation node
   MX ev;
-  ev.assignNode(new Evaluation(fcn, arg, fseed, aseed, output_given));
+  ev.assignNode(new EvaluationMX(fcn, arg, fseed, aseed, output_given));
 
   // Output index
   int ind = 0;

@@ -25,13 +25,17 @@
 #include <stack>
 #include <cassert>
 #include "../casadi_math.hpp"
+#include "constant_sx.hpp"
+#include "symbolic_sx.hpp"
+#include "unary_sx.hpp"
+#include "binary_sx.hpp"
 
 using namespace std;
 namespace CasADi{
 
 // Allocate storage for the caching
-CACHING_MAP<int,IntegerSXNode*> IntegerSXNode::cached_constants_;
-CACHING_MAP<double,RealtypeSXNode*> RealtypeSXNode::cached_constants_;
+CACHING_MAP<int,IntegerSX*> IntegerSX::cached_constants_;
+CACHING_MAP<double,RealtypeSX*> RealtypeSX::cached_constants_;
 
 SX::SX(){
   node = casadi_limits<SX>::nan.node;
@@ -58,18 +62,18 @@ SX::SX(double val){
     else if(intval == 1)        node = casadi_limits<SX>::one.node;
     else if(intval == 2)        node = casadi_limits<SX>::two.node;
     else if(intval == -1)       node = casadi_limits<SX>::minus_one.node;
-    else                        node = IntegerSXNode::create(intval);
+    else                        node = IntegerSX::create(intval);
     node->count++;
   } else {
     if(isnan(val))              node = casadi_limits<SX>::nan.node;
     else if(isinf(val))         node = val > 0 ? casadi_limits<SX>::inf.node : casadi_limits<SX>::minus_inf.node;
-    else                        node = RealtypeSXNode::create(val);
+    else                        node = RealtypeSX::create(val);
     node->count++;
   }
 }
 
 SX::SX(const std::string& name){
-  node = new SymbolicSXNode(name);  
+  node = new SymbolicSX(name);  
   node->count++;
 }
 
@@ -137,18 +141,18 @@ SX SX::operator-() const{
   else if(node->isOne())
     return -1;
   else
-   return UnarySXNode::create(NEG, *this);
+   return UnarySX::create(NEG, *this);
 }
 
 SX SX::sign() const{
   if(isConstant())
     return CasADi::sign(getValue());
   else
-    return UnarySXNode::create(SIGN, *this);
+    return UnarySX::create(SIGN, *this);
 }
 
 SX SX::erfinv() const{
-  return UnarySXNode::create(ERFINV,*this);
+  return UnarySX::create(ERFINV,*this);
 }
 
 SX SX::__add__(const SX& y) const{
@@ -179,7 +183,7 @@ SX SX::__add__(const SX& y) const{
   else if(y.hasDep() && y.getOp()==SUB && isEquivalent(y.getDep(1)))
     return y.getDep(0);
   else // create a new branch
-    return BinarySXNode::create(ADD,*this, y);
+    return BinarySX::create(ADD,*this, y);
 }
 
 SX SX::__sub__(const SX& y) const{
@@ -202,7 +206,7 @@ SX SX::__sub__(const SX& y) const{
   else if(y.hasDep() && y.getOp()==ADD && isEquivalent(y.getDep(0)))
     return y.getDep(1);
   else // create a new branch
-    return BinarySXNode::create(SUB,*this,y);
+    return BinarySX::create(SUB,*this,y);
 }
 
 SX SX::__mul__(const SX& y) const{
@@ -232,7 +236,7 @@ SX SX::__mul__(const SX& y) const{
   else if(y.hasDep() && y.getOp()==DIV && y.getDep(1).isEquivalent(*this)) // ((2/x)*x)
     return y.getDep(0);
   else     // create a new branch
-    return BinarySXNode::create(MUL,*this,y);
+    return BinarySX::create(MUL,*this,y);
 }
 
 bool SX::isDoubled() const{
@@ -281,7 +285,7 @@ SX SX::__div__(const SX& y) const{
   else if(y.isConstant() && hasDep() && getOp()==DIV && getDep(1).isConstant() && y.getValue()*getDep(1).getValue()==1) // (x/5)/0.2 
     return getDep(0);
   else if(y.hasDep() && y.getOp()==MUL && y.getDep(1).isEquivalent(*this)) // x/(2*x) = 1/2
-    return BinarySXNode::create(DIV,1,y.getDep(0));
+    return BinarySX::create(DIV,1,y.getDep(0));
   else if(hasDep() && getOp()==NEG && getDep(0).isEquivalent(y))      // (-x)/x = -1
     return -1;
   else if(y.hasDep() && y.getOp()==NEG && y.getDep(0).isEquivalent(*this))      // x/(-x) = 1
@@ -291,14 +295,14 @@ SX SX::__div__(const SX& y) const{
   else if(isOp(DIV) && y.isEquivalent(node->dep(0)))
     return node->dep(1).inv();
   else // create a new branch
-    return BinarySXNode::create(DIV,*this,y);
+    return BinarySX::create(DIV,*this,y);
 }
 
 SX SX::inv() const{
   if(node->hasDep() && node->getOp()==INV){
     return node->dep(0);
   } else {
-    return UnarySXNode::create(INV,*this);
+    return UnarySX::create(INV,*this);
   }
 }
 
@@ -340,7 +344,7 @@ SX operator>=(const SX &a, const SX &b){
   else if(x->isConstant())
     return x->getValue()>=0; // ok since the result will be either 0 or 1, i.e. no new nodes
   else
-    return UnarySXNode::create(STEP,x);
+    return UnarySX::create(STEP,x);
 }
 
 SX operator<(const SX &a, const SX &b){
@@ -365,7 +369,7 @@ SX operator==(const SX &x, const SX &y){
   else if(x.isConstant() && y.isConstant())
     return 0;
   else // create a new node
-    return BinarySXNode::create(EQUALITY,x,y);
+    return BinarySX::create(EQUALITY,x,y);
 }
 
 SX operator!=(const SX &a, const SX &b){
@@ -393,11 +397,11 @@ SX if_else(const SX& cond, const SX& if_true, const SX& if_false){
 }
 
 SX SX::binary(int op, const SX& x, const SX& y){
-  return BinarySXNode::create(Operation(op),x,y);    
+  return BinarySX::create(Operation(op),x,y);    
 }
 
 SX SX::unary(int op, const SX& x){
-  return UnarySXNode::create(Operation(op),x);  
+  return UnarySX::create(Operation(op),x);  
 }
 
 // SX::operator vector<SX>() const{
@@ -501,13 +505,13 @@ long SX::__hash__() const {
    return (long) node;
 }
 
-const SX casadi_limits<SX>::zero(new ZeroSXNode(),false); // node corresponding to a constant 0
-const SX casadi_limits<SX>::one(new OneSXNode(),false); // node corresponding to a constant 1
-const SX casadi_limits<SX>::two(IntegerSXNode::create(2),false); // node corresponding to a constant 2
-const SX casadi_limits<SX>::minus_one(new MinusOneSXNode(),false); // node corresponding to a constant -1
-const SX casadi_limits<SX>::nan(new NanSXNode(),false);
-const SX casadi_limits<SX>::inf(new InfSXNode(),false);
-const SX casadi_limits<SX>::minus_inf(new MinusInfSXNode(),false);
+const SX casadi_limits<SX>::zero(new ZeroSX(),false); // node corresponding to a constant 0
+const SX casadi_limits<SX>::one(new OneSX(),false); // node corresponding to a constant 1
+const SX casadi_limits<SX>::two(IntegerSX::create(2),false); // node corresponding to a constant 2
+const SX casadi_limits<SX>::minus_one(new MinusOneSX(),false); // node corresponding to a constant -1
+const SX casadi_limits<SX>::nan(new NanSX(),false);
+const SX casadi_limits<SX>::inf(new InfSX(),false);
+const SX casadi_limits<SX>::minus_inf(new MinusInfSX(),false);
 
 bool casadi_limits<SX>::isZero(const SX& val){ 
   return val.isZero();
@@ -542,11 +546,11 @@ bool casadi_limits<SX>::isNaN(const SX& val){
 }
 
 SX SX::exp() const{
-  return UnarySXNode::create(EXP,*this);
+  return UnarySX::create(EXP,*this);
 }
 
 SX SX::log() const{
-  return UnarySXNode::create(LOG,*this);
+  return UnarySX::create(LOG,*this);
 }
 
 SX SX::log10() const{
@@ -559,73 +563,73 @@ SX SX::sqrt() const{
   else if(isSquared())
     return node->dep(0).fabs();
   else
-    return UnarySXNode::create(SQRT,*this);
+    return UnarySX::create(SQRT,*this);
 }
 
 SX SX::sin() const{
   if(node->isZero())
     return 0;
   else
-    return UnarySXNode::create(SIN,*this);
+    return UnarySX::create(SIN,*this);
 }
 
 SX SX::cos() const{
   if(node->isZero())
     return 1;
   else
-    return UnarySXNode::create(COS,*this);
+    return UnarySX::create(COS,*this);
 }
 
 SX SX::tan() const{
   if(node->isZero())
     return 0;
   else
-    return UnarySXNode::create(TAN,*this);
+    return UnarySX::create(TAN,*this);
 }
 
 SX SX::arcsin() const{
-  return UnarySXNode::create(ASIN,*this);
+  return UnarySX::create(ASIN,*this);
 }
 
 SX SX::arccos() const{
-  return UnarySXNode::create(ACOS,*this);
+  return UnarySX::create(ACOS,*this);
 }
 
 SX SX::arctan() const{
-  return UnarySXNode::create(ATAN,*this);
+  return UnarySX::create(ATAN,*this);
 }
 
 SX SX::sinh() const{
   if(node->isZero())
     return 0;
   else
-    return UnarySXNode::create(SINH,*this);
+    return UnarySX::create(SINH,*this);
 }
 
 SX SX::cosh() const{
   if(node->isZero())
     return 1;
   else
-    return UnarySXNode::create(COSH,*this);
+    return UnarySX::create(COSH,*this);
 }
 
 SX SX::tanh() const{
   if(node->isZero())
     return 0;
   else
-    return UnarySXNode::create(TANH,*this);
+    return UnarySX::create(TANH,*this);
 }
 
 SX SX::floor() const{
-  return UnarySXNode::create(FLOOR,*this);
+  return UnarySX::create(FLOOR,*this);
 }
 
 SX SX::ceil() const{
-  return UnarySXNode::create(CEIL,*this);
+  return UnarySX::create(CEIL,*this);
 }
 
 SX SX::erf() const{
-  return UnarySXNode::create(ERF,*this);
+  return UnarySX::create(ERF,*this);
 }
 
 SX SX::fabs() const{
@@ -636,7 +640,7 @@ SX SX::fabs() const{
   else if(isSquared())
     return *this;
   else
-    return UnarySXNode::create(FABS,*this);
+    return UnarySX::create(FABS,*this);
 }
 
 SX::operator Matrix<SX>() const{
@@ -644,19 +648,19 @@ SX::operator Matrix<SX>() const{
 }
 
 SX SX::fmin(const SX &b) const{
-  return BinarySXNode::create(FMIN,*this,b);
+  return BinarySX::create(FMIN,*this,b);
 }
 
 SX SX::fmax(const SX &b) const{
-  return BinarySXNode::create(FMAX,*this,b);
+  return BinarySX::create(FMAX,*this,b);
 }
 
 SX SX::arctan2(const SX &b) const{
-  return BinarySXNode::create(ATAN2,*this,b);
+  return BinarySX::create(ATAN2,*this,b);
 }
 
 SX SX::printme(const SX &b) const{
-  return BinarySXNode::create(OP_PRINTME,*this,b);
+  return BinarySX::create(OP_PRINTME,*this,b);
 }
 
 SX SX::__pow__(const SX& n) const{
@@ -666,7 +670,7 @@ SX SX::__pow__(const SX& n) const{
       if(nn == 0)
         return 1;
       else if(nn>100 || nn<-100) // maximum depth
-        return BinarySXNode::create(CONSTPOW,*this,nn);
+        return BinarySX::create(CONSTPOW,*this,nn);
       else if(nn<0) // negative power
         return 1/pow(*this,-nn);
       else if(nn%2 == 1) // odd power
@@ -678,19 +682,19 @@ SX SX::__pow__(const SX& n) const{
     } else if(n->getValue()==0.5){
       return sqrt();
     } else {
-      return BinarySXNode::create(CONSTPOW,*this,n);
+      return BinarySX::create(CONSTPOW,*this,n);
     }
   } else {
-    return BinarySXNode::create(POW,*this,n);
+    return BinarySX::create(POW,*this,n);
   }
 }
 
 SX SX::__constpow__(const SX& n) const{
-  return BinarySXNode::create(CONSTPOW,*this,n);
+  return BinarySX::create(CONSTPOW,*this,n);
 }
 
 SX SX::constpow(const SX& n) const{
-  return BinarySXNode::create(CONSTPOW,*this,n);
+  return BinarySX::create(CONSTPOW,*this,n);
 }
 
 int SX::getTemp() const{

@@ -23,13 +23,13 @@
 #include "mx.hpp"
 #include "mx_node.hpp"
 #include "mx_tools.hpp"
-#include "unary_op.hpp"
-#include "binary_op.hpp"
+#include "unary_mx.hpp"
+#include "binary_mx.hpp"
 #include "mapping.hpp"
 #include "../fx/sx_function.hpp"
-#include "evaluation.hpp"
-#include "symbolic_mx_node.hpp"
-#include "mx_constant.hpp"
+#include "evaluation_mx.hpp"
+#include "symbolic_mx.hpp"
+#include "constant_mx.hpp"
 #include "mx_tools.hpp"
 #include "../stl_vector_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
@@ -49,27 +49,27 @@ MX::MX(){
 }
 
 MX::MX(double x){
-  assignNode(new MXConstant(x));
+  assignNode(new ConstantMX(x));
 }
 
 MX::MX(const Matrix<double> &x){
-  assignNode(new MXConstant(x));
+  assignNode(new ConstantMX(x));
 }
 
 MX::MX(const vector<double> &x){
-  assignNode(new MXConstant(x));
+  assignNode(new ConstantMX(x));
 }
 
 MX::MX(const string& name, int n, int m){
-  assignNode(new SymbolicMatrix(name,n,m));
+  assignNode(new SymbolicMX(name,n,m));
 }
 
 MX::MX(const std::string& name,const std::pair<int,int> &nm) {
-  assignNode(new SymbolicMatrix(name,nm.first,nm.second));
+  assignNode(new SymbolicMX(name,nm.first,nm.second));
 }
 
 MX::MX(const string& name, const CRSSparsity & sp){
-  assignNode(new SymbolicMatrix(name,sp));
+  assignNode(new SymbolicMX(name,sp));
 }
 
 MX::MX(int nrow, int ncol){
@@ -460,7 +460,7 @@ MX MX::unary(int op, const MX &x){
   if(operation_checker<F0XChecker>(op) && isZero(x)){
     return sparse(x.size1(),x.size2());
   } else {
-    return create(new UnaryOp(Operation(op),x));
+    return create(new UnaryMX(Operation(op),x));
   }
 }
 
@@ -899,19 +899,19 @@ FX MX::getFunction () {  return (*this)->getFunction(); }
  	
 const Matrix<double> & MX::getConstant() const {
   casadi_assert_message(isConstant(),"MX::getConstant: must be constant");
-  return dynamic_cast<const MXConstant*>(get())->x_;
+  return dynamic_cast<const ConstantMX*>(get())->x_;
 }
  	  
-bool MX::isBinary() const { return !isNull() ? dynamic_cast<const BinaryOp*>(get()) != 0 : false;  }
+bool MX::isBinary() const { return !isNull() ? dynamic_cast<const BinaryMX*>(get()) != 0 : false;  }
 
-bool MX::isUnary() const { return !isNull() ? dynamic_cast<const UnaryOp*>(get()) != 0 : false;  }
+bool MX::isUnary() const { return !isNull() ? dynamic_cast<const UnaryMX*>(get()) != 0 : false;  }
  	
 int MX::getOp() const {
   casadi_assert_message(isBinary() || isUnary(),"MX::getOp: must be binary or unary operation");
   if (isBinary()) {
-    return dynamic_cast<const BinaryOp*>(get())->op_;
+    return dynamic_cast<const BinaryMX*>(get())->op_;
   } else {
-    return dynamic_cast<const UnaryOp*>(get())->op_;
+    return dynamic_cast<const UnaryMX*>(get())->op_;
   }
 }
  	

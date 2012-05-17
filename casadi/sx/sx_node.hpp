@@ -72,7 +72,7 @@ virtual const std::string& getName() const; // get the name
 /** \brief get the operation 
 only for binary nodes
 */
-virtual int getOp() const; // get the operation (only for binary nodes)
+virtual int getOp() const=0; // get the operation (only for binary nodes)
 /// comparison
 bool isEqual(const SXNode& node) const; // comparison
 /// comparison
@@ -104,7 +104,6 @@ virtual void print(std::ostream &stream, long& remaining_calls) const = 0;
  The variable is initialized to zero
 */
 int temp;
-// int temp2;
 
 // Reference counter -- counts the number of parents of the node
 unsigned int count;
@@ -112,12 +111,5 @@ unsigned int count;
 };
 
 } // namespace CasADi
-
-
-/** \brief  Derived classes */
-#include "constant_sx_node.hpp"
-#include "symbolic_sx_node.hpp"
-#include "unary_sx_node.hpp"
-#include "binary_sx_node.hpp"
 
 #endif // SX_NODE_HPP

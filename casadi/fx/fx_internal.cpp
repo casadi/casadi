@@ -21,7 +21,8 @@
  */
 
 #include "fx_internal.hpp"
-#include "../mx/evaluation.hpp"
+#include "../mx/evaluation_mx.hpp"
+#include "../sx/evaluation_sx.hpp"
 #include <typeinfo> 
 #include "../stl_vector_tools.hpp"
 #include "jacobian.hpp"

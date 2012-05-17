@@ -23,7 +23,7 @@
 #include "mx_tools.hpp"
 #include "mapping.hpp"
 #include "norm.hpp"
-#include "mx_constant.hpp"
+#include "constant_mx.hpp"
 #include "if_else_node.hpp"
 #include "../fx/mx_function.hpp"
 #include "../matrix/matrix_tools.hpp"
@@ -151,7 +151,7 @@ bool isZero(const MX& ex){
   if(ex.size()==0){
     return true;
   } else {
-    const MXConstant* n = dynamic_cast<const MXConstant*>(ex.get());
+    const ConstantMX* n = dynamic_cast<const ConstantMX*>(ex.get());
     if(n==0){
       return false;
     } else {
@@ -161,7 +161,7 @@ bool isZero(const MX& ex){
 }
 
 bool isOne(const MX& ex){
-  const MXConstant* n = dynamic_cast<const MXConstant*>(ex.get());
+  const ConstantMX* n = dynamic_cast<const ConstantMX*>(ex.get());
   if(n==0){
     return false;
   } else {
@@ -170,7 +170,7 @@ bool isOne(const MX& ex){
 }
 
 bool isMinusOne(const MX& ex){
-  const MXConstant* n = dynamic_cast<const MXConstant*>(ex.get());
+  const ConstantMX* n = dynamic_cast<const ConstantMX*>(ex.get());
   if(n==0){
     return false;
   } else {
@@ -179,7 +179,7 @@ bool isMinusOne(const MX& ex){
 }
 
 bool isIdentity(const MX& ex){
-  const MXConstant* n = dynamic_cast<const MXConstant*>(ex.get());
+  const ConstantMX* n = dynamic_cast<const ConstantMX*>(ex.get());
   if(n==0)
     return false;
   else

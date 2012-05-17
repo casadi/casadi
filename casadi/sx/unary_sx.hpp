@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef UNARY_SX_NODE_HPP
-#define UNARY_SX_NODE_HPP
+#ifndef UNARY_SX_HPP
+#define UNARY_SX_HPP
 
 #include "sx_node.hpp"
 #include <stack>
@@ -32,21 +32,21 @@ namespace CasADi{
   \author Joel Andersson 
   \date 2012
 */
-class UnarySXNode : public SXNode{
+class UnarySX : public SXNode{
   private:
     
     /** \brief  Constructor is private, use "create" below (unary version) */
-    UnarySXNode(unsigned char op, const SX& dep) : op_(op), dep_(dep){}
+    UnarySX(unsigned char op, const SX& dep) : op_(op), dep_(dep){}
     
   public:
     
     /** \brief  Create a unary expression */
     inline static SX create(unsigned char op, const SX& dep){
-      return SX::create(new UnarySXNode(op,dep));
+      return SX::create(new UnarySX(op,dep));
     }
     
     /** \brief Destructor */
-    virtual ~UnarySXNode(){}
+    virtual ~UnarySX(){}
     
     virtual bool isSmooth() const{ return operation_checker<SmoothChecker>(op_);}
     
@@ -85,4 +85,4 @@ class UnarySXNode : public SXNode{
 } // namespace CasADi
 
 
-#endif // UNARY_SX_NODE_HPP
+#endif // UNARY_SX_HPP

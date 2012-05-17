@@ -30,7 +30,6 @@
 #include "../stl_vector_tools.hpp"
 #include "../sx/sx_tools.hpp"
 #include "../sx/sx_node.hpp"
-#include "../mx/evaluation.hpp"
 #include "../casadi_types.hpp"
 #include "../matrix/crs_sparsity_internal.hpp"
 

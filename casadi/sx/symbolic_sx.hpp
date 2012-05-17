@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef SYMBOLIC_SCALAR_HPP
-#define SYMBOLIC_SCALAR_HPP
+#ifndef SYMBOLIC_SX_HPP
+#define SYMBOLIC_SX_HPP
 
 #include "sx_node.hpp"
 
@@ -33,32 +33,29 @@ namespace CasADi{
   A regular user is not supposed to work with this Node class.
   This user can call SX(name) instead.
 */
-class SymbolicSXNode : public SXNode{
+class SymbolicSX : public SXNode{
 public:
+  explicit SymbolicSX(const std::string &name) : name(name){}
+  virtual ~SymbolicSX(){}
+  
+  virtual bool isSymbolic() const{ return true; }
 
-explicit SymbolicSXNode(const std::string &name) : name(name){}
-virtual ~SymbolicSXNode(){}
-
-virtual bool isSymbolic() const{ 
-  return true; 
-}
-
-virtual const std::string& getName() const{ 
-  return name; 
-}
-
-/** \brief  Name */
-std::string name;
+  virtual const std::string& getName() const{ return name; }
+  
+    /** \brief  Get the operation */
+  virtual int getOp() const{ return OP_VAR;}
+  
+  /** \brief  Name */
+  std::string name;
 
 protected:
-
-/** \brief  print */
-virtual void print(std::ostream &stream, long& remaining_calls) const{
-  stream << name;
-}
-
+  
+  /** \brief  print */
+  virtual void print(std::ostream &stream, long& remaining_calls) const{
+    stream << name;
+  }
 };
 
 } // namespace CasADi
 
-#endif // SYMBOLIC_SCALAR_HPP
+#endif // SYMBOLIC_SX_HPP

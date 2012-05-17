@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef MX_CONSTANT_HPP
-#define MX_CONSTANT_HPP
+#ifndef CONSTANT_MX_HPP
+#define CONSTANT_MX_HPP
 
 #include "mx_node.hpp"
 
@@ -35,14 +35,14 @@ namespace CasADi{
 	This user can call MX(double) directly, or even rely on implicit typecasting.
 	\sa zeros , ones
 */
-class MXConstant : public MXNode{
+class ConstantMX : public MXNode{
   public:
 
     /** \brief  Constructor */
-    MXConstant(const Matrix<double> &x);
+    ConstantMX(const Matrix<double> &x);
 
     /** \brief  Clone function */
-    virtual MXConstant* clone() const;
+    virtual ConstantMX* clone() const;
 
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
@@ -73,4 +73,4 @@ class MXConstant : public MXNode{
 } // namespace CasADi
 
 
-#endif // MX_CONSTANT_HPP
+#endif // CONSTANT_MX_HPP

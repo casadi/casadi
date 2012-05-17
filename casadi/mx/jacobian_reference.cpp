@@ -21,7 +21,7 @@
  */
 
 #include "jacobian_reference.hpp"
-#include "evaluation.hpp"
+#include "evaluation_mx.hpp"
 #include "../stl_vector_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
 

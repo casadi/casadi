@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef BINARY_SX_NODE_HPP
-#define BINARY_SX_NODE_HPP
+#ifndef BINARY_SX_HPP
+#define BINARY_SX_HPP
 
 #include "sx_node.hpp"
 #include <stack>
@@ -32,24 +32,24 @@ namespace CasADi{
   \author Joel Andersson 
   \date 2010
 */
-class BinarySXNode : public SXNode{
+class BinarySX : public SXNode{
   private:
     
     /** \brief  Constructor is private, use "create" below (binary version) */
-    BinarySXNode(unsigned char op, const SX& dep0, const SX& dep1) : op_(op), dep0_(dep0), dep1_(dep1){}
+    BinarySX(unsigned char op, const SX& dep0, const SX& dep1) : op_(op), dep0_(dep0), dep1_(dep1){}
     
   public:
     
     /** \brief  Create a binary expression */
     inline static SX create(unsigned char op, const SX& dep0, const SX& dep1){
-      return SX::create(new BinarySXNode(op,dep0,dep1));
+      return SX::create(new BinarySX(op,dep0,dep1));
     }
     
     /** \brief Destructor
     This is a rather complex destructor which is necessary since the default destructor 
     can cause stack overflow due to recursive calling.
     */
-    virtual ~BinarySXNode(){
+    virtual ~BinarySX(){
       // Start destruction method if any of the dependencies has dependencies
       for(int c1=0; c1<2; ++c1){
         // Get the node of the dependency and remove it from the smart pointer
@@ -156,4 +156,4 @@ class BinarySXNode : public SXNode{
 } // namespace CasADi
 
 
-#endif // BINARY_SX_NODE_HPP
+#endif // BINARY_SX_HPP

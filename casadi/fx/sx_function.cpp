@@ -29,7 +29,6 @@
 #include <sstream>
 #include "../stl_vector_tools.hpp"
 #include "../sx/sx_node.hpp"
-#include "../mx/evaluation.hpp"
 #include "../sx/sx_tools.hpp"
 #include "mx_function.hpp"
 

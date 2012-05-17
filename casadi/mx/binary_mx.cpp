@@ -20,7 +20,7 @@
  *
  */
 
-#include "binary_op.hpp"
+#include "binary_mx.hpp"
 #include "mx_tools.hpp"
 #include <vector>
 #include <sstream>
@@ -34,14 +34,14 @@ using namespace std;
 
 namespace CasADi{
 
-BinaryOp::BinaryOp(Operation op, const MX& x, const MX& y) : op_(op){
+BinaryMX::BinaryMX(Operation op, const MX& x, const MX& y) : op_(op){
   setDependencies(x,y);
 }
 
-BinaryOp::~BinaryOp(){
+BinaryMX::~BinaryMX(){
 }
 
-SparseSparseOp::SparseSparseOp(Operation op, const MX& x, const MX& y) : BinaryOp(op,x,y){
+SparseSparseOp::SparseSparseOp(Operation op, const MX& x, const MX& y) : BinaryMX(op,x,y){
   // Get the sparsity pattern
   bool f00_is_zero = operation_checker<F00Checker>(op_);
   bool f0x_is_zero = operation_checker<F0XChecker>(op_);
@@ -50,7 +50,7 @@ SparseSparseOp::SparseSparseOp(Operation op, const MX& x, const MX& y) : BinaryO
   setSparsity(sp);
 }
 
-void BinaryOp::printPart(std::ostream &stream, int part) const{
+void BinaryMX::printPart(std::ostream &stream, int part) const{
   if(part==0){
     casadi_math<double>::printPre(op_,stream);
   } else if(part==1){
@@ -127,7 +127,7 @@ void SparseSparseOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output,
   Matrix<SX>::binary_no_alloc(casadi_math<SX>::fun,op_,*input[0],*input[1],*output[0],mapping_);
 }
 
-// void BinaryOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+// void BinaryMX::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
 //   // Evaluate function
 // //  if(!output_given){
 //     casadi_math<SXMatrix>::fun(op_,*input[0],*input[1],*output[0]);
@@ -148,7 +148,7 @@ void SparseSparseOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output,
 //   }
 // }
 
-void BinaryOp::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+void BinaryMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
   // Evaluate function
   if(!output_given){
     casadi_math<MX>::fun(op_,*input[0],*input[1],*output[0]);
@@ -175,7 +175,7 @@ void BinaryOp::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fw
   }
 }
 
-NonzerosScalarOp::NonzerosScalarOp(Operation op, const MX& x, const MX& y) : BinaryOp(op,x,y){
+NonzerosScalarOp::NonzerosScalarOp(Operation op, const MX& x, const MX& y) : BinaryMX(op,x,y){
   setSparsity(x.sparsity());
 }
 
@@ -225,7 +225,7 @@ void NonzerosScalarOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& outpu
   evaluateGen<SX,SXMatrixPtrV,SXMatrixPtrVV>(input,output,fwdSeed,fwdSens,adjSeed,adjSens);
 }
 
-ScalarNonzerosOp::ScalarNonzerosOp(Operation op, const MX& x, const MX& y) : BinaryOp(op,x,y){
+ScalarNonzerosOp::ScalarNonzerosOp(Operation op, const MX& x, const MX& y) : BinaryMX(op,x,y){
   setSparsity(y.sparsity());
 }
 
@@ -275,7 +275,7 @@ void ScalarNonzerosOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& outpu
 }
 
 
-NonzerosNonzerosOp::NonzerosNonzerosOp(Operation op, const MX& x, const MX& y) : BinaryOp(op,x,y){
+NonzerosNonzerosOp::NonzerosNonzerosOp(Operation op, const MX& x, const MX& y) : BinaryMX(op,x,y){
   setSparsity(x.sparsity());
 }
 

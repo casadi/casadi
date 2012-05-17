@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef CONSTANT_NODE_HPP
-#define CONSTANT_NODE_HPP
+#ifndef CONSTANT_SX_HPP
+#define CONSTANT_SX_HPP
 
 #include "sx_node.hpp"
 #include <cassert>
@@ -43,17 +43,20 @@ namespace CasADi{
   \author Joel Andersson 
   \date 2010
 */
-class ConstantSXNode : public SXNode{
+class ConstantSX : public SXNode{
 public:
 
 // Destructor
-virtual ~ConstantSXNode(){};
+virtual ~ConstantSX(){};
   
 /** \brief  Get the value must be defined */
 virtual double getValue() const = 0;
 
 /** \brief  Properties */
 virtual bool isConstant() const{ return true; }
+
+/** \brief  Get the operation */
+virtual int getOp() const{ return OP_CONST;}
 
 protected:
 
@@ -70,28 +73,28 @@ virtual void print(std::ostream &stream, long& remaining_calls) const{
   \author Joel Andersson 
   \date 2010
 */
-class RealtypeSXNode : public ConstantSXNode{
+class RealtypeSX : public ConstantSX{
   private:
     /// Constructor is private, use "create" below
-    explicit RealtypeSXNode(double value) : value(value){} 
+    explicit RealtypeSX(double value) : value(value){} 
   
   public:
     
     /// Destructor
-    virtual ~RealtypeSXNode(){
+    virtual ~RealtypeSX(){
       size_t num_erased = cached_constants_.erase(value);
       assert(num_erased==1);
     }
     
     /// Static creator function (use instead of constructor)
-    inline static RealtypeSXNode* create(double value){
+    inline static RealtypeSX* create(double value){
       // Try to find the constant
-      CACHING_MAP<double,RealtypeSXNode*>::iterator it = cached_constants_.find(value);
+      CACHING_MAP<double,RealtypeSX*>::iterator it = cached_constants_.find(value);
       
       // If not found, add it,
       if(it==cached_constants_.end()){
         // Allocate a new object
-        RealtypeSXNode* n = new RealtypeSXNode(value);
+        RealtypeSX* n = new RealtypeSX(value);
         
         // Add to hash_table
         cached_constants_.insert(it,std::make_pair(value,n));
@@ -111,7 +114,7 @@ class RealtypeSXNode : public ConstantSXNode{
     
   protected:
     /** \brief Hash map of all constants currently allocated (storage is allocated for it in sx.cpp) */
-    static CACHING_MAP<double,RealtypeSXNode*> cached_constants_;
+    static CACHING_MAP<double,RealtypeSX*> cached_constants_;
     
     /** \brief  Data members */
     double value;
@@ -122,28 +125,28 @@ class RealtypeSXNode : public ConstantSXNode{
   \author Joel Andersson 
   \date 2010
 */
-class IntegerSXNode : public ConstantSXNode{
+class IntegerSX : public ConstantSX{
   private:
     /// Constructor is private, use "create" below
-    explicit IntegerSXNode(int value) : value(value){}
+    explicit IntegerSX(int value) : value(value){}
   
   public:
 
     /// Destructor
-    virtual ~IntegerSXNode(){
+    virtual ~IntegerSX(){
       size_t num_erased = cached_constants_.erase(value);
       assert(num_erased==1);
     }
     
     /// Static creator function (use instead of constructor)
-    inline static IntegerSXNode* create(int value){
+    inline static IntegerSX* create(int value){
       // Try to find the constant
-      CACHING_MAP<int,IntegerSXNode*>::iterator it = cached_constants_.find(value);
+      CACHING_MAP<int,IntegerSX*>::iterator it = cached_constants_.find(value);
       
       // If not found, add it,
       if(it==cached_constants_.end()){
         // Allocate a new object
-        IntegerSXNode* n = new IntegerSXNode(value);
+        IntegerSX* n = new IntegerSX(value);
         
         // Add to hash_table
         cached_constants_.insert(it,std::make_pair(value,n));
@@ -167,7 +170,7 @@ class IntegerSXNode : public ConstantSXNode{
   protected:
 
     /** \brief Hash map of all constants currently allocated (storage is allocated for it in sx.cpp) */
-    static CACHING_MAP<int,IntegerSXNode*> cached_constants_;
+    static CACHING_MAP<int,IntegerSX*> cached_constants_;
     
     /** \brief  Data members */
     int value;
@@ -177,11 +180,11 @@ class IntegerSXNode : public ConstantSXNode{
   \author Joel Andersson 
   \date 2010
 */
-class ZeroSXNode : public ConstantSXNode{
+class ZeroSX : public ConstantSX{
 public:
 
-  virtual ~ZeroSXNode(){}
-  explicit ZeroSXNode(){}
+  virtual ~ZeroSX(){}
+  explicit ZeroSX(){}
 
   //@{
   /** \brief  Get the value */
@@ -201,11 +204,11 @@ public:
   \author Joel Andersson 
   \date 2010
 */
-class OneSXNode : public ConstantSXNode{
+class OneSX : public ConstantSX{
 public:
 
-  explicit OneSXNode(){}
-  virtual ~OneSXNode(){}
+  explicit OneSX(){}
+  virtual ~OneSX(){}
 
   /** \brief  Get the value */
   virtual double getValue() const{ return 1;}
@@ -222,11 +225,11 @@ public:
   \author Joel Andersson 
   \date 2010
 */
-class MinusOneSXNode : public ConstantSXNode{
+class MinusOneSX : public ConstantSX{
 public:
 
-  explicit MinusOneSXNode(){}
-  virtual ~MinusOneSXNode(){}
+  explicit MinusOneSX(){}
+  virtual ~MinusOneSX(){}
 
   //@{
   /** \brief  Get the value */
@@ -247,11 +250,11 @@ public:
   \author Joel Andersson 
   \date 2010
 */
-class InfSXNode : public ConstantSXNode{
+class InfSX : public ConstantSX{
 public:
 
-  explicit InfSXNode(){}
-  virtual ~InfSXNode(){}
+  explicit InfSX(){}
+  virtual ~InfSX(){}
 
   /** \brief  Get the value */
   virtual double getValue() const{ return std::numeric_limits<double>::infinity();}
@@ -266,11 +269,11 @@ public:
   \author Joel Andersson 
   \date 2010
 */
-class MinusInfSXNode : public ConstantSXNode{
+class MinusInfSX : public ConstantSX{
 public:
   
-  explicit MinusInfSXNode(){}
-  virtual ~MinusInfSXNode(){}
+  explicit MinusInfSX(){}
+  virtual ~MinusInfSX(){}
 
   /** \brief  Get the value */
   virtual double getValue() const{ return -std::numeric_limits<double>::infinity();}
@@ -285,11 +288,11 @@ public:
   \author Joel Andersson 
   \date 2010
 */
-class NanSXNode : public ConstantSXNode{
+class NanSX : public ConstantSX{
 public:
   
-  explicit NanSXNode(){this->count++;}
-  virtual ~NanSXNode(){this->count--;}
+  explicit NanSX(){this->count++;}
+  virtual ~NanSX(){this->count--;}
 
   /** \brief  Get the value */
   virtual double getValue() const{ return std::numeric_limits<double>::quiet_NaN();}
@@ -302,4 +305,4 @@ public:
 } // namespace CasADi
 
 
-#endif // CONSTANT_SCALAR_HPP
+#endif // CONSTANT_SX_HPP
