@@ -10498,7 +10498,14 @@ row. As an alternative, P can be transposed (inverted). ";
 
 Get the dimension as a string. ";
 
-%feature("docstring")  CasADi::CRSSparsity::spy "";
+%feature("docstring")  CasADi::CRSSparsity::spy "
+
+Print a textual representation of sparsity. ";
+
+%feature("docstring")  CasADi::CRSSparsity::spyMatlab "
+
+Generate a script for Matlab or Octave which visualizes the sparsity using
+the spy command. ";
 
 %feature("docstring")  CasADi::CRSSparsity::set "";
 
@@ -10817,6 +10824,11 @@ Order the rows by decreasing degree. ";
 %feature("docstring")  CasADi::CRSSparsityInternal::pmult "
 
 Permute rows and/or columns. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::spyMatlab "
+
+Generate a script for Matlab or Octave which visualizes the sparsity using
+the spy command. ";
 
 %feature("docstring")  CasADi::CRSSparsityInternal::regRef "
 
