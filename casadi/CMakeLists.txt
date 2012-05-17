@@ -34,7 +34,8 @@ SET(CASADI_SRCS
   sx/sx_node.hpp             sx/sx_node.cpp             # Base class for all the nodes
   sx/symbolic_sx_node.hpp                               # A symbolic SX variable 
   sx/constant_sx_node.hpp                               # A constant SX node
-  sx/binary_sx_node.hpp                                 # A binary _or_ unary operation
+#   sx/unary_sx_node.hpp                                  # A unary operation
+  sx/binary_sx_node.hpp                                 # A binary operation
   sx/sx_tools.cpp            sx/sx_tools.hpp            # Set of functions
 
   # More general graph representation with sparse matrix expressions and function evaluations

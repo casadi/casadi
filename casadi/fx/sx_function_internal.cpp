@@ -729,29 +729,58 @@ void SXFunctionInternal::init(){
           // Reference to the child node
           SX& c = binops_[i]->dep(1);
           
-          // If the dependent variable is a binary variable
-          bool dep_is_binary = c.isBinary();
-          if(dep_is_binary){
+	  // Number of dependencies
+	  int c_ndep = c->ndep();
+	  
+          // If the dependent variable is a unary variable
+          if(c_ndep==1){
 
-            // Get the indices of the children of the child
             int c_temp = c.get()->temp;
-            int c_temp0 = c->dep(0).get()->temp;
-            int c_temp1 = c->dep(1).get()->temp;
-            
-            // Index currently assigned to the storage location
             int c_curr = curr_assign[place[c_temp]];
-            int c_curr0 = curr_assign[place[c_temp0]];
-            int c_curr1 = curr_assign[place[c_temp1]];
-            
-            // Number of dependencies
-            int c_ndeps = casadi_math<double>::ndeps(c.getOp());
-            
+
             // Check if the node is used exactly one time
             bool ok_replace = refcount_copy.at(c_temp)==1;
-            
+	    	    
+	    int c_temp0 = c->dep(0).get()->temp;
+            int c_curr0 = curr_assign[place[c_temp0]];
+            	                            
             // Check if the values of the children are still available in the work vector or was assigned during the child operation
             ok_replace = ok_replace && (c_curr0<0 || c_curr0==c_temp0 || c_curr0==c_curr);
-            ok_replace = ok_replace && (c_ndeps<2 ||  c_curr1<1 || c_curr1==c_temp1 || c_curr1==c_curr);
+            
+            if(ok_replace){
+              
+              // Mark the node negative so that we can remove it later
+              refcount_copy.at(c.get()->temp) = -1;
+              
+              // Save the indices of the children
+              it->arg.i[0] = place[c_temp0];
+
+              // Replace operation with an inplace operation
+              it->op = ip*NUM_BUILT_IN_OPS + c->getOp();
+              
+              // Increase the inplace counter
+              num_inplace++;
+            }
+          }
+          	  
+          // If the dependent variable is a binary variable
+          if(c_ndep==2){
+
+            int c_temp = c.get()->temp;
+            int c_curr = curr_assign[place[c_temp]];
+
+            // Check if the node is used exactly one time
+            bool ok_replace = refcount_copy.at(c_temp)==1;
+	    	    
+	    int c_temp0 = c->dep(0).get()->temp;
+            int c_curr0 = curr_assign[place[c_temp0]];
+            	    
+	    int c_temp1 = c->dep(1).get()->temp;
+            int c_curr1 = curr_assign[place[c_temp1]];
+                        
+            // Check if the values of the children are still available in the work vector or was assigned during the child operation
+            ok_replace = ok_replace && (c_curr0<0 || c_curr0==c_temp0 || c_curr0==c_curr);
+            ok_replace = ok_replace && (c_curr1<1 || c_curr1==c_temp1 || c_curr1==c_curr);
             
             if(ok_replace){
               

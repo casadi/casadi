@@ -149,7 +149,7 @@ class SX : public GenericExpression<SX>{
     bool isConstant() const;
     bool isInteger() const;
     bool isSymbolic() const;
-    bool isBinary() const;
+    bool hasDep() const;
     /** \brief Check wether a binary SX is commutative*/
     bool isCommutative() const;
     bool isZero() const;

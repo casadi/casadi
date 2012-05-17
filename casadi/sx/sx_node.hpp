@@ -117,6 +117,7 @@ unsigned int count;
 /** \brief  Derived classes */
 #include "constant_sx_node.hpp"
 #include "symbolic_sx_node.hpp"
+#include "unary_sx_node.hpp"
 #include "binary_sx_node.hpp"
 
 #endif // SX_NODE_HPP
