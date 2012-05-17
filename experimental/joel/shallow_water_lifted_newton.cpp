@@ -47,7 +47,7 @@ bool with_ipopt = false;
 bool lifted = true;
 
 // Single-shooting
-bool single_shooting = true;
+bool single_shooting = false;
 
 // Expand MX->SX
 // bool expand = true;
@@ -369,7 +369,7 @@ int main(){
       //qp_solver_options["verbose"] = true;
       nlp_solver.setOption("qp_solver_options",qp_solver_options);
       if(lifted) nlp_solver.setOption("num_lifted",nv);
-      nlp_solver.setOption("maxiter",200);
+      nlp_solver.setOption("maxiter",100);
       nlp_solver.setOption("toldx",1e-9);
       nlp_solver.setOption("verbose",true);
     }

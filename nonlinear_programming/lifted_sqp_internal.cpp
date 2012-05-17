@@ -409,11 +409,40 @@ void LiftedSQPInternal::evaluate(int nfdir, int nadir){
     if(has_lam_g) lfcn_.setInput(lam_g_k,LIN_LAM_G);
     lfcn_.setInput(d_k_,LIN_D);
     lfcn_.evaluate();
-    const DMatrix& B1_k = lfcn_.output(LIN_J1);
+    DMatrix& B1_k = lfcn_.output(LIN_J1);
     const DMatrix& b1_k = lfcn_.output(LIN_F1);
     const DMatrix& B2_k = lfcn_.output(LIN_J2);
     const DMatrix& b2_k = lfcn_.output(LIN_F2);
 
+    // Regularization
+    double reg = 0;
+    bool regularization = false;
+    
+    // Check the smallest eigenvalue of the Hessian
+    if(regularization && nu==2){
+      double a = B1_k.elem(0,0);
+      double b = B1_k.elem(0,1);
+      double c = B1_k.elem(1,0);
+      double d = B1_k.elem(1,1);
+      
+      // Make sure no not a numbers
+      casadi_assert(a==a && b==b && c==c &&  d==d);
+      
+      // Make sure symmetric
+      casadi_assert_warning(fabs(b-c)<1e-10,"Hessian is not symmetric: " << b << " != " << c);
+      
+      double eig_smallest = (a+d)/2 - std::sqrt(4*b*c + (a-d)*(a-d))/2;
+      double threshold = 1e-8;
+      if(eig_smallest<threshold){
+	// Regularization
+	reg = threshold-eig_smallest;
+	std::cerr << "Regularization with " << reg << " to ensure positive definite Hessian." << endl;
+	B1_k(0,0) += reg;
+	B1_k(1,1) += reg;
+      }
+    }
+    
+    
     // Solve the QP
     qp_solver_.setInput(B1_k,QP_H);
     qp_solver_.setInput(b1_k,QP_G);

@@ -30,10 +30,8 @@ using namespace std;
 namespace CasADi{
 
 // Allocate storage for the caching
-#ifdef CACHING_CONSTANTS
-std::unordered_map<int,IntegerSXNode*> IntegerSXNode::cached_constants_;
-std::unordered_map<double,RealtypeSXNode*> RealtypeSXNode::cached_constants_;
-#endif // CASHING_CONSTANTS
+CACHING_MAP<int,IntegerSXNode*> IntegerSXNode::cached_constants_;
+CACHING_MAP<double,RealtypeSXNode*> RealtypeSXNode::cached_constants_;
 
 SX::SX(){
   node = casadi_limits<SX>::nan.node;

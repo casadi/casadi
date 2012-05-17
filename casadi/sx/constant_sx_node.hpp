@@ -26,10 +26,16 @@
 #include "sx_node.hpp"
 #include <cassert>
 
-// Cashing of constants relies on C++11 features such as std::unordered_map
-#ifdef CACHING_CONSTANTS
+// Cashing of constants requires a map (preferably a hash map)
+#ifdef HAVE_UNORDERED_MAP
+// Using C++11 unordered_map (hash map)
 #include <unordered_map>
-#endif // CACHING_CONSTANTS
+#define CACHING_MAP std::unordered_map
+#else // HAVE_UNORDERED_MAP
+// Falling back to std::map (binary search tree)
+#include <map>
+#define CACHING_MAP std::map
+#endif // HAVE_UNORDERED_MAP
 
 namespace CasADi{
 
@@ -73,17 +79,14 @@ class RealtypeSXNode : public ConstantSXNode{
     
     /// Destructor
     virtual ~RealtypeSXNode(){
-      #ifdef CACHING_CONSTANTS
       size_t num_erased = cached_constants_.erase(value);
       assert(num_erased==1);
-      #endif // CACHING_CONSTANTS
     }
     
     /// Static creator function (use instead of constructor)
     inline static RealtypeSXNode* create(double value){
-      #ifdef CACHING_CONSTANTS
       // Try to find the constant
-      std::unordered_map<double,RealtypeSXNode*>::iterator it = cached_constants_.find(value);
+      CACHING_MAP<double,RealtypeSXNode*>::iterator it = cached_constants_.find(value);
       
       // If not found, add it,
       if(it==cached_constants_.end()){
@@ -98,9 +101,6 @@ class RealtypeSXNode : public ConstantSXNode{
       } else { // Else, returned the object
         return it->second;
       }
-      #else // CACHING_CONSTANTS
-      return new RealtypeSXNode(value);
-      #endif // CACHING_CONSTANTS
     }
     
     //@{
@@ -110,10 +110,8 @@ class RealtypeSXNode : public ConstantSXNode{
     //@}
     
   protected:
-    #ifdef CACHING_CONSTANTS
     /** \brief Hash map of all constants currently allocated (storage is allocated for it in sx.cpp) */
-    static std::unordered_map<double,RealtypeSXNode*> cached_constants_;
-    #endif // CACHING_CONSTANTS
+    static CACHING_MAP<double,RealtypeSXNode*> cached_constants_;
     
     /** \brief  Data members */
     double value;
@@ -133,17 +131,14 @@ class IntegerSXNode : public ConstantSXNode{
 
     /// Destructor
     virtual ~IntegerSXNode(){
-      #ifdef CACHING_CONSTANTS
       size_t num_erased = cached_constants_.erase(value);
       assert(num_erased==1);
-      #endif // CACHING_CONSTANTS
     }
     
     /// Static creator function (use instead of constructor)
     inline static IntegerSXNode* create(int value){
-      #ifdef CACHING_CONSTANTS
       // Try to find the constant
-      std::unordered_map<int,IntegerSXNode*>::iterator it = cached_constants_.find(value);
+      CACHING_MAP<int,IntegerSXNode*>::iterator it = cached_constants_.find(value);
       
       // If not found, add it,
       if(it==cached_constants_.end()){
@@ -158,9 +153,6 @@ class IntegerSXNode : public ConstantSXNode{
       } else { // Else, returned the object
         return it->second;
       }
-      #else // CACHING_CONSTANTS
-      return new IntegerSXNode(value);
-      #endif // CACHING_CONSTANTS
     }
     
     //@{
@@ -174,10 +166,8 @@ class IntegerSXNode : public ConstantSXNode{
   
   protected:
 
-    #ifdef CACHING_CONSTANTS
     /** \brief Hash map of all constants currently allocated (storage is allocated for it in sx.cpp) */
-    static std::unordered_map<int,IntegerSXNode*> cached_constants_;
-    #endif // CACHING_CONSTANTS
+    static CACHING_MAP<int,IntegerSXNode*> cached_constants_;
     
     /** \brief  Data members */
     int value;
