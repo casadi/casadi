@@ -411,6 +411,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::AcadoIntegrator::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::AcadoIntegrator::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -460,7 +470,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::AcadoIntegrator::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::AcadoIntegrator::call "
 
@@ -471,6 +481,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::AcadoIntegrator::eval "
 
@@ -1726,6 +1740,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::AcadoOCP::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::AcadoOCP::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::AcadoOCP::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -1775,7 +1799,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::AcadoOCP::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::AcadoOCP::call "
 
@@ -1786,6 +1810,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::AcadoOCP::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::AcadoOCP::eval "
 
@@ -2658,226 +2686,226 @@ casadi_calculus.hpp ";
 casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1BinaryOp.xml
-%feature("docstring") CasADi::BinaryOp "
+// File: classCasADi_1_1BinaryMX.xml
+%feature("docstring") CasADi::BinaryMX "
 
 Represents any binary operation that involves two matrices.
 
 Joel Andersson
 
-C++ includes: binary_op.hpp ";
+C++ includes: binary_mx.hpp ";
 
-%feature("docstring")  CasADi::BinaryOp::BinaryOp "
+%feature("docstring")  CasADi::BinaryMX::BinaryMX "
 
 Constructor. ";
 
-%feature("docstring")  CasADi::BinaryOp::~BinaryOp "
+%feature("docstring")  CasADi::BinaryMX::~BinaryMX "
 
 Destructor. ";
 
-%feature("docstring")  CasADi::BinaryOp::printPart "
+%feature("docstring")  CasADi::BinaryMX::printPart "
 
 Print a part of the expression. ";
 
-%feature("docstring")  CasADi::BinaryOp::isOperation "
+%feature("docstring")  CasADi::BinaryMX::isOperation "
 
 Is it a certain operation. ";
 
-%feature("docstring")  CasADi::BinaryOp::evaluateMX "
+%feature("docstring")  CasADi::BinaryMX::evaluateMX "
 
 Evaluate the function symbolically ( MX) ";
 
-%feature("docstring")  CasADi::BinaryOp::clone "
+%feature("docstring")  CasADi::BinaryMX::clone "
 
 Clone function. ";
 
-%feature("docstring")  CasADi::BinaryOp::deepCopyMembers "
+%feature("docstring")  CasADi::BinaryMX::deepCopyMembers "
 
 Deep copy data members. ";
 
-%feature("docstring")  CasADi::BinaryOp::repr "
+%feature("docstring")  CasADi::BinaryMX::repr "
 
 Print a representation. ";
 
-%feature("docstring")  CasADi::BinaryOp::print "
+%feature("docstring")  CasADi::BinaryMX::print "
 
 Print a description. ";
 
-%feature("docstring")  CasADi::BinaryOp::print "
+%feature("docstring")  CasADi::BinaryMX::print "
 
 Print expression (make sure number of calls is not exceeded) ";
 
-%feature("docstring")  CasADi::BinaryOp::evaluateD "
+%feature("docstring")  CasADi::BinaryMX::evaluateD "
 
 Evaluate the function. ";
 
-%feature("docstring")  CasADi::BinaryOp::evaluateD "
+%feature("docstring")  CasADi::BinaryMX::evaluateD "
 
 Evaluate the function, no derivatives. ";
 
-%feature("docstring")  CasADi::BinaryOp::evaluateSX "
+%feature("docstring")  CasADi::BinaryMX::evaluateSX "
 
 Evaluate symbolically ( SX) ";
 
-%feature("docstring")  CasADi::BinaryOp::evaluateSX "
+%feature("docstring")  CasADi::BinaryMX::evaluateSX "
 
 Evaluate symbolically ( SX), no derivatives. ";
 
-%feature("docstring")  CasADi::BinaryOp::evaluateMX "
+%feature("docstring")  CasADi::BinaryMX::evaluateMX "
 
 Evaluate symbolically ( MX), no derivatives. ";
 
-%feature("docstring")  CasADi::BinaryOp::propagateSparsity "
+%feature("docstring")  CasADi::BinaryMX::propagateSparsity "
 
 Propagate sparsity. ";
 
-%feature("docstring")  CasADi::BinaryOp::getName "
+%feature("docstring")  CasADi::BinaryMX::getName "
 
 Get the name. ";
 
-%feature("docstring")  CasADi::BinaryOp::isSymbolic "
+%feature("docstring")  CasADi::BinaryMX::isSymbolic "
 
 Check if symbolic. ";
 
-%feature("docstring")  CasADi::BinaryOp::isConstant "
+%feature("docstring")  CasADi::BinaryMX::isConstant "
 
 Check if constant. ";
 
-%feature("docstring")  CasADi::BinaryOp::isMapping "
+%feature("docstring")  CasADi::BinaryMX::isMapping "
 
 Check if mapping. ";
 
-%feature("docstring")  CasADi::BinaryOp::isEvaluation "
+%feature("docstring")  CasADi::BinaryMX::isEvaluation "
 
 Check if evaluation. ";
 
-%feature("docstring")  CasADi::BinaryOp::isOutputNode "
+%feature("docstring")  CasADi::BinaryMX::isOutputNode "
 
 Check if evaluation output. ";
 
-%feature("docstring")  CasADi::BinaryOp::isMultipleOutput "
+%feature("docstring")  CasADi::BinaryMX::isMultipleOutput "
 
 Check if a multiple output node. ";
 
-%feature("docstring")  CasADi::BinaryOp::isJacobian "
+%feature("docstring")  CasADi::BinaryMX::isJacobian "
 
 Check if jacobian reference. ";
 
-%feature("docstring")  CasADi::BinaryOp::isMultiplication "
+%feature("docstring")  CasADi::BinaryMX::isMultiplication "
 
 Check if matrix multiplication. ";
 
-%feature("docstring")  CasADi::BinaryOp::getFunction "
+%feature("docstring")  CasADi::BinaryMX::getFunction "
 
 Get function reference. ";
 
-%feature("docstring")  CasADi::BinaryOp::getFunctionInput "
+%feature("docstring")  CasADi::BinaryMX::getFunctionInput "
 
 Get function input. ";
 
-%feature("docstring")  CasADi::BinaryOp::getFunctionOutput "
+%feature("docstring")  CasADi::BinaryMX::getFunctionOutput "
 
 Get function output. ";
 
-%feature("docstring")  CasADi::BinaryOp::dep "
+%feature("docstring")  CasADi::BinaryMX::dep "
 
 dependencies - functions that have to be evaluated before this one ";
 
-%feature("docstring")  CasADi::BinaryOp::dep "";
+%feature("docstring")  CasADi::BinaryMX::dep "";
 
-%feature("docstring")  CasADi::BinaryOp::ndep "
+%feature("docstring")  CasADi::BinaryMX::ndep "
 
 Number of dependencies. ";
 
-%feature("docstring")  CasADi::BinaryOp::hasDep "
+%feature("docstring")  CasADi::BinaryMX::hasDep "
 
 Does the node depend on other nodes. ";
 
-%feature("docstring")  CasADi::BinaryOp::getNumOutputs "
+%feature("docstring")  CasADi::BinaryMX::getNumOutputs "
 
 Number of outputs. ";
 
-%feature("docstring")  CasADi::BinaryOp::sparsity "
+%feature("docstring")  CasADi::BinaryMX::sparsity "
 
 Get the sparsity. ";
 
-%feature("docstring")  CasADi::BinaryOp::sparsity "
+%feature("docstring")  CasADi::BinaryMX::sparsity "
 
 Get the sparsity of output oind. ";
 
-%feature("docstring")  CasADi::BinaryOp::isNonLinear "
+%feature("docstring")  CasADi::BinaryMX::isNonLinear "
 
 Is the node nonlinear. ";
 
-%feature("docstring")  CasADi::BinaryOp::setSparsity "
+%feature("docstring")  CasADi::BinaryMX::setSparsity "
 
 Set the sparsity. ";
 
-%feature("docstring")  CasADi::BinaryOp::setDependencies "
+%feature("docstring")  CasADi::BinaryMX::setDependencies "
 
 Set unary dependency. ";
 
-%feature("docstring")  CasADi::BinaryOp::setDependencies "
+%feature("docstring")  CasADi::BinaryMX::setDependencies "
 
 Set binary dependencies. ";
 
-%feature("docstring")  CasADi::BinaryOp::setDependencies "
+%feature("docstring")  CasADi::BinaryMX::setDependencies "
 
 Set ternary dependencies. ";
 
-%feature("docstring")  CasADi::BinaryOp::setDependencies "
+%feature("docstring")  CasADi::BinaryMX::setDependencies "
 
 Set multiple dependencies. ";
 
-%feature("docstring")  CasADi::BinaryOp::addDependency "
+%feature("docstring")  CasADi::BinaryMX::addDependency "
 
 Add a dependency. ";
 
-%feature("docstring")  CasADi::BinaryOp::assign "
+%feature("docstring")  CasADi::BinaryMX::assign "
 
 Assign nonzeros (mapping matrix) ";
 
-%feature("docstring")  CasADi::BinaryOp::assign "
+%feature("docstring")  CasADi::BinaryMX::assign "
 
 Assign nonzeros (mapping matrix), output indices sequential. ";
 
-%feature("docstring")  CasADi::BinaryOp::numel "
+%feature("docstring")  CasADi::BinaryMX::numel "
 
 Number of elements. ";
 
-%feature("docstring")  CasADi::BinaryOp::size "
+%feature("docstring")  CasADi::BinaryMX::size "
 
 Get size. ";
 
-%feature("docstring")  CasADi::BinaryOp::size1 "
+%feature("docstring")  CasADi::BinaryMX::size1 "
 
 Get size. ";
 
-%feature("docstring")  CasADi::BinaryOp::size2 "
+%feature("docstring")  CasADi::BinaryMX::size2 "
 
 Get size. ";
 
-%feature("docstring")  CasADi::BinaryOp::regRef "
+%feature("docstring")  CasADi::BinaryMX::regRef "
 
 Register a weak reference. ";
 
-%feature("docstring")  CasADi::BinaryOp::unregRef "
+%feature("docstring")  CasADi::BinaryMX::unregRef "
 
 Unregister a weak reference. ";
 
-%feature("docstring")  CasADi::BinaryOp::getCount "
+%feature("docstring")  CasADi::BinaryMX::getCount "
 
 Get the reference count. ";
 
-%feature("docstring")  CasADi::BinaryOp::init "
+%feature("docstring")  CasADi::BinaryMX::init "
 
 Initialize the object. ";
 
-%feature("docstring")  CasADi::BinaryOp::isInit "
+%feature("docstring")  CasADi::BinaryMX::isInit "
 
 Check if the object has been initialized. ";
 
-%feature("docstring")  CasADi::BinaryOp::assertInit "
+%feature("docstring")  CasADi::BinaryMX::assertInit "
 
 Assert that the object has been initialized. ";
 
@@ -2980,88 +3008,88 @@ C++ includes: casadi_calculus.hpp ";
 casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1BinarySXNode.xml
-%feature("docstring") CasADi::BinarySXNode "
+// File: classCasADi_1_1BinarySX.xml
+%feature("docstring") CasADi::BinarySX "
 
 Represents a basic binary operation on two SX nodes.
 
 Joel Andersson
 
-C++ includes: binary_sx_node.hpp ";
+C++ includes: binary_sx.hpp ";
 
-%feature("docstring")  CasADi::BinarySXNode::isConstant "
+%feature("docstring")  CasADi::BinarySX::isConstant "
 
 check properties of a node ";
 
-%feature("docstring")  CasADi::BinarySXNode::isInteger "";
+%feature("docstring")  CasADi::BinarySX::isInteger "";
 
-%feature("docstring")  CasADi::BinarySXNode::isSymbolic "";
+%feature("docstring")  CasADi::BinarySX::isSymbolic "";
 
-%feature("docstring")  CasADi::BinarySXNode::isZero "";
+%feature("docstring")  CasADi::BinarySX::isZero "";
 
-%feature("docstring")  CasADi::BinarySXNode::isOne "";
+%feature("docstring")  CasADi::BinarySX::isOne "";
 
-%feature("docstring")  CasADi::BinarySXNode::isMinusOne "";
+%feature("docstring")  CasADi::BinarySX::isMinusOne "";
 
-%feature("docstring")  CasADi::BinarySXNode::isNan "";
+%feature("docstring")  CasADi::BinarySX::isNan "";
 
-%feature("docstring")  CasADi::BinarySXNode::isInf "";
+%feature("docstring")  CasADi::BinarySX::isInf "";
 
-%feature("docstring")  CasADi::BinarySXNode::isMinusInf "";
+%feature("docstring")  CasADi::BinarySX::isMinusInf "";
 
-%feature("docstring")  CasADi::BinarySXNode::getValue "
+%feature("docstring")  CasADi::BinarySX::getValue "
 
 Get value of a constant node. ";
 
-%feature("docstring")  CasADi::BinarySXNode::getIntValue "";
+%feature("docstring")  CasADi::BinarySX::getIntValue "";
 
-%feature("docstring")  CasADi::BinarySXNode::~BinarySXNode "
+%feature("docstring")  CasADi::BinarySX::~BinarySX "
 
 Destructor This is a rather complex destructor which is necessary since the
 default destructor can cause stack overflow due to recursive calling. ";
 
-%feature("docstring")  CasADi::BinarySXNode::isSmooth "
+%feature("docstring")  CasADi::BinarySX::isSmooth "
 
 Check if smooth. ";
 
-%feature("docstring")  CasADi::BinarySXNode::hasDep "";
+%feature("docstring")  CasADi::BinarySX::hasDep "";
 
-%feature("docstring")  CasADi::BinarySXNode::ndep "
+%feature("docstring")  CasADi::BinarySX::ndep "
 
 Number of dependencies. ";
 
-%feature("docstring")  CasADi::BinarySXNode::dep "
+%feature("docstring")  CasADi::BinarySX::dep "
+
+get the reference of a dependency ";
+
+%feature("docstring")  CasADi::BinarySX::dep "
 
 get the reference of a child ";
 
-%feature("docstring")  CasADi::BinarySXNode::dep "
-
-get the reference of a child ";
-
-%feature("docstring")  CasADi::BinarySXNode::getOp "
+%feature("docstring")  CasADi::BinarySX::getOp "
 
 Get the operation. ";
 
-%feature("docstring")  CasADi::BinarySXNode::print "
+%feature("docstring")  CasADi::BinarySX::print "
 
 Print the expression (recursively with a maximum number of levels) ";
 
-%feature("docstring")  CasADi::BinarySXNode::getName "";
+%feature("docstring")  CasADi::BinarySX::getName "";
 
-%feature("docstring")  CasADi::BinarySXNode::isEqual "
-
-comparison ";
-
-%feature("docstring")  CasADi::BinarySXNode::isEqual "
+%feature("docstring")  CasADi::BinarySX::isEqual "
 
 comparison ";
 
-%feature("docstring")  CasADi::BinarySXNode::init "
+%feature("docstring")  CasADi::BinarySX::isEqual "
+
+comparison ";
+
+%feature("docstring")  CasADi::BinarySX::init "
 
 Initialize the node (currently used only to give a similar interface to
 MXNode) ";
 
-%feature("docstring")  CasADi::BinarySXNode::print "
+%feature("docstring")  CasADi::BinarySX::print "
 
 print ";
 
@@ -3571,6 +3599,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::CFunction::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::CFunction::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::CFunction::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -3620,7 +3658,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::CFunction::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::CFunction::call "
 
@@ -3631,6 +3669,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::CFunction::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::CFunction::eval "
 
@@ -4788,6 +4830,18 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")
+CasADi::OptimalControl::Collocation::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")
+CasADi::OptimalControl::Collocation::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::OptimalControl::Collocation::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -4837,7 +4891,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::OptimalControl::Collocation::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::OptimalControl::Collocation::call "
 
@@ -4848,6 +4902,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::OptimalControl::Collocation::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::OptimalControl::Collocation::eval "
 
@@ -5591,6 +5649,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::CollocationIntegrator::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::CollocationIntegrator::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -5640,7 +5708,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::call "
 
@@ -5651,6 +5719,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::eval "
 
@@ -7243,81 +7315,307 @@ casadi_calculus.hpp ";
 casadi_calculus.hpp ";
 
 
-// File: classCasADi_1_1ConstantSXNode.xml
-%feature("docstring") CasADi::ConstantSXNode "
+// File: classCasADi_1_1ConstantMX.xml
+%feature("docstring") CasADi::ConstantMX "
+
+Represents an MX that is only composed of a constant.
+
+Joel Andersson  A regular user is not supposed to work with this Node class.
+This user can call MX(double) directly, or even rely on implicit
+typecasting. See:  zeros , ones
+
+C++ includes: constant_mx.hpp ";
+
+%feature("docstring")  CasADi::ConstantMX::ConstantMX "
+
+Constructor. ";
+
+%feature("docstring")  CasADi::ConstantMX::clone "
+
+Clone function. ";
+
+%feature("docstring")  CasADi::ConstantMX::printPart "
+
+Print a part of the expression. ";
+
+%feature("docstring")  CasADi::ConstantMX::evaluateD "
+
+Evaluate the function numerically. ";
+
+%feature("docstring")  CasADi::ConstantMX::evaluateSX "
+
+Evaluate the function symbolically ( SX) ";
+
+%feature("docstring")  CasADi::ConstantMX::evaluateMX "
+
+Evaluate the function symbolically ( MX) ";
+
+%feature("docstring")  CasADi::ConstantMX::propagateSparsity "
+
+Propagate sparsity. ";
+
+%feature("docstring")  CasADi::ConstantMX::isConstant "
+
+Indicate that the node is constant. ";
+
+%feature("docstring")  CasADi::ConstantMX::eval "
+
+Symbolic evaluation (matrix graph) ";
+
+%feature("docstring")  CasADi::ConstantMX::deepCopyMembers "
+
+Deep copy data members. ";
+
+%feature("docstring")  CasADi::ConstantMX::repr "
+
+Print a representation. ";
+
+%feature("docstring")  CasADi::ConstantMX::print "
+
+Print a description. ";
+
+%feature("docstring")  CasADi::ConstantMX::print "
+
+Print expression (make sure number of calls is not exceeded) ";
+
+%feature("docstring")  CasADi::ConstantMX::evaluateD "
+
+Evaluate the function, no derivatives. ";
+
+%feature("docstring")  CasADi::ConstantMX::evaluateSX "
+
+Evaluate symbolically ( SX), no derivatives. ";
+
+%feature("docstring")  CasADi::ConstantMX::evaluateMX "
+
+Evaluate symbolically ( MX), no derivatives. ";
+
+%feature("docstring")  CasADi::ConstantMX::getName "
+
+Get the name. ";
+
+%feature("docstring")  CasADi::ConstantMX::isSymbolic "
+
+Check if symbolic. ";
+
+%feature("docstring")  CasADi::ConstantMX::isMapping "
+
+Check if mapping. ";
+
+%feature("docstring")  CasADi::ConstantMX::isEvaluation "
+
+Check if evaluation. ";
+
+%feature("docstring")  CasADi::ConstantMX::isOutputNode "
+
+Check if evaluation output. ";
+
+%feature("docstring")  CasADi::ConstantMX::isMultipleOutput "
+
+Check if a multiple output node. ";
+
+%feature("docstring")  CasADi::ConstantMX::isJacobian "
+
+Check if jacobian reference. ";
+
+%feature("docstring")  CasADi::ConstantMX::isMultiplication "
+
+Check if matrix multiplication. ";
+
+%feature("docstring")  CasADi::ConstantMX::getFunction "
+
+Get function reference. ";
+
+%feature("docstring")  CasADi::ConstantMX::getFunctionInput "
+
+Get function input. ";
+
+%feature("docstring")  CasADi::ConstantMX::getFunctionOutput "
+
+Get function output. ";
+
+%feature("docstring")  CasADi::ConstantMX::dep "
+
+dependencies - functions that have to be evaluated before this one ";
+
+%feature("docstring")  CasADi::ConstantMX::dep "";
+
+%feature("docstring")  CasADi::ConstantMX::ndep "
+
+Number of dependencies. ";
+
+%feature("docstring")  CasADi::ConstantMX::hasDep "
+
+Does the node depend on other nodes. ";
+
+%feature("docstring")  CasADi::ConstantMX::getNumOutputs "
+
+Number of outputs. ";
+
+%feature("docstring")  CasADi::ConstantMX::sparsity "
+
+Get the sparsity. ";
+
+%feature("docstring")  CasADi::ConstantMX::sparsity "
+
+Get the sparsity of output oind. ";
+
+%feature("docstring")  CasADi::ConstantMX::isNonLinear "
+
+Is the node nonlinear. ";
+
+%feature("docstring")  CasADi::ConstantMX::setSparsity "
+
+Set the sparsity. ";
+
+%feature("docstring")  CasADi::ConstantMX::setDependencies "
+
+Set unary dependency. ";
+
+%feature("docstring")  CasADi::ConstantMX::setDependencies "
+
+Set binary dependencies. ";
+
+%feature("docstring")  CasADi::ConstantMX::setDependencies "
+
+Set ternary dependencies. ";
+
+%feature("docstring")  CasADi::ConstantMX::setDependencies "
+
+Set multiple dependencies. ";
+
+%feature("docstring")  CasADi::ConstantMX::addDependency "
+
+Add a dependency. ";
+
+%feature("docstring")  CasADi::ConstantMX::assign "
+
+Assign nonzeros (mapping matrix) ";
+
+%feature("docstring")  CasADi::ConstantMX::assign "
+
+Assign nonzeros (mapping matrix), output indices sequential. ";
+
+%feature("docstring")  CasADi::ConstantMX::isOperation "
+
+Is it a certain operation. ";
+
+%feature("docstring")  CasADi::ConstantMX::numel "
+
+Number of elements. ";
+
+%feature("docstring")  CasADi::ConstantMX::size "
+
+Get size. ";
+
+%feature("docstring")  CasADi::ConstantMX::size1 "
+
+Get size. ";
+
+%feature("docstring")  CasADi::ConstantMX::size2 "
+
+Get size. ";
+
+%feature("docstring")  CasADi::ConstantMX::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::ConstantMX::unregRef "
+
+Unregister a weak reference. ";
+
+%feature("docstring")  CasADi::ConstantMX::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::ConstantMX::init "
+
+Initialize the object. ";
+
+%feature("docstring")  CasADi::ConstantMX::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::ConstantMX::assertInit "
+
+Assert that the object has been initialized. ";
+
+
+// File: classCasADi_1_1ConstantSX.xml
+%feature("docstring") CasADi::ConstantSX "
 
 Represents a constant SX.
 
 Joel Andersson
 
-C++ includes: constant_sx_node.hpp ";
+C++ includes: constant_sx.hpp ";
 
-%feature("docstring")  CasADi::ConstantSXNode::isInteger "";
+%feature("docstring")  CasADi::ConstantSX::isInteger "";
 
-%feature("docstring")  CasADi::ConstantSXNode::isSymbolic "";
+%feature("docstring")  CasADi::ConstantSX::isSymbolic "";
 
-%feature("docstring")  CasADi::ConstantSXNode::hasDep "";
+%feature("docstring")  CasADi::ConstantSX::hasDep "";
 
-%feature("docstring")  CasADi::ConstantSXNode::isZero "";
+%feature("docstring")  CasADi::ConstantSX::isZero "";
 
-%feature("docstring")  CasADi::ConstantSXNode::isOne "";
+%feature("docstring")  CasADi::ConstantSX::isOne "";
 
-%feature("docstring")  CasADi::ConstantSXNode::isMinusOne "";
+%feature("docstring")  CasADi::ConstantSX::isMinusOne "";
 
-%feature("docstring")  CasADi::ConstantSXNode::isNan "";
+%feature("docstring")  CasADi::ConstantSX::isNan "";
 
-%feature("docstring")  CasADi::ConstantSXNode::isInf "";
+%feature("docstring")  CasADi::ConstantSX::isInf "";
 
-%feature("docstring")  CasADi::ConstantSXNode::isMinusInf "";
+%feature("docstring")  CasADi::ConstantSX::isMinusInf "";
 
-%feature("docstring")  CasADi::ConstantSXNode::getIntValue "";
+%feature("docstring")  CasADi::ConstantSX::getIntValue "";
 
-%feature("docstring")  CasADi::ConstantSXNode::~ConstantSXNode "";
+%feature("docstring")  CasADi::ConstantSX::~ConstantSX "";
 
-%feature("docstring")  CasADi::ConstantSXNode::getValue "
+%feature("docstring")  CasADi::ConstantSX::getValue "
 
 Get the value must be defined. ";
 
-%feature("docstring")  CasADi::ConstantSXNode::isConstant "
+%feature("docstring")  CasADi::ConstantSX::isConstant "
 
 Properties. ";
 
-%feature("docstring")  CasADi::ConstantSXNode::getName "";
+%feature("docstring")  CasADi::ConstantSX::getOp "
 
-%feature("docstring")  CasADi::ConstantSXNode::getOp "
+Get the operation. ";
 
-get the operation only for binary nodes ";
+%feature("docstring")  CasADi::ConstantSX::getName "";
 
-%feature("docstring")  CasADi::ConstantSXNode::isEqual "
-
-comparison ";
-
-%feature("docstring")  CasADi::ConstantSXNode::isEqual "
+%feature("docstring")  CasADi::ConstantSX::isEqual "
 
 comparison ";
 
-%feature("docstring")  CasADi::ConstantSXNode::ndep "
+%feature("docstring")  CasADi::ConstantSX::isEqual "
+
+comparison ";
+
+%feature("docstring")  CasADi::ConstantSX::ndep "
 
 Number of dependencies. ";
 
-%feature("docstring")  CasADi::ConstantSXNode::dep "
+%feature("docstring")  CasADi::ConstantSX::dep "
 
 get the reference of a child ";
 
-%feature("docstring")  CasADi::ConstantSXNode::dep "
+%feature("docstring")  CasADi::ConstantSX::dep "
 
 get the reference of a child ";
 
-%feature("docstring")  CasADi::ConstantSXNode::init "
+%feature("docstring")  CasADi::ConstantSX::init "
 
 Initialize the node (currently used only to give a similar interface to
 MXNode) ";
 
-%feature("docstring")  CasADi::ConstantSXNode::isSmooth "
+%feature("docstring")  CasADi::ConstantSX::isSmooth "
 
 Check if smooth. ";
 
-%feature("docstring")  CasADi::ConstantSXNode::print "
+%feature("docstring")  CasADi::ConstantSX::print "
 
 print ";
 
@@ -7809,6 +8107,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::ControlSimulator::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::ControlSimulator::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::ControlSimulator::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -7858,7 +8166,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::ControlSimulator::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::ControlSimulator::call "
 
@@ -7869,6 +8177,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::ControlSimulator::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::ControlSimulator::eval "
 
@@ -9805,6 +10117,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::CplexSolver::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::CplexSolver::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::CplexSolver::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -9854,7 +10176,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::CplexSolver::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::CplexSolver::call "
 
@@ -9865,6 +10187,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::CplexSolver::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::CplexSolver::eval "
 
@@ -11178,6 +11504,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::Interfaces::CSparse::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::Interfaces::CSparse::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::Interfaces::CSparse::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -11223,7 +11559,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Interfaces::CSparse::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::Interfaces::CSparse::call "
 
@@ -11234,6 +11570,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::Interfaces::CSparse::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparse::eval "
 
@@ -12667,6 +13007,18 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")
+CasADi::Sundials::CVodesIntegrator::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")
+CasADi::Sundials::CVodesIntegrator::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -12716,7 +13068,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::call "
 
@@ -12727,6 +13079,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesIntegrator::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::eval "
 
@@ -14089,226 +14445,312 @@ CasADi::OptimalControl::EquationSorter::~EquationSorter "";
 %feature("docstring")  CasADi::OptimalControl::EquationSorter::decrease "";
 
 
-// File: classCasADi_1_1Evaluation.xml
-%feature("docstring") CasADi::Evaluation "
+// File: classCasADi_1_1EvaluationMX.xml
+%feature("docstring") CasADi::EvaluationMX "
 
 Joel Andersson
 
-C++ includes: evaluation.hpp ";
+C++ includes: evaluation_mx.hpp ";
 
-%feature("docstring")  CasADi::Evaluation::Evaluation "
+%feature("docstring")  CasADi::EvaluationMX::EvaluationMX "
 
 Constructor. ";
 
-%feature("docstring")  CasADi::Evaluation::~Evaluation "
+%feature("docstring")  CasADi::EvaluationMX::~EvaluationMX "
 
 Destructor. ";
 
-%feature("docstring")  CasADi::Evaluation::clone "
+%feature("docstring")  CasADi::EvaluationMX::clone "
 
 Clone function. ";
 
-%feature("docstring")  CasADi::Evaluation::printPart "
+%feature("docstring")  CasADi::EvaluationMX::printPart "
 
 Print a part of the expression. ";
 
-%feature("docstring")  CasADi::Evaluation::evaluateD "
+%feature("docstring")  CasADi::EvaluationMX::evaluateD "
 
 Evaluate the function numerically. ";
 
-%feature("docstring")  CasADi::Evaluation::evaluateSX "
+%feature("docstring")  CasADi::EvaluationMX::evaluateSX "
 
 Evaluate the function symbolically ( SX) ";
 
-%feature("docstring")  CasADi::Evaluation::evaluateMX "
+%feature("docstring")  CasADi::EvaluationMX::evaluateMX "
 
 Evaluate the function symbolically ( MX) ";
 
-%feature("docstring")  CasADi::Evaluation::propagateSparsity "
+%feature("docstring")  CasADi::EvaluationMX::propagateSparsity "
 
 Propagate sparsity. ";
 
-%feature("docstring")  CasADi::Evaluation::isEvaluation "
+%feature("docstring")  CasADi::EvaluationMX::isEvaluation "
 
 Check if evaluation. ";
 
-%feature("docstring")  CasADi::Evaluation::getFunction "
+%feature("docstring")  CasADi::EvaluationMX::getFunction "
 
 Get function reference. ";
 
-%feature("docstring")  CasADi::Evaluation::getFunctionInput "
+%feature("docstring")  CasADi::EvaluationMX::getFunctionInput "
 
 Get function input. ";
 
-%feature("docstring")  CasADi::Evaluation::getFunctionOutput "
+%feature("docstring")  CasADi::EvaluationMX::getFunctionOutput "
 
 Get function output. ";
 
-%feature("docstring")  CasADi::Evaluation::deepCopyMembers "
+%feature("docstring")  CasADi::EvaluationMX::deepCopyMembers "
 
 Deep copy data members. ";
 
-%feature("docstring")  CasADi::Evaluation::getNumOutputs "
+%feature("docstring")  CasADi::EvaluationMX::getNumOutputs "
 
 Number of outputs. ";
 
-%feature("docstring")  CasADi::Evaluation::sparsity "
+%feature("docstring")  CasADi::EvaluationMX::sparsity "
 
 Get the sparsity of output oind. ";
 
-%feature("docstring")  CasADi::Evaluation::sparsity "
+%feature("docstring")  CasADi::EvaluationMX::sparsity "
 
 Get the sparsity. ";
 
-%feature("docstring")  CasADi::Evaluation::isMultipleOutput "
+%feature("docstring")  CasADi::EvaluationMX::isMultipleOutput "
 
 Check if a multiple output node. ";
 
-%feature("docstring")  CasADi::Evaluation::repr "
+%feature("docstring")  CasADi::EvaluationMX::repr "
 
 Print a representation. ";
 
-%feature("docstring")  CasADi::Evaluation::print "
+%feature("docstring")  CasADi::EvaluationMX::print "
 
 Print a description. ";
 
-%feature("docstring")  CasADi::Evaluation::print "
+%feature("docstring")  CasADi::EvaluationMX::print "
 
 Print expression (make sure number of calls is not exceeded) ";
 
-%feature("docstring")  CasADi::Evaluation::evaluateD "
+%feature("docstring")  CasADi::EvaluationMX::evaluateD "
 
 Evaluate the function, no derivatives. ";
 
-%feature("docstring")  CasADi::Evaluation::evaluateSX "
+%feature("docstring")  CasADi::EvaluationMX::evaluateSX "
 
 Evaluate symbolically ( SX), no derivatives. ";
 
-%feature("docstring")  CasADi::Evaluation::evaluateMX "
+%feature("docstring")  CasADi::EvaluationMX::evaluateMX "
 
 Evaluate symbolically ( MX), no derivatives. ";
 
-%feature("docstring")  CasADi::Evaluation::getName "
+%feature("docstring")  CasADi::EvaluationMX::getName "
 
 Get the name. ";
 
-%feature("docstring")  CasADi::Evaluation::isSymbolic "
+%feature("docstring")  CasADi::EvaluationMX::isSymbolic "
 
 Check if symbolic. ";
 
-%feature("docstring")  CasADi::Evaluation::isConstant "
+%feature("docstring")  CasADi::EvaluationMX::isConstant "
 
 Check if constant. ";
 
-%feature("docstring")  CasADi::Evaluation::isMapping "
+%feature("docstring")  CasADi::EvaluationMX::isMapping "
 
 Check if mapping. ";
 
-%feature("docstring")  CasADi::Evaluation::isOutputNode "
+%feature("docstring")  CasADi::EvaluationMX::isOutputNode "
 
 Check if evaluation output. ";
 
-%feature("docstring")  CasADi::Evaluation::isJacobian "
+%feature("docstring")  CasADi::EvaluationMX::isJacobian "
 
 Check if jacobian reference. ";
 
-%feature("docstring")  CasADi::Evaluation::isMultiplication "
+%feature("docstring")  CasADi::EvaluationMX::isMultiplication "
 
 Check if matrix multiplication. ";
 
-%feature("docstring")  CasADi::Evaluation::dep "
+%feature("docstring")  CasADi::EvaluationMX::dep "
 
 dependencies - functions that have to be evaluated before this one ";
 
-%feature("docstring")  CasADi::Evaluation::dep "";
+%feature("docstring")  CasADi::EvaluationMX::dep "";
 
-%feature("docstring")  CasADi::Evaluation::ndep "
+%feature("docstring")  CasADi::EvaluationMX::ndep "
 
 Number of dependencies. ";
 
-%feature("docstring")  CasADi::Evaluation::hasDep "
+%feature("docstring")  CasADi::EvaluationMX::hasDep "
 
 Does the node depend on other nodes. ";
 
-%feature("docstring")  CasADi::Evaluation::isNonLinear "
+%feature("docstring")  CasADi::EvaluationMX::isNonLinear "
 
 Is the node nonlinear. ";
 
-%feature("docstring")  CasADi::Evaluation::setSparsity "
+%feature("docstring")  CasADi::EvaluationMX::setSparsity "
 
 Set the sparsity. ";
 
-%feature("docstring")  CasADi::Evaluation::setDependencies "
+%feature("docstring")  CasADi::EvaluationMX::setDependencies "
 
 Set unary dependency. ";
 
-%feature("docstring")  CasADi::Evaluation::setDependencies "
+%feature("docstring")  CasADi::EvaluationMX::setDependencies "
 
 Set binary dependencies. ";
 
-%feature("docstring")  CasADi::Evaluation::setDependencies "
+%feature("docstring")  CasADi::EvaluationMX::setDependencies "
 
 Set ternary dependencies. ";
 
-%feature("docstring")  CasADi::Evaluation::setDependencies "
+%feature("docstring")  CasADi::EvaluationMX::setDependencies "
 
 Set multiple dependencies. ";
 
-%feature("docstring")  CasADi::Evaluation::addDependency "
+%feature("docstring")  CasADi::EvaluationMX::addDependency "
 
 Add a dependency. ";
 
-%feature("docstring")  CasADi::Evaluation::assign "
+%feature("docstring")  CasADi::EvaluationMX::assign "
 
 Assign nonzeros (mapping matrix) ";
 
-%feature("docstring")  CasADi::Evaluation::assign "
+%feature("docstring")  CasADi::EvaluationMX::assign "
 
 Assign nonzeros (mapping matrix), output indices sequential. ";
 
-%feature("docstring")  CasADi::Evaluation::isOperation "
+%feature("docstring")  CasADi::EvaluationMX::isOperation "
 
 Is it a certain operation. ";
 
-%feature("docstring")  CasADi::Evaluation::numel "
+%feature("docstring")  CasADi::EvaluationMX::numel "
 
 Number of elements. ";
 
-%feature("docstring")  CasADi::Evaluation::size "
+%feature("docstring")  CasADi::EvaluationMX::size "
 
 Get size. ";
 
-%feature("docstring")  CasADi::Evaluation::size1 "
+%feature("docstring")  CasADi::EvaluationMX::size1 "
 
 Get size. ";
 
-%feature("docstring")  CasADi::Evaluation::size2 "
+%feature("docstring")  CasADi::EvaluationMX::size2 "
 
 Get size. ";
 
-%feature("docstring")  CasADi::Evaluation::regRef "
+%feature("docstring")  CasADi::EvaluationMX::regRef "
 
 Register a weak reference. ";
 
-%feature("docstring")  CasADi::Evaluation::unregRef "
+%feature("docstring")  CasADi::EvaluationMX::unregRef "
 
 Unregister a weak reference. ";
 
-%feature("docstring")  CasADi::Evaluation::getCount "
+%feature("docstring")  CasADi::EvaluationMX::getCount "
 
 Get the reference count. ";
 
-%feature("docstring")  CasADi::Evaluation::init "
+%feature("docstring")  CasADi::EvaluationMX::init "
 
 Initialize the object. ";
 
-%feature("docstring")  CasADi::Evaluation::isInit "
+%feature("docstring")  CasADi::EvaluationMX::isInit "
 
 Check if the object has been initialized. ";
 
-%feature("docstring")  CasADi::Evaluation::assertInit "
+%feature("docstring")  CasADi::EvaluationMX::assertInit "
 
 Assert that the object has been initialized. ";
+
+
+// File: classCasADi_1_1EvaluationSX.xml
+%feature("docstring") CasADi::EvaluationSX "
+
+Represents a function call.
+
+Joel Andersson
+
+C++ includes: evaluation_sx.hpp ";
+
+%feature("docstring")  CasADi::EvaluationSX::isConstant "
+
+check properties of a node ";
+
+%feature("docstring")  CasADi::EvaluationSX::isInteger "";
+
+%feature("docstring")  CasADi::EvaluationSX::isSymbolic "";
+
+%feature("docstring")  CasADi::EvaluationSX::isZero "";
+
+%feature("docstring")  CasADi::EvaluationSX::isOne "";
+
+%feature("docstring")  CasADi::EvaluationSX::isMinusOne "";
+
+%feature("docstring")  CasADi::EvaluationSX::isNan "";
+
+%feature("docstring")  CasADi::EvaluationSX::isInf "";
+
+%feature("docstring")  CasADi::EvaluationSX::isMinusInf "";
+
+%feature("docstring")  CasADi::EvaluationSX::getValue "
+
+Get value of a constant node. ";
+
+%feature("docstring")  CasADi::EvaluationSX::getIntValue "";
+
+%feature("docstring")  CasADi::EvaluationSX::~EvaluationSX "
+
+Destructor This might need fixing to avoid stack overflow due to recursive
+calling. ";
+
+%feature("docstring")  CasADi::EvaluationSX::isSmooth "
+
+Check if smooth. ";
+
+%feature("docstring")  CasADi::EvaluationSX::hasDep "";
+
+%feature("docstring")  CasADi::EvaluationSX::ndep "
+
+Number of dependencies. ";
+
+%feature("docstring")  CasADi::EvaluationSX::dep "
+
+get the reference of a dependency ";
+
+%feature("docstring")  CasADi::EvaluationSX::dep "
+
+get the reference of a child ";
+
+%feature("docstring")  CasADi::EvaluationSX::getOp "
+
+Get the operation. ";
+
+%feature("docstring")  CasADi::EvaluationSX::print "
+
+Print the expression (recursively with a maximum number of levels) ";
+
+%feature("docstring")  CasADi::EvaluationSX::getName "";
+
+%feature("docstring")  CasADi::EvaluationSX::isEqual "
+
+comparison ";
+
+%feature("docstring")  CasADi::EvaluationSX::isEqual "
+
+comparison ";
+
+%feature("docstring")  CasADi::EvaluationSX::init "
+
+Initialize the node (currently used only to give a similar interface to
+MXNode) ";
+
+%feature("docstring")  CasADi::EvaluationSX::print "
+
+print ";
 
 
 // File: classCasADi_1_1ExternalFunction.xml
@@ -14590,6 +15032,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::ExternalFunction::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::ExternalFunction::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::ExternalFunction::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -14639,7 +15091,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::ExternalFunction::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::ExternalFunction::call "
 
@@ -14650,6 +15102,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::ExternalFunction::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::ExternalFunction::eval "
 
@@ -16008,6 +16464,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::FX::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::FX::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::FX::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -16057,7 +16523,11 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::FX::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
+
+%feature("docstring")  CasADi::FX::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::FX::call "
 
@@ -17920,6 +18390,18 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::Sundials::IdasIntegrator::getNumScalarInputs
+"
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::Sundials::IdasIntegrator::getNumScalarOutputs
+"
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -17969,7 +18451,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::call "
 
@@ -17980,6 +18462,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::Sundials::IdasIntegrator::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::eval "
 
@@ -19690,6 +20176,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::ImplicitFunction::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::ImplicitFunction::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::ImplicitFunction::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -19739,7 +20235,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::ImplicitFunction::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::ImplicitFunction::call "
 
@@ -19750,6 +20246,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::ImplicitFunction::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::ImplicitFunction::eval "
 
@@ -20547,168 +21047,168 @@ A set of indices. ";
 Get a vector of indices. ";
 
 
-// File: classCasADi_1_1InfSXNode.xml
-%feature("docstring") CasADi::InfSXNode "
+// File: classCasADi_1_1InfSX.xml
+%feature("docstring") CasADi::InfSX "
 
 Represents an infinity SX.
 
 Joel Andersson
 
-C++ includes: constant_sx_node.hpp ";
+C++ includes: constant_sx.hpp ";
 
-%feature("docstring")  CasADi::InfSXNode::isInteger "";
+%feature("docstring")  CasADi::InfSX::isInteger "";
 
-%feature("docstring")  CasADi::InfSXNode::isSymbolic "";
+%feature("docstring")  CasADi::InfSX::isSymbolic "";
 
-%feature("docstring")  CasADi::InfSXNode::hasDep "";
+%feature("docstring")  CasADi::InfSX::hasDep "";
 
-%feature("docstring")  CasADi::InfSXNode::isZero "";
+%feature("docstring")  CasADi::InfSX::isZero "";
 
-%feature("docstring")  CasADi::InfSXNode::isOne "";
+%feature("docstring")  CasADi::InfSX::isOne "";
 
-%feature("docstring")  CasADi::InfSXNode::isMinusOne "";
+%feature("docstring")  CasADi::InfSX::isMinusOne "";
 
-%feature("docstring")  CasADi::InfSXNode::isNan "";
+%feature("docstring")  CasADi::InfSX::isNan "";
 
-%feature("docstring")  CasADi::InfSXNode::isMinusInf "";
+%feature("docstring")  CasADi::InfSX::isMinusInf "";
 
-%feature("docstring")  CasADi::InfSXNode::getIntValue "";
+%feature("docstring")  CasADi::InfSX::getIntValue "";
 
-%feature("docstring")  CasADi::InfSXNode::InfSXNode "";
+%feature("docstring")  CasADi::InfSX::InfSX "";
 
-%feature("docstring")  CasADi::InfSXNode::~InfSXNode "";
+%feature("docstring")  CasADi::InfSX::~InfSX "";
 
-%feature("docstring")  CasADi::InfSXNode::getValue "
+%feature("docstring")  CasADi::InfSX::getValue "
 
 Get the value. ";
 
-%feature("docstring")  CasADi::InfSXNode::isInf "
+%feature("docstring")  CasADi::InfSX::isInf "
 
 Properties. ";
 
-%feature("docstring")  CasADi::InfSXNode::isConstant "
+%feature("docstring")  CasADi::InfSX::isConstant "
 
 Properties. ";
 
-%feature("docstring")  CasADi::InfSXNode::print "
+%feature("docstring")  CasADi::InfSX::getOp "
+
+Get the operation. ";
+
+%feature("docstring")  CasADi::InfSX::print "
 
 print ";
 
-%feature("docstring")  CasADi::InfSXNode::getName "";
+%feature("docstring")  CasADi::InfSX::getName "";
 
-%feature("docstring")  CasADi::InfSXNode::getOp "
-
-get the operation only for binary nodes ";
-
-%feature("docstring")  CasADi::InfSXNode::isEqual "
+%feature("docstring")  CasADi::InfSX::isEqual "
 
 comparison ";
 
-%feature("docstring")  CasADi::InfSXNode::isEqual "
+%feature("docstring")  CasADi::InfSX::isEqual "
 
 comparison ";
 
-%feature("docstring")  CasADi::InfSXNode::ndep "
+%feature("docstring")  CasADi::InfSX::ndep "
 
 Number of dependencies. ";
 
-%feature("docstring")  CasADi::InfSXNode::dep "
+%feature("docstring")  CasADi::InfSX::dep "
 
 get the reference of a child ";
 
-%feature("docstring")  CasADi::InfSXNode::dep "
+%feature("docstring")  CasADi::InfSX::dep "
 
 get the reference of a child ";
 
-%feature("docstring")  CasADi::InfSXNode::init "
+%feature("docstring")  CasADi::InfSX::init "
 
 Initialize the node (currently used only to give a similar interface to
 MXNode) ";
 
-%feature("docstring")  CasADi::InfSXNode::isSmooth "
+%feature("docstring")  CasADi::InfSX::isSmooth "
 
 Check if smooth. ";
 
 
-// File: classCasADi_1_1IntegerSXNode.xml
-%feature("docstring") CasADi::IntegerSXNode "
+// File: classCasADi_1_1IntegerSX.xml
+%feature("docstring") CasADi::IntegerSX "
 
 Represents a constant integer SX.
 
 Joel Andersson
 
-C++ includes: constant_sx_node.hpp ";
+C++ includes: constant_sx.hpp ";
 
-%feature("docstring")  CasADi::IntegerSXNode::getValue "
+%feature("docstring")  CasADi::IntegerSX::getValue "
 
 evaluate function ";
 
-%feature("docstring")  CasADi::IntegerSXNode::getIntValue "";
+%feature("docstring")  CasADi::IntegerSX::getIntValue "";
 
-%feature("docstring")  CasADi::IntegerSXNode::isSymbolic "";
+%feature("docstring")  CasADi::IntegerSX::isSymbolic "";
 
-%feature("docstring")  CasADi::IntegerSXNode::hasDep "";
+%feature("docstring")  CasADi::IntegerSX::hasDep "";
 
-%feature("docstring")  CasADi::IntegerSXNode::isZero "";
+%feature("docstring")  CasADi::IntegerSX::isZero "";
 
-%feature("docstring")  CasADi::IntegerSXNode::isOne "";
+%feature("docstring")  CasADi::IntegerSX::isOne "";
 
-%feature("docstring")  CasADi::IntegerSXNode::isMinusOne "";
+%feature("docstring")  CasADi::IntegerSX::isMinusOne "";
 
-%feature("docstring")  CasADi::IntegerSXNode::isNan "";
+%feature("docstring")  CasADi::IntegerSX::isNan "";
 
-%feature("docstring")  CasADi::IntegerSXNode::isInf "";
+%feature("docstring")  CasADi::IntegerSX::isInf "";
 
-%feature("docstring")  CasADi::IntegerSXNode::isMinusInf "";
+%feature("docstring")  CasADi::IntegerSX::isMinusInf "";
 
-%feature("docstring")  CasADi::IntegerSXNode::~IntegerSXNode "
+%feature("docstring")  CasADi::IntegerSX::~IntegerSX "
 
 Destructor. ";
 
-%feature("docstring")  CasADi::IntegerSXNode::isInteger "
+%feature("docstring")  CasADi::IntegerSX::isInteger "
 
 Properties. ";
 
-%feature("docstring")  CasADi::IntegerSXNode::isConstant "
+%feature("docstring")  CasADi::IntegerSX::isConstant "
 
 Properties. ";
 
-%feature("docstring")  CasADi::IntegerSXNode::print "
+%feature("docstring")  CasADi::IntegerSX::getOp "
+
+Get the operation. ";
+
+%feature("docstring")  CasADi::IntegerSX::print "
 
 print ";
 
-%feature("docstring")  CasADi::IntegerSXNode::getName "";
+%feature("docstring")  CasADi::IntegerSX::getName "";
 
-%feature("docstring")  CasADi::IntegerSXNode::getOp "
-
-get the operation only for binary nodes ";
-
-%feature("docstring")  CasADi::IntegerSXNode::isEqual "
+%feature("docstring")  CasADi::IntegerSX::isEqual "
 
 comparison ";
 
-%feature("docstring")  CasADi::IntegerSXNode::isEqual "
+%feature("docstring")  CasADi::IntegerSX::isEqual "
 
 comparison ";
 
-%feature("docstring")  CasADi::IntegerSXNode::ndep "
+%feature("docstring")  CasADi::IntegerSX::ndep "
 
 Number of dependencies. ";
 
-%feature("docstring")  CasADi::IntegerSXNode::dep "
+%feature("docstring")  CasADi::IntegerSX::dep "
 
 get the reference of a child ";
 
-%feature("docstring")  CasADi::IntegerSXNode::dep "
+%feature("docstring")  CasADi::IntegerSX::dep "
 
 get the reference of a child ";
 
-%feature("docstring")  CasADi::IntegerSXNode::init "
+%feature("docstring")  CasADi::IntegerSX::init "
 
 Initialize the node (currently used only to give a similar interface to
 MXNode) ";
 
-%feature("docstring")  CasADi::IntegerSXNode::isSmooth "
+%feature("docstring")  CasADi::IntegerSX::isSmooth "
 
 Check if smooth. ";
 
@@ -21086,6 +21586,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::Integrator::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::Integrator::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::Integrator::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -21135,7 +21645,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Integrator::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::Integrator::call "
 
@@ -21146,6 +21656,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::Integrator::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::Integrator::eval "
 
@@ -23052,6 +23566,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::IPMethod::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::IPMethod::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::IPMethod::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -23101,7 +23625,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::IPMethod::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::IPMethod::call "
 
@@ -23112,6 +23636,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::IPMethod::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::IPMethod::eval "
 
@@ -28422,6 +28950,18 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::Interfaces::IpoptQPSolver::getNumScalarInputs
+"
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")
+CasADi::Interfaces::IpoptQPSolver::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -28471,7 +29011,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::call "
 
@@ -28482,6 +29022,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPSolver::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::eval "
 
@@ -31835,6 +32379,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::IpoptSolver::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::IpoptSolver::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::IpoptSolver::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -31884,7 +32438,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::IpoptSolver::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::IpoptSolver::call "
 
@@ -31895,6 +32449,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::IpoptSolver::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::IpoptSolver::eval "
 
@@ -32515,6 +33073,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::Jacobian::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::Jacobian::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::Jacobian::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -32564,7 +33132,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Jacobian::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::Jacobian::call "
 
@@ -32575,6 +33143,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::Jacobian::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::Jacobian::eval "
 
@@ -34513,6 +35085,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::Sundials::KinsolSolver::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::Sundials::KinsolSolver::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::Sundials::KinsolSolver::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -34562,7 +35144,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Sundials::KinsolSolver::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::Sundials::KinsolSolver::call "
 
@@ -34573,6 +35155,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::Sundials::KinsolSolver::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolSolver::eval "
 
@@ -36257,6 +36843,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::KnitroSolver::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::KnitroSolver::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::KnitroSolver::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -36306,7 +36902,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::KnitroSolver::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::KnitroSolver::call "
 
@@ -36317,6 +36913,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::KnitroSolver::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::KnitroSolver::eval "
 
@@ -36931,6 +37531,18 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::Interfaces::LapackLUDense::getNumScalarInputs
+"
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackLUDense::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -36976,7 +37588,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::call "
 
@@ -36987,6 +37599,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackLUDense::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::eval "
 
@@ -38127,6 +38743,18 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::Interfaces::LapackQRDense::getNumScalarInputs
+"
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackQRDense::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -38172,7 +38800,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::call "
 
@@ -38183,6 +38811,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackQRDense::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::eval "
 
@@ -39521,6 +40153,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::LiftedSQP::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::LiftedSQP::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::LiftedSQP::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -39570,7 +40212,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::LiftedSQP::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::LiftedSQP::call "
 
@@ -39581,6 +40223,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::LiftedSQP::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::LiftedSQP::eval "
 
@@ -41651,6 +42297,18 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::Interfaces::LiftoptSolver::getNumScalarInputs
+"
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")
+CasADi::Interfaces::LiftoptSolver::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -41700,7 +42358,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::call "
 
@@ -41711,6 +42369,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptSolver::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::eval "
 
@@ -42293,6 +42955,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::LinearSolver::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::LinearSolver::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::LinearSolver::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -42338,7 +43010,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::LinearSolver::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::LinearSolver::call "
 
@@ -42349,6 +43021,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::LinearSolver::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::LinearSolver::eval "
 
@@ -43997,168 +44673,168 @@ Return a string with a representation (for SWIG) ";
 Return a string with a destription (for SWIG) ";
 
 
-// File: classCasADi_1_1MinusInfSXNode.xml
-%feature("docstring") CasADi::MinusInfSXNode "
+// File: classCasADi_1_1MinusInfSX.xml
+%feature("docstring") CasADi::MinusInfSX "
 
 Represents a minus infinity SX.
 
 Joel Andersson
 
-C++ includes: constant_sx_node.hpp ";
+C++ includes: constant_sx.hpp ";
 
-%feature("docstring")  CasADi::MinusInfSXNode::isInteger "";
+%feature("docstring")  CasADi::MinusInfSX::isInteger "";
 
-%feature("docstring")  CasADi::MinusInfSXNode::isSymbolic "";
+%feature("docstring")  CasADi::MinusInfSX::isSymbolic "";
 
-%feature("docstring")  CasADi::MinusInfSXNode::hasDep "";
+%feature("docstring")  CasADi::MinusInfSX::hasDep "";
 
-%feature("docstring")  CasADi::MinusInfSXNode::isZero "";
+%feature("docstring")  CasADi::MinusInfSX::isZero "";
 
-%feature("docstring")  CasADi::MinusInfSXNode::isOne "";
+%feature("docstring")  CasADi::MinusInfSX::isOne "";
 
-%feature("docstring")  CasADi::MinusInfSXNode::isMinusOne "";
+%feature("docstring")  CasADi::MinusInfSX::isMinusOne "";
 
-%feature("docstring")  CasADi::MinusInfSXNode::isNan "";
+%feature("docstring")  CasADi::MinusInfSX::isNan "";
 
-%feature("docstring")  CasADi::MinusInfSXNode::isInf "";
+%feature("docstring")  CasADi::MinusInfSX::isInf "";
 
-%feature("docstring")  CasADi::MinusInfSXNode::getIntValue "";
+%feature("docstring")  CasADi::MinusInfSX::getIntValue "";
 
-%feature("docstring")  CasADi::MinusInfSXNode::MinusInfSXNode "";
+%feature("docstring")  CasADi::MinusInfSX::MinusInfSX "";
 
-%feature("docstring")  CasADi::MinusInfSXNode::~MinusInfSXNode "";
+%feature("docstring")  CasADi::MinusInfSX::~MinusInfSX "";
 
-%feature("docstring")  CasADi::MinusInfSXNode::getValue "
+%feature("docstring")  CasADi::MinusInfSX::getValue "
 
 Get the value. ";
 
-%feature("docstring")  CasADi::MinusInfSXNode::isMinusInf "
+%feature("docstring")  CasADi::MinusInfSX::isMinusInf "
 
 Properties. ";
 
-%feature("docstring")  CasADi::MinusInfSXNode::isConstant "
+%feature("docstring")  CasADi::MinusInfSX::isConstant "
 
 Properties. ";
 
-%feature("docstring")  CasADi::MinusInfSXNode::print "
+%feature("docstring")  CasADi::MinusInfSX::getOp "
+
+Get the operation. ";
+
+%feature("docstring")  CasADi::MinusInfSX::print "
 
 print ";
 
-%feature("docstring")  CasADi::MinusInfSXNode::getName "";
+%feature("docstring")  CasADi::MinusInfSX::getName "";
 
-%feature("docstring")  CasADi::MinusInfSXNode::getOp "
-
-get the operation only for binary nodes ";
-
-%feature("docstring")  CasADi::MinusInfSXNode::isEqual "
+%feature("docstring")  CasADi::MinusInfSX::isEqual "
 
 comparison ";
 
-%feature("docstring")  CasADi::MinusInfSXNode::isEqual "
+%feature("docstring")  CasADi::MinusInfSX::isEqual "
 
 comparison ";
 
-%feature("docstring")  CasADi::MinusInfSXNode::ndep "
+%feature("docstring")  CasADi::MinusInfSX::ndep "
 
 Number of dependencies. ";
 
-%feature("docstring")  CasADi::MinusInfSXNode::dep "
+%feature("docstring")  CasADi::MinusInfSX::dep "
 
 get the reference of a child ";
 
-%feature("docstring")  CasADi::MinusInfSXNode::dep "
+%feature("docstring")  CasADi::MinusInfSX::dep "
 
 get the reference of a child ";
 
-%feature("docstring")  CasADi::MinusInfSXNode::init "
+%feature("docstring")  CasADi::MinusInfSX::init "
 
 Initialize the node (currently used only to give a similar interface to
 MXNode) ";
 
-%feature("docstring")  CasADi::MinusInfSXNode::isSmooth "
+%feature("docstring")  CasADi::MinusInfSX::isSmooth "
 
 Check if smooth. ";
 
 
-// File: classCasADi_1_1MinusOneSXNode.xml
-%feature("docstring") CasADi::MinusOneSXNode "
+// File: classCasADi_1_1MinusOneSX.xml
+%feature("docstring") CasADi::MinusOneSX "
 
 Represents a minus one SX.
 
 Joel Andersson
 
-C++ includes: constant_sx_node.hpp ";
+C++ includes: constant_sx.hpp ";
 
-%feature("docstring")  CasADi::MinusOneSXNode::getValue "
+%feature("docstring")  CasADi::MinusOneSX::getValue "
 
 Get the value. ";
 
-%feature("docstring")  CasADi::MinusOneSXNode::getIntValue "";
+%feature("docstring")  CasADi::MinusOneSX::getIntValue "";
 
-%feature("docstring")  CasADi::MinusOneSXNode::isInteger "
-
-Properties. ";
-
-%feature("docstring")  CasADi::MinusOneSXNode::isMinusOne "";
-
-%feature("docstring")  CasADi::MinusOneSXNode::isSymbolic "";
-
-%feature("docstring")  CasADi::MinusOneSXNode::hasDep "";
-
-%feature("docstring")  CasADi::MinusOneSXNode::isZero "";
-
-%feature("docstring")  CasADi::MinusOneSXNode::isOne "";
-
-%feature("docstring")  CasADi::MinusOneSXNode::isNan "";
-
-%feature("docstring")  CasADi::MinusOneSXNode::isInf "";
-
-%feature("docstring")  CasADi::MinusOneSXNode::isMinusInf "";
-
-%feature("docstring")  CasADi::MinusOneSXNode::MinusOneSXNode "";
-
-%feature("docstring")  CasADi::MinusOneSXNode::~MinusOneSXNode "";
-
-%feature("docstring")  CasADi::MinusOneSXNode::isConstant "
+%feature("docstring")  CasADi::MinusOneSX::isInteger "
 
 Properties. ";
 
-%feature("docstring")  CasADi::MinusOneSXNode::print "
+%feature("docstring")  CasADi::MinusOneSX::isMinusOne "";
+
+%feature("docstring")  CasADi::MinusOneSX::isSymbolic "";
+
+%feature("docstring")  CasADi::MinusOneSX::hasDep "";
+
+%feature("docstring")  CasADi::MinusOneSX::isZero "";
+
+%feature("docstring")  CasADi::MinusOneSX::isOne "";
+
+%feature("docstring")  CasADi::MinusOneSX::isNan "";
+
+%feature("docstring")  CasADi::MinusOneSX::isInf "";
+
+%feature("docstring")  CasADi::MinusOneSX::isMinusInf "";
+
+%feature("docstring")  CasADi::MinusOneSX::MinusOneSX "";
+
+%feature("docstring")  CasADi::MinusOneSX::~MinusOneSX "";
+
+%feature("docstring")  CasADi::MinusOneSX::isConstant "
+
+Properties. ";
+
+%feature("docstring")  CasADi::MinusOneSX::getOp "
+
+Get the operation. ";
+
+%feature("docstring")  CasADi::MinusOneSX::print "
 
 print ";
 
-%feature("docstring")  CasADi::MinusOneSXNode::getName "";
+%feature("docstring")  CasADi::MinusOneSX::getName "";
 
-%feature("docstring")  CasADi::MinusOneSXNode::getOp "
-
-get the operation only for binary nodes ";
-
-%feature("docstring")  CasADi::MinusOneSXNode::isEqual "
+%feature("docstring")  CasADi::MinusOneSX::isEqual "
 
 comparison ";
 
-%feature("docstring")  CasADi::MinusOneSXNode::isEqual "
+%feature("docstring")  CasADi::MinusOneSX::isEqual "
 
 comparison ";
 
-%feature("docstring")  CasADi::MinusOneSXNode::ndep "
+%feature("docstring")  CasADi::MinusOneSX::ndep "
 
 Number of dependencies. ";
 
-%feature("docstring")  CasADi::MinusOneSXNode::dep "
+%feature("docstring")  CasADi::MinusOneSX::dep "
 
 get the reference of a child ";
 
-%feature("docstring")  CasADi::MinusOneSXNode::dep "
+%feature("docstring")  CasADi::MinusOneSX::dep "
 
 get the reference of a child ";
 
-%feature("docstring")  CasADi::MinusOneSXNode::init "
+%feature("docstring")  CasADi::MinusOneSX::init "
 
 Initialize the node (currently used only to give a similar interface to
 MXNode) ";
 
-%feature("docstring")  CasADi::MinusOneSXNode::isSmooth "
+%feature("docstring")  CasADi::MinusOneSX::isSmooth "
 
 Check if smooth. ";
 
@@ -44929,6 +45605,18 @@ CasADi::OptimalControl::MultipleShooting::getNumOutputs "
 Get number of outputs. ";
 
 %feature("docstring")
+CasADi::OptimalControl::MultipleShooting::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShooting::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
+%feature("docstring")
 CasADi::OptimalControl::MultipleShooting::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -44981,7 +45669,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::OptimalControl::MultipleShooting::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::OptimalControl::MultipleShooting::call "
 
@@ -44992,6 +45680,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::OptimalControl::MultipleShooting::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::OptimalControl::MultipleShooting::eval "
 
@@ -47239,232 +47931,6 @@ An elemenent of the algorithm, namely an MX node.
 C++ includes: mx_function.hpp ";
 
 
-// File: classCasADi_1_1MXConstant.xml
-%feature("docstring") CasADi::MXConstant "
-
-Represents an MX that is only composed of a constant.
-
-Joel Andersson  A regular user is not supposed to work with this Node class.
-This user can call MX(double) directly, or even rely on implicit
-typecasting. See:  zeros , ones
-
-C++ includes: mx_constant.hpp ";
-
-%feature("docstring")  CasADi::MXConstant::MXConstant "
-
-Constructor. ";
-
-%feature("docstring")  CasADi::MXConstant::clone "
-
-Clone function. ";
-
-%feature("docstring")  CasADi::MXConstant::printPart "
-
-Print a part of the expression. ";
-
-%feature("docstring")  CasADi::MXConstant::evaluateD "
-
-Evaluate the function numerically. ";
-
-%feature("docstring")  CasADi::MXConstant::evaluateSX "
-
-Evaluate the function symbolically ( SX) ";
-
-%feature("docstring")  CasADi::MXConstant::evaluateMX "
-
-Evaluate the function symbolically ( MX) ";
-
-%feature("docstring")  CasADi::MXConstant::propagateSparsity "
-
-Propagate sparsity. ";
-
-%feature("docstring")  CasADi::MXConstant::isConstant "
-
-Indicate that the node is constant. ";
-
-%feature("docstring")  CasADi::MXConstant::eval "
-
-Symbolic evaluation (matrix graph) ";
-
-%feature("docstring")  CasADi::MXConstant::deepCopyMembers "
-
-Deep copy data members. ";
-
-%feature("docstring")  CasADi::MXConstant::repr "
-
-Print a representation. ";
-
-%feature("docstring")  CasADi::MXConstant::print "
-
-Print a description. ";
-
-%feature("docstring")  CasADi::MXConstant::print "
-
-Print expression (make sure number of calls is not exceeded) ";
-
-%feature("docstring")  CasADi::MXConstant::evaluateD "
-
-Evaluate the function, no derivatives. ";
-
-%feature("docstring")  CasADi::MXConstant::evaluateSX "
-
-Evaluate symbolically ( SX), no derivatives. ";
-
-%feature("docstring")  CasADi::MXConstant::evaluateMX "
-
-Evaluate symbolically ( MX), no derivatives. ";
-
-%feature("docstring")  CasADi::MXConstant::getName "
-
-Get the name. ";
-
-%feature("docstring")  CasADi::MXConstant::isSymbolic "
-
-Check if symbolic. ";
-
-%feature("docstring")  CasADi::MXConstant::isMapping "
-
-Check if mapping. ";
-
-%feature("docstring")  CasADi::MXConstant::isEvaluation "
-
-Check if evaluation. ";
-
-%feature("docstring")  CasADi::MXConstant::isOutputNode "
-
-Check if evaluation output. ";
-
-%feature("docstring")  CasADi::MXConstant::isMultipleOutput "
-
-Check if a multiple output node. ";
-
-%feature("docstring")  CasADi::MXConstant::isJacobian "
-
-Check if jacobian reference. ";
-
-%feature("docstring")  CasADi::MXConstant::isMultiplication "
-
-Check if matrix multiplication. ";
-
-%feature("docstring")  CasADi::MXConstant::getFunction "
-
-Get function reference. ";
-
-%feature("docstring")  CasADi::MXConstant::getFunctionInput "
-
-Get function input. ";
-
-%feature("docstring")  CasADi::MXConstant::getFunctionOutput "
-
-Get function output. ";
-
-%feature("docstring")  CasADi::MXConstant::dep "
-
-dependencies - functions that have to be evaluated before this one ";
-
-%feature("docstring")  CasADi::MXConstant::dep "";
-
-%feature("docstring")  CasADi::MXConstant::ndep "
-
-Number of dependencies. ";
-
-%feature("docstring")  CasADi::MXConstant::hasDep "
-
-Does the node depend on other nodes. ";
-
-%feature("docstring")  CasADi::MXConstant::getNumOutputs "
-
-Number of outputs. ";
-
-%feature("docstring")  CasADi::MXConstant::sparsity "
-
-Get the sparsity. ";
-
-%feature("docstring")  CasADi::MXConstant::sparsity "
-
-Get the sparsity of output oind. ";
-
-%feature("docstring")  CasADi::MXConstant::isNonLinear "
-
-Is the node nonlinear. ";
-
-%feature("docstring")  CasADi::MXConstant::setSparsity "
-
-Set the sparsity. ";
-
-%feature("docstring")  CasADi::MXConstant::setDependencies "
-
-Set unary dependency. ";
-
-%feature("docstring")  CasADi::MXConstant::setDependencies "
-
-Set binary dependencies. ";
-
-%feature("docstring")  CasADi::MXConstant::setDependencies "
-
-Set ternary dependencies. ";
-
-%feature("docstring")  CasADi::MXConstant::setDependencies "
-
-Set multiple dependencies. ";
-
-%feature("docstring")  CasADi::MXConstant::addDependency "
-
-Add a dependency. ";
-
-%feature("docstring")  CasADi::MXConstant::assign "
-
-Assign nonzeros (mapping matrix) ";
-
-%feature("docstring")  CasADi::MXConstant::assign "
-
-Assign nonzeros (mapping matrix), output indices sequential. ";
-
-%feature("docstring")  CasADi::MXConstant::isOperation "
-
-Is it a certain operation. ";
-
-%feature("docstring")  CasADi::MXConstant::numel "
-
-Number of elements. ";
-
-%feature("docstring")  CasADi::MXConstant::size "
-
-Get size. ";
-
-%feature("docstring")  CasADi::MXConstant::size1 "
-
-Get size. ";
-
-%feature("docstring")  CasADi::MXConstant::size2 "
-
-Get size. ";
-
-%feature("docstring")  CasADi::MXConstant::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::MXConstant::unregRef "
-
-Unregister a weak reference. ";
-
-%feature("docstring")  CasADi::MXConstant::getCount "
-
-Get the reference count. ";
-
-%feature("docstring")  CasADi::MXConstant::init "
-
-Initialize the object. ";
-
-%feature("docstring")  CasADi::MXConstant::isInit "
-
-Check if the object has been initialized. ";
-
-%feature("docstring")  CasADi::MXConstant::assertInit "
-
-Assert that the object has been initialized. ";
-
-
 // File: classCasADi_1_1MXFunction.xml
 %feature("docstring") CasADi::MXFunction "
 
@@ -47798,6 +48264,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::MXFunction::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::MXFunction::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::MXFunction::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -47847,7 +48323,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::MXFunction::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::MXFunction::call "
 
@@ -47858,6 +48334,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::MXFunction::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::MXFunction::eval "
 
@@ -48857,85 +49337,85 @@ A helper class to use stl::sort in OptionsFunctionalityNode::getBestMatches.
 ";
 
 
-// File: classCasADi_1_1NanSXNode.xml
-%feature("docstring") CasADi::NanSXNode "
+// File: classCasADi_1_1NanSX.xml
+%feature("docstring") CasADi::NanSX "
 
 Represents a not-a-number SX.
 
 Joel Andersson
 
-C++ includes: constant_sx_node.hpp ";
+C++ includes: constant_sx.hpp ";
 
-%feature("docstring")  CasADi::NanSXNode::isInteger "";
+%feature("docstring")  CasADi::NanSX::isInteger "";
 
-%feature("docstring")  CasADi::NanSXNode::isSymbolic "";
+%feature("docstring")  CasADi::NanSX::isSymbolic "";
 
-%feature("docstring")  CasADi::NanSXNode::hasDep "";
+%feature("docstring")  CasADi::NanSX::hasDep "";
 
-%feature("docstring")  CasADi::NanSXNode::isZero "";
+%feature("docstring")  CasADi::NanSX::isZero "";
 
-%feature("docstring")  CasADi::NanSXNode::isOne "";
+%feature("docstring")  CasADi::NanSX::isOne "";
 
-%feature("docstring")  CasADi::NanSXNode::isMinusOne "";
+%feature("docstring")  CasADi::NanSX::isMinusOne "";
 
-%feature("docstring")  CasADi::NanSXNode::isInf "";
+%feature("docstring")  CasADi::NanSX::isInf "";
 
-%feature("docstring")  CasADi::NanSXNode::isMinusInf "";
+%feature("docstring")  CasADi::NanSX::isMinusInf "";
 
-%feature("docstring")  CasADi::NanSXNode::getIntValue "";
+%feature("docstring")  CasADi::NanSX::getIntValue "";
 
-%feature("docstring")  CasADi::NanSXNode::NanSXNode "";
+%feature("docstring")  CasADi::NanSX::NanSX "";
 
-%feature("docstring")  CasADi::NanSXNode::~NanSXNode "";
+%feature("docstring")  CasADi::NanSX::~NanSX "";
 
-%feature("docstring")  CasADi::NanSXNode::getValue "
+%feature("docstring")  CasADi::NanSX::getValue "
 
 Get the value. ";
 
-%feature("docstring")  CasADi::NanSXNode::isNan "
+%feature("docstring")  CasADi::NanSX::isNan "
 
 Properties. ";
 
-%feature("docstring")  CasADi::NanSXNode::isConstant "
+%feature("docstring")  CasADi::NanSX::isConstant "
 
 Properties. ";
 
-%feature("docstring")  CasADi::NanSXNode::print "
+%feature("docstring")  CasADi::NanSX::getOp "
+
+Get the operation. ";
+
+%feature("docstring")  CasADi::NanSX::print "
 
 print ";
 
-%feature("docstring")  CasADi::NanSXNode::getName "";
+%feature("docstring")  CasADi::NanSX::getName "";
 
-%feature("docstring")  CasADi::NanSXNode::getOp "
-
-get the operation only for binary nodes ";
-
-%feature("docstring")  CasADi::NanSXNode::isEqual "
+%feature("docstring")  CasADi::NanSX::isEqual "
 
 comparison ";
 
-%feature("docstring")  CasADi::NanSXNode::isEqual "
+%feature("docstring")  CasADi::NanSX::isEqual "
 
 comparison ";
 
-%feature("docstring")  CasADi::NanSXNode::ndep "
+%feature("docstring")  CasADi::NanSX::ndep "
 
 Number of dependencies. ";
 
-%feature("docstring")  CasADi::NanSXNode::dep "
+%feature("docstring")  CasADi::NanSX::dep "
 
 get the reference of a child ";
 
-%feature("docstring")  CasADi::NanSXNode::dep "
+%feature("docstring")  CasADi::NanSX::dep "
 
 get the reference of a child ";
 
-%feature("docstring")  CasADi::NanSXNode::init "
+%feature("docstring")  CasADi::NanSX::init "
 
 Initialize the node (currently used only to give a similar interface to
 MXNode) ";
 
-%feature("docstring")  CasADi::NanSXNode::isSmooth "
+%feature("docstring")  CasADi::NanSX::isSmooth "
 
 Check if smooth. ";
 
@@ -49376,6 +49856,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::NLPSolver::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::NLPSolver::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::NLPSolver::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -49425,7 +49915,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::NLPSolver::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::NLPSolver::call "
 
@@ -49436,6 +49926,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::NLPSolver::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::NLPSolver::eval "
 
@@ -50354,7 +50848,7 @@ Constructor. ";
 
 A matrix-matrix binary operation with matching nonzeros.
 
-C++ includes: binary_op.hpp ";
+C++ includes: binary_mx.hpp ";
 
 %feature("docstring")  CasADi::NonzerosNonzerosOp::NonzerosNonzerosOp "
 
@@ -50581,7 +51075,7 @@ Assert that the object has been initialized. ";
 A matrix-scalar binary operation where one loops only over nonzeros of the
 matrix.
 
-C++ includes: binary_op.hpp ";
+C++ includes: binary_mx.hpp ";
 
 %feature("docstring")  CasADi::NonzerosScalarOp::NonzerosScalarOp "
 
@@ -52277,6 +52771,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::OCPSolver::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::OCPSolver::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::OCPSolver::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -52326,7 +52830,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::OCPSolver::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::OCPSolver::call "
 
@@ -52337,6 +52841,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::OCPSolver::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::OCPSolver::eval "
 
@@ -53181,85 +53689,85 @@ Check if the object has been initialized. ";
 Assert that the object has been initialized. ";
 
 
-// File: classCasADi_1_1OneSXNode.xml
-%feature("docstring") CasADi::OneSXNode "
+// File: classCasADi_1_1OneSX.xml
+%feature("docstring") CasADi::OneSX "
 
 Represents a one SX.
 
 Joel Andersson
 
-C++ includes: constant_sx_node.hpp ";
+C++ includes: constant_sx.hpp ";
 
-%feature("docstring")  CasADi::OneSXNode::isSymbolic "";
+%feature("docstring")  CasADi::OneSX::isSymbolic "";
 
-%feature("docstring")  CasADi::OneSXNode::hasDep "";
+%feature("docstring")  CasADi::OneSX::hasDep "";
 
-%feature("docstring")  CasADi::OneSXNode::isZero "";
+%feature("docstring")  CasADi::OneSX::isZero "";
 
-%feature("docstring")  CasADi::OneSXNode::isMinusOne "";
+%feature("docstring")  CasADi::OneSX::isMinusOne "";
 
-%feature("docstring")  CasADi::OneSXNode::isNan "";
+%feature("docstring")  CasADi::OneSX::isNan "";
 
-%feature("docstring")  CasADi::OneSXNode::isInf "";
+%feature("docstring")  CasADi::OneSX::isInf "";
 
-%feature("docstring")  CasADi::OneSXNode::isMinusInf "";
+%feature("docstring")  CasADi::OneSX::isMinusInf "";
 
-%feature("docstring")  CasADi::OneSXNode::OneSXNode "";
+%feature("docstring")  CasADi::OneSX::OneSX "";
 
-%feature("docstring")  CasADi::OneSXNode::~OneSXNode "";
+%feature("docstring")  CasADi::OneSX::~OneSX "";
 
-%feature("docstring")  CasADi::OneSXNode::getValue "
+%feature("docstring")  CasADi::OneSX::getValue "
 
 Get the value. ";
 
-%feature("docstring")  CasADi::OneSXNode::getIntValue "";
+%feature("docstring")  CasADi::OneSX::getIntValue "";
 
-%feature("docstring")  CasADi::OneSXNode::isInteger "
-
-Properties. ";
-
-%feature("docstring")  CasADi::OneSXNode::isOne "";
-
-%feature("docstring")  CasADi::OneSXNode::isConstant "
+%feature("docstring")  CasADi::OneSX::isInteger "
 
 Properties. ";
 
-%feature("docstring")  CasADi::OneSXNode::print "
+%feature("docstring")  CasADi::OneSX::isOne "";
+
+%feature("docstring")  CasADi::OneSX::isConstant "
+
+Properties. ";
+
+%feature("docstring")  CasADi::OneSX::getOp "
+
+Get the operation. ";
+
+%feature("docstring")  CasADi::OneSX::print "
 
 print ";
 
-%feature("docstring")  CasADi::OneSXNode::getName "";
+%feature("docstring")  CasADi::OneSX::getName "";
 
-%feature("docstring")  CasADi::OneSXNode::getOp "
-
-get the operation only for binary nodes ";
-
-%feature("docstring")  CasADi::OneSXNode::isEqual "
+%feature("docstring")  CasADi::OneSX::isEqual "
 
 comparison ";
 
-%feature("docstring")  CasADi::OneSXNode::isEqual "
+%feature("docstring")  CasADi::OneSX::isEqual "
 
 comparison ";
 
-%feature("docstring")  CasADi::OneSXNode::ndep "
+%feature("docstring")  CasADi::OneSX::ndep "
 
 Number of dependencies. ";
 
-%feature("docstring")  CasADi::OneSXNode::dep "
+%feature("docstring")  CasADi::OneSX::dep "
 
 get the reference of a child ";
 
-%feature("docstring")  CasADi::OneSXNode::dep "
+%feature("docstring")  CasADi::OneSX::dep "
 
 get the reference of a child ";
 
-%feature("docstring")  CasADi::OneSXNode::init "
+%feature("docstring")  CasADi::OneSX::init "
 
 Initialize the node (currently used only to give a similar interface to
 MXNode) ";
 
-%feature("docstring")  CasADi::OneSXNode::isSmooth "
+%feature("docstring")  CasADi::OneSX::isSmooth "
 
 Check if smooth. ";
 
@@ -54177,6 +54685,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::Interfaces::OOQPSolver::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPSolver::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -54226,7 +54744,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::call "
 
@@ -54237,6 +54755,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPSolver::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::eval "
 
@@ -55060,6 +55582,92 @@ Input nonzero and dependency index.
 C++ includes: mapping.hpp ";
 
 
+// File: classCasADi_1_1OutputSX.xml
+%feature("docstring") CasADi::OutputSX "
+
+Represents an auxillary output of a function.
+
+Joel Andersson
+
+C++ includes: output_sx.hpp ";
+
+%feature("docstring")  CasADi::OutputSX::isConstant "
+
+check properties of a node ";
+
+%feature("docstring")  CasADi::OutputSX::isInteger "";
+
+%feature("docstring")  CasADi::OutputSX::isSymbolic "";
+
+%feature("docstring")  CasADi::OutputSX::isZero "";
+
+%feature("docstring")  CasADi::OutputSX::isOne "";
+
+%feature("docstring")  CasADi::OutputSX::isMinusOne "";
+
+%feature("docstring")  CasADi::OutputSX::isNan "";
+
+%feature("docstring")  CasADi::OutputSX::isInf "";
+
+%feature("docstring")  CasADi::OutputSX::isMinusInf "";
+
+%feature("docstring")  CasADi::OutputSX::getValue "
+
+Get value of a constant node. ";
+
+%feature("docstring")  CasADi::OutputSX::getIntValue "";
+
+%feature("docstring")  CasADi::OutputSX::~OutputSX "
+
+Destructor This might need fixing to avoid stack overflow due to recursive
+calling. ";
+
+%feature("docstring")  CasADi::OutputSX::isSmooth "
+
+Check if smooth. ";
+
+%feature("docstring")  CasADi::OutputSX::hasDep "";
+
+%feature("docstring")  CasADi::OutputSX::ndep "
+
+Number of dependencies. ";
+
+%feature("docstring")  CasADi::OutputSX::dep "
+
+get the reference of a dependency ";
+
+%feature("docstring")  CasADi::OutputSX::dep "
+
+get the reference of a child ";
+
+%feature("docstring")  CasADi::OutputSX::getOp "
+
+Get the operation. ";
+
+%feature("docstring")  CasADi::OutputSX::print "
+
+Print the expression (recursively with a maximum number of levels) ";
+
+%feature("docstring")  CasADi::OutputSX::getName "";
+
+%feature("docstring")  CasADi::OutputSX::isEqual "
+
+comparison ";
+
+%feature("docstring")  CasADi::OutputSX::isEqual "
+
+comparison ";
+
+%feature("docstring")  CasADi::OutputSX::init "
+
+Initialize the node (currently used only to give a similar interface to
+MXNode) ";
+
+%feature("docstring")  CasADi::OutputSX::print "
+
+print ";
+
+
 // File: classCasADi_1_1Parallelizer.xml
 %feature("docstring") CasADi::Parallelizer "
 
@@ -55360,6 +55968,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::Parallelizer::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::Parallelizer::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::Parallelizer::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -55409,7 +56027,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Parallelizer::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::Parallelizer::call "
 
@@ -55420,6 +56038,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::Parallelizer::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::Parallelizer::eval "
 
@@ -57157,6 +57779,18 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::Interfaces::QPOasesSolver::getNumScalarInputs
+"
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")
+CasADi::Interfaces::QPOasesSolver::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -57206,7 +57840,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::call "
 
@@ -57217,6 +57851,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesSolver::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::eval "
 
@@ -57833,6 +58471,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::QPSolver::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::QPSolver::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::QPSolver::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -57882,7 +58530,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::QPSolver::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::QPSolver::call "
 
@@ -57893,6 +58541,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::QPSolver::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::QPSolver::eval "
 
@@ -58688,83 +59340,83 @@ Check if the object has been initialized. ";
 Assert that the object has been initialized. ";
 
 
-// File: classCasADi_1_1RealtypeSXNode.xml
-%feature("docstring") CasADi::RealtypeSXNode "
+// File: classCasADi_1_1RealtypeSX.xml
+%feature("docstring") CasADi::RealtypeSX "
 
 DERIVED CLASSES.
 
 Represents a constant real SX Joel Andersson
 
-C++ includes: constant_sx_node.hpp ";
+C++ includes: constant_sx.hpp ";
 
-%feature("docstring")  CasADi::RealtypeSXNode::getValue "
+%feature("docstring")  CasADi::RealtypeSX::getValue "
 
 Get the value. ";
 
-%feature("docstring")  CasADi::RealtypeSXNode::getIntValue "";
+%feature("docstring")  CasADi::RealtypeSX::getIntValue "";
 
-%feature("docstring")  CasADi::RealtypeSXNode::isInteger "";
+%feature("docstring")  CasADi::RealtypeSX::isInteger "";
 
-%feature("docstring")  CasADi::RealtypeSXNode::isSymbolic "";
+%feature("docstring")  CasADi::RealtypeSX::isSymbolic "";
 
-%feature("docstring")  CasADi::RealtypeSXNode::hasDep "";
+%feature("docstring")  CasADi::RealtypeSX::hasDep "";
 
-%feature("docstring")  CasADi::RealtypeSXNode::isZero "";
+%feature("docstring")  CasADi::RealtypeSX::isZero "";
 
-%feature("docstring")  CasADi::RealtypeSXNode::isOne "";
+%feature("docstring")  CasADi::RealtypeSX::isOne "";
 
-%feature("docstring")  CasADi::RealtypeSXNode::isMinusOne "";
+%feature("docstring")  CasADi::RealtypeSX::isMinusOne "";
 
-%feature("docstring")  CasADi::RealtypeSXNode::isNan "";
+%feature("docstring")  CasADi::RealtypeSX::isNan "";
 
-%feature("docstring")  CasADi::RealtypeSXNode::isInf "";
+%feature("docstring")  CasADi::RealtypeSX::isInf "";
 
-%feature("docstring")  CasADi::RealtypeSXNode::isMinusInf "";
+%feature("docstring")  CasADi::RealtypeSX::isMinusInf "";
 
-%feature("docstring")  CasADi::RealtypeSXNode::~RealtypeSXNode "
+%feature("docstring")  CasADi::RealtypeSX::~RealtypeSX "
 
 Destructor. ";
 
-%feature("docstring")  CasADi::RealtypeSXNode::isConstant "
+%feature("docstring")  CasADi::RealtypeSX::isConstant "
 
 Properties. ";
 
-%feature("docstring")  CasADi::RealtypeSXNode::print "
+%feature("docstring")  CasADi::RealtypeSX::getOp "
+
+Get the operation. ";
+
+%feature("docstring")  CasADi::RealtypeSX::print "
 
 print ";
 
-%feature("docstring")  CasADi::RealtypeSXNode::getName "";
+%feature("docstring")  CasADi::RealtypeSX::getName "";
 
-%feature("docstring")  CasADi::RealtypeSXNode::getOp "
-
-get the operation only for binary nodes ";
-
-%feature("docstring")  CasADi::RealtypeSXNode::isEqual "
+%feature("docstring")  CasADi::RealtypeSX::isEqual "
 
 comparison ";
 
-%feature("docstring")  CasADi::RealtypeSXNode::isEqual "
+%feature("docstring")  CasADi::RealtypeSX::isEqual "
 
 comparison ";
 
-%feature("docstring")  CasADi::RealtypeSXNode::ndep "
+%feature("docstring")  CasADi::RealtypeSX::ndep "
 
 Number of dependencies. ";
 
-%feature("docstring")  CasADi::RealtypeSXNode::dep "
+%feature("docstring")  CasADi::RealtypeSX::dep "
 
 get the reference of a child ";
 
-%feature("docstring")  CasADi::RealtypeSXNode::dep "
+%feature("docstring")  CasADi::RealtypeSX::dep "
 
 get the reference of a child ";
 
-%feature("docstring")  CasADi::RealtypeSXNode::init "
+%feature("docstring")  CasADi::RealtypeSX::init "
 
 Initialize the node (currently used only to give a similar interface to
 MXNode) ";
 
-%feature("docstring")  CasADi::RealtypeSXNode::isSmooth "
+%feature("docstring")  CasADi::RealtypeSX::isSmooth "
 
 Check if smooth. ";
 
@@ -59176,6 +59828,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::RKIntegrator::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::RKIntegrator::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::RKIntegrator::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -59225,7 +59887,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::RKIntegrator::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::RKIntegrator::call "
 
@@ -59236,6 +59898,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::RKIntegrator::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::RKIntegrator::eval "
 
@@ -60094,7 +60760,7 @@ Assert that the object has been initialized. ";
 A scalar-matrix binary operation where one loops only over nonzeros of the
 matrix.
 
-C++ includes: binary_op.hpp ";
+C++ includes: binary_mx.hpp ";
 
 %feature("docstring")  CasADi::ScalarNonzerosOp::ScalarNonzerosOp "
 
@@ -60840,6 +61506,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::Simulator::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::Simulator::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::Simulator::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -60889,7 +61565,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Simulator::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::Simulator::call "
 
@@ -60900,6 +61576,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::Simulator::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::Simulator::eval "
 
@@ -61737,7 +62417,7 @@ casadi_calculus.hpp ";
 
 A sparse matrix-matrix binary operation.
 
-C++ includes: binary_op.hpp ";
+C++ includes: binary_mx.hpp ";
 
 %feature("docstring")  CasADi::SparseSparseOp::SparseSparseOp "
 
@@ -63202,6 +63882,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::SQPMethod::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::SQPMethod::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::SQPMethod::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -63251,7 +63941,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::SQPMethod::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::SQPMethod::call "
 
@@ -63262,6 +63952,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::SQPMethod::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::SQPMethod::eval "
 
@@ -64143,6 +64837,18 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")
+CasADi::Sundials::SundialsIntegrator::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")
+CasADi::Sundials::SundialsIntegrator::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::Sundials::SundialsIntegrator::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -64192,7 +64898,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::Sundials::SundialsIntegrator::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::Sundials::SundialsIntegrator::call "
 
@@ -64203,6 +64909,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::Sundials::SundialsIntegrator::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::Sundials::SundialsIntegrator::eval "
 
@@ -65631,6 +66341,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::SuperLU::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::SuperLU::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::SuperLU::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -65676,7 +66396,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::SuperLU::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::SuperLU::call "
 
@@ -65687,6 +66407,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::SuperLU::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::SuperLU::eval "
 
@@ -66579,7 +67303,7 @@ An SX qualifies as leaf when it has no dependencies. ";
 
 %feature("docstring")  CasADi::SX::isSymbolic "";
 
-%feature("docstring")  CasADi::SX::isBinary "";
+%feature("docstring")  CasADi::SX::hasDep "";
 
 %feature("docstring")  CasADi::SX::isCommutative "
 
@@ -67162,6 +67886,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::SXFunction::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::SXFunction::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::SXFunction::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -67198,7 +67932,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::SXFunction::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::SXFunction::call "
 
@@ -67209,6 +67943,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::SXFunction::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::SXFunction::eval "
 
@@ -68080,234 +68818,234 @@ print ";
 print ";
 
 
-// File: classCasADi_1_1SymbolicMatrix.xml
-%feature("docstring") CasADi::SymbolicMatrix "
+// File: classCasADi_1_1SymbolicMX.xml
+%feature("docstring") CasADi::SymbolicMX "
 
 Represents a symbolic MX.
 
 Joel Andersson
 
-C++ includes: symbolic_mx_node.hpp ";
+C++ includes: symbolic_mx.hpp ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::SymbolicMatrix "
-
-Constructors. ";
-
-%feature("docstring")  CasADi::SymbolicMatrix::SymbolicMatrix "
+%feature("docstring")  CasADi::SymbolicMX::SymbolicMX "
 
 Constructors. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::clone "
+%feature("docstring")  CasADi::SymbolicMX::SymbolicMX "
+
+Constructors. ";
+
+%feature("docstring")  CasADi::SymbolicMX::clone "
 
 Clone function. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::printPart "
+%feature("docstring")  CasADi::SymbolicMX::printPart "
 
 Print a part of the expression. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::evaluateD "
+%feature("docstring")  CasADi::SymbolicMX::evaluateD "
 
 Evaluate the function numerically. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::evaluateSX "
+%feature("docstring")  CasADi::SymbolicMX::evaluateSX "
 
 Evaluate the function symbolically ( SX) ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::evaluateMX "
+%feature("docstring")  CasADi::SymbolicMX::evaluateMX "
 
 Evaluate the function symbolically ( MX) ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::propagateSparsity "
+%feature("docstring")  CasADi::SymbolicMX::propagateSparsity "
 
 Propagate sparsity. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::isSymbolic "
+%feature("docstring")  CasADi::SymbolicMX::isSymbolic "
 
 Is symbolic. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::getName "
+%feature("docstring")  CasADi::SymbolicMX::getName "
 
 Get the name. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::eval "
+%feature("docstring")  CasADi::SymbolicMX::eval "
 
 Symbolic evaluation (matrix graph) ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::partial "
+%feature("docstring")  CasADi::SymbolicMX::partial "
 
 Partial derivatives. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::deepCopyMembers "
+%feature("docstring")  CasADi::SymbolicMX::deepCopyMembers "
 
 Deep copy data members. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::repr "
+%feature("docstring")  CasADi::SymbolicMX::repr "
 
 Print a representation. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::print "
+%feature("docstring")  CasADi::SymbolicMX::print "
 
 Print a description. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::print "
+%feature("docstring")  CasADi::SymbolicMX::print "
 
 Print expression (make sure number of calls is not exceeded) ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::evaluateD "
+%feature("docstring")  CasADi::SymbolicMX::evaluateD "
 
 Evaluate the function, no derivatives. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::evaluateSX "
+%feature("docstring")  CasADi::SymbolicMX::evaluateSX "
 
 Evaluate symbolically ( SX), no derivatives. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::evaluateMX "
+%feature("docstring")  CasADi::SymbolicMX::evaluateMX "
 
 Evaluate symbolically ( MX), no derivatives. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::isConstant "
+%feature("docstring")  CasADi::SymbolicMX::isConstant "
 
 Check if constant. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::isMapping "
+%feature("docstring")  CasADi::SymbolicMX::isMapping "
 
 Check if mapping. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::isEvaluation "
+%feature("docstring")  CasADi::SymbolicMX::isEvaluation "
 
 Check if evaluation. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::isOutputNode "
+%feature("docstring")  CasADi::SymbolicMX::isOutputNode "
 
 Check if evaluation output. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::isMultipleOutput "
+%feature("docstring")  CasADi::SymbolicMX::isMultipleOutput "
 
 Check if a multiple output node. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::isJacobian "
+%feature("docstring")  CasADi::SymbolicMX::isJacobian "
 
 Check if jacobian reference. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::isMultiplication "
+%feature("docstring")  CasADi::SymbolicMX::isMultiplication "
 
 Check if matrix multiplication. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::getFunction "
+%feature("docstring")  CasADi::SymbolicMX::getFunction "
 
 Get function reference. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::getFunctionInput "
+%feature("docstring")  CasADi::SymbolicMX::getFunctionInput "
 
 Get function input. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::getFunctionOutput "
+%feature("docstring")  CasADi::SymbolicMX::getFunctionOutput "
 
 Get function output. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::dep "
+%feature("docstring")  CasADi::SymbolicMX::dep "
 
 dependencies - functions that have to be evaluated before this one ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::dep "";
+%feature("docstring")  CasADi::SymbolicMX::dep "";
 
-%feature("docstring")  CasADi::SymbolicMatrix::ndep "
+%feature("docstring")  CasADi::SymbolicMX::ndep "
 
 Number of dependencies. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::hasDep "
+%feature("docstring")  CasADi::SymbolicMX::hasDep "
 
 Does the node depend on other nodes. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::getNumOutputs "
+%feature("docstring")  CasADi::SymbolicMX::getNumOutputs "
 
 Number of outputs. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::sparsity "
+%feature("docstring")  CasADi::SymbolicMX::sparsity "
 
 Get the sparsity. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::sparsity "
+%feature("docstring")  CasADi::SymbolicMX::sparsity "
 
 Get the sparsity of output oind. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::isNonLinear "
+%feature("docstring")  CasADi::SymbolicMX::isNonLinear "
 
 Is the node nonlinear. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::setSparsity "
+%feature("docstring")  CasADi::SymbolicMX::setSparsity "
 
 Set the sparsity. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::setDependencies "
+%feature("docstring")  CasADi::SymbolicMX::setDependencies "
 
 Set unary dependency. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::setDependencies "
+%feature("docstring")  CasADi::SymbolicMX::setDependencies "
 
 Set binary dependencies. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::setDependencies "
+%feature("docstring")  CasADi::SymbolicMX::setDependencies "
 
 Set ternary dependencies. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::setDependencies "
+%feature("docstring")  CasADi::SymbolicMX::setDependencies "
 
 Set multiple dependencies. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::addDependency "
+%feature("docstring")  CasADi::SymbolicMX::addDependency "
 
 Add a dependency. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::assign "
+%feature("docstring")  CasADi::SymbolicMX::assign "
 
 Assign nonzeros (mapping matrix) ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::assign "
+%feature("docstring")  CasADi::SymbolicMX::assign "
 
 Assign nonzeros (mapping matrix), output indices sequential. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::isOperation "
+%feature("docstring")  CasADi::SymbolicMX::isOperation "
 
 Is it a certain operation. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::numel "
+%feature("docstring")  CasADi::SymbolicMX::numel "
 
 Number of elements. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::size "
+%feature("docstring")  CasADi::SymbolicMX::size "
 
 Get size. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::size1 "
+%feature("docstring")  CasADi::SymbolicMX::size1 "
 
 Get size. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::size2 "
+%feature("docstring")  CasADi::SymbolicMX::size2 "
 
 Get size. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::regRef "
+%feature("docstring")  CasADi::SymbolicMX::regRef "
 
 Register a weak reference. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::unregRef "
+%feature("docstring")  CasADi::SymbolicMX::unregRef "
 
 Unregister a weak reference. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::getCount "
+%feature("docstring")  CasADi::SymbolicMX::getCount "
 
 Get the reference count. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::init "
+%feature("docstring")  CasADi::SymbolicMX::init "
 
 Initialize the object. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::isInit "
+%feature("docstring")  CasADi::SymbolicMX::isInit "
 
 Check if the object has been initialized. ";
 
-%feature("docstring")  CasADi::SymbolicMatrix::assertInit "
+%feature("docstring")  CasADi::SymbolicMX::assertInit "
 
 Assert that the object has been initialized. ";
 
@@ -68557,307 +69295,307 @@ Return a string with a representation (for SWIG) ";
 Return a string with a destription (for SWIG) ";
 
 
-// File: classCasADi_1_1SymbolicSXNode.xml
-%feature("docstring") CasADi::SymbolicSXNode "
+// File: classCasADi_1_1SymbolicSX.xml
+%feature("docstring") CasADi::SymbolicSX "
 
 Represents a scalar symbolic expression.
 
 Joel Andersson
 
-C++ includes: symbolic_sx_node.hpp ";
+C++ includes: symbolic_sx.hpp ";
 
-%feature("docstring")  CasADi::SymbolicSXNode::isConstant "
+%feature("docstring")  CasADi::SymbolicSX::isConstant "
 
 check properties of a node ";
 
-%feature("docstring")  CasADi::SymbolicSXNode::isInteger "";
+%feature("docstring")  CasADi::SymbolicSX::isInteger "";
 
-%feature("docstring")  CasADi::SymbolicSXNode::hasDep "";
+%feature("docstring")  CasADi::SymbolicSX::hasDep "";
 
-%feature("docstring")  CasADi::SymbolicSXNode::isZero "";
+%feature("docstring")  CasADi::SymbolicSX::isZero "";
 
-%feature("docstring")  CasADi::SymbolicSXNode::isOne "";
+%feature("docstring")  CasADi::SymbolicSX::isOne "";
 
-%feature("docstring")  CasADi::SymbolicSXNode::isMinusOne "";
+%feature("docstring")  CasADi::SymbolicSX::isMinusOne "";
 
-%feature("docstring")  CasADi::SymbolicSXNode::isNan "";
+%feature("docstring")  CasADi::SymbolicSX::isNan "";
 
-%feature("docstring")  CasADi::SymbolicSXNode::isInf "";
+%feature("docstring")  CasADi::SymbolicSX::isInf "";
 
-%feature("docstring")  CasADi::SymbolicSXNode::isMinusInf "";
+%feature("docstring")  CasADi::SymbolicSX::isMinusInf "";
 
-%feature("docstring")  CasADi::SymbolicSXNode::getValue "
+%feature("docstring")  CasADi::SymbolicSX::getValue "
 
 Get value of a constant node. ";
 
-%feature("docstring")  CasADi::SymbolicSXNode::getIntValue "";
+%feature("docstring")  CasADi::SymbolicSX::getIntValue "";
 
-%feature("docstring")  CasADi::SymbolicSXNode::SymbolicSXNode "";
+%feature("docstring")  CasADi::SymbolicSX::SymbolicSX "";
 
-%feature("docstring")  CasADi::SymbolicSXNode::~SymbolicSXNode "";
+%feature("docstring")  CasADi::SymbolicSX::~SymbolicSX "";
 
-%feature("docstring")  CasADi::SymbolicSXNode::isSymbolic "";
+%feature("docstring")  CasADi::SymbolicSX::isSymbolic "";
 
-%feature("docstring")  CasADi::SymbolicSXNode::getName "";
+%feature("docstring")  CasADi::SymbolicSX::getName "";
 
-%feature("docstring")  CasADi::SymbolicSXNode::getOp "
+%feature("docstring")  CasADi::SymbolicSX::getOp "
 
-get the operation only for binary nodes ";
+Get the operation. ";
 
-%feature("docstring")  CasADi::SymbolicSXNode::isEqual "
-
-comparison ";
-
-%feature("docstring")  CasADi::SymbolicSXNode::isEqual "
+%feature("docstring")  CasADi::SymbolicSX::isEqual "
 
 comparison ";
 
-%feature("docstring")  CasADi::SymbolicSXNode::ndep "
+%feature("docstring")  CasADi::SymbolicSX::isEqual "
+
+comparison ";
+
+%feature("docstring")  CasADi::SymbolicSX::ndep "
 
 Number of dependencies. ";
 
-%feature("docstring")  CasADi::SymbolicSXNode::dep "
+%feature("docstring")  CasADi::SymbolicSX::dep "
 
 get the reference of a child ";
 
-%feature("docstring")  CasADi::SymbolicSXNode::dep "
+%feature("docstring")  CasADi::SymbolicSX::dep "
 
 get the reference of a child ";
 
-%feature("docstring")  CasADi::SymbolicSXNode::init "
+%feature("docstring")  CasADi::SymbolicSX::init "
 
 Initialize the node (currently used only to give a similar interface to
 MXNode) ";
 
-%feature("docstring")  CasADi::SymbolicSXNode::isSmooth "
+%feature("docstring")  CasADi::SymbolicSX::isSmooth "
 
 Check if smooth. ";
 
-%feature("docstring")  CasADi::SymbolicSXNode::print "
+%feature("docstring")  CasADi::SymbolicSX::print "
 
 print ";
 
 
-// File: classCasADi_1_1UnaryOp.xml
-%feature("docstring") CasADi::UnaryOp "
+// File: classCasADi_1_1UnaryMX.xml
+%feature("docstring") CasADi::UnaryMX "
 
 Represents a general unary operation on an MX.
 
 Joel Andersson
 
-C++ includes: unary_op.hpp ";
+C++ includes: unary_mx.hpp ";
 
-%feature("docstring")  CasADi::UnaryOp::UnaryOp "
+%feature("docstring")  CasADi::UnaryMX::UnaryMX "
 
 Constructor. ";
 
-%feature("docstring")  CasADi::UnaryOp::~UnaryOp "
+%feature("docstring")  CasADi::UnaryMX::~UnaryMX "
 
 Destructor. ";
 
-%feature("docstring")  CasADi::UnaryOp::clone "
+%feature("docstring")  CasADi::UnaryMX::clone "
 
 Clone function. ";
 
-%feature("docstring")  CasADi::UnaryOp::printPart "
+%feature("docstring")  CasADi::UnaryMX::printPart "
 
 Print a part of the expression. ";
 
-%feature("docstring")  CasADi::UnaryOp::evaluateD "
+%feature("docstring")  CasADi::UnaryMX::evaluateD "
 
 Evaluate the function numerically. ";
 
-%feature("docstring")  CasADi::UnaryOp::evaluateSX "
+%feature("docstring")  CasADi::UnaryMX::evaluateSX "
 
 Evaluate the function symbolically ( SX) ";
 
-%feature("docstring")  CasADi::UnaryOp::evaluateMX "
+%feature("docstring")  CasADi::UnaryMX::evaluateMX "
 
 Evaluate the function symbolically ( MX) ";
 
-%feature("docstring")  CasADi::UnaryOp::propagateSparsity "
+%feature("docstring")  CasADi::UnaryMX::propagateSparsity "
 
 Propagate sparsity. ";
 
-%feature("docstring")  CasADi::UnaryOp::isOperation "
+%feature("docstring")  CasADi::UnaryMX::isOperation "
 
 Is it a certain operation. ";
 
-%feature("docstring")  CasADi::UnaryOp::deepCopyMembers "
+%feature("docstring")  CasADi::UnaryMX::deepCopyMembers "
 
 Deep copy data members. ";
 
-%feature("docstring")  CasADi::UnaryOp::repr "
+%feature("docstring")  CasADi::UnaryMX::repr "
 
 Print a representation. ";
 
-%feature("docstring")  CasADi::UnaryOp::print "
+%feature("docstring")  CasADi::UnaryMX::print "
 
 Print a description. ";
 
-%feature("docstring")  CasADi::UnaryOp::print "
+%feature("docstring")  CasADi::UnaryMX::print "
 
 Print expression (make sure number of calls is not exceeded) ";
 
-%feature("docstring")  CasADi::UnaryOp::evaluateD "
+%feature("docstring")  CasADi::UnaryMX::evaluateD "
 
 Evaluate the function, no derivatives. ";
 
-%feature("docstring")  CasADi::UnaryOp::evaluateSX "
+%feature("docstring")  CasADi::UnaryMX::evaluateSX "
 
 Evaluate symbolically ( SX), no derivatives. ";
 
-%feature("docstring")  CasADi::UnaryOp::evaluateMX "
+%feature("docstring")  CasADi::UnaryMX::evaluateMX "
 
 Evaluate symbolically ( MX), no derivatives. ";
 
-%feature("docstring")  CasADi::UnaryOp::getName "
+%feature("docstring")  CasADi::UnaryMX::getName "
 
 Get the name. ";
 
-%feature("docstring")  CasADi::UnaryOp::isSymbolic "
+%feature("docstring")  CasADi::UnaryMX::isSymbolic "
 
 Check if symbolic. ";
 
-%feature("docstring")  CasADi::UnaryOp::isConstant "
+%feature("docstring")  CasADi::UnaryMX::isConstant "
 
 Check if constant. ";
 
-%feature("docstring")  CasADi::UnaryOp::isMapping "
+%feature("docstring")  CasADi::UnaryMX::isMapping "
 
 Check if mapping. ";
 
-%feature("docstring")  CasADi::UnaryOp::isEvaluation "
+%feature("docstring")  CasADi::UnaryMX::isEvaluation "
 
 Check if evaluation. ";
 
-%feature("docstring")  CasADi::UnaryOp::isOutputNode "
+%feature("docstring")  CasADi::UnaryMX::isOutputNode "
 
 Check if evaluation output. ";
 
-%feature("docstring")  CasADi::UnaryOp::isMultipleOutput "
+%feature("docstring")  CasADi::UnaryMX::isMultipleOutput "
 
 Check if a multiple output node. ";
 
-%feature("docstring")  CasADi::UnaryOp::isJacobian "
+%feature("docstring")  CasADi::UnaryMX::isJacobian "
 
 Check if jacobian reference. ";
 
-%feature("docstring")  CasADi::UnaryOp::isMultiplication "
+%feature("docstring")  CasADi::UnaryMX::isMultiplication "
 
 Check if matrix multiplication. ";
 
-%feature("docstring")  CasADi::UnaryOp::getFunction "
+%feature("docstring")  CasADi::UnaryMX::getFunction "
 
 Get function reference. ";
 
-%feature("docstring")  CasADi::UnaryOp::getFunctionInput "
+%feature("docstring")  CasADi::UnaryMX::getFunctionInput "
 
 Get function input. ";
 
-%feature("docstring")  CasADi::UnaryOp::getFunctionOutput "
+%feature("docstring")  CasADi::UnaryMX::getFunctionOutput "
 
 Get function output. ";
 
-%feature("docstring")  CasADi::UnaryOp::dep "
+%feature("docstring")  CasADi::UnaryMX::dep "
 
 dependencies - functions that have to be evaluated before this one ";
 
-%feature("docstring")  CasADi::UnaryOp::dep "";
+%feature("docstring")  CasADi::UnaryMX::dep "";
 
-%feature("docstring")  CasADi::UnaryOp::ndep "
+%feature("docstring")  CasADi::UnaryMX::ndep "
 
 Number of dependencies. ";
 
-%feature("docstring")  CasADi::UnaryOp::hasDep "
+%feature("docstring")  CasADi::UnaryMX::hasDep "
 
 Does the node depend on other nodes. ";
 
-%feature("docstring")  CasADi::UnaryOp::getNumOutputs "
+%feature("docstring")  CasADi::UnaryMX::getNumOutputs "
 
 Number of outputs. ";
 
-%feature("docstring")  CasADi::UnaryOp::sparsity "
+%feature("docstring")  CasADi::UnaryMX::sparsity "
 
 Get the sparsity. ";
 
-%feature("docstring")  CasADi::UnaryOp::sparsity "
+%feature("docstring")  CasADi::UnaryMX::sparsity "
 
 Get the sparsity of output oind. ";
 
-%feature("docstring")  CasADi::UnaryOp::isNonLinear "
+%feature("docstring")  CasADi::UnaryMX::isNonLinear "
 
 Is the node nonlinear. ";
 
-%feature("docstring")  CasADi::UnaryOp::setSparsity "
+%feature("docstring")  CasADi::UnaryMX::setSparsity "
 
 Set the sparsity. ";
 
-%feature("docstring")  CasADi::UnaryOp::setDependencies "
+%feature("docstring")  CasADi::UnaryMX::setDependencies "
 
 Set unary dependency. ";
 
-%feature("docstring")  CasADi::UnaryOp::setDependencies "
+%feature("docstring")  CasADi::UnaryMX::setDependencies "
 
 Set binary dependencies. ";
 
-%feature("docstring")  CasADi::UnaryOp::setDependencies "
+%feature("docstring")  CasADi::UnaryMX::setDependencies "
 
 Set ternary dependencies. ";
 
-%feature("docstring")  CasADi::UnaryOp::setDependencies "
+%feature("docstring")  CasADi::UnaryMX::setDependencies "
 
 Set multiple dependencies. ";
 
-%feature("docstring")  CasADi::UnaryOp::addDependency "
+%feature("docstring")  CasADi::UnaryMX::addDependency "
 
 Add a dependency. ";
 
-%feature("docstring")  CasADi::UnaryOp::assign "
+%feature("docstring")  CasADi::UnaryMX::assign "
 
 Assign nonzeros (mapping matrix) ";
 
-%feature("docstring")  CasADi::UnaryOp::assign "
+%feature("docstring")  CasADi::UnaryMX::assign "
 
 Assign nonzeros (mapping matrix), output indices sequential. ";
 
-%feature("docstring")  CasADi::UnaryOp::numel "
+%feature("docstring")  CasADi::UnaryMX::numel "
 
 Number of elements. ";
 
-%feature("docstring")  CasADi::UnaryOp::size "
+%feature("docstring")  CasADi::UnaryMX::size "
 
 Get size. ";
 
-%feature("docstring")  CasADi::UnaryOp::size1 "
+%feature("docstring")  CasADi::UnaryMX::size1 "
 
 Get size. ";
 
-%feature("docstring")  CasADi::UnaryOp::size2 "
+%feature("docstring")  CasADi::UnaryMX::size2 "
 
 Get size. ";
 
-%feature("docstring")  CasADi::UnaryOp::regRef "
+%feature("docstring")  CasADi::UnaryMX::regRef "
 
 Register a weak reference. ";
 
-%feature("docstring")  CasADi::UnaryOp::unregRef "
+%feature("docstring")  CasADi::UnaryMX::unregRef "
 
 Unregister a weak reference. ";
 
-%feature("docstring")  CasADi::UnaryOp::getCount "
+%feature("docstring")  CasADi::UnaryMX::getCount "
 
 Get the reference count. ";
 
-%feature("docstring")  CasADi::UnaryOp::init "
+%feature("docstring")  CasADi::UnaryMX::init "
 
 Initialize the object. ";
 
-%feature("docstring")  CasADi::UnaryOp::isInit "
+%feature("docstring")  CasADi::UnaryMX::isInit "
 
 Check if the object has been initialized. ";
 
-%feature("docstring")  CasADi::UnaryOp::assertInit "
+%feature("docstring")  CasADi::UnaryMX::assertInit "
 
 Assert that the object has been initialized. ";
 
@@ -69041,6 +69779,91 @@ C++ includes: casadi_calculus.hpp ";
 Hyperbolic tangent.
 
 C++ includes: casadi_calculus.hpp ";
+
+
+// File: classCasADi_1_1UnarySX.xml
+%feature("docstring") CasADi::UnarySX "
+
+Represents a basic unary operation on an SX node.
+
+Joel Andersson
+
+C++ includes: unary_sx.hpp ";
+
+%feature("docstring")  CasADi::UnarySX::isConstant "
+
+check properties of a node ";
+
+%feature("docstring")  CasADi::UnarySX::isInteger "";
+
+%feature("docstring")  CasADi::UnarySX::isSymbolic "";
+
+%feature("docstring")  CasADi::UnarySX::isZero "";
+
+%feature("docstring")  CasADi::UnarySX::isOne "";
+
+%feature("docstring")  CasADi::UnarySX::isMinusOne "";
+
+%feature("docstring")  CasADi::UnarySX::isNan "";
+
+%feature("docstring")  CasADi::UnarySX::isInf "";
+
+%feature("docstring")  CasADi::UnarySX::isMinusInf "";
+
+%feature("docstring")  CasADi::UnarySX::getValue "
+
+Get value of a constant node. ";
+
+%feature("docstring")  CasADi::UnarySX::getIntValue "";
+
+%feature("docstring")  CasADi::UnarySX::~UnarySX "
+
+Destructor. ";
+
+%feature("docstring")  CasADi::UnarySX::isSmooth "
+
+Check if smooth. ";
+
+%feature("docstring")  CasADi::UnarySX::hasDep "";
+
+%feature("docstring")  CasADi::UnarySX::ndep "
+
+Number of dependencies. ";
+
+%feature("docstring")  CasADi::UnarySX::dep "
+
+get the reference of a dependency ";
+
+%feature("docstring")  CasADi::UnarySX::dep "
+
+get the reference of a child ";
+
+%feature("docstring")  CasADi::UnarySX::getOp "
+
+Get the operation. ";
+
+%feature("docstring")  CasADi::UnarySX::print "
+
+Print the expression (recursively with a maximum number of levels) ";
+
+%feature("docstring")  CasADi::UnarySX::getName "";
+
+%feature("docstring")  CasADi::UnarySX::isEqual "
+
+comparison ";
+
+%feature("docstring")  CasADi::UnarySX::isEqual "
+
+comparison ";
+
+%feature("docstring")  CasADi::UnarySX::init "
+
+Initialize the node (currently used only to give a similar interface to
+MXNode) ";
+
+%feature("docstring")  CasADi::UnarySX::print "
+
+print ";
 
 
 // File: classCasADi_1_1Variable.xml
@@ -71927,6 +72750,16 @@ Get number of inputs. ";
 
 Get number of outputs. ";
 
+%feature("docstring")  CasADi::WorhpSolver::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::WorhpSolver::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::WorhpSolver::setNumInputs "
 
 Set number of inputs (normally invoked internally) ";
@@ -71976,7 +72809,7 @@ Create a function call (single input) ";
 
 %feature("docstring")  CasADi::WorhpSolver::call "
 
-Create a function call. ";
+Create a function call ( MX graph) ";
 
 %feature("docstring")  CasADi::WorhpSolver::call "
 
@@ -71987,6 +72820,10 @@ reference with SWIG. ";
 
 Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
 be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::WorhpSolver::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
 
 %feature("docstring")  CasADi::WorhpSolver::eval "
 
@@ -72806,85 +73643,85 @@ Get the value of the text field. ";
 %feature("docstring")  CasADi::XMLNode::dump "";
 
 
-// File: classCasADi_1_1ZeroSXNode.xml
-%feature("docstring") CasADi::ZeroSXNode "
+// File: classCasADi_1_1ZeroSX.xml
+%feature("docstring") CasADi::ZeroSX "
 
 Represents a zero SX.
 
 Joel Andersson
 
-C++ includes: constant_sx_node.hpp ";
+C++ includes: constant_sx.hpp ";
 
-%feature("docstring")  CasADi::ZeroSXNode::getValue "
+%feature("docstring")  CasADi::ZeroSX::getValue "
 
 Get the value. ";
 
-%feature("docstring")  CasADi::ZeroSXNode::getIntValue "";
+%feature("docstring")  CasADi::ZeroSX::getIntValue "";
 
-%feature("docstring")  CasADi::ZeroSXNode::isInteger "
-
-Properties. ";
-
-%feature("docstring")  CasADi::ZeroSXNode::isZero "";
-
-%feature("docstring")  CasADi::ZeroSXNode::isSymbolic "";
-
-%feature("docstring")  CasADi::ZeroSXNode::hasDep "";
-
-%feature("docstring")  CasADi::ZeroSXNode::isOne "";
-
-%feature("docstring")  CasADi::ZeroSXNode::isMinusOne "";
-
-%feature("docstring")  CasADi::ZeroSXNode::isNan "";
-
-%feature("docstring")  CasADi::ZeroSXNode::isInf "";
-
-%feature("docstring")  CasADi::ZeroSXNode::isMinusInf "";
-
-%feature("docstring")  CasADi::ZeroSXNode::~ZeroSXNode "";
-
-%feature("docstring")  CasADi::ZeroSXNode::ZeroSXNode "";
-
-%feature("docstring")  CasADi::ZeroSXNode::isConstant "
+%feature("docstring")  CasADi::ZeroSX::isInteger "
 
 Properties. ";
 
-%feature("docstring")  CasADi::ZeroSXNode::print "
+%feature("docstring")  CasADi::ZeroSX::isZero "";
+
+%feature("docstring")  CasADi::ZeroSX::isSymbolic "";
+
+%feature("docstring")  CasADi::ZeroSX::hasDep "";
+
+%feature("docstring")  CasADi::ZeroSX::isOne "";
+
+%feature("docstring")  CasADi::ZeroSX::isMinusOne "";
+
+%feature("docstring")  CasADi::ZeroSX::isNan "";
+
+%feature("docstring")  CasADi::ZeroSX::isInf "";
+
+%feature("docstring")  CasADi::ZeroSX::isMinusInf "";
+
+%feature("docstring")  CasADi::ZeroSX::~ZeroSX "";
+
+%feature("docstring")  CasADi::ZeroSX::ZeroSX "";
+
+%feature("docstring")  CasADi::ZeroSX::isConstant "
+
+Properties. ";
+
+%feature("docstring")  CasADi::ZeroSX::getOp "
+
+Get the operation. ";
+
+%feature("docstring")  CasADi::ZeroSX::print "
 
 print ";
 
-%feature("docstring")  CasADi::ZeroSXNode::getName "";
+%feature("docstring")  CasADi::ZeroSX::getName "";
 
-%feature("docstring")  CasADi::ZeroSXNode::getOp "
-
-get the operation only for binary nodes ";
-
-%feature("docstring")  CasADi::ZeroSXNode::isEqual "
+%feature("docstring")  CasADi::ZeroSX::isEqual "
 
 comparison ";
 
-%feature("docstring")  CasADi::ZeroSXNode::isEqual "
+%feature("docstring")  CasADi::ZeroSX::isEqual "
 
 comparison ";
 
-%feature("docstring")  CasADi::ZeroSXNode::ndep "
+%feature("docstring")  CasADi::ZeroSX::ndep "
 
 Number of dependencies. ";
 
-%feature("docstring")  CasADi::ZeroSXNode::dep "
+%feature("docstring")  CasADi::ZeroSX::dep "
 
 get the reference of a child ";
 
-%feature("docstring")  CasADi::ZeroSXNode::dep "
+%feature("docstring")  CasADi::ZeroSX::dep "
 
 get the reference of a child ";
 
-%feature("docstring")  CasADi::ZeroSXNode::init "
+%feature("docstring")  CasADi::ZeroSX::init "
 
 Initialize the node (currently used only to give a similar interface to
 MXNode) ";
 
-%feature("docstring")  CasADi::ZeroSXNode::isSmooth "
+%feature("docstring")  CasADi::ZeroSX::isSmooth "
 
 Check if smooth. ";
 
@@ -74844,13 +75681,13 @@ h:  internal expressions which the user may wish to inspect ";
 // File: b0__options_8hpp.xml
 
 
-// File: binary__op_8cpp.xml
+// File: binary__mx_8cpp.xml
 
 
-// File: binary__op_8hpp.xml
+// File: binary__mx_8hpp.xml
 
 
-// File: binary__sx__node_8hpp.xml
+// File: binary__sx_8hpp.xml
 
 
 // File: c0__monitors_8hpp.xml
@@ -74938,7 +75775,13 @@ h:  internal expressions which the user may wish to inspect ";
 // File: collocation__internal_8hpp.xml
 
 
-// File: constant__sx__node_8hpp.xml
+// File: constant__mx_8cpp.xml
+
+
+// File: constant__mx_8hpp.xml
+
+
+// File: constant__sx_8hpp.xml
 
 
 // File: control__simulator_8cpp.xml
@@ -75028,10 +75871,13 @@ This file does absolutely nothing but including all headers ";
 // File: dotdraw_8hpp.xml
 
 
-// File: evaluation_8cpp.xml
+// File: evaluation__mx_8cpp.xml
 
 
-// File: evaluation_8hpp.xml
+// File: evaluation__mx_8hpp.xml
+
+
+// File: evaluation__sx_8hpp.xml
 
 
 // File: exacthessian_8hpp.xml
@@ -75428,12 +76274,6 @@ This file does absolutely nothing but including all headers ";
 // File: mx_8hpp.xml
 
 
-// File: mx__constant_8cpp.xml
-
-
-// File: mx__constant_8hpp.xml
-
-
 // File: mx__function_8cpp.xml
 
 
@@ -75513,6 +76353,9 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: options__functionality_8hpp.xml
+
+
+// File: output__sx_8hpp.xml
 
 
 // File: parallelizer_8cpp.xml
@@ -75712,10 +76555,10 @@ This file does absolutely nothing but including all headers ";
 // File: SXFunction__constr__py_8hpp.xml
 
 
-// File: symbolic__mx__node_8cpp.xml
+// File: symbolic__mx_8cpp.xml
 
 
-// File: symbolic__mx__node_8hpp.xml
+// File: symbolic__mx_8hpp.xml
 
 
 // File: symbolic__nlp_8cpp.xml
@@ -75730,7 +76573,7 @@ This file does absolutely nothing but including all headers ";
 // File: symbolic__ocp_8hpp.xml
 
 
-// File: symbolic__sx__node_8hpp.xml
+// File: symbolic__sx_8hpp.xml
 
 
 // File: symbolicsubstitution_8hpp.xml
@@ -75747,10 +76590,13 @@ This file does absolutely nothing but including all headers ";
 // File: tolerance_8hpp.xml
 
 
-// File: unary__op_8cpp.xml
+// File: unary__mx_8cpp.xml
 
 
-// File: unary__op_8hpp.xml
+// File: unary__mx_8hpp.xml
+
+
+// File: unary__sx_8hpp.xml
 
 
 // File: unittest__kinvec_8cpp.xml
