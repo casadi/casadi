@@ -516,6 +516,22 @@ class Matrixtests(casadiTestCase):
     self.assertEqual(D.shape[0],4)
     self.assertEqual(D.shape[1],7)
     
+  def test_remove(self):
+    self.message("remove")
+    B = DMatrix([[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16],[17,18,19,20]])
+
+    A = DMatrix(B)
+    A.remove([],[])
+    self.checkarray(A, B,"remove nothing")
+    
+    A = DMatrix(B)
+    A.remove([],[1])
+    self.checkarray(A, DMatrix([[1,3,4],[5,7,8],[9,11,12],[13,15,16],[17,19,20]]),"remove a column")
+   
+    A = DMatrix(B)
+    A.remove([0,3],[1])
+    self.checkarray(A, DMatrix([[5,7,8],[9,11,12],[17,19,20]]),"remove a column and two rows ")
+    
 if __name__ == '__main__':
     unittest.main()
 

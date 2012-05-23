@@ -1037,6 +1037,26 @@ void Matrix<T>::erase(const std::vector<int>& ii, const std::vector<int>& jj){
   data().resize(mapping.size());
 }
 
+
+template<class T>
+void Matrix<T>::remove(const std::vector<int>& ii, const std::vector<int>& jj) {
+  if (!inBounds(ii,size1())) {
+    casadi_error("Remove(ii,jj) out of bounds. Your ii contains " << *std::min_element(ii.begin(),ii.end()) << " up to " << *std::max_element(ii.begin(),ii.end()) << ", which is outside of the matrix shape " << dimString() << ".");
+  }
+  if (!inBounds(jj,size2())) {
+    casadi_error("Remove(ii,jj) out of bounds. Your jj contains " << *std::min_element(jj.begin(),jj.end()) << " up to " << *std::max_element(jj.begin(),jj.end()) << ", which is outside of the matrix shape " << dimString() << ".");
+  }
+  
+  // Remove by performing a complementary slice
+  std::vector<int> iic = complement(ii,size1());
+  std::vector<int> jjc = complement(jj,size2());
+  
+  Matrix<T> ret = operator()(iic,jjc);
+  
+  operator=(ret);
+  
+}
+
 template<class T>
 void Matrix<T>::enlarge(int nrow, int ncol, const std::vector<int>& ii, const std::vector<int>& jj){
   sparsityRef().enlarge(nrow,ncol,ii,jj);

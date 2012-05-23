@@ -94,6 +94,14 @@ namespace CasADi{
   template<typename T>
   bool inBounds(const std::vector<T> &v, int lower, int upper);
   
+  /** \brief Returns the list of all i in [0,size[ not found in supplied list
+  * 
+  * The supplied vector may contain duplicates and may be non-monotonous
+  * The supplied vector will be checked for bounds
+  * The result vector is guaranteed to be monotonously increasing
+  */
+  std::vector<int> complement(const std::vector<int> &v, int size);
+  
   /// Check if the vector is strictly increasing
   template<typename T>
   bool isIncreasing(const std::vector<T> &v);
@@ -252,7 +260,7 @@ namespace CasADi{
     int min = *std::min_element(v.begin(),v.end());
     return (min >= lower);
   }
-  
+
   template<typename T>
   bool isIncreasing(const std::vector<T> &v) {
     if (v.size()==0) return true;

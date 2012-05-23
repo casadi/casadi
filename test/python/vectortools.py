@@ -19,21 +19,29 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 # 
-from mx import *
-from sx import *
-from typemaps import *
-from integration import *
-from ocp import *
-from nlp import *
-from ad import *
-from sparsity import *
-from matrix import *
-from qpsolver import *
-from misc import *
-from fx import *
-from tools import *
-from simulator import *
-from vectortools import *
+from casadi import *
+import casadi as c
+from numpy import *
+import unittest
+from types import *
+from helpers import *
+from casadi.tools import *
+
+class Vectortoolsstests(casadiTestCase):
+  def test_complement(self):
+    self.message("complement")
+    
+    w = [2,1,4,6]
+    
+    self.assertRaises(RuntimeError,lambda : complement(w,3) )
+    self.assertRaises(RuntimeError,lambda : complement(w,6) )
+    
+    
+    wc = list(complement(w,8))
+    self.checkarray(DMatrix(wc),DMatrix([0,3,5,7]),"complement")
+    
+    
 
 if __name__ == '__main__':
     unittest.main()
+
