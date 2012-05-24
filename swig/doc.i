@@ -44530,6 +44530,10 @@ Get string representation of dimensions. The representation is (nrow x ncol
 
 Erase a submatrix Erase rows and/or columns of a matrix. ";
 
+%feature("docstring")  CasADi::Matrix::remove "
+
+Remove rows or columns Rremove/delete rows and/or columns of a matrix. ";
+
 %feature("docstring")  CasADi::Matrix::enlarge "
 
 Enlarge matrix Make the matrix larger by inserting empty rows and columns,
@@ -74727,6 +74731,14 @@ Parameters:
 stop:
 
 list [0,1,2...stop-1] ";
+
+%feature("docstring")  CasADi::Interfaces::complement "
+
+Returns the list of all i in [0,size[ not found in supplied list.
+
+The supplied vector may contain duplicates and may be non-monotonous The
+supplied vector will be checked for bounds The result vector is guaranteed
+to be monotonously increasing ";
 
 %feature("docstring")  CasADi::Interfaces::get_bvec_t "
 
