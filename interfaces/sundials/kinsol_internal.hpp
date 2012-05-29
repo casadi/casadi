@@ -37,6 +37,12 @@
 #include <kinsol/kinsol_impl.h> /* Needed for the provided linear solver */
 #include <ctime>
 
+#ifdef WITH_SUNDIALS_2_5
+typedef long SUNDIALS_INT;
+#else  // WITH_SUNDIALS_2_5
+typedef int SUNDIALS_INT;
+#endif // WITH_SUNDIALS_2_5
+
 namespace CasADi{
 namespace Sundials{
   
@@ -80,8 +86,8 @@ public:
   
   /** \brief Residual */
   void func(N_Vector u, N_Vector fval);
-  void djac(int N, N_Vector u, N_Vector fu, DlsMat J, N_Vector tmp1, N_Vector tmp2);
-  void bjac(int N, int mupper, int mlower, N_Vector u, N_Vector fu, DlsMat J, N_Vector tmp1, N_Vector tmp2);
+  void djac(SUNDIALS_INT N, N_Vector u, N_Vector fu, DlsMat J, N_Vector tmp1, N_Vector tmp2);
+  void bjac(SUNDIALS_INT N, SUNDIALS_INT mupper, SUNDIALS_INT mlower, N_Vector u, N_Vector fu, DlsMat J, N_Vector tmp1, N_Vector tmp2);
   void jtimes(N_Vector v, N_Vector Jv, N_Vector u, int* new_u);
   void psetup(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale, N_Vector tmp1, N_Vector tmp2);
   void psolve(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale, N_Vector v, N_Vector tmp);
@@ -91,8 +97,8 @@ public:
   
   /** \brief Wrappers */
   static int func_wrapper(N_Vector u, N_Vector fval, void *user_data);
-  static int djac_wrapper(int N, N_Vector u, N_Vector fu, DlsMat J, void *user_data, N_Vector tmp1, N_Vector tmp2);
-  static int bjac_wrapper(int N, int mupper, int mlower, N_Vector u, N_Vector fu, DlsMat J, void *user_data, N_Vector tmp1, N_Vector tmp2);
+  static int djac_wrapper(SUNDIALS_INT N, N_Vector u, N_Vector fu, DlsMat J, void *user_data, N_Vector tmp1, N_Vector tmp2);
+  static int bjac_wrapper(SUNDIALS_INT N, SUNDIALS_INT mupper, SUNDIALS_INT mlower, N_Vector u, N_Vector fu, DlsMat J, void *user_data, N_Vector tmp1, N_Vector tmp2);
   static int jtimes_wrapper(N_Vector v, N_Vector Jv, N_Vector u, int* new_u, void *user_data);
   static int psetup_wrapper(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale, void* user_data, N_Vector tmp1, N_Vector tmp2);
   static int psolve_wrapper(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector fscale, N_Vector v, void* user_data, N_Vector tmp);

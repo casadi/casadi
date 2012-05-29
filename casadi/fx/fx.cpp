@@ -58,17 +58,19 @@ vector<SXMatrix> FX::callSX(const std::vector<SXMatrix> &arg){
   
   // Make sure that the number of inputs matches
   casadi_assert_message(arg.size()<=getNumInputs(),"Too many input arguments.");
-  casadi_assert_message(arg.size()==getNumInputs(),"Too short input argument vectors not yet implemented.");
   
   // Assemble all the scalar inputs
-  vector<SX> f_in;
-  f_in.reserve(getNumScalarInputs());
-  for(int iind=0; iind<getNumInputs(); ++iind){
-    // Mismatching sparsity not yet supported
-    casadi_assert_message(arg[iind].sparsity()==input(iind).sparsity(),"Inputs with mismatching sparsity not yet implemented.");
-    
-    // Add to list of scalar inputs
-    f_in.insert(f_in.end(),arg[iind].begin(),arg[iind].end());
+  vector<SX> f_in(getNumScalarInputs());
+  SX* f_in_local = getPtr(f_in);
+  for(int iind=0; iind<arg.size(); ++iind){
+    const CRSSparsity& sp_in = input(iind).sparsity();
+    sp_in.set(f_in_local,getPtr(arg[iind].data()),arg[iind].sparsity());
+    f_in_local += sp_in.size();
+  }
+  
+  // Make sure that there are no unset input arguments
+  for(int iind=arg.size(); iind<getNumInputs(); ++iind){
+    casadi_assert_message(input(iind).empty(),"Nonzeros not set for input argument " << iind << ".");
   }
   
   // Create call node

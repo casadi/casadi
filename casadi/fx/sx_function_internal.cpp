@@ -104,7 +104,13 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
         CASADI_MATH_FUN_ALL_BUILTIN(work_[it->arg.i[0]],work_[it->arg.i[1]],work_[it->res])
         
         // Now all other operations
+	
+	// Constant
         case OP_CONST: work_[it->res] = it->arg.d; break;
+	
+	// Get input
+// 	case OP_INPUT: work_[it->res] = input(it->arg.i[0]).at(it->arg.i[1]); break;
+// 	case OP_OUTPUT: input(it->arg.i[0]).at(it->arg.i[1]) = work_[it->res]; break;
       }
     }
   } else { // with taping

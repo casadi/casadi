@@ -416,7 +416,7 @@ void LiftedSQPInternal::evaluate(int nfdir, int nadir){
 
     // Regularization
     double reg = 0;
-    bool regularization = false;
+    bool regularization = true;
     
     // Check the smallest eigenvalue of the Hessian
     if(regularization && nu==2){
@@ -429,7 +429,10 @@ void LiftedSQPInternal::evaluate(int nfdir, int nadir){
       casadi_assert(a==a && b==b && c==c &&  d==d);
       
       // Make sure symmetric
-      casadi_assert_warning(fabs(b-c)<1e-10,"Hessian is not symmetric: " << b << " != " << c);
+      if(b!=c){
+	casadi_assert_warning(fabs(b-c)<1e-10,"Hessian is not symmetric: " << b << " != " << c);
+	B1_k.elem(1,0) = c = b;
+      }
       
       double eig_smallest = (a+d)/2 - std::sqrt(4*b*c + (a-d)*(a-d))/2;
       double threshold = 1e-8;
