@@ -42,7 +42,7 @@
 #include "llvm/PassManager.h"
 #include "llvm/Analysis/Verifier.h"
 #include "llvm/Target/TargetData.h"
-#include "llvm/Target/TargetSelect.h"
+#include "llvm/Support/TargetSelect.h"
 #include "llvm/Transforms/Scalar.h"
 #include "llvm/Support/IRBuilder.h"
 
@@ -958,10 +958,10 @@ void SXFunctionInternal::init(){
     OurFPM.doInitialization();
 
     // Single argument
-    std::vector<const llvm::Type*> unaryArg(1,llvm::Type::getDoubleTy(llvm::getGlobalContext()));
+    std::vector<llvm::Type*> unaryArg(1,llvm::Type::getDoubleTy(llvm::getGlobalContext()));
 
     // Two arguments
-    std::vector<const llvm::Type*> binaryArg(2,llvm::Type::getDoubleTy(llvm::getGlobalContext()));
+    std::vector<llvm::Type*> binaryArg(2,llvm::Type::getDoubleTy(llvm::getGlobalContext()));
     
     // Unary operation
     llvm::FunctionType *unaryFun = llvm::FunctionType::get(llvm::Type::getDoubleTy(llvm::getGlobalContext()),unaryArg, false);
@@ -988,22 +988,22 @@ void SXFunctionInternal::init(){
     builtins[TANH] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "tanh", jit_module_);
 
     // Void type
-    const llvm::Type* void_t = llvm::Type::getVoidTy(llvm::getGlobalContext());
+    llvm::Type* void_t = llvm::Type::getVoidTy(llvm::getGlobalContext());
 
     // Double type
-    const llvm::Type* double_t = llvm::Type::getDoubleTy(llvm::getGlobalContext());
+    llvm::Type* double_t = llvm::Type::getDoubleTy(llvm::getGlobalContext());
     
     // Double pointer type
-    const llvm::Type* double_ptr_t = llvm::Type::getDoublePtrTy(llvm::getGlobalContext());
+    llvm::Type* double_ptr_t = llvm::Type::getDoublePtrTy(llvm::getGlobalContext());
 
     // Double pointer pointer type
-    const llvm::Type* double_ptr_ptr_t = llvm::PointerType::getUnqual(double_ptr_t);
+    llvm::Type* double_ptr_ptr_t = llvm::PointerType::getUnqual(double_ptr_t);
 
     // A normal 32-bit integer
-    const llvm::IntegerType *int32Ty = llvm::IntegerType::get(llvm::getGlobalContext(), 32);
+    llvm::IntegerType *int32Ty = llvm::IntegerType::get(llvm::getGlobalContext(), 32);
     
     // Two arguments in and two references
-    std::vector<const llvm::Type*> genArg(2);
+    std::vector<llvm::Type*> genArg(2);
     genArg[0] = double_ptr_ptr_t;
     genArg[1] = double_ptr_ptr_t;
     
@@ -1064,7 +1064,7 @@ void SXFunctionInternal::init(){
 
 	default:
 	  casadi_assert_message(builtins[it->op]!=0, "No way to treat: " << it->op);
-	  res = builder.CreateCall(builtins[it->op], oarg.begin(), oarg.end());
+	  res = builder.CreateCall(builtins[it->op], oarg);
       }
       
       // Save to work vector
