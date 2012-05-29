@@ -126,7 +126,7 @@ class NLPtests(casadiTestCase):
         continue # SQPMethod must have constraints
       self.message(str(Solver))
       solver = Solver(f)
-      for k,v in ({"tol":1e-8,"hessian_approximation":"limited-memory","max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver}).iteritems():
+      for k,v in ({"tol":1e-9,"TolOpti":1e-14,"hessian_approximation":"limited-memory","max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
       solver.init()
@@ -134,8 +134,8 @@ class NLPtests(casadiTestCase):
       solver.input(NLP_UBX).set([10]*2)
       solver.solve()
       self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,str(Solver))
-      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,9,str(Solver))
-      self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,9,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,8,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,8,str(Solver))
 
     
   def testIPOPTrb2(self):
@@ -162,9 +162,9 @@ class NLPtests(casadiTestCase):
       
       digits = 10
 
-      self.assertAlmostEqual(solver.output(NLP_COST)[0],0,digits,str(Solver))
-      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,digits,str(Solver))
-      self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,digits,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,8,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,8,str(Solver))
 
   def testIPOPTrbf(self):
     self.message("rosenbrock fixed, limited-memorey hessian approx")
