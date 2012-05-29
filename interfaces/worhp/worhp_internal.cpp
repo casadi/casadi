@@ -187,13 +187,18 @@ WorhpInternal::WorhpInternal(const FX& F, const FX& G, const FX& H, const FX& J,
   addOption("ReinitFilter",OT_BOOLEAN,worhp_p.ReinitFilter,"Enables Filter-reinitialisation accelerating heuristic");
   addOption("DebugMarker06",OT_INTEGER,worhp_p.DebugMarker06,"Debug marker, only needed for ASTOS integration");
   addOption("initialised",OT_BOOLEAN,worhp_p.initialised,"Automatically added initialisation flag. ");
-  
+ 
+  worhp_o.initialised = false;
+  worhp_w.initialised = false;
+  worhp_p.initialised = false;
+  worhp_c.initialised = false;
   
 }
 
 
 WorhpInternal::~WorhpInternal(){
-
+  if (worhp_o.initialised)
+    WorhpFree(&worhp_o, &worhp_w, &worhp_p, &worhp_c);
 }
 
 void WorhpInternal::init(){
@@ -617,7 +622,6 @@ void WorhpInternal::evaluate(int nfdir, int nadir){
   if (m_>0) copy(worhp_o.Mu,worhp_o.Mu+n_,output(NLP_LAMBDA_G).begin());
   
   StatusMsg(&worhp_o, &worhp_w, &worhp_p, &worhp_c);
-  WorhpFree(&worhp_o, &worhp_w, &worhp_p, &worhp_c);
  
 }
 
