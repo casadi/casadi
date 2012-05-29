@@ -58,7 +58,7 @@ if(NOT HAVE_UNORDERED_MAP)
   try_compile(HAVE_UNORDERED_MAP 
     ${CMAKE_BINARY_DIR} 
     ${CMAKE_SOURCE_DIR}/cmake_modules/check_unordered_map.cpp
-    COMPILE_DEFINITIONS "-std=gnu++0x"
+    CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=-std=gnu++0x
     OUTPUT_VARIABLE OUTPUT)
     
     # Add flag
