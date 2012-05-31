@@ -1279,7 +1279,7 @@ void Matrix<T>::mul_sparsity(Matrix<T> &x, Matrix<T> &y_trans, Matrix<T>& z, boo
 template<class T>
 Matrix<T> Matrix<T>::trans() const{
   // quick return if empty or scalar
-  if(empty() || scalar()) return *this;
+  if((size1()==0 && size2()==0) || scalar()) return *this;
 
   // Create the new sparsity pattern and the mapping
   std::vector<int> mapping;

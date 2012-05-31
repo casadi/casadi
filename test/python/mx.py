@@ -441,6 +441,13 @@ class MXtests(casadiTestCase):
       for j in range(3):
         self.assertAlmostEqual(Lr[i,j]*2, zt[i,j],10)
     
+  def test_trans(self):
+    self.message("trans")
+    a = MX(0,1)
+    b = trans(a)
+    self.assertEquals(b.size1(),1)
+    self.assertEquals(b.size2(),0)
+    
   def test_MXtrans(self):
     self.message("trans(MX)")
     x = MX("x",2,3)
