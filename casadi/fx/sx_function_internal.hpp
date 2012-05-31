@@ -116,6 +116,9 @@ class SXFunctionInternal : public XFunctionInternal<SXFunctionInternal,Matrix<SX
   /// The expressions corresponding to each binary operation
   std::vector<SX> binops_;
   
+  /// The expressions corresponding to each constant
+  std::vector<SX> constants_;
+  
   /** \brief  Initialize */
   virtual void init();
 

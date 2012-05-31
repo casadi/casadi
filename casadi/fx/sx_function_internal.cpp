@@ -120,7 +120,9 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
     for(; it!=algorithm_.end(); ++it, ++it1){
       // NOTE: This is equivalent to casadi_math<double>::derF(it->op,x,y,f,it1->d);
       // but forces the function to be inlined, which is important for speed here
-      CASADI_MATH_DERF(double,it->op,work_[it->arg.i[0]],work_[it->arg.i[1]],work_[it->res],it1->d)
+      switch(it->op){
+	CASADI_MATH_DERF_BUILTIN(double,work_[it->arg.i[0]],work_[it->arg.i[1]],work_[it->res],it1->d)
+      }
     }
   }
 
@@ -537,6 +539,13 @@ void SXFunctionInternal::init(){
       snodes.push_back(t);
     else
       bnodes.push_back(t);
+  }
+
+  // Save the constants
+  constants_.clear();
+  constants_.reserve(cnodes.size());
+  for(vector<SXNode*>::iterator it = cnodes.begin(); it != cnodes.end(); ++it){
+    constants_.push_back(SX::create(*it));
   }
   
   // Get the sortign algorithm

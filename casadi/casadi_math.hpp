@@ -186,9 +186,8 @@ inline void casadi_math<T>::fun(unsigned char op, const T& x, const T& y, T& f){
 
 template<typename T>
 inline void casadi_math<T>::der(unsigned char op, const T& x, const T& y, const T& f, T* d){
-// NOTE: We define the implementation in a preprocessor macro to be able to force inlining
-#define CASADI_MATH_DER(TYPE,OP,X,Y,F,D) \
-  switch(OP){\
+// NOTE: We define the implementation in a preprocessor macro to be able to force inlining, and to allow extensions in the VM
+#define CASADI_MATH_DER_BUILTIN(TYPE,X,Y,F,D) \
     case OP_ASSIGN:    BinaryOperation<OP_ASSIGN>::der(X,Y,F,D);     break;\
     case ADD:       BinaryOperation<ADD>::der(X,Y,F,D);        break;\
     case SUB:       BinaryOperation<SUB>::der(X,Y,F,D);        break;\
@@ -221,19 +220,18 @@ inline void casadi_math<T>::der(unsigned char op, const T& x, const T& y, const 
     case TANH:      BinaryOperation<TANH>::der(X,Y,F,D);       break;\
     case ATAN2:      BinaryOperation<ATAN2>::der(X,Y,F,D);       break;\
     case ERFINV:    BinaryOperation<ERFINV>::der(X,Y,F,D);     break;\
-    case OP_PRINTME:   BinaryOperation<OP_PRINTME>::der(X,Y,F,D);    break;\
-  }
+    case OP_PRINTME:   BinaryOperation<OP_PRINTME>::der(X,Y,F,D);    break;
   
-  CASADI_MATH_DER(T,op,x,y,f,d)
+  switch(op){
+    CASADI_MATH_DER_BUILTIN(T,x,y,f,d)
+  }
 }
 
 
 template<typename T>
 inline void casadi_math<T>::derF(unsigned char op, const T& x, const T& y, T& f, T* d){
-// NOTE: We define the implementation in a preprocessor macro to be able to force inlining
-#define CASADI_MATH_DERF(TYPE,OP,X,Y,F,D) \
-  /* A lookup table */ \
-  switch(OP){\
+// NOTE: We define the implementation in a preprocessor macro to be able to force inlining, and to allow extensions in the VM
+#define CASADI_MATH_DERF_BUILTIN(TYPE,X,Y,F,D) \
     case OP_ASSIGN:    DerBinaryOpertion<OP_ASSIGN>::derf(X,Y,F,D);        break;\
     case ADD:       DerBinaryOpertion<ADD>::derf(X,Y,F,D);        break;\
     case SUB:       DerBinaryOpertion<SUB>::derf(X,Y,F,D);        break;\
@@ -266,10 +264,11 @@ inline void casadi_math<T>::derF(unsigned char op, const T& x, const T& y, T& f,
     case TANH:      DerBinaryOpertion<TANH>::derf(X,Y,F,D);        break;\
     case ATAN2:      DerBinaryOpertion<ATAN2>::derf(X,Y,F,D);        break;\
     case ERFINV:    DerBinaryOpertion<ERFINV>::derf(X,Y,F,D);        break;\
-    case OP_PRINTME:   DerBinaryOpertion<OP_PRINTME>::derf(X,Y,F,D);     break;\
-  }
+    case OP_PRINTME:   DerBinaryOpertion<OP_PRINTME>::derf(X,Y,F,D);     break;
   
-  CASADI_MATH_DERF(T,op,x,y,f,d)
+  switch(op){
+    CASADI_MATH_DERF_BUILTIN(T,x,y,f,d)
+  }
 }
 
 template<typename T>
