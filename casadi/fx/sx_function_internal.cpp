@@ -292,6 +292,11 @@ void SXFunctionInternal::printOperation(std::ostream &stream, int i) const{
 void SXFunctionInternal::generateCode(const string& src_name){
   assertInit();
 
+  // Bug #391
+  if(bool(getOption("live_variables"))){
+    casadi_assert_warning(getOption("topological_sorting")=="depth-first", "The combination \"breadth_first_search\" and \"live_variables\" appears not to be working properly for SXFunctionInternal::generateCode. CasADi ticket #391.");
+  }
+  
   // Make sure that there are no free variables
   if (!free_vars_.empty()) {
     casadi_error("Code generation is not possible since variables " << free_vars_ << " are free.");
@@ -571,10 +576,6 @@ void SXFunctionInternal::init(){
   }
 
   if(live_variables){
-    if(verbose()){
-      casadi_warning("Live variables is currently not compatible with symbolic calculations");
-    }
-    
     // Count the number of times each node is used
     vector<int> refcount(nodes.size(),0);
     for(int i=0; i<bnodes.size(); ++i){
