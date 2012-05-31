@@ -112,7 +112,7 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   } else { // with taping
     
     vector<AlgEl>::iterator it = algorithm_.begin();
-    vector<AlgElData>::iterator it1 = pder_.begin();
+    vector<TapeEl<double> >::iterator it1 = pdwork_.begin();
     for(; it!=algorithm_.end(); ++it, ++it1){
       switch(it->op){
         // Start by adding all of the built operations
@@ -131,12 +131,15 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
       res.data()[i] = work_[output_ind_[ind][i]];
     }
   }
+  
+  // Quick return if no sensitivities
+  if(nfdir==0 && nadir==0) return;
 
+  // Clear the seeds (not necessary if constants and parameters have zero value!)
+  if(nfdir>0) fill(dwork_.begin(),dwork_.end(),0);
+  
   // Loop over all forward directions
   for(int dir=0; dir<nfdir; ++dir){
-
-    // Clear the seeds (not necessary if constants and parameters have zero value!)
-    fill(dwork_.begin(),dwork_.end(),0);
     
     // Copy the function arguments to the work vector
     for(int ind=0; ind<input_.size(); ++ind){
@@ -148,9 +151,9 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   
     // Evaluate the algorithm_ for the sensitivities
     vector<AlgEl>::const_iterator it = algorithm_.begin();
-    vector<AlgElData>::const_iterator it2 = pder_.begin();
+    vector<TapeEl<double> >::const_iterator it2 = pdwork_.begin();
     for(; it!=algorithm_.end(); ++it, ++it2){
-      dwork_[it->res] = it2->d[0] * dwork_[it->arg.i[0]] + it2->d[1] * dwork_[it->arg.i[1]];
+      dwork_[it->res] = it2->d[0] * dwork_[it->arg.i[0]] + it2->d[1] * dwork_[it->arg.i[1]]; // FIXME
     }
   
     // Get the forward sensitivities
@@ -162,10 +165,10 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
     }
   }
   
-  // Clear the seeds since it might have been set during forward sensitivity calculations
-  if(nadir>0)
-    fill(dwork_.begin(),dwork_.end(),0);
+  // Clear the seeds
+  if(nadir>0) fill(dwork_.begin(),dwork_.end(),0);
   
+  // Loop over all adjoint directions
   for(int dir=0; dir<nadir; ++dir){
 
     // Pass the output seeds
@@ -178,30 +181,16 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
       }
     }
     
-    #if 0 // this didn't work on a mac (why?)
     vector<AlgEl>::const_reverse_iterator it = algorithm_.rbegin();
-    vector<AlgElData>::const_reverse_iterator it2 = pder_.rbegin();
-
-    for(; it!=algorithm_.rend(); ++it, ++it2){
+    vector<TapeEl<double> >::const_reverse_iterator it2 = pdwork_.rbegin();
+    for(; it!=algorithm_.rend(); ++it, ++it2){  // FIXME
       // copy the seed and clear the cache entry
       double seed = dwork_[it->res];
       dwork_[it->res] = 0;
-      dwork_[it->ch[0]] += it2->d[0] * seed;
-      dwork_[it->ch[1]] += it2->d[1] * seed;
+      dwork_[it->arg.i[0]] += it2->d[0] * seed;
+      dwork_[it->arg.i[1]] += it2->d[1] * seed;
     }
-    #else
-    for(int i=algorithm_.size()-1; i>=0; --i){
-      const AlgEl& ae = algorithm_[i];
-      const AlgElData& aed = pder_[i];
-      
-      // copy the seed and clear the cache entry
-      double seed = dwork_[ae.res];
-      dwork_[ae.res] = 0;
-
-      dwork_[ae.arg.i[0]] += aed.d[0] * seed;
-      dwork_[ae.arg.i[1]] += aed.d[1] * seed;
-    }
-    #endif
+    
     // Collect the adjoint sensitivities
     for(int ind=0; ind<getNumInputs(); ++ind){
       Matrix<double> &asens = adjSens(ind,dir);
@@ -702,7 +691,7 @@ void SXFunctionInternal::init(){
   // Add the binary operations
   algorithm_.clear();
   algorithm_.resize(binops_.size());
-  pder_.resize(algorithm_.size());
+  pdwork_.resize(algorithm_.size());
   vector<AlgEl>::iterator it=algorithm_.begin();
   for(int i=0; i<algorithm_.size(); ++i, ++it){
 
@@ -873,17 +862,17 @@ void SXFunctionInternal::init(){
 
   // Allocate work vectors (symbolic/numeric)
   work_.resize(worksize_,numeric_limits<double>::quiet_NaN());
-  swork_.resize(worksize_);
+  s_work_.resize(worksize_);
 
   // Save the constants to the work vector
   for(vector<SXNode*>::iterator it=cnodes.begin(); it!=cnodes.end(); ++it){
     work_[place[(**it).temp]] = (**it).getValue();
-    swork_[place[(**it).temp]] = SX::create(*it);
+    s_work_[place[(**it).temp]] = SX::create(*it);
   }
 
   // Save the symbolic variables to the symbolic work vector
   for(vector<SXNode*>::iterator it=snodes.begin(); it!=snodes.end(); ++it){
-    swork_[place[(**it).temp]] = SX::create(*it);
+    s_work_[place[(**it).temp]] = SX::create(*it);
   }
 
   // Reset the temporary variables
@@ -1231,56 +1220,59 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
   for(int i=0; i<output.size(); ++i){
     casadi_assert_message(output[i].sparsity()==outputv_[i].sparsity(), "SXFunctionInternal::evals: result sparsity inconsistent");
   }
-  
-  if(output_given){
-    // Iterator to the binary operations
-    vector<SX>::const_iterator f_it=binops_.begin();
-    
-    // Assign to the symbolic work vector
-    for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it, ++f_it){
-      swork_[it->res] = *f_it;
-    }
-    
-  } else {
-    // Copy the function arguments to the work vector
-    for(int ind=0; ind<input.size(); ++ind){
-      const vector<SX>& idata = input[ind].data();
-      for(int i=0; i<input_ind_[ind].size(); ++i){
-        swork_[input_ind_[ind][i]] = idata[i];
-      }
-    }
-    
-    // Iterator to stack of constants
-    vector<SX>::const_iterator c_it = constants_.begin();
-    
-    // Evaluate the algorithm
-    for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it<algorithm_.end(); ++it){
-
-      // Get the arguments
-      switch(it->op){
-        // Start by adding all of the built operations
-	CASADI_MATH_FUN_ALL_BUILTIN(swork_[it->arg.i[0]],swork_[it->arg.i[1]],swork_[it->res])
-
-	// Constant
-        case OP_CONST: swork_[it->res] = *c_it++; break;
-      }
-    }
-
-    // Get the results
-    for(int ind=0; ind<output.size(); ++ind){
-      vector<SX>& odata = output[ind].data();
-      for(int i=0; i<output_ind_[ind].size(); ++i){
-        odata[i] = swork_[output_ind_[ind][i]];
-      }
-    }
-  }
 
   // Get the number of forward and adjoint sweeps
   int nfwd = fwdSens.size();
   int nadj = adjSeed.size();
+
+  // Do we need taping?
+  bool taping = nfwd>0 || nadj>0;
+  
+  // Copy the function arguments to the work vector
+  for(int ind=0; ind<input.size(); ++ind){
+    const vector<SX>& idata = input[ind].data();
+    for(int i=0; i<input_ind_[ind].size(); ++i){
+      s_work_[input_ind_[ind][i]] = idata[i];
+    }
+  }
+  
+  // Iterator to the binary operations
+  vector<SX>::const_iterator b_it=binops_.begin();
+  
+  // Iterator to stack of constants
+  vector<SX>::const_iterator c_it = constants_.begin();
+
+  // Evaluate the algorithm
+  for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it<algorithm_.end(); ++it){
+    
+    if(output_given){
+      // Assign to the symbolic work vector
+      s_work_[it->res] = *b_it++;
+    } else {
+      // Get the arguments
+      switch(it->op){
+        // Start by adding all of the built operations
+	CASADI_MATH_FUN_ALL_BUILTIN(s_work_[it->arg.i[0]],s_work_[it->arg.i[1]],s_work_[it->res])
+
+	// Constant
+        case OP_CONST: s_work_[it->res] = c_it != constants_.end() ? *c_it++ : SX(it->arg.d); break;
+      }
+    }
+  }
+
+  // Get the results
+  for(int ind=0; ind<output.size(); ++ind){
+    vector<SX>& odata = output[ind].data();
+    for(int i=0; i<output_ind_[ind].size(); ++i){
+      odata[i] = s_work_[output_ind_[ind][i]];
+    }
+  }
     
   // Quick return if no sensitivities
-  if(nfwd==0 && nadj==0) return;
+  if(!taping) return;
+
+  // Symbolic working vector
+  vector<SX> s_dwork(s_work_.size());
   
   // Calculate the partial derivatives
   vector<SX> der1, der2;
@@ -1288,7 +1280,7 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
   der2.reserve(algorithm_.size());
   SX tmp[2];
   for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
-      const SX& f = swork_[it->res];
+      const SX& f = s_work_[it->res];
       const SX& x = f->dep(0);
       const SX& y = f->dep(1);
       casadi_math<SX>::der(it->op,x,y,f,tmp);
@@ -1299,15 +1291,12 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
       else                  der2.push_back(0);
   }
 
-  // Gradient (this is also the working array)
-  vector<SX> g(swork_.size(),casadi_limits<SX>::zero);
-  if(verbose())   cout << "SXFunctionInternal::evalNew gradient working array size " << swork_.size() << endl;
 
   // Carry out the forward sweeps
   for(int dir=0; dir<nfwd; ++dir){
     
     // Remove Seeds
-    fill(g.begin(),g.end(),0);
+    fill(s_dwork.begin(),s_dwork.end(),0);
     
     // Pass the forward seeds
     for(int iind=0; iind<input.size(); ++iind){
@@ -1317,7 +1306,7 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
       // Copy seeds to work vector
       const vector<SX>& fdata = fwdSeed[dir][iind].data();
       for(int k=0; k<fdata.size(); ++k){
-        g[input_ind_[iind][k]] = fdata[k];
+        s_dwork[input_ind_[iind][k]] = fdata[k];
       }
     }
     
@@ -1326,13 +1315,13 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
       const AlgEl& ae = algorithm_[k];
       
       // First argument
-      if(!g[ae.arg.i[0]]->isZero() &&  !der1[k]->isZero()){
-        g[ae.res] += der1[k] * g[ae.arg.i[0]];
+      if(!s_dwork[ae.arg.i[0]]->isZero() &&  !der1[k]->isZero()){
+        s_dwork[ae.res] += der1[k] * s_dwork[ae.arg.i[0]];
       }
       
       // Second argument
-      if(!g[ae.arg.i[1]]->isZero() &&  !der2[k]->isZero()){
-        g[ae.res] += der2[k] * g[ae.arg.i[1]];
+      if(!s_dwork[ae.arg.i[1]]->isZero() &&  !der2[k]->isZero()){
+        s_dwork[ae.res] += der2[k] * s_dwork[ae.arg.i[1]];
       }
     }
     
@@ -1344,7 +1333,7 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
       // Copy sens from work vector
       vector<SX>& fdata = fwdSens[dir][oind].data();
       for(int k=0; k<fdata.size(); ++k){
-        fdata[k] = g[output_ind_[oind][k]];
+        fdata[k] = s_dwork[output_ind_[oind][k]];
       }
     }
   }
@@ -1353,7 +1342,7 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
   for(int dir=0; dir<nadj; ++dir){
     
     // Remove Seeds
-    fill(g.begin(),g.end(),0);
+    fill(s_dwork.begin(),s_dwork.end(),0);
   
     // Pass the adjoint seeds
     for(int oind=0; oind<output.size(); ++oind){
@@ -1363,7 +1352,7 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
       // Copy sens from work vector
       const vector<SX>& adata = adjSeed[dir][oind].data();
       for(int k=0; k<adata.size(); ++k){
-        g[output_ind_[oind][k]] = adata[k];
+        s_dwork[output_ind_[oind][k]] = adata[k];
       }
     }
     
@@ -1372,17 +1361,17 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
       const AlgEl& ae = algorithm_[k];
 
       // Get the seed
-      SX seed = g[ae.res];
+      SX seed = s_dwork[ae.res];
       
       // Clear the seed
-      g[ae.res] = 0;
+      s_dwork[ae.res] = 0;
 
       // Propagate if the seed is not zero
       if(!seed->isZero()){
         if(!der1[k]->isZero())
-          g[ae.arg.i[0]] += der1[k] * seed;
+          s_dwork[ae.arg.i[0]] += der1[k] * seed;
         if(!der2[k]->isZero())
-          g[ae.arg.i[1]] += der2[k] * seed;
+          s_dwork[ae.arg.i[1]] += der2[k] * seed;
       }
     }
     
@@ -1394,7 +1383,7 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
       // Copy sens from work vector
       vector<SX>& adata = adjSens[dir][iind].data();
       for(int k=0; k<adata.size(); ++k){
-        adata[k] = g[input_ind_[iind][k]];
+        adata[k] = s_dwork[input_ind_[iind][k]];
       }
     }
   }
@@ -1408,7 +1397,7 @@ SXFunctionInternal* SXFunctionInternal::clone() const{
 void SXFunctionInternal::clearSymbolic(){
   inputv_.clear();
   outputv_.clear();
-  swork_.clear();
+  s_work_.clear();
 }
 
 FX SXFunctionInternal::jacobian(const vector<pair<int,int> >& jblocks){
