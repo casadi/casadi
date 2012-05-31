@@ -194,7 +194,7 @@ WorhpInternal::WorhpInternal(const FX& F, const FX& G, const FX& H, const FX& J,
 }
 
 WorhpInternal::~WorhpInternal(){
-  if (worhp_p.initialised || worhp_o.initialised || worhp_w.initialised || worhp_c.initialised) {
+  if (worhp_p.initialised || worhp_o.initialised || worhp_w.initialised || worhp_c.initialised)
     WorhpFree(&worhp_o, &worhp_w, &worhp_p, &worhp_c);
 }
 
