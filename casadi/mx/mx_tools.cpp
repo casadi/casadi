@@ -575,13 +575,13 @@ std::string getOperatorRepresentation(const MX& x, const std::vector<std::string
   return s.str();
 }
 
-void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, bool reverse, bool eliminate_constants){
+void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, bool reverse){
   // Empty vector
   vector<MX> ex;
-  substituteInPlace(v,vdef,ex,reverse,eliminate_constants);
+  substituteInPlace(v,vdef,ex,reverse);
 }
 
-void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, std::vector<MX>& ex, bool reverse, bool eliminate_constants){
+void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, std::vector<MX>& ex, bool reverse){
   casadi_assert_message(v.size()==vdef.size(),"Mismatch in the number of expression to substitute.");
   for(int k=0; k<v.size(); ++k){
     casadi_assert_message(isSymbolic(v[k]),"Variable " << k << " is not symbolic");
@@ -636,7 +636,7 @@ void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, std::vec
 
   // Replace expression
   std::vector<MX> outputv = f->outputv_;
-  f->eval(f->inputv_, outputv, dummy, dummy, dummy, dummy, false, eliminate_constants);
+  f->eval(f->inputv_, outputv, dummy, dummy, dummy, dummy, false);
   
   // Replace the result
   std::vector<MX>::iterator outputv_it = outputv.begin();

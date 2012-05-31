@@ -97,14 +97,10 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   // Evaluate the algorithm
   if(nfdir==0 && nadir==0){ // without taping
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-      // NOTE: This is equivalent to casadi_math<double>::inplacefun(it->op,x,y,f);
-      // but forces the function to be inlined, which is important for speed here
       switch(it->op){
         // Start by adding all of the built operations
         CASADI_MATH_FUN_ALL_BUILTIN(work_[it->arg.i[0]],work_[it->arg.i[1]],work_[it->res])
         
-        // Now all other operations
-	
 	// Constant
         case OP_CONST: work_[it->res] = it->arg.d; break;
 	
@@ -118,10 +114,12 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
     vector<AlgEl>::iterator it = algorithm_.begin();
     vector<AlgElData>::iterator it1 = pder_.begin();
     for(; it!=algorithm_.end(); ++it, ++it1){
-      // NOTE: This is equivalent to casadi_math<double>::derF(it->op,x,y,f,it1->d);
-      // but forces the function to be inlined, which is important for speed here
       switch(it->op){
-	CASADI_MATH_DERF_BUILTIN(double,work_[it->arg.i[0]],work_[it->arg.i[1]],work_[it->res],it1->d)
+        // Start by adding all of the built operations
+	CASADI_MATH_DERF_BUILTIN(work_[it->arg.i[0]],work_[it->arg.i[1]],work_[it->res],it1->d)
+
+	// Constant
+        case OP_CONST: work_[it->res] = it->arg.d; break;
       }
     }
   }
@@ -246,14 +244,7 @@ void SXFunctionInternal::print(ostream &stream) const{
     int ip = op/NUM_BUILT_IN_OPS;
     op -= NUM_BUILT_IN_OPS*ip;
     
-    stringstream s,s0,s1;
-    s << "a" << it->res;
-
-    int i0 = it->arg.i[0], i1 = it->arg.i[1];
-    s0 << "a" << i0;
-    s1 << "a" << i1;
-    
-    stream << s.str();
+    stream << "a" << it->res;
     switch(ip){
       case 0:  stream << " = "; break;
       case 1:  stream << " += "; break;
@@ -262,7 +253,15 @@ void SXFunctionInternal::print(ostream &stream) const{
       case 4:  stream << " /= "; break;
     }
     
-    casadi_math<double>::print(op,stream,s0.str(),s1.str());
+    if(op==OP_CONST){
+      stream << it->arg.d;
+    } else {
+      stringstream s0,s1;
+      int i0 = it->arg.i[0], i1 = it->arg.i[1];
+      s0 << "a" << i0;
+      s1 << "a" << i1;
+      casadi_math<double>::print(op,stream,s0.str(),s1.str());
+    }
     stream << ";" << endl;
   }
 }
@@ -714,13 +713,6 @@ void SXFunctionInternal::init(){
     it->arg.i[0] = place[binops_[i]->dep(0).get()->temp];
     it->arg.i[1] = place[binops_[i]->dep(1).get()->temp];
     
-    // Make sure that the first argument is equal to the index, if possible
-//     if(it->ch[1]==it->res && 
-//       casadi_math<double>::isCommutative(it->op) && 
-//       ndeps==2){
-//       std::swap(it->ch[0],it->ch[1]);
-//     }
-
     // Operation
     it->op = binops_[i]->getOp();
 
@@ -1065,11 +1057,12 @@ void SXFunctionInternal::init(){
       llvm::Value* res = 0;
       
       switch(it->op){
-	case ADD: res = builder.CreateFAdd(oarg[0],oarg[1]); break;
-	case SUB: res = builder.CreateFSub(oarg[0],oarg[1]); break;
-	case MUL: res = builder.CreateFMul(oarg[0],oarg[1]); break;
-	case DIV: res = builder.CreateFDiv(oarg[0],oarg[1]); break;
-	case NEG: res = builder.CreateFNeg(oarg[0]);         break;
+	case ADD: 	res = builder.CreateFAdd(oarg[0],oarg[1]); break;
+	case SUB: 	res = builder.CreateFSub(oarg[0],oarg[1]); break;
+	case MUL: 	res = builder.CreateFMul(oarg[0],oarg[1]); break;
+	case DIV: 	res = builder.CreateFDiv(oarg[0],oarg[1]); break;
+	case NEG: 	res = builder.CreateFNeg(oarg[0]);         break;
+	case OP_CONST: 	res = llvm::ConstantFP::get(llvm::getGlobalContext(), llvm::APFloat(it->arg.d)); break;
 
 	default:
 	  casadi_assert_message(builtins[it->op]!=0, "No way to treat: " << it->op);
@@ -1225,7 +1218,7 @@ FX SXFunctionInternal::hessian(int iind, int oind){
 void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
                                 const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
                                 const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
-                                bool output_given, bool eliminate_constants){
+                                bool output_given){
   
   if(verbose()) cout << "SXFunctionInternal::eval begin" << endl;
   
@@ -1257,19 +1250,19 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
       }
     }
     
+    // Iterator to stack of constants
+    vector<SX>::const_iterator c_it = constants_.begin();
+    
     // Evaluate the algorithm
     for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it<algorithm_.end(); ++it){
 
       // Get the arguments
-      SX x = swork_[it->arg.i[0]];
-      SX y = swork_[it->arg.i[1]];
-      if(eliminate_constants && x.isConstant() && y.isConstant()){
-        // Check if both arguments are constants
-        double temp;
-        casadi_math<double>::fun(it->op,x.getValue(),y.getValue(),temp);
-        swork_[it->res] = temp;
-      } else {
-        casadi_math<SX>::fun(it->op,x,y,swork_[it->res]);
+      switch(it->op){
+        // Start by adding all of the built operations
+	CASADI_MATH_FUN_ALL_BUILTIN(swork_[it->arg.i[0]],swork_[it->arg.i[1]],swork_[it->res])
+
+	// Constant
+        case OP_CONST: swork_[it->res] = *c_it++; break;
       }
     }
 
@@ -1555,7 +1548,7 @@ FX SXFunctionInternal::getDerivative(int nfwd, int nadj){
   
   // Evaluate symbolically
   vector<vector<SXMatrix> > fsens(nfwd,outputv_), asens(nadj,inputv_);
-  evalSX(inputv_,outputv_,fseed,fsens,aseed,asens,true,false);
+  evalSX(inputv_,outputv_,fseed,fsens,aseed,asens,true);
 
   // All inputs of the return function
   vector<SXMatrix> ret_in;

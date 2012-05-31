@@ -579,8 +579,7 @@ void SymbolicOCP::print(ostream &stream) const{
 }
 
 void SymbolicOCP::eliminateInterdependencies(){
-  bool eliminate_constants = true; // also simplify constant expressions
-  substituteInPlace(var(y),dep,false,eliminate_constants);
+  substituteInPlace(var(y),dep,false);
   
   // Make sure that the dependent variables have been properly eliminated from the dependent expressions
   casadi_assert(!dependsOn(dep,var(y)));
@@ -1027,9 +1026,8 @@ void SymbolicOCP::makeExplicit(){
   }
   
   // Eliminate inter-dependencies in fb_exp
-  bool eliminate_constants = true; // also simplify constant expressions
   SXMatrix f_expmat = f_exp;
-  substituteInPlace(highest(x_exp),f_expmat,false,eliminate_constants);
+  substituteInPlace(highest(x_exp),f_expmat,false);
   f_exp = f_expmat.data();
 
   // New dependent variables and binding equations

@@ -183,10 +183,10 @@ Matrix<SX> substitute(const Matrix<SX> &ex, const Matrix<SX> &v, const Matrix<SX
 std::vector<Matrix<SX> > substitute(const std::vector<Matrix<SX> > &ex, const Matrix<SX> &var, const Matrix<SX> &expr);
 
 /// Substitute variable var out of or into an expression expr
-void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, bool reverse=false, bool eliminate_constants=false);
+void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, bool reverse=false);
 
 /// Substitute variable var out of or into an expression expr, with an arbitrary number of other expressions piggyback
-void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, std::vector<Matrix<SX> >& ex, bool reverse=false, bool eliminate_constants=false);
+void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, std::vector<Matrix<SX> >& ex, bool reverse=false);
 
 // /** \brief  Make the expression smooth by replacing non-smooth nodes with binary variables */
 //void makeSmooth(Matrix<SX> &ex, Matrix<SX> &bvar, Matrix<SX> &bexpr);
@@ -350,14 +350,6 @@ Matrix<SX> mtaylor(const Matrix<SX>& ex,const Matrix<SX>& x, const Matrix<SX>& a
 *
 */
 Matrix<SX> mtaylor(const Matrix<SX>& ex,const Matrix<SX>& x, const Matrix<SX>& a,int order,const std::vector<int>&order_contributions);
-
-/**
-  \brief Eliminate constants
-  Eliminate constants from an expression.
-  This will make the graph of the expression smaller, meaning less operations need to be evaluated at runtime. At the same time, 
-  it degrate the cache utilization.
-*/
-Matrix<SX> evaluateConstants(const Matrix<SX>& ex);
 
 /** \brief Count number of nodes */
 int countNodes(const Matrix<SX>& A);

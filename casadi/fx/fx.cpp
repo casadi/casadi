@@ -403,7 +403,7 @@ vector<SXMatrix> FX::evalSX(const vector<SXMatrix>& arg){
   vector<vector<SXMatrix> > dummy;
   
   // Evaluate the algorithm
-  (*this)->eval(arg2,res,dummy,dummy,dummy,dummy,false,false);
+  (*this)->eval(arg2,res,dummy,dummy,dummy,dummy,false);
   
   // Return the result
   return res;
@@ -412,36 +412,36 @@ vector<SXMatrix> FX::evalSX(const vector<SXMatrix>& arg){
 vector<MX> FX::evalMX(const vector<MX>& arg){
   vector<MX> res;
   vector<vector<MX> > dummy;
-  (*this)->evalMX(arg,res,dummy,dummy,dummy,dummy,false,false);
+  (*this)->evalMX(arg,res,dummy,dummy,dummy,dummy,false);
   return res;
 }
 
 void FX::evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
 		       const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
 		       const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
-		       bool output_given, bool eliminate_constants){
-  (*this)->evalSX(arg,res,fseed,fsens,aseed,asens,output_given,eliminate_constants);
+		       bool output_given){
+  (*this)->evalSX(arg,res,fseed,fsens,aseed,asens,output_given);
 }
 
 void FX::evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 
 		       const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
 		       const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
-		       bool output_given, bool eliminate_constants){
-  (*this)->evalMX(arg,res,fseed,fsens,aseed,asens,output_given,eliminate_constants);
+		       bool output_given){
+  (*this)->evalMX(arg,res,fseed,fsens,aseed,asens,output_given);
 }
                         
 void FX::eval(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
 		     const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
 		     const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
-		     bool output_given, bool eliminate_constants){
-  (*this)->eval(arg,res,fseed,fsens,aseed,asens,output_given,eliminate_constants);
+		     bool output_given){
+  (*this)->eval(arg,res,fseed,fsens,aseed,asens,output_given);
 }
 
 void FX::eval(const std::vector<MX>& arg, std::vector<MX>& res, 
 		     const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
 		     const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
-		     bool output_given, bool eliminate_constants){
-  (*this)->eval(arg,res,fseed,fsens,aseed,asens,output_given,eliminate_constants);
+		     bool output_given){
+  (*this)->eval(arg,res,fseed,fsens,aseed,asens,output_given);
 }
 
 void FX::spEvaluate(bool fwd){

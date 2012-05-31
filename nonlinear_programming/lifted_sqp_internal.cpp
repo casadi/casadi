@@ -211,7 +211,7 @@ void LiftedSQPInternal::init(){
   ex[0] = f1;
   ex[1] = f2;
   ex[2] = f;
-  substituteInPlace(v, d_def, ex, false, false);
+  substituteInPlace(v, d_def, ex, false);
   SXMatrix f1_z = ex[0];
   SXMatrix f2_z = ex[1];
   SXMatrix f_z = ex[2];
@@ -269,7 +269,7 @@ void LiftedSQPInternal::init(){
     Z_fwdSeed[1][Z_LAM_X].setZero();
     Z_fwdSeed[1][Z_LAM_F2] = dlam_f2;
     
-    zfcn.eval(zfcn_in,zfcn_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true,false);
+    zfcn.eval(zfcn_in,zfcn_out,Z_fwdSeed,Z_fwdSens,Z_adjSeed,Z_adjSens,true);
     
     b1 += Z_fwdSens[0][Z_F12](Slice(0,nf1));
     b2 += Z_fwdSens[0][Z_F12](Slice(nf1,B.size1()));

@@ -187,7 +187,7 @@ inline void casadi_math<T>::fun(unsigned char op, const T& x, const T& y, T& f){
 template<typename T>
 inline void casadi_math<T>::der(unsigned char op, const T& x, const T& y, const T& f, T* d){
 // NOTE: We define the implementation in a preprocessor macro to be able to force inlining, and to allow extensions in the VM
-#define CASADI_MATH_DER_BUILTIN(TYPE,X,Y,F,D) \
+#define CASADI_MATH_DER_BUILTIN(X,Y,F,D) \
     case OP_ASSIGN:    BinaryOperation<OP_ASSIGN>::der(X,Y,F,D);     break;\
     case ADD:       BinaryOperation<ADD>::der(X,Y,F,D);        break;\
     case SUB:       BinaryOperation<SUB>::der(X,Y,F,D);        break;\
@@ -223,7 +223,7 @@ inline void casadi_math<T>::der(unsigned char op, const T& x, const T& y, const 
     case OP_PRINTME:   BinaryOperation<OP_PRINTME>::der(X,Y,F,D);    break;
   
   switch(op){
-    CASADI_MATH_DER_BUILTIN(T,x,y,f,d)
+    CASADI_MATH_DER_BUILTIN(x,y,f,d)
   }
 }
 
@@ -231,7 +231,7 @@ inline void casadi_math<T>::der(unsigned char op, const T& x, const T& y, const 
 template<typename T>
 inline void casadi_math<T>::derF(unsigned char op, const T& x, const T& y, T& f, T* d){
 // NOTE: We define the implementation in a preprocessor macro to be able to force inlining, and to allow extensions in the VM
-#define CASADI_MATH_DERF_BUILTIN(TYPE,X,Y,F,D) \
+#define CASADI_MATH_DERF_BUILTIN(X,Y,F,D) \
     case OP_ASSIGN:    DerBinaryOpertion<OP_ASSIGN>::derf(X,Y,F,D);        break;\
     case ADD:       DerBinaryOpertion<ADD>::derf(X,Y,F,D);        break;\
     case SUB:       DerBinaryOpertion<SUB>::derf(X,Y,F,D);        break;\
@@ -267,13 +267,15 @@ inline void casadi_math<T>::derF(unsigned char op, const T& x, const T& y, T& f,
     case OP_PRINTME:   DerBinaryOpertion<OP_PRINTME>::derf(X,Y,F,D);     break;
   
   switch(op){
-    CASADI_MATH_DERF_BUILTIN(T,x,y,f,d)
+    CASADI_MATH_DERF_BUILTIN(x,y,f,d)
   }
 }
 
 template<typename T>
 inline int casadi_math<T>::ndeps(unsigned char op){
   switch(op){
+    case OP_CONST:
+      return 0;
     case ADD:
     case SUB:
     case MUL:

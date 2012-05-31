@@ -302,17 +302,17 @@ std::string getOperatorRepresentation(const MX& x, const std::vector<std::string
  * Substitute variables v out of the expressions vdef sequentially 
  */
 #ifndef SWIG
-void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, bool reverse=false, bool eliminate_constants=false);
+void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, bool reverse=false);
 #else // SWIG
-void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& INOUT, bool reverse=false, bool eliminate_constants=false);
+void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& INOUT, bool reverse=false);
 #endif // SWIG
 
 /** \brief Inplace substitution with piggyback expressions
  * Substitute variables v out of the expressions vdef sequentially, as well as out of a number of other expressions piggyback */
 #ifndef SWIG
-void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, std::vector<MX>& ex, bool reverse=false, bool eliminate_constants=false);
+void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, std::vector<MX>& ex, bool reverse=false);
 #else // SWIG
-void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& INOUT, std::vector<MX>& INOUT, bool reverse=false, bool eliminate_constants=false);
+void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& INOUT, std::vector<MX>& INOUT, bool reverse=false);
 #endif // SWIG
 
 #ifndef SWIG
