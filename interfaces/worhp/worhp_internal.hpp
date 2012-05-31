@@ -61,6 +61,17 @@ std::map<std::string,opt_type> ops_;
   /// Gradient of the objective function
   FX GF_; 
 
+  /// objective function
+  FX Fmod_;
+  /// constraint function
+  FX Gmod_;
+  /// Hessian of the Lagrangian function
+  FX Hmod_;
+  /// Jacobian of the constraint function
+  FX Jmod_; 
+  /// Gradient of the objective function
+  FX GFmod_; 
+  
   // Worhp callback functions
   bool eval_f(const double* x, double& obj_value);
   bool eval_grad_f(const double* x, double scale , double* grad_f);
@@ -79,6 +90,20 @@ std::map<std::string,opt_type> ops_;
   
   std::string formatStatus(int status) const;
   
+  // Lists the indices into the decision variables for which LBX!=LBU
+  std::vector< int > freeX_; 
+  
+  // The complement of freeX_
+  std::vector< int > nonfreeX_;
+  
+  // Lists the indices into the constraints for which LBG or UBG is different from infinity
+  std::vector< int > freeG_; 
+  
+  // The complement of freeX_
+  std::vector< int > nonfreeG_;
+  
+  /// Will do inspections on bounds and do a reinitialisation if needed
+  void checkinit();
 };
 
 } // namespace CasADi

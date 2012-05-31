@@ -45,7 +45,6 @@ qpsolver_options = {"tol": 1e-12,}
 
 class NLPtests(casadiTestCase):
   def testIPOPT(self):
-    
     x=SX("x")
     f=SXFunction([x],[[(x-1)**2]])
     g=SXFunction([x],[x])
@@ -67,7 +66,6 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,9,str(Solver))
 
   def testIPOPT_par(self):
-    
     x=SX("x")
     p=SX("p")
     f=SXFunction([[x],[p]],[[(x-p)**2]])
@@ -76,7 +74,7 @@ class NLPtests(casadiTestCase):
     for Solver in solvers:
       self.message("trivial " + str(Solver))
       solver = Solver(f,g)
-      for k,v in ({"tol":1e-5,"hessian_approximation":"limited-memory","max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver }).iteritems():
+      for k,v in ({"tol":1e-5,"hessian_approximation":"limited-memory","max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
       solver.setOption("parametric",True)
@@ -107,15 +105,12 @@ class NLPtests(casadiTestCase):
       solver.input(NLP_UBX).set([Inf])
       solver.input(NLP_LBG).set([-Inf])
       solver.input(NLP_UBG).set([Inf])
-      if (Solver.__name__ == "WorhpSolver"):
-        self.assertRaises(Exception,lambda x:solver.solve())
-      else:
-        solver.solve()
-        self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,str(Solver))
-        self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,7,str(Solver) + str(solver.output(NLP_X_OPT)[0]-1))
-    
+      solver.solve()
+      self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,7,str(Solver) + str(solver.output(NLP_X_OPT)[0]-1))
+  
   def testIPOPTrb(self):
-    self.message("rosenbrock, limited-memorey hessian approx")
+    self.message("rosenbrock, limited-memory hessian approx")
     x=SX("x")
     y=SX("y")
     
@@ -139,7 +134,7 @@ class NLPtests(casadiTestCase):
 
     
   def testIPOPTrb2(self):
-    self.message("rosenbrock, limited-memorey hessian approx")
+    self.message("rosenbrock, limited-memory hessian approx")
     x=SX("x")
     y=SX("y")
     
@@ -167,7 +162,7 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,8,str(Solver))
 
   def testIPOPTrbf(self):
-    self.message("rosenbrock fixed, limited-memorey hessian approx")
+    self.message("rosenbrock fixed, limited-memory hessian approx")
     x=SX("x")
     y=SX("y")
     
@@ -185,13 +180,10 @@ class NLPtests(casadiTestCase):
       solver.input(NLP_UBX).set([10,1])
       solver.input(NLP_LBG).set([-10])
       solver.input(NLP_UBG).set([10])
-      if (Solver.__name__ == "WorhpSolver"):
-        self.assertRaises(Exception,lambda x:solver.solve())
-      else:
-        solver.solve()
-        self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,str(Solver))
-        self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,9,str(Solver))
-        self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,9,str(Solver))
+      solver.solve()
+      self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,9,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,9,str(Solver))
     
   def testIPOPTrhb2(self):
     self.message("rosenbrock, exact hessian, constrained")
@@ -208,7 +200,12 @@ class NLPtests(casadiTestCase):
     sigma=SX("sigma")
     lambd=SX("lambd")
     h=SXFunction([[x,y],[lambd],[sigma]],[sigma*hessian(obj,[x,y])+lambd*hessian(g.outputSX(0),[x,y])])
-
+    h.init()
+    h.input().set([0.5,0.5])
+    h.input(1).set(-40)
+    h.input(2).set(1)
+    h.evaluate()
+    print h.output()
     for Solver in solvers:
       self.message(str(Solver))
       solver = Solver(f,g,h)
@@ -523,7 +520,6 @@ class NLPtests(casadiTestCase):
   
   def testIPOPTnoc(self):
     self.message("trivial IPOPT, no constraints")
-
     """ There is an assertion error thrown, but still it works"""
     x=ssym("x")
     f=SXFunction([x],[(x-1)**2])
@@ -642,16 +638,13 @@ class NLPtests(casadiTestCase):
       for k,v in ({"tol":1e-5,"max_iter":100, "hessian_approximation": "limited-memory", "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
-      if (Solver.__name__ == "WorhpSolver"):
-        self.assertRaises(Exception,lambda x:solver.init())
-      else:
-        solver.init()
-        solver.input(NLP_LBX).set([-10, -10])
-        solver.input(NLP_UBX).set([10, 10])
-        solver.input(NLP_LBG).set([0, 3])
-        solver.input(NLP_UBG).set([0, 3])
-        solver.solve()
-        self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],solver.output(NLP_X_OPT)[1],10,"IPOPT")
+      solver.init()
+      solver.input(NLP_LBX).set([-10, -10])
+      solver.input(NLP_UBX).set([10, 10])
+      solver.input(NLP_LBG).set([0, 3])
+      solver.input(NLP_UBG).set([0, 3])
+      solver.solve()
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],solver.output(NLP_X_OPT)[1],10,"IPOPT")
 
   def testIPOPTdegc(self):
     self.message("degenerate optimization IPOPT, overconstrained")
@@ -668,17 +661,15 @@ class NLPtests(casadiTestCase):
       for k,v in ({"tol":1e-5,"max_iter":100, "hessian_approximation": "limited-memory", "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
-      if (Solver.__name__ == "WorhpSolver"):
-        self.assertRaises(Exception,lambda x:solver.init())
-      else:
-        solver.init()
-        solver.input(NLP_LBX).set([-10, -10])
-        solver.input(NLP_UBX).set([10, 10])
-        solver.input(NLP_LBG).set([0, 3 , -10])
-        solver.input(NLP_UBG).set([0, 3, 10])
-        solver.solve()
-        # todo: catch error when set([0, 3 , 5]) two times
-        self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],solver.output(NLP_X_OPT)[1],10,"IPOPT")
+
+      solver.init()
+      solver.input(NLP_LBX).set([-10, -10])
+      solver.input(NLP_UBX).set([10, 10])
+      solver.input(NLP_LBG).set([0, 3 , -10])
+      solver.input(NLP_UBG).set([0, 3, 10])
+      solver.solve()
+      # todo: catch error when set([0, 3 , 5]) two times
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],solver.output(NLP_X_OPT)[1],10,"IPOPT")
       
   def testKINSol1(self):
     self.message("Scalar KINSol problem, n=0")
@@ -721,6 +712,38 @@ class NLPtests(casadiTestCase):
     solver.output().set(-6)
     solver.solve()
     self.assertAlmostEqual(solver.output()[0],-2*pi,5)
+    
+    
+  def testXfreeChange(self):
+    self.message("Change in X settings")
+    return # Does not work yet with WORHP
+    x=SX("x")
+    y=SX("y")
+    
+    f=SXFunction([[x,y]],[(1-x)**2+100*(y-x**2)**2])
+    g=SXFunction([[x,y]],[x+y])
+    for Solver in solvers:
+      self.message(str(Solver))
+      solver = Solver(f,g)
+      for k,v in ({"tol":1e-8,"TolOpti":1e-20,"hessian_approximation":"limited-memory","max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
+        if solver.hasOption(k):
+          solver.setOption(k,v)
+      solver.init()
+      solver.input(NLP_X_INIT).set([0,1])
+      solver.input(NLP_LBX).set([-10,-10])
+      solver.input(NLP_UBX).set([10,10])
+      solver.input(NLP_LBG).set([-10])
+      solver.input(NLP_UBG).set([10])
+      solver.solve()
+      solver.input(NLP_LBX).set([-10,1])
+      solver.input(NLP_UBX).set([10,1])
+      solver.input(NLP_LBG).set([-10])
+      solver.input(NLP_UBG).set([10])
+      solver.solve()
+      
+      self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,9,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,9,str(Solver))
     
 if __name__ == '__main__':
     unittest.main()
