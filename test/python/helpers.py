@@ -75,6 +75,11 @@ class casadiTestCase(unittest.TestCase):
   def message(self,s):
       print s
       sys.stdout.flush()
+
+  def assertAlmostEqual(self,first, second, places=7, msg=""):
+      msg+= "%.16e <-> %.16e"  % (first, second)
+      unittest.TestCase.assertAlmostEqual(self,first,second,places=places,msg=msg)
+
   def checkarray(self,zr,zt,name,failmessage="",digits=10):
       """
       Checks for equality of two numpy matrices.

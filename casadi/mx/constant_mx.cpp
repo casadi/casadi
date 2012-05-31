@@ -20,7 +20,7 @@
  *
  */
 
-#include "mx_constant.hpp"
+#include "constant_mx.hpp"
 #include <cassert>
 #include <vector>
 #include <algorithm>
@@ -29,20 +29,20 @@
 using namespace std;
 
 namespace CasADi{
-// 
-MXConstant::MXConstant(const Matrix<double> &x) : x_(x){
+
+ConstantMX::ConstantMX(const Matrix<double> &x) : x_(x){
   setSparsity(x.sparsity());
 }
 
-MXConstant* MXConstant::clone() const{
-  return new MXConstant(*this);
+ConstantMX* ConstantMX::clone() const{
+  return new ConstantMX(*this);
 }
 
-void MXConstant::printPart(std::ostream &stream, int part) const{
+void ConstantMX::printPart(std::ostream &stream, int part) const{
   x_.print(stream);
 }
 
-void MXConstant::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+void ConstantMX::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
   int nfwd = fwdSens.size();
   copy(x_.begin(),x_.end(),&output[0]->front());
   for(int d=0; d<nfwd; ++d){
@@ -50,17 +50,17 @@ void MXConstant::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const 
   }
 }
 
-bool MXConstant::isConstant() const{
+bool ConstantMX::isConstant() const{
   return true;
 }
 
-void MXConstant::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+void ConstantMX::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
   SXMatrix r(x_);
   casadi_assert(output[0]->sparsity()==r.sparsity());
   output[0]->set(r);
 }
 
-void MXConstant::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+void ConstantMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
 
   // Evaluate nondifferentiated
   if(!output_given){
@@ -82,7 +82,7 @@ void MXConstant::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& 
   }
 }
 
-void MXConstant::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+void ConstantMX::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
   if(fwd){
     bvec_t *outputd = get_bvec_t(output[0]->data());
     fill_n(outputd,output[0]->size(),0);

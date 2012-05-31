@@ -68,3 +68,8 @@
 
 %template(IntegratorVector) std::vector<CasADi::Integrator>;
 
+%{
+#include "integration/rk_integrator.hpp"
+%}
+
+%include "integration/rk_integrator.hpp"

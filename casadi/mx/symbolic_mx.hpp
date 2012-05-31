@@ -20,38 +20,29 @@
  *
  */
 
-#ifndef EVALUATION_HPP
-#define EVALUATION_HPP
+#ifndef SYMBOLIC_MX_HPP
+#define SYMBOLIC_MX_HPP
 
-#include "multiple_output.hpp"
-#include "../fx/fx.hpp"
+#include "mx_node.hpp"
 
 namespace CasADi{
-
-/** 
+/** \brief Represents a symbolic MX
   \author Joel Andersson 
-  \date 2010-2011
+  \date 2010
+  A regular user is not supposed to work with this Node class.
+  This user can call MX(name,n,m) directly.
 */
-class Evaluation : public MultipleOutput{
+class SymbolicMX : public MXNode{
   public:
 
-    /** \brief  Constructor */
-    explicit Evaluation(const FX& fcn, const std::vector<MX> &arg, 
-			const std::vector<std::vector<MX> > &fseed, const std::vector<std::vector<MX> > &aseed,
-			bool output_given);
+    /** \brief  Constructors */
+    explicit SymbolicMX(const std::string& name, int n=1, int m=1);
 
-    /** \brief  Creator function, arranges the outputs */
-    static void create(const FX& fcn, 
-		       const std::vector<MX> &arg, std::vector<MX> &res, 
-		       const std::vector<std::vector<MX> > &fseed, std::vector<std::vector<MX> > &fsens, 
-		       const std::vector<std::vector<MX> > &aseed, std::vector<std::vector<MX> > &asens,
-		       bool output_given=false);
+    /** \brief  Constructors */
+    explicit SymbolicMX(const std::string& name, const CRSSparsity & sp);
     
-    /** \brief  Destructor */
-    virtual ~Evaluation(){}
-  
     /** \brief  Clone function */
-    virtual Evaluation* clone() const;
+    virtual SymbolicMX* clone() const;
 
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
@@ -68,37 +59,24 @@ class Evaluation : public MultipleOutput{
     /** \brief  Propagate sparsity */
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
 
-    /** \brief  Check if evaluation */
-    virtual bool isEvaluation() const{return true;}
-
-    /** \brief  Get function reference */
-    virtual FX& getFunction();
-
-    /** \brief  Get function input */
-    virtual int getFunctionInput() const{ return -1;}
-
-    /** \brief  Get function output */
-    virtual int getFunctionOutput() const{ return -1;}
-
-    /** \brief  Deep copy data members */
-    virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
-
-    /** \brief  Number of outputs */
-    virtual int getNumOutputs() const;
-        
-    /** \brief  Get the sparsity of output oind */
-    virtual const CRSSparsity& sparsity(int oind);
-
-    // Function to be evaluated
-    FX fcn_;
+    /** \brief  Is symbolic */
+    virtual bool isSymbolic() const;
     
-    // Number of directional derivatives
-    int nfwd_f_, nadj_f_;
+    /** \brief  Get the name */
+    virtual const std::string& getName() const;
     
-    // Is the argument identical to the input of the function
-    bool output_given_f_;    
+    /// Symbolic evaluation (matrix graph)
+    virtual MX eval(const std::vector<MX>& x){return MX::create(this);}
+
+    /// Partial derivatives
+    virtual std::vector<MX> partial(const std::vector<MX>& x);
+
+  protected:
+    // Name of the varible
+    std::string name_;
 };
 
 } // namespace CasADi
 
-#endif // EVALUATION_HPP
+
+#endif // SYMBOLIC_MX_HPP

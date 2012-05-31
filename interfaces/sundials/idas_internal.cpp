@@ -1232,7 +1232,7 @@ int IdasInternal::rhsQB_wrapper(double t, N_Vector y, N_Vector xzdot, N_Vector x
   }
 }
 
-void IdasInternal::djac(int Neq, double t, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
+void IdasInternal::djac(SUNDIALS_INT Neq, double t, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
   log("IdasInternal::djac","begin");
 
   // Get time
@@ -1276,7 +1276,7 @@ void IdasInternal::djac(int Neq, double t, double cj, N_Vector xz, N_Vector xzdo
   log("IdasInternal::djac","end");
 }
 
-int IdasInternal::djac_wrapper(int Neq, double t, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
+int IdasInternal::djac_wrapper(SUNDIALS_INT Neq, double t, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
  try{
     IdasInternal *this_ = (IdasInternal*)user_data;
     this_->djac(Neq, t, cj, xz, xzdot, rr, Jac, tmp1, tmp2, tmp3);
@@ -1287,7 +1287,7 @@ int IdasInternal::djac_wrapper(int Neq, double t, double cj, N_Vector xz, N_Vect
   }
 }
 
-void IdasInternal::bjac(int Neq, int mupper, int mlower, double tt, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, N_Vector tmp1, N_Vector tmp2,N_Vector tmp3){
+void IdasInternal::bjac(SUNDIALS_INT Neq, SUNDIALS_INT mupper, SUNDIALS_INT mlower, double tt, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, N_Vector tmp1, N_Vector tmp2,N_Vector tmp3){
   log("IdasInternal::bjac","begin");
   // Get time
   time1 = clock();
@@ -1327,7 +1327,7 @@ void IdasInternal::bjac(int Neq, int mupper, int mlower, double tt, double cj, N
   log("IdasInternal::bjac","end");
 }
 
-int IdasInternal::bjac_wrapper(int Neq, int mupper, int mlower, double tt, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2,N_Vector tmp3){
+int IdasInternal::bjac_wrapper(SUNDIALS_INT Neq, SUNDIALS_INT mupper, SUNDIALS_INT mlower, double tt, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2,N_Vector tmp3){
  try{
     IdasInternal *this_ = (IdasInternal*)user_data;
     this_->bjac(Neq, mupper, mlower, tt, cj, xz, xzdot, rr, Jac, tmp1, tmp2, tmp3);

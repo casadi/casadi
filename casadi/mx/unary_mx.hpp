@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef UNARY_OP_HPP
-#define UNARY_OP_HPP
+#ifndef UNARY_MX_HPP
+#define UNARY_MX_HPP
 
 #include "mx_node.hpp"
 
@@ -30,17 +30,17 @@ namespace CasADi{
   \author Joel Andersson 
   \date 2010
 */	
-class UnaryOp : public MXNode{
+class UnaryMX : public MXNode{
 public:
 
   /** \brief  Constructor */
-  UnaryOp(Operation op, MX x);
+  UnaryMX(Operation op, MX x);
 
   /** \brief  Destructor */
-  virtual ~UnaryOp(){}
+  virtual ~UnaryMX(){}
 
   /** \brief  Clone function */
-  virtual UnaryOp * clone() const;
+  virtual UnaryMX * clone() const;
 
   /** \brief  Print a part of the expression */
   virtual void printPart(std::ostream &stream, int part) const;
@@ -67,4 +67,4 @@ public:
 } // namespace CasADi
 
 
-#endif // UNARY_OP_HPP
+#endif // UNARY_MX_HPP

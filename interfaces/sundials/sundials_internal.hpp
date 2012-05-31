@@ -26,6 +26,12 @@
 #include "sundials_integrator.hpp"
 #include "casadi/fx/integrator_internal.hpp"
 
+#ifdef WITH_SUNDIALS_2_5
+typedef long SUNDIALS_INT;
+#else  // WITH_SUNDIALS_2_5
+typedef int SUNDIALS_INT;
+#endif // WITH_SUNDIALS_2_5
+
 namespace CasADi{
 namespace Sundials{
 

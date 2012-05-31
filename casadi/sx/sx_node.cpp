@@ -44,10 +44,6 @@ double SXNode::getValue() const{
   throw "SXNode::getValue()";*/
 }
 
-int SXNode::getOp() const{
-  throw CasadiException(string("getOp() not defined for class ") + typeid(*this).name());
-}
-
 int SXNode::getIntValue() const{
   throw CasadiException(string("getIntValue() not defined for class ") + typeid(*this).name());
 }

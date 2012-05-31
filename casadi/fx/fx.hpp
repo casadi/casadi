@@ -119,7 +119,13 @@ class FX : public OptionsFunctionality{
 
   /** \brief  Get number of outputs */
   int getNumOutputs() const;
+  
+  /** \brief  Get total number of scalar inputs (i.e. the number of nonzeros in all of the matrix-valued inputs) */
+  int getNumScalarInputs() const;
 
+  /** \brief  Get total number of scalar outputs (i.e. the number of nonzeros in all of the matrix-valued outputs) */
+  int getNumScalarOutputs() const;
+  
   /** \brief  Set number of inputs (normally invoked internally) */
   void setNumInputs(int num_in);
 
@@ -157,8 +163,11 @@ class FX : public OptionsFunctionality{
   std::vector<MX> call(const MX &arg);
 #endif // SWIG
   
-  /** \brief  Create a function call */
+  /** \brief  Create a function call (MX graph) */
   std::vector<MX> call(const std::vector<MX> &arg);
+
+  /** \brief  Create a function call (SX graph) NOTE: UNDER DEVELOPMENT */
+  std::vector<SXMatrix> callSX(const std::vector<SXMatrix> &arg);
 
   /** \brief  Create a function call with directional derivatives 
    * Note: return by reference with SWIG

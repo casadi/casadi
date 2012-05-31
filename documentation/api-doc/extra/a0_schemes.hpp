@@ -403,6 +403,20 @@
 <br/>
 @copydoc scheme_QPOutput
 */
+/** \class CasADi::CplexInternal
+\n
+\par
+@copydoc scheme_NLPInput
+<br/>
+@copydoc scheme_NLPOutput
+*/
+/** \class CasADi::CplexSolver
+\n
+\par
+@copydoc scheme_NLPInput
+<br/>
+@copydoc scheme_NLPOutput
+*/
 /** \class CasADi::KnitroInternal
 \n
 \par
@@ -445,20 +459,6 @@
 <br/>
 @copydoc scheme_IntegratorOutput
 */
-/** \class CasADi::Sundials::IdasInternal
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
-*/
-/** \class CasADi::Sundials::IdasIntegrator
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
-*/
 /** \class CasADi::SQPInternal
 \n
 \par
@@ -472,6 +472,20 @@
 @copydoc scheme_NLPInput
 <br/>
 @copydoc scheme_NLPOutput
+*/
+/** \class CasADi::Sundials::IdasInternal
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
+/** \class CasADi::Sundials::IdasIntegrator
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
 */
 /** \class CasADi::RKIntegratorInternal
 \n
@@ -510,20 +524,6 @@
 \n
 \par
 @copydoc scheme_ControlSimulatorInput
-*/
-/** \class CasADi::CplexInternal
-\n
-\par
-@copydoc scheme_NLPInput
-<br/>
-@copydoc scheme_NLPOutput
-*/
-/** \class CasADi::CplexSolver
-\n
-\par
-@copydoc scheme_NLPInput
-<br/>
-@copydoc scheme_NLPOutput
 */
 /** \class CasADi::OptimalControl::CollocationInternal
 \n

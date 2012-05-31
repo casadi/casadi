@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef MATRIX_MATRIX_OP_HPP
-#define MATRIX_MATRIX_OP_HPP
+#ifndef BINARY_MX_HPP
+#define BINARY_MX_HPP
 
 #include "mx_node.hpp"
 
@@ -30,13 +30,13 @@ namespace CasADi{
   \author Joel Andersson 
   \date 2010	
 */
-class BinaryOp : public MXNode{
+class BinaryMX : public MXNode{
   public:
     /** \brief  Constructor */
-    BinaryOp(Operation op, const MX& x, const MX& y);
+    BinaryMX(Operation op, const MX& x, const MX& y);
     
     /** \brief  Destructor */
-    virtual ~BinaryOp()=0;
+    virtual ~BinaryMX()=0;
 
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
@@ -56,7 +56,7 @@ class BinaryOp : public MXNode{
 };
 
 /// A sparse matrix-matrix binary operation
-class SparseSparseOp : public BinaryOp{
+class SparseSparseOp : public BinaryMX{
   public:
     
     /** \brief  Constructor */
@@ -82,7 +82,7 @@ class SparseSparseOp : public BinaryOp{
 };
 
 /// A matrix-scalar binary operation where one loops only over nonzeros of the matrix
-class NonzerosScalarOp : public BinaryOp{
+class NonzerosScalarOp : public BinaryMX{
   public:
     
     /** \brief  Constructor */
@@ -109,7 +109,7 @@ class NonzerosScalarOp : public BinaryOp{
 };
 
 /// A scalar-matrix binary operation where one loops only over nonzeros of the matrix
-class ScalarNonzerosOp : public BinaryOp{
+class ScalarNonzerosOp : public BinaryMX{
   public:
     
     /** \brief  Constructor */
@@ -136,7 +136,7 @@ class ScalarNonzerosOp : public BinaryOp{
 };
 
 /// A matrix-matrix binary operation with matching nonzeros
-class NonzerosNonzerosOp : public BinaryOp{
+class NonzerosNonzerosOp : public BinaryMX{
   public:
     
     /** \brief  Constructor */
@@ -168,4 +168,4 @@ class NonzerosNonzerosOp : public BinaryOp{
 } // namespace CasADi
 
 
-#endif // MATRIX_MATRIX_OP_HPP
+#endif // BINARY_MX_HPP

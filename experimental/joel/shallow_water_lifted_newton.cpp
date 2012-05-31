@@ -47,7 +47,7 @@ bool with_ipopt = false;
 bool lifted = true;
 
 // Single-shooting
-bool single_shooting = true;
+bool single_shooting = false;
 
 // Expand MX->SX
 // bool expand = true;
@@ -76,7 +76,7 @@ int main(){
 //   int num_measurements = 20;
 
   // The largest dimensions which work with SX and exact Hessian
-  int numboxes = 15; // (but e.g. 10 fails with the error message "Initial QP could not be solved due to unboundedness"
+  int numboxes = 20; // (but e.g. 10 fails with the error message "Initial QP could not be solved due to unboundedness"
   int num_eulersteps = 10;
   int num_measurements = 25;
 
@@ -106,7 +106,7 @@ int main(){
   DMatrix h0 = DMatrix::zeros(numboxes  ,numboxes  ); 
   for(int i=0; i<numboxes; ++i){
     for(int j=0; j<numboxes; ++j){
-      double spdist = sqrt(pow((x[i]-0.04),2) + pow((y[j]-0.04),2));
+      double spdist = sqrt(pow((x[i]-0.04),2.) + pow((y[j]-0.04),2.));
       if(spdist<sprad/3.0){
 	h0.elem(i,j) = spheight * cos(3.0*M_PI*spdist/(2.0*sprad));
       }
@@ -369,7 +369,7 @@ int main(){
       //qp_solver_options["verbose"] = true;
       nlp_solver.setOption("qp_solver_options",qp_solver_options);
       if(lifted) nlp_solver.setOption("num_lifted",nv);
-      nlp_solver.setOption("maxiter",200);
+      nlp_solver.setOption("maxiter",100);
       nlp_solver.setOption("toldx",1e-9);
       nlp_solver.setOption("verbose",true);
     }

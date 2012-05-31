@@ -16,7 +16,6 @@ option(WITH_OOQP "Enable OOQP interface" OFF)
 option(WITH_FORTRAN "Enable Fortran linking, if this is set to OFF, no Fortran linking will be invoked (should not be needed, CMakeDetermineFortranCompiler should do the job)" ON)
 option(WITH_SWIG_SPLIT "Split SWIG wrapper generation into multiple modules" OFF) 
 option(WITH_WORHP "Compile the WORHP interface" OFF) 
-option(CACHING_CONSTANTS "Cache numerical constants to avoid duplicates (requires C++11/C++0X support)" OFF)
 
 if(WITH_FORTRAN)
   # Enable Fortran linking (needed e.g. for LAPACK/BLAS), if Fortran is available
@@ -48,13 +47,28 @@ endif(WITH_PRINTME)
 
 include_directories(.)
 
-# Enable C++0X and set defines if CACHING_CONSTANTS is needed
-if(CACHING_CONSTANTS)
-  if(CMAKE_COMPILER_IS_GNUCXX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
-    add_definitions(-DCACHING_CONSTANTS)
-  endif(CMAKE_COMPILER_IS_GNUCXX)
-endif(CACHING_CONSTANTS)
+# Check if unordered map is available
+try_compile(HAVE_UNORDERED_MAP
+  ${CMAKE_BINARY_DIR} 
+  ${CMAKE_SOURCE_DIR}/cmake_modules/check_unordered_map.cpp
+  OUTPUT_VARIABLE OUTPUT)
+
+# Add -std=gnu++0x and try again
+if(NOT HAVE_UNORDERED_MAP)
+  try_compile(HAVE_UNORDERED_MAP 
+    ${CMAKE_BINARY_DIR} 
+    ${CMAKE_SOURCE_DIR}/cmake_modules/check_unordered_map.cpp
+    CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=-std=gnu++0x
+    OUTPUT_VARIABLE OUTPUT)
+    
+    # Add flag
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++0x")
+endif(NOT HAVE_UNORDERED_MAP)
+
+# Add definition
+if(HAVE_UNORDERED_MAP)
+add_definitions(-DHAVE_UNORDERED_MAP)
+endif(HAVE_UNORDERED_MAP)
 
 # set(CMAKE_VERBOSE_MAKEFILE 0)
 

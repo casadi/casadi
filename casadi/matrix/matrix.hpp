@@ -482,6 +482,10 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     Erase rows and/or columns of a matrix */
     void erase(const std::vector<int>& ii, const std::vector<int>& jj);
     
+    /** \brief Remove rows or columns
+    Rremove/delete rows and/or columns of a matrix */
+    void remove(const std::vector<int>& ii, const std::vector<int>& jj);
+    
     /** \brief Enlarge matrix
     Make the matrix larger by inserting empty rows and columns, keeping the existing non-zeros */
     void enlarge(int nrow, int ncol, const std::vector<int>& ii, const std::vector<int>& jj);

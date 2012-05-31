@@ -20,45 +20,27 @@
  *
  */
 
-#ifndef SYMBOLIC_SCALAR_HPP
-#define SYMBOLIC_SCALAR_HPP
+#include <nvector/nvector_serial.h>
+#include <sundials/sundials_dense.h>
+#include <sundials/sundials_types.h>
+#include <cvodes/cvodes.h>
+#include <cvodes/cvodes_dense.h>
+#include <cvodes/cvodes_band.h> 
+#include <cvodes/cvodes_spgmr.h>
+#include <cvodes/cvodes_spbcgs.h>
+#include <cvodes/cvodes_sptfqmr.h>
+#include <cvodes/cvodes_impl.h>
 
-#include "sx_node.hpp"
+#ifdef SUNDIALS_2_5
+#define SUNDIALS_INT long
+#else
+#define SUNDIALS_INT long
+#endif
 
-namespace CasADi{
+static int djac_wrapper(SUNDIALS_INT N, double t, N_Vector y, N_Vector fy, DlsMat Jac, void *user_data,N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){ return 0; }
 
-/** \brief Represents a scalar symbolic expression
-  \author Joel Andersson 
-  \date 2010
-  A regular user is not supposed to work with this Node class.
-  This user can call SX(name) instead.
-*/
-class SymbolicSXNode : public SXNode{
-public:
-
-explicit SymbolicSXNode(const std::string &name) : name(name){}
-virtual ~SymbolicSXNode(){}
-
-virtual bool isSymbolic() const{ 
-  return true; 
+int main(){
+  void* mem = 0;
+  CVDlsSetDenseJacFn(mem, djac_wrapper);
+  return 0;
 }
-
-virtual const std::string& getName() const{ 
-  return name; 
-}
-
-/** \brief  Name */
-std::string name;
-
-protected:
-
-/** \brief  print */
-virtual void print(std::ostream &stream, long& remaining_calls) const{
-  stream << name;
-}
-
-};
-
-} // namespace CasADi
-
-#endif // SYMBOLIC_SCALAR_HPP

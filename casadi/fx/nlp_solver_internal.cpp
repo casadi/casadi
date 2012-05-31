@@ -284,6 +284,7 @@ void NLPSolverInternal::init(){
           // Lagrangian function
           MXFunction lfcn(lfcn_in,sigma*f+ inner_prod(lam,g));
           lfcn.init();
+	  log("SX Lagrangian function generated");
           
 /*          cout << "countNodes(lfcn.outputMX()) = " << countNodes(lfcn.outputMX()) << endl;*/
       
@@ -291,7 +292,7 @@ void NLPSolverInternal::init(){
           if(adjoint_mode){
           
             // Gradient of the lagrangian
-            MX gL = trans(lfcn.grad());
+            MX gL = lfcn.grad();
             log("MX Lagrangian gradient generated");
 
             MXFunction glfcn(lfcn_in,gL);

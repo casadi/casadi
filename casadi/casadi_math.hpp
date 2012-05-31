@@ -60,6 +60,9 @@ bool operation_checker(unsigned int op){
     case COSH:          return F<COSH>::check;
     case TANH:          return F<TANH>::check;
     case OP_CONST:      return F<OP_CONST>::check;
+    case OP_CALL:      	 return F<OP_CALL>::check;
+    case OP_VAR:      	 return F<OP_VAR>::check;
+    case OP_OUTPUT:     return F<OP_OUTPUT>::check;
     case ERFINV:        return F<ERFINV>::check;
     case OP_PRINTME:    return F<OP_PRINTME>::check;
     case ATAN2:         return F<ATAN2>::check;

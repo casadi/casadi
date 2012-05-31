@@ -20,51 +20,51 @@
  *
  */
 
-#include "symbolic_mx_node.hpp"
+#include "symbolic_mx.hpp"
 #include "../stl_vector_tools.hpp"
 
 using namespace std;
 
 namespace CasADi{
 
-SymbolicMatrix::SymbolicMatrix(const std::string& name, int n, int m) : name_(name) {
+SymbolicMX::SymbolicMX(const std::string& name, int n, int m) : name_(name) {
   setSparsity(CRSSparsity(n,m,true));
 }
 
-SymbolicMatrix::SymbolicMatrix(const std::string& name, const CRSSparsity & sp) : name_(name) {
+SymbolicMX::SymbolicMX(const std::string& name, const CRSSparsity & sp) : name_(name) {
   setSparsity(sp);
 }
 
-SymbolicMatrix* SymbolicMatrix::clone() const{
-  return new SymbolicMatrix(*this);
+SymbolicMX* SymbolicMX::clone() const{
+  return new SymbolicMX(*this);
 }
 
-void SymbolicMatrix::printPart(std::ostream &stream, int part) const{
+void SymbolicMX::printPart(std::ostream &stream, int part) const{
   stream << name_;
 }
 
-void SymbolicMatrix::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+void SymbolicMX::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
 }
 
-void SymbolicMatrix::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+void SymbolicMX::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
 }
 
-void SymbolicMatrix::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+void SymbolicMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
 }
 
-bool SymbolicMatrix::isSymbolic() const{
+bool SymbolicMX::isSymbolic() const{
   return true;
 }
 
-const std::string& SymbolicMatrix::getName() const{
+const std::string& SymbolicMX::getName() const{
   return name_;
 }
 
-std::vector<MX> SymbolicMatrix::partial(const std::vector<MX>& x){
+std::vector<MX> SymbolicMX::partial(const std::vector<MX>& x){
   return std::vector<MX>(1,MX::eye(sparsity().numel()));
 }
 
-void SymbolicMatrix::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+void SymbolicMX::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
   if(fwd){
     bvec_t *outputd = get_bvec_t(output[0]->data());
     fill_n(outputd,output[0]->size(),0);

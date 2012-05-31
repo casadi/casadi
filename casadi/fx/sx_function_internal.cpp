@@ -30,7 +30,6 @@
 #include "../stl_vector_tools.hpp"
 #include "../sx/sx_tools.hpp"
 #include "../sx/sx_node.hpp"
-#include "../mx/evaluation.hpp"
 #include "../casadi_types.hpp"
 #include "../matrix/crs_sparsity_internal.hpp"
 
@@ -43,7 +42,7 @@
 #include "llvm/PassManager.h"
 #include "llvm/Analysis/Verifier.h"
 #include "llvm/Target/TargetData.h"
-#include "llvm/Target/TargetSelect.h"
+#include "llvm/Support/TargetSelect.h"
 #include "llvm/Transforms/Scalar.h"
 #include "llvm/Support/IRBuilder.h"
 
@@ -105,7 +104,13 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
         CASADI_MATH_FUN_ALL_BUILTIN(work_[it->arg.i[0]],work_[it->arg.i[1]],work_[it->res])
         
         // Now all other operations
+	
+	// Constant
         case OP_CONST: work_[it->res] = it->arg.d; break;
+	
+	// Get input
+// 	case OP_INPUT: work_[it->res] = input(it->arg.i[0]).at(it->arg.i[1]); break;
+// 	case OP_OUTPUT: input(it->arg.i[0]).at(it->arg.i[1]) = work_[it->res]; break;
       }
     }
   } else { // with taping
@@ -729,29 +734,58 @@ void SXFunctionInternal::init(){
           // Reference to the child node
           SX& c = binops_[i]->dep(1);
           
-          // If the dependent variable is a binary variable
-          bool dep_is_binary = c.isBinary();
-          if(dep_is_binary){
+	  // Number of dependencies
+	  int c_ndep = c->ndep();
+	  
+          // If the dependent variable is a unary variable
+          if(c_ndep==1){
 
-            // Get the indices of the children of the child
             int c_temp = c.get()->temp;
-            int c_temp0 = c->dep(0).get()->temp;
-            int c_temp1 = c->dep(1).get()->temp;
-            
-            // Index currently assigned to the storage location
             int c_curr = curr_assign[place[c_temp]];
-            int c_curr0 = curr_assign[place[c_temp0]];
-            int c_curr1 = curr_assign[place[c_temp1]];
-            
-            // Number of dependencies
-            int c_ndeps = casadi_math<double>::ndeps(c.getOp());
-            
+
             // Check if the node is used exactly one time
             bool ok_replace = refcount_copy.at(c_temp)==1;
-            
+	    	    
+	    int c_temp0 = c->dep(0).get()->temp;
+            int c_curr0 = curr_assign[place[c_temp0]];
+            	                            
             // Check if the values of the children are still available in the work vector or was assigned during the child operation
             ok_replace = ok_replace && (c_curr0<0 || c_curr0==c_temp0 || c_curr0==c_curr);
-            ok_replace = ok_replace && (c_ndeps<2 ||  c_curr1<1 || c_curr1==c_temp1 || c_curr1==c_curr);
+            
+            if(ok_replace){
+              
+              // Mark the node negative so that we can remove it later
+              refcount_copy.at(c.get()->temp) = -1;
+              
+              // Save the indices of the children
+              it->arg.i[0] = place[c_temp0];
+
+              // Replace operation with an inplace operation
+              it->op = ip*NUM_BUILT_IN_OPS + c->getOp();
+              
+              // Increase the inplace counter
+              num_inplace++;
+            }
+          }
+          	  
+          // If the dependent variable is a binary variable
+          if(c_ndep==2){
+
+            int c_temp = c.get()->temp;
+            int c_curr = curr_assign[place[c_temp]];
+
+            // Check if the node is used exactly one time
+            bool ok_replace = refcount_copy.at(c_temp)==1;
+	    	    
+	    int c_temp0 = c->dep(0).get()->temp;
+            int c_curr0 = curr_assign[place[c_temp0]];
+            	    
+	    int c_temp1 = c->dep(1).get()->temp;
+            int c_curr1 = curr_assign[place[c_temp1]];
+                        
+            // Check if the values of the children are still available in the work vector or was assigned during the child operation
+            ok_replace = ok_replace && (c_curr0<0 || c_curr0==c_temp0 || c_curr0==c_curr);
+            ok_replace = ok_replace && (c_curr1<1 || c_curr1==c_temp1 || c_curr1==c_curr);
             
             if(ok_replace){
               
@@ -924,10 +958,10 @@ void SXFunctionInternal::init(){
     OurFPM.doInitialization();
 
     // Single argument
-    std::vector<const llvm::Type*> unaryArg(1,llvm::Type::getDoubleTy(llvm::getGlobalContext()));
+    std::vector<llvm::Type*> unaryArg(1,llvm::Type::getDoubleTy(llvm::getGlobalContext()));
 
     // Two arguments
-    std::vector<const llvm::Type*> binaryArg(2,llvm::Type::getDoubleTy(llvm::getGlobalContext()));
+    std::vector<llvm::Type*> binaryArg(2,llvm::Type::getDoubleTy(llvm::getGlobalContext()));
     
     // Unary operation
     llvm::FunctionType *unaryFun = llvm::FunctionType::get(llvm::Type::getDoubleTy(llvm::getGlobalContext()),unaryArg, false);
@@ -954,22 +988,22 @@ void SXFunctionInternal::init(){
     builtins[TANH] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "tanh", jit_module_);
 
     // Void type
-    const llvm::Type* void_t = llvm::Type::getVoidTy(llvm::getGlobalContext());
+    llvm::Type* void_t = llvm::Type::getVoidTy(llvm::getGlobalContext());
 
     // Double type
-    const llvm::Type* double_t = llvm::Type::getDoubleTy(llvm::getGlobalContext());
+    llvm::Type* double_t = llvm::Type::getDoubleTy(llvm::getGlobalContext());
     
     // Double pointer type
-    const llvm::Type* double_ptr_t = llvm::Type::getDoublePtrTy(llvm::getGlobalContext());
+    llvm::Type* double_ptr_t = llvm::Type::getDoublePtrTy(llvm::getGlobalContext());
 
     // Double pointer pointer type
-    const llvm::Type* double_ptr_ptr_t = llvm::PointerType::getUnqual(double_ptr_t);
+    llvm::Type* double_ptr_ptr_t = llvm::PointerType::getUnqual(double_ptr_t);
 
     // A normal 32-bit integer
-    const llvm::IntegerType *int32Ty = llvm::IntegerType::get(llvm::getGlobalContext(), 32);
+    llvm::IntegerType *int32Ty = llvm::IntegerType::get(llvm::getGlobalContext(), 32);
     
     // Two arguments in and two references
-    std::vector<const llvm::Type*> genArg(2);
+    std::vector<llvm::Type*> genArg(2);
     genArg[0] = double_ptr_ptr_t;
     genArg[1] = double_ptr_ptr_t;
     
@@ -1030,7 +1064,7 @@ void SXFunctionInternal::init(){
 
 	default:
 	  casadi_assert_message(builtins[it->op]!=0, "No way to treat: " << it->op);
-	  res = builder.CreateCall(builtins[it->op], oarg.begin(), oarg.end());
+	  res = builder.CreateCall(builtins[it->op], oarg);
       }
       
       // Save to work vector

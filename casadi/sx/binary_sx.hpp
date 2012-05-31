@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef BINARY_SCALAR_HPP
-#define BINARY_SCALAR_HPP
+#ifndef BINARY_SX_HPP
+#define BINARY_SX_HPP
 
 #include "sx_node.hpp"
 #include <stack>
@@ -32,56 +32,28 @@ namespace CasADi{
   \author Joel Andersson 
   \date 2010
 */
-class BinarySXNode : public SXNode{
+class BinarySX : public SXNode{
   private:
     
-    /** \brief  Constructor is private, use "create" below (unary version) */
-    BinarySXNode(unsigned char op_, const SX& child1_){
-      op = op_;
-      child[0] = child1_;
-      child[1] = casadi_limits<SX>::zero;
-    }
-    
     /** \brief  Constructor is private, use "create" below (binary version) */
-    BinarySXNode(unsigned char op_, const SX& child1_, const SX& child2_){
-      op = op_;
-      child[0] = child1_;
-      child[1] = child2_;
-    }
+    BinarySX(unsigned char op, const SX& dep0, const SX& dep1) : op_(op), dep0_(dep0), dep1_(dep1){}
     
   public:
     
-    /** \brief  Create a unary expression */
-    inline static SX create(unsigned char op_, const SX& child1_){
-      return SX::create(new BinarySXNode(op_,child1_));
-    }
-    
     /** \brief  Create a binary expression */
-    inline static SX create(unsigned char op_, const SX& child1_, const SX& child2_){
-      return SX::create(new BinarySXNode(op_,child1_,child2_));
-    }
-    
-    /** \brief  Create a unary expression (templated version) */
-    template<int op_>
-    inline static SX createT(const SX& child1_){
-      return SX::create(new BinarySXNode(op_,child1_));
-    }
-    
-    /** \brief  Create a binary expression (templated version) */
-    template<int op_>
-    inline static SX createT(const SX& child1_, const SX& child2_){
-      return SX::create(new BinarySXNode(op_,child1_,child2_));
+    inline static SX create(unsigned char op, const SX& dep0, const SX& dep1){
+      return SX::create(new BinarySX(op,dep0,dep1));
     }
     
     /** \brief Destructor
     This is a rather complex destructor which is necessary since the default destructor 
     can cause stack overflow due to recursive calling.
     */
-    virtual ~BinarySXNode(){
+    virtual ~BinarySX(){
       // Start destruction method if any of the dependencies has dependencies
       for(int c1=0; c1<2; ++c1){
-        // Get the node of the child and remove it from the smart pointer
-        SXNode* n1 = child[c1].assignNoDelete(casadi_limits<SX>::nan);
+        // Get the node of the dependency and remove it from the smart pointer
+        SXNode* n1 = dep(c1).assignNoDelete(casadi_limits<SX>::nan);
         
         // Check if this was the last reference
         if(n1->count==0){
@@ -107,9 +79,9 @@ class BinarySXNode : public SXNode{
               
               // Check if the top element has dependencies with dependencies
               bool added_to_stack = false;
-              for(int c2=0; c2<2; ++c2){ // for all children of the child
+              for(int c2=0; c2<t->ndep(); ++c2){ // for all dependencies of the dependency
                 
-                // Get the node of the child of the top element and remove it from the smart pointer
+                // Get the node of the dependency of the top element and remove it from the smart pointer
                 SXNode *n2 = t->dep(c2).assignNoDelete(casadi_limits<SX>::nan);
                 
                 // Check if this is the only reference to the element
@@ -141,51 +113,47 @@ class BinarySXNode : public SXNode{
       }
     }
     
-    virtual bool isSmooth() const{ return operation_checker<SmoothChecker>(op);}
+    virtual bool isSmooth() const{ return operation_checker<SmoothChecker>(op_);}
     
     virtual bool hasDep() const{ return true; }
     
     /** \brief  Number of dependencies */
     virtual int ndep() const{ return 2;}
     
-    /** \brief  get the reference of a child */
-    virtual const SX& dep(int i) const{ return child[i];}
-    virtual SX& dep(int i){ return child[i];}
+    /** \brief  get the reference of a dependency */
+    virtual const SX& dep(int i) const{ return i==0 ? dep0_ : dep1_;}
+    virtual SX& dep(int i){ return i==0 ? dep0_ : dep1_;}
     
     /** \brief  Get the operation */
-    virtual int getOp() const{ return op;}
+    virtual int getOp() const{ return op_;}
     
     /** \brief  Print the expression (recursively with a maximum number of levels) */
     virtual void print(std::ostream &stream, long& remaining_calls) const{
 
       // Print the prefix
-      casadi_math<double>::printPre(op,stream);
+      casadi_math<double>::printPre(op_,stream);
       
-      // Print the first child
-      child[0].print(stream,remaining_calls);
+      // Print the first dependency
+      dep0_.print(stream,remaining_calls);
       
-      // If binary
-      if(casadi_math<double>::ndeps(op)>1){
-        
-        //Print the infix
-        casadi_math<double>::printSep(op,stream);
+      //Print the infix
+      casadi_math<double>::printSep(op_,stream);
 
-        // Print the second child
-        child[1].print(stream,remaining_calls);
-      }
+      // Print the second dependency
+      dep1_.print(stream,remaining_calls);
       
       // Print the suffix
-      casadi_math<double>::printPost(op,stream);
+      casadi_math<double>::printPost(op_,stream);
     }
     
     /** \brief  The binary operation as an 1 byte integer (allows 256 values) */
-    unsigned char op;
+    unsigned char op_;
     
-    /** \brief  The children of the node */
-    SX child[2];
+    /** \brief  The dependencies of the node */
+    SX dep0_, dep1_;
 };
 
 } // namespace CasADi
 
 
-#endif // BINARY_SCALAR_HPP
+#endif // BINARY_SX_HPP

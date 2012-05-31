@@ -20,7 +20,7 @@
  *
  */
 
-#include "unary_op.hpp"
+#include "unary_mx.hpp"
 #include "mx_tools.hpp"
 #include <vector>
 #include <sstream>
@@ -30,7 +30,7 @@ using namespace std;
 
 namespace CasADi{
 
-UnaryOp::UnaryOp(Operation op, MX x) : op_(op){
+UnaryMX::UnaryMX(Operation op, MX x) : op_(op){
   // Put a densifying node in between if necessary
   if(!operation_checker<F00Checker>(op_)){
     makeDense(x);
@@ -40,11 +40,11 @@ UnaryOp::UnaryOp(Operation op, MX x) : op_(op){
   setSparsity(x->sparsity());
 }
 
-UnaryOp* UnaryOp::clone() const{
-  return new UnaryOp(*this);
+UnaryMX* UnaryMX::clone() const{
+  return new UnaryMX(*this);
 }
 
-void UnaryOp::printPart(std::ostream &stream, int part) const{
+void UnaryMX::printPart(std::ostream &stream, int part) const{
   if(part==0){
     casadi_math<double>::printPre(op_,stream);
   } else {
@@ -52,7 +52,7 @@ void UnaryOp::printPart(std::ostream &stream, int part) const{
   }
 }
 
-void UnaryOp::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
+void UnaryMX::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
   double nan = numeric_limits<double>::quiet_NaN();
   vector<double> &outputd = output[0]->data();
   const vector<double> &inputd = input[0]->data();
@@ -85,7 +85,7 @@ void UnaryOp::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMa
   }
 }
 
-void UnaryOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
+void UnaryMX::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
   // Do the operation on all non-zero elements
   const vector<SX> &xd = input[0]->data();
   vector<SX> &od = output[0]->data();
@@ -95,7 +95,7 @@ void UnaryOp::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const 
   }
 }
 
-void UnaryOp::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
+void UnaryMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
   // Evaluate function
   MX dummy;   // Dummy second argument
   if(!output_given){
@@ -122,7 +122,7 @@ void UnaryOp::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwd
   }
 }
 
-void UnaryOp::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
+void UnaryMX::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){
   bvec_t *inputd = get_bvec_t(input[0]->data());
   bvec_t *outputd = get_bvec_t(output[0]->data());
   if(fwd){

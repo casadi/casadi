@@ -512,39 +512,39 @@ void expand(const Matrix<SX>& ex2, Matrix<SX> &ww, Matrix<SX>& tt){
         casadi_assert(to_be_expanded.top()->hasDep()); // make sure that the node is binary
 
         // Check if addition, subtracton or multiplication
-        BinarySXNode*     binnode = (BinarySXNode*)to_be_expanded.top();
+        SXNode* node = to_be_expanded.top();
         // If we have a binary node that we can factorize
-        if(binnode->op == ADD || binnode->op == SUB || (binnode->op == MUL  && (binnode->child[0]->isConstant() || binnode->child[1]->isConstant()))){
+        if(node->getOp() == ADD || node->getOp() == SUB || (node->getOp() == MUL  && (node->dep(0)->isConstant() || node->dep(1)->isConstant()))){
           // Make sure that both children are factorized, if not - add to stack
-          if (indices.find(binnode->child[0].get()) == indices.end()){
-            to_be_expanded.push(binnode->child[0].get());
+          if (indices.find(node->dep(0).get()) == indices.end()){
+            to_be_expanded.push(node->dep(0).get());
             continue;
           }
-          if (indices.find(binnode->child[1].get()) == indices.end()){
-             to_be_expanded.push(binnode->child[1].get());
+          if (indices.find(node->dep(1).get()) == indices.end()){
+             to_be_expanded.push(node->dep(1).get());
              continue;
           }
 
           // Get indices of children
-          int ind1 = indices[binnode->child[0].get()];
-          int ind2 = indices[binnode->child[1].get()];
+          int ind1 = indices[node->dep(0).get()];
+          int ind2 = indices[node->dep(1).get()];
   
           // If multiplication
-          if(binnode->op == MUL){
+          if(node->getOp() == MUL){
             double fac;
-            if(binnode->child[0]->isConstant()){ // Multiplication where the first factor is a constant
-              fac = binnode->child[0]->getValue();
+            if(node->dep(0)->isConstant()){ // Multiplication where the first factor is a constant
+              fac = node->dep(0)->getValue();
               f = terms[ind2];
               w = weights[ind2];
             } else { // Multiplication where the second factor is a constant
-              fac = binnode->child[1]->getValue();
+              fac = node->dep(1)->getValue();
               f = terms[ind1];
               w = weights[ind1];
             }
             for(int i=0; i<w.size(); ++i) w[i] *= fac;
 
           } else { // if addition or subtraction
-            if(binnode->op == ADD){          // Addition: join both sums
+            if(node->getOp() == ADD){          // Addition: join both sums
               f = terms[ind1];      f.insert(f.end(), terms[ind2].begin(), terms[ind2].end());
               w = weights[ind1];    w.insert(w.end(), weights[ind2].begin(), weights[ind2].end());
             } else {      // Subtraction: join both sums with negative weights for second term
@@ -575,7 +575,7 @@ void expand(const Matrix<SX>& ex2, Matrix<SX> &ww, Matrix<SX>& tt){
       } else { // if we have a binary node that we cannot factorize
         // By default, 
         w.push_back(1);
-        f.push_back(binnode);
+        f.push_back(node);
 
       }
     }
@@ -851,7 +851,7 @@ int countNodes(const Matrix<SX>& A){
 
 
 std::string getOperatorRepresentation(const SX& x, const std::vector<std::string>& args) {
-  if (!x.isBinary()) throw CasadiException("getOperatorRepresentation: SX must be binary operator");
+  if (!x.hasDep()) throw CasadiException("getOperatorRepresentation: SX must be binary operator");
   if (args.size() == 0 || casadi_math<double>::ndeps(x.getOp())==2 && args.size() < 2) throw CasadiException("getOperatorRepresentation: not enough arguments supplied");
   std::stringstream s;
   casadi_math<double>::print(x.getOp(),s,args[0],args[1]);

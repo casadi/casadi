@@ -348,9 +348,13 @@ class CRSSparsity : public CachedObject{
     /// Get the dimension as a string
     std::string dimString() 	const;
     
-    /* \brief print a textual representation of sparsity
+    /** \brief Print a textual representation of sparsity
     */
     void spy(std::ostream &stream=std::cout) const;
+
+    /** \brief Generate a script for Matlab or Octave which visualizes the sparsity using the spy command
+    */
+    void spyMatlab(const std::string& mfile) const;
 
     #ifndef SWIG
     /* \brief Assign the nonzero entries of one sparsity pattern to the nonzero entries of another sparsity pattern */

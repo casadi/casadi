@@ -294,6 +294,9 @@ enum Operation{
   ATAN2,
   
   OP_CONST,
+  OP_VAR,
+  OP_CALL,
+  OP_OUTPUT,
   
   ERFINV,
   OP_PRINTME,
