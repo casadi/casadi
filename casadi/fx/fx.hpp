@@ -473,10 +473,14 @@ void getAdjSens(T val, int ind=0, int dir=0) const;
   /// Get a single statistic obtained at the end of the last evaluate call
   GenericType getStat(const std::string& name) const;
 
-  /// Get a vector of symbolic variables with the same dimensions as the inputs
+  /** \brief  Get a vector of symbolic variables with the same dimensions as the inputs
+  * There is no guarantee that consecutive calls return identical objects
+  */
   std::vector<MX> symbolicInput() const;
   
-  /// Get a vector of symbolic variables with the same dimensions as the inputs, SX graph
+  /** \brief Get a vector of symbolic variables with the same dimensions as the inputs, SX graph
+  * There is no guarantee that consecutive calls return identical objects
+  */
   std::vector<SXMatrix> symbolicInputSX() const;
 
   /** \brief Is the class able to propate seeds through the algorithm? (for usage, see the example propagating_sparsity.cpp) */
