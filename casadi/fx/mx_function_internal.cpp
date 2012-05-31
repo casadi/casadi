@@ -650,7 +650,7 @@ MX MXFunctionInternal::jac(int iind, int oind, bool compact, bool symmetric){
 void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 
                                 const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
                                 const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
-                                bool output_given, bool eliminate_constants){
+                                bool output_given){
   assertInit();
   casadi_assert_message(arg.size()==getNumInputs(),"Wrong number of input arguments");
   casadi_assert_message(res.size()==getNumOutputs(),"Wrong number of output arguments");
@@ -873,7 +873,7 @@ FX MXFunctionInternal::hessian(int iind, int oind) {
 void MXFunctionInternal::evalSX(const std::vector<SXMatrix>& input_s, std::vector<SXMatrix>& output_s, 
                                 const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
                                 const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
-                                bool output_given, bool eliminate_constants){
+                                bool output_given){
   casadi_assert_message(fwdSens.empty(),"Not implemented");
   casadi_assert_message(adjSeed.empty(),"Not implemented");
   
@@ -945,7 +945,7 @@ SXFunction MXFunctionInternal::expand(const std::vector<SXMatrix>& inputvsx ){
   vector<vector<SXMatrix> > dummy;
   
   // Evaluate symbolically
-  eval(arg,res,dummy,dummy,dummy,dummy,false,false);
+  eval(arg,res,dummy,dummy,dummy,dummy,false);
   
   // Create function
   SXFunction f(arg,res);
@@ -1012,7 +1012,7 @@ FX MXFunctionInternal::getDerivative(int nfwd, int nadj){
 
 	// Evaluate symbolically
 	vector<vector<MX> > fsens(nfwd,outputv_), asens(nadj,inputv_);
-    evalMX(inputv_,outputv_,fseed,fsens,aseed,asens,true,false);
+    evalMX(inputv_,outputv_,fseed,fsens,aseed,asens,true);
 
     // All inputs of the return function
     vector<MX> ret_in;

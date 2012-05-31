@@ -36,11 +36,6 @@ namespace llvm{
 
 namespace CasADi{
 
-  struct AlgElData{
-    // Partial derivatives
-    double d[2];
-};
-
 /** \brief  Internal node class for SXFunction
   A regular user should never work with any Node class. Use SXFunction directly.
   \author Joel Andersson 
@@ -68,7 +63,7 @@ class SXFunctionInternal : public XFunctionInternal<SXFunctionInternal,Matrix<SX
   virtual void evalSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
                       const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
                       const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
-                      bool output_given, bool eliminate_constants);
+                      bool output_given);
                           
   /** \brief  Check if smooth */
   bool isSmooth() const;
@@ -99,22 +94,31 @@ class SXFunctionInternal : public XFunctionInternal<SXFunctionInternal,Matrix<SX
   /** \brief  An elemenent of the algorithm, namely a binary operation */
   typedef SXAlgEl AlgEl;
   
+  /** \brief  An elemenent of the tape */
+  template<typename T>
+  struct TapeEl{
+    T d[2];
+  };
+  
   /** \brief  all binary nodes of the tree in the order of execution */
   std::vector<AlgEl> algorithm_;
-  std::vector<AlgElData> pder_;
 
   /** \brief  Working vector for numeric calculation */
   std::vector<double> work_;
   std::vector<double> dwork_;
+  std::vector<TapeEl<double> > pdwork_;
   int worksize_;
 
   /// work vector for symbolic calculations (allocated first time)
-  std::vector<SX> swork_;
+  std::vector<SX> s_work_;
   std::vector<SX> free_vars_;
   std::vector<int> refcount_;
   
   /// The expressions corresponding to each binary operation
   std::vector<SX> binops_;
+  
+  /// The expressions corresponding to each constant
+  std::vector<SX> constants_;
   
   /** \brief  Initialize */
   virtual void init();

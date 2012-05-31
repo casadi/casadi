@@ -145,10 +145,7 @@ SX SX::operator-() const{
 }
 
 SX SX::sign() const{
-  if(isConstant())
-    return CasADi::sign(getValue());
-  else
-    return UnarySX::create(SIGN, *this);
+  return UnarySX::create(SIGN, *this);
 }
 
 SX SX::erfinv() const{
@@ -341,8 +338,6 @@ SX operator>=(const SX &a, const SX &b){
   SX x = a-b;
   if(x.isSquared() || x.isOp(FABS))
     return 1;
-  else if(x->isConstant())
-    return x->getValue()>=0; // ok since the result will be either 0 or 1, i.e. no new nodes
   else
     return UnarySX::create(STEP,x);
 }
@@ -365,10 +360,8 @@ SX operator||(const SX &a, const SX &b){
 
 SX operator==(const SX &x, const SX &y){
   if(x.isEqual(y))
-    return 1; // this also covers the case when both are constant and equal
-  else if(x.isConstant() && y.isConstant())
-    return 0;
-  else // create a new node
+    return 1;
+  else
     return BinarySX::create(EQUALITY,x,y);
 }
 
@@ -633,9 +626,7 @@ SX SX::erf() const{
 }
 
 SX SX::fabs() const{
-  if(isConstant() && getValue()>=0)
-    return *this;
-  else if(isOp(FABS))
+  if(isOp(FABS))
     return *this;
   else if(isSquared())
     return *this;

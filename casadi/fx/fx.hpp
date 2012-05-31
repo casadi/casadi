@@ -208,14 +208,13 @@ class FX : public OptionsFunctionality{
    * the length of the vector being the number of forward directions.
    * The next two arguments are a set of adjoint directional seeds and the resulting adjoint directional derivatives,
    * the length of the vector being the number of adjoint directions.
-   * The first boolean argument allows the second argument to the functions to be used as an input instead of output,
-   * assuming it is already known and the second boolean arguments allows constants to be eliminated during the 
-   * evaluations (as the treatment of constants in CasADi will get more efficient, this will become unnecessary).
+   * The boolean argument allows the second argument to the functions to be used as an input instead of output,
+   * assuming it is already known.
    */
   void evalSX(const SXMatrixVector& arg, SXMatrixVector& res, 
 	      const SXMatrixVectorVector& fseed, SXMatrixVectorVector& fsens, 
 	      const SXMatrixVectorVector& aseed, SXMatrixVectorVector& asens,
-	      bool output_given=false, bool eliminate_constants=false);
+	      bool output_given=false);
 
   /** \brief Evaluate symbolically with with directional derivatives, MX type
    * The first two arguments are the nondifferentiated inputs and results of the evaluation,
@@ -223,14 +222,13 @@ class FX : public OptionsFunctionality{
    * the length of the vector being the number of forward directions.
    * The next two arguments are a set of adjoint directional seeds and the resulting adjoint directional derivatives,
    * the length of the vector being the number of adjoint directions.
-   * The first boolean argument allows the second argument to the functions to be used as an input instead of output,
-   * assuming it is already known and the second boolean arguments allows constants to be eliminated during the 
-   * evaluations (as the treatment of constants in CasADi will get more efficient, this will become unnecessary).
+   * The boolean argument allows the second argument to the functions to be used as an input instead of output,
+   * assuming it is already known.
    */
   void evalMX(const MXVector& arg, MXVector& res, 
 	      const MXVectorVector& fseed, MXVectorVector& fsens, 
 	      const MXVectorVector& aseed, MXVectorVector& asens,
-	      bool output_given=false, bool eliminate_constants=false);
+	      bool output_given=false);
                         
   /** \brief Evaluate symbolically with with directional derivatives, SX type, overloaded
    * The first two arguments are the nondifferentiated inputs and results of the evaluation,
@@ -238,14 +236,13 @@ class FX : public OptionsFunctionality{
    * the length of the vector being the number of forward directions.
    * The next two arguments are a set of adjoint directional seeds and the resulting adjoint directional derivatives,
    * the length of the vector being the number of adjoint directions.
-   * The first boolean argument allows the second argument to the functions to be used as an input instead of output,
-   * assuming it is already known and the second boolean arguments allows constants to be eliminated during the 
-   * evaluations (as the treatment of constants in CasADi will get more efficient, this will become unnecessary).
+   * The boolean argument allows the second argument to the functions to be used as an input instead of output,
+   * assuming it is already known.
    */
   void eval(const SXMatrixVector& arg, std::vector<SXMatrix>& res, 
 	    const SXMatrixVectorVector& fseed, SXMatrixVectorVector& fsens, 
 	    const SXMatrixVectorVector& aseed, SXMatrixVectorVector& asens,
-	    bool output_given=false, bool eliminate_constants=false);
+	    bool output_given=false);
 
   /** \brief Evaluate symbolically with with directional derivatives, MX type, overloaded
    * The first two arguments are the nondifferentiated inputs and results of the evaluation,
@@ -253,14 +250,13 @@ class FX : public OptionsFunctionality{
    * the length of the vector being the number of forward directions.
    * The next two arguments are a set of adjoint directional seeds and the resulting adjoint directional derivatives,
    * the length of the vector being the number of adjoint directions.
-   * The first boolean argument allows the second argument to the functions to be used as an input instead of output,
-   * assuming it is already known and the second boolean arguments allows constants to be eliminated during the 
-   * evaluations (as the treatment of constants in CasADi will get more efficient, this will become unnecessary).
+   * The boolean argument allows the second argument to the functions to be used as an input instead of output,
+   * assuming it is already known.
    */
   void eval(const MXVector& arg, MXVector& res, 
 	    const MXVectorVector& fseed, MXVectorVector& fsens, 
 	    const MXVectorVector& aseed, MXVectorVector& asens,
-	    bool output_given=false, bool eliminate_constants=false);
+	    bool output_given=false);
   
 #ifndef SWIG
   /// evaluate symbolically, single input, single output 
@@ -473,10 +469,14 @@ void getAdjSens(T val, int ind=0, int dir=0) const;
   /// Get a single statistic obtained at the end of the last evaluate call
   GenericType getStat(const std::string& name) const;
 
-  /// Get a vector of symbolic variables with the same dimensions as the inputs
+  /** \brief  Get a vector of symbolic variables with the same dimensions as the inputs
+  * There is no guarantee that consecutive calls return identical objects
+  */
   std::vector<MX> symbolicInput() const;
   
-  /// Get a vector of symbolic variables with the same dimensions as the inputs, SX graph
+  /** \brief Get a vector of symbolic variables with the same dimensions as the inputs, SX graph
+  * There is no guarantee that consecutive calls return identical objects
+  */
   std::vector<SXMatrix> symbolicInputSX() const;
 
   /** \brief Is the class able to propate seeds through the algorithm? (for usage, see the example propagating_sparsity.cpp) */

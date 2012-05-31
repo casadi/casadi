@@ -743,14 +743,14 @@ void FXInternal::evaluate_switch(int nfdir, int nadir){
 void FXInternal::evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
       const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
       const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
-      bool output_given, bool eliminate_constants){
+      bool output_given){
   casadi_error("FXInternal::evalSX not defined for class " << typeid(*this).name());
 }
 
 void FXInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 
       const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
       const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
-      bool output_given, bool eliminate_constants){
+      bool output_given){
   casadi_error("FXInternal::evalMX not defined for class " << typeid(*this).name());
 }
 

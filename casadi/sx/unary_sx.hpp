@@ -42,7 +42,16 @@ class UnarySX : public SXNode{
     
     /** \brief  Create a unary expression */
     inline static SX create(unsigned char op, const SX& dep){
-      return SX::create(new UnarySX(op,dep));
+      if(dep.isConstant()){
+	// Evaluate constant
+	double dep_val = dep.getValue();
+	double ret_val;
+	casadi_math<double>::fun(op,dep_val,dep_val,ret_val);
+	return ret_val;
+      } else {
+	// Expression containing free variables
+	return SX::create(new UnarySX(op,dep));
+      }
     }
     
     /** \brief Destructor */

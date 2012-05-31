@@ -90,28 +90,28 @@ class FXInternal : public OptionsFunctionalityNode{
     virtual void evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
                         const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
                         const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
-                        bool output_given, bool eliminate_constants);
+                        bool output_given);
 
     /** \brief  Evaluate symbolically, MX type */
     virtual void evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 
                         const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
                         const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
-                        bool output_given, bool eliminate_constants);
+                        bool output_given);
 
     /** \brief  Evaluate symbolically, SX type (overloaded)*/
     void eval(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
               const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
               const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
-              bool output_given, bool eliminate_constants){
-      evalSX(arg,res,fseed,fsens,aseed,asens,output_given,eliminate_constants);
+              bool output_given){
+      evalSX(arg,res,fseed,fsens,aseed,asens,output_given);
     }
 
     /** \brief  Evaluate symbolically, MX type (overloaded)*/
     void eval(const std::vector<MX>& arg, std::vector<MX>& res, 
               const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
               const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
-              bool output_given, bool eliminate_constants){
-      evalMX(arg,res,fseed,fsens,aseed,asens,output_given,eliminate_constants);
+              bool output_given){
+      evalMX(arg,res,fseed,fsens,aseed,asens,output_given);
     }
     
     /// Get a function that calculates nfwd forward derivatives and nadj adjoint derivatives (cached)

@@ -63,6 +63,13 @@ class Matrixtests(casadiTestCase):
     self.assertEquals(c,7)
     self.assertEquals(d,8)
     
+  def test_trans(self):
+    self.message("trans")
+    a = DMatrix(0,1)
+    b = trans(a)
+    self.assertEquals(b.size1(),1)
+    self.assertEquals(b.size2(),0)
+    
   def test_numpy(self):
     self.message("numpy check")
     # This is an example that failed on a windows machine

@@ -171,13 +171,13 @@ Matrix<SX> substitute(const Matrix<SX> &ex, const Matrix<SX> &v, const Matrix<SX
   return fcn.eval(vdef);
 }
 
-void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, bool reverse, bool eliminate_constants){
+void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, bool reverse){
   // Empty vector
   vector<Matrix<SX> > ex;
-  substituteInPlace(v,vdef,ex,reverse,eliminate_constants);
+  substituteInPlace(v,vdef,ex,reverse);
 }
 
-void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, std::vector<Matrix<SX> >& ex, bool reverse, bool eliminate_constants){
+void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, std::vector<Matrix<SX> >& ex, bool reverse){
   casadi_assert_message(isSymbolic(v),"the variable is not symbolic");
   casadi_assert_message(v.size1() == vdef.size1() && v.size2() == vdef.size2(),"the dimensions do not match");
   casadi_assert_message(vdef.dense(),"Expression must be dense");
@@ -231,7 +231,7 @@ void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, std::vector<Matrix
 
   // Replace expression
   std::vector<Matrix<SX> > outputv = f->outputv_;
-  f->eval(f->inputv_, outputv, dummy, dummy, dummy, dummy, false, eliminate_constants);
+  f->eval(f->inputv_, outputv, dummy, dummy, dummy, dummy, false);
   
   // Replace the result
   vdef = outputv.front();
@@ -825,22 +825,6 @@ Matrix<SX> mtaylor(const Matrix<SX>& ex,const Matrix<SX>& x, const Matrix<SX>& a
   );
 
   return trans(reshape(mtaylor_recursive(vec(ex),x,a,order,order_contributions),ex.size2(),ex.size1()));
-}
-
-Matrix<SX> evaluateConstants(const Matrix<SX>& ex){
-  // An empty input argument
-  std::vector<Matrix<SX> > input_s;
-
-  SXFunction fcn(input_s,ex); // Note: no input argument necessary
-  fcn.init();
-
-  // No sensitivities
-  vector<vector<SXMatrix> > dummy;
-
-  // Evaluate symbolically, eliminating constants
-  std::vector<Matrix<SX> > output_s = fcn->outputv_;
-  fcn->eval(input_s,output_s,dummy,dummy,dummy,dummy,false,true);
-  return output_s.front();
 }
 
 int countNodes(const Matrix<SX>& A){

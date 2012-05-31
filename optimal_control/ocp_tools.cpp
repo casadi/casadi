@@ -51,8 +51,7 @@ void updateDependent(SymbolicOCP& ocp){
   
   // Sort out interdependencies
   bool reverse=false;
-  bool eliminate_constants=true;
-  substituteInPlace(pd, pd_def, reverse, eliminate_constants);
+  substituteInPlace(pd, pd_def, reverse);
 
   // Create a function which evaluates the binding equations numerically
   SXMatrix ci = var(ocp.ci);

@@ -528,7 +528,7 @@ MatType XFunctionInternal<DerivedType,MatType,NodeType>::jacGen(int iind, int oi
   }
   
   // Evaluate symbolically
-  eval(inputv_,outputv_,fseed,fsens,aseed,asens,true,false);
+  eval(inputv_,outputv_,fseed,fsens,aseed,asens,true);
 
   // Get transposes and mappings for all jacobian sparsity patterns if we are using forward mode
   if(verbose())   std::cout << "XFunctionInternal::jac transposes and mapping" << std::endl;
