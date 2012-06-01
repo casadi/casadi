@@ -41,7 +41,6 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv, const std:
   XFunctionInternal<MXFunctionInternal,MX,MXNode>(inputv,outputv) {
   
   setOption("name", "unnamed_mx_function");
-  setOption("topological_sorting","depth-first"); // breadth-first not working
   setOption("numeric_jacobian", true);
 
   liftfun_ = 0;

@@ -71,7 +71,7 @@ class XFunctionInternal : public FXInternal{
 template<typename DerivedType, typename MatType, typename NodeType>
 XFunctionInternal<DerivedType,MatType,NodeType>::XFunctionInternal(
     const std::vector<MatType>& inputv, const std::vector<MatType>& outputv) : inputv_(inputv),  outputv_(outputv){
-      addOption("topological_sorting",OT_STRING,"breadth-first","Topological sorting algorithm","depth-first|breadth-first");
+      addOption("topological_sorting",OT_STRING,"depth-first","Topological sorting algorithm","depth-first|breadth-first");
   
   // Make sure that inputs are symbolic
   for(int i=0; i<inputv.size(); ++i){
