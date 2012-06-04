@@ -155,7 +155,14 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
     vector<AlgEl>::const_iterator it = algorithm_.begin();
     vector<TapeEl<double> >::const_iterator it2 = pdwork_.begin();
     for(; it!=algorithm_.end(); ++it, ++it2){
-      dwork_[it->res] = it2->d[0] * dwork_[it->arg.i[0]] + it2->d[1] * dwork_[it->arg.i[1]]; // FIXME
+      switch(it->op){
+	case OP_CONST:
+	  dwork_[it->res] = 0; break;
+	CASADI_MATH_BINARY_BUILTIN // Binary operation
+	  dwork_[it->res] = it2->d[0] * dwork_[it->arg.i[0]] + it2->d[1] * dwork_[it->arg.i[1]];  break;
+	default: // Unary operation
+	  dwork_[it->res] = it2->d[0] * dwork_[it->arg.i[0]];
+      }
     }
   
     // Get the forward sensitivities
@@ -183,14 +190,19 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
       }
     }
     
-    vector<AlgEl>::const_reverse_iterator it = algorithm_.rbegin();
     vector<TapeEl<double> >::const_reverse_iterator it2 = pdwork_.rbegin();
-    for(; it!=algorithm_.rend(); ++it, ++it2){  // FIXME
+    for(vector<AlgEl>::const_reverse_iterator it = algorithm_.rbegin(); it!=algorithm_.rend(); ++it, ++it2){
       // copy the seed and clear the cache entry
       double seed = dwork_[it->res];
       dwork_[it->res] = 0;
-      dwork_[it->arg.i[0]] += it2->d[0] * seed;
-      dwork_[it->arg.i[1]] += it2->d[1] * seed;
+      switch(it->op){
+	case OP_CONST:
+	  break;
+	CASADI_MATH_BINARY_BUILTIN // Binary operation
+	  dwork_[it->arg.i[1]] += it2->d[1] * seed; // fall-through
+	default: // Unary operation
+	  dwork_[it->arg.i[0]] += it2->d[0] * seed;
+      }
     }
     
     // Collect the adjoint sensitivities
@@ -243,15 +255,17 @@ void SXFunctionInternal::print(ostream &stream) const{
       case 3:  stream << " *= "; break;
       case 4:  stream << " /= "; break;
     }
-    
+
     if(op==OP_CONST){
       stream << it->arg.d;
     } else {
-      stringstream s0,s1;
-      int i0 = it->arg.i[0], i1 = it->arg.i[1];
-      s0 << "a" << i0;
-      s1 << "a" << i1;
-      casadi_math<double>::print(op,stream,s0.str(),s1.str());
+      int ndep = casadi_math<double>::ndeps(op);
+      casadi_math<double>::printPre(op,stream);
+      for(int c=0; c<ndep; ++c){
+	if(c==1) casadi_math<double>::printSep(op,stream);
+	stream << "a" << it->arg.i[c];
+      }
+      casadi_math<double>::printPost(op,stream);
     }
     stream << ";" << endl;
   }
@@ -270,7 +284,8 @@ void SXFunctionInternal::printOperation(std::ostream &stream, int i) const{
   const AlgEl& ae = algorithm_[i];
   const SX& f = binops_[i];
   casadi_math<double>::printPre(ae.op,stream);
-  for(int c=0; c<casadi_math<double>::ndeps(ae.op); ++c){
+  int ndep = casadi_math<double>::ndeps(ae.op);
+  for(int c=0; c<ndep; ++c){
     if(c==1) casadi_math<double>::printSep(ae.op,stream);
 
     if(f->dep(c)->isConstant()){
@@ -446,14 +461,10 @@ void SXFunctionInternal::generateCode(const string& src_name){
  }
  
  // Run the algorithm_
- vector<SX>::const_iterator f_it=binops_.begin();
  int ii=0;
- for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it, ++f_it, ++ii){
+ for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it, ++ii){
    // Skip printing variables that can be inlined
    if(refcount_[ii]<2) continue;
-   
-   // Get a pointer to the expression
-   const SX& f = *f_it;
    
     if(!declared[it->res]){
       cfile << "d ";
@@ -543,20 +554,20 @@ void SXFunctionInternal::init(){
     constants_.push_back(SX::create(*it));
   }
   
-  // Get the sortign algorithm
-  bool breadth_first_search;
-  if(getOption("topological_sorting")=="breadth-first"){
-    breadth_first_search = true;
-  } else if(getOption("topological_sorting")=="depth-first"){
-    breadth_first_search = false;
-  } else {
-    casadi_error("Unrecongnized topological_sorting: " << getOption("topological_sorting"));
-  }
-  
-  // Resort the nodes in a more cache friendly order (Kahn 1962)
-  if(breadth_first_search){
-    resort_breadth_first(bnodes);
-  }
+//   // Get the sortign algorithm
+//   bool breadth_first_search;
+//   if(getOption("topological_sorting")=="breadth-first"){
+//     breadth_first_search = true;
+//   } else if(getOption("topological_sorting")=="depth-first"){
+//     breadth_first_search = false;
+//   } else {
+//     casadi_error("Unrecongnized topological_sorting: " << getOption("topological_sorting"));
+//   }
+//   
+//   // Resort the nodes in a more cache friendly order (Kahn 1962)
+//   if(breadth_first_search){
+//     resort_breadth_first(bnodes);
+//   }
 
   // Set the temporary variables to be the corresponding place in the sorted graph
   for(int i=0; i<nodes.size(); ++i)
@@ -579,12 +590,13 @@ void SXFunctionInternal::init(){
     // Count the number of times each node is used
     vector<int> refcount(nodes.size(),0);
     for(int i=0; i<bnodes.size(); ++i){
-      for(int c=0; c<2; ++c){
+      int ndep = bnodes[i]->ndep();
+      for(int c=0; c<ndep; ++c){
         refcount[bnodes[i]->dep(c)->temp]++;
       }
     }
     
-    // Add artificial count to the outputs to avoid them being overwritten
+    // Add artificial count to the outputs to avoid them being overwritten // TODO: REMOVE THIS
     for(int ind=0; ind<output_.size(); ++ind){
       for(int el=0; el<outputv_[ind].size(); ++el){
         refcount[outputv_[ind].at(el)->temp]++;
@@ -603,11 +615,9 @@ void SXFunctionInternal::init(){
       refcount_copy = refcount;
     }
 
-    #if 1 // sort by type, then by location in node vector
     // Place the constants in the work vector
     for(vector<SXNode*>::iterator it=cnodes.begin(); it!=cnodes.end(); ++it){
       place[(**it).temp] = p++;
-      refcount[(**it).temp]++; // make sure constants are not overwritten
     }
 
     // Then all symbolic variables
@@ -619,7 +629,8 @@ void SXFunctionInternal::init(){
       int i = (**it).temp;
       
       // decrease reference count of children
-      for(int c=1; c>=0; --c){ // reverse order so that the first argument will end up at the top of the stack
+      int ndep = (*it)->ndep();
+      for(int c=ndep-1; c>=0; --c){ // reverse order so that the first argument will end up at the top of the stack
         int ch_ind = (*it)->dep(c)->temp;
         int remaining = --refcount[ch_ind];
         if(remaining==0) unused.push(place[ch_ind]);
@@ -633,38 +644,7 @@ void SXFunctionInternal::init(){
         place[i] = p++;
       }
     }
-    
-    #else
-    // Use the same sorting as the node vector, but with live variables
-    // FIXME:2011-08-09:Joel:Doesn't work, c_code_generation.py example fails.
-    
-    // Loop over the nodes
-    for(vector<SXNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it){
-      if((*it)->isConstant()){
-        place[(**it).temp] = p++;
-      } else if((*it)->isSymbolic()) {
-        place[(**it).temp] = p++;
-      } else {
-        int i = (**it).temp;
         
-        // decrease reference count of children
-        for(int c=0; c<2; ++c){
-          int ch_ind = (*it)->dep(c)->temp;
-          int remaining = --refcount[ch_ind];
-          if(remaining==0) unused.push(place[ch_ind]);
-        }
-        
-        // Try to reuse a variable from the stack if possible
-        if(!unused.empty()){
-          place[i] = unused.top();
-          unused.pop();
-        } else {
-          place[i] = p++;
-        }
-      }
-    }
-    #endif
-    
     if(verbose()){
       cout << "Using live variables. Worksize is " << p << " instead of " << nodes.size() << "(" << bnodes.size() << " elementary operations)" << endl;
     }
@@ -693,115 +673,142 @@ void SXFunctionInternal::init(){
   
   // Add the binary operations
   algorithm_.clear();
-  algorithm_.resize(binops_.size());
-  pdwork_.resize(algorithm_.size());
-  vector<AlgEl>::iterator it=algorithm_.begin();
-  for(int i=0; i<algorithm_.size(); ++i, ++it){
+  algorithm_.reserve(binops_.size());
+  for(vector<SXNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it){
+    // Current node
+    SXNode* n = *it;
+ 
+    // New element in the algorithm
+    AlgEl ae;
 
-    // Save the node index
-    it->res = place[binops_[i]->temp];
-    
-    // Save the indices of the children
-    it->arg.i[0] = place[binops_[i]->dep(0).get()->temp];
-    it->arg.i[1] = place[binops_[i]->dep(1).get()->temp];
-    
-    // Operation
-    it->op = binops_[i]->getOp();
+    if(n->isConstant()){
 
-    // Replace inplace operations
-    if(evaluate_inplace_){
-      // Check if the operation can be performed inplace
-      if(it->arg.i[0]==it->res){
-        int ip;
-        switch(it->op){
-          case ADD: ip=1; break;
-          case SUB: ip=2; break;
-          case MUL: ip=3; break;
-          case DIV: ip=4; break;
-          default:  ip=0; break;
-        }
-        
-        // if the operation can be performed inplace
-        if(ip!=0){
-          
-          // Reference to the child node
-          SX& c = binops_[i]->dep(1);
-          
-	  // Number of dependencies
-	  int c_ndep = c->ndep();
+      // Constant
+      ae.op = OP_CONST;
+      ae.arg.d = n->getValue();
+      ae.res = place[n->temp];
+      algorithm_.push_back(ae);
+      
+    } else if(n->isSymbolic()){
+      continue;     // Not implemented
+    
+    } else {
+    
+      
+      // Save the node index
+      ae.res = place[n->temp];
+      
+      // Number of children
+      int ndep = n->ndep();
+      
+      // Save the indices of the children
+      ae.arg.i[0] = place[n->dep(0).get()->temp];
+      ae.arg.i[1] = place[n->dep(1).get()->temp];
+      
+      // Operation
+      ae.op = n->getOp();
+
+      // Replace inplace operations
+      if(evaluate_inplace_){
+	// Check if the operation can be performed inplace
+	if(ae.arg.i[0]==ae.res){
+	  int ip;
+	  switch(ae.op){
+	    case ADD: ip=1; break;
+	    case SUB: ip=2; break;
+	    case MUL: ip=3; break;
+	    case DIV: ip=4; break;
+	    default:  ip=0; break;
+	  }
 	  
-          // If the dependent variable is a unary variable
-          if(c_ndep==1){
+	  // if the operation can be performed inplace
+	  if(ip!=0){
+	    
+	    // Reference to the child node
+	    SX& c = n->dep(1);
+	    
+	    // Number of dependencies
+	    int c_ndep = c->ndep();
+	    
+	    // If the dependent variable is a unary variable
+	    if(c_ndep==1){
 
-            int c_temp = c.get()->temp;
-            int c_curr = curr_assign[place[c_temp]];
+	      int c_temp = c.get()->temp;
+	      int c_curr = curr_assign[place[c_temp]];
 
-            // Check if the node is used exactly one time
-            bool ok_replace = refcount_copy.at(c_temp)==1;
-	    	    
-	    int c_temp0 = c->dep(0).get()->temp;
-            int c_curr0 = curr_assign[place[c_temp0]];
-            	                            
-            // Check if the values of the children are still available in the work vector or was assigned during the child operation
-            ok_replace = ok_replace && (c_curr0<0 || c_curr0==c_temp0 || c_curr0==c_curr);
-            
-            if(ok_replace){
-              
-              // Mark the node negative so that we can remove it later
-              refcount_copy.at(c.get()->temp) = -1;
-              
-              // Save the indices of the children
-              it->arg.i[0] = place[c_temp0];
+	      // Check if the node is used exactly one time
+	      bool ok_replace = refcount_copy.at(c_temp)==1;
+		      
+	      int c_temp0 = c->dep(0).get()->temp;
+	      int c_curr0 = curr_assign[place[c_temp0]];
+					      
+	      // Check if the values of the children are still available in the work vector or was assigned during the child operation
+	      ok_replace = ok_replace && (c_curr0<0 || c_curr0==c_temp0 || c_curr0==c_curr);
+	      
+	      if(ok_replace){
+		
+		// Mark the node negative so that we can remove it later
+		refcount_copy.at(c.get()->temp) = -1;
+		
+		// Save the indices of the children
+		ae.arg.i[0] = place[c_temp0];
 
-              // Replace operation with an inplace operation
-              it->op = ip*NUM_BUILT_IN_OPS + c->getOp();
-              
-              // Increase the inplace counter
-              num_inplace++;
-            }
-          }
-          	  
-          // If the dependent variable is a binary variable
-          if(c_ndep==2){
+		// Replace operation with an inplace operation
+		ae.op = ip*NUM_BUILT_IN_OPS + c->getOp();
+		
+		// Increase the inplace counter
+		num_inplace++;
+	      }
+	    }
+		    
+	    // If the dependent variable is a binary variable
+	    if(c_ndep==2){
 
-            int c_temp = c.get()->temp;
-            int c_curr = curr_assign[place[c_temp]];
+	      int c_temp = c.get()->temp;
+	      int c_curr = curr_assign[place[c_temp]];
 
-            // Check if the node is used exactly one time
-            bool ok_replace = refcount_copy.at(c_temp)==1;
-	    	    
-	    int c_temp0 = c->dep(0).get()->temp;
-            int c_curr0 = curr_assign[place[c_temp0]];
-            	    
-	    int c_temp1 = c->dep(1).get()->temp;
-            int c_curr1 = curr_assign[place[c_temp1]];
-                        
-            // Check if the values of the children are still available in the work vector or was assigned during the child operation
-            ok_replace = ok_replace && (c_curr0<0 || c_curr0==c_temp0 || c_curr0==c_curr);
-            ok_replace = ok_replace && (c_curr1<1 || c_curr1==c_temp1 || c_curr1==c_curr);
-            
-            if(ok_replace){
-              
-              // Mark the node negative so that we can remove it later
-              refcount_copy.at(c.get()->temp) = -1;
-              
-              // Save the indices of the children
-              it->arg.i[0] = place[c_temp0];
-              it->arg.i[1] = place[c_temp1];
+	      // Check if the node is used exactly one time
+	      bool ok_replace = refcount_copy.at(c_temp)==1;
+		      
+	      int c_temp0 = c->dep(0).get()->temp;
+	      int c_curr0 = curr_assign[place[c_temp0]];
+		      
+	      int c_temp1 = c->dep(1).get()->temp;
+	      int c_curr1 = curr_assign[place[c_temp1]];
+			  
+	      // Check if the values of the children are still available in the work vector or was assigned during the child operation
+	      ok_replace = ok_replace && (c_curr0<0 || c_curr0==c_temp0 || c_curr0==c_curr);
+	      ok_replace = ok_replace && (c_curr1<1 || c_curr1==c_temp1 || c_curr1==c_curr);
+	      
+	      if(ok_replace){
+		
+		// Mark the node negative so that we can remove it later
+		refcount_copy.at(c.get()->temp) = -1;
+		
+		// Save the indices of the children
+		ae.arg.i[0] = place[c_temp0];
+		ae.arg.i[1] = place[c_temp1];
 
-              // Replace operation with an inplace operation
-              it->op = ip*NUM_BUILT_IN_OPS + c->getOp();
-              
-              // Increase the inplace counter
-              num_inplace++;
-            }
-          }
-        }
+		// Replace operation with an inplace operation
+		ae.op = ip*NUM_BUILT_IN_OPS + c->getOp();
+		
+		// Increase the inplace counter
+		num_inplace++;
+	      }
+	    }
+	  }
+	}
+	// Save index
+	curr_assign[ae.res] = n->temp;
       }
-      // Save index
-      curr_assign[it->res] = binops_[i]->temp;
+      
+      // Add to algorithm
+      algorithm_.push_back(ae);
     }
   }
+  
+  // Work vector for partial derivatives
+  pdwork_.resize(algorithm_.size());
   
   if(num_inplace>0){
     if(verbose()){
@@ -811,7 +818,7 @@ void SXFunctionInternal::init(){
     vector<AlgEl> algorithm_new;
     algorithm_new.reserve(binops_.size()-num_inplace);
     
-    for(int i=0; i<binops_.size(); ++i, ++it){
+    for(int i=0; i<binops_.size(); ++i){
       
       // Check if marked
       bool marked = refcount_copy[binops_[i].get()->temp]<0;
@@ -866,12 +873,6 @@ void SXFunctionInternal::init(){
   // Allocate work vectors (symbolic/numeric)
   work_.resize(worksize_,numeric_limits<double>::quiet_NaN());
   s_work_.resize(worksize_);
-
-  // Save the constants to the work vector
-  for(vector<SXNode*>::iterator it=cnodes.begin(); it!=cnodes.end(); ++it){
-    work_[place[(**it).temp]] = (**it).getValue();
-    s_work_[place[(**it).temp]] = SX::create(*it);
-  }
 
   // Save the symbolic variables to the symbolic work vector
   for(vector<SXNode*>::iterator it=snodes.begin(); it!=snodes.end(); ++it){
@@ -1018,11 +1019,6 @@ void SXFunctionInternal::init(){
     // Allocate work vector
     std::vector<llvm::Value*> jwork(work_.size());
 
-    // Add all constants to the work vector
-    for(int k=0; k<jwork.size(); ++k){
-      jwork[k] = llvm::ConstantFP::get(llvm::getGlobalContext(), llvm::APFloat(work_[k]));
-    }
-    
     // Copy the arguments to the work vector
     for(int ind=0; ind<input_ind_.size(); ++ind){
       // Get the vector-valued argument first
@@ -1272,7 +1268,7 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
     for(; it!=algorithm_.end(); ++it, ++it1){
       if(output_given){
 	// Assign to the symbolic work vector
-	SX f = *b_it++;
+	SX f = it->op == OP_CONST ? c_it != constants_.end() ? *c_it++ : SX(it->arg.d) : *b_it++;
 	switch(it->op){
 	  // Start by adding all of the built operations
 	  CASADI_MATH_DER_BUILTIN(s_work_[it->arg.i[0]],s_work_[it->arg.i[1]],f,it1->d)
@@ -1337,7 +1333,14 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
     vector<AlgEl>::const_iterator it = algorithm_.begin();
     vector<TapeEl<SX> >::const_iterator it2 = s_pdwork.begin();
     for(; it!=algorithm_.end(); ++it, ++it2){
-      s_dwork[it->res] = it2->d[0] * s_dwork[it->arg.i[0]] + it2->d[1] * s_dwork[it->arg.i[1]]; // FIXME
+      switch(it->op){
+	case OP_CONST:
+	  break;
+	CASADI_MATH_BINARY_BUILTIN // Binary operation
+	  s_dwork[it->res] = it2->d[0] * s_dwork[it->arg.i[0]] + it2->d[1] * s_dwork[it->arg.i[1]]; break;
+	default: // Unary operation
+	  s_dwork[it->res] = it2->d[0] * s_dwork[it->arg.i[0]];
+      }
     }
 
     // Get the forward sensitivities
@@ -1374,17 +1377,18 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
       }
     }
     
-    vector<AlgEl>::const_reverse_iterator it = algorithm_.rbegin();
     vector<TapeEl<SX> >::const_reverse_iterator it2 = s_pdwork.rbegin();
-    for(; it!=algorithm_.rend(); ++it, ++it2){  // FIXME
+    for(vector<AlgEl>::const_reverse_iterator it = algorithm_.rbegin(); it!=algorithm_.rend(); ++it, ++it2){
       // copy the seed and clear the cache entry
       SX seed = s_dwork[it->res];
       s_dwork[it->res] = 0;
-      if(!seed->isZero()){
-        if(!it2->d[0]->isZero()) 
+      switch(it->op){
+	case OP_CONST:
+	  break;
+	CASADI_MATH_BINARY_BUILTIN // Binary operation
+	  s_dwork[it->arg.i[1]] += it2->d[1] * seed; // fall-through
+	default: // Unary operation
 	  s_dwork[it->arg.i[0]] += it2->d[0] * seed;
-        if(!it2->d[1]->isZero())
-	  s_dwork[it->arg.i[1]] += it2->d[1] * seed;
       }
     }
     
@@ -1464,7 +1468,14 @@ void SXFunctionInternal::spEvaluate(bool fwd){
     
     // Propagate sparsity forward
     for(std::vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-      iwork[it->res] = iwork[it->arg.i[0]] | iwork[it->arg.i[1]];
+      switch(it->op){
+	case OP_CONST:
+	  iwork[it->res] = bvec_t(0); break;
+	CASADI_MATH_BINARY_BUILTIN // Binary operation
+	  iwork[it->res] = iwork[it->arg.i[0]] | iwork[it->arg.i[1]]; break;
+	default: // Unary operation
+	  iwork[it->res] = iwork[it->arg.i[0]]; break;
+      }
     }
     
     // Get the output seeds
@@ -1495,8 +1506,14 @@ void SXFunctionInternal::spEvaluate(bool fwd){
       iwork[it->res] = 0;
       
       // Propagate seeds
-      iwork[it->arg.i[0]] |= seed;
-      iwork[it->arg.i[1]] |= seed;
+      switch(it->op){
+	case OP_CONST:
+	  break; // Do nothing
+	CASADI_MATH_BINARY_BUILTIN // Binary operation
+	  iwork[it->arg.i[1]] |= seed; // fall-through
+	default: // Unary operation
+	  iwork[it->arg.i[0]] |= seed;
+      }
     }
     
     // Get the input seeds and clear it from the work vector

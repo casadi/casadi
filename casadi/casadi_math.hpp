@@ -273,20 +273,23 @@ inline void casadi_math<T>::derF(unsigned char op, const T& x, const T& y, T& f,
 
 template<typename T>
 inline int casadi_math<T>::ndeps(unsigned char op){
+#define CASADI_MATH_BINARY_BUILTIN \
+    case ADD:\
+    case SUB:\
+    case MUL:\
+    case DIV:\
+    case POW:\
+    case CONSTPOW:\
+    case EQUALITY:\
+    case FMIN:\
+    case FMAX:\
+    case ATAN2:\
+    case OP_PRINTME:
+  
   switch(op){
     case OP_CONST:
       return 0;
-    case ADD:
-    case SUB:
-    case MUL:
-    case DIV:
-    case POW:
-    case CONSTPOW:
-    case EQUALITY:
-    case FMIN:
-    case FMAX:
-    case ATAN2:
-    case OP_PRINTME:
+    CASADI_MATH_BINARY_BUILTIN
       return 2;
     default:
       return 1;

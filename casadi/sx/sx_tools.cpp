@@ -213,8 +213,10 @@ void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, std::vector<Matrix
   
   // Now filter out the variables from the algorithm
   for(vector<SXAlgEl>::iterator it=algorithm.begin(); it!=algorithm.end(); ++it){
-    it->arg.i[0] = filter[it->arg.i[0]];
-    it->arg.i[1] = filter[it->arg.i[1]];
+    int ndeps = casadi_math<double>::ndeps(it->op);
+    for(int c=0; c<ndeps; ++c){
+      it->arg.i[c] = filter[it->arg.i[c]];
+    }
   }
   
   // Filter the variables from the dependent expressions
