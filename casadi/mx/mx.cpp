@@ -575,10 +575,10 @@ MX MX::eye(int n){
 
 
 MX MX::operator-() const{
-  if((*this)->isOperation(NEG)){
+  if((*this)->isOperation(OP_NEG)){
     return (*this)->dep(0);
   } else {
-    return unary(NEG,*this);
+    return unary(OP_NEG,*this);
   }
 }
 
@@ -687,26 +687,26 @@ MX MX::outer_prod(const MX& y) const{
 
 MX MX::__pow__(const MX& n) const{
   if(n->isConstant()){
-    return MX::binary(CONSTPOW,*this,n);
+    return MX::binary(OP_CONSTPOW,*this,n);
   } else {
-    return MX::binary(POW,*this,n);
+    return MX::binary(OP_POW,*this,n);
   }
 }
 
 MX MX::constpow(const MX& b) const{    
-  return binary(CONSTPOW,*this,b);
+  return binary(OP_CONSTPOW,*this,b);
 }
 
 MX MX::fmin(const MX& b) const{       
-  return binary(FMIN,*this,b);
+  return binary(OP_FMIN,*this,b);
 }
 
 MX MX::fmax(const MX& b) const{       
-  return binary(FMAX,*this,b);
+  return binary(OP_FMAX,*this,b);
 }
 
 MX MX::arctan2(const MX& b) const{       
-  return binary(ATAN2,*this,b);
+  return binary(OP_ATAN2,*this,b);
 }
 
 MX MX::printme(const MX& b) const{ 
@@ -714,11 +714,11 @@ MX MX::printme(const MX& b) const{
 }
 
 MX MX::exp() const{ 
-  return unary(EXP,*this);
+  return unary(OP_EXP,*this);
 }
 
 MX MX::log() const{ 
-  return unary(LOG,*this);
+  return unary(OP_LOG,*this);
 }
 
 MX MX::log10() const{ 
@@ -726,67 +726,67 @@ MX MX::log10() const{
 }
 
 MX MX::sqrt() const{ 
-  return unary(SQRT,*this);
+  return unary(OP_SQRT,*this);
 }
 
 MX MX::sin() const{ 
-  return unary(SIN,*this);
+  return unary(OP_SIN,*this);
 }
 
 MX MX::cos() const{ 
-  return unary(COS,*this);
+  return unary(OP_COS,*this);
 }
 
 MX MX::tan() const{ 
-  return unary(TAN,*this);
+  return unary(OP_TAN,*this);
 }
 
 MX MX::arcsin() const{ 
-  return unary(ASIN,*this);
+  return unary(OP_ASIN,*this);
 }
 
 MX MX::arccos() const{ 
-  return unary(ACOS,*this);
+  return unary(OP_ACOS,*this);
 }
 
 MX MX::arctan() const{ 
-  return unary(ATAN,*this);
+  return unary(OP_ATAN,*this);
 }
 
 MX MX::sinh() const{ 
-  return unary(SINH,*this);
+  return unary(OP_SINH,*this);
 }
 
 MX MX::cosh() const{ 
-  return unary(COSH,*this);
+  return unary(OP_COSH,*this);
 }
 
 MX MX::tanh() const{ 
-  return unary(TANH,*this);
+  return unary(OP_TANH,*this);
 }
 
 MX MX::floor() const{ 
-  return unary(FLOOR,*this);
+  return unary(OP_FLOOR,*this);
 }
 
 MX MX::ceil() const{ 
-  return unary(CEIL,*this);
+  return unary(OP_CEIL,*this);
 }
 
 MX MX::fabs() const{ 
-  return unary(FABS,*this);
+  return unary(OP_FABS,*this);
 }
 
 MX MX::sign() const{ 
-  return unary(SIGN,*this);
+  return unary(OP_SIGN,*this);
 }
 
 MX MX::erfinv() const{ 
-  return unary(ERFINV,*this);
+  return unary(OP_ERFINV,*this);
 }
 
 MX MX::erf() const{ 
-  return unary(ERF,*this);
+  return unary(OP_ERF,*this);
 }
 
 MX MX::__add__(const MX& y) const{
@@ -796,16 +796,16 @@ MX MX::__add__(const MX& y) const{
     return y;
   } else if((samedim || y.scalar()) && isZero(y)){
     return x;
-  } else if(y->isOperation(NEG)){
+  } else if(y->isOperation(OP_NEG)){
     return x - y->dep(0);
-  } else if(x->isOperation(NEG)){
+  } else if(x->isOperation(OP_NEG)){
     return y - x->dep(0);
-  } else if(x->isOperation(SUB) && y.get()==x->dep(1).get()){
+  } else if(x->isOperation(OP_SUB) && y.get()==x->dep(1).get()){
     return x->dep(0);
-  } else if(y->isOperation(SUB) && x.get()==y->dep(1).get()){
+  } else if(y->isOperation(OP_SUB) && x.get()==y->dep(1).get()){
     return y->dep(0);
   } else {
-    return MX::binary(ADD,x,y);
+    return MX::binary(OP_ADD,x,y);
   }
 }
 
@@ -816,12 +816,12 @@ MX MX::__sub__(const MX& y) const{
     return -y;
   } else if((samedim || y.scalar()) && isZero(y)){
     return x;
-  } else if(y->isOperation(NEG)){
+  } else if(y->isOperation(OP_NEG)){
     return x+y->dep(0);
   } else if(y.get()==x.get()){
     return MX::sparse(x.size1(),x.size2());
   } else {
-    return MX::binary(SUB,x,y);
+    return MX::binary(OP_SUB,x,y);
   }
 }
 
@@ -837,7 +837,7 @@ MX MX::__mul__(const MX& y) const{
   } else if((samedim || y.scalar()) && isMinusOne(y)){
     return -x;
   } else {
-    return MX::binary(MUL,x,y);
+    return MX::binary(OP_MUL,x,y);
   }
 }
 
@@ -847,7 +847,7 @@ MX MX::__div__(const MX& y) const{
   if((samedim || y.scalar()) && isOne(y)){
     return x;
   } else {
-    return MX::binary(DIV,x,y);
+    return MX::binary(OP_DIV,x,y);
   }
 }
 

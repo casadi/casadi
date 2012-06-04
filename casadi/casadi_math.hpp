@@ -30,42 +30,42 @@ template<template<int> class F>
 bool operation_checker(unsigned int op){
   switch(op){
     case OP_ASSIGN:     return F<OP_ASSIGN>::check;
-    case ADD:           return F<ADD>::check;
-    case SUB:           return F<SUB>::check;
-    case MUL:           return F<MUL>::check;
-    case DIV:           return F<DIV>::check;
-    case NEG:           return F<NEG>::check;
-    case EXP:           return F<EXP>::check;
-    case LOG:           return F<LOG>::check;
-    case POW:           return F<POW>::check;
-    case CONSTPOW:      return F<CONSTPOW>::check;
-    case SQRT:          return F<SQRT>::check;
-    case SIN:           return F<SIN>::check;
-    case COS:           return F<COS>::check;
-    case TAN:           return F<TAN>::check;
-    case ASIN:          return F<ASIN>::check;
-    case ACOS:          return F<ACOS>::check;
-    case ATAN:          return F<ATAN>::check;
-    case STEP:          return F<STEP>::check;
-    case FLOOR:         return F<FLOOR>::check;
-    case CEIL:          return F<CEIL>::check;
-    case EQUALITY:      return F<EQUALITY>::check;
-    case FABS:          return F<FABS>::check;
-    case SIGN:          return F<SIGN>::check;
-    case ERF:           return F<ERF>::check;
-    case FMIN:          return F<FMIN>::check;
-    case FMAX:          return F<FMAX>::check;
-    case INV:           return F<INV>::check;
-    case SINH:          return F<SINH>::check;
-    case COSH:          return F<COSH>::check;
-    case TANH:          return F<TANH>::check;
+    case OP_ADD:           return F<OP_ADD>::check;
+    case OP_SUB:           return F<OP_SUB>::check;
+    case OP_MUL:           return F<OP_MUL>::check;
+    case OP_DIV:           return F<OP_DIV>::check;
+    case OP_NEG:           return F<OP_NEG>::check;
+    case OP_EXP:           return F<OP_EXP>::check;
+    case OP_LOG:           return F<OP_LOG>::check;
+    case OP_POW:           return F<OP_POW>::check;
+    case OP_CONSTPOW:      return F<OP_CONSTPOW>::check;
+    case OP_SQRT:          return F<OP_SQRT>::check;
+    case OP_SIN:           return F<OP_SIN>::check;
+    case OP_COS:           return F<OP_COS>::check;
+    case OP_TAN:           return F<OP_TAN>::check;
+    case OP_ASIN:          return F<OP_ASIN>::check;
+    case OP_ACOS:          return F<OP_ACOS>::check;
+    case OP_ATAN:          return F<OP_ATAN>::check;
+    case OP_STEP:          return F<OP_STEP>::check;
+    case OP_FLOOR:         return F<OP_FLOOR>::check;
+    case OP_CEIL:          return F<OP_CEIL>::check;
+    case OP_EQUALITY:      return F<OP_EQUALITY>::check;
+    case OP_FABS:          return F<OP_FABS>::check;
+    case OP_SIGN:          return F<OP_SIGN>::check;
+    case OP_ERF:           return F<OP_ERF>::check;
+    case OP_FMIN:          return F<OP_FMIN>::check;
+    case OP_FMAX:          return F<OP_FMAX>::check;
+    case OP_INV:           return F<OP_INV>::check;
+    case OP_SINH:          return F<OP_SINH>::check;
+    case OP_COSH:          return F<OP_COSH>::check;
+    case OP_TANH:          return F<OP_TANH>::check;
     case OP_CONST:      return F<OP_CONST>::check;
     case OP_CALL:      	 return F<OP_CALL>::check;
     case OP_VAR:      	 return F<OP_VAR>::check;
     case OP_OUTPUT:     return F<OP_OUTPUT>::check;
-    case ERFINV:        return F<ERFINV>::check;
+    case OP_ERFINV:        return F<OP_ERFINV>::check;
     case OP_PRINTME:    return F<OP_PRINTME>::check;
-    case ATAN2:         return F<ATAN2>::check;
+    case OP_ATAN2:         return F<OP_ATAN2>::check;
   }
 };
 
@@ -139,37 +139,37 @@ inline void casadi_math<T>::fun(unsigned char op, const T& x, const T& y, T& f){
 // NOTE: We define the implementation in a preprocessor macro to be able to force inlining, and to allow extensions in the VM
 #define CASADI_MATH_FUN_BUILTIN(X,Y,F,C,OFF) \
     case OP_ASSIGN+OFF:    C<OP_ASSIGN>::fcn(X,Y,F);        break;\
-    case ADD+OFF:       C<ADD>::fcn(X,Y,F);           break;\
-    case SUB+OFF:       C<SUB>::fcn(X,Y,F);           break;\
-    case MUL+OFF:       C<MUL>::fcn(X,Y,F);           break;\
-    case DIV+OFF:       C<DIV>::fcn(X,Y,F);           break;\
-    case NEG+OFF:       C<NEG>::fcn(X,Y,F);           break;\
-    case EXP+OFF:       C<EXP>::fcn(X,Y,F);           break;\
-    case LOG+OFF:       C<LOG>::fcn(X,Y,F);           break;\
-    case POW+OFF:       C<POW>::fcn(X,Y,F);           break;\
-    case CONSTPOW+OFF:  C<CONSTPOW>::fcn(X,Y,F);      break;\
-    case SQRT+OFF:      C<SQRT>::fcn(X,Y,F);          break;\
-    case SIN+OFF:       C<SIN>::fcn(X,Y,F);           break;\
-    case COS+OFF:       C<COS>::fcn(X,Y,F);           break;\
-    case TAN+OFF:       C<TAN>::fcn(X,Y,F);           break;\
-    case ASIN+OFF:      C<ASIN>::fcn(X,Y,F);          break;\
-    case ACOS+OFF:      C<ACOS>::fcn(X,Y,F);          break;\
-    case ATAN+OFF:      C<ATAN>::fcn(X,Y,F);          break;\
-    case STEP+OFF:      C<STEP>::fcn(X,Y,F);          break;\
-    case FLOOR+OFF:     C<FLOOR>::fcn(X,Y,F);         break;\
-    case CEIL+OFF:      C<CEIL>::fcn(X,Y,F);          break;\
-    case EQUALITY+OFF:  C<EQUALITY>::fcn(X,Y,F);      break;\
-    case FABS+OFF:      C<FABS>::fcn(X,Y,F);          break;\
-    case SIGN+OFF:     C<SIGN>::fcn(X,Y,F);           break;\
-    case ERF+OFF:       C<ERF>::fcn(X,Y,F);           break;\
-    case FMIN+OFF:      C<FMIN>::fcn(X,Y,F);          break;\
-    case FMAX+OFF:      C<FMAX>::fcn(X,Y,F);          break;\
-    case INV+OFF:       C<INV>::fcn(X,Y,F);           break;\
-    case SINH+OFF:      C<SINH>::fcn(X,Y,F);          break;\
-    case COSH+OFF:      C<COSH>::fcn(X,Y,F);          break;\
-    case TANH+OFF:      C<TANH>::fcn(X,Y,F);          break;\
-    case ATAN2+OFF:     C<ATAN2>::fcn(X,Y,F);        break; \
-    case ERFINV+OFF:    C<ERFINV>::fcn(X,Y,F);        break;\
+    case OP_ADD+OFF:       C<OP_ADD>::fcn(X,Y,F);           break;\
+    case OP_SUB+OFF:       C<OP_SUB>::fcn(X,Y,F);           break;\
+    case OP_MUL+OFF:       C<OP_MUL>::fcn(X,Y,F);           break;\
+    case OP_DIV+OFF:       C<OP_DIV>::fcn(X,Y,F);           break;\
+    case OP_NEG+OFF:       C<OP_NEG>::fcn(X,Y,F);           break;\
+    case OP_EXP+OFF:       C<OP_EXP>::fcn(X,Y,F);           break;\
+    case OP_LOG+OFF:       C<OP_LOG>::fcn(X,Y,F);           break;\
+    case OP_POW+OFF:       C<OP_POW>::fcn(X,Y,F);           break;\
+    case OP_CONSTPOW+OFF:  C<OP_CONSTPOW>::fcn(X,Y,F);      break;\
+    case OP_SQRT+OFF:      C<OP_SQRT>::fcn(X,Y,F);          break;\
+    case OP_SIN+OFF:       C<OP_SIN>::fcn(X,Y,F);           break;\
+    case OP_COS+OFF:       C<OP_COS>::fcn(X,Y,F);           break;\
+    case OP_TAN+OFF:       C<OP_TAN>::fcn(X,Y,F);           break;\
+    case OP_ASIN+OFF:      C<OP_ASIN>::fcn(X,Y,F);          break;\
+    case OP_ACOS+OFF:      C<OP_ACOS>::fcn(X,Y,F);          break;\
+    case OP_ATAN+OFF:      C<OP_ATAN>::fcn(X,Y,F);          break;\
+    case OP_STEP+OFF:      C<OP_STEP>::fcn(X,Y,F);          break;\
+    case OP_FLOOR+OFF:     C<OP_FLOOR>::fcn(X,Y,F);         break;\
+    case OP_CEIL+OFF:      C<OP_CEIL>::fcn(X,Y,F);          break;\
+    case OP_EQUALITY+OFF:  C<OP_EQUALITY>::fcn(X,Y,F);      break;\
+    case OP_FABS+OFF:      C<OP_FABS>::fcn(X,Y,F);          break;\
+    case OP_SIGN+OFF:     C<OP_SIGN>::fcn(X,Y,F);           break;\
+    case OP_ERF+OFF:       C<OP_ERF>::fcn(X,Y,F);           break;\
+    case OP_FMIN+OFF:      C<OP_FMIN>::fcn(X,Y,F);          break;\
+    case OP_FMAX+OFF:      C<OP_FMAX>::fcn(X,Y,F);          break;\
+    case OP_INV+OFF:       C<OP_INV>::fcn(X,Y,F);           break;\
+    case OP_SINH+OFF:      C<OP_SINH>::fcn(X,Y,F);          break;\
+    case OP_COSH+OFF:      C<OP_COSH>::fcn(X,Y,F);          break;\
+    case OP_TANH+OFF:      C<OP_TANH>::fcn(X,Y,F);          break;\
+    case OP_ATAN2+OFF:     C<OP_ATAN2>::fcn(X,Y,F);        break; \
+    case OP_ERFINV+OFF:    C<OP_ERFINV>::fcn(X,Y,F);        break;\
     case OP_PRINTME+OFF:   C<OP_PRINTME>::fcn(X,Y,F);       break;
   
   #define CASADI_MATH_FUN_ALL_BUILTIN(X,Y,F) \
@@ -189,37 +189,37 @@ inline void casadi_math<T>::der(unsigned char op, const T& x, const T& y, const 
 // NOTE: We define the implementation in a preprocessor macro to be able to force inlining, and to allow extensions in the VM
 #define CASADI_MATH_DER_BUILTIN(X,Y,F,D) \
     case OP_ASSIGN:    BinaryOperation<OP_ASSIGN>::der(X,Y,F,D);     break;\
-    case ADD:       BinaryOperation<ADD>::der(X,Y,F,D);        break;\
-    case SUB:       BinaryOperation<SUB>::der(X,Y,F,D);        break;\
-    case MUL:       BinaryOperation<MUL>::der(X,Y,F,D);        break;\
-    case DIV:       BinaryOperation<DIV>::der(X,Y,F,D);        break;\
-    case NEG:       BinaryOperation<NEG>::der(X,Y,F,D);        break;\
-    case EXP:       BinaryOperation<EXP>::der(X,Y,F,D);        break;\
-    case LOG:       BinaryOperation<LOG>::der(X,Y,F,D);        break;\
-    case POW:       BinaryOperation<POW>::der(X,Y,F,D);        break;\
-    case CONSTPOW:  BinaryOperation<CONSTPOW>::der(X,Y,F,D);   break;\
-    case SQRT:      BinaryOperation<SQRT>::der(X,Y,F,D);       break;\
-    case SIN:       BinaryOperation<SIN>::der(X,Y,F,D);        break;\
-    case COS:       BinaryOperation<COS>::der(X,Y,F,D);        break;\
-    case TAN:       BinaryOperation<TAN>::der(X,Y,F,D);        break;\
-    case ASIN:      BinaryOperation<ASIN>::der(X,Y,F,D);       break;\
-    case ACOS:      BinaryOperation<ACOS>::der(X,Y,F,D);       break;\
-    case ATAN:      BinaryOperation<ATAN>::der(X,Y,F,D);       break;\
-    case STEP:      BinaryOperation<STEP>::der(X,Y,F,D);       break;\
-    case FLOOR:     BinaryOperation<FLOOR>::der(X,Y,F,D);      break;\
-    case CEIL:      BinaryOperation<CEIL>::der(X,Y,F,D);       break;\
-    case EQUALITY:  BinaryOperation<EQUALITY>::der(X,Y,F,D);   break;\
-    case FABS:      BinaryOperation<FABS>::der(X,Y,F,D);       break;\
-    case SIGN:      BinaryOperation<SIGN>::der(X,Y,F,D);       break;\
-    case ERF:       BinaryOperation<ERF>::der(X,Y,F,D);        break;\
-    case FMIN:      BinaryOperation<FMIN>::der(X,Y,F,D);       break;\
-    case FMAX:      BinaryOperation<FMAX>::der(X,Y,F,D);       break;\
-    case INV:       BinaryOperation<INV>::der(X,Y,F,D);        break;\
-    case SINH:      BinaryOperation<SINH>::der(X,Y,F,D);       break;\
-    case COSH:      BinaryOperation<COSH>::der(X,Y,F,D);       break;\
-    case TANH:      BinaryOperation<TANH>::der(X,Y,F,D);       break;\
-    case ATAN2:      BinaryOperation<ATAN2>::der(X,Y,F,D);       break;\
-    case ERFINV:    BinaryOperation<ERFINV>::der(X,Y,F,D);     break;\
+    case OP_ADD:       BinaryOperation<OP_ADD>::der(X,Y,F,D);        break;\
+    case OP_SUB:       BinaryOperation<OP_SUB>::der(X,Y,F,D);        break;\
+    case OP_MUL:       BinaryOperation<OP_MUL>::der(X,Y,F,D);        break;\
+    case OP_DIV:       BinaryOperation<OP_DIV>::der(X,Y,F,D);        break;\
+    case OP_NEG:       BinaryOperation<OP_NEG>::der(X,Y,F,D);        break;\
+    case OP_EXP:       BinaryOperation<OP_EXP>::der(X,Y,F,D);        break;\
+    case OP_LOG:       BinaryOperation<OP_LOG>::der(X,Y,F,D);        break;\
+    case OP_POW:       BinaryOperation<OP_POW>::der(X,Y,F,D);        break;\
+    case OP_CONSTPOW:  BinaryOperation<OP_CONSTPOW>::der(X,Y,F,D);   break;\
+    case OP_SQRT:      BinaryOperation<OP_SQRT>::der(X,Y,F,D);       break;\
+    case OP_SIN:       BinaryOperation<OP_SIN>::der(X,Y,F,D);        break;\
+    case OP_COS:       BinaryOperation<OP_COS>::der(X,Y,F,D);        break;\
+    case OP_TAN:       BinaryOperation<OP_TAN>::der(X,Y,F,D);        break;\
+    case OP_ASIN:      BinaryOperation<OP_ASIN>::der(X,Y,F,D);       break;\
+    case OP_ACOS:      BinaryOperation<OP_ACOS>::der(X,Y,F,D);       break;\
+    case OP_ATAN:      BinaryOperation<OP_ATAN>::der(X,Y,F,D);       break;\
+    case OP_STEP:      BinaryOperation<OP_STEP>::der(X,Y,F,D);       break;\
+    case OP_FLOOR:     BinaryOperation<OP_FLOOR>::der(X,Y,F,D);      break;\
+    case OP_CEIL:      BinaryOperation<OP_CEIL>::der(X,Y,F,D);       break;\
+    case OP_EQUALITY:  BinaryOperation<OP_EQUALITY>::der(X,Y,F,D);   break;\
+    case OP_FABS:      BinaryOperation<OP_FABS>::der(X,Y,F,D);       break;\
+    case OP_SIGN:      BinaryOperation<OP_SIGN>::der(X,Y,F,D);       break;\
+    case OP_ERF:       BinaryOperation<OP_ERF>::der(X,Y,F,D);        break;\
+    case OP_FMIN:      BinaryOperation<OP_FMIN>::der(X,Y,F,D);       break;\
+    case OP_FMAX:      BinaryOperation<OP_FMAX>::der(X,Y,F,D);       break;\
+    case OP_INV:       BinaryOperation<OP_INV>::der(X,Y,F,D);        break;\
+    case OP_SINH:      BinaryOperation<OP_SINH>::der(X,Y,F,D);       break;\
+    case OP_COSH:      BinaryOperation<OP_COSH>::der(X,Y,F,D);       break;\
+    case OP_TANH:      BinaryOperation<OP_TANH>::der(X,Y,F,D);       break;\
+    case OP_ATAN2:      BinaryOperation<OP_ATAN2>::der(X,Y,F,D);       break;\
+    case OP_ERFINV:    BinaryOperation<OP_ERFINV>::der(X,Y,F,D);     break;\
     case OP_PRINTME:   BinaryOperation<OP_PRINTME>::der(X,Y,F,D);    break;
   
   switch(op){
@@ -233,37 +233,37 @@ inline void casadi_math<T>::derF(unsigned char op, const T& x, const T& y, T& f,
 // NOTE: We define the implementation in a preprocessor macro to be able to force inlining, and to allow extensions in the VM
 #define CASADI_MATH_DERF_BUILTIN(X,Y,F,D) \
     case OP_ASSIGN:    DerBinaryOpertion<OP_ASSIGN>::derf(X,Y,F,D);        break;\
-    case ADD:       DerBinaryOpertion<ADD>::derf(X,Y,F,D);        break;\
-    case SUB:       DerBinaryOpertion<SUB>::derf(X,Y,F,D);        break;\
-    case MUL:       DerBinaryOpertion<MUL>::derf(X,Y,F,D);        break;\
-    case DIV:       DerBinaryOpertion<DIV>::derf(X,Y,F,D);        break;\
-    case NEG:       DerBinaryOpertion<NEG>::derf(X,Y,F,D);        break;\
-    case EXP:       DerBinaryOpertion<EXP>::derf(X,Y,F,D);        break;\
-    case LOG:       DerBinaryOpertion<LOG>::derf(X,Y,F,D);        break;\
-    case POW:       DerBinaryOpertion<POW>::derf(X,Y,F,D);        break;\
-    case CONSTPOW:  DerBinaryOpertion<CONSTPOW>::derf(X,Y,F,D);   break;\
-    case SQRT:      DerBinaryOpertion<SQRT>::derf(X,Y,F,D);       break;\
-    case SIN:       DerBinaryOpertion<SIN>::derf(X,Y,F,D);        break;\
-    case COS:       DerBinaryOpertion<COS>::derf(X,Y,F,D);        break;\
-    case TAN:       DerBinaryOpertion<TAN>::derf(X,Y,F,D);        break;\
-    case ASIN:      DerBinaryOpertion<ASIN>::derf(X,Y,F,D);       break;\
-    case ACOS:      DerBinaryOpertion<ACOS>::derf(X,Y,F,D);       break;\
-    case ATAN:      DerBinaryOpertion<ATAN>::derf(X,Y,F,D);       break;\
-    case STEP:      DerBinaryOpertion<STEP>::derf(X,Y,F,D);       break;\
-    case FLOOR:     DerBinaryOpertion<FLOOR>::derf(X,Y,F,D);      break;\
-    case CEIL:      DerBinaryOpertion<CEIL>::derf(X,Y,F,D);       break;\
-    case EQUALITY:  DerBinaryOpertion<EQUALITY>::derf(X,Y,F,D);   break;\
-    case FABS:      DerBinaryOpertion<FABS>::derf(X,Y,F,D);        break;\
-    case SIGN:      DerBinaryOpertion<SIGN>::derf(X,Y,F,D);        break;\
-    case ERF:       DerBinaryOpertion<ERF>::derf(X,Y,F,D);        break;\
-    case FMIN:      DerBinaryOpertion<FMIN>::derf(X,Y,F,D);       break;\
-    case FMAX:      DerBinaryOpertion<FMAX>::derf(X,Y,F,D);       break;\
-    case INV:       DerBinaryOpertion<INV>::derf(X,Y,F,D);         break;\
-    case SINH:      DerBinaryOpertion<SINH>::derf(X,Y,F,D);        break;\
-    case COSH:      DerBinaryOpertion<COSH>::derf(X,Y,F,D);        break;\
-    case TANH:      DerBinaryOpertion<TANH>::derf(X,Y,F,D);        break;\
-    case ATAN2:      DerBinaryOpertion<ATAN2>::derf(X,Y,F,D);        break;\
-    case ERFINV:    DerBinaryOpertion<ERFINV>::derf(X,Y,F,D);        break;\
+    case OP_ADD:       DerBinaryOpertion<OP_ADD>::derf(X,Y,F,D);        break;\
+    case OP_SUB:       DerBinaryOpertion<OP_SUB>::derf(X,Y,F,D);        break;\
+    case OP_MUL:       DerBinaryOpertion<OP_MUL>::derf(X,Y,F,D);        break;\
+    case OP_DIV:       DerBinaryOpertion<OP_DIV>::derf(X,Y,F,D);        break;\
+    case OP_NEG:       DerBinaryOpertion<OP_NEG>::derf(X,Y,F,D);        break;\
+    case OP_EXP:       DerBinaryOpertion<OP_EXP>::derf(X,Y,F,D);        break;\
+    case OP_LOG:       DerBinaryOpertion<OP_LOG>::derf(X,Y,F,D);        break;\
+    case OP_POW:       DerBinaryOpertion<OP_POW>::derf(X,Y,F,D);        break;\
+    case OP_CONSTPOW:  DerBinaryOpertion<OP_CONSTPOW>::derf(X,Y,F,D);   break;\
+    case OP_SQRT:      DerBinaryOpertion<OP_SQRT>::derf(X,Y,F,D);       break;\
+    case OP_SIN:       DerBinaryOpertion<OP_SIN>::derf(X,Y,F,D);        break;\
+    case OP_COS:       DerBinaryOpertion<OP_COS>::derf(X,Y,F,D);        break;\
+    case OP_TAN:       DerBinaryOpertion<OP_TAN>::derf(X,Y,F,D);        break;\
+    case OP_ASIN:      DerBinaryOpertion<OP_ASIN>::derf(X,Y,F,D);       break;\
+    case OP_ACOS:      DerBinaryOpertion<OP_ACOS>::derf(X,Y,F,D);       break;\
+    case OP_ATAN:      DerBinaryOpertion<OP_ATAN>::derf(X,Y,F,D);       break;\
+    case OP_STEP:      DerBinaryOpertion<OP_STEP>::derf(X,Y,F,D);       break;\
+    case OP_FLOOR:     DerBinaryOpertion<OP_FLOOR>::derf(X,Y,F,D);      break;\
+    case OP_CEIL:      DerBinaryOpertion<OP_CEIL>::derf(X,Y,F,D);       break;\
+    case OP_EQUALITY:  DerBinaryOpertion<OP_EQUALITY>::derf(X,Y,F,D);   break;\
+    case OP_FABS:      DerBinaryOpertion<OP_FABS>::derf(X,Y,F,D);        break;\
+    case OP_SIGN:      DerBinaryOpertion<OP_SIGN>::derf(X,Y,F,D);        break;\
+    case OP_ERF:       DerBinaryOpertion<OP_ERF>::derf(X,Y,F,D);        break;\
+    case OP_FMIN:      DerBinaryOpertion<OP_FMIN>::derf(X,Y,F,D);       break;\
+    case OP_FMAX:      DerBinaryOpertion<OP_FMAX>::derf(X,Y,F,D);       break;\
+    case OP_INV:       DerBinaryOpertion<OP_INV>::derf(X,Y,F,D);         break;\
+    case OP_SINH:      DerBinaryOpertion<OP_SINH>::derf(X,Y,F,D);        break;\
+    case OP_COSH:      DerBinaryOpertion<OP_COSH>::derf(X,Y,F,D);        break;\
+    case OP_TANH:      DerBinaryOpertion<OP_TANH>::derf(X,Y,F,D);        break;\
+    case OP_ATAN2:      DerBinaryOpertion<OP_ATAN2>::derf(X,Y,F,D);        break;\
+    case OP_ERFINV:    DerBinaryOpertion<OP_ERFINV>::derf(X,Y,F,D);        break;\
     case OP_PRINTME:   DerBinaryOpertion<OP_PRINTME>::derf(X,Y,F,D);     break;
   
   switch(op){
@@ -274,16 +274,16 @@ inline void casadi_math<T>::derF(unsigned char op, const T& x, const T& y, T& f,
 template<typename T>
 inline int casadi_math<T>::ndeps(unsigned char op){
 #define CASADI_MATH_BINARY_BUILTIN \
-    case ADD:\
-    case SUB:\
-    case MUL:\
-    case DIV:\
-    case POW:\
-    case CONSTPOW:\
-    case EQUALITY:\
-    case FMIN:\
-    case FMAX:\
-    case ATAN2:\
+    case OP_ADD:\
+    case OP_SUB:\
+    case OP_MUL:\
+    case OP_DIV:\
+    case OP_POW:\
+    case OP_CONSTPOW:\
+    case OP_EQUALITY:\
+    case OP_FMIN:\
+    case OP_FMAX:\
+    case OP_ATAN2:\
     case OP_PRINTME:
   
   switch(op){
@@ -315,37 +315,37 @@ template<typename T>
 inline void casadi_math<T>::printPre(unsigned char op, std::ostream &stream){
   switch(op){
     case OP_ASSIGN:                          break;
-    case ADD:       stream << "(";        break;
-    case SUB:       stream << "(";        break;
-    case MUL:       stream << "(";        break;
-    case DIV:       stream << "(";        break;
-    case NEG:       stream << "(-";       break;
-    case EXP:       stream << "exp(";     break;
-    case LOG:       stream << "log(";     break;
-    case POW:       stream << "pow(";     break;
-    case CONSTPOW:  stream << "pow(";     break;
-    case SQRT:      stream << "sqrt(";    break;
-    case SIN:       stream << "sin(";     break;
-    case COS:       stream << "cos(";     break;
-    case TAN:       stream << "tan(";     break;
-    case ASIN:      stream << "asin(";    break;
-    case ACOS:      stream << "acos(";    break;
-    case ATAN:      stream << "atan(";    break;
-    case STEP:      stream << "(";        break;
-    case FLOOR:     stream << "floor(";   break;
-    case CEIL:      stream << "ceil(";    break;
-    case EQUALITY:  stream << "(";        break;
-    case FABS:      stream << "fabs(";    break;
-    case SIGN:     stream << "sign(";   break;
-    case ERF:       stream << "erf(";     break;
-    case FMIN:      stream << "fmin(";    break;
-    case FMAX:      stream << "fmax(";    break;
-    case INV:       stream << "(1./";     break;
-    case SINH:      stream << "sinh(";    break;
-    case COSH:      stream << "cosh(";    break;
-    case TANH:      stream << "tanh(";    break;
-    case ATAN2:      stream << "atan2(";    break;
-    case ERFINV:    stream << "erfinv(";  break;
+    case OP_ADD:       stream << "(";        break;
+    case OP_SUB:       stream << "(";        break;
+    case OP_MUL:       stream << "(";        break;
+    case OP_DIV:       stream << "(";        break;
+    case OP_NEG:       stream << "(-";       break;
+    case OP_EXP:       stream << "exp(";     break;
+    case OP_LOG:       stream << "log(";     break;
+    case OP_POW:       stream << "pow(";     break;
+    case OP_CONSTPOW:  stream << "pow(";     break;
+    case OP_SQRT:      stream << "sqrt(";    break;
+    case OP_SIN:       stream << "sin(";     break;
+    case OP_COS:       stream << "cos(";     break;
+    case OP_TAN:       stream << "tan(";     break;
+    case OP_ASIN:      stream << "asin(";    break;
+    case OP_ACOS:      stream << "acos(";    break;
+    case OP_ATAN:      stream << "atan(";    break;
+    case OP_STEP:      stream << "(";        break;
+    case OP_FLOOR:     stream << "floor(";   break;
+    case OP_CEIL:      stream << "ceil(";    break;
+    case OP_EQUALITY:  stream << "(";        break;
+    case OP_FABS:      stream << "fabs(";    break;
+    case OP_SIGN:     stream << "sign(";   break;
+    case OP_ERF:       stream << "erf(";     break;
+    case OP_FMIN:      stream << "fmin(";    break;
+    case OP_FMAX:      stream << "fmax(";    break;
+    case OP_INV:       stream << "(1./";     break;
+    case OP_SINH:      stream << "sinh(";    break;
+    case OP_COSH:      stream << "cosh(";    break;
+    case OP_TANH:      stream << "tanh(";    break;
+    case OP_ATAN2:      stream << "atan2(";    break;
+    case OP_ERFINV:    stream << "erfinv(";  break;
     case OP_PRINTME:   stream << "printme("; break;
   }
 }
@@ -353,11 +353,11 @@ inline void casadi_math<T>::printPre(unsigned char op, std::ostream &stream){
 template<typename T>
 inline void casadi_math<T>::printSep(unsigned char op, std::ostream &stream){
   switch(op){
-    case ADD:       stream << "+";        break;
-    case SUB:       stream << "-";        break;
-    case MUL:       stream << "*";        break;
-    case DIV:       stream << "/";        break;
-    case EQUALITY:  stream << "==";       break;
+    case OP_ADD:       stream << "+";        break;
+    case OP_SUB:       stream << "-";        break;
+    case OP_MUL:       stream << "*";        break;
+    case OP_DIV:       stream << "/";        break;
+    case OP_EQUALITY:  stream << "==";       break;
     default:        stream << ",";        break;
   }
 }
@@ -366,7 +366,7 @@ template<typename T>
 inline void casadi_math<T>::printPost(unsigned char op, std::ostream &stream){
   switch(op){
     case OP_ASSIGN:                          break;
-    case STEP:      stream << ">=0)";     break;
+    case OP_STEP:      stream << ">=0)";     break;
     default:        stream << ")";        break;
   }
 }

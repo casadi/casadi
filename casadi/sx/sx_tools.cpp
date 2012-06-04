@@ -515,7 +515,7 @@ void expand(const Matrix<SX>& ex2, Matrix<SX> &ww, Matrix<SX>& tt){
         // Check if addition, subtracton or multiplication
         SXNode* node = to_be_expanded.top();
         // If we have a binary node that we can factorize
-        if(node->getOp() == ADD || node->getOp() == SUB || (node->getOp() == MUL  && (node->dep(0)->isConstant() || node->dep(1)->isConstant()))){
+        if(node->getOp() == OP_ADD || node->getOp() == OP_SUB || (node->getOp() == OP_MUL  && (node->dep(0)->isConstant() || node->dep(1)->isConstant()))){
           // Make sure that both children are factorized, if not - add to stack
           if (indices.find(node->dep(0).get()) == indices.end()){
             to_be_expanded.push(node->dep(0).get());
@@ -531,7 +531,7 @@ void expand(const Matrix<SX>& ex2, Matrix<SX> &ww, Matrix<SX>& tt){
           int ind2 = indices[node->dep(1).get()];
   
           // If multiplication
-          if(node->getOp() == MUL){
+          if(node->getOp() == OP_MUL){
             double fac;
             if(node->dep(0)->isConstant()){ // Multiplication where the first factor is a constant
               fac = node->dep(0)->getValue();
@@ -545,7 +545,7 @@ void expand(const Matrix<SX>& ex2, Matrix<SX> &ww, Matrix<SX>& tt){
             for(int i=0; i<w.size(); ++i) w[i] *= fac;
 
           } else { // if addition or subtraction
-            if(node->getOp() == ADD){          // Addition: join both sums
+            if(node->getOp() == OP_ADD){          // Addition: join both sums
               f = terms[ind1];      f.insert(f.end(), terms[ind2].begin(), terms[ind2].end());
               w = weights[ind1];    w.insert(w.end(), weights[ind2].begin(), weights[ind2].end());
             } else {      // Subtraction: join both sums with negative weights for second term

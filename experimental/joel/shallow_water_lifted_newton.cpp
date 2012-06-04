@@ -71,14 +71,14 @@ int main(){
   // Discretization
 
   // The largest dimensions which work with SX and IPOPT
-//   int numboxes = 3;
-//   int num_eulersteps = 20;
-//   int num_measurements = 20;
+  int numboxes = 3;
+  int num_eulersteps = 20;
+  int num_measurements = 20;
 
   // The largest dimensions which work with SX and exact Hessian
-  int numboxes = 20; // (but e.g. 10 fails with the error message "Initial QP could not be solved due to unboundedness"
-  int num_eulersteps = 10;
-  int num_measurements = 25;
+//   int numboxes = 20; // (but e.g. 10 fails with the error message "Initial QP could not be solved due to unboundedness"
+//   int num_eulersteps = 10;
+//   int num_measurements = 25;
 
   // The largest dimensions which work with SX and Gauss-Newton Hessian
   //   int numboxes = 20;

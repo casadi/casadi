@@ -107,9 +107,11 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
 	// Constant
         case OP_CONST: work_[it->res] = it->arg.d; break;
 	
-	// Get input
-// 	case OP_INPUT: work_[it->res] = input(it->arg.i[0]).at(it->arg.i[1]); break;
-// 	case OP_OUTPUT: input(it->arg.i[0]).at(it->arg.i[1]) = work_[it->res]; break;
+	// Load function input to work vector
+	//case OP_INPUT: work_[it->res] = input(it->arg.i[0]).data()[it->arg.i[1]]; break;
+	
+	// Get function output from work vector
+	//case OP_OUTPUT: output(it->arg.i[0]).data()[it->arg.i[1]] = work_[it->res]; break;
       }
     }
   } else {
@@ -224,7 +226,7 @@ bool SXFunctionInternal::isSmooth() const{
   assertInit();
     // Go through all nodes and check if any node is non-smooth
     for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
-      if(it->op == STEP || it->op == FLOOR )
+      if(it->op == OP_STEP || it->op == OP_FLOOR )
         return false;
     }
     return true;
@@ -714,10 +716,10 @@ void SXFunctionInternal::init(){
 	if(ae.arg.i[0]==ae.res){
 	  int ip;
 	  switch(ae.op){
-	    case ADD: ip=1; break;
-	    case SUB: ip=2; break;
-	    case MUL: ip=3; break;
-	    case DIV: ip=4; break;
+	    case OP_ADD: ip=1; break;
+	    case OP_SUB: ip=2; break;
+	    case OP_MUL: ip=3; break;
+	    case OP_DIV: ip=4; break;
 	    default:  ip=0; break;
 	  }
 	  
@@ -965,21 +967,21 @@ void SXFunctionInternal::init(){
 
     // Declare all the CasADi built-in functions
     vector<llvm::Function*> builtins(NUM_BUILT_IN_OPS,0);
-    builtins[POW] = builtins[CONSTPOW] = llvm::Function::Create(binaryFun, llvm::Function::ExternalLinkage, "pow", jit_module_);
-    builtins[SQRT] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "sqrt", jit_module_);
-    builtins[SIN] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "sin", jit_module_);
-    builtins[COS] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "cos", jit_module_);
-    builtins[TAN] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "tan", jit_module_);
-    builtins[ASIN] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "asin", jit_module_);
-    builtins[ACOS] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "acos", jit_module_);
-    builtins[ATAN] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "atan", jit_module_);
-    builtins[FLOOR] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "floor", jit_module_);
-    builtins[CEIL] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "ceil", jit_module_);
-    builtins[FMIN] = llvm::Function::Create(binaryFun, llvm::Function::ExternalLinkage, "fmin", jit_module_);
-    builtins[FMAX] = llvm::Function::Create(binaryFun, llvm::Function::ExternalLinkage, "fmax", jit_module_);
-    builtins[SINH] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "sinh", jit_module_);
-    builtins[COSH] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "cosh", jit_module_);
-    builtins[TANH] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "tanh", jit_module_);
+    builtins[OP_POW] = builtins[OP_CONSTPOW] = llvm::Function::Create(binaryFun, llvm::Function::ExternalLinkage, "pow", jit_module_);
+    builtins[OP_SQRT] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "sqrt", jit_module_);
+    builtins[OP_SIN] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "sin", jit_module_);
+    builtins[OP_COS] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "cos", jit_module_);
+    builtins[OP_TAN] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "tan", jit_module_);
+    builtins[OP_ASIN] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "asin", jit_module_);
+    builtins[OP_ACOS] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "acos", jit_module_);
+    builtins[OP_ATAN] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "atan", jit_module_);
+    builtins[OP_FLOOR] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "floor", jit_module_);
+    builtins[OP_CEIL] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "ceil", jit_module_);
+    builtins[OP_FMIN] = llvm::Function::Create(binaryFun, llvm::Function::ExternalLinkage, "fmin", jit_module_);
+    builtins[OP_FMAX] = llvm::Function::Create(binaryFun, llvm::Function::ExternalLinkage, "fmax", jit_module_);
+    builtins[OP_SINH] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "sinh", jit_module_);
+    builtins[OP_COSH] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "cosh", jit_module_);
+    builtins[OP_TANH] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "tanh", jit_module_);
 
     // Void type
     llvm::Type* void_t = llvm::Type::getVoidTy(llvm::getGlobalContext());
@@ -1045,11 +1047,11 @@ void SXFunctionInternal::init(){
       llvm::Value* res = 0;
       
       switch(it->op){
-	case ADD: 	res = builder.CreateFAdd(oarg[0],oarg[1]); break;
-	case SUB: 	res = builder.CreateFSub(oarg[0],oarg[1]); break;
-	case MUL: 	res = builder.CreateFMul(oarg[0],oarg[1]); break;
-	case DIV: 	res = builder.CreateFDiv(oarg[0],oarg[1]); break;
-	case NEG: 	res = builder.CreateFNeg(oarg[0]);         break;
+	case OP_ADD: 	res = builder.CreateFAdd(oarg[0],oarg[1]); break;
+	case OP_SUB: 	res = builder.CreateFSub(oarg[0],oarg[1]); break;
+	case OP_MUL: 	res = builder.CreateFMul(oarg[0],oarg[1]); break;
+	case OP_DIV: 	res = builder.CreateFDiv(oarg[0],oarg[1]); break;
+	case OP_NEG: 	res = builder.CreateFNeg(oarg[0]);         break;
 	case OP_CONST: 	res = llvm::ConstantFP::get(llvm::getGlobalContext(), llvm::APFloat(it->arg.d)); break;
 
 	default:

@@ -282,23 +282,23 @@ struct DerBinaryOpertion{
 /// Enum for quick access to any node
 enum Operation{
   OP_ASSIGN,
-  ADD,  SUB,  MUL,  DIV,
-  NEG,  EXP,  LOG,  POW, CONSTPOW,
-  SQRT,  SIN,  COS,  TAN,  
-  ASIN,  ACOS,  ATAN,  
-  STEP,  
-  FLOOR,  CEIL,  EQUALITY, FABS, SIGN, 
-  ERF,  FMIN,  FMAX,
-  INV,
-  SINH,  COSH,  TANH,
-  ATAN2,
+  OP_ADD,  OP_SUB,  OP_MUL,  OP_DIV,
+  OP_NEG,  OP_EXP,  OP_LOG,  OP_POW, OP_CONSTPOW,
+  OP_SQRT,  OP_SIN,  OP_COS,  OP_TAN,  
+  OP_ASIN,  OP_ACOS,  OP_ATAN,  
+  OP_STEP,  
+  OP_FLOOR,  OP_CEIL,  OP_EQUALITY, OP_FABS, OP_SIGN, 
+  OP_ERF,  OP_FMIN,  OP_FMAX,
+  OP_INV,
+  OP_SINH,  OP_COSH,  OP_TANH,
+  OP_ATAN2,
   
   OP_CONST,
   OP_VAR,
   OP_CALL,
   OP_OUTPUT,
   
-  ERFINV,
+  OP_ERFINV,
   OP_PRINTME,
   NUM_BUILT_IN_OPS
 };
@@ -306,74 +306,74 @@ enum Operation{
 //@{
   /// Smoothness (by default true)
   template<int I> struct SmoothChecker{ static const bool check=true;};
-  template<>      struct SmoothChecker<STEP>{ static const bool check=false;};
-  template<>      struct SmoothChecker<FLOOR>{ static const bool check=false;};
-  template<>      struct SmoothChecker<CEIL>{ static const bool check=false;};
-  template<>      struct SmoothChecker<EQUALITY>{ static const bool check=false;};
-  template<>      struct SmoothChecker<SIGN>{ static const bool check=false;};
+  template<>      struct SmoothChecker<OP_STEP>{ static const bool check=false;};
+  template<>      struct SmoothChecker<OP_FLOOR>{ static const bool check=false;};
+  template<>      struct SmoothChecker<OP_CEIL>{ static const bool check=false;};
+  template<>      struct SmoothChecker<OP_EQUALITY>{ static const bool check=false;};
+  template<>      struct SmoothChecker<OP_SIGN>{ static const bool check=false;};
 //@}
 
 //@{
   /// If evaluated with the first argument zero, is the result zero?
   template<int I> struct F0XChecker{ static const bool check=false;};
   template<>      struct F0XChecker<OP_ASSIGN>{ static const bool check=true;};
-  template<>      struct F0XChecker<MUL>{ static const bool check=true;};
-  template<>      struct F0XChecker<DIV>{ static const bool check=true;};
-  template<>      struct F0XChecker<NEG>{ static const bool check=true;};
-  template<>      struct F0XChecker<SQRT>{ static const bool check=true;};
-  template<>      struct F0XChecker<SIN>{ static const bool check=true;};
-  template<>      struct F0XChecker<TAN>{ static const bool check=true;};
-  template<>      struct F0XChecker<ASIN>{ static const bool check=true;};
-  template<>      struct F0XChecker<FLOOR>{ static const bool check=true;};
-  template<>      struct F0XChecker<CEIL>{ static const bool check=true;};
-  template<>      struct F0XChecker<FABS>{ static const bool check=true;};
-  template<>      struct F0XChecker<SIGN>{ static const bool check=true;};
-  template<>      struct F0XChecker<ERF>{ static const bool check=true;};
-  template<>      struct F0XChecker<SINH>{ static const bool check=true;};
-  template<>      struct F0XChecker<TANH>{ static const bool check=true;};
-  template<>      struct F0XChecker<ERFINV>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_MUL>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_DIV>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_NEG>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_SQRT>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_SIN>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_TAN>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_ASIN>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_FLOOR>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_CEIL>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_FABS>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_SIGN>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_ERF>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_SINH>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_TANH>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_ERFINV>{ static const bool check=true;};
 //@}
 
 //@{
   /// If evaluated with the second argument zero, is the result zero?
   template<int I> struct FX0Checker{ static const bool check=false;};
-  template<>      struct FX0Checker<MUL>{ static const bool check=true;};
+  template<>      struct FX0Checker<OP_MUL>{ static const bool check=true;};
 //@}
 
 //@{
   /// If evaluated with both arguments zero, is the result zero?
   template<int I> struct F00Checker{ static const bool check=F0XChecker<I>::check;};
-  template<>      struct F00Checker<ADD>{ static const bool check=true;};
-  template<>      struct F00Checker<SUB>{ static const bool check=true;};
-  template<>      struct F00Checker<FMIN>{ static const bool check=true;};
-  template<>      struct F00Checker<FMAX>{ static const bool check=true;};
+  template<>      struct F00Checker<OP_ADD>{ static const bool check=true;};
+  template<>      struct F00Checker<OP_SUB>{ static const bool check=true;};
+  template<>      struct F00Checker<OP_FMIN>{ static const bool check=true;};
+  template<>      struct F00Checker<OP_FMAX>{ static const bool check=true;};
 //@}
 
 //@{
   /// Is commutative
   template<int I> struct CommChecker{ static const bool check=true;};
-  template<>      struct CommChecker<SUB>{ static const bool check=false;};
-  template<>      struct CommChecker<DIV>{ static const bool check=false;};
-  template<>      struct CommChecker<POW>{ static const bool check=false;};
-  template<>      struct CommChecker<CONSTPOW>{ static const bool check=false;};
+  template<>      struct CommChecker<OP_SUB>{ static const bool check=false;};
+  template<>      struct CommChecker<OP_DIV>{ static const bool check=false;};
+  template<>      struct CommChecker<OP_POW>{ static const bool check=false;};
+  template<>      struct CommChecker<OP_CONSTPOW>{ static const bool check=false;};
   template<>      struct CommChecker<OP_PRINTME>{ static const bool check=false;};
-  template<>      struct CommChecker<ATAN2>{ static const bool check=false;};
+  template<>      struct CommChecker<OP_ATAN2>{ static const bool check=false;};
 //@}
 
 //@{
   /// Is the operation binary as opposed to unary
   template<int I> struct BinaryChecker{ static const bool check=false;};
-  template<>      struct BinaryChecker<ADD>{ static const bool check=true;};
-  template<>      struct BinaryChecker<SUB>{ static const bool check=true;};
-  template<>      struct BinaryChecker<MUL>{ static const bool check=true;};
-  template<>      struct BinaryChecker<DIV>{ static const bool check=true;};
-  template<>      struct BinaryChecker<POW>{ static const bool check=true;};
-  template<>      struct BinaryChecker<CONSTPOW>{ static const bool check=true;};
-  template<>      struct BinaryChecker<EQUALITY>{ static const bool check=true;};
-  template<>      struct BinaryChecker<FMIN>{ static const bool check=true;};
-  template<>      struct BinaryChecker<FMAX>{ static const bool check=true;};
+  template<>      struct BinaryChecker<OP_ADD>{ static const bool check=true;};
+  template<>      struct BinaryChecker<OP_SUB>{ static const bool check=true;};
+  template<>      struct BinaryChecker<OP_MUL>{ static const bool check=true;};
+  template<>      struct BinaryChecker<OP_DIV>{ static const bool check=true;};
+  template<>      struct BinaryChecker<OP_POW>{ static const bool check=true;};
+  template<>      struct BinaryChecker<OP_CONSTPOW>{ static const bool check=true;};
+  template<>      struct BinaryChecker<OP_EQUALITY>{ static const bool check=true;};
+  template<>      struct BinaryChecker<OP_FMIN>{ static const bool check=true;};
+  template<>      struct BinaryChecker<OP_FMAX>{ static const bool check=true;};
   template<>      struct BinaryChecker<OP_PRINTME>{ static const bool check=true;};
-  template<>      struct BinaryChecker<ATAN2>{ static const bool check=true;};
+  template<>      struct BinaryChecker<OP_ATAN2>{ static const bool check=true;};
 //@}
 
 /// Simple assignment
@@ -386,7 +386,7 @@ struct UnaryOperation<OP_ASSIGN>{
 
 /// Addition
 template<>
-struct BinaryOperation<ADD>{
+struct BinaryOperation<OP_ADD>{
   public:
     template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f = x+y;}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ d[0]=d[1]=1;}
@@ -394,7 +394,7 @@ struct BinaryOperation<ADD>{
 
 /// Subtraction
 template<>
-struct BinaryOperation<SUB>{
+struct BinaryOperation<OP_SUB>{
   public:
     template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f = x-y;}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ d[0]=1; d[1]=-1;}
@@ -402,7 +402,7 @@ struct BinaryOperation<SUB>{
 
 /// Multiplication
 template<>
-struct BinaryOperation<MUL>{
+struct BinaryOperation<OP_MUL>{
   public:
     template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f = x*y;}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ d[0]=y; d[1]=x;}
@@ -410,7 +410,7 @@ struct BinaryOperation<MUL>{
 
 /// Division
 template<>
-struct BinaryOperation<DIV>{
+struct BinaryOperation<OP_DIV>{
   public:
     template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f = x/y;}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ d[0]=1/y; d[1]=-f/y;}
@@ -418,7 +418,7 @@ struct BinaryOperation<DIV>{
 
 /// Negation
 template<>
-struct UnaryOperation<NEG>{
+struct UnaryOperation<OP_NEG>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f){ f = -x;}
     template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0]=-1;}
@@ -426,7 +426,7 @@ struct UnaryOperation<NEG>{
 
 /// Natural exponent
 template<>
-struct UnaryOperation<EXP>{
+struct UnaryOperation<OP_EXP>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f){ f = exp(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0]=f;}
@@ -434,7 +434,7 @@ struct UnaryOperation<EXP>{
 
 /// Natural logarithm
 template<>
-struct UnaryOperation<LOG>{
+struct UnaryOperation<OP_LOG>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f){ f = log(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0]=1/x;}
@@ -442,7 +442,7 @@ struct UnaryOperation<LOG>{
 
 /// Power, defined only for x>=0
 template<>
-struct BinaryOperation<POW>{
+struct BinaryOperation<OP_POW>{
   public:
     template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f = pow(x,y);}
     // See issue #104 why d[0] is no longer y*f/x
@@ -451,7 +451,7 @@ struct BinaryOperation<POW>{
 
 /// Power, defined only for y constant
 template<>
-struct BinaryOperation<CONSTPOW>{
+struct BinaryOperation<OP_CONSTPOW>{
   public:
     template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f = pow(x,y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ d[0]=y*pow(x,y-1); d[1]=0;}
@@ -459,7 +459,7 @@ struct BinaryOperation<CONSTPOW>{
 
 /// Square root
 template<>
-struct UnaryOperation<SQRT>{
+struct UnaryOperation<OP_SQRT>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f){ f = sqrt(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0]=1/(timesTwo(f));}
@@ -467,7 +467,7 @@ struct UnaryOperation<SQRT>{
 
 /// Sine
 template<>
-struct UnaryOperation<SIN>{
+struct UnaryOperation<OP_SIN>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f){ f = sin(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0]=cos(x);}
@@ -475,7 +475,7 @@ struct UnaryOperation<SIN>{
 
 /// Cosine
 template<>
-struct UnaryOperation<COS>{
+struct UnaryOperation<OP_COS>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f){ f = cos(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0]=-sin(x);}
@@ -483,7 +483,7 @@ struct UnaryOperation<COS>{
 
 /// Tangent
 template<>
-struct UnaryOperation<TAN>{
+struct UnaryOperation<OP_TAN>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f){ f = tan(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0] = 1/square(cos(x));}
@@ -491,7 +491,7 @@ struct UnaryOperation<TAN>{
 
 /// Arcus sine
 template<>
-struct UnaryOperation<ASIN>{
+struct UnaryOperation<OP_ASIN>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f){ f = asin(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0]=1/sqrt(1-x*x);}
@@ -499,7 +499,7 @@ struct UnaryOperation<ASIN>{
 
 /// Arcus cosine
 template<>
-struct UnaryOperation<ACOS>{
+struct UnaryOperation<OP_ACOS>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f){ f = acos(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0]=-1/sqrt(1-x*x);}
@@ -507,7 +507,7 @@ struct UnaryOperation<ACOS>{
 
 /// Arcus tangent
 template<>
-struct UnaryOperation<ATAN>{
+struct UnaryOperation<OP_ATAN>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f){ f = atan(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0] = 1/(1+x*x);}
@@ -515,7 +515,7 @@ struct UnaryOperation<ATAN>{
 
 /// Step function
 template<>
-struct UnaryOperation<STEP>{
+struct UnaryOperation<OP_STEP>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f){ f = x >= T(0.);}
     template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0] = 0;}
@@ -523,7 +523,7 @@ struct UnaryOperation<STEP>{
 
 /// Floor function
 template<>
-struct UnaryOperation<FLOOR>{
+struct UnaryOperation<OP_FLOOR>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f){ f = floor(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0] = 0;}
@@ -531,7 +531,7 @@ struct UnaryOperation<FLOOR>{
 
 /// Ceil function
 template<>
-struct UnaryOperation<CEIL>{
+struct UnaryOperation<OP_CEIL>{
   public:
     template<typename T> static inline void fcn(const T& x, T& f){ f = ceil(x);}
     template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0] = 0;}
@@ -539,77 +539,77 @@ struct UnaryOperation<CEIL>{
 
 /// Equality
 template<>
-struct BinaryOperation<EQUALITY>{
+struct BinaryOperation<OP_EQUALITY>{
   template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f = x==y;}
   template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ d[0]=d[1]=0;}
 };
 
 /// Error function
 template<>
-struct UnaryOperation<ERF>{
+struct UnaryOperation<OP_ERF>{
   template<typename T> static inline void fcn(const T& x, T& f){ f = erf(x);}
   template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0] = (2/sqrt(M_PI))*exp(-x*x);}
 };
 
 /// Absolute value
 template<>
-struct UnaryOperation<FABS>{
+struct UnaryOperation<OP_FABS>{
   template<typename T> static inline void fcn(const T& x, T& f){ f = fabs(x);}
   template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0]=sign(x);}
 };
 
 /// Sign
 template<>
-struct UnaryOperation<SIGN>{
+struct UnaryOperation<OP_SIGN>{
   template<typename T> static inline void fcn(const T& x, T& f){ f = sign(x);}
   template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0]=0;}
 };
 
 /// Minimum
 template<>
-struct BinaryOperation<FMIN>{
+struct BinaryOperation<OP_FMIN>{
   template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f = fmin(x,y);}
   template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ d[0]=x<=y; d[1]=!d[0];}
 };
 
 /// Maximum
 template<>
-struct BinaryOperation<FMAX>{
+struct BinaryOperation<OP_FMAX>{
   template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f = fmax(x,y);}
   template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ d[0]=x>=y; d[1]=!d[0];}
 };
 
 /// Elementwise inverse
 template<>
-struct UnaryOperation<INV>{
+struct UnaryOperation<OP_INV>{
   template<typename T> static inline void fcn(const T& x, T& f){ f = 1./x;}
   template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0] = -f*f; }
 };
 
 /// Hyperbolic sine
 template<>
-struct UnaryOperation<SINH>{
+struct UnaryOperation<OP_SINH>{
   template<typename T> static inline void fcn(const T& x, T& f){ f = sinh(x);}
   template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0] = cosh(x); }
 };
 
 /// Hyperbolic cosine
 template<>
-struct UnaryOperation<COSH>{
+struct UnaryOperation<OP_COSH>{
   template<typename T> static inline void fcn(const T& x, T& f){ f = cosh(x);}
   template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0] = -sinh(x); }
 };
 
 /// Hyperbolic tangent
 template<>
-struct UnaryOperation<TANH>{
+struct UnaryOperation<OP_TANH>{
   template<typename T> static inline void fcn(const T& x, T& f){ f = tanh(x);}
   template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0] = 1-f*f; }
 };
 
 /// Inverse of error function
 template<>
-struct UnaryOperation<ERFINV>{
+struct UnaryOperation<OP_ERFINV>{
   template<typename T> static inline void fcn(const T& x, T& f){ f = erfinv(x);}
   template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0] = (sqrt(M_PI)/2)*exp(f*f); }
 };
@@ -623,7 +623,7 @@ struct BinaryOperation<OP_PRINTME>{
 
 /// Arctan2
 template<>
-struct BinaryOperation<ATAN2>{
+struct BinaryOperation<OP_ATAN2>{
   public:
     template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f = atan2(x,y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ T t = x*x+y*y; d[0]=y/t; d[1]=-x/t;}
