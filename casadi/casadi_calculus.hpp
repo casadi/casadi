@@ -281,7 +281,10 @@ struct DerBinaryOpertion{
 
 /// Enum for quick access to any node
 enum Operation{
+  // Simple assignment
   OP_ASSIGN,
+  
+  // Standard unary and binary functions
   OP_ADD,  OP_SUB,  OP_MUL,  OP_DIV,
   OP_NEG,  OP_EXP,  OP_LOG,  OP_POW, OP_CONSTPOW,
   OP_SQRT,  OP_SIN,  OP_COS,  OP_TAN,  
@@ -293,10 +296,17 @@ enum Operation{
   OP_SINH,  OP_COSH,  OP_TANH,
   OP_ATAN2,
   
+  // Double constant
   OP_CONST,
-  OP_VAR,
-  OP_CALL,
-  OP_OUTPUT,
+  
+  // Function input and output
+  OP_INPUT, OP_OUTPUT,
+  
+  // Free parameter
+  OP_PARAMETER,
+  
+  // Embedded function call
+  OP_FINPUT, OP_CALL, OP_FOUTPUT,
   
   OP_ERFINV,
   OP_PRINTME,

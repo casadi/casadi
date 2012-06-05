@@ -29,7 +29,7 @@ namespace CasADi{
 template<template<int> class F>
 bool operation_checker(unsigned int op){
   switch(op){
-    case OP_ASSIGN:     return F<OP_ASSIGN>::check;
+    case OP_ASSIGN:        return F<OP_ASSIGN>::check;
     case OP_ADD:           return F<OP_ADD>::check;
     case OP_SUB:           return F<OP_SUB>::check;
     case OP_MUL:           return F<OP_MUL>::check;
@@ -59,12 +59,12 @@ bool operation_checker(unsigned int op){
     case OP_SINH:          return F<OP_SINH>::check;
     case OP_COSH:          return F<OP_COSH>::check;
     case OP_TANH:          return F<OP_TANH>::check;
-    case OP_CONST:      return F<OP_CONST>::check;
-    case OP_CALL:      	 return F<OP_CALL>::check;
-    case OP_VAR:      	 return F<OP_VAR>::check;
-    case OP_OUTPUT:     return F<OP_OUTPUT>::check;
+    case OP_CONST:         return F<OP_CONST>::check;
+    case OP_CALL:          return F<OP_CALL>::check;
+    case OP_INPUT:         return F<OP_INPUT>::check;
+    case OP_OUTPUT:        return F<OP_OUTPUT>::check;
     case OP_ERFINV:        return F<OP_ERFINV>::check;
-    case OP_PRINTME:    return F<OP_PRINTME>::check;
+    case OP_PRINTME:       return F<OP_PRINTME>::check;
     case OP_ATAN2:         return F<OP_ATAN2>::check;
   }
 };
