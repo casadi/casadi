@@ -135,7 +135,7 @@ void FXInternal::print(ostream &stream) const{
   } else{
     stream << " Inputs (" << getNumInputs() << "):" << std::endl;
     for (int i=0;i<getNumInputs();i++) {
-       stream << "  " << i+1 << ". " << input(i).dimString() << std::endl;
+      stream << "  " << i+1 << ". " << input(i).dimString() << std::endl;
     }
   }
   if (getNumOutputs()==1) {
@@ -143,7 +143,7 @@ void FXInternal::print(ostream &stream) const{
   } else {
     stream << " Outputs (" << getNumOutputs() << "):" << std::endl;
     for (int i=0;i<getNumOutputs();i++) {
-       stream << "  " << i+1 << ". " << output(i).dimString() << std::endl;
+      stream << "  " << i+1 << ". " << output(i).dimString() << std::endl;
     }
   }
 }
@@ -462,12 +462,12 @@ CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
       
       // Print progress
       if(verbose()){
-  int progress_new = (s*100)/nsweep;
-  // Print when entering a new decade
-  if(progress_new / 10 > progress / 10){
-    progress = progress_new;
-    std::cout << progress << " %"  << std::endl;
-  }
+        int progress_new = (s*100)/nsweep;
+        // Print when entering a new decade
+        if(progress_new / 10 > progress / 10){
+          progress = progress_new;
+          std::cout << progress << " %"  << std::endl;
+        }
       }
       
       // Nonzero offset
@@ -477,7 +477,7 @@ CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
       int ndir_local = std::min(bvec_size,nz_seed-offset);
 
       for(int i=0; i<ndir_local; ++i){
-  seed_v[offset+i] |= bvec_t(1)<<i;
+        seed_v[offset+i] |= bvec_t(1)<<i;
       }
       
       // Propagate the dependencies
@@ -486,33 +486,33 @@ CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
       // Loop over the nonzeros of the output
       for(int el=0; el<nz_sens; ++el){
 
-  // Get the sparsity sensitivity
-  bvec_t spsens = sens_v[el];
+        // Get the sparsity sensitivity
+        bvec_t spsens = sens_v[el];
 
-  // Clear the sensitivities for the next sweep
-  if(!use_fwd){
-    sens_v[el] = 0;
-  }
+        // Clear the sensitivities for the next sweep
+        if(!use_fwd){
+          sens_v[el] = 0;
+        }
   
-  // If there is a dependency in any of the directions
-  if(0!=spsens){
-    
-    // Loop over seed directions
-    for(int i=0; i<ndir_local; ++i){
-      
-      // If dependents on the variable
-      if((bvec_t(1) << i) & spsens){
-        // Add to pattern
-        jrow.push_back(el);
-        jcol.push_back(i+offset);
-      }
-    }
-  }
+        // If there is a dependency in any of the directions
+        if(0!=spsens){
+          
+          // Loop over seed directions
+          for(int i=0; i<ndir_local; ++i){
+            
+            // If dependents on the variable
+            if((bvec_t(1) << i) & spsens){
+              // Add to pattern
+              jrow.push_back(el);
+              jcol.push_back(i+offset);
+            }
+          }
+        }
       }
       
       // Remove the seeds
       for(int i=0; i<bvec_size && offset+i<nz_seed; ++i){
-  seed_v[offset+i] = 0;
+        seed_v[offset+i] = 0;
       }
     }
     

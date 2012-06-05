@@ -1478,6 +1478,9 @@ void SXFunctionInternal::spEvaluate(bool fwd){
   // Get work array
   bvec_t *iwork = get_bvec_t(dwork_);
 
+  // FIXME Workaround: the following will remove seeds added to parameters in a previous sweep
+  //   fill_n(iwork,dwork_.size(),0);
+
   if(fwd){ // Forward propagation
     
     // Pass input seeds
@@ -1507,6 +1510,11 @@ void SXFunctionInternal::spEvaluate(bool fwd){
         swork[k] = iwork[output_ind_[ind][k]];
       }
     }
+    
+    // FIXME Workaround: the following will remove seeds added to parameters for the next sweep
+//     for(std::vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
+//       iwork[it->res] = bvec_t(0);
+//     }
     
   } else { // Backward propagation
 
