@@ -130,7 +130,7 @@ class SXFunctionInternal : public XFunctionInternal<SXFunctionInternal,Matrix<SX
   static void printVector(std::ostream &cfile, const std::string& name, const std::vector<int>& v);
 
   /** \brief  Print operation i to a stream */
-  void printOperation(std::ostream &stream, int i) const;
+  void printOperation(std::ostream &stream, int i, std::vector<int>& place) const;
   
   /** \brief  Print to a c file */
   void generateCode(const std::string& filename);

@@ -280,8 +280,8 @@ void SXFunctionInternal::printVector(std::ostream &cfile, const std::string& nam
   cfile << "};" << endl;
 }
 
-void SXFunctionInternal::printOperation(std::ostream &stream, int i) const{
-  const AlgEl& ae = algorithm_[i];
+void SXFunctionInternal::printOperation(std::ostream &stream, int i, std::vector<int>& place) const{
+  const AlgEl& ae = algorithm_[place[i]];
   const SX& f = binops_[i];
   casadi_math<double>::printPre(ae.op,stream);
   int ndep = casadi_math<double>::ndeps(ae.op);
@@ -296,7 +296,7 @@ void SXFunctionInternal::printOperation(std::ostream &stream, int i) const{
         stream << "(" << v << ")";
       }
     } else if(f->dep(c)->hasDep() && refcount_[f->dep(c)->temp-1]==1) {
-      printOperation(stream,f->dep(c)->temp-1);
+      printOperation(stream,f->dep(c)->temp-1,place);
     } else {
       stream << "a" << ae.arg.i[c];
     }
@@ -424,7 +424,16 @@ void SXFunctionInternal::generateCode(const string& src_name){
     }
   }
 
- // For each node, mark its place in the algorithm
+  // Place in the algorithm for each binary node
+  vector<int> place(binops_.size());
+  vector<int>::iterator it_place=place.begin();
+  for(int i=0; i<algorithm_.size(); ++i){
+    if(algorithm_[i].op != OP_CONST){
+      *it_place++ = i;
+    }
+  }
+  
+ // For each node, mark its place in the list of binary operations
  for(int i=0; i<binops_.size(); ++i){
    binops_[i]->temp = i+1;
  }
@@ -432,8 +441,9 @@ void SXFunctionInternal::generateCode(const string& src_name){
  // Count how many times a node is referenced in the algorithm
  refcount_.resize(binops_.size());
  fill(refcount_.begin(),refcount_.end(),0);
- for(int i=0; i<algorithm_.size(); ++i){
-   for(int c=0; c<2; ++c){
+ for(int i=0; i<binops_.size(); ++i){
+   int ndeps = casadi_math<double>::ndeps(binops_[i]->getOp());
+   for(int c=0; c<ndeps; ++c){
      // Get the place in the algorithm of the child
      int i_ch = binops_[i]->dep(c)->temp-1;
      if(i_ch>=0){
@@ -462,17 +472,26 @@ void SXFunctionInternal::generateCode(const string& src_name){
  
  // Run the algorithm_
  int ii=0;
- for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it, ++ii){
+ for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
+   // Skip if constant
+   if(it->op==OP_CONST) continue;
+   
    // Skip printing variables that can be inlined
-   if(refcount_[ii]<2) continue;
+   if(refcount_[ii]<2){
+     ii++;
+     continue;
+   }
    
     if(!declared[it->res]){
       cfile << "d ";
       declared[it->res]=true;
     }
     cfile << "a" << it->res << "=";
-    printOperation(cfile,ii);
+    printOperation(cfile,ii,place);
     cfile  << ";" << endl;
+   
+   // Next binary operation
+   ++ii;
   }
 
  // Clear the reference counter
@@ -487,7 +506,7 @@ void SXFunctionInternal::generateCode(const string& src_name){
       if(i==0){ // constant
         cfile << f->getValue();
       } else if(i>0){ // binary node
-        cfile << "a" << algorithm_[i-1].res;
+        cfile << "a" << algorithm_[place[i-1]].res;
       } else { // input feedthrough
         cfile << "a" << (-i-1);
       }
