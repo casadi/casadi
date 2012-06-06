@@ -502,12 +502,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::AcadoIntegrator::eval "
 
@@ -517,12 +514,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::AcadoIntegrator::eval "
 
@@ -540,12 +534,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::AcadoIntegrator::evalSX "
 
@@ -559,12 +550,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::AcadoIntegrator::derivative "
 
@@ -657,13 +645,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::AcadoIntegrator::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::AcadoIntegrator::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::AcadoIntegrator::spCanEvaluate "
 
@@ -1831,12 +1820,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::AcadoOCP::eval "
 
@@ -1846,12 +1832,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::AcadoOCP::eval "
 
@@ -1869,12 +1852,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::AcadoOCP::evalSX "
 
@@ -1888,12 +1868,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::AcadoOCP::derivative "
 
@@ -1986,13 +1963,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::AcadoOCP::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::AcadoOCP::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::AcadoOCP::spCanEvaluate "
 
@@ -2618,11 +2596,6 @@ Assert that the object has been initialized. ";
 casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1AlgElData.xml
-%feature("docstring") CasADi::AlgElData "C++ includes:
-sx_function_internal.hpp ";
-
-
 // File: structCasADi_1_1BinaryChecker.xml
 %feature("docstring") CasADi::BinaryChecker "
 
@@ -2631,43 +2604,48 @@ Is the operation binary as opposed to unary.
 C++ includes: casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1BinaryChecker_3_01ADD_01_4.xml
-%feature("docstring") CasADi::BinaryChecker< ADD > " C++ includes:
+// File: structCasADi_1_1BinaryChecker_3_01OP__ADD_01_4.xml
+%feature("docstring") CasADi::BinaryChecker< OP_ADD > " C++ includes:
 casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1BinaryChecker_3_01ATAN2_01_4.xml
-%feature("docstring") CasADi::BinaryChecker< ATAN2 > " C++ includes:
+// File: structCasADi_1_1BinaryChecker_3_01OP__ATAN2_01_4.xml
+%feature("docstring") CasADi::BinaryChecker< OP_ATAN2 > " C++ includes:
 casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1BinaryChecker_3_01CONSTPOW_01_4.xml
-%feature("docstring") CasADi::BinaryChecker< CONSTPOW > " C++ includes:
+// File: structCasADi_1_1BinaryChecker_3_01OP__CONSTPOW_01_4.xml
+%feature("docstring") CasADi::BinaryChecker< OP_CONSTPOW > " C++ includes:
 casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1BinaryChecker_3_01DIV_01_4.xml
-%feature("docstring") CasADi::BinaryChecker< DIV > " C++ includes:
+// File: structCasADi_1_1BinaryChecker_3_01OP__DIV_01_4.xml
+%feature("docstring") CasADi::BinaryChecker< OP_DIV > " C++ includes:
 casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1BinaryChecker_3_01EQUALITY_01_4.xml
-%feature("docstring") CasADi::BinaryChecker< EQUALITY > " C++ includes:
+// File: structCasADi_1_1BinaryChecker_3_01OP__EQUALITY_01_4.xml
+%feature("docstring") CasADi::BinaryChecker< OP_EQUALITY > " C++ includes:
 casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1BinaryChecker_3_01FMAX_01_4.xml
-%feature("docstring") CasADi::BinaryChecker< FMAX > " C++ includes:
+// File: structCasADi_1_1BinaryChecker_3_01OP__FMAX_01_4.xml
+%feature("docstring") CasADi::BinaryChecker< OP_FMAX > " C++ includes:
 casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1BinaryChecker_3_01FMIN_01_4.xml
-%feature("docstring") CasADi::BinaryChecker< FMIN > " C++ includes:
+// File: structCasADi_1_1BinaryChecker_3_01OP__FMIN_01_4.xml
+%feature("docstring") CasADi::BinaryChecker< OP_FMIN > " C++ includes:
 casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1BinaryChecker_3_01MUL_01_4.xml
-%feature("docstring") CasADi::BinaryChecker< MUL > " C++ includes:
+// File: structCasADi_1_1BinaryChecker_3_01OP__MUL_01_4.xml
+%feature("docstring") CasADi::BinaryChecker< OP_MUL > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1BinaryChecker_3_01OP__POW_01_4.xml
+%feature("docstring") CasADi::BinaryChecker< OP_POW > " C++ includes:
 casadi_calculus.hpp ";
 
 
@@ -2676,13 +2654,8 @@ casadi_calculus.hpp ";
 casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1BinaryChecker_3_01POW_01_4.xml
-%feature("docstring") CasADi::BinaryChecker< POW > " C++ includes:
-casadi_calculus.hpp ";
-
-
-// File: structCasADi_1_1BinaryChecker_3_01SUB_01_4.xml
-%feature("docstring") CasADi::BinaryChecker< SUB > " C++ includes:
+// File: structCasADi_1_1BinaryChecker_3_01OP__SUB_01_4.xml
+%feature("docstring") CasADi::BinaryChecker< OP_SUB > " C++ includes:
 casadi_calculus.hpp ";
 
 
@@ -2915,66 +2888,74 @@ Assert that the object has been initialized. ";
 casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1BinaryOperation_3_01ADD_01_4.xml
-%feature("docstring") CasADi::BinaryOperation< ADD > "
+// File: structCasADi_1_1BinaryOperation_3_01OP__ADD_01_4.xml
+%feature("docstring") CasADi::BinaryOperation< OP_ADD > "
 
 Addition.
 
 C++ includes: casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1BinaryOperation_3_01ATAN2_01_4.xml
-%feature("docstring") CasADi::BinaryOperation< ATAN2 > "
+// File: structCasADi_1_1BinaryOperation_3_01OP__ATAN2_01_4.xml
+%feature("docstring") CasADi::BinaryOperation< OP_ATAN2 > "
 
 Arctan2.
 
 C++ includes: casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1BinaryOperation_3_01CONSTPOW_01_4.xml
-%feature("docstring") CasADi::BinaryOperation< CONSTPOW > "
+// File: structCasADi_1_1BinaryOperation_3_01OP__CONSTPOW_01_4.xml
+%feature("docstring") CasADi::BinaryOperation< OP_CONSTPOW > "
 
 Power, defined only for y constant.
 
 C++ includes: casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1BinaryOperation_3_01DIV_01_4.xml
-%feature("docstring") CasADi::BinaryOperation< DIV > "
+// File: structCasADi_1_1BinaryOperation_3_01OP__DIV_01_4.xml
+%feature("docstring") CasADi::BinaryOperation< OP_DIV > "
 
 Division.
 
 C++ includes: casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1BinaryOperation_3_01EQUALITY_01_4.xml
-%feature("docstring") CasADi::BinaryOperation< EQUALITY > "
+// File: structCasADi_1_1BinaryOperation_3_01OP__EQUALITY_01_4.xml
+%feature("docstring") CasADi::BinaryOperation< OP_EQUALITY > "
 
 Equality.
 
 C++ includes: casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1BinaryOperation_3_01FMAX_01_4.xml
-%feature("docstring") CasADi::BinaryOperation< FMAX > "
+// File: structCasADi_1_1BinaryOperation_3_01OP__FMAX_01_4.xml
+%feature("docstring") CasADi::BinaryOperation< OP_FMAX > "
 
 Maximum.
 
 C++ includes: casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1BinaryOperation_3_01FMIN_01_4.xml
-%feature("docstring") CasADi::BinaryOperation< FMIN > "
+// File: structCasADi_1_1BinaryOperation_3_01OP__FMIN_01_4.xml
+%feature("docstring") CasADi::BinaryOperation< OP_FMIN > "
 
 Minimum.
 
 C++ includes: casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1BinaryOperation_3_01MUL_01_4.xml
-%feature("docstring") CasADi::BinaryOperation< MUL > "
+// File: structCasADi_1_1BinaryOperation_3_01OP__MUL_01_4.xml
+%feature("docstring") CasADi::BinaryOperation< OP_MUL > "
 
 Multiplication.
+
+C++ includes: casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1BinaryOperation_3_01OP__POW_01_4.xml
+%feature("docstring") CasADi::BinaryOperation< OP_POW > "
+
+Power, defined only for x>=0.
 
 C++ includes: casadi_calculus.hpp ";
 
@@ -2987,16 +2968,8 @@ Identity operator with the side effect of printing.
 C++ includes: casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1BinaryOperation_3_01POW_01_4.xml
-%feature("docstring") CasADi::BinaryOperation< POW > "
-
-Power, defined only for x>=0.
-
-C++ includes: casadi_calculus.hpp ";
-
-
-// File: structCasADi_1_1BinaryOperation_3_01SUB_01_4.xml
-%feature("docstring") CasADi::BinaryOperation< SUB > "
+// File: structCasADi_1_1BinaryOperation_3_01OP__SUB_01_4.xml
+%feature("docstring") CasADi::BinaryOperation< OP_SUB > "
 
 Subtraction.
 
@@ -3690,12 +3663,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::CFunction::eval "
 
@@ -3705,12 +3675,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::CFunction::eval "
 
@@ -3728,12 +3695,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::CFunction::evalSX "
 
@@ -3747,12 +3711,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::CFunction::derivative "
 
@@ -3845,13 +3806,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::CFunction::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::CFunction::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::CFunction::spCanEvaluate "
 
@@ -4923,12 +4885,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::OptimalControl::Collocation::eval "
 
@@ -4938,12 +4897,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::OptimalControl::Collocation::eval "
 
@@ -4961,12 +4917,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::OptimalControl::Collocation::evalSX "
 
@@ -4980,12 +4933,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::OptimalControl::Collocation::derivative "
 
@@ -5084,14 +5034,15 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::OptimalControl::Collocation::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::OptimalControl::Collocation::symbolicInputSX
 "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::OptimalControl::Collocation::spCanEvaluate "
 
@@ -5740,12 +5691,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::eval "
 
@@ -5755,12 +5703,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::eval "
 
@@ -5778,12 +5723,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::evalSX "
 
@@ -5797,12 +5739,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::derivative "
 
@@ -5895,13 +5834,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::spCanEvaluate "
 
@@ -7285,18 +7225,23 @@ Is commutative.
 C++ includes: casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1CommChecker_3_01ATAN2_01_4.xml
-%feature("docstring") CasADi::CommChecker< ATAN2 > " C++ includes:
+// File: structCasADi_1_1CommChecker_3_01OP__ATAN2_01_4.xml
+%feature("docstring") CasADi::CommChecker< OP_ATAN2 > " C++ includes:
 casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1CommChecker_3_01CONSTPOW_01_4.xml
-%feature("docstring") CasADi::CommChecker< CONSTPOW > " C++ includes:
+// File: structCasADi_1_1CommChecker_3_01OP__CONSTPOW_01_4.xml
+%feature("docstring") CasADi::CommChecker< OP_CONSTPOW > " C++ includes:
 casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1CommChecker_3_01DIV_01_4.xml
-%feature("docstring") CasADi::CommChecker< DIV > " C++ includes:
+// File: structCasADi_1_1CommChecker_3_01OP__DIV_01_4.xml
+%feature("docstring") CasADi::CommChecker< OP_DIV > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1CommChecker_3_01OP__POW_01_4.xml
+%feature("docstring") CasADi::CommChecker< OP_POW > " C++ includes:
 casadi_calculus.hpp ";
 
 
@@ -7305,13 +7250,8 @@ casadi_calculus.hpp ";
 casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1CommChecker_3_01POW_01_4.xml
-%feature("docstring") CasADi::CommChecker< POW > " C++ includes:
-casadi_calculus.hpp ";
-
-
-// File: structCasADi_1_1CommChecker_3_01SUB_01_4.xml
-%feature("docstring") CasADi::CommChecker< SUB > " C++ includes:
+// File: structCasADi_1_1CommChecker_3_01OP__SUB_01_4.xml
+%feature("docstring") CasADi::CommChecker< OP_SUB > " C++ includes:
 casadi_calculus.hpp ";
 
 
@@ -8198,12 +8138,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::ControlSimulator::eval "
 
@@ -8213,12 +8150,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::ControlSimulator::eval "
 
@@ -8236,12 +8170,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::ControlSimulator::evalSX "
 
@@ -8255,12 +8186,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::ControlSimulator::derivative "
 
@@ -8353,13 +8281,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::ControlSimulator::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::ControlSimulator::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::ControlSimulator::spCanEvaluate "
 
@@ -10208,12 +10137,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::CplexSolver::eval "
 
@@ -10223,12 +10149,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::CplexSolver::eval "
 
@@ -10246,12 +10169,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::CplexSolver::evalSX "
 
@@ -10265,12 +10185,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::CplexSolver::derivative "
 
@@ -10363,13 +10280,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::CplexSolver::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::CplexSolver::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::CplexSolver::spCanEvaluate "
 
@@ -11591,12 +11509,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparse::eval "
 
@@ -11606,12 +11521,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparse::eval "
 
@@ -11629,12 +11541,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparse::evalSX "
 
@@ -11648,12 +11557,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparse::derivative "
 
@@ -11746,13 +11652,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparse::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparse::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparse::spCanEvaluate "
 
@@ -13100,12 +13007,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::eval "
 
@@ -13115,12 +13019,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::eval "
 
@@ -13138,12 +13039,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::evalSX "
 
@@ -13157,12 +13055,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::derivative "
 
@@ -13257,13 +13152,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::spCanEvaluate "
 
@@ -15123,12 +15019,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::ExternalFunction::eval "
 
@@ -15138,12 +15031,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::ExternalFunction::eval "
 
@@ -15161,12 +15051,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::ExternalFunction::evalSX "
 
@@ -15180,12 +15067,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::ExternalFunction::derivative "
 
@@ -15278,13 +15162,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::ExternalFunction::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::ExternalFunction::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::ExternalFunction::spCanEvaluate "
 
@@ -15858,23 +15743,23 @@ If evaluated with both arguments zero, is the result zero?
 C++ includes: casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1F00Checker_3_01ADD_01_4.xml
-%feature("docstring") CasADi::F00Checker< ADD > " C++ includes:
+// File: structCasADi_1_1F00Checker_3_01OP__ADD_01_4.xml
+%feature("docstring") CasADi::F00Checker< OP_ADD > " C++ includes:
 casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1F00Checker_3_01FMAX_01_4.xml
-%feature("docstring") CasADi::F00Checker< FMAX > " C++ includes:
+// File: structCasADi_1_1F00Checker_3_01OP__FMAX_01_4.xml
+%feature("docstring") CasADi::F00Checker< OP_FMAX > " C++ includes:
 casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1F00Checker_3_01FMIN_01_4.xml
-%feature("docstring") CasADi::F00Checker< FMIN > " C++ includes:
+// File: structCasADi_1_1F00Checker_3_01OP__FMIN_01_4.xml
+%feature("docstring") CasADi::F00Checker< OP_FMIN > " C++ includes:
 casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1F00Checker_3_01SUB_01_4.xml
-%feature("docstring") CasADi::F00Checker< SUB > " C++ includes:
+// File: structCasADi_1_1F00Checker_3_01OP__SUB_01_4.xml
+%feature("docstring") CasADi::F00Checker< OP_SUB > " C++ includes:
 casadi_calculus.hpp ";
 
 
@@ -15886,48 +15771,8 @@ If evaluated with the first argument zero, is the result zero?
 C++ includes: casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1F0XChecker_3_01ASIN_01_4.xml
-%feature("docstring") CasADi::F0XChecker< ASIN > " C++ includes:
-casadi_calculus.hpp ";
-
-
-// File: structCasADi_1_1F0XChecker_3_01CEIL_01_4.xml
-%feature("docstring") CasADi::F0XChecker< CEIL > " C++ includes:
-casadi_calculus.hpp ";
-
-
-// File: structCasADi_1_1F0XChecker_3_01DIV_01_4.xml
-%feature("docstring") CasADi::F0XChecker< DIV > " C++ includes:
-casadi_calculus.hpp ";
-
-
-// File: structCasADi_1_1F0XChecker_3_01ERF_01_4.xml
-%feature("docstring") CasADi::F0XChecker< ERF > " C++ includes:
-casadi_calculus.hpp ";
-
-
-// File: structCasADi_1_1F0XChecker_3_01ERFINV_01_4.xml
-%feature("docstring") CasADi::F0XChecker< ERFINV > " C++ includes:
-casadi_calculus.hpp ";
-
-
-// File: structCasADi_1_1F0XChecker_3_01FABS_01_4.xml
-%feature("docstring") CasADi::F0XChecker< FABS > " C++ includes:
-casadi_calculus.hpp ";
-
-
-// File: structCasADi_1_1F0XChecker_3_01FLOOR_01_4.xml
-%feature("docstring") CasADi::F0XChecker< FLOOR > " C++ includes:
-casadi_calculus.hpp ";
-
-
-// File: structCasADi_1_1F0XChecker_3_01MUL_01_4.xml
-%feature("docstring") CasADi::F0XChecker< MUL > " C++ includes:
-casadi_calculus.hpp ";
-
-
-// File: structCasADi_1_1F0XChecker_3_01NEG_01_4.xml
-%feature("docstring") CasADi::F0XChecker< NEG > " C++ includes:
+// File: structCasADi_1_1F0XChecker_3_01OP__ASIN_01_4.xml
+%feature("docstring") CasADi::F0XChecker< OP_ASIN > " C++ includes:
 casadi_calculus.hpp ";
 
 
@@ -15936,33 +15781,73 @@ casadi_calculus.hpp ";
 casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1F0XChecker_3_01SIGN_01_4.xml
-%feature("docstring") CasADi::F0XChecker< SIGN > " C++ includes:
+// File: structCasADi_1_1F0XChecker_3_01OP__CEIL_01_4.xml
+%feature("docstring") CasADi::F0XChecker< OP_CEIL > " C++ includes:
 casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1F0XChecker_3_01SIN_01_4.xml
-%feature("docstring") CasADi::F0XChecker< SIN > " C++ includes:
+// File: structCasADi_1_1F0XChecker_3_01OP__DIV_01_4.xml
+%feature("docstring") CasADi::F0XChecker< OP_DIV > " C++ includes:
 casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1F0XChecker_3_01SINH_01_4.xml
-%feature("docstring") CasADi::F0XChecker< SINH > " C++ includes:
+// File: structCasADi_1_1F0XChecker_3_01OP__ERF_01_4.xml
+%feature("docstring") CasADi::F0XChecker< OP_ERF > " C++ includes:
 casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1F0XChecker_3_01SQRT_01_4.xml
-%feature("docstring") CasADi::F0XChecker< SQRT > " C++ includes:
+// File: structCasADi_1_1F0XChecker_3_01OP__ERFINV_01_4.xml
+%feature("docstring") CasADi::F0XChecker< OP_ERFINV > " C++ includes:
 casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1F0XChecker_3_01TAN_01_4.xml
-%feature("docstring") CasADi::F0XChecker< TAN > " C++ includes:
+// File: structCasADi_1_1F0XChecker_3_01OP__FABS_01_4.xml
+%feature("docstring") CasADi::F0XChecker< OP_FABS > " C++ includes:
 casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1F0XChecker_3_01TANH_01_4.xml
-%feature("docstring") CasADi::F0XChecker< TANH > " C++ includes:
+// File: structCasADi_1_1F0XChecker_3_01OP__FLOOR_01_4.xml
+%feature("docstring") CasADi::F0XChecker< OP_FLOOR > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F0XChecker_3_01OP__MUL_01_4.xml
+%feature("docstring") CasADi::F0XChecker< OP_MUL > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F0XChecker_3_01OP__NEG_01_4.xml
+%feature("docstring") CasADi::F0XChecker< OP_NEG > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F0XChecker_3_01OP__SIGN_01_4.xml
+%feature("docstring") CasADi::F0XChecker< OP_SIGN > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F0XChecker_3_01OP__SIN_01_4.xml
+%feature("docstring") CasADi::F0XChecker< OP_SIN > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F0XChecker_3_01OP__SINH_01_4.xml
+%feature("docstring") CasADi::F0XChecker< OP_SINH > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F0XChecker_3_01OP__SQRT_01_4.xml
+%feature("docstring") CasADi::F0XChecker< OP_SQRT > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F0XChecker_3_01OP__TAN_01_4.xml
+%feature("docstring") CasADi::F0XChecker< OP_TAN > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F0XChecker_3_01OP__TANH_01_4.xml
+%feature("docstring") CasADi::F0XChecker< OP_TANH > " C++ includes:
 casadi_calculus.hpp ";
 
 
@@ -16563,12 +16448,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::FX::evalMX "
 
@@ -16578,12 +16460,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::FX::eval "
 
@@ -16593,12 +16472,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::FX::eval "
 
@@ -16608,12 +16484,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::FX::eval "
 
@@ -16714,13 +16587,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::FX::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::FX::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::FX::spCanEvaluate "
 
@@ -16832,8 +16706,8 @@ If evaluated with the second argument zero, is the result zero?
 C++ includes: casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1FX0Checker_3_01MUL_01_4.xml
-%feature("docstring") CasADi::FX0Checker< MUL > " C++ includes:
+// File: structCasADi_1_1FX0Checker_3_01OP__MUL_01_4.xml
+%feature("docstring") CasADi::FX0Checker< OP_MUL > " C++ includes:
 casadi_calculus.hpp ";
 
 
@@ -18483,12 +18357,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::eval "
 
@@ -18498,12 +18369,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::eval "
 
@@ -18521,12 +18389,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::evalSX "
 
@@ -18540,12 +18405,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::derivative "
 
@@ -18639,13 +18501,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::spCanEvaluate "
 
@@ -20267,12 +20130,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::ImplicitFunction::eval "
 
@@ -20282,12 +20142,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::ImplicitFunction::eval "
 
@@ -20305,12 +20162,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::ImplicitFunction::evalSX "
 
@@ -20324,12 +20178,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::ImplicitFunction::derivative "
 
@@ -20422,13 +20273,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::ImplicitFunction::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::ImplicitFunction::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::ImplicitFunction::spCanEvaluate "
 
@@ -21677,12 +21529,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Integrator::eval "
 
@@ -21692,12 +21541,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Integrator::eval "
 
@@ -21715,12 +21561,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Integrator::evalSX "
 
@@ -21734,12 +21577,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Integrator::derivative "
 
@@ -21832,13 +21672,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::Integrator::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::Integrator::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::Integrator::spCanEvaluate "
 
@@ -23657,12 +23498,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::IPMethod::eval "
 
@@ -23672,12 +23510,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::IPMethod::eval "
 
@@ -23695,12 +23530,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::IPMethod::evalSX "
 
@@ -23714,12 +23546,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::IPMethod::derivative "
 
@@ -23812,13 +23641,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::IPMethod::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::IPMethod::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::IPMethod::spCanEvaluate "
 
@@ -29043,12 +28873,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::eval "
 
@@ -29058,12 +28885,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::eval "
 
@@ -29081,12 +28905,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::evalSX "
 
@@ -29100,12 +28921,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::derivative "
 
@@ -29200,13 +29018,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::spCanEvaluate "
 
@@ -32470,12 +32289,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::IpoptSolver::eval "
 
@@ -32485,12 +32301,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::IpoptSolver::eval "
 
@@ -32508,12 +32321,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::IpoptSolver::evalSX "
 
@@ -32527,12 +32337,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::IpoptSolver::derivative "
 
@@ -32625,13 +32432,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::IpoptSolver::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::IpoptSolver::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::IpoptSolver::spCanEvaluate "
 
@@ -33164,12 +32972,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Jacobian::eval "
 
@@ -33179,12 +32984,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Jacobian::eval "
 
@@ -33202,12 +33004,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Jacobian::evalSX "
 
@@ -33221,12 +33020,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Jacobian::derivative "
 
@@ -33323,13 +33119,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::Jacobian::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::Jacobian::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::Jacobian::spCanEvaluate "
 
@@ -35176,12 +34973,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolSolver::eval "
 
@@ -35191,12 +34985,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolSolver::eval "
 
@@ -35214,12 +35005,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolSolver::evalSX "
 
@@ -35233,12 +35021,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolSolver::derivative "
 
@@ -35331,13 +35116,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolSolver::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolSolver::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolSolver::spCanEvaluate "
 
@@ -36934,12 +36720,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::KnitroSolver::eval "
 
@@ -36949,12 +36732,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::KnitroSolver::eval "
 
@@ -36972,12 +36752,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::KnitroSolver::evalSX "
 
@@ -36991,12 +36768,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::KnitroSolver::derivative "
 
@@ -37089,13 +36863,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::KnitroSolver::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::KnitroSolver::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::KnitroSolver::spCanEvaluate "
 
@@ -37620,12 +37395,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::eval "
 
@@ -37635,12 +37407,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::eval "
 
@@ -37658,12 +37427,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::evalSX "
 
@@ -37677,12 +37443,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::derivative "
 
@@ -37777,13 +37540,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::spCanEvaluate "
 
@@ -38832,12 +38596,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::eval "
 
@@ -38847,12 +38608,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::eval "
 
@@ -38870,12 +38628,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::evalSX "
 
@@ -38889,12 +38644,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::derivative "
 
@@ -38989,13 +38741,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::spCanEvaluate "
 
@@ -40244,12 +39997,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::LiftedSQP::eval "
 
@@ -40259,12 +40009,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::LiftedSQP::eval "
 
@@ -40282,12 +40029,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::LiftedSQP::evalSX "
 
@@ -40301,12 +40045,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::LiftedSQP::derivative "
 
@@ -40399,13 +40140,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::LiftedSQP::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::LiftedSQP::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::LiftedSQP::spCanEvaluate "
 
@@ -42390,12 +42132,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::eval "
 
@@ -42405,12 +42144,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::eval "
 
@@ -42428,12 +42164,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::evalSX "
 
@@ -42447,12 +42180,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::derivative "
 
@@ -42547,13 +42277,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::spCanEvaluate "
 
@@ -43042,12 +42773,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::LinearSolver::eval "
 
@@ -43057,12 +42785,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::LinearSolver::eval "
 
@@ -43080,12 +42805,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::LinearSolver::evalSX "
 
@@ -43099,12 +42821,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::LinearSolver::derivative "
 
@@ -43197,13 +42916,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::LinearSolver::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::LinearSolver::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::LinearSolver::spCanEvaluate "
 
@@ -45705,12 +45425,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::OptimalControl::MultipleShooting::eval "
 
@@ -45720,12 +45437,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::OptimalControl::MultipleShooting::eval "
 
@@ -45743,12 +45457,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::OptimalControl::MultipleShooting::evalSX "
 
@@ -45762,12 +45473,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::OptimalControl::MultipleShooting::derivative
 "
@@ -45870,14 +45578,15 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")
 CasADi::OptimalControl::MultipleShooting::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")
 CasADi::OptimalControl::MultipleShooting::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")
 CasADi::OptimalControl::MultipleShooting::spCanEvaluate "
@@ -48359,12 +48068,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::MXFunction::eval "
 
@@ -48374,12 +48080,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::MXFunction::eval "
 
@@ -48397,12 +48100,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::MXFunction::evalSX "
 
@@ -48416,12 +48116,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::MXFunction::derivative "
 
@@ -48514,13 +48211,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::MXFunction::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::MXFunction::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::MXFunction::spCanEvaluate "
 
@@ -49951,12 +49649,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::NLPSolver::eval "
 
@@ -49966,12 +49661,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::NLPSolver::eval "
 
@@ -49989,12 +49681,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::NLPSolver::evalSX "
 
@@ -50008,12 +49697,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::NLPSolver::derivative "
 
@@ -50106,13 +49792,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::NLPSolver::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::NLPSolver::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::NLPSolver::spCanEvaluate "
 
@@ -52866,12 +52553,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::OCPSolver::eval "
 
@@ -52881,12 +52565,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::OCPSolver::eval "
 
@@ -52904,12 +52585,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::OCPSolver::evalSX "
 
@@ -52923,12 +52601,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::OCPSolver::derivative "
 
@@ -53025,13 +52700,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::OCPSolver::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::OCPSolver::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::OCPSolver::spCanEvaluate "
 
@@ -54780,12 +54456,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::eval "
 
@@ -54795,12 +54468,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::eval "
 
@@ -54818,12 +54488,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::evalSX "
 
@@ -54837,12 +54504,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::derivative "
 
@@ -54935,13 +54599,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::spCanEvaluate "
 
@@ -56063,12 +55728,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Parallelizer::eval "
 
@@ -56078,12 +55740,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Parallelizer::eval "
 
@@ -56101,12 +55760,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Parallelizer::evalSX "
 
@@ -56120,12 +55776,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Parallelizer::derivative "
 
@@ -56222,13 +55875,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::Parallelizer::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::Parallelizer::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::Parallelizer::spCanEvaluate "
 
@@ -57876,12 +57530,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::eval "
 
@@ -57891,12 +57542,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::eval "
 
@@ -57914,12 +57562,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::evalSX "
 
@@ -57933,12 +57578,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::derivative "
 
@@ -58033,13 +57675,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::spCanEvaluate "
 
@@ -58566,12 +58209,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::QPSolver::eval "
 
@@ -58581,12 +58221,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::QPSolver::eval "
 
@@ -58604,12 +58241,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::QPSolver::evalSX "
 
@@ -58623,12 +58257,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::QPSolver::derivative "
 
@@ -58721,13 +58352,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::QPSolver::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::QPSolver::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::QPSolver::spCanEvaluate "
 
@@ -59923,12 +59555,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::RKIntegrator::eval "
 
@@ -59938,12 +59567,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::RKIntegrator::eval "
 
@@ -59961,12 +59587,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::RKIntegrator::evalSX "
 
@@ -59980,12 +59603,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::RKIntegrator::derivative "
 
@@ -60078,13 +59698,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::RKIntegrator::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::RKIntegrator::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::RKIntegrator::spCanEvaluate "
 
@@ -61601,12 +61222,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Simulator::eval "
 
@@ -61616,12 +61234,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Simulator::eval "
 
@@ -61639,12 +61254,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Simulator::evalSX "
 
@@ -61658,12 +61270,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Simulator::derivative "
 
@@ -61756,13 +61365,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::Simulator::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::Simulator::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::Simulator::spCanEvaluate "
 
@@ -62391,28 +62001,28 @@ Smoothness (by default true)
 C++ includes: casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1SmoothChecker_3_01CEIL_01_4.xml
-%feature("docstring") CasADi::SmoothChecker< CEIL > " C++ includes:
+// File: structCasADi_1_1SmoothChecker_3_01OP__CEIL_01_4.xml
+%feature("docstring") CasADi::SmoothChecker< OP_CEIL > " C++ includes:
 casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1SmoothChecker_3_01EQUALITY_01_4.xml
-%feature("docstring") CasADi::SmoothChecker< EQUALITY > " C++ includes:
+// File: structCasADi_1_1SmoothChecker_3_01OP__EQUALITY_01_4.xml
+%feature("docstring") CasADi::SmoothChecker< OP_EQUALITY > " C++ includes:
 casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1SmoothChecker_3_01FLOOR_01_4.xml
-%feature("docstring") CasADi::SmoothChecker< FLOOR > " C++ includes:
+// File: structCasADi_1_1SmoothChecker_3_01OP__FLOOR_01_4.xml
+%feature("docstring") CasADi::SmoothChecker< OP_FLOOR > " C++ includes:
 casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1SmoothChecker_3_01SIGN_01_4.xml
-%feature("docstring") CasADi::SmoothChecker< SIGN > " C++ includes:
+// File: structCasADi_1_1SmoothChecker_3_01OP__SIGN_01_4.xml
+%feature("docstring") CasADi::SmoothChecker< OP_SIGN > " C++ includes:
 casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1SmoothChecker_3_01STEP_01_4.xml
-%feature("docstring") CasADi::SmoothChecker< STEP > " C++ includes:
+// File: structCasADi_1_1SmoothChecker_3_01OP__STEP_01_4.xml
+%feature("docstring") CasADi::SmoothChecker< OP_STEP > " C++ includes:
 casadi_calculus.hpp ";
 
 
@@ -63977,12 +63587,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::SQPMethod::eval "
 
@@ -63992,12 +63599,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::SQPMethod::eval "
 
@@ -64015,12 +63619,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::SQPMethod::evalSX "
 
@@ -64034,12 +63635,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::SQPMethod::derivative "
 
@@ -64132,13 +63730,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::SQPMethod::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::SQPMethod::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::SQPMethod::spCanEvaluate "
 
@@ -64934,12 +64533,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Sundials::SundialsIntegrator::eval "
 
@@ -64949,12 +64545,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Sundials::SundialsIntegrator::eval "
 
@@ -64972,12 +64565,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Sundials::SundialsIntegrator::evalSX "
 
@@ -64991,12 +64581,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::Sundials::SundialsIntegrator::derivative "
 
@@ -65092,14 +64679,15 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::Sundials::SundialsIntegrator::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::Sundials::SundialsIntegrator::symbolicInputSX
 "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::Sundials::SundialsIntegrator::spCanEvaluate "
 
@@ -66432,12 +66020,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::SuperLU::eval "
 
@@ -66447,12 +66032,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::SuperLU::eval "
 
@@ -66470,12 +66052,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::SuperLU::evalSX "
 
@@ -66489,12 +66068,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::SuperLU::derivative "
 
@@ -66587,13 +66163,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::SuperLU::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::SuperLU::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::SuperLU::spCanEvaluate "
 
@@ -67968,12 +67545,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::SXFunction::eval "
 
@@ -67983,12 +67557,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::SXFunction::eval "
 
@@ -68006,12 +67577,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::SXFunction::evalSX "
 
@@ -68025,12 +67593,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::SXFunction::derivative "
 
@@ -68119,13 +67684,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::SXFunction::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::SXFunction::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::SXFunction::spCanEvaluate "
 
@@ -69380,6 +68946,14 @@ Check if smooth. ";
 print ";
 
 
+// File: structCasADi_1_1SXFunctionInternal_1_1TapeEl.xml
+%feature("docstring") CasADi::SXFunctionInternal::TapeEl "
+
+An elemenent of the tape.
+
+C++ includes: sx_function_internal.hpp ";
+
+
 // File: classCasADi_1_1UnaryMX.xml
 %feature("docstring") CasADi::UnaryMX "
 
@@ -69609,114 +69183,18 @@ Assert that the object has been initialized. ";
 casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1UnaryOperation_3_01ACOS_01_4.xml
-%feature("docstring") CasADi::UnaryOperation< ACOS > "
+// File: structCasADi_1_1UnaryOperation_3_01OP__ACOS_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< OP_ACOS > "
 
 Arcus cosine.
 
 C++ includes: casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1UnaryOperation_3_01ASIN_01_4.xml
-%feature("docstring") CasADi::UnaryOperation< ASIN > "
+// File: structCasADi_1_1UnaryOperation_3_01OP__ASIN_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< OP_ASIN > "
 
 Arcus sine.
-
-C++ includes: casadi_calculus.hpp ";
-
-
-// File: structCasADi_1_1UnaryOperation_3_01ATAN_01_4.xml
-%feature("docstring") CasADi::UnaryOperation< ATAN > "
-
-Arcus tangent.
-
-C++ includes: casadi_calculus.hpp ";
-
-
-// File: structCasADi_1_1UnaryOperation_3_01CEIL_01_4.xml
-%feature("docstring") CasADi::UnaryOperation< CEIL > "
-
-Ceil function.
-
-C++ includes: casadi_calculus.hpp ";
-
-
-// File: structCasADi_1_1UnaryOperation_3_01COS_01_4.xml
-%feature("docstring") CasADi::UnaryOperation< COS > "
-
-Cosine.
-
-C++ includes: casadi_calculus.hpp ";
-
-
-// File: structCasADi_1_1UnaryOperation_3_01COSH_01_4.xml
-%feature("docstring") CasADi::UnaryOperation< COSH > "
-
-Hyperbolic cosine.
-
-C++ includes: casadi_calculus.hpp ";
-
-
-// File: structCasADi_1_1UnaryOperation_3_01ERF_01_4.xml
-%feature("docstring") CasADi::UnaryOperation< ERF > "
-
-Error function.
-
-C++ includes: casadi_calculus.hpp ";
-
-
-// File: structCasADi_1_1UnaryOperation_3_01ERFINV_01_4.xml
-%feature("docstring") CasADi::UnaryOperation< ERFINV > "
-
-Inverse of error function.
-
-C++ includes: casadi_calculus.hpp ";
-
-
-// File: structCasADi_1_1UnaryOperation_3_01EXP_01_4.xml
-%feature("docstring") CasADi::UnaryOperation< EXP > "
-
-Natural exponent.
-
-C++ includes: casadi_calculus.hpp ";
-
-
-// File: structCasADi_1_1UnaryOperation_3_01FABS_01_4.xml
-%feature("docstring") CasADi::UnaryOperation< FABS > "
-
-Absolute value.
-
-C++ includes: casadi_calculus.hpp ";
-
-
-// File: structCasADi_1_1UnaryOperation_3_01FLOOR_01_4.xml
-%feature("docstring") CasADi::UnaryOperation< FLOOR > "
-
-Floor function.
-
-C++ includes: casadi_calculus.hpp ";
-
-
-// File: structCasADi_1_1UnaryOperation_3_01INV_01_4.xml
-%feature("docstring") CasADi::UnaryOperation< INV > "
-
-Elementwise inverse.
-
-C++ includes: casadi_calculus.hpp ";
-
-
-// File: structCasADi_1_1UnaryOperation_3_01LOG_01_4.xml
-%feature("docstring") CasADi::UnaryOperation< LOG > "
-
-Natural logarithm.
-
-C++ includes: casadi_calculus.hpp ";
-
-
-// File: structCasADi_1_1UnaryOperation_3_01NEG_01_4.xml
-%feature("docstring") CasADi::UnaryOperation< NEG > "
-
-Negation.
 
 C++ includes: casadi_calculus.hpp ";
 
@@ -69729,56 +69207,152 @@ Simple assignment.
 C++ includes: casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1UnaryOperation_3_01SIGN_01_4.xml
-%feature("docstring") CasADi::UnaryOperation< SIGN > "
+// File: structCasADi_1_1UnaryOperation_3_01OP__ATAN_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< OP_ATAN > "
+
+Arcus tangent.
+
+C++ includes: casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1UnaryOperation_3_01OP__CEIL_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< OP_CEIL > "
+
+Ceil function.
+
+C++ includes: casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1UnaryOperation_3_01OP__COS_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< OP_COS > "
+
+Cosine.
+
+C++ includes: casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1UnaryOperation_3_01OP__COSH_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< OP_COSH > "
+
+Hyperbolic cosine.
+
+C++ includes: casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1UnaryOperation_3_01OP__ERF_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< OP_ERF > "
+
+Error function.
+
+C++ includes: casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1UnaryOperation_3_01OP__ERFINV_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< OP_ERFINV > "
+
+Inverse of error function.
+
+C++ includes: casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1UnaryOperation_3_01OP__EXP_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< OP_EXP > "
+
+Natural exponent.
+
+C++ includes: casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1UnaryOperation_3_01OP__FABS_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< OP_FABS > "
+
+Absolute value.
+
+C++ includes: casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1UnaryOperation_3_01OP__FLOOR_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< OP_FLOOR > "
+
+Floor function.
+
+C++ includes: casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1UnaryOperation_3_01OP__INV_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< OP_INV > "
+
+Elementwise inverse.
+
+C++ includes: casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1UnaryOperation_3_01OP__LOG_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< OP_LOG > "
+
+Natural logarithm.
+
+C++ includes: casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1UnaryOperation_3_01OP__NEG_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< OP_NEG > "
+
+Negation.
+
+C++ includes: casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1UnaryOperation_3_01OP__SIGN_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< OP_SIGN > "
 
 Sign.
 
 C++ includes: casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1UnaryOperation_3_01SIN_01_4.xml
-%feature("docstring") CasADi::UnaryOperation< SIN > "
+// File: structCasADi_1_1UnaryOperation_3_01OP__SIN_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< OP_SIN > "
 
 Sine.
 
 C++ includes: casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1UnaryOperation_3_01SINH_01_4.xml
-%feature("docstring") CasADi::UnaryOperation< SINH > "
+// File: structCasADi_1_1UnaryOperation_3_01OP__SINH_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< OP_SINH > "
 
 Hyperbolic sine.
 
 C++ includes: casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1UnaryOperation_3_01SQRT_01_4.xml
-%feature("docstring") CasADi::UnaryOperation< SQRT > "
+// File: structCasADi_1_1UnaryOperation_3_01OP__SQRT_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< OP_SQRT > "
 
 Square root.
 
 C++ includes: casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1UnaryOperation_3_01STEP_01_4.xml
-%feature("docstring") CasADi::UnaryOperation< STEP > "
+// File: structCasADi_1_1UnaryOperation_3_01OP__STEP_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< OP_STEP > "
 
 Step function.
 
 C++ includes: casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1UnaryOperation_3_01TAN_01_4.xml
-%feature("docstring") CasADi::UnaryOperation< TAN > "
+// File: structCasADi_1_1UnaryOperation_3_01OP__TAN_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< OP_TAN > "
 
 Tangent.
 
 C++ includes: casadi_calculus.hpp ";
 
 
-// File: structCasADi_1_1UnaryOperation_3_01TANH_01_4.xml
-%feature("docstring") CasADi::UnaryOperation< TANH > "
+// File: structCasADi_1_1UnaryOperation_3_01OP__TANH_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< OP_TANH > "
 
 Hyperbolic tangent.
 
@@ -70296,705 +69870,711 @@ number of constraints (A)
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| AcceptTolFea | OT_REAL      | worhp_p.Acce | Tolerance    | CasADi::Worh |
-| s            |              | ptTolFeas    | for          | pInternal    |
+| AcceptTolFea | OT_REAL      | 0.001        | Tolerance    | CasADi::Worh |
+| s            |              |              | for          | pInternal    |
 |              |              |              | acceptable   |              |
 |              |              |              | feasibility  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| AcceptTolOpt | OT_REAL      | worhp_p.Acce | Tolerance    | CasADi::Worh |
-| i            |              | ptTolOpti    | for          | pInternal    |
+| AcceptTolOpt | OT_REAL      | 0.001        | Tolerance    | CasADi::Worh |
+| i            |              |              | for          | pInternal    |
 |              |              |              | acceptable   |              |
 |              |              |              | optimality   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| AlphaMinCons | OT_BOOLEAN   | worhp_p.Alph | Use a        | CasADi::Worh |
-| t            |              | aMinConst    | constant     | pInternal    |
+| AlphaMinCons | OT_BOOLEAN   | False        | Use a        | CasADi::Worh |
+| t            |              |              | constant     | pInternal    |
 |              |              |              | lower bound  |              |
 |              |              |              | on Armijo    |              |
 |              |              |              | stepsize in  |              |
 |              |              |              | Filter       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ArmijoBeta   | OT_REAL      | worhp_p.Armi | Trial        | CasADi::Worh |
-|              |              | joBeta       | stepsize     | pInternal    |
+| Ares         | OT_INTEGERVE | (42, 41, 42, | Armijo       | CasADi::Worh |
+|              | CTOR         | 45, 43, 46,  | recovery     | pInternal    |
+|              |              | 44)          | strategies.  |              |
+|              |              |              | Vector of    |              |
+|              |              |              | size 7       |              |
++--------------+--------------+--------------+--------------+--------------+
+| ArmijoBeta   | OT_REAL      | 0.712        | Trial        | CasADi::Worh |
+|              |              |              | stepsize     | pInternal    |
 |              |              |              | decrease     |              |
 |              |              |              | factor for   |              |
 |              |              |              | Armijo rule  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ArmijoMaxAlp | OT_REAL      | worhp_p.Armi | Initial      | CasADi::Worh |
-| ha           |              | joMaxAlpha   | alpha for    | pInternal    |
+| ArmijoMaxAlp | OT_REAL      | 1            | Initial      | CasADi::Worh |
+| ha           |              |              | alpha for    | pInternal    |
 |              |              |              | Armijo rule  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ArmijoMinAlp | OT_REAL      | worhp_p.Armi | Lower bound  | CasADi::Worh |
-| ha           |              | joMinAlpha   | on alpha for | pInternal    |
+| ArmijoMinAlp | OT_REAL      | 0.000        | Lower bound  | CasADi::Worh |
+| ha           |              |              | on alpha for | pInternal    |
 |              |              |              | Armijo rule  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ArmijoMinAlp | OT_REAL      | worhp_p.Armi | Lower bound  | CasADi::Worh |
-| haRec        |              | joMinAlphaRe | on alpha for | pInternal    |
-|              |              | c            | Armijo rule  |              |
+| ArmijoMinAlp | OT_REAL      | 0.000        | Lower bound  | CasADi::Worh |
+| haRec        |              |              | on alpha for | pInternal    |
+|              |              |              | Armijo rule  |              |
 |              |              |              | during       |              |
 |              |              |              | recovery     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ArmijoSigma  | OT_REAL      | worhp_p.Armi | Scale factor | CasADi::Worh |
-|              |              | joSigma      | for          | pInternal    |
+| ArmijoSigma  | OT_REAL      | 0.005        | Scale factor | CasADi::Worh |
+|              |              |              | for          | pInternal    |
 |              |              |              | linearised   |              |
 |              |              |              | descent      |              |
 |              |              |              | check in     |              |
 |              |              |              | Armijo rule  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| AutoQPRecove | OT_BOOLEAN   | worhp_p.Auto | Enable       | CasADi::Worh |
-| ry           |              | QPRecovery   | automatic QP | pInternal    |
+| AutoQPRecove | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+| ry           |              |              | automatic QP | pInternal    |
 |              |              |              | recovery     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| BFGSmaxblock | OT_INTEGER   | worhp_p.BFGS | Maximum BFGS | CasADi::Worh |
-| Size         |              | maxblockSize | block size   | pInternal    |
+| BFGSmaxblock | OT_INTEGER   | 300          | Maximum BFGS | CasADi::Worh |
+| Size         |              |              | block size   | pInternal    |
 |              |              |              | (depends on  |              |
 |              |              |              | BFGS method) |              |
 +--------------+--------------+--------------+--------------+--------------+
-| BFGSmethod   | OT_INTEGER   | worhp_p.BFGS | Choose BFGS  | CasADi::Worh |
-|              |              | method       | method       | pInternal    |
+| BFGSmethod   | OT_INTEGER   | 0            | Choose BFGS  | CasADi::Worh |
+|              |              |              | method       | pInternal    |
 |              |              |              | (dense,      |              |
 |              |              |              | block,       |              |
 |              |              |              | sparse)      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| BFGSminblock | OT_INTEGER   | worhp_p.BFGS | Minimum BFGS | CasADi::Worh |
-| Size         |              | minblockSize | block size   | pInternal    |
+| BFGSminblock | OT_INTEGER   | 300          | Minimum BFGS | CasADi::Worh |
+| Size         |              |              | block size   | pInternal    |
 |              |              |              | (depends on  |              |
 |              |              |              | BFGS method) |              |
 +--------------+--------------+--------------+--------------+--------------+
-| BFGSrestart  | OT_INTEGER   | worhp_p.BFGS | Restart BFGS | CasADi::Worh |
-|              |              | restart      | update after | pInternal    |
+| BFGSrestart  | OT_INTEGER   | 50           | Restart BFGS | CasADi::Worh |
+|              |              |              | update after | pInternal    |
 |              |              |              | this many    |              |
 |              |              |              | iterations   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| BettsFactor  | OT_REAL      | worhp_p.Bett | Update       | CasADi::Worh |
-|              |              | sFactor      | factor for   | pInternal    |
+| BettsFactor  | OT_REAL      | 2.100        | Update       | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
 |              |              |              | Betts'       |              |
 |              |              |              | Hessian regu |              |
 |              |              |              | larisation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| BettsPoint   | OT_REAL      | worhp_p.Bett | Smallest     | CasADi::Worh |
-|              |              | sPoint       | eigenvalue   | pInternal    |
+| BettsPoint   | OT_REAL      | 1            | Smallest     | CasADi::Worh |
+|              |              |              | eigenvalue   | pInternal    |
 |              |              |              | of the       |              |
 |              |              |              | regularised  |              |
 |              |              |              | Hessian      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| BoundTolFac  | OT_REAL      | worhp_p.Boun | Factor in    | CasADi::Worh |
-|              |              | dTolFac      | determining  | pInternal    |
+| BoundTolFac  | OT_REAL      | 1000         | Factor in    | CasADi::Worh |
+|              |              |              | determining  | pInternal    |
 |              |              |              | active       |              |
 |              |              |              | constraints  |              |
 |              |              |              | by KKT       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| CheckFJ      | OT_REAL      | worhp_p.Chec | Upper bound  | CasADi::Worh |
-|              |              | kFJ          | used by      | pInternal    |
+| CheckFJ      | OT_REAL      | 1.000e+12    | Upper bound  | CasADi::Worh |
+|              |              |              | used by      | pInternal    |
 |              |              |              | Fritz-John   |              |
 |              |              |              | heuristic    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| CheckStructu | OT_BOOLEAN   | worhp_p.Chec | Enable       | CasADi::Worh |
-| reDF         |              | kStructureDF | structural   | pInternal    |
+| CheckStructu | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+| reDF         |              |              | structural   | pInternal    |
 |              |              |              | checking of  |              |
 |              |              |              | DF           |              |
 +--------------+--------------+--------------+--------------+--------------+
-| CheckStructu | OT_BOOLEAN   | worhp_p.Chec | Enable       | CasADi::Worh |
-| reDG         |              | kStructureDG | structural   | pInternal    |
+| CheckStructu | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+| reDG         |              |              | structural   | pInternal    |
 |              |              |              | checking of  |              |
 |              |              |              | DG           |              |
 +--------------+--------------+--------------+--------------+--------------+
-| CheckStructu | OT_BOOLEAN   | worhp_p.Chec | Enable       | CasADi::Worh |
-| reHM         |              | kStructureHM | structural   | pInternal    |
+| CheckStructu | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+| reHM         |              |              | structural   | pInternal    |
 |              |              |              | checking of  |              |
 |              |              |              | HM           |              |
 +--------------+--------------+--------------+--------------+--------------+
-| CorStepBetts | OT_REAL      | worhp_p.CorS | (experimenta | CasADi::Worh |
-| Sum          |              | tepBettsSum  | l)           | pInternal    |
+| CorStepBetts | OT_REAL      | 0.500        | (experimenta | CasADi::Worh |
+| Sum          |              |              | l)           | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| CorStepConSt | OT_REAL      | worhp_p.CorS | (experimenta | CasADi::Worh |
-| op           |              | tepConStop   | l)           | pInternal    |
+| CorStepConSt | OT_REAL      | 0.000        | (experimenta | CasADi::Worh |
+| op           |              |              | l)           | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| CorStepConvi | OT_REAL      | worhp_p.CorS | (experimenta | CasADi::Worh |
-| o            |              | tepConvio    | l)           | pInternal    |
+| CorStepConvi | OT_REAL      | 1            | (experimenta | CasADi::Worh |
+| o            |              |              | l)           | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| CorStepMaxIt | OT_INTEGER   | worhp_p.CorS | (experimenta | CasADi::Worh |
-| er           |              | tepMaxIter   | l)           | pInternal    |
+| CorStepMaxIt | OT_INTEGER   | 50           | (experimenta | CasADi::Worh |
+| er           |              |              | l)           | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| CorStepMetho | OT_INTEGER   | worhp_p.CorS | (experimenta | CasADi::Worh |
-| d            |              | tepMethod    | l)           | pInternal    |
+| CorStepMetho | OT_INTEGER   | 0            | (experimenta | CasADi::Worh |
+| d            |              |              | l)           | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| CorStepMode  | OT_INTEGER   | worhp_p.CorS | (experimenta | CasADi::Worh |
-|              |              | tepMode      | l)           | pInternal    |
+| CorStepMode  | OT_INTEGER   | 1            | (experimenta | CasADi::Worh |
+|              |              |              | l)           | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| CorStepPFact | OT_REAL      | worhp_p.CorS | (experimenta | CasADi::Worh |
-| or           |              | tepPFactor   | l)           | pInternal    |
+| CorStepPFact | OT_REAL      | 1            | (experimenta | CasADi::Worh |
+| or           |              |              | l)           | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| CorStepPMax  | OT_REAL      | worhp_p.CorS | (experimenta | CasADi::Worh |
-|              |              | tepPMax      | l)           | pInternal    |
+| CorStepPMax  | OT_REAL      | 1000000      | (experimenta | CasADi::Worh |
+|              |              |              | l)           | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| CorStepRecov | OT_BOOLEAN   | worhp_p.CorS | Enable       | CasADi::Worh |
-| eryDX        |              | tepRecoveryD | structural   | pInternal    |
-|              |              | X            | checking of  |              |
+| CorStepRecov | OT_BOOLEAN   | False        | Enable       | CasADi::Worh |
+| eryDX        |              |              | structural   | pInternal    |
+|              |              |              | checking of  |              |
 |              |              |              | HM           |              |
 +--------------+--------------+--------------+--------------+--------------+
-| CurvBCond    | OT_REAL      | worhp_p.Curv | Block BFGS   | CasADi::Worh |
-|              |              | BCond        | curvature    | pInternal    |
+| CurvBCond    | OT_REAL      | 0.020        | Block BFGS   | CasADi::Worh |
+|              |              |              | curvature    | pInternal    |
 |              |              |              | condition    |              |
 |              |              |              | bound        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| CurvBFac     | OT_REAL      | worhp_p.Curv | Block BFGS   | CasADi::Worh |
-|              |              | BFac         | curvature    | pInternal    |
+| CurvBFac     | OT_REAL      | 0.300        | Block BFGS   | CasADi::Worh |
+|              |              |              | curvature    | pInternal    |
 |              |              |              | condition re |              |
 |              |              |              | gularisation |              |
 |              |              |              | factor       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| CurvCond     | OT_REAL      | worhp_p.Curv | BFGS         | CasADi::Worh |
-|              |              | Cond         | Curvature    | pInternal    |
+| CurvCond     | OT_REAL      | 0.020        | BFGS         | CasADi::Worh |
+|              |              |              | Curvature    | pInternal    |
 |              |              |              | condition    |              |
 |              |              |              | bound        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| CurvFac      | OT_REAL      | worhp_p.Curv | BFGS         | CasADi::Worh |
-|              |              | Fac          | curvature    | pInternal    |
+| CurvFac      | OT_REAL      | 0.300        | BFGS         | CasADi::Worh |
+|              |              |              | curvature    | pInternal    |
 |              |              |              | condition re |              |
 |              |              |              | gularisation |              |
 |              |              |              | factor       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| CutLength    | OT_REAL      | worhp_p.CutL | Scaling      | CasADi::Worh |
-|              |              | ength        | factor for   | pInternal    |
+| CutLength    | OT_REAL      | 0.001        | Scaling      | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
 |              |              |              | Cut recovery |              |
 |              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| DebugMarker0 | OT_INTEGER   | worhp_p.Debu | Debug        | CasADi::Worh |
-| 6            |              | gMarker06    | marker, only | pInternal    |
+| DebugMarker0 | OT_INTEGER   | 42           | Debug        | CasADi::Worh |
+| 6            |              |              | marker, only | pInternal    |
 |              |              |              | needed for   |              |
 |              |              |              | ASTOS        |              |
 |              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FGtogether   | OT_BOOLEAN   | worhp_p.FGto | F and G      | CasADi::Worh |
-|              |              | gether       | cannot be    | pInternal    |
+| FGtogether   | OT_BOOLEAN   | False        | F and G      | CasADi::Worh |
+|              |              |              | cannot be    | pInternal    |
 |              |              |              | evaluated    |              |
 |              |              |              | separately   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FJandND      | OT_BOOLEAN   | worhp_p.FJan | Enable       | CasADi::Worh |
-|              |              | dND          | Fritz-John   | pInternal    |
+| FJandND      | OT_BOOLEAN   | False        | Enable       | CasADi::Worh |
+|              |              |              | Fritz-John   | pInternal    |
 |              |              |              | and non-diff |              |
 |              |              |              | erentiable   |              |
 |              |              |              | check        |              |
 |              |              |              | heuristics   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FeasibleDual | OT_BOOLEAN   | worhp_p.Feas | Activate     | CasADi::Worh |
-|              |              | ibleDual     | dual         | pInternal    |
+| FeasibleDual | OT_BOOLEAN   | False        | Activate     | CasADi::Worh |
+|              |              |              | dual         | pInternal    |
 |              |              |              | feasibility  |              |
 |              |              |              | mode         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FeasibleInit | OT_BOOLEAN   | worhp_p.Feas | Activate     | CasADi::Worh |
-|              |              | ibleInit     | initial      | pInternal    |
+| FeasibleInit | OT_BOOLEAN   | False        | Activate     | CasADi::Worh |
+|              |              |              | initial      | pInternal    |
 |              |              |              | feasibility  |              |
 |              |              |              | mode         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FeasibleInit | OT_REAL      | worhp_p.Feas | Feasibility  | CasADi::Worh |
-| Tol          |              | ibleInitTol  | tolerance    | pInternal    |
+| FeasibleInit | OT_REAL      | 0.001        | Feasibility  | CasADi::Worh |
+| Tol          |              |              | tolerance    | pInternal    |
 |              |              |              | for no-      |              |
 |              |              |              | objective    |              |
 |              |              |              | feasible     |              |
 |              |              |              | mode         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FeasibleOnly | OT_BOOLEAN   | worhp_p.Feas | Activate     | CasADi::Worh |
-|              |              | ibleOnly     | feasible-    | pInternal    |
+| FeasibleOnly | OT_BOOLEAN   | False        | Activate     | CasADi::Worh |
+|              |              |              | feasible-    | pInternal    |
 |              |              |              | only mode    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FidifEps     | OT_REAL      | worhp_p.Fidi | Finite       | CasADi::Worh |
-|              |              | fEps         | difference   | pInternal    |
+| FidifEps     | OT_REAL      | 0.000        | Finite       | CasADi::Worh |
+|              |              |              | difference   | pInternal    |
 |              |              |              | perturbation |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FidifHM      | OT_BOOLEAN   | worhp_p.Fidi | Approximate  | CasADi::Worh |
-|              |              | fHM          | Hessian by   | pInternal    |
+| FidifHM      | OT_BOOLEAN   | False        | Approximate  | CasADi::Worh |
+|              |              |              | Hessian by   | pInternal    |
 |              |              |              | finite       |              |
 |              |              |              | differences  |              |
 |              |              |              | (otherwise   |              |
 |              |              |              | BFGS)        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FilterBisecA | OT_BOOLEAN   | worhp_p.Filt | Filter       | CasADi::Worh |
-| lpha         |              | erBisecAlpha | heuristic to | pInternal    |
+| FilterBisecA | OT_BOOLEAN   | True         | Filter       | CasADi::Worh |
+| lpha         |              |              | heuristic to | pInternal    |
 |              |              |              | save Armijo  |              |
 |              |              |              | iterations   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FilterGammaC | OT_REAL      | worhp_p.Filt | Constraint   | CasADi::Worh |
-| V            |              | erGammaCV    | violation    | pInternal    |
+| FilterGammaC | OT_REAL      | 0.000        | Constraint   | CasADi::Worh |
+| V            |              |              | violation    | pInternal    |
 |              |              |              | decrease     |              |
 |              |              |              | factor in    |              |
 |              |              |              | Filter       |              |
 |              |              |              | acceptance   |              |
 |              |              |              | check        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FilterGammaF | OT_REAL      | worhp_p.Filt | Objective    | CasADi::Worh |
-|              |              | erGammaF     | decrease     | pInternal    |
+| FilterGammaF | OT_REAL      | 0.000        | Objective    | CasADi::Worh |
+|              |              |              | decrease     | pInternal    |
 |              |              |              | factor in    |              |
 |              |              |              | Filter       |              |
 |              |              |              | acceptance   |              |
 |              |              |              | check        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FilterInters | OT_BOOLEAN   | worhp_p.Filt | Filter       | CasADi::Worh |
-| ecAlpha      |              | erIntersecAl | heuristic to | pInternal    |
-|              |              | pha          | save Armijo  |              |
+| FilterInters | OT_BOOLEAN   | True         | Filter       | CasADi::Worh |
+| ecAlpha      |              |              | heuristic to | pInternal    |
+|              |              |              | save Armijo  |              |
 |              |              |              | iterations   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FirstDifCent | OT_BOOLEAN   | worhp_p.Firs | Use central  | CasADi::Worh |
-| ral          |              | tDifCentral  | finite       | pInternal    |
+| FirstDifCent | OT_BOOLEAN   | True         | Use central  | CasADi::Worh |
+| ral          |              |              | finite       | pInternal    |
 |              |              |              | difference   |              |
 |              |              |              | quotient for |              |
 |              |              |              | first        |              |
 |              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FocusOnFeas  | OT_BOOLEAN   | worhp_p.Focu | Enable       | CasADi::Worh |
-|              |              | sOnFeas      | Focus-on-    | pInternal    |
+| FocusOnFeas  | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+|              |              |              | Focus-on-    | pInternal    |
 |              |              |              | Feasibility  |              |
 |              |              |              | mode         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FocusOnFeasF | OT_REAL      | worhp_p.Focu | Factor in    | CasADi::Worh |
-| actor        |              | sOnFeasFacto | Focus-on-    | pInternal    |
-|              |              | r            | Feasibility  |              |
+| FocusOnFeasF | OT_REAL      | 1.360        | Factor in    | CasADi::Worh |
+| actor        |              |              | Focus-on-    | pInternal    |
+|              |              |              | Feasibility  |              |
 |              |              |              | mode         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| GammaAlpha   | OT_REAL      | worhp_p.Gamm | Safety       | CasADi::Worh |
-|              |              | aAlpha       | factor for   | pInternal    |
+| GammaAlpha   | OT_REAL      | 0.050        | Safety       | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
 |              |              |              | alphamin     |              |
 |              |              |              | calculation  |              |
 |              |              |              | by Filter    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| GroupMethod  | OT_INTEGER   | worhp_p.Grou | Select       | CasADi::Worh |
-|              |              | pMethod      | method to    | pInternal    |
+| GroupMethod  | OT_INTEGER   | 1            | Select       | CasADi::Worh |
+|              |              |              | method to    | pInternal    |
 |              |              |              | determine    |              |
 |              |              |              | graph        |              |
 |              |              |              | colouring    |              |
 |              |              |              | groups       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| IgnoreFilter | OT_BOOLEAN   | worhp_p.Igno | Activate     | CasADi::Worh |
-| Crit         |              | reFilterCrit | accelerating | pInternal    |
+| IgnoreFilter | OT_BOOLEAN   | False        | Activate     | CasADi::Worh |
+| Crit         |              |              | accelerating | pInternal    |
 |              |              |              | heuristics   |              |
 |              |              |              | for Filter   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| IncBettsTau  | OT_REAL      | worhp_p.IncB | Increase     | CasADi::Worh |
-|              |              | ettsTau      | factor for   | pInternal    |
+| IncBettsTau  | OT_REAL      | 2            | Increase     | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
 |              |              |              | Betts'       |              |
 |              |              |              | update       |              |
 |              |              |              | dampening    |              |
 |              |              |              | term         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| IncBettsTauM | OT_REAL      | worhp_p.IncB | Larger       | CasADi::Worh |
-| ore          |              | ettsTauMore  | increase     | pInternal    |
+| IncBettsTauM | OT_REAL      | 100          | Larger       | CasADi::Worh |
+| ore          |              |              | increase     | pInternal    |
 |              |              |              | factor for   |              |
 |              |              |              | Betts'       |              |
 |              |              |              | update       |              |
 |              |              |              | dampening    |              |
 |              |              |              | term         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| IncreaseIWS  | OT_REAL      | worhp_p.Incr | Increase     | CasADi::Worh |
-|              |              | easeIWS      | factor for   | pInternal    |
+| IncreaseIWS  | OT_REAL      | 1            | Increase     | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
 |              |              |              | estimated    |              |
 |              |              |              | integer      |              |
 |              |              |              | workspace    |              |
 |              |              |              | requirement  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| IncreaseRWS  | OT_REAL      | worhp_p.Incr | Increase     | CasADi::Worh |
-|              |              | easeRWS      | factor for   | pInternal    |
+| IncreaseRWS  | OT_REAL      | 1            | Increase     | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
 |              |              |              | estimated    |              |
 |              |              |              | real         |              |
 |              |              |              | workspace    |              |
 |              |              |              | requirement  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| Infty        | OT_REAL      | worhp_p.Inft | Upper bound  | CasADi::Worh |
-|              |              | y            | for numbers  | pInternal    |
+| Infty        | OT_REAL      | 1.000e+20    | Upper bound  | CasADi::Worh |
+|              |              |              | for numbers  | pInternal    |
 |              |              |              | to be        |              |
 |              |              |              | regarded as  |              |
 |              |              |              | finite       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| InftyUnbound | OT_REAL      | worhp_p.Inft | Tolerance    | CasADi::Worh |
-| ed           |              | yUnbounded   | for unbounde | pInternal    |
+| InftyUnbound | OT_REAL      | 1.000e+20    | Tolerance    | CasADi::Worh |
+| ed           |              |              | for unbounde | pInternal    |
 |              |              |              | dness        |              |
 |              |              |              | detection    |              |
 |              |              |              | heuristic    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| InitialLMest | OT_BOOLEAN   | worhp_p.Init | Enable       | CasADi::Worh |
-|              |              | ialLMest     | initial      | pInternal    |
+| InitialLMest | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+|              |              |              | initial      | pInternal    |
 |              |              |              | Lagrange     |              |
 |              |              |              | multiplier   |              |
 |              |              |              | estimate     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| KeepAcceptab | OT_BOOLEAN   | worhp_p.Keep | Save         | CasADi::Worh |
-| leSol        |              | AcceptableSo | acceptable   | pInternal    |
-|              |              | l            | solutions as |              |
+| KeepAcceptab | OT_BOOLEAN   | True         | Save         | CasADi::Worh |
+| leSol        |              |              | acceptable   | pInternal    |
+|              |              |              | solutions as |              |
 |              |              |              | fallback     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| LMestQPipCom | OT_REAL      | worhp_p.LMes | IP complemen | CasADi::Worh |
-| Tol          |              | tQPipComTol  | tarity       | pInternal    |
+| LMestQPipCom | OT_REAL      | 0.003        | IP complemen | CasADi::Worh |
+| Tol          |              |              | tarity       | pInternal    |
 |              |              |              | tolerance in |              |
 |              |              |              | initial      |              |
 |              |              |              | multiplier   |              |
 |              |              |              | estimate     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| LMestQPipRes | OT_REAL      | worhp_p.LMes | IP residual  | CasADi::Worh |
-| Tol          |              | tQPipResTol  | tolerance in | pInternal    |
+| LMestQPipRes | OT_REAL      | 1            | IP residual  | CasADi::Worh |
+| Tol          |              |              | tolerance in | pInternal    |
 |              |              |              | initial      |              |
 |              |              |              | multiplier   |              |
 |              |              |              | estimate     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| LinMult      | OT_BOOLEAN   | worhp_p.LinM | Control      | CasADi::Worh |
-|              |              | ult          | Lagrange     | pInternal    |
+| LinMult      | OT_BOOLEAN   | False        | Control      | CasADi::Worh |
+|              |              |              | Lagrange     | pInternal    |
 |              |              |              | multiplier   |              |
 |              |              |              | update       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| LogLevel     | OT_INTEGER   | worhp_p.LogL | Enable XML   | CasADi::Worh |
-|              |              | evel         | logfiles and | pInternal    |
+| LogLevel     | OT_INTEGER   | 0            | Enable XML   | CasADi::Worh |
+|              |              |              | logfiles and | pInternal    |
 |              |              |              | writing      |              |
 |              |              |              | interval     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| LogResult    | OT_INTEGER   | worhp_p.LogR | Enable XML   | CasADi::Worh |
-|              |              | esult        | result       | pInternal    |
+| LogResult    | OT_INTEGER   | 0            | Enable XML   | CasADi::Worh |
+|              |              |              | result       | pInternal    |
 |              |              |              | logging and  |              |
 |              |              |              | detail level |              |
 +--------------+--------------+--------------+--------------+--------------+
-| LowPassAlpha | OT_REAL      | worhp_p.LowP | Lowpass-     | CasADi::Worh |
-| F            |              | assAlphaF    | filter       | pInternal    |
+| LowPassAlpha | OT_REAL      | 0.950        | Lowpass-     | CasADi::Worh |
+| F            |              |              | filter       | pInternal    |
 |              |              |              | update       |              |
 |              |              |              | factor for   |              |
 |              |              |              | objective    |              |
 |              |              |              | values       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| LowPassAlpha | OT_REAL      | worhp_p.LowP | Lowpass-     | CasADi::Worh |
-| G            |              | assAlphaG    | filter       | pInternal    |
+| LowPassAlpha | OT_REAL      | 0.950        | Lowpass-     | CasADi::Worh |
+| G            |              |              | filter       | pInternal    |
 |              |              |              | update       |              |
 |              |              |              | factor for   |              |
 |              |              |              | constraint   |              |
 |              |              |              | values       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| LowPassAlpha | OT_REAL      | worhp_p.LowP | Lowpass-     | CasADi::Worh |
-| Merit        |              | assAlphaMeri | filter       | pInternal    |
-|              |              | t            | update       |              |
+| LowPassAlpha | OT_REAL      | 0.100        | Lowpass-     | CasADi::Worh |
+| Merit        |              |              | filter       | pInternal    |
+|              |              |              | update       |              |
 |              |              |              | factor for   |              |
 |              |              |              | merit        |              |
 |              |              |              | function     |              |
 |              |              |              | values       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| LowPassFilte | OT_BOOLEAN   | worhp_p.LowP | Enable       | CasADi::Worh |
-| r            |              | assFilter    | lowpass-     | pInternal    |
+| LowPassFilte | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+| r            |              |              | lowpass-     | pInternal    |
 |              |              |              | filter       |              |
 |              |              |              | termination  |              |
 |              |              |              | criterion    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| Ma57PivotThr | OT_REAL      | worhp_p.Ma57 | Pivoting     | CasADi::Worh |
-| esh          |              | PivotThresh  | tolerance    | pInternal    |
+| Ma57PivotThr | OT_REAL      | 0.000        | Pivoting     | CasADi::Worh |
+| esh          |              |              | tolerance    | pInternal    |
 |              |              |              | for MA57 =   |              |
 |              |              |              | CNTL(1)      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| MatrixCC     | OT_BOOLEAN   | worhp_p.Matr | Not to be    | CasADi::Worh |
-|              |              | ixCC         | included     | pInternal    |
+| MatrixCC     | OT_BOOLEAN   | False        | Not to be    | CasADi::Worh |
+|              |              |              | included     | pInternal    |
 |              |              |              | into a       |              |
 |              |              |              | parameter    |              |
 |              |              |              | file!        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| MaxCalls     | OT_INTEGER   | worhp_p.MaxC | Upper bound  | CasADi::Worh |
-|              |              | alls         | to Reverse C | pInternal    |
+| MaxCalls     | OT_INTEGER   | 2.147e+09    | Upper bound  | CasADi::Worh |
+|              |              |              | to Reverse C | pInternal    |
 |              |              |              | ommunication |              |
 |              |              |              | calls        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| MaxForce     | OT_INTEGER   | worhp_p.MaxF | Maximum      | CasADi::Worh |
-|              |              | orce         | number of    | pInternal    |
+| MaxForce     | OT_INTEGER   | 1000         | Maximum      | CasADi::Worh |
+|              |              |              | number of    | pInternal    |
 |              |              |              | Force        |              |
 |              |              |              | recovery     |              |
 |              |              |              | strategy     |              |
 |              |              |              | steps        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| MaxGPart     | OT_INTEGER   | worhp_p.MaxG | (experimenta | CasADi::Worh |
-|              |              | Part         | l)           | pInternal    |
+| MaxGPart     | OT_INTEGER   | 1            | (experimenta | CasADi::Worh |
+|              |              |              | l)           | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| MaxIter      | OT_INTEGER   | worhp_p.MaxI | Upper bound  | CasADi::Worh |
-|              |              | ter          | on major     | pInternal    |
+| MaxIter      | OT_INTEGER   | 500          | Upper bound  | CasADi::Worh |
+|              |              |              | on major     | pInternal    |
 |              |              |              | iterations   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| MaxLScounter | OT_INTEGER   | worhp_p.MaxL | Control      | CasADi::Worh |
-|              |              | Scounter     | activation   | pInternal    |
+| MaxLScounter | OT_INTEGER   | 3            | Control      | CasADi::Worh |
+|              |              |              | activation   | pInternal    |
 |              |              |              | of Filter    |              |
 |              |              |              | acceleration |              |
 |              |              |              | heuristics   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| MaxNorm      | OT_BOOLEAN   | worhp_p.MaxN | Select max-  | CasADi::Worh |
-|              |              | orm          | norm instead | pInternal    |
+| MaxNorm      | OT_BOOLEAN   | True         | Select max-  | CasADi::Worh |
+|              |              |              | norm instead | pInternal    |
 |              |              |              | of 1-norm in |              |
 |              |              |              | Filter       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| MeritFunctio | OT_INTEGER   | worhp_p.Meri | Select merit | CasADi::Worh |
-| n            |              | tFunction    | function and | pInternal    |
+| MeritFunctio | OT_INTEGER   | 4            | Select merit | CasADi::Worh |
+| n            |              |              | function and | pInternal    |
 |              |              |              | penalty      |              |
 |              |              |              | update [0,   |              |
 |              |              |              | 3..5]        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| MeritGradTol | OT_REAL      | worhp_p.Meri | Threshold of | CasADi::Worh |
-|              |              | tGradTol     | meritfunctio | pInternal    |
+| MeritGradTol | OT_REAL      | 0.000        | Threshold of | CasADi::Worh |
+|              |              |              | meritfunctio | pInternal    |
 |              |              |              | n gradient   |              |
 |              |              |              | for          |              |
 |              |              |              | increasing   |              |
 |              |              |              | Hessian regu |              |
 |              |              |              | larisation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| MinBettsTau  | OT_REAL      | worhp_p.MinB | Lower bound  | CasADi::Worh |
-|              |              | ettsTau      | for Betts'   | pInternal    |
+| MinBettsTau  | OT_REAL      | 0.000        | Lower bound  | CasADi::Worh |
+|              |              |              | for Betts'   | pInternal    |
 |              |              |              | update       |              |
 |              |              |              | dampening    |              |
 |              |              |              | term         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| MoreRelax    | OT_BOOLEAN   | worhp_p.More | Introduce    | CasADi::Worh |
-|              |              | Relax        | one          | pInternal    |
+| MoreRelax    | OT_BOOLEAN   | False        | Introduce    | CasADi::Worh |
+|              |              |              | one          | pInternal    |
 |              |              |              | relaxation   |              |
 |              |              |              | variable for |              |
 |              |              |              | every        |              |
 |              |              |              | constraint   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| NLPmethod    | OT_INTEGER   | worhp_p.NLPm | Select (1) M | CasADi::Worh |
-|              |              | ethod        | eritfunction | pInternal    |
+| NLPmethod    | OT_INTEGER   | 1            | Select (1) M | CasADi::Worh |
+|              |              |              | eritfunction | pInternal    |
 |              |              |              | or (3)       |              |
 |              |              |              | Filter globa |              |
 |              |              |              | lisation     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| NLPprint     | OT_INTEGER   | worhp_p.NLPp | NLP print    | CasADi::Worh |
-|              |              | rint         | level        | pInternal    |
+| NLPprint     | OT_INTEGER   | 2            | NLP print    | CasADi::Worh |
+|              |              |              | level        | pInternal    |
 |              |              |              | [-1..4]      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| PairMethod   | OT_INTEGER   | worhp_p.Pair | Select       | CasADi::Worh |
-|              |              | Method       | method to    | pInternal    |
+| PairMethod   | OT_INTEGER   | 1            | Select       | CasADi::Worh |
+|              |              |              | method to    | pInternal    |
 |              |              |              | determine    |              |
 |              |              |              | graph        |              |
 |              |              |              | colouring    |              |
 |              |              |              | pairgroups   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| PenUpdEpsBar | OT_REAL      | worhp_p.PenU | Penalty      | CasADi::Worh |
-|              |              | pdEpsBar     | update       | pInternal    |
+| PenUpdEpsBar | OT_REAL      | 0.900        | Penalty      | CasADi::Worh |
+|              |              |              | update       | pInternal    |
 |              |              |              | parameter    |              |
 |              |              |              | factor for M |              |
 |              |              |              | eritFunction |              |
 |              |              |              | = 3          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| PenUpdEpsKFa | OT_REAL      | worhp_p.PenU | Penalty      | CasADi::Worh |
-| c            |              | pdEpsKFac    | update       | pInternal    |
+| PenUpdEpsKFa | OT_REAL      | 2            | Penalty      | CasADi::Worh |
+| c            |              |              | update       | pInternal    |
 |              |              |              | parameter    |              |
 |              |              |              | factor for M |              |
 |              |              |              | eritFunction |              |
 |              |              |              | = 4          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| PenUpdEpsKSe | OT_INTEGER   | worhp_p.PenU | Penalty      | CasADi::Worh |
-| quence       |              | pdEpsKSequen | update       | pInternal    |
-|              |              | ce           | parameter    |              |
+| PenUpdEpsKSe | OT_INTEGER   | 2            | Penalty      | CasADi::Worh |
+| quence       |              |              | update       | pInternal    |
+|              |              |              | parameter    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| PenUpdMaxDel | OT_REAL      | worhp_p.PenU | Max penalty  | CasADi::Worh |
-| taK          |              | pdMaxDeltaK  | for MeritFun | pInternal    |
+| PenUpdMaxDel | OT_REAL      | 11           | Max penalty  | CasADi::Worh |
+| taK          |              |              | for MeritFun | pInternal    |
 |              |              |              | ction = 4    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| PenUpdMaxFac | OT_REAL      | worhp_p.PenU | Max factor   | CasADi::Worh |
-|              |              | pdMaxFac     | for          | pInternal    |
+| PenUpdMaxFac | OT_REAL      | 100000000    | Max factor   | CasADi::Worh |
+|              |              |              | for          | pInternal    |
 |              |              |              | increasing   |              |
 |              |              |              | penalty for  |              |
 |              |              |              | MeritFunctio |              |
 |              |              |              | n = 4        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| PenUpdRBar   | OT_REAL      | worhp_p.PenU | Penalty      | CasADi::Worh |
-|              |              | pdRBar       | update       | pInternal    |
+| PenUpdRBar   | OT_REAL      | 2            | Penalty      | CasADi::Worh |
+|              |              |              | update       | pInternal    |
 |              |              |              | parameter    |              |
 |              |              |              | for MeritFun |              |
 |              |              |              | ction = 3    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| PrecisionF   | OT_REAL      | worhp_p.Prec | (currently   | CasADi::Worh |
-|              |              | isionF       | unused)      | pInternal    |
+| PrecisionF   | OT_REAL      | 0.000        | (currently   | CasADi::Worh |
+|              |              |              | unused)      | pInternal    |
 |              |              |              | Relative     |              |
 |              |              |              | precision of |              |
 |              |              |              | objective    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| PrecisionG   | OT_REAL      | worhp_p.Prec | (currently   | CasADi::Worh |
-|              |              | isionG       | unused)      | pInternal    |
+| PrecisionG   | OT_REAL      | 0.000        | (currently   | CasADi::Worh |
+|              |              |              | unused)      | pInternal    |
 |              |              |              | Relative     |              |
 |              |              |              | precision of |              |
 |              |              |              | constraints  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| QPscaleParam | OT_REAL      | worhp_p.QPsc | (currently   | CasADi::Worh |
-|              |              | aleParam     | unused)      | pInternal    |
+| QPscaleParam | OT_REAL      | 0            | (currently   | CasADi::Worh |
+|              |              |              | unused)      | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| QuadraticPro | OT_BOOLEAN   | worhp_p.Quad | Not to be    | CasADi::Worh |
-| blem         |              | raticProblem | included     | pInternal    |
+| QuadraticPro | OT_BOOLEAN   | False        | Not to be    | CasADi::Worh |
+| blem         |              |              | included     | pInternal    |
 |              |              |              | into a       |              |
 |              |              |              | parameter    |              |
 |              |              |              | file!        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ReduceBettsT | OT_REAL      | worhp_p.Redu | Decrease     | CasADi::Worh |
-| au           |              | ceBettsTau   | factor for   | pInternal    |
+| ReduceBettsT | OT_REAL      | 0.300        | Decrease     | CasADi::Worh |
+| au           |              |              | factor for   | pInternal    |
 |              |              |              | Betts'       |              |
 |              |              |              | update       |              |
 |              |              |              | dampening    |              |
 |              |              |              | term         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| RegStrategy  | OT_INTEGER   | worhp_p.RegS | Select       | CasADi::Worh |
-|              |              | trategy      | Hessian regu | pInternal    |
+| RegStrategy  | OT_INTEGER   | 1            | Select       | CasADi::Worh |
+|              |              |              | Hessian regu | pInternal    |
 |              |              |              | larisation   |              |
 |              |              |              | strategy in  |              |
 |              |              |              | Filter       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ReinitFilter | OT_BOOLEAN   | worhp_p.Rein | Enables      | CasADi::Worh |
-|              |              | itFilter     | Filter-reini | pInternal    |
+| ReinitFilter | OT_BOOLEAN   | False        | Enables      | CasADi::Worh |
+|              |              |              | Filter-reini | pInternal    |
 |              |              |              | tialisation  |              |
 |              |              |              | accelerating |              |
 |              |              |              | heuristic    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| RelaxMaxDelt | OT_REAL      | worhp_p.Rela | Upper bound  | CasADi::Worh |
-| a            |              | xMaxDelta    | for          | pInternal    |
+| RelaxMaxDelt | OT_REAL      | 0.920        | Upper bound  | CasADi::Worh |
+| a            |              |              | for          | pInternal    |
 |              |              |              | accepting    |              |
 |              |              |              | the          |              |
 |              |              |              | constraint   |              |
 |              |              |              | relaxation   |              |
 |              |              |              | variable     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| RelaxMaxPen  | OT_REAL      | worhp_p.Rela | Upper bound  | CasADi::Worh |
-|              |              | xMaxPen      | on the       | pInternal    |
+| RelaxMaxPen  | OT_REAL      | 50000000     | Upper bound  | CasADi::Worh |
+|              |              |              | on the       | pInternal    |
 |              |              |              | constraint   |              |
 |              |              |              | relaxation   |              |
 |              |              |              | penalty      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| RelaxRho     | OT_REAL      | worhp_p.Rela | Update       | CasADi::Worh |
-|              |              | xRho         | factor for   | pInternal    |
+| RelaxRho     | OT_REAL      | 6            | Update       | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
 |              |              |              | the          |              |
 |              |              |              | constraint   |              |
 |              |              |              | relaxation   |              |
 |              |              |              | penalty      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| RelaxStart   | OT_REAL      | worhp_p.Rela | Initial      | CasADi::Worh |
-|              |              | xStart       | value of the | pInternal    |
+| RelaxStart   | OT_REAL      | 1            | Initial      | CasADi::Worh |
+|              |              |              | value of the | pInternal    |
 |              |              |              | constraint   |              |
 |              |              |              | relaxation   |              |
 |              |              |              | penalty      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| RestUntilFea | OT_BOOLEAN   | worhp_p.Rest | Do           | CasADi::Worh |
-| s            |              | UntilFeas    | restoration  | pInternal    |
+| RestUntilFea | OT_BOOLEAN   | False        | Do           | CasADi::Worh |
+| s            |              |              | restoration  | pInternal    |
 |              |              |              | until a      |              |
 |              |              |              | feasible     |              |
 |              |              |              | solution is  |              |
 |              |              |              | found        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ScaleConIter | OT_BOOLEAN   | worhp_p.Scal | Scale        | CasADi::Worh |
-|              |              | eConIter     | constraints  | pInternal    |
+| ScaleConIter | OT_BOOLEAN   | False        | Scale        | CasADi::Worh |
+|              |              |              | constraints  | pInternal    |
 |              |              |              | in every     |              |
 |              |              |              | iteration    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ScaleFacObj  | OT_REAL      | worhp_p.Scal | Value to     | CasADi::Worh |
-|              |              | eFacObj      | scale large  | pInternal    |
+| ScaleFacObj  | OT_REAL      | 10           | Value to     | CasADi::Worh |
+|              |              |              | scale large  | pInternal    |
 |              |              |              | objective    |              |
 |              |              |              | functions to |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ScaleFacQP   | OT_REAL      | worhp_p.Scal | Upper bound  | CasADi::Worh |
-|              |              | eFacQP       | on resulting | pInternal    |
+| ScaleFacQP   | OT_REAL      | 10           | Upper bound  | CasADi::Worh |
+|              |              |              | on resulting | pInternal    |
 |              |              |              | matrix norm  |              |
 |              |              |              | for QP       |              |
 |              |              |              | scaling      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ScaledFD     | OT_BOOLEAN   | worhp_p.Scal | Use a scaled | CasADi::Worh |
-|              |              | edFD         | perturbation | pInternal    |
+| ScaledFD     | OT_BOOLEAN   | True         | Use a scaled | CasADi::Worh |
+|              |              |              | perturbation | pInternal    |
 |              |              |              | for finite   |              |
 |              |              |              | differences  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ScaledKKT    | OT_BOOLEAN   | worhp_p.Scal | Scale KKT    | CasADi::Worh |
-|              |              | edKKT        | conditions   | pInternal    |
+| ScaledKKT    | OT_BOOLEAN   | True         | Scale KKT    | CasADi::Worh |
+|              |              |              | conditions   | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| ScaledObj    | OT_BOOLEAN   | worhp_p.Scal | Scale the    | CasADi::Worh |
-|              |              | edObj        | objective    | pInternal    |
+| ScaledObj    | OT_BOOLEAN   | True         | Scale the    | CasADi::Worh |
+|              |              |              | objective    | pInternal    |
 |              |              |              | function     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ScaledQP     | OT_BOOLEAN   | worhp_p.Scal | Scale some   | CasADi::Worh |
-|              |              | edQP         | matrices     | pInternal    |
+| ScaledQP     | OT_BOOLEAN   | True         | Scale some   | CasADi::Worh |
+|              |              |              | matrices     | pInternal    |
 |              |              |              | handed to    |              |
 |              |              |              | the QP       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| StartBettsTa | OT_REAL      | worhp_p.Star | Initial      | CasADi::Worh |
-| u            |              | tBettsTau    | value for    | pInternal    |
+| StartBettsTa | OT_REAL      | 0.100        | Initial      | CasADi::Worh |
+| u            |              |              | value for    | pInternal    |
 |              |              |              | Betts'       |              |
 |              |              |              | update       |              |
 |              |              |              | dampening    |              |
 |              |              |              | term         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| SwitchingDel | OT_REAL      | worhp_p.Swit | Filter       | CasADi::Worh |
-| ta           |              | chingDelta   | switching    | pInternal    |
+| SwitchingDel | OT_REAL      | 0.010        | Filter       | CasADi::Worh |
+| ta           |              |              | switching    | pInternal    |
 |              |              |              | condition    |              |
 |              |              |              | parameter    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| SwitchingSCV | OT_REAL      | worhp_p.Swit | Filter       | CasADi::Worh |
-|              |              | chingSCV     | switching    | pInternal    |
+| SwitchingSCV | OT_REAL      | 1.100        | Filter       | CasADi::Worh |
+|              |              |              | switching    | pInternal    |
 |              |              |              | condition    |              |
 |              |              |              | parameter    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| SwitchingSF  | OT_REAL      | worhp_p.Swit | Filter       | CasADi::Worh |
-|              |              | chingSF      | switching    | pInternal    |
+| SwitchingSF  | OT_REAL      | 2.300        | Filter       | CasADi::Worh |
+|              |              |              | switching    | pInternal    |
 |              |              |              | condition    |              |
 |              |              |              | parameter    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| TakeQPSol    | OT_BOOLEAN   | worhp_p.Take | Evaluate QP  | CasADi::Worh |
-|              |              | QPSol        | search       | pInternal    |
+| TakeQPSol    | OT_BOOLEAN   | False        | Evaluate QP  | CasADi::Worh |
+|              |              |              | search       | pInternal    |
 |              |              |              | direction    |              |
 |              |              |              | regardless   |              |
 |              |              |              | of           |              |
 |              |              |              | convergence  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| Timeout      | OT_REAL      | worhp_p.Time | Timeout in   | CasADi::Worh |
-|              |              | out          | seconds      | pInternal    |
+| Timeout      | OT_REAL      | 300          | Timeout in   | CasADi::Worh |
+|              |              |              | seconds      | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| TolComp      | OT_REAL      | worhp_p.TolC | Complementar | CasADi::Worh |
-|              |              | omp          | ity          | pInternal    |
+| TolComp      | OT_REAL      | 0.001        | Complementar | CasADi::Worh |
+|              |              |              | ity          | pInternal    |
 |              |              |              | tolerance    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| TolFeas      | OT_REAL      | worhp_p.TolF | Feasibility  | CasADi::Worh |
-|              |              | eas          | tolerance    | pInternal    |
+| TolFeas      | OT_REAL      | 0.000        | Feasibility  | CasADi::Worh |
+|              |              |              | tolerance    | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| TolOpti      | OT_REAL      | worhp_p.TolO | Optimality   | CasADi::Worh |
-|              |              | pti          | tolerance    | pInternal    |
+| TolOpti      | OT_REAL      | 0.000        | Optimality   | CasADi::Worh |
+|              |              |              | tolerance    | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| TolWeakActiv | OT_REAL      | worhp_p.TolW | (experimenta | CasADi::Worh |
-| e            |              | eakActive    | l)           | pInternal    |
+| TolWeakActiv | OT_REAL      | 1            | (experimenta | CasADi::Worh |
+| e            |              |              | l)           | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| TooBig       | OT_BOOLEAN   | worhp_p.TooB | Enable too-  | CasADi::Worh |
-|              |              | ig           | big          | pInternal    |
+| TooBig       | OT_BOOLEAN   | True         | Enable too-  | CasADi::Worh |
+|              |              |              | big          | pInternal    |
 |              |              |              | termination  |              |
 |              |              |              | heuristics   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| TooBigCV     | OT_REAL      | worhp_p.TooB | Upper bound  | CasADi::Worh |
-|              |              | igCV         | on           | pInternal    |
+| TooBigCV     | OT_REAL      | 1.000e+25    | Upper bound  | CasADi::Worh |
+|              |              |              | on           | pInternal    |
 |              |              |              | constraint   |              |
 |              |              |              | violation    |              |
 |              |              |              | for too-big  |              |
 |              |              |              | heuristic    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| TooBigKKT    | OT_REAL      | worhp_p.TooB | Upper bound  | CasADi::Worh |
-|              |              | igKKT        | on KKT       | pInternal    |
+| TooBigKKT    | OT_REAL      | 1.000e+30    | Upper bound  | CasADi::Worh |
+|              |              |              | on KKT       | pInternal    |
 |              |              |              | values for   |              |
 |              |              |              | too-big      |              |
 |              |              |              | heuristic    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| UserDF       | OT_BOOLEAN   | worhp_p.User | Objective    | CasADi::Worh |
-|              |              | DF           | gradient     | pInternal    |
+| UserDF       | OT_BOOLEAN   | True         | Objective    | CasADi::Worh |
+|              |              |              | gradient     | pInternal    |
 |              |              |              | values       |              |
 |              |              |              | supplied by  |              |
 |              |              |              | caller       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| UserDG       | OT_BOOLEAN   | worhp_p.User | Jacobian     | CasADi::Worh |
-|              |              | DG           | values       | pInternal    |
+| UserDG       | OT_BOOLEAN   | True         | Jacobian     | CasADi::Worh |
+|              |              |              | values       | pInternal    |
 |              |              |              | supplied by  |              |
 |              |              |              | caller       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| UserHM       | OT_BOOLEAN   | worhp_p.User | Hessian      | CasADi::Worh |
-|              |              | HM           | values       | pInternal    |
+| UserHM       | OT_BOOLEAN   | False        | Hessian      | CasADi::Worh |
+|              |              |              | values       | pInternal    |
 |              |              |              | supplied by  |              |
 |              |              |              | caller       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| UserHMstruct | OT_INTEGER   | worhp_p.User | Enable       | CasADi::Worh |
-| ure          |              | HMstructure  | automatic    | pInternal    |
+| UserHMstruct | OT_INTEGER   | 2            | Enable       | CasADi::Worh |
+| ure          |              |              | automatic    | pInternal    |
 |              |              |              | Hessian      |              |
 |              |              |              | structure    |              |
 |              |              |              | generation   |              |
 |              |              |              | or checking  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| WeakActiveSe | OT_BOOLEAN   | worhp_p.Weak | (experimenta | CasADi::Worh |
-| t            |              | ActiveSet    | l)           | pInternal    |
+| WeakActiveSe | OT_BOOLEAN   | False        | (experimenta | CasADi::Worh |
+| t            |              |              | l)           | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
-|              |              |              | calculate    | ternal       |
+| ad_mode      | OT_STRING    | automatic    | How to       | CasADi::Worh |
+|              |              |              | calculate    | pInternal    |
 |              |              |              | the          |              |
 |              |              |              | Jacobians:   |              |
 |              |              |              | \"forward\"    |              |
@@ -71011,65 +70591,62 @@ number of constraints (A)
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| eps          | OT_REAL      | worhp_p.eps  | Machine      | CasADi::Worh |
+| eps          | OT_REAL      | 0.000        | Machine      | CasADi::Worh |
 |              |              |              | epsilon      | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
-|              |              |              | objective    | olverInterna |
-|              |              |              | function in  | l            |
+| expand_f     | OT_BOOLEAN   | False        | Expand the   | CasADi::Worh |
+|              |              |              | objective    | pInternal    |
+|              |              |              | function in  |              |
 |              |              |              | terms of     |              |
 |              |              |              | scalar       |              |
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_g     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
-|              |              |              | constraint   | olverInterna |
-|              |              |              | function in  | l            |
+| expand_g     | OT_BOOLEAN   | False        | Expand the   | CasADi::Worh |
+|              |              |              | constraint   | pInternal    |
+|              |              |              | function in  |              |
 |              |              |              | terms of     |              |
 |              |              |              | scalar       |              |
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
-| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
-|              |              |              | Newton       | olverInterna |
-|              |              |              | Hessian appr | l            |
+| gauss_newton | OT_BOOLEAN   | False        | Use Gauss    | CasADi::Worh |
+|              |              |              | Newton       | pInternal    |
+|              |              |              | Hessian appr |              |
 |              |              |              | oximation    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
-| sian         |              |              | exact        | olverInterna |
-|              |              |              | Hessian of   | l            |
+| generate_hes | OT_BOOLEAN   | False        | Generate an  | CasADi::Worh |
+| sian         |              |              | exact        | pInternal    |
+|              |              |              | Hessian of   |              |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
 |              |              |              | if not       |              |
 |              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
-| obian        |              |              | exact        | olverInterna |
-|              |              |              | Jacobian of  | l            |
+| generate_jac | OT_BOOLEAN   | True         | Generate an  | CasADi::Worh |
+| obian        |              |              | exact        | pInternal    |
+|              |              |              | Jacobian of  |              |
 |              |              |              | the          |              |
 |              |              |              | constraints  |              |
 |              |              |              | if not       |              |
 |              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
-| _vec         |              |              | true, the    | olverInterna |
-|              |              |              | input shape  | l            |
+| ignore_check | OT_BOOLEAN   | False        | If set to    | CasADi::Worh |
+| _vec         |              |              | true, the    | pInternal    |
+|              |              |              | input shape  |              |
 |              |              |              | of F will    |              |
 |              |              |              | not be       |              |
 |              |              |              | checked.     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| initialised  | OT_BOOLEAN   | worhp_p.init | Automaticall | CasADi::Worh |
-|              |              | ialised      | y added init | pInternal    |
+| initialised  | OT_BOOLEAN   | True         | Automaticall | CasADi::Worh |
+|              |              |              | y added init | pInternal    |
 |              |              |              | ialisation   |              |
 |              |              |              | flag.        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_FX        | FX()         | A function   | CasADi::NLPS |
-| llback       |              |              | that will be | olverInterna |
-|              |              |              | called at    | l            |
+| iteration_ca | OT_FX        |              | A function   | CasADi::Worh |
+| llback       |              |              | that will be | pInternal    |
+|              |              |              | called at    |              |
 |              |              |              | each         |              |
 |              |              |              | iteration.   |              |
 |              |              |              | Input scheme |              |
@@ -71081,29 +70658,29 @@ number of constraints (A)
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
-| llback_ignor |              |              | true, errors | olverInterna |
-| e_errors     |              |              | thrown by it | l            |
+| iteration_ca | OT_BOOLEAN   | False        | If set to    | CasADi::Worh |
+| llback_ignor |              |              | true, errors | pInternal    |
+| e_errors     |              |              | thrown by it |              |
 |              |              |              | eration_call |              |
 |              |              |              | back will be |              |
 |              |              |              | ignored.     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_INTEGER   | 1            | Only call    | CasADi::NLPS |
-| llback_step  |              |              | the callback | olverInterna |
-|              |              |              | function     | l            |
+| iteration_ca | OT_INTEGER   | 1            | Only call    | CasADi::Worh |
+| llback_step  |              |              | the callback | pInternal    |
+|              |              |              | function     |              |
 |              |              |              | every few    |              |
 |              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
+| jac_for_sens | OT_BOOLEAN   | False        | Create the a | CasADi::Worh |
+|              |              |              | Jacobian     | pInternal    |
 |              |              |              | function and |              |
 |              |              |              | use this to  |              |
 |              |              |              | calculate    |              |
 |              |              |              | forward sens |              |
 |              |              |              | itivities    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
-| erator       | ENERATOR     | )            | pointer that | ternal       |
+| jacobian_gen | OT_JACOBIANG |              | Function     | CasADi::Worh |
+| erator       | ENERATOR     |              | pointer that | pInternal    |
 |              |              |              | returns a    |              |
 |              |              |              | Jacobian     |              |
 |              |              |              | function     |              |
@@ -71115,35 +70692,28 @@ number of constraints (A)
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
-|              | TOR          | )            | be activated | ternal   Cas |
-|              |              |              | (inputs|outp | ADi::WorhpIn |
-|              |              |              | uts)  (eval_ | ternal       |
-|              |              |              | f|eval_g|eva |              |
-|              |              |              | l_jac_g|eval |              |
-|              |              |              | _grad_f|eval |              |
-|              |              |              | _h)          |              |
+| monitor      | OT_STRINGVEC |              | Monitors to  | CasADi::Worh |
+|              | TOR          |              | be activated | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
+| name         | OT_STRING    | unnamed_shar | n/a          | CasADi::Worh |
+|              |              | ed_object    |              | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
-| j_dir        |              |              | adjoint      | ternal       |
+| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::Worh |
+| j_dir        |              |              | adjoint      | pInternal    |
 |              |              |              | derivatives  |              |
 |              |              |              | to be        |              |
 |              |              |              | calculated s |              |
 |              |              |              | imultanously |              |
 +--------------+--------------+--------------+--------------+--------------+
-| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
-| d_dir        |              |              | forward      | ternal       |
+| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::Worh |
+| d_dir        |              |              | forward      | pInternal    |
 |              |              |              | derivatives  |              |
 |              |              |              | to be        |              |
 |              |              |              | calculated s |              |
 |              |              |              | imultanously |              |
 +--------------+--------------+--------------+--------------+--------------+
-| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
-| ian          |              |              | Hessians     | ternal       |
+| numeric_hess | OT_BOOLEAN   | False        | Calculate    | CasADi::Worh |
+| ian          |              |              | Hessians     | pInternal    |
 |              |              |              | numerically  |              |
 |              |              |              | (using       |              |
 |              |              |              | directional  |              |
@@ -71153,8 +70723,8 @@ number of constraints (A)
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
-| bian         |              |              | Jacobians    | ternal       |
+| numeric_jaco | OT_BOOLEAN   | False        | Calculate    | CasADi::Worh |
+| bian         |              |              | Jacobians    | pInternal    |
 |              |              |              | numerically  |              |
 |              |              |              | (using       |              |
 |              |              |              | directional  |              |
@@ -71164,9 +70734,9 @@ number of constraints (A)
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| parametric   | OT_BOOLEAN   | false        | Expect F, G, | CasADi::NLPS |
-|              |              |              | H, J to have | olverInterna |
-|              |              |              | an           | l            |
+| parametric   | OT_BOOLEAN   | False        | Expect F, G, | CasADi::Worh |
+|              |              |              | H, J to have | pInternal    |
+|              |              |              | an           |              |
 |              |              |              | additional   |              |
 |              |              |              | input        |              |
 |              |              |              | argument     |              |
@@ -71176,11 +70746,11 @@ number of constraints (A)
 |              |              |              | fixed        |              |
 |              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
-|              |              |              | sparse       | ternal       |
+| sparse       | OT_BOOLEAN   | True         | function is  | CasADi::Worh |
+|              |              |              | sparse       | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
-| erator       | ENERATOR     | )            | that         | ternal       |
+| sparsity_gen | OT_SPARSITYG |              | Function     | CasADi::Worh |
+| erator       | ENERATOR     |              | that         | pInternal    |
 |              |              |              | provides     |              |
 |              |              |              | sparsity for |              |
 |              |              |              | a given      |              |
@@ -71190,8 +70760,8 @@ number of constraints (A)
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
-| ans          |              |              | references   | ternal       |
+| store_jacobi | OT_BOOLEAN   | False        | keep         | CasADi::Worh |
+| ans          |              |              | references   | pInternal    |
 |              |              |              | to generated |              |
 |              |              |              | Jacobians in |              |
 |              |              |              | order to     |              |
@@ -71202,8 +70772,8 @@ number of constraints (A)
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
-|              |              | )            | defined      | ternal       |
+| user_data    | OT_UNKNOWN   |              | A user-      | CasADi::Worh |
+|              |              |              | defined      | pInternal    |
 |              |              |              | field that   |              |
 |              |              |              | can be used  |              |
 |              |              |              | to identify  |              |
@@ -71212,14 +70782,14 @@ number of constraints (A)
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
-|              |              |              | evaluation   | ternal       |
+| verbose      | OT_BOOLEAN   | False        | verbose      | CasADi::Worh |
+|              |              |              | evaluation   | pInternal    |
 |              |              |              | -- for       |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
-| _bounds      |              |              | initial      | olverInterna |
-|              |              |              | guess does   | l            |
+| warn_initial | OT_BOOLEAN   | False        | Warn if the  | CasADi::Worh |
+| _bounds      |              |              | initial      | pInternal    |
+|              |              |              | guess does   |              |
 |              |              |              | not satisfy  |              |
 |              |              |              | LBX and UBX  |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -71261,6 +70831,9 @@ Initialize Initialize and make the object ready for setting arguments and
 evaluation. This method is typically called after setting options but before
 evaluating. If passed to another class (in the constructor), this class
 should invoke this function when initialized.
+
+Known issue in WORHP: Worhp cannot handle the degenerate case of constant
+objective value.
 
 Autogenerated from C_worhp_aux.h with params.pl ";
 
@@ -71583,15 +71156,6 @@ Assert that the object has been initialized. ";
 
 interface to WORHP NLP solver
 
-NOTE: The WORHP interface currently has some limitations, as compared to
-e.g. Ipopt: You may not set LBX and UBX to the same value, making parametric
-NLPs a must.
-
-You cannot have both bounds LBG and UBG infinity
-
-You cannot have a degenerate (constant) objective value (workaround
-possible, please notify the CasADi developers if you need this feature)
-
 Solves the following nonlinear optimization problem:   min          F(x,p)
 x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
 <= UBX                      n: number of decision variables (x)       m:
@@ -71650,705 +71214,711 @@ number of constraints (A)
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| AcceptTolFea | OT_REAL      | worhp_p.Acce | Tolerance    | CasADi::Worh |
-| s            |              | ptTolFeas    | for          | pInternal    |
+| AcceptTolFea | OT_REAL      | 0.001        | Tolerance    | CasADi::Worh |
+| s            |              |              | for          | pInternal    |
 |              |              |              | acceptable   |              |
 |              |              |              | feasibility  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| AcceptTolOpt | OT_REAL      | worhp_p.Acce | Tolerance    | CasADi::Worh |
-| i            |              | ptTolOpti    | for          | pInternal    |
+| AcceptTolOpt | OT_REAL      | 0.001        | Tolerance    | CasADi::Worh |
+| i            |              |              | for          | pInternal    |
 |              |              |              | acceptable   |              |
 |              |              |              | optimality   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| AlphaMinCons | OT_BOOLEAN   | worhp_p.Alph | Use a        | CasADi::Worh |
-| t            |              | aMinConst    | constant     | pInternal    |
+| AlphaMinCons | OT_BOOLEAN   | False        | Use a        | CasADi::Worh |
+| t            |              |              | constant     | pInternal    |
 |              |              |              | lower bound  |              |
 |              |              |              | on Armijo    |              |
 |              |              |              | stepsize in  |              |
 |              |              |              | Filter       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ArmijoBeta   | OT_REAL      | worhp_p.Armi | Trial        | CasADi::Worh |
-|              |              | joBeta       | stepsize     | pInternal    |
+| Ares         | OT_INTEGERVE | (42, 41, 42, | Armijo       | CasADi::Worh |
+|              | CTOR         | 45, 43, 46,  | recovery     | pInternal    |
+|              |              | 44)          | strategies.  |              |
+|              |              |              | Vector of    |              |
+|              |              |              | size 7       |              |
++--------------+--------------+--------------+--------------+--------------+
+| ArmijoBeta   | OT_REAL      | 0.712        | Trial        | CasADi::Worh |
+|              |              |              | stepsize     | pInternal    |
 |              |              |              | decrease     |              |
 |              |              |              | factor for   |              |
 |              |              |              | Armijo rule  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ArmijoMaxAlp | OT_REAL      | worhp_p.Armi | Initial      | CasADi::Worh |
-| ha           |              | joMaxAlpha   | alpha for    | pInternal    |
+| ArmijoMaxAlp | OT_REAL      | 1            | Initial      | CasADi::Worh |
+| ha           |              |              | alpha for    | pInternal    |
 |              |              |              | Armijo rule  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ArmijoMinAlp | OT_REAL      | worhp_p.Armi | Lower bound  | CasADi::Worh |
-| ha           |              | joMinAlpha   | on alpha for | pInternal    |
+| ArmijoMinAlp | OT_REAL      | 0.000        | Lower bound  | CasADi::Worh |
+| ha           |              |              | on alpha for | pInternal    |
 |              |              |              | Armijo rule  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ArmijoMinAlp | OT_REAL      | worhp_p.Armi | Lower bound  | CasADi::Worh |
-| haRec        |              | joMinAlphaRe | on alpha for | pInternal    |
-|              |              | c            | Armijo rule  |              |
+| ArmijoMinAlp | OT_REAL      | 0.000        | Lower bound  | CasADi::Worh |
+| haRec        |              |              | on alpha for | pInternal    |
+|              |              |              | Armijo rule  |              |
 |              |              |              | during       |              |
 |              |              |              | recovery     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ArmijoSigma  | OT_REAL      | worhp_p.Armi | Scale factor | CasADi::Worh |
-|              |              | joSigma      | for          | pInternal    |
+| ArmijoSigma  | OT_REAL      | 0.005        | Scale factor | CasADi::Worh |
+|              |              |              | for          | pInternal    |
 |              |              |              | linearised   |              |
 |              |              |              | descent      |              |
 |              |              |              | check in     |              |
 |              |              |              | Armijo rule  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| AutoQPRecove | OT_BOOLEAN   | worhp_p.Auto | Enable       | CasADi::Worh |
-| ry           |              | QPRecovery   | automatic QP | pInternal    |
+| AutoQPRecove | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+| ry           |              |              | automatic QP | pInternal    |
 |              |              |              | recovery     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| BFGSmaxblock | OT_INTEGER   | worhp_p.BFGS | Maximum BFGS | CasADi::Worh |
-| Size         |              | maxblockSize | block size   | pInternal    |
+| BFGSmaxblock | OT_INTEGER   | 300          | Maximum BFGS | CasADi::Worh |
+| Size         |              |              | block size   | pInternal    |
 |              |              |              | (depends on  |              |
 |              |              |              | BFGS method) |              |
 +--------------+--------------+--------------+--------------+--------------+
-| BFGSmethod   | OT_INTEGER   | worhp_p.BFGS | Choose BFGS  | CasADi::Worh |
-|              |              | method       | method       | pInternal    |
+| BFGSmethod   | OT_INTEGER   | 0            | Choose BFGS  | CasADi::Worh |
+|              |              |              | method       | pInternal    |
 |              |              |              | (dense,      |              |
 |              |              |              | block,       |              |
 |              |              |              | sparse)      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| BFGSminblock | OT_INTEGER   | worhp_p.BFGS | Minimum BFGS | CasADi::Worh |
-| Size         |              | minblockSize | block size   | pInternal    |
+| BFGSminblock | OT_INTEGER   | 300          | Minimum BFGS | CasADi::Worh |
+| Size         |              |              | block size   | pInternal    |
 |              |              |              | (depends on  |              |
 |              |              |              | BFGS method) |              |
 +--------------+--------------+--------------+--------------+--------------+
-| BFGSrestart  | OT_INTEGER   | worhp_p.BFGS | Restart BFGS | CasADi::Worh |
-|              |              | restart      | update after | pInternal    |
+| BFGSrestart  | OT_INTEGER   | 50           | Restart BFGS | CasADi::Worh |
+|              |              |              | update after | pInternal    |
 |              |              |              | this many    |              |
 |              |              |              | iterations   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| BettsFactor  | OT_REAL      | worhp_p.Bett | Update       | CasADi::Worh |
-|              |              | sFactor      | factor for   | pInternal    |
+| BettsFactor  | OT_REAL      | 2.100        | Update       | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
 |              |              |              | Betts'       |              |
 |              |              |              | Hessian regu |              |
 |              |              |              | larisation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| BettsPoint   | OT_REAL      | worhp_p.Bett | Smallest     | CasADi::Worh |
-|              |              | sPoint       | eigenvalue   | pInternal    |
+| BettsPoint   | OT_REAL      | 1            | Smallest     | CasADi::Worh |
+|              |              |              | eigenvalue   | pInternal    |
 |              |              |              | of the       |              |
 |              |              |              | regularised  |              |
 |              |              |              | Hessian      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| BoundTolFac  | OT_REAL      | worhp_p.Boun | Factor in    | CasADi::Worh |
-|              |              | dTolFac      | determining  | pInternal    |
+| BoundTolFac  | OT_REAL      | 1000         | Factor in    | CasADi::Worh |
+|              |              |              | determining  | pInternal    |
 |              |              |              | active       |              |
 |              |              |              | constraints  |              |
 |              |              |              | by KKT       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| CheckFJ      | OT_REAL      | worhp_p.Chec | Upper bound  | CasADi::Worh |
-|              |              | kFJ          | used by      | pInternal    |
+| CheckFJ      | OT_REAL      | 1.000e+12    | Upper bound  | CasADi::Worh |
+|              |              |              | used by      | pInternal    |
 |              |              |              | Fritz-John   |              |
 |              |              |              | heuristic    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| CheckStructu | OT_BOOLEAN   | worhp_p.Chec | Enable       | CasADi::Worh |
-| reDF         |              | kStructureDF | structural   | pInternal    |
+| CheckStructu | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+| reDF         |              |              | structural   | pInternal    |
 |              |              |              | checking of  |              |
 |              |              |              | DF           |              |
 +--------------+--------------+--------------+--------------+--------------+
-| CheckStructu | OT_BOOLEAN   | worhp_p.Chec | Enable       | CasADi::Worh |
-| reDG         |              | kStructureDG | structural   | pInternal    |
+| CheckStructu | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+| reDG         |              |              | structural   | pInternal    |
 |              |              |              | checking of  |              |
 |              |              |              | DG           |              |
 +--------------+--------------+--------------+--------------+--------------+
-| CheckStructu | OT_BOOLEAN   | worhp_p.Chec | Enable       | CasADi::Worh |
-| reHM         |              | kStructureHM | structural   | pInternal    |
+| CheckStructu | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+| reHM         |              |              | structural   | pInternal    |
 |              |              |              | checking of  |              |
 |              |              |              | HM           |              |
 +--------------+--------------+--------------+--------------+--------------+
-| CorStepBetts | OT_REAL      | worhp_p.CorS | (experimenta | CasADi::Worh |
-| Sum          |              | tepBettsSum  | l)           | pInternal    |
+| CorStepBetts | OT_REAL      | 0.500        | (experimenta | CasADi::Worh |
+| Sum          |              |              | l)           | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| CorStepConSt | OT_REAL      | worhp_p.CorS | (experimenta | CasADi::Worh |
-| op           |              | tepConStop   | l)           | pInternal    |
+| CorStepConSt | OT_REAL      | 0.000        | (experimenta | CasADi::Worh |
+| op           |              |              | l)           | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| CorStepConvi | OT_REAL      | worhp_p.CorS | (experimenta | CasADi::Worh |
-| o            |              | tepConvio    | l)           | pInternal    |
+| CorStepConvi | OT_REAL      | 1            | (experimenta | CasADi::Worh |
+| o            |              |              | l)           | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| CorStepMaxIt | OT_INTEGER   | worhp_p.CorS | (experimenta | CasADi::Worh |
-| er           |              | tepMaxIter   | l)           | pInternal    |
+| CorStepMaxIt | OT_INTEGER   | 50           | (experimenta | CasADi::Worh |
+| er           |              |              | l)           | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| CorStepMetho | OT_INTEGER   | worhp_p.CorS | (experimenta | CasADi::Worh |
-| d            |              | tepMethod    | l)           | pInternal    |
+| CorStepMetho | OT_INTEGER   | 0            | (experimenta | CasADi::Worh |
+| d            |              |              | l)           | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| CorStepMode  | OT_INTEGER   | worhp_p.CorS | (experimenta | CasADi::Worh |
-|              |              | tepMode      | l)           | pInternal    |
+| CorStepMode  | OT_INTEGER   | 1            | (experimenta | CasADi::Worh |
+|              |              |              | l)           | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| CorStepPFact | OT_REAL      | worhp_p.CorS | (experimenta | CasADi::Worh |
-| or           |              | tepPFactor   | l)           | pInternal    |
+| CorStepPFact | OT_REAL      | 1            | (experimenta | CasADi::Worh |
+| or           |              |              | l)           | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| CorStepPMax  | OT_REAL      | worhp_p.CorS | (experimenta | CasADi::Worh |
-|              |              | tepPMax      | l)           | pInternal    |
+| CorStepPMax  | OT_REAL      | 1000000      | (experimenta | CasADi::Worh |
+|              |              |              | l)           | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| CorStepRecov | OT_BOOLEAN   | worhp_p.CorS | Enable       | CasADi::Worh |
-| eryDX        |              | tepRecoveryD | structural   | pInternal    |
-|              |              | X            | checking of  |              |
+| CorStepRecov | OT_BOOLEAN   | False        | Enable       | CasADi::Worh |
+| eryDX        |              |              | structural   | pInternal    |
+|              |              |              | checking of  |              |
 |              |              |              | HM           |              |
 +--------------+--------------+--------------+--------------+--------------+
-| CurvBCond    | OT_REAL      | worhp_p.Curv | Block BFGS   | CasADi::Worh |
-|              |              | BCond        | curvature    | pInternal    |
+| CurvBCond    | OT_REAL      | 0.020        | Block BFGS   | CasADi::Worh |
+|              |              |              | curvature    | pInternal    |
 |              |              |              | condition    |              |
 |              |              |              | bound        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| CurvBFac     | OT_REAL      | worhp_p.Curv | Block BFGS   | CasADi::Worh |
-|              |              | BFac         | curvature    | pInternal    |
+| CurvBFac     | OT_REAL      | 0.300        | Block BFGS   | CasADi::Worh |
+|              |              |              | curvature    | pInternal    |
 |              |              |              | condition re |              |
 |              |              |              | gularisation |              |
 |              |              |              | factor       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| CurvCond     | OT_REAL      | worhp_p.Curv | BFGS         | CasADi::Worh |
-|              |              | Cond         | Curvature    | pInternal    |
+| CurvCond     | OT_REAL      | 0.020        | BFGS         | CasADi::Worh |
+|              |              |              | Curvature    | pInternal    |
 |              |              |              | condition    |              |
 |              |              |              | bound        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| CurvFac      | OT_REAL      | worhp_p.Curv | BFGS         | CasADi::Worh |
-|              |              | Fac          | curvature    | pInternal    |
+| CurvFac      | OT_REAL      | 0.300        | BFGS         | CasADi::Worh |
+|              |              |              | curvature    | pInternal    |
 |              |              |              | condition re |              |
 |              |              |              | gularisation |              |
 |              |              |              | factor       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| CutLength    | OT_REAL      | worhp_p.CutL | Scaling      | CasADi::Worh |
-|              |              | ength        | factor for   | pInternal    |
+| CutLength    | OT_REAL      | 0.001        | Scaling      | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
 |              |              |              | Cut recovery |              |
 |              |              |              | strategy     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| DebugMarker0 | OT_INTEGER   | worhp_p.Debu | Debug        | CasADi::Worh |
-| 6            |              | gMarker06    | marker, only | pInternal    |
+| DebugMarker0 | OT_INTEGER   | 42           | Debug        | CasADi::Worh |
+| 6            |              |              | marker, only | pInternal    |
 |              |              |              | needed for   |              |
 |              |              |              | ASTOS        |              |
 |              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FGtogether   | OT_BOOLEAN   | worhp_p.FGto | F and G      | CasADi::Worh |
-|              |              | gether       | cannot be    | pInternal    |
+| FGtogether   | OT_BOOLEAN   | False        | F and G      | CasADi::Worh |
+|              |              |              | cannot be    | pInternal    |
 |              |              |              | evaluated    |              |
 |              |              |              | separately   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FJandND      | OT_BOOLEAN   | worhp_p.FJan | Enable       | CasADi::Worh |
-|              |              | dND          | Fritz-John   | pInternal    |
+| FJandND      | OT_BOOLEAN   | False        | Enable       | CasADi::Worh |
+|              |              |              | Fritz-John   | pInternal    |
 |              |              |              | and non-diff |              |
 |              |              |              | erentiable   |              |
 |              |              |              | check        |              |
 |              |              |              | heuristics   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FeasibleDual | OT_BOOLEAN   | worhp_p.Feas | Activate     | CasADi::Worh |
-|              |              | ibleDual     | dual         | pInternal    |
+| FeasibleDual | OT_BOOLEAN   | False        | Activate     | CasADi::Worh |
+|              |              |              | dual         | pInternal    |
 |              |              |              | feasibility  |              |
 |              |              |              | mode         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FeasibleInit | OT_BOOLEAN   | worhp_p.Feas | Activate     | CasADi::Worh |
-|              |              | ibleInit     | initial      | pInternal    |
+| FeasibleInit | OT_BOOLEAN   | False        | Activate     | CasADi::Worh |
+|              |              |              | initial      | pInternal    |
 |              |              |              | feasibility  |              |
 |              |              |              | mode         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FeasibleInit | OT_REAL      | worhp_p.Feas | Feasibility  | CasADi::Worh |
-| Tol          |              | ibleInitTol  | tolerance    | pInternal    |
+| FeasibleInit | OT_REAL      | 0.001        | Feasibility  | CasADi::Worh |
+| Tol          |              |              | tolerance    | pInternal    |
 |              |              |              | for no-      |              |
 |              |              |              | objective    |              |
 |              |              |              | feasible     |              |
 |              |              |              | mode         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FeasibleOnly | OT_BOOLEAN   | worhp_p.Feas | Activate     | CasADi::Worh |
-|              |              | ibleOnly     | feasible-    | pInternal    |
+| FeasibleOnly | OT_BOOLEAN   | False        | Activate     | CasADi::Worh |
+|              |              |              | feasible-    | pInternal    |
 |              |              |              | only mode    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FidifEps     | OT_REAL      | worhp_p.Fidi | Finite       | CasADi::Worh |
-|              |              | fEps         | difference   | pInternal    |
+| FidifEps     | OT_REAL      | 0.000        | Finite       | CasADi::Worh |
+|              |              |              | difference   | pInternal    |
 |              |              |              | perturbation |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FidifHM      | OT_BOOLEAN   | worhp_p.Fidi | Approximate  | CasADi::Worh |
-|              |              | fHM          | Hessian by   | pInternal    |
+| FidifHM      | OT_BOOLEAN   | False        | Approximate  | CasADi::Worh |
+|              |              |              | Hessian by   | pInternal    |
 |              |              |              | finite       |              |
 |              |              |              | differences  |              |
 |              |              |              | (otherwise   |              |
 |              |              |              | BFGS)        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FilterBisecA | OT_BOOLEAN   | worhp_p.Filt | Filter       | CasADi::Worh |
-| lpha         |              | erBisecAlpha | heuristic to | pInternal    |
+| FilterBisecA | OT_BOOLEAN   | True         | Filter       | CasADi::Worh |
+| lpha         |              |              | heuristic to | pInternal    |
 |              |              |              | save Armijo  |              |
 |              |              |              | iterations   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FilterGammaC | OT_REAL      | worhp_p.Filt | Constraint   | CasADi::Worh |
-| V            |              | erGammaCV    | violation    | pInternal    |
+| FilterGammaC | OT_REAL      | 0.000        | Constraint   | CasADi::Worh |
+| V            |              |              | violation    | pInternal    |
 |              |              |              | decrease     |              |
 |              |              |              | factor in    |              |
 |              |              |              | Filter       |              |
 |              |              |              | acceptance   |              |
 |              |              |              | check        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FilterGammaF | OT_REAL      | worhp_p.Filt | Objective    | CasADi::Worh |
-|              |              | erGammaF     | decrease     | pInternal    |
+| FilterGammaF | OT_REAL      | 0.000        | Objective    | CasADi::Worh |
+|              |              |              | decrease     | pInternal    |
 |              |              |              | factor in    |              |
 |              |              |              | Filter       |              |
 |              |              |              | acceptance   |              |
 |              |              |              | check        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FilterInters | OT_BOOLEAN   | worhp_p.Filt | Filter       | CasADi::Worh |
-| ecAlpha      |              | erIntersecAl | heuristic to | pInternal    |
-|              |              | pha          | save Armijo  |              |
+| FilterInters | OT_BOOLEAN   | True         | Filter       | CasADi::Worh |
+| ecAlpha      |              |              | heuristic to | pInternal    |
+|              |              |              | save Armijo  |              |
 |              |              |              | iterations   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FirstDifCent | OT_BOOLEAN   | worhp_p.Firs | Use central  | CasADi::Worh |
-| ral          |              | tDifCentral  | finite       | pInternal    |
+| FirstDifCent | OT_BOOLEAN   | True         | Use central  | CasADi::Worh |
+| ral          |              |              | finite       | pInternal    |
 |              |              |              | difference   |              |
 |              |              |              | quotient for |              |
 |              |              |              | first        |              |
 |              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FocusOnFeas  | OT_BOOLEAN   | worhp_p.Focu | Enable       | CasADi::Worh |
-|              |              | sOnFeas      | Focus-on-    | pInternal    |
+| FocusOnFeas  | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+|              |              |              | Focus-on-    | pInternal    |
 |              |              |              | Feasibility  |              |
 |              |              |              | mode         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| FocusOnFeasF | OT_REAL      | worhp_p.Focu | Factor in    | CasADi::Worh |
-| actor        |              | sOnFeasFacto | Focus-on-    | pInternal    |
-|              |              | r            | Feasibility  |              |
+| FocusOnFeasF | OT_REAL      | 1.360        | Factor in    | CasADi::Worh |
+| actor        |              |              | Focus-on-    | pInternal    |
+|              |              |              | Feasibility  |              |
 |              |              |              | mode         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| GammaAlpha   | OT_REAL      | worhp_p.Gamm | Safety       | CasADi::Worh |
-|              |              | aAlpha       | factor for   | pInternal    |
+| GammaAlpha   | OT_REAL      | 0.050        | Safety       | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
 |              |              |              | alphamin     |              |
 |              |              |              | calculation  |              |
 |              |              |              | by Filter    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| GroupMethod  | OT_INTEGER   | worhp_p.Grou | Select       | CasADi::Worh |
-|              |              | pMethod      | method to    | pInternal    |
+| GroupMethod  | OT_INTEGER   | 1            | Select       | CasADi::Worh |
+|              |              |              | method to    | pInternal    |
 |              |              |              | determine    |              |
 |              |              |              | graph        |              |
 |              |              |              | colouring    |              |
 |              |              |              | groups       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| IgnoreFilter | OT_BOOLEAN   | worhp_p.Igno | Activate     | CasADi::Worh |
-| Crit         |              | reFilterCrit | accelerating | pInternal    |
+| IgnoreFilter | OT_BOOLEAN   | False        | Activate     | CasADi::Worh |
+| Crit         |              |              | accelerating | pInternal    |
 |              |              |              | heuristics   |              |
 |              |              |              | for Filter   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| IncBettsTau  | OT_REAL      | worhp_p.IncB | Increase     | CasADi::Worh |
-|              |              | ettsTau      | factor for   | pInternal    |
+| IncBettsTau  | OT_REAL      | 2            | Increase     | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
 |              |              |              | Betts'       |              |
 |              |              |              | update       |              |
 |              |              |              | dampening    |              |
 |              |              |              | term         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| IncBettsTauM | OT_REAL      | worhp_p.IncB | Larger       | CasADi::Worh |
-| ore          |              | ettsTauMore  | increase     | pInternal    |
+| IncBettsTauM | OT_REAL      | 100          | Larger       | CasADi::Worh |
+| ore          |              |              | increase     | pInternal    |
 |              |              |              | factor for   |              |
 |              |              |              | Betts'       |              |
 |              |              |              | update       |              |
 |              |              |              | dampening    |              |
 |              |              |              | term         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| IncreaseIWS  | OT_REAL      | worhp_p.Incr | Increase     | CasADi::Worh |
-|              |              | easeIWS      | factor for   | pInternal    |
+| IncreaseIWS  | OT_REAL      | 1            | Increase     | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
 |              |              |              | estimated    |              |
 |              |              |              | integer      |              |
 |              |              |              | workspace    |              |
 |              |              |              | requirement  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| IncreaseRWS  | OT_REAL      | worhp_p.Incr | Increase     | CasADi::Worh |
-|              |              | easeRWS      | factor for   | pInternal    |
+| IncreaseRWS  | OT_REAL      | 1            | Increase     | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
 |              |              |              | estimated    |              |
 |              |              |              | real         |              |
 |              |              |              | workspace    |              |
 |              |              |              | requirement  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| Infty        | OT_REAL      | worhp_p.Inft | Upper bound  | CasADi::Worh |
-|              |              | y            | for numbers  | pInternal    |
+| Infty        | OT_REAL      | 1.000e+20    | Upper bound  | CasADi::Worh |
+|              |              |              | for numbers  | pInternal    |
 |              |              |              | to be        |              |
 |              |              |              | regarded as  |              |
 |              |              |              | finite       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| InftyUnbound | OT_REAL      | worhp_p.Inft | Tolerance    | CasADi::Worh |
-| ed           |              | yUnbounded   | for unbounde | pInternal    |
+| InftyUnbound | OT_REAL      | 1.000e+20    | Tolerance    | CasADi::Worh |
+| ed           |              |              | for unbounde | pInternal    |
 |              |              |              | dness        |              |
 |              |              |              | detection    |              |
 |              |              |              | heuristic    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| InitialLMest | OT_BOOLEAN   | worhp_p.Init | Enable       | CasADi::Worh |
-|              |              | ialLMest     | initial      | pInternal    |
+| InitialLMest | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+|              |              |              | initial      | pInternal    |
 |              |              |              | Lagrange     |              |
 |              |              |              | multiplier   |              |
 |              |              |              | estimate     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| KeepAcceptab | OT_BOOLEAN   | worhp_p.Keep | Save         | CasADi::Worh |
-| leSol        |              | AcceptableSo | acceptable   | pInternal    |
-|              |              | l            | solutions as |              |
+| KeepAcceptab | OT_BOOLEAN   | True         | Save         | CasADi::Worh |
+| leSol        |              |              | acceptable   | pInternal    |
+|              |              |              | solutions as |              |
 |              |              |              | fallback     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| LMestQPipCom | OT_REAL      | worhp_p.LMes | IP complemen | CasADi::Worh |
-| Tol          |              | tQPipComTol  | tarity       | pInternal    |
+| LMestQPipCom | OT_REAL      | 0.003        | IP complemen | CasADi::Worh |
+| Tol          |              |              | tarity       | pInternal    |
 |              |              |              | tolerance in |              |
 |              |              |              | initial      |              |
 |              |              |              | multiplier   |              |
 |              |              |              | estimate     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| LMestQPipRes | OT_REAL      | worhp_p.LMes | IP residual  | CasADi::Worh |
-| Tol          |              | tQPipResTol  | tolerance in | pInternal    |
+| LMestQPipRes | OT_REAL      | 1            | IP residual  | CasADi::Worh |
+| Tol          |              |              | tolerance in | pInternal    |
 |              |              |              | initial      |              |
 |              |              |              | multiplier   |              |
 |              |              |              | estimate     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| LinMult      | OT_BOOLEAN   | worhp_p.LinM | Control      | CasADi::Worh |
-|              |              | ult          | Lagrange     | pInternal    |
+| LinMult      | OT_BOOLEAN   | False        | Control      | CasADi::Worh |
+|              |              |              | Lagrange     | pInternal    |
 |              |              |              | multiplier   |              |
 |              |              |              | update       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| LogLevel     | OT_INTEGER   | worhp_p.LogL | Enable XML   | CasADi::Worh |
-|              |              | evel         | logfiles and | pInternal    |
+| LogLevel     | OT_INTEGER   | 0            | Enable XML   | CasADi::Worh |
+|              |              |              | logfiles and | pInternal    |
 |              |              |              | writing      |              |
 |              |              |              | interval     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| LogResult    | OT_INTEGER   | worhp_p.LogR | Enable XML   | CasADi::Worh |
-|              |              | esult        | result       | pInternal    |
+| LogResult    | OT_INTEGER   | 0            | Enable XML   | CasADi::Worh |
+|              |              |              | result       | pInternal    |
 |              |              |              | logging and  |              |
 |              |              |              | detail level |              |
 +--------------+--------------+--------------+--------------+--------------+
-| LowPassAlpha | OT_REAL      | worhp_p.LowP | Lowpass-     | CasADi::Worh |
-| F            |              | assAlphaF    | filter       | pInternal    |
+| LowPassAlpha | OT_REAL      | 0.950        | Lowpass-     | CasADi::Worh |
+| F            |              |              | filter       | pInternal    |
 |              |              |              | update       |              |
 |              |              |              | factor for   |              |
 |              |              |              | objective    |              |
 |              |              |              | values       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| LowPassAlpha | OT_REAL      | worhp_p.LowP | Lowpass-     | CasADi::Worh |
-| G            |              | assAlphaG    | filter       | pInternal    |
+| LowPassAlpha | OT_REAL      | 0.950        | Lowpass-     | CasADi::Worh |
+| G            |              |              | filter       | pInternal    |
 |              |              |              | update       |              |
 |              |              |              | factor for   |              |
 |              |              |              | constraint   |              |
 |              |              |              | values       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| LowPassAlpha | OT_REAL      | worhp_p.LowP | Lowpass-     | CasADi::Worh |
-| Merit        |              | assAlphaMeri | filter       | pInternal    |
-|              |              | t            | update       |              |
+| LowPassAlpha | OT_REAL      | 0.100        | Lowpass-     | CasADi::Worh |
+| Merit        |              |              | filter       | pInternal    |
+|              |              |              | update       |              |
 |              |              |              | factor for   |              |
 |              |              |              | merit        |              |
 |              |              |              | function     |              |
 |              |              |              | values       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| LowPassFilte | OT_BOOLEAN   | worhp_p.LowP | Enable       | CasADi::Worh |
-| r            |              | assFilter    | lowpass-     | pInternal    |
+| LowPassFilte | OT_BOOLEAN   | True         | Enable       | CasADi::Worh |
+| r            |              |              | lowpass-     | pInternal    |
 |              |              |              | filter       |              |
 |              |              |              | termination  |              |
 |              |              |              | criterion    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| Ma57PivotThr | OT_REAL      | worhp_p.Ma57 | Pivoting     | CasADi::Worh |
-| esh          |              | PivotThresh  | tolerance    | pInternal    |
+| Ma57PivotThr | OT_REAL      | 0.000        | Pivoting     | CasADi::Worh |
+| esh          |              |              | tolerance    | pInternal    |
 |              |              |              | for MA57 =   |              |
 |              |              |              | CNTL(1)      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| MatrixCC     | OT_BOOLEAN   | worhp_p.Matr | Not to be    | CasADi::Worh |
-|              |              | ixCC         | included     | pInternal    |
+| MatrixCC     | OT_BOOLEAN   | False        | Not to be    | CasADi::Worh |
+|              |              |              | included     | pInternal    |
 |              |              |              | into a       |              |
 |              |              |              | parameter    |              |
 |              |              |              | file!        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| MaxCalls     | OT_INTEGER   | worhp_p.MaxC | Upper bound  | CasADi::Worh |
-|              |              | alls         | to Reverse C | pInternal    |
+| MaxCalls     | OT_INTEGER   | 2.147e+09    | Upper bound  | CasADi::Worh |
+|              |              |              | to Reverse C | pInternal    |
 |              |              |              | ommunication |              |
 |              |              |              | calls        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| MaxForce     | OT_INTEGER   | worhp_p.MaxF | Maximum      | CasADi::Worh |
-|              |              | orce         | number of    | pInternal    |
+| MaxForce     | OT_INTEGER   | 1000         | Maximum      | CasADi::Worh |
+|              |              |              | number of    | pInternal    |
 |              |              |              | Force        |              |
 |              |              |              | recovery     |              |
 |              |              |              | strategy     |              |
 |              |              |              | steps        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| MaxGPart     | OT_INTEGER   | worhp_p.MaxG | (experimenta | CasADi::Worh |
-|              |              | Part         | l)           | pInternal    |
+| MaxGPart     | OT_INTEGER   | 1            | (experimenta | CasADi::Worh |
+|              |              |              | l)           | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| MaxIter      | OT_INTEGER   | worhp_p.MaxI | Upper bound  | CasADi::Worh |
-|              |              | ter          | on major     | pInternal    |
+| MaxIter      | OT_INTEGER   | 500          | Upper bound  | CasADi::Worh |
+|              |              |              | on major     | pInternal    |
 |              |              |              | iterations   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| MaxLScounter | OT_INTEGER   | worhp_p.MaxL | Control      | CasADi::Worh |
-|              |              | Scounter     | activation   | pInternal    |
+| MaxLScounter | OT_INTEGER   | 3            | Control      | CasADi::Worh |
+|              |              |              | activation   | pInternal    |
 |              |              |              | of Filter    |              |
 |              |              |              | acceleration |              |
 |              |              |              | heuristics   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| MaxNorm      | OT_BOOLEAN   | worhp_p.MaxN | Select max-  | CasADi::Worh |
-|              |              | orm          | norm instead | pInternal    |
+| MaxNorm      | OT_BOOLEAN   | True         | Select max-  | CasADi::Worh |
+|              |              |              | norm instead | pInternal    |
 |              |              |              | of 1-norm in |              |
 |              |              |              | Filter       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| MeritFunctio | OT_INTEGER   | worhp_p.Meri | Select merit | CasADi::Worh |
-| n            |              | tFunction    | function and | pInternal    |
+| MeritFunctio | OT_INTEGER   | 4            | Select merit | CasADi::Worh |
+| n            |              |              | function and | pInternal    |
 |              |              |              | penalty      |              |
 |              |              |              | update [0,   |              |
 |              |              |              | 3..5]        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| MeritGradTol | OT_REAL      | worhp_p.Meri | Threshold of | CasADi::Worh |
-|              |              | tGradTol     | meritfunctio | pInternal    |
+| MeritGradTol | OT_REAL      | 0.000        | Threshold of | CasADi::Worh |
+|              |              |              | meritfunctio | pInternal    |
 |              |              |              | n gradient   |              |
 |              |              |              | for          |              |
 |              |              |              | increasing   |              |
 |              |              |              | Hessian regu |              |
 |              |              |              | larisation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| MinBettsTau  | OT_REAL      | worhp_p.MinB | Lower bound  | CasADi::Worh |
-|              |              | ettsTau      | for Betts'   | pInternal    |
+| MinBettsTau  | OT_REAL      | 0.000        | Lower bound  | CasADi::Worh |
+|              |              |              | for Betts'   | pInternal    |
 |              |              |              | update       |              |
 |              |              |              | dampening    |              |
 |              |              |              | term         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| MoreRelax    | OT_BOOLEAN   | worhp_p.More | Introduce    | CasADi::Worh |
-|              |              | Relax        | one          | pInternal    |
+| MoreRelax    | OT_BOOLEAN   | False        | Introduce    | CasADi::Worh |
+|              |              |              | one          | pInternal    |
 |              |              |              | relaxation   |              |
 |              |              |              | variable for |              |
 |              |              |              | every        |              |
 |              |              |              | constraint   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| NLPmethod    | OT_INTEGER   | worhp_p.NLPm | Select (1) M | CasADi::Worh |
-|              |              | ethod        | eritfunction | pInternal    |
+| NLPmethod    | OT_INTEGER   | 1            | Select (1) M | CasADi::Worh |
+|              |              |              | eritfunction | pInternal    |
 |              |              |              | or (3)       |              |
 |              |              |              | Filter globa |              |
 |              |              |              | lisation     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| NLPprint     | OT_INTEGER   | worhp_p.NLPp | NLP print    | CasADi::Worh |
-|              |              | rint         | level        | pInternal    |
+| NLPprint     | OT_INTEGER   | 2            | NLP print    | CasADi::Worh |
+|              |              |              | level        | pInternal    |
 |              |              |              | [-1..4]      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| PairMethod   | OT_INTEGER   | worhp_p.Pair | Select       | CasADi::Worh |
-|              |              | Method       | method to    | pInternal    |
+| PairMethod   | OT_INTEGER   | 1            | Select       | CasADi::Worh |
+|              |              |              | method to    | pInternal    |
 |              |              |              | determine    |              |
 |              |              |              | graph        |              |
 |              |              |              | colouring    |              |
 |              |              |              | pairgroups   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| PenUpdEpsBar | OT_REAL      | worhp_p.PenU | Penalty      | CasADi::Worh |
-|              |              | pdEpsBar     | update       | pInternal    |
+| PenUpdEpsBar | OT_REAL      | 0.900        | Penalty      | CasADi::Worh |
+|              |              |              | update       | pInternal    |
 |              |              |              | parameter    |              |
 |              |              |              | factor for M |              |
 |              |              |              | eritFunction |              |
 |              |              |              | = 3          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| PenUpdEpsKFa | OT_REAL      | worhp_p.PenU | Penalty      | CasADi::Worh |
-| c            |              | pdEpsKFac    | update       | pInternal    |
+| PenUpdEpsKFa | OT_REAL      | 2            | Penalty      | CasADi::Worh |
+| c            |              |              | update       | pInternal    |
 |              |              |              | parameter    |              |
 |              |              |              | factor for M |              |
 |              |              |              | eritFunction |              |
 |              |              |              | = 4          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| PenUpdEpsKSe | OT_INTEGER   | worhp_p.PenU | Penalty      | CasADi::Worh |
-| quence       |              | pdEpsKSequen | update       | pInternal    |
-|              |              | ce           | parameter    |              |
+| PenUpdEpsKSe | OT_INTEGER   | 2            | Penalty      | CasADi::Worh |
+| quence       |              |              | update       | pInternal    |
+|              |              |              | parameter    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| PenUpdMaxDel | OT_REAL      | worhp_p.PenU | Max penalty  | CasADi::Worh |
-| taK          |              | pdMaxDeltaK  | for MeritFun | pInternal    |
+| PenUpdMaxDel | OT_REAL      | 11           | Max penalty  | CasADi::Worh |
+| taK          |              |              | for MeritFun | pInternal    |
 |              |              |              | ction = 4    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| PenUpdMaxFac | OT_REAL      | worhp_p.PenU | Max factor   | CasADi::Worh |
-|              |              | pdMaxFac     | for          | pInternal    |
+| PenUpdMaxFac | OT_REAL      | 100000000    | Max factor   | CasADi::Worh |
+|              |              |              | for          | pInternal    |
 |              |              |              | increasing   |              |
 |              |              |              | penalty for  |              |
 |              |              |              | MeritFunctio |              |
 |              |              |              | n = 4        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| PenUpdRBar   | OT_REAL      | worhp_p.PenU | Penalty      | CasADi::Worh |
-|              |              | pdRBar       | update       | pInternal    |
+| PenUpdRBar   | OT_REAL      | 2            | Penalty      | CasADi::Worh |
+|              |              |              | update       | pInternal    |
 |              |              |              | parameter    |              |
 |              |              |              | for MeritFun |              |
 |              |              |              | ction = 3    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| PrecisionF   | OT_REAL      | worhp_p.Prec | (currently   | CasADi::Worh |
-|              |              | isionF       | unused)      | pInternal    |
+| PrecisionF   | OT_REAL      | 0.000        | (currently   | CasADi::Worh |
+|              |              |              | unused)      | pInternal    |
 |              |              |              | Relative     |              |
 |              |              |              | precision of |              |
 |              |              |              | objective    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| PrecisionG   | OT_REAL      | worhp_p.Prec | (currently   | CasADi::Worh |
-|              |              | isionG       | unused)      | pInternal    |
+| PrecisionG   | OT_REAL      | 0.000        | (currently   | CasADi::Worh |
+|              |              |              | unused)      | pInternal    |
 |              |              |              | Relative     |              |
 |              |              |              | precision of |              |
 |              |              |              | constraints  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| QPscaleParam | OT_REAL      | worhp_p.QPsc | (currently   | CasADi::Worh |
-|              |              | aleParam     | unused)      | pInternal    |
+| QPscaleParam | OT_REAL      | 0            | (currently   | CasADi::Worh |
+|              |              |              | unused)      | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| QuadraticPro | OT_BOOLEAN   | worhp_p.Quad | Not to be    | CasADi::Worh |
-| blem         |              | raticProblem | included     | pInternal    |
+| QuadraticPro | OT_BOOLEAN   | False        | Not to be    | CasADi::Worh |
+| blem         |              |              | included     | pInternal    |
 |              |              |              | into a       |              |
 |              |              |              | parameter    |              |
 |              |              |              | file!        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ReduceBettsT | OT_REAL      | worhp_p.Redu | Decrease     | CasADi::Worh |
-| au           |              | ceBettsTau   | factor for   | pInternal    |
+| ReduceBettsT | OT_REAL      | 0.300        | Decrease     | CasADi::Worh |
+| au           |              |              | factor for   | pInternal    |
 |              |              |              | Betts'       |              |
 |              |              |              | update       |              |
 |              |              |              | dampening    |              |
 |              |              |              | term         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| RegStrategy  | OT_INTEGER   | worhp_p.RegS | Select       | CasADi::Worh |
-|              |              | trategy      | Hessian regu | pInternal    |
+| RegStrategy  | OT_INTEGER   | 1            | Select       | CasADi::Worh |
+|              |              |              | Hessian regu | pInternal    |
 |              |              |              | larisation   |              |
 |              |              |              | strategy in  |              |
 |              |              |              | Filter       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ReinitFilter | OT_BOOLEAN   | worhp_p.Rein | Enables      | CasADi::Worh |
-|              |              | itFilter     | Filter-reini | pInternal    |
+| ReinitFilter | OT_BOOLEAN   | False        | Enables      | CasADi::Worh |
+|              |              |              | Filter-reini | pInternal    |
 |              |              |              | tialisation  |              |
 |              |              |              | accelerating |              |
 |              |              |              | heuristic    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| RelaxMaxDelt | OT_REAL      | worhp_p.Rela | Upper bound  | CasADi::Worh |
-| a            |              | xMaxDelta    | for          | pInternal    |
+| RelaxMaxDelt | OT_REAL      | 0.920        | Upper bound  | CasADi::Worh |
+| a            |              |              | for          | pInternal    |
 |              |              |              | accepting    |              |
 |              |              |              | the          |              |
 |              |              |              | constraint   |              |
 |              |              |              | relaxation   |              |
 |              |              |              | variable     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| RelaxMaxPen  | OT_REAL      | worhp_p.Rela | Upper bound  | CasADi::Worh |
-|              |              | xMaxPen      | on the       | pInternal    |
+| RelaxMaxPen  | OT_REAL      | 50000000     | Upper bound  | CasADi::Worh |
+|              |              |              | on the       | pInternal    |
 |              |              |              | constraint   |              |
 |              |              |              | relaxation   |              |
 |              |              |              | penalty      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| RelaxRho     | OT_REAL      | worhp_p.Rela | Update       | CasADi::Worh |
-|              |              | xRho         | factor for   | pInternal    |
+| RelaxRho     | OT_REAL      | 6            | Update       | CasADi::Worh |
+|              |              |              | factor for   | pInternal    |
 |              |              |              | the          |              |
 |              |              |              | constraint   |              |
 |              |              |              | relaxation   |              |
 |              |              |              | penalty      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| RelaxStart   | OT_REAL      | worhp_p.Rela | Initial      | CasADi::Worh |
-|              |              | xStart       | value of the | pInternal    |
+| RelaxStart   | OT_REAL      | 1            | Initial      | CasADi::Worh |
+|              |              |              | value of the | pInternal    |
 |              |              |              | constraint   |              |
 |              |              |              | relaxation   |              |
 |              |              |              | penalty      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| RestUntilFea | OT_BOOLEAN   | worhp_p.Rest | Do           | CasADi::Worh |
-| s            |              | UntilFeas    | restoration  | pInternal    |
+| RestUntilFea | OT_BOOLEAN   | False        | Do           | CasADi::Worh |
+| s            |              |              | restoration  | pInternal    |
 |              |              |              | until a      |              |
 |              |              |              | feasible     |              |
 |              |              |              | solution is  |              |
 |              |              |              | found        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ScaleConIter | OT_BOOLEAN   | worhp_p.Scal | Scale        | CasADi::Worh |
-|              |              | eConIter     | constraints  | pInternal    |
+| ScaleConIter | OT_BOOLEAN   | False        | Scale        | CasADi::Worh |
+|              |              |              | constraints  | pInternal    |
 |              |              |              | in every     |              |
 |              |              |              | iteration    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ScaleFacObj  | OT_REAL      | worhp_p.Scal | Value to     | CasADi::Worh |
-|              |              | eFacObj      | scale large  | pInternal    |
+| ScaleFacObj  | OT_REAL      | 10           | Value to     | CasADi::Worh |
+|              |              |              | scale large  | pInternal    |
 |              |              |              | objective    |              |
 |              |              |              | functions to |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ScaleFacQP   | OT_REAL      | worhp_p.Scal | Upper bound  | CasADi::Worh |
-|              |              | eFacQP       | on resulting | pInternal    |
+| ScaleFacQP   | OT_REAL      | 10           | Upper bound  | CasADi::Worh |
+|              |              |              | on resulting | pInternal    |
 |              |              |              | matrix norm  |              |
 |              |              |              | for QP       |              |
 |              |              |              | scaling      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ScaledFD     | OT_BOOLEAN   | worhp_p.Scal | Use a scaled | CasADi::Worh |
-|              |              | edFD         | perturbation | pInternal    |
+| ScaledFD     | OT_BOOLEAN   | True         | Use a scaled | CasADi::Worh |
+|              |              |              | perturbation | pInternal    |
 |              |              |              | for finite   |              |
 |              |              |              | differences  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ScaledKKT    | OT_BOOLEAN   | worhp_p.Scal | Scale KKT    | CasADi::Worh |
-|              |              | edKKT        | conditions   | pInternal    |
+| ScaledKKT    | OT_BOOLEAN   | True         | Scale KKT    | CasADi::Worh |
+|              |              |              | conditions   | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| ScaledObj    | OT_BOOLEAN   | worhp_p.Scal | Scale the    | CasADi::Worh |
-|              |              | edObj        | objective    | pInternal    |
+| ScaledObj    | OT_BOOLEAN   | True         | Scale the    | CasADi::Worh |
+|              |              |              | objective    | pInternal    |
 |              |              |              | function     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ScaledQP     | OT_BOOLEAN   | worhp_p.Scal | Scale some   | CasADi::Worh |
-|              |              | edQP         | matrices     | pInternal    |
+| ScaledQP     | OT_BOOLEAN   | True         | Scale some   | CasADi::Worh |
+|              |              |              | matrices     | pInternal    |
 |              |              |              | handed to    |              |
 |              |              |              | the QP       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| StartBettsTa | OT_REAL      | worhp_p.Star | Initial      | CasADi::Worh |
-| u            |              | tBettsTau    | value for    | pInternal    |
+| StartBettsTa | OT_REAL      | 0.100        | Initial      | CasADi::Worh |
+| u            |              |              | value for    | pInternal    |
 |              |              |              | Betts'       |              |
 |              |              |              | update       |              |
 |              |              |              | dampening    |              |
 |              |              |              | term         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| SwitchingDel | OT_REAL      | worhp_p.Swit | Filter       | CasADi::Worh |
-| ta           |              | chingDelta   | switching    | pInternal    |
+| SwitchingDel | OT_REAL      | 0.010        | Filter       | CasADi::Worh |
+| ta           |              |              | switching    | pInternal    |
 |              |              |              | condition    |              |
 |              |              |              | parameter    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| SwitchingSCV | OT_REAL      | worhp_p.Swit | Filter       | CasADi::Worh |
-|              |              | chingSCV     | switching    | pInternal    |
+| SwitchingSCV | OT_REAL      | 1.100        | Filter       | CasADi::Worh |
+|              |              |              | switching    | pInternal    |
 |              |              |              | condition    |              |
 |              |              |              | parameter    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| SwitchingSF  | OT_REAL      | worhp_p.Swit | Filter       | CasADi::Worh |
-|              |              | chingSF      | switching    | pInternal    |
+| SwitchingSF  | OT_REAL      | 2.300        | Filter       | CasADi::Worh |
+|              |              |              | switching    | pInternal    |
 |              |              |              | condition    |              |
 |              |              |              | parameter    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| TakeQPSol    | OT_BOOLEAN   | worhp_p.Take | Evaluate QP  | CasADi::Worh |
-|              |              | QPSol        | search       | pInternal    |
+| TakeQPSol    | OT_BOOLEAN   | False        | Evaluate QP  | CasADi::Worh |
+|              |              |              | search       | pInternal    |
 |              |              |              | direction    |              |
 |              |              |              | regardless   |              |
 |              |              |              | of           |              |
 |              |              |              | convergence  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| Timeout      | OT_REAL      | worhp_p.Time | Timeout in   | CasADi::Worh |
-|              |              | out          | seconds      | pInternal    |
+| Timeout      | OT_REAL      | 300          | Timeout in   | CasADi::Worh |
+|              |              |              | seconds      | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| TolComp      | OT_REAL      | worhp_p.TolC | Complementar | CasADi::Worh |
-|              |              | omp          | ity          | pInternal    |
+| TolComp      | OT_REAL      | 0.001        | Complementar | CasADi::Worh |
+|              |              |              | ity          | pInternal    |
 |              |              |              | tolerance    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| TolFeas      | OT_REAL      | worhp_p.TolF | Feasibility  | CasADi::Worh |
-|              |              | eas          | tolerance    | pInternal    |
+| TolFeas      | OT_REAL      | 0.000        | Feasibility  | CasADi::Worh |
+|              |              |              | tolerance    | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| TolOpti      | OT_REAL      | worhp_p.TolO | Optimality   | CasADi::Worh |
-|              |              | pti          | tolerance    | pInternal    |
+| TolOpti      | OT_REAL      | 0.000        | Optimality   | CasADi::Worh |
+|              |              |              | tolerance    | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| TolWeakActiv | OT_REAL      | worhp_p.TolW | (experimenta | CasADi::Worh |
-| e            |              | eakActive    | l)           | pInternal    |
+| TolWeakActiv | OT_REAL      | 1            | (experimenta | CasADi::Worh |
+| e            |              |              | l)           | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| TooBig       | OT_BOOLEAN   | worhp_p.TooB | Enable too-  | CasADi::Worh |
-|              |              | ig           | big          | pInternal    |
+| TooBig       | OT_BOOLEAN   | True         | Enable too-  | CasADi::Worh |
+|              |              |              | big          | pInternal    |
 |              |              |              | termination  |              |
 |              |              |              | heuristics   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| TooBigCV     | OT_REAL      | worhp_p.TooB | Upper bound  | CasADi::Worh |
-|              |              | igCV         | on           | pInternal    |
+| TooBigCV     | OT_REAL      | 1.000e+25    | Upper bound  | CasADi::Worh |
+|              |              |              | on           | pInternal    |
 |              |              |              | constraint   |              |
 |              |              |              | violation    |              |
 |              |              |              | for too-big  |              |
 |              |              |              | heuristic    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| TooBigKKT    | OT_REAL      | worhp_p.TooB | Upper bound  | CasADi::Worh |
-|              |              | igKKT        | on KKT       | pInternal    |
+| TooBigKKT    | OT_REAL      | 1.000e+30    | Upper bound  | CasADi::Worh |
+|              |              |              | on KKT       | pInternal    |
 |              |              |              | values for   |              |
 |              |              |              | too-big      |              |
 |              |              |              | heuristic    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| UserDF       | OT_BOOLEAN   | worhp_p.User | Objective    | CasADi::Worh |
-|              |              | DF           | gradient     | pInternal    |
+| UserDF       | OT_BOOLEAN   | True         | Objective    | CasADi::Worh |
+|              |              |              | gradient     | pInternal    |
 |              |              |              | values       |              |
 |              |              |              | supplied by  |              |
 |              |              |              | caller       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| UserDG       | OT_BOOLEAN   | worhp_p.User | Jacobian     | CasADi::Worh |
-|              |              | DG           | values       | pInternal    |
+| UserDG       | OT_BOOLEAN   | True         | Jacobian     | CasADi::Worh |
+|              |              |              | values       | pInternal    |
 |              |              |              | supplied by  |              |
 |              |              |              | caller       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| UserHM       | OT_BOOLEAN   | worhp_p.User | Hessian      | CasADi::Worh |
-|              |              | HM           | values       | pInternal    |
+| UserHM       | OT_BOOLEAN   | False        | Hessian      | CasADi::Worh |
+|              |              |              | values       | pInternal    |
 |              |              |              | supplied by  |              |
 |              |              |              | caller       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| UserHMstruct | OT_INTEGER   | worhp_p.User | Enable       | CasADi::Worh |
-| ure          |              | HMstructure  | automatic    | pInternal    |
+| UserHMstruct | OT_INTEGER   | 2            | Enable       | CasADi::Worh |
+| ure          |              |              | automatic    | pInternal    |
 |              |              |              | Hessian      |              |
 |              |              |              | structure    |              |
 |              |              |              | generation   |              |
 |              |              |              | or checking  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| WeakActiveSe | OT_BOOLEAN   | worhp_p.Weak | (experimenta | CasADi::Worh |
-| t            |              | ActiveSet    | l)           | pInternal    |
+| WeakActiveSe | OT_BOOLEAN   | False        | (experimenta | CasADi::Worh |
+| t            |              |              | l)           | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
-|              |              |              | calculate    | ternal       |
+| ad_mode      | OT_STRING    | automatic    | How to       | CasADi::Worh |
+|              |              |              | calculate    | pInternal    |
 |              |              |              | the          |              |
 |              |              |              | Jacobians:   |              |
 |              |              |              | \"forward\"    |              |
@@ -72365,65 +71935,62 @@ number of constraints (A)
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| eps          | OT_REAL      | worhp_p.eps  | Machine      | CasADi::Worh |
+| eps          | OT_REAL      | 0.000        | Machine      | CasADi::Worh |
 |              |              |              | epsilon      | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
-|              |              |              | objective    | olverInterna |
-|              |              |              | function in  | l            |
+| expand_f     | OT_BOOLEAN   | False        | Expand the   | CasADi::Worh |
+|              |              |              | objective    | pInternal    |
+|              |              |              | function in  |              |
 |              |              |              | terms of     |              |
 |              |              |              | scalar       |              |
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_g     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
-|              |              |              | constraint   | olverInterna |
-|              |              |              | function in  | l            |
+| expand_g     | OT_BOOLEAN   | False        | Expand the   | CasADi::Worh |
+|              |              |              | constraint   | pInternal    |
+|              |              |              | function in  |              |
 |              |              |              | terms of     |              |
 |              |              |              | scalar       |              |
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
-| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
-|              |              |              | Newton       | olverInterna |
-|              |              |              | Hessian appr | l            |
+| gauss_newton | OT_BOOLEAN   | False        | Use Gauss    | CasADi::Worh |
+|              |              |              | Newton       | pInternal    |
+|              |              |              | Hessian appr |              |
 |              |              |              | oximation    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
-| sian         |              |              | exact        | olverInterna |
-|              |              |              | Hessian of   | l            |
+| generate_hes | OT_BOOLEAN   | False        | Generate an  | CasADi::Worh |
+| sian         |              |              | exact        | pInternal    |
+|              |              |              | Hessian of   |              |
 |              |              |              | the          |              |
 |              |              |              | Lagrangian   |              |
 |              |              |              | if not       |              |
 |              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
-| obian        |              |              | exact        | olverInterna |
-|              |              |              | Jacobian of  | l            |
+| generate_jac | OT_BOOLEAN   | True         | Generate an  | CasADi::Worh |
+| obian        |              |              | exact        | pInternal    |
+|              |              |              | Jacobian of  |              |
 |              |              |              | the          |              |
 |              |              |              | constraints  |              |
 |              |              |              | if not       |              |
 |              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
-| _vec         |              |              | true, the    | olverInterna |
-|              |              |              | input shape  | l            |
+| ignore_check | OT_BOOLEAN   | False        | If set to    | CasADi::Worh |
+| _vec         |              |              | true, the    | pInternal    |
+|              |              |              | input shape  |              |
 |              |              |              | of F will    |              |
 |              |              |              | not be       |              |
 |              |              |              | checked.     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| initialised  | OT_BOOLEAN   | worhp_p.init | Automaticall | CasADi::Worh |
-|              |              | ialised      | y added init | pInternal    |
+| initialised  | OT_BOOLEAN   | True         | Automaticall | CasADi::Worh |
+|              |              |              | y added init | pInternal    |
 |              |              |              | ialisation   |              |
 |              |              |              | flag.        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_FX        | FX()         | A function   | CasADi::NLPS |
-| llback       |              |              | that will be | olverInterna |
-|              |              |              | called at    | l            |
+| iteration_ca | OT_FX        |              | A function   | CasADi::Worh |
+| llback       |              |              | that will be | pInternal    |
+|              |              |              | called at    |              |
 |              |              |              | each         |              |
 |              |              |              | iteration.   |              |
 |              |              |              | Input scheme |              |
@@ -72435,29 +72002,29 @@ number of constraints (A)
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
-| llback_ignor |              |              | true, errors | olverInterna |
-| e_errors     |              |              | thrown by it | l            |
+| iteration_ca | OT_BOOLEAN   | False        | If set to    | CasADi::Worh |
+| llback_ignor |              |              | true, errors | pInternal    |
+| e_errors     |              |              | thrown by it |              |
 |              |              |              | eration_call |              |
 |              |              |              | back will be |              |
 |              |              |              | ignored.     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_INTEGER   | 1            | Only call    | CasADi::NLPS |
-| llback_step  |              |              | the callback | olverInterna |
-|              |              |              | function     | l            |
+| iteration_ca | OT_INTEGER   | 1            | Only call    | CasADi::Worh |
+| llback_step  |              |              | the callback | pInternal    |
+|              |              |              | function     |              |
 |              |              |              | every few    |              |
 |              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
+| jac_for_sens | OT_BOOLEAN   | False        | Create the a | CasADi::Worh |
+|              |              |              | Jacobian     | pInternal    |
 |              |              |              | function and |              |
 |              |              |              | use this to  |              |
 |              |              |              | calculate    |              |
 |              |              |              | forward sens |              |
 |              |              |              | itivities    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
-| erator       | ENERATOR     | )            | pointer that | ternal       |
+| jacobian_gen | OT_JACOBIANG |              | Function     | CasADi::Worh |
+| erator       | ENERATOR     |              | pointer that | pInternal    |
 |              |              |              | returns a    |              |
 |              |              |              | Jacobian     |              |
 |              |              |              | function     |              |
@@ -72469,35 +72036,28 @@ number of constraints (A)
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
-|              | TOR          | )            | be activated | ternal   Cas |
-|              |              |              | (inputs|outp | ADi::WorhpIn |
-|              |              |              | uts)  (eval_ | ternal       |
-|              |              |              | f|eval_g|eva |              |
-|              |              |              | l_jac_g|eval |              |
-|              |              |              | _grad_f|eval |              |
-|              |              |              | _h)          |              |
+| monitor      | OT_STRINGVEC |              | Monitors to  | CasADi::Worh |
+|              | TOR          |              | be activated | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
+| name         | OT_STRING    | unnamed_shar | n/a          | CasADi::Worh |
+|              |              | ed_object    |              | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
-| j_dir        |              |              | adjoint      | ternal       |
+| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::Worh |
+| j_dir        |              |              | adjoint      | pInternal    |
 |              |              |              | derivatives  |              |
 |              |              |              | to be        |              |
 |              |              |              | calculated s |              |
 |              |              |              | imultanously |              |
 +--------------+--------------+--------------+--------------+--------------+
-| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
-| d_dir        |              |              | forward      | ternal       |
+| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::Worh |
+| d_dir        |              |              | forward      | pInternal    |
 |              |              |              | derivatives  |              |
 |              |              |              | to be        |              |
 |              |              |              | calculated s |              |
 |              |              |              | imultanously |              |
 +--------------+--------------+--------------+--------------+--------------+
-| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
-| ian          |              |              | Hessians     | ternal       |
+| numeric_hess | OT_BOOLEAN   | False        | Calculate    | CasADi::Worh |
+| ian          |              |              | Hessians     | pInternal    |
 |              |              |              | numerically  |              |
 |              |              |              | (using       |              |
 |              |              |              | directional  |              |
@@ -72507,8 +72067,8 @@ number of constraints (A)
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
-| bian         |              |              | Jacobians    | ternal       |
+| numeric_jaco | OT_BOOLEAN   | False        | Calculate    | CasADi::Worh |
+| bian         |              |              | Jacobians    | pInternal    |
 |              |              |              | numerically  |              |
 |              |              |              | (using       |              |
 |              |              |              | directional  |              |
@@ -72518,9 +72078,9 @@ number of constraints (A)
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| parametric   | OT_BOOLEAN   | false        | Expect F, G, | CasADi::NLPS |
-|              |              |              | H, J to have | olverInterna |
-|              |              |              | an           | l            |
+| parametric   | OT_BOOLEAN   | False        | Expect F, G, | CasADi::Worh |
+|              |              |              | H, J to have | pInternal    |
+|              |              |              | an           |              |
 |              |              |              | additional   |              |
 |              |              |              | input        |              |
 |              |              |              | argument     |              |
@@ -72530,11 +72090,11 @@ number of constraints (A)
 |              |              |              | fixed        |              |
 |              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
-|              |              |              | sparse       | ternal       |
+| sparse       | OT_BOOLEAN   | True         | function is  | CasADi::Worh |
+|              |              |              | sparse       | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
-| erator       | ENERATOR     | )            | that         | ternal       |
+| sparsity_gen | OT_SPARSITYG |              | Function     | CasADi::Worh |
+| erator       | ENERATOR     |              | that         | pInternal    |
 |              |              |              | provides     |              |
 |              |              |              | sparsity for |              |
 |              |              |              | a given      |              |
@@ -72544,8 +72104,8 @@ number of constraints (A)
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
-| ans          |              |              | references   | ternal       |
+| store_jacobi | OT_BOOLEAN   | False        | keep         | CasADi::Worh |
+| ans          |              |              | references   | pInternal    |
 |              |              |              | to generated |              |
 |              |              |              | Jacobians in |              |
 |              |              |              | order to     |              |
@@ -72556,8 +72116,8 @@ number of constraints (A)
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
-|              |              | )            | defined      | ternal       |
+| user_data    | OT_UNKNOWN   |              | A user-      | CasADi::Worh |
+|              |              |              | defined      | pInternal    |
 |              |              |              | field that   |              |
 |              |              |              | can be used  |              |
 |              |              |              | to identify  |              |
@@ -72566,14 +72126,14 @@ number of constraints (A)
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
-|              |              |              | evaluation   | ternal       |
+| verbose      | OT_BOOLEAN   | False        | verbose      | CasADi::Worh |
+|              |              |              | evaluation   | pInternal    |
 |              |              |              | -- for       |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
-| _bounds      |              |              | initial      | olverInterna |
-|              |              |              | guess does   | l            |
+| warn_initial | OT_BOOLEAN   | False        | Warn if the  | CasADi::Worh |
+| _bounds      |              |              | initial      | pInternal    |
+|              |              |              | guess does   |              |
 |              |              |              | not satisfy  |              |
 |              |              |              | LBX and UBX  |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -72845,12 +72405,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::WorhpSolver::eval "
 
@@ -72860,12 +72417,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::WorhpSolver::eval "
 
@@ -72883,12 +72437,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::WorhpSolver::evalSX "
 
@@ -72902,12 +72453,9 @@ evaluation, the next two arguments are a set of forward directional seeds
 and the resulting forward directional derivatives, the length of the vector
 being the number of forward directions. The next two arguments are a set of
 adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The first
-boolean argument allows the second argument to the functions to be used as
-an input instead of output, assuming it is already known and the second
-boolean arguments allows constants to be eliminated during the evaluations
-(as the treatment of constants in CasADi will get more efficient, this will
-become unnecessary). ";
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
 
 %feature("docstring")  CasADi::WorhpSolver::derivative "
 
@@ -73000,13 +72548,14 @@ Get a single statistic obtained at the end of the last evaluate call. ";
 
 %feature("docstring")  CasADi::WorhpSolver::symbolicInput "
 
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
 
 %feature("docstring")  CasADi::WorhpSolver::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph. ";
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
 
 %feature("docstring")  CasADi::WorhpSolver::spCanEvaluate "
 
@@ -75025,12 +74574,6 @@ Example usage
 
 $ \\\\sin(b+a)+\\\\cos(b+a)(x-a)+\\\\cos(b+a)(y-b) $ $ y+x-(x^3+3y x^2+3 y^2
 x+y^3)/6 $ $ (-3 x^2 y-x^3)/6+y+x $ ";
-
-%feature("docstring")  CasADi::Interfaces::evaluateConstants "
-
-Eliminate constants Eliminate constants from an expression. This will make
-the graph of the expression smaller, meaning less operations need to be
-evaluated at runtime. At the same time, it degrate the cache utilization. ";
 
 %feature("docstring")  CasADi::Interfaces::countNodes "
 
