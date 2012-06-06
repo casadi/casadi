@@ -99,6 +99,12 @@ virtual void print(std::ostream &stream) const;
 /** \brief  print */
 virtual void print(std::ostream &stream, long& remaining_calls) const = 0;
 
+// Check if marked (i.e. temporary is negative)
+bool marked() const;
+    
+// Mark by flipping the sign of the temporary and decreasing by one
+void mark();
+
 /** Temporary variables to be used in user algorithms like sorting, 
  the user is resposible of making sure that use is thread-safe
  The variable is initialized to zero

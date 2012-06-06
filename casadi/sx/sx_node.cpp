@@ -118,5 +118,13 @@ void SXNode::print(std::ostream &stream) const{
   print(stream,remaining_calls);
 }
 
+bool SXNode::marked() const{
+  return temp<0;
+}
+    
+void SXNode::mark(){
+  temp = -temp-1;
+}
+
 
 } // namespace CasADi

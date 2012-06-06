@@ -241,6 +241,9 @@ void SXFunctionInternal::print(ostream &stream) const{
   }
   #endif // WITH_LLVM
   
+  // Iterator to free variables
+  vector<SX>::const_iterator p_it = free_vars_.begin();
+  
   // Normal, interpreted output
   for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
     int op = it->op;
@@ -258,6 +261,8 @@ void SXFunctionInternal::print(ostream &stream) const{
 
     if(op==OP_CONST){
       stream << it->arg.d;
+    } else if(op==OP_PARAMETER){
+      stream << *p_it++;
     } else {
       int ndep = casadi_math<double>::ndeps(op);
       casadi_math<double>::printPre(op,stream);
@@ -690,6 +695,20 @@ void SXFunctionInternal::init(){
     curr_assign.resize(worksize_,-1);
   }
   
+  // Mark all inputs
+  for(vector<SXMatrix>::iterator i=inputv_.begin(); i!=inputv_.end(); ++i){
+    for(vector<SX>::iterator j=i->begin(); j!=i->end(); ++j){
+      j->mark();
+    }
+  }
+  
+  // Allocate work vectors (symbolic/numeric)
+  work_.resize(worksize_,numeric_limits<double>::quiet_NaN());
+  s_work_.resize(worksize_);
+  
+  // Free varables
+  free_vars_.clear();
+  
   // Add the binary operations
   algorithm_.clear();
   algorithm_.reserve(binops_.size());
@@ -710,11 +729,29 @@ void SXFunctionInternal::init(){
       ae.res = place[n->temp];
       algorithm_.push_back(ae);
       
-    } else if(ae.op==OP_PARAMETER){
-      continue;     // Not implemented
-    
-    } else if(ae.op==OP_INPUT){
-      continue;     // Not implemented
+    } else if(ae.op==OP_PARAMETER){ // input or free parameter
+      if(n->marked()){ // Input have been marked
+
+        // Unmark node
+        n->mark();
+        
+        // Mark as input
+        ae.op=OP_INPUT;
+        
+        continue;     // Not implemented
+        
+      } else { // free parameter
+
+        // Create parameter expression
+        SX par = SX::create(*it);
+      
+        // Save to list of free parameters
+        free_vars_.push_back(par);
+        
+        // Save the parameter
+        ae.res = place[n->temp];
+        algorithm_.push_back(ae);
+      }
     
     } else if(ae.op==OP_OUTPUT){
       continue;     // Not implemented
@@ -862,22 +899,6 @@ void SXFunctionInternal::init(){
     algorithm_new.swap(algorithm_);
   }
 
-  // Indices corresponding to the inputs
-  input_ind_.resize(inputv_.size());
-  for(int i=0; i<inputv_.size(); ++i){
-    // References
-    const Matrix<SX>& ip = inputv_[i];
-
-    // Allocate space for the indices
-    vector<int>& ii = input_ind_[i];
-    ii.resize(ip.size());
-
-    // save the indices
-    for(int j=0; j<ip.size(); ++j){
-      ii[j] = place[ip.data()[j].get()->temp];
-    }
-  }
-
   // Indices corresponding to each non-zero outputs
   output_ind_.resize(output_.size());
   for(int i=0; i<outputv_.size(); ++i){
@@ -893,42 +914,26 @@ void SXFunctionInternal::init(){
       oi[j] = place[op.data()[j].get()->temp];
     }
   }
+  
+  // Indices corresponding to the inputs
+  input_ind_.resize(inputv_.size());
+  for(int i=0; i<inputv_.size(); ++i){
+    // References
+    Matrix<SX>& ip = inputv_[i];
 
-  // Allocate work vectors (symbolic/numeric)
-  work_.resize(worksize_,numeric_limits<double>::quiet_NaN());
-  s_work_.resize(worksize_);
+    // Allocate space for the indices
+    vector<int>& ii = input_ind_[i];
+    ii.resize(ip.size());
 
-  // Save the symbolic variables to the symbolic work vector
-  for(vector<SXNode*>::iterator it=snodes.begin(); it!=snodes.end(); ++it){
-    s_work_[place[(**it).temp]] = SX::create(*it);
+    // save the indices
+    for(int j=0; j<ip.size(); ++j){
+      ii[j] = place[ip.data()[j].get()->temp];
+    }
   }
 
   // Reset the temporary variables
   for(int i=0; i<nodes.size(); ++i){
     nodes[i]->temp = 0;
-  }
-
-
-  // Mark all the variables
-  for(vector<SXMatrix>::iterator i=inputv_.begin(); i!=inputv_.end(); ++i){
-    for(vector<SX>::iterator j=i->begin(); j!=i->end(); ++j){
-      j->setTemp(1);
-    }
-  }
-  
-  // Collect free varables
-  free_vars_.clear();
-  for(int el=0; el<snodes.size(); ++el){
-    if(!snodes[el]->temp){
-      free_vars_.push_back(SX::create(snodes[el]));
-    }
-  }
-
-  // Unmark variables
-  for(vector<SXMatrix>::iterator i=inputv_.begin(); i!=inputv_.end(); ++i){
-    for(vector<SX>::iterator j=i->begin(); j!=i->end(); ++j){
-      j->setTemp(0);
-    }
   }
 
   // Allocate memory for directional derivatives
@@ -942,6 +947,14 @@ void SXFunctionInternal::init(){
   // Initialize just-in-time compilation
   just_in_time_ = getOption("just_in_time");
   if(just_in_time_){
+    
+    // Make sure that there are no parameters
+    if (!free_vars_.empty()) {
+      std::stringstream ss;
+      repr(ss);
+      casadi_error("Cannot just-in-time compile \"" << ss.str() << "\" since variables " << free_vars_ << " are free.");
+    }
+    
     #ifdef WITH_LLVM
     llvm::InitializeNativeTarget();
 
@@ -1265,6 +1278,9 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
   // Iterator to stack of constants
   vector<SX>::const_iterator c_it = constants_.begin();
 
+  // Iterator to free variables
+  vector<SX>::const_iterator p_it = free_vars_.begin();
+  
   // Tape
   std::vector<TapeEl<SX> > s_pdwork;
 
@@ -1273,7 +1289,7 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
     for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it<algorithm_.end(); ++it){
       if(output_given){
         // Assign to the symbolic work vector
-        s_work_[it->res] = *b_it++;
+        s_work_[it->res] = it->op == OP_CONST ? c_it != constants_.end() ? *c_it++ : SX(it->arg.d) : it->op==OP_PARAMETER ? *p_it++ : *b_it++;
       } else {
         // Get the arguments
         switch(it->op){
@@ -1282,6 +1298,9 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
 
           // Constant
           case OP_CONST: s_work_[it->res] = c_it != constants_.end() ? *c_it++ : SX(it->arg.d); break;
+
+          // Parameter
+          case OP_PARAMETER: s_work_[it->res] = *p_it++; break;
         }
       }
     }
@@ -1291,13 +1310,14 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
     for(vector<AlgEl>::iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it, ++it1){
       if(output_given){
         // Assign to the symbolic work vector
-        SX f = it->op == OP_CONST ? c_it != constants_.end() ? *c_it++ : SX(it->arg.d) : *b_it++;
+        SX f = it->op == OP_CONST ? c_it != constants_.end() ? *c_it++ : SX(it->arg.d) : it->op==OP_PARAMETER ? *p_it++ : *b_it++;
         switch(it->op){
           // Start by adding all of the built operations
           CASADI_MATH_DER_BUILTIN(s_work_[it->arg.i[0]],s_work_[it->arg.i[1]],f,it1->d)
 
           // Constant
           case OP_CONST: 
+          case OP_PARAMETER:
             it1->d[0] = it1->d[1] = 0; 
             break;
         }
@@ -1310,6 +1330,12 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
           // Constant
           case OP_CONST: 
             s_work_[it->res] = c_it != constants_.end() ? *c_it++ : SX(it->arg.d); 
+            it1->d[0] = it1->d[1] = 0;
+            break;
+
+          // Parameter
+          case OP_PARAMETER: 
+            s_work_[it->res] = *p_it++;
             it1->d[0] = it1->d[1] = 0;
             break;
         }
@@ -1357,6 +1383,7 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
     for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it, ++it2){
       switch(it->op){
         case OP_CONST:
+        case OP_PARAMETER:
           break;
         CASADI_MATH_BINARY_BUILTIN // Binary operation
           s_dwork[it->res] = it2->d[0] * s_dwork[it->arg.i[0]] + it2->d[1] * s_dwork[it->arg.i[1]]; break;
@@ -1406,6 +1433,7 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
       s_dwork[it->res] = 0;
       switch(it->op){
         case OP_CONST:
+        case OP_PARAMETER:
           break;
         CASADI_MATH_BINARY_BUILTIN // Binary operation
           s_dwork[it->arg.i[1]] += it2->d[1] * seed; // fall-through
@@ -1478,9 +1506,6 @@ void SXFunctionInternal::spEvaluate(bool fwd){
   // Get work array
   bvec_t *iwork = get_bvec_t(dwork_);
 
-  // FIXME Workaround: the following will remove seeds added to parameters in a previous sweep
-  //   fill_n(iwork,dwork_.size(),0);
-
   if(fwd){ // Forward propagation
     
     // Pass input seeds
@@ -1495,6 +1520,7 @@ void SXFunctionInternal::spEvaluate(bool fwd){
     for(std::vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
       switch(it->op){
         case OP_CONST:
+        case OP_PARAMETER:
           iwork[it->res] = bvec_t(0); break;
         CASADI_MATH_BINARY_BUILTIN // Binary operation
           iwork[it->res] = iwork[it->arg.i[0]] | iwork[it->arg.i[1]]; break;
@@ -1510,12 +1536,7 @@ void SXFunctionInternal::spEvaluate(bool fwd){
         swork[k] = iwork[output_ind_[ind][k]];
       }
     }
-    
-    // FIXME Workaround: the following will remove seeds added to parameters for the next sweep
-//     for(std::vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-//       iwork[it->res] = bvec_t(0);
-//     }
-    
+        
   } else { // Backward propagation
 
     // Pass output seeds
@@ -1538,6 +1559,7 @@ void SXFunctionInternal::spEvaluate(bool fwd){
       // Propagate seeds
       switch(it->op){
         case OP_CONST:
+        case OP_PARAMETER:
           break; // Do nothing
         CASADI_MATH_BINARY_BUILTIN // Binary operation
           iwork[it->arg.i[1]] |= seed; // fall-through

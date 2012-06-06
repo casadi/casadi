@@ -696,6 +696,14 @@ void SX::setTemp(int t){
   (*this)->temp = t;
 }
 
+bool SX::marked() const{
+  return (*this)->marked();
+}
+    
+void SX::mark(){
+  (*this)->mark();
+}
+
 long SX::max_num_calls_in_print_ = 10000;
 
 void SX::setMaxNumCallsInPrint(long num){
