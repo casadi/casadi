@@ -3066,6 +3066,10 @@ MXNode) ";
 
 print ";
 
+%feature("docstring")  CasADi::BinarySX::marked "";
+
+%feature("docstring")  CasADi::BinarySX::mark "";
+
 
 // File: classCasADi_1_1CachedObject.xml
 %feature("docstring") CasADi::CachedObject "
@@ -7558,6 +7562,10 @@ Check if smooth. ";
 %feature("docstring")  CasADi::ConstantSX::print "
 
 print ";
+
+%feature("docstring")  CasADi::ConstantSX::marked "";
+
+%feature("docstring")  CasADi::ConstantSX::mark "";
 
 
 // File: classCasADi_1_1ControlSimulator.xml
@@ -14648,6 +14656,10 @@ MXNode) ";
 
 print ";
 
+%feature("docstring")  CasADi::EvaluationSX::marked "";
+
+%feature("docstring")  CasADi::EvaluationSX::mark "";
+
 
 // File: classCasADi_1_1ExternalFunction.xml
 %feature("docstring") CasADi::ExternalFunction "
@@ -20981,6 +20993,10 @@ MXNode) ";
 
 Check if smooth. ";
 
+%feature("docstring")  CasADi::InfSX::marked "";
+
+%feature("docstring")  CasADi::InfSX::mark "";
+
 
 // File: classCasADi_1_1IntegerSX.xml
 %feature("docstring") CasADi::IntegerSX "
@@ -21063,6 +21079,10 @@ MXNode) ";
 %feature("docstring")  CasADi::IntegerSX::isSmooth "
 
 Check if smooth. ";
+
+%feature("docstring")  CasADi::IntegerSX::marked "";
+
+%feature("docstring")  CasADi::IntegerSX::mark "";
 
 
 // File: classCasADi_1_1Integrator.xml
@@ -44479,6 +44499,10 @@ MXNode) ";
 
 Check if smooth. ";
 
+%feature("docstring")  CasADi::MinusInfSX::marked "";
+
+%feature("docstring")  CasADi::MinusInfSX::mark "";
+
 
 // File: classCasADi_1_1MinusOneSX.xml
 %feature("docstring") CasADi::MinusOneSX "
@@ -44561,6 +44585,10 @@ MXNode) ";
 %feature("docstring")  CasADi::MinusOneSX::isSmooth "
 
 Check if smooth. ";
+
+%feature("docstring")  CasADi::MinusOneSX::marked "";
+
+%feature("docstring")  CasADi::MinusOneSX::mark "";
 
 
 // File: classKINEMATICS_1_1ModelSimulator.xml
@@ -49121,6 +49149,10 @@ MXNode) ";
 
 Check if smooth. ";
 
+%feature("docstring")  CasADi::NanSX::marked "";
+
+%feature("docstring")  CasADi::NanSX::mark "";
+
 
 // File: classCasADi_1_1NLPSolver.xml
 %feature("docstring") CasADi::NLPSolver "
@@ -53451,6 +53483,10 @@ MXNode) ";
 
 Check if smooth. ";
 
+%feature("docstring")  CasADi::OneSX::marked "";
+
+%feature("docstring")  CasADi::OneSX::mark "";
+
 
 // File: classCasADi_1_1Interfaces_1_1OOQPInternal.xml
 %feature("docstring") CasADi::Interfaces::OOQPInternal "
@@ -55335,6 +55371,10 @@ MXNode) ";
 %feature("docstring")  CasADi::OutputSX::print "
 
 print ";
+
+%feature("docstring")  CasADi::OutputSX::marked "";
+
+%feature("docstring")  CasADi::OutputSX::mark "";
 
 
 // File: classCasADi_1_1Parallelizer.xml
@@ -59055,6 +59095,10 @@ MXNode) ";
 %feature("docstring")  CasADi::RealtypeSX::isSmooth "
 
 Check if smooth. ";
+
+%feature("docstring")  CasADi::RealtypeSX::marked "";
+
+%feature("docstring")  CasADi::RealtypeSX::mark "";
 
 
 // File: structCasADi_1_1ResEntry.xml
@@ -67032,6 +67076,10 @@ allow unambigous access. ";
 
 %feature("docstring")  CasADi::SX::setTemp "";
 
+%feature("docstring")  CasADi::SX::marked "";
+
+%feature("docstring")  CasADi::SX::mark "";
+
 %feature("docstring")  CasADi::SX::assignNoDelete "
 
 Assign the node to something, without invoking the deletion of the node, if
@@ -68387,6 +68435,10 @@ print ";
 
 print ";
 
+%feature("docstring")  CasADi::SXNode::marked "";
+
+%feature("docstring")  CasADi::SXNode::mark "";
+
 
 // File: classCasADi_1_1SymbolicMX.xml
 %feature("docstring") CasADi::SymbolicMX "
@@ -68945,6 +68997,10 @@ Check if smooth. ";
 
 print ";
 
+%feature("docstring")  CasADi::SymbolicSX::marked "";
+
+%feature("docstring")  CasADi::SymbolicSX::mark "";
+
 
 // File: structCasADi_1_1SXFunctionInternal_1_1TapeEl.xml
 %feature("docstring") CasADi::SXFunctionInternal::TapeEl "
@@ -69442,6 +69498,10 @@ MXNode) ";
 %feature("docstring")  CasADi::UnarySX::print "
 
 print ";
+
+%feature("docstring")  CasADi::UnarySX::marked "";
+
+%feature("docstring")  CasADi::UnarySX::mark "";
 
 
 // File: classCasADi_1_1Variable.xml
@@ -73277,6 +73337,10 @@ MXNode) ";
 %feature("docstring")  CasADi::ZeroSX::isSmooth "
 
 Check if smooth. ";
+
+%feature("docstring")  CasADi::ZeroSX::marked "";
+
+%feature("docstring")  CasADi::ZeroSX::mark "";
 
 
 // File: namespaceACADO.xml
