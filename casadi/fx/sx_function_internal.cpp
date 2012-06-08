@@ -128,7 +128,7 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   if(!taping) return;
 
   // Clear the seeds (not necessary if constants and parameters have zero value!)
-  if(nfdir>0) fill(dwork_.begin(),dwork_.end(),0);
+  if(nfdir>0) fill(work_.begin(),work_.end(),0);
   
   // Calculate forward sensitivities
   for(int dir=0; dir<nfdir; ++dir){
@@ -136,19 +136,19 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
     for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it, ++it2){
       switch(it->op){
         case OP_CONST:
-          dwork_[it->res] = 0; break;
+          work_[it->res] = 0; break;
         case OP_INPUT: 
-          dwork_[it->res] = fwdSeed<false>(it->arg.i[0],dir).data()[it->arg.i[1]]; break;
+          work_[it->res] = fwdSeed<false>(it->arg.i[0],dir).data()[it->arg.i[1]]; break;
         case OP_OUTPUT: 
-          fwdSens<false>(it->res,dir).data()[it->arg.i[1]] = dwork_[it->arg.i[0]]; break;
+          fwdSens<false>(it->res,dir).data()[it->arg.i[1]] = work_[it->arg.i[0]]; break;
         default: // Unary or binary operation
-          dwork_[it->res] = it2->d[0] * dwork_[it->arg.i[0]] + it2->d[1] * dwork_[it->arg.i[1]];  break;
+          work_[it->res] = it2->d[0] * work_[it->arg.i[0]] + it2->d[1] * work_[it->arg.i[1]];  break;
       }
     }
   }
   
   // Clear the seeds
-  if(nadir>0) fill(dwork_.begin(),dwork_.end(),0);
+  if(nadir>0) fill(work_.begin(),work_.end(),0);
   
   // Calculate adjoint sensitivities
   for(int dir=0; dir<nadir; ++dir){
@@ -157,20 +157,20 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
       double seed;
       switch(it->op){
         case OP_CONST:
-          dwork_[it->res] = 0;
+          work_[it->res] = 0;
           break;
         case OP_INPUT:
-          adjSens<false>(it->arg.i[0],dir).data()[it->arg.i[1]] = dwork_[it->res];
-          dwork_[it->res] = 0;
+          adjSens<false>(it->arg.i[0],dir).data()[it->arg.i[1]] = work_[it->res];
+          work_[it->res] = 0;
           break;
         case OP_OUTPUT:
-          dwork_[it->arg.i[0]] += adjSeed<false>(it->res,dir).data()[it->arg.i[1]];
+          work_[it->arg.i[0]] += adjSeed<false>(it->res,dir).data()[it->arg.i[1]];
           break;
         default: // Unary or binary operation
-          seed = dwork_[it->res];
-          dwork_[it->res] = 0;
-          dwork_[it->arg.i[0]] += it2->d[0] * seed;
-          dwork_[it->arg.i[1]] += it2->d[1] * seed;
+          seed = work_[it->res];
+          work_[it->res] = 0;
+          work_[it->arg.i[0]] += it2->d[0] * seed;
+          work_[it->arg.i[1]] += it2->d[1] * seed;
       }
     }
   }
@@ -384,7 +384,7 @@ void SXFunctionInternal::generateCode(const string& src_name){
   cfile << "int evaluate(const double** x, double** r){" << endl;
 
   // Which variables have been declared
-  vector<bool> declared(dwork_.size(),false);
+  vector<bool> declared(work_.size(),false);
   
   // Place in the algorithm for each binary node
   vector<int> place(binops_.size());
@@ -1156,11 +1156,6 @@ void SXFunctionInternal::init(){
 void SXFunctionInternal::updateNumSens(bool recursive){
   // Call the base class if needed
   if(recursive) XFunctionInternal<SXFunctionInternal,Matrix<SX>,SXNode>::updateNumSens(recursive);
-  
-  // Allocate a working array
-  if(nfdir_>0 || nadir_>0){
-    dwork_.resize(worksize_,numeric_limits<double>::quiet_NaN());
-  }
 }
 
 FX SXFunctionInternal::hessian(int iind, int oind){
@@ -1355,17 +1350,14 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
   // Quick return if no sensitivities
   if(!taping) return;
 
-  // Symbolic working vector (reuse s_work_?)
-  vector<SX> s_dwork(s_work_.size());
-  
   // Clear the seeds (do once instead of for every direction?)
-  // if(nfdir>0) fill(s_dwork.begin(),s_dwork.end(),0);
+  // if(nfdir>0) fill(s_work_.begin(),s_work_.end(),0);
   
   // Loop over all forward directions
   for(int dir=0; dir<nfdir; ++dir){
 
     // Clear the seeds (needed?)
-    fill(s_dwork.begin(),s_dwork.end(),0);
+    fill(s_work_.begin(),s_work_.end(),0);
     
     // Evaluate the algorithm for the sensitivities
     vector<TapeEl<SX> >::const_iterator it2 = s_pdwork.begin();
@@ -1375,25 +1367,25 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
         case OP_PARAMETER:
           break;
         case OP_INPUT:
-          s_dwork[it->res] = fwdSeed[dir][it->arg.i[0]].data()[it->arg.i[1]]; break;
+          s_work_[it->res] = fwdSeed[dir][it->arg.i[0]].data()[it->arg.i[1]]; break;
         case OP_OUTPUT:
-          fwdSens[dir][it->res].data()[it->arg.i[1]] = s_dwork[it->arg.i[0]]; break;
+          fwdSens[dir][it->res].data()[it->arg.i[1]] = s_work_[it->arg.i[0]]; break;
         CASADI_MATH_BINARY_BUILTIN // Binary operation
-          s_dwork[it->res] = it2->d[0] * s_dwork[it->arg.i[0]] + it2->d[1] * s_dwork[it->arg.i[1]]; break;
+          s_work_[it->res] = it2->d[0] * s_work_[it->arg.i[0]] + it2->d[1] * s_work_[it->arg.i[1]]; break;
         default: // Unary operation
-          s_dwork[it->res] = it2->d[0] * s_dwork[it->arg.i[0]];
+          s_work_[it->res] = it2->d[0] * s_work_[it->arg.i[0]];
       }
     }
   }
 
   // Clear the seeds (do once instead of for every direction?)
-  // if(nadir>0) fill(s_dwork.begin(),s_dwork.end(),0);
+  // if(nadir>0) fill(s_work_.begin(),s_work_.end(),0);
   
   // Loop over all adjoint directions
   for(int dir=0; dir<nadir; ++dir){
     
     // Clear the seeds (needed?)
-    fill(s_dwork.begin(),s_dwork.end(),0);
+    fill(s_work_.begin(),s_work_.end(),0);
     
     vector<TapeEl<SX> >::const_reverse_iterator it2 = s_pdwork.rbegin();
     for(vector<AlgEl>::const_reverse_iterator it = algorithm_.rbegin(); it!=algorithm_.rend(); ++it, ++it2){
@@ -1401,20 +1393,20 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
       switch(it->op){
         case OP_CONST:
         case OP_PARAMETER:
-          s_dwork[it->res] = 0;
+          s_work_[it->res] = 0;
           break;
         case OP_INPUT:
-          adjSens[dir][it->arg.i[0]].data()[it->arg.i[1]] = s_dwork[it->res];
-          s_dwork[it->res] = 0;
+          adjSens[dir][it->arg.i[0]].data()[it->arg.i[1]] = s_work_[it->res];
+          s_work_[it->res] = 0;
           break;
         case OP_OUTPUT:
-          s_dwork[it->arg.i[0]] += adjSeed[dir][it->res].data()[it->arg.i[1]];
+          s_work_[it->arg.i[0]] += adjSeed[dir][it->res].data()[it->arg.i[1]];
           break;
         default: // Unary or binary operation
-          seed = s_dwork[it->res];
-          s_dwork[it->res] = 0;
-          s_dwork[it->arg.i[0]] += it2->d[0] * seed;
-          s_dwork[it->arg.i[1]] += it2->d[1] * seed;
+          seed = s_work_[it->res];
+          s_work_[it->res] = 0;
+          s_work_[it->arg.i[0]] += it2->d[0] * seed;
+          s_work_[it->arg.i[1]] += it2->d[1] * seed;
       }
     }
   }
@@ -1456,18 +1448,15 @@ FX SXFunctionInternal::jacobian(const vector<pair<int,int> >& jblocks){
 }
 
 void SXFunctionInternal::spInit(bool fwd){
-  // Make sure that dwork_, which we will now use, has been allocated
-  if(dwork_.size() < worksize_) dwork_.resize(worksize_);
-  
   // We need a work array containing unsigned long rather than doubles. Since the two datatypes have the same size (64 bits)
   // we can save overhead by reusing the double array
-  bvec_t *iwork = get_bvec_t(dwork_);
-  fill_n(iwork,dwork_.size(),0);
+  bvec_t *iwork = get_bvec_t(work_);
+  fill_n(iwork,work_.size(),0);
 }
 
 void SXFunctionInternal::spEvaluate(bool fwd){
   // Get work array
-  bvec_t *iwork = get_bvec_t(dwork_);
+  bvec_t *iwork = get_bvec_t(work_);
 
   if(fwd){
     // Propagate sparsity forward

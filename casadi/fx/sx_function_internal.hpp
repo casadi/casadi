@@ -105,7 +105,6 @@ class SXFunctionInternal : public XFunctionInternal<SXFunctionInternal,Matrix<SX
 
   /** \brief  Working vector for numeric calculation */
   std::vector<double> work_;
-  std::vector<double> dwork_;
   std::vector<TapeEl<double> > pdwork_;
   int worksize_;
 
