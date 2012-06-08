@@ -533,57 +533,54 @@ void SXFunctionInternal::init(){
   // Place in the work vector for each of the nodes in the tree (overwrites the reference counter)
   vector<int> place(nodes.size());
   
-  if(live_variables){
-    // Stack with unused elements in the work vector
-    stack<int> unused;
+  // Stack with unused elements in the work vector
+  stack<int> unused;
+  
+  // Work vector size
+  int worksize = 0;
+  
+  // Find a place in the work vector for the operation
+  for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
     
-    // Work vector size
-    worksize_ = 0;
+    // Number of dependencies
+    int ndeps = casadi_math<double>::ndeps(it->op);
+  
+    // decrease reference count of children
+    for(int c=ndeps-1; c>=0; --c){ // reverse order so that the first argument will end up at the top of the stack
+      int ch_ind = it->arg.i[c];
+      int remaining = --refcount[ch_ind];
+      if(remaining==0) unused.push(place[ch_ind]);
+    }
     
-    // Find a place in the work vector for the operation
-    for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-      
-      // Number of dependencies
-      int ndeps = casadi_math<double>::ndeps(it->op);
-    
-      // decrease reference count of children
-      for(int c=ndeps-1; c>=0; --c){ // reverse order so that the first argument will end up at the top of the stack
-        int ch_ind = it->arg.i[c];
-        int remaining = --refcount[ch_ind];
-        if(remaining==0) unused.push(place[ch_ind]);
-      }
-      
-      // Find a place to store the variable
-      if(it->op!=OP_OUTPUT){
-        if(!unused.empty()){
-          // Try to reuse a variable from the stack if possible (last in, first out)
-          it->res = place[it->res] = unused.top();
-          unused.pop();
-        } else {
-          // Allocate a new variable
-          it->res = place[it->res] = worksize_++;
-        }
-      }
-      
-      // Save the location of the children
-      for(int c=0; c<ndeps; ++c){
-        it->arg.i[c] = place[it->arg.i[c]];
+    // Find a place to store the variable
+    if(it->op!=OP_OUTPUT){
+      if(live_variables && !unused.empty()){
+        // Try to reuse a variable from the stack if possible (last in, first out)
+        it->res = place[it->res] = unused.top();
+        unused.pop();
+      } else {
+        // Allocate a new variable
+        it->res = place[it->res] = worksize++;
       }
     }
     
-    if(verbose()){
-      cout << "Using live variables: work array is " <<  worksize_ << " instead of " << nodes.size() << endl;
+    // Save the location of the children
+    for(int c=0; c<ndeps; ++c){
+      it->arg.i[c] = place[it->arg.i[c]];
     }
-    
-  } else {
-    worksize_ = nodes.size();
-    for(int i=0; i<place.size(); ++i)
-      place[i] = i;
   }
   
+  if(verbose()){
+    if(live_variables){
+      cout << "Using live variables: work array is " <<  worksize << " instead of " << nodes.size() << endl;
+    } else {
+      cout << "Not using live variables" << endl;
+    }
+  }
+    
   // Allocate work vectors (symbolic/numeric)
-  work_.resize(worksize_,numeric_limits<double>::quiet_NaN());
-  s_work_.resize(worksize_);
+  work_.resize(worksize,numeric_limits<double>::quiet_NaN());
+  s_work_.resize(worksize);
   
     
   // Work vector for partial derivatives
