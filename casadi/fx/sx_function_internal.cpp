@@ -537,26 +537,18 @@ void SXFunctionInternal::init(){
   }
     
   // Sort the nodes by type
-  vector<SXNode*> bnodes, cnodes, snodes;
+  constants_.clear();
+  binops_.clear();
   for(vector<SXNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it){
     SXNode* t = *it;
     if(t){
       if(t->isConstant())
-        cnodes.push_back(t);
-      else if(t->isSymbolic())
-        snodes.push_back(t);
-      else
-        bnodes.push_back(t);
+        constants_.push_back(SX::create(t));
+      else if(!t->isSymbolic())
+        binops_.push_back(SX::create(t));
     }
   }
-
-  // Save the constants
-  constants_.clear();
-  constants_.reserve(cnodes.size());
-  for(vector<SXNode*>::iterator it = cnodes.begin(); it != cnodes.end(); ++it){
-    constants_.push_back(SX::create(*it));
-  }
-
+  
   // Use live variables?
   bool live_variables = getOption("live_variables");
 
@@ -566,84 +558,6 @@ void SXFunctionInternal::init(){
     casadi_warning("Inplace variables not available for the current version of CasADi.");
     evaluate_inplace_ = false;
   }
-
-  // Place in the work vector for each of the nodes in the tree
-  vector<int> place(nodes.size(),-1);
-  
-  if(live_variables){
-    // Count the number of times each node is used
-    vector<int> refcount(nodes.size(),0);
-    for(int i=0; i<bnodes.size(); ++i){
-      int ndep = bnodes[i]->ndep();
-      for(int c=0; c<ndep; ++c){
-        refcount[bnodes[i]->dep(c)->temp]++;
-      }
-    }
-    
-    // Add artificial count to the outputs to avoid them being overwritten // TODO: REMOVE THIS
-    for(int ind=0; ind<output_.size(); ++ind){
-      for(int el=0; el<outputv_[ind].size(); ++el){
-        refcount[outputv_[ind].at(el)->temp]++;
-      }
-    }
-
-
-    // Stack with unused elements in the work vector
-    stack<int> unused;
-
-    // Place the work vector
-    int p=0;
-
-    // Place the constants in the work vector
-    for(vector<SXNode*>::iterator it=cnodes.begin(); it!=cnodes.end(); ++it){
-      place[(**it).temp] = p++;
-    }
-
-    // Then all symbolic variables
-    for(vector<SXNode*>::iterator it=snodes.begin(); it!=snodes.end(); ++it){
-      place[(**it).temp] = p++;
-    }
-   
-    for(vector<SXNode*>::iterator it=bnodes.begin(); it!=bnodes.end(); ++it){
-      int i = (**it).temp;
-      
-      // decrease reference count of children
-      int ndep = (*it)->ndep();
-      for(int c=ndep-1; c>=0; --c){ // reverse order so that the first argument will end up at the top of the stack
-        int ch_ind = (*it)->dep(c)->temp;
-        int remaining = --refcount[ch_ind];
-        if(remaining==0) unused.push(place[ch_ind]);
-      }
-      
-      // Try to reuse a variable from the stack if possible
-      if(!unused.empty()){
-        place[i] = unused.top();
-        unused.pop();
-      } else {
-        place[i] = p++;
-      }
-    }
-        
-    if(verbose()){
-      cout << "Using live variables. Worksize is " << p << " instead of " << nodes.size() << "(" << bnodes.size() << " elementary operations)" << endl;
-    }
-    worksize_ = p;
-  } else {
-    worksize_ = nodes.size();
-    for(int i=0; i<place.size(); ++i)
-      place[i] = i;
-  }
-
-  // Allocate a vector containing expression corresponding to each binary operation
-  binops_.resize(bnodes.size());
-  for(int i=0; i<bnodes.size(); ++i){
-    binops_[i] = SX::create(bnodes[i]);
-  }
-  bnodes.clear();
-  
-  // Allocate work vectors (symbolic/numeric)
-  work_.resize(worksize_,numeric_limits<double>::quiet_NaN());
-  s_work_.resize(worksize_);
   
   // Input instructions
   vector<pair<int,SXNode*> > symb_loc;
@@ -655,6 +569,9 @@ void SXFunctionInternal::init(){
       break;
     }
   }
+  
+  // Count the number of times each node is used
+  vector<int> refcount(nodes.size(),0);
   
   // Add the binary operations
   algorithm_.clear();
@@ -669,56 +586,110 @@ void SXFunctionInternal::init(){
     // Get operation
     ae.op = n==0 ? OP_OUTPUT : n->getOp();
     
-    if(ae.op==OP_CONST){
-      // Constant
-      ae.arg.d = n->getValue();
-      ae.res = place[n->temp];
-      
-    } else if(ae.op==OP_PARAMETER){ 
-      // input or free parameter
-      symb_loc.push_back(make_pair(algorithm_.size(),n));
-      ae.res = place[n->temp];
-    
-    } else if(ae.op==OP_OUTPUT){
-      // Store storage instruction
-      ae.res = curr_oind;
-      ae.arg.i[0] = place[outputv_[curr_oind].at(curr_nz)->temp];
-      ae.arg.i[1] = curr_nz;
-      
-      // Go to the next nonzero
-      curr_nz++;
-      if(curr_nz>=outputv_[curr_oind].size()){
-        curr_nz=0;
-        curr_oind++;
-        for(; curr_oind<outputv_.size(); ++curr_oind){
-          if(!outputv_[curr_oind].empty()){
-            break;
+    // Get instruction
+    switch(ae.op){
+      case OP_CONST: // constant
+        ae.arg.d = n->getValue();
+        ae.res = n->temp;
+        break;
+      case OP_PARAMETER: // a parameter or input
+        symb_loc.push_back(make_pair(algorithm_.size(),n));
+        ae.res = n->temp;
+        break;
+      case OP_OUTPUT: // output instruction
+        ae.res = curr_oind;
+        ae.arg.i[0] = outputv_[curr_oind].at(curr_nz)->temp;
+        ae.arg.i[1] = curr_nz;
+        
+        // Go to the next nonzero
+        curr_nz++;
+        if(curr_nz>=outputv_[curr_oind].size()){
+          curr_nz=0;
+          curr_oind++;
+          for(; curr_oind<outputv_.size(); ++curr_oind){
+            if(!outputv_[curr_oind].empty()){
+              break;
+            }
           }
         }
-      }
-    
-    } else {
-      // Unary or binary operation
-      
-      // Save the node index
-      ae.res = place[n->temp];
-      
-      // Number of children
-      int ndep = n->ndep();
-      
-      // Save the indices of the children
-      ae.arg.i[0] = place[n->dep(0).get()->temp];
-      ae.arg.i[1] = place[n->dep(1).get()->temp];
+        break;
+      default:       // Unary or binary operation
+        ae.res = n->temp;
+        ae.arg.i[0] = n->dep(0).get()->temp;
+        ae.arg.i[1] = n->dep(1).get()->temp;
     }
+    
+    // Number of dependencies
+    int ndeps = casadi_math<double>::ndeps(ae.op);
+    
+    // Increase count of dependencies
+    for(int c=0; c<ndeps; ++c)
+      refcount[ae.arg.i[c]]++;
     
     // Add to algorithm
     algorithm_.push_back(ae);
   }
+  
+  // Place in the work vector for each of the nodes in the tree (overwrites the reference counter)
+  vector<int> place(nodes.size());
+  
+  if(live_variables){
+    // Stack with unused elements in the work vector
+    stack<int> unused;
+    
+    // Work vector size
+    worksize_ = 0;
+    
+    // Find a place in the work vector for the operation
+    for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
+      
+      // Number of dependencies
+      int ndeps = casadi_math<double>::ndeps(it->op);
+    
+      // decrease reference count of children
+      for(int c=ndeps-1; c>=0; --c){ // reverse order so that the first argument will end up at the top of the stack
+        int ch_ind = it->arg.i[c];
+        int remaining = --refcount[ch_ind];
+        if(remaining==0) unused.push(place[ch_ind]);
+      }
+      
+      // Find a place to store the variable
+      if(it->op!=OP_OUTPUT){
+        if(!unused.empty()){
+          // Try to reuse a variable from the stack if possible (last in, first out)
+          it->res = place[it->res] = unused.top();
+          unused.pop();
+        } else {
+          // Allocate a new variable
+          it->res = place[it->res] = worksize_++;
+        }
+      }
+      
+      // Save the location of the children
+      for(int c=0; c<ndeps; ++c){
+        it->arg.i[c] = place[it->arg.i[c]];
+      }
+    }
+    
+    if(verbose()){
+      cout << "Using live variables: work array is " <<  worksize_ << " instead of " << nodes.size() << endl;
+    }
+    
+  } else {
+    worksize_ = nodes.size();
+    for(int i=0; i<place.size(); ++i)
+      place[i] = i;
+  }
+  
+  // Allocate work vectors (symbolic/numeric)
+  work_.resize(worksize_,numeric_limits<double>::quiet_NaN());
+  s_work_.resize(worksize_);
+  
     
   // Work vector for partial derivatives
   pdwork_.resize(algorithm_.size());
 
-  // Indices corresponding to each non-zero outputs
+  // Indices corresponding to each non-zero outputs // TODO: remove!
   output_ind_.resize(output_.size());
   for(int i=0; i<outputv_.size(); ++i){
     // References
@@ -734,7 +705,7 @@ void SXFunctionInternal::init(){
     }
   }
   
-  // Indices corresponding to the inputs
+  // Indices corresponding to the inputs // TODO: remove!
   input_ind_.resize(inputv_.size());
   for(int i=0; i<inputv_.size(); ++i){
     // References
