@@ -246,30 +246,6 @@ void SXFunctionInternal::printVector(std::ostream &cfile, const std::string& nam
   cfile << "};" << endl;
 }
 
-void SXFunctionInternal::printOperation(std::ostream &stream, int i, std::vector<int>& place) const{
-  const AlgEl& ae = algorithm_[place[i]];
-  const SX& f = binops_[i];
-  casadi_math<double>::printPre(ae.op,stream);
-  int ndep = casadi_math<double>::ndeps(ae.op);
-  for(int c=0; c<ndep; ++c){
-    if(c==1) casadi_math<double>::printSep(ae.op,stream);
-
-    if(f->dep(c)->isConstant()){
-      double v = f->dep(c)->getValue();
-      if(v>=0){
-        stream << v;
-      } else {
-        stream << "(" << v << ")";
-      }
-    } else if(f->dep(c)->hasDep() && refcount_[f->dep(c)->temp-1]==1) {
-      printOperation(stream,f->dep(c)->temp-1,place);
-    } else {
-      stream << "a" << ae.arg.i[c];
-    }
-  }
-  casadi_math<double>::printPost(ae.op,stream);
-}
-
 void SXFunctionInternal::generateCode(const string& src_name){
   assertInit();
 
@@ -380,113 +356,37 @@ void SXFunctionInternal::generateCode(const string& src_name){
 
   // Which variables have been declared
   vector<bool> declared(work_.size(),false);
-  
-  // Place in the algorithm for each binary node
-  vector<int> place(binops_.size());
-  vector<int>::iterator it_place=place.begin();
-  for(int i=0; i<algorithm_.size(); ++i){
-    if(algorithm_[i].op != OP_CONST && algorithm_[i].op != OP_OUTPUT && algorithm_[i].op != OP_INPUT){
-      *it_place++ = i;
-    }
-  }
-  
- // For each node, mark its place in the list of binary operations
- for(int i=0; i<binops_.size(); ++i){
-   binops_[i]->temp = i+1;
- }
-
- // Count how many times a node is referenced in the algorithm
- refcount_.resize(binops_.size());
- fill(refcount_.begin(),refcount_.end(),0);
- for(int i=0; i<binops_.size(); ++i){
-   int ndeps = casadi_math<double>::ndeps(binops_[i]->getOp());
-   for(int c=0; c<ndeps; ++c){
-     // Get the place in the algorithm of the child
-     int i_ch = binops_[i]->dep(c)->temp-1;
-     if(i_ch>=0){
-       // If the child is a binary operation
-       refcount_[i_ch]++;
-     }
-   }
- }
-  
- // Mark the inputs with negative numbers indicating where they are stored in the work vector
- for(int ind=0; ind<input_.size(); ++ind){
-   for(int el=0; el<inputv_[ind].size(); ++el){
-     inputv_[ind].at(el)->temp = -1-input_ind_[ind][el];
-   }
- }
-
- // Outputs get extra reference in order to prevent them from being inlined
- for(int ind=0; ind<output_.size(); ++ind){
-   for(int el=0; el<outputv_[ind].size(); ++el){
-     int i = outputv_[ind].at(el)->temp-1;
-     if(i>=0){
-       refcount_[i] += 2;
-     }
-   }
- }
  
- // Run the algorithm
- int ii=0;
- for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
-   // Skip if constant or output
-   if(it->op==OP_CONST) continue;
-
+  // Run the algorithm
+  for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
    if(it->op==OP_OUTPUT){
-     // Retrieve output
-     cfile << "r[" << it->res << "][" << it->arg.i[1] << "]=";
-     const SX& f = outputv_[it->res].at(it->arg.i[1]);
-     int i=f->temp;
-     if(i==0){ // constant
-        cfile << f->getValue();
-      } else if(i>0){ // binary node
-        cfile << "a" << it->arg.i[0];
-      } else { // input feedthrough
-        cfile << "a" << (-i-1);
-      }
+     cfile << "r[" << it->res << "][" << it->arg.i[1] << "]=" << "a" << it->arg.i[0];
+   } else {
+     // Declare result if not already declared
+     if(!declared[it->res]){
+       cfile << "d ";
+       declared[it->res]=true;
+     }
      
-   } else if(it->op==OP_INPUT){
-     if(!declared[it->res]){
-       cfile << "d ";
-       declared[it->res]=true;
-     }
-     cfile << "a" << it->res << "=" << "x[" << it->arg.i[0] << "][" << it->arg.i[1] << "]";
-
-   } else { // Unary or binary operation
-     // Skip printing variables that can be inlined
-     if(refcount_[ii]<2){
-       ii++;
-       continue;
-     }
-      
-     if(!declared[it->res]){
-       cfile << "d ";
-       declared[it->res]=true;
-     }
+     // Where to store the result
      cfile << "a" << it->res << "=";
-     
-     printOperation(cfile,ii,place);
-      
-     // Next binary operation
-     ++ii;
+    
+     // What to store
+     if(it->op==OP_CONST){
+       cfile << it->arg.d;
+     } else if(it->op==OP_INPUT){
+       cfile << "x[" << it->arg.i[0] << "][" << it->arg.i[1] << "]";
+     } else {
+       int ndep = casadi_math<double>::ndeps(it->op);
+       casadi_math<double>::printPre(it->op,cfile);
+       for(int c=0; c<ndep; ++c){
+         if(c==1) casadi_math<double>::printSep(it->op,cfile);
+         cfile << "a" << it->arg.i[c];
+       }
+       casadi_math<double>::printPost(it->op,cfile);
+     }
    }
    cfile  << ";" << endl;
- }
-
- // Clear the reference counter
- refcount_.clear();
-
- // Unmark the binary operations
- for(int i=0; i<binops_.size(); ++i){
-   binops_[i]->temp = 0;
- }
- 
-  // Unmark the inputs 
- for(int ind=0; ind<input_.size(); ++ind){
-   for(int el=0; el<inputv_[ind].size(); ++el){
-     inputv_[ind].at(el)->temp = 0;
-   }
  }
 
   cfile << "return 0;" << endl;
@@ -538,14 +438,14 @@ void SXFunctionInternal::init(){
     
   // Sort the nodes by type
   constants_.clear();
-  binops_.clear();
+  operations_.clear();
   for(vector<SXNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it){
     SXNode* t = *it;
     if(t){
       if(t->isConstant())
         constants_.push_back(SX::create(t));
       else if(!t->isSymbolic())
-        binops_.push_back(SX::create(t));
+        operations_.push_back(SX::create(t));
     }
   }
   
@@ -1090,7 +990,7 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
   bool taping = nfdir>0 || nadir>0;
   
   // Iterator to the binary operations
-  vector<SX>::const_iterator b_it=binops_.begin();
+  vector<SX>::const_iterator b_it=operations_.begin();
   
   // Iterator to stack of constants
   vector<SX>::const_iterator c_it = constants_.begin();
