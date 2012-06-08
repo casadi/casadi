@@ -30,7 +30,6 @@
 #include "../stl_vector_tools.hpp"
 #include "../sx/sx_tools.hpp"
 #include "../sx/sx_node.hpp"
-#include "../sx/output_sx.hpp"
 #include "../casadi_types.hpp"
 #include "../matrix/crs_sparsity_internal.hpp"
 
@@ -109,10 +108,10 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
         case OP_CONST: work_[it->res] = it->arg.d; break;
         
         // Load function input to work vector
-        //case OP_INPUT: work_[it->res] = input<false>(it->arg.i[0]).data()[it->arg.i[1]]; break;
+        case OP_INPUT: /*work_[it->res] = input<false>(it->arg.i[0]).data()[it->arg.i[1]];*/ break;
         
         // Get function output from work vector
-        case OP_OUTPUT: /*output<false>(it->res).data()[it->arg.i[1]] = work_[it->arg.i[0]];*/ break;
+        case OP_OUTPUT: output<false>(it->res).data()[it->arg.i[1]] = work_[it->arg.i[0]]; break;
       }
     }
   } else {
@@ -126,16 +125,8 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
         case OP_CONST: work_[it->res] = it->arg.d; break;
         
         // Get function output from work vector
-        case OP_OUTPUT: /*output<false>(it->res).data()[it->arg.i[1]] = work_[it->arg.i[0]];*/ break;
+        case OP_OUTPUT: output<false>(it->res).data()[it->arg.i[1]] = work_[it->arg.i[0]]; break;
       }
-    }
-  }
-
-  // Get the results
-  for(int ind=0; ind<getNumOutputs(); ++ind){
-    Matrix<double> &res = output<false>(ind);
-    for(int i=0; i<res.size(); ++i){
-      res.data()[i] = work_[output_ind_[ind][i]];
     }
   }
   
@@ -163,17 +154,9 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
         case OP_CONST:
           dwork_[it->res] = 0; break;
         case OP_OUTPUT: 
-          /*fwdSens<false>(it->res,dir).data()[it->arg.i[1]] = work_[it->arg.i[0]];*/ break;
+          fwdSens<false>(it->res,dir).data()[it->arg.i[1]] = dwork_[it->arg.i[0]]; break;
         default: // Unary or binary operation
           dwork_[it->res] = it2->d[0] * dwork_[it->arg.i[0]] + it2->d[1] * dwork_[it->arg.i[1]];  break;
-      }
-    }
-  
-    // Get the forward sensitivities
-    for(int ind=0; ind<output_.size(); ++ind){
-      Matrix<double> &fsens = fwdSens<false>(ind,dir);
-      for(int i=0; i<output_ind_[ind].size(); ++i){
-        fsens.data()[i] = dwork_[output_ind_[ind][i]];
       }
     }
   }
@@ -183,17 +166,6 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   
   // Loop over all adjoint directions
   for(int dir=0; dir<nadir; ++dir){
-
-    // Pass the output seeds
-    for(int ind=0; ind<output_.size(); ++ind){
-      const Matrix<double> &aseed = adjSeed<false>(ind,dir);
-      
-      // Add seed to each entry, note that multiple outputs may point to the same variable
-      for(int i=0; i<output_ind_[ind].size(); ++i){
-        dwork_[output_ind_[ind][i]] += aseed.data()[i];
-      }
-    }
-    
     vector<TapeEl<double> >::const_reverse_iterator it2 = pdwork_.rbegin();
     for(vector<AlgEl>::const_reverse_iterator it = algorithm_.rbegin(); it!=algorithm_.rend(); ++it, ++it2){
       // copy the seed and clear the cache entry
@@ -202,8 +174,12 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
         case OP_CONST:
           dwork_[it->res] = 0;
           break;
+        case OP_INPUT:
+          //adjSens<false>(it->arg.i[0],dir).data()[it->arg.i[1]] = dwork_[it->res];
+          //dwork_[it->res] = 0;
+          break;
         case OP_OUTPUT:
-          //dwork_[it->arg.i[0]] += adjSeed<false>(it->res,dir).data()[it->arg.i[1]];
+          dwork_[it->arg.i[0]] += adjSeed<false>(it->res,dir).data()[it->arg.i[1]];
           break;
         default: // Unary or binary operation
           seed = dwork_[it->res];
@@ -215,7 +191,7 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
     
     // Collect the adjoint sensitivities
     for(int ind=0; ind<getNumInputs(); ++ind){
-      Matrix<double> &asens = adjSens(ind,dir);
+      Matrix<double> &asens = adjSens<false>(ind,dir);
       for(int i=0; i<input_ind_[ind].size(); ++i){
         asens.data()[i] = dwork_[input_ind_[ind][i]];
         dwork_[input_ind_[ind][i]] = 0;
@@ -259,31 +235,32 @@ void SXFunctionInternal::print(ostream &stream) const{
     op -= NUM_BUILT_IN_OPS*ip;
     
     if(op==OP_OUTPUT){
-      stream << "output[" << it->res << "][" << it->arg.i[1] << "] = @" << it->arg.i[0] << ";" << endl;
-      continue;
-    }
-
-    stream << "@" << it->res;
-    switch(ip){
-      case 0:  stream << " = "; break;
-      case 1:  stream << " += "; break;
-      case 2:  stream << " -= "; break;
-      case 3:  stream << " *= "; break;
-      case 4:  stream << " /= "; break;
-    }
-
-    if(op==OP_CONST){
-      stream << it->arg.d;
-    } else if(op==OP_PARAMETER){
-      stream << *p_it++;
+      stream << "output[" << it->res << "][" << it->arg.i[1] << "] = @" << it->arg.i[0];
+    } else if(op==OP_INPUT){
+      stream << "@" << it->res << " = input[" << it->arg.i[0] << "][" << it->arg.i[1] << "]";
     } else {
-      int ndep = casadi_math<double>::ndeps(op);
-      casadi_math<double>::printPre(op,stream);
-      for(int c=0; c<ndep; ++c){
-        if(c==1) casadi_math<double>::printSep(op,stream);
-        stream << "@" << it->arg.i[c];
+      stream << "@" << it->res;
+      switch(ip){
+        case 0:  stream << " = "; break;
+        case 1:  stream << " += "; break;
+        case 2:  stream << " -= "; break;
+        case 3:  stream << " *= "; break;
+        case 4:  stream << " /= "; break;
       }
-      casadi_math<double>::printPost(op,stream);
+
+      if(op==OP_CONST){
+        stream << it->arg.d;
+      } else if(op==OP_PARAMETER){
+        stream << *p_it++;
+      } else {
+        int ndep = casadi_math<double>::ndeps(op);
+        casadi_math<double>::printPre(op,stream);
+        for(int c=0; c<ndep; ++c){
+          if(c==1) casadi_math<double>::printSep(op,stream);
+          stream << "@" << it->arg.i[c];
+        }
+        casadi_math<double>::printPost(op,stream);
+      }
     }
     stream << ";" << endl;
   }
@@ -446,7 +423,7 @@ void SXFunctionInternal::generateCode(const string& src_name){
   vector<int> place(binops_.size());
   vector<int>::iterator it_place=place.begin();
   for(int i=0; i<algorithm_.size(); ++i){
-    if(algorithm_[i].op != OP_CONST){
+    if(algorithm_[i].op != OP_CONST && algorithm_[i].op != OP_OUTPUT && algorithm_[i].op != OP_INPUT){
       *it_place++ = i;
     }
   }
@@ -488,49 +465,47 @@ void SXFunctionInternal::generateCode(const string& src_name){
    }
  }
  
- // Run the algorithm_
+ // Run the algorithm
  int ii=0;
  for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
-   // Skip if constant
-   if(it->op==OP_CONST) continue;
-   
-   // Skip printing variables that can be inlined
-   if(refcount_[ii]<2){
-     ii++;
-     continue;
-   }
-   
-    if(!declared[it->res]){
-      cfile << "d ";
-      declared[it->res]=true;
-    }
-    cfile << "a" << it->res << "=";
-    printOperation(cfile,ii,place);
-    cfile  << ";" << endl;
-   
-   // Next binary operation
-   ++ii;
-  }
+   // Skip if constant or output
+   if(it->op==OP_CONST || it->op==OP_INPUT) continue;
 
- // Clear the reference counter
- refcount_.clear();
-
-  // Get the results
-  for(int ind=0; ind<output_.size(); ++ind){
-    for(int el=0; el<outputv_[ind].size(); ++el){
-      cfile << "r[" << ind << "][" << el << "]=";
-      const SX& f = outputv_[ind].at(el);
-      int i=f->temp;
-      if(i==0){ // constant
+   if(it->op==OP_OUTPUT){
+     cfile << "r[" << it->res << "][" << it->arg.i[1] << "]=";
+     const SX& f = outputv_[it->res].at(it->arg.i[1]);
+     int i=f->temp;
+     if(i==0){ // constant
         cfile << f->getValue();
       } else if(i>0){ // binary node
-        cfile << "a" << algorithm_[place[i-1]].res;
+        cfile << "a" << it->arg.i[0];
       } else { // input feedthrough
         cfile << "a" << (-i-1);
       }
       cfile << ";" << endl;
-    }
-  }
+     
+   } else {
+     // Skip printing variables that can be inlined
+     if(refcount_[ii]<2){
+       ii++;
+       continue;
+     }
+      
+     if(!declared[it->res]){
+       cfile << "d ";
+       declared[it->res]=true;
+     }
+     cfile << "a" << it->res << "=";
+     printOperation(cfile,ii,place);
+     cfile  << ";" << endl;
+      
+     // Next binary operation
+     ++ii;
+   }
+ }
+
+ // Clear the reference counter
+ refcount_.clear();
 
  // Unmark the binary operations
  for(int i=0; i<binops_.size(); ++i){
@@ -561,10 +536,6 @@ void SXFunctionInternal::init(){
   // All nodes
   std::vector<SXNode*> nodes;
 
-  // Output nodes
-  std::vector<SX> output_markers;
-  output_markers.reserve(getNumScalarOutputs());
-  
   // Add the list of nodes
   int ind=0;
   for(vector<Matrix<SX> >::const_iterator it = outputv_.begin(); it != outputv_.end(); ++it, ++ind){
@@ -574,9 +545,8 @@ void SXFunctionInternal::init(){
       s.push(itc->get());
       sort_depth_first(s,nodes);
       
-      // Add an output node
-      output_markers.push_back(OutputSX::create(*itc,ind,nz));
-      nodes.push_back(output_markers.back().get());
+      // A null pointer means an output instruction
+      nodes.push_back(0);
     }
   }
   
@@ -591,19 +561,23 @@ void SXFunctionInternal::init(){
 
   // Set the temporary variables to be the corresponding place in the sorted graph
   for(int i=0; i<nodes.size(); ++i){
-    nodes[i]->temp = i;
+    if(nodes[i]){
+      nodes[i]->temp = i;
+    }
   }
     
   // Sort the nodes by type
   vector<SXNode*> bnodes, cnodes, snodes;
   for(vector<SXNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it){
     SXNode* t = *it;
-    if(t->isConstant())
-      cnodes.push_back(t);
-    else if(t->isSymbolic())
-      snodes.push_back(t);
-    else if(t->getOp()!=OP_OUTPUT)
-      bnodes.push_back(t);
+    if(t){
+      if(t->isConstant())
+        cnodes.push_back(t);
+      else if(t->isSymbolic())
+        snodes.push_back(t);
+      else
+        bnodes.push_back(t);
+    }
   }
 
   // Save the constants
@@ -621,6 +595,12 @@ void SXFunctionInternal::init(){
 
   // Evaluate with inplace operations (experimental)
   evaluate_inplace_ = getOption("inplace");
+  if(evaluate_inplace_){
+    casadi_warning("Inplace variables disabled.");
+    evaluate_inplace_ = false;
+  }
+  
+  
   vector<int> refcount_copy;
   if(evaluate_inplace_){
     casadi_assert_message(live_variables,"\"evaluate_inplace\" requires \"live_variables\"");
@@ -725,6 +705,17 @@ void SXFunctionInternal::init(){
   // Free varables
   free_vars_.clear();
   
+  // Input instructions
+  vector<pair<int,SXNode*> > symb_loc;
+  
+  // Current output and nonzero, start with the first one
+  int curr_oind, curr_nz=0;
+  for(curr_oind=0; curr_oind<outputv_.size(); ++curr_oind){
+    if(!outputv_[curr_oind].empty()){
+      break;
+    }
+  }
+  
   // Add the binary operations
   algorithm_.clear();
   algorithm_.reserve(nodes.size());
@@ -736,7 +727,7 @@ void SXFunctionInternal::init(){
     AlgEl ae;
 
     // Get operation
-    ae.op = n->getOp();
+    ae.op = n==0 ? OP_OUTPUT : n->getOp();
     
     if(ae.op==OP_CONST){
 
@@ -746,6 +737,7 @@ void SXFunctionInternal::init(){
       algorithm_.push_back(ae);
       
     } else if(ae.op==OP_PARAMETER){ // input or free parameter
+      symb_loc.push_back(make_pair(algorithm_.size(),n));
       if(n->marked()){ // Input have been marked
 
         // Unmark node
@@ -770,11 +762,23 @@ void SXFunctionInternal::init(){
       }
     
     } else if(ae.op==OP_OUTPUT){
-      // Store storage location
-      OutputSX* nn = static_cast<OutputSX*>(n);
-      ae.res = nn->ind_;
-      ae.arg.i[0] = place[nn->dep_->temp];
-      ae.arg.i[1] = nn->nz_;
+      // Store storage instruction
+      ae.res = curr_oind;
+      ae.arg.i[0] = place[outputv_[curr_oind].at(curr_nz)->temp];
+      ae.arg.i[1] = curr_nz;
+      
+      // Go to the next nonzero
+      curr_nz++;
+      if(curr_nz>=outputv_[curr_oind].size()){
+        curr_nz=0;
+        curr_oind++;
+        for(; curr_oind<outputv_.size(); ++curr_oind){
+          if(!outputv_[curr_oind].empty()){
+            break;
+          }
+        }
+      }
+      
       algorithm_.push_back(ae);
     
     } else { // Unary or binary operation
@@ -888,7 +892,7 @@ void SXFunctionInternal::init(){
       algorithm_.push_back(ae);
     }
   }
-  
+    
   // Work vector for partial derivatives
   pdwork_.resize(algorithm_.size());
   
@@ -954,7 +958,9 @@ void SXFunctionInternal::init(){
 
   // Reset the temporary variables
   for(int i=0; i<nodes.size(); ++i){
-    nodes[i]->temp = 0;
+    if(nodes[i]){
+      nodes[i]->temp = 0;
+    }
   }
 
   // Allocate memory for directional derivatives
@@ -1101,7 +1107,7 @@ void SXFunctionInternal::init(){
     
     // Build up the LLVM expression graphs
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-      if(it->op==OP_OUTPUT) continue;
+      if(it->op==OP_INPUT) continue;
       
       // Argument of the operation
       std::vector<llvm::Value*> oarg(casadi_math<double>::ndeps(it->op));
@@ -1132,14 +1138,6 @@ void SXFunctionInternal::init(){
         
         // Save to work vector
         jwork[it->res] = res;
-      }
-    }
-    
-    // Store the results from the work vector
-    for(int ind=0; ind<output_ind_.size(); ++ind){
-      for(int k=0; k<output_ind_[ind].size(); ++k){
-        llvm::Value *k_v = llvm::ConstantInt::get(int32Ty, k);
-        builder.CreateStore(jwork[output_ind_[ind][k]],builder.CreateGEP(output_v[ind],k_v));
       }
     }
     
@@ -1319,9 +1317,11 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
   // Evaluate the algorithm
   if(!taping){
     for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it<algorithm_.end(); ++it){
-      if(it->op==OP_OUTPUT) continue;
-      
-      if(output_given){
+      if(it->op==OP_INPUT){
+        //s_work_[it->res] = input[it->arg.i[0]].data()[it->arg.i[1]];
+      } else if(it->op==OP_OUTPUT){
+        output[it->res].data()[it->arg.i[1]] = s_work_[it->arg.i[0]];
+      } else if(output_given){
         // Assign to the symbolic work vector
         s_work_[it->res] = it->op == OP_CONST ? c_it != constants_.end() ? *c_it++ : SX(it->arg.d) : it->op==OP_PARAMETER ? *p_it++ : *b_it++;
       } else {
@@ -1335,9 +1335,6 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
 
           // Parameter
           case OP_PARAMETER: s_work_[it->res] = *p_it++; break;
-          
-          // Output
-          case OP_OUTPUT: output[it->res].data()[it->arg.i[1]] = s_work_[it->arg.i[0]]; break;
         }
       }
     }
@@ -1345,8 +1342,13 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
     s_pdwork.resize(pdwork_.size());
     vector<TapeEl<SX> >::iterator it1 = s_pdwork.begin();
     for(vector<AlgEl>::iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it, ++it1){
-      if(it->op==OP_OUTPUT) continue;
-      if(output_given){
+      if(it->op==OP_INPUT){
+        //s_work_[it->res] = input[it->arg.i[0]].data()[it->arg.i[1]];
+        //it1->d[0] = it1->d[1] = 0;
+      } else if(it->op==OP_OUTPUT){
+        output[it->res].data()[it->arg.i[1]] = s_work_[it->arg.i[0]];
+        it1->d[0] = it1->d[1] = 0;
+      } else if(output_given){
         // Assign to the symbolic work vector
         SX f = it->op == OP_CONST ? c_it != constants_.end() ? *c_it++ : SX(it->arg.d) : it->op==OP_PARAMETER ? *p_it++ : *b_it++;
         switch(it->op){
@@ -1380,15 +1382,7 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
       }
     }
   }
-  
-  // Get the results
-  for(int ind=0; ind<output.size(); ++ind){
-    vector<SX>& odata = output[ind].data();
-    for(int i=0; i<output_ind_[ind].size(); ++i){
-      odata[i] = s_work_[output_ind_[ind][i]];
-    }
-  }
-    
+      
   // Quick return if no sensitivities
   if(!taping) return;
 
@@ -1422,24 +1416,15 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
       switch(it->op){
         case OP_CONST:
         case OP_PARAMETER:
-        case OP_OUTPUT:
           break;
+        case OP_INPUT:
+          /*s_dwork[it->res] = fwdSeed[dir][it->arg.i[0]].data()[it->arg.i[1]];*/ break;
+        case OP_OUTPUT:
+          fwdSens[dir][it->res].data()[it->arg.i[1]] = s_dwork[it->arg.i[0]]; break;
         CASADI_MATH_BINARY_BUILTIN // Binary operation
           s_dwork[it->res] = it2->d[0] * s_dwork[it->arg.i[0]] + it2->d[1] * s_dwork[it->arg.i[1]]; break;
         default: // Unary operation
           s_dwork[it->res] = it2->d[0] * s_dwork[it->arg.i[0]];
-      }
-    }
-
-    // Get the forward sensitivities
-    for(int oind=0; oind<output.size(); ++oind){
-      // Assert sparsity
-      casadi_assert_message(output[oind].sparsity()==fwdSens[dir][oind].sparsity(), "SXFunctionInternal::eval: sparsity inconsistent");
-      
-      // Copy sens from work vector
-      vector<SX>& fdata = fwdSens[dir][oind].data();
-      for(int k=0; k<fdata.size(); ++k){
-        fdata[k] = s_dwork[output_ind_[oind][k]];
       }
     }
   }
@@ -1452,18 +1437,6 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
     
     // Clear the seeds (needed?)
     fill(s_dwork.begin(),s_dwork.end(),0);
-
-    // Pass the adjoint seeds
-    for(int oind=0; oind<output.size(); ++oind){
-      // Assert sparsity
-      casadi_assert_message(output[oind].sparsity()==adjSeed[dir][oind].sparsity(), "SXFunctionInternal::eval: sparsity inconsistent");
-      
-      // Copy sens from work vector
-      const vector<SX>& adata = adjSeed[dir][oind].data();
-      for(int k=0; k<adata.size(); ++k){
-        s_dwork[output_ind_[oind][k]] += adata[k];
-      }
-    }
     
     vector<TapeEl<SX> >::const_reverse_iterator it2 = s_pdwork.rbegin();
     for(vector<AlgEl>::const_reverse_iterator it = algorithm_.rbegin(); it!=algorithm_.rend(); ++it, ++it2){
@@ -1475,8 +1448,12 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
         case OP_PARAMETER:
           s_dwork[it->res] = 0;
           break;
+        case OP_INPUT:
+          //adjSens[dir][it->arg.i[0]].data()[it->arg.i[1]] = s_dwork[it->res];
+          //s_dwork[it->res] = 0;
+          break;
         case OP_OUTPUT:
-          //s_dwork[it->arg.i[0]] += adjSeed[dir][it->res].data()[it->arg.i[1]];
+          s_dwork[it->arg.i[0]] += adjSeed[dir][it->res].data()[it->arg.i[1]];
           break;
         default: // Unary or binary operation
           seed = s_dwork[it->res];
@@ -1566,30 +1543,16 @@ void SXFunctionInternal::spEvaluate(bool fwd){
         case OP_CONST:
         case OP_PARAMETER:
           iwork[it->res] = bvec_t(0); break;
+        case OP_INPUT:
+          /*iwork[it->res] = reinterpret_cast<bvec_t*>(&input<false>(it->i[0]).front())[it->arg.i[1]];*/ break;
         case OP_OUTPUT:
-          /*reinterpret_cast<bvec_t*>(&output<false>(it->res).front())[it->arg.i[1]] = iwork[it->arg.i[0]];*/ break;
+          reinterpret_cast<bvec_t*>(&output<false>(it->res).front())[it->arg.i[1]] = iwork[it->arg.i[0]]; break;
         default: // Unary or binary operation
           iwork[it->res] = iwork[it->arg.i[0]] | iwork[it->arg.i[1]]; break;
       }
     }
-    
-    // Get the output seeds
-    for(int ind=0; ind<output_ind_.size(); ++ind){
-      bvec_t* swork = get_bvec_t(output<false>(ind).data());
-      for(int k=0; k<output_ind_[ind].size(); ++k){
-        swork[k] = iwork[output_ind_[ind][k]];
-      }
-    }
         
   } else { // Backward propagation
-
-    // Pass output seeds
-    for(int ind=0; ind<output_ind_.size(); ++ind){
-      bvec_t* swork = get_bvec_t(output<false>(ind).data());
-      for(int k=0; k<output_ind_[ind].size(); ++k){
-        iwork[output_ind_[ind][k]] |= swork[k];
-      }
-    }
 
     // Propagate sparsity backward
     for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it){
@@ -1603,7 +1566,7 @@ void SXFunctionInternal::spEvaluate(bool fwd){
           iwork[it->res] = 0;
           break;
         case OP_OUTPUT:
-          //iwork[it->arg.i[0]] |= reinterpret_cast<bvec_t*>(&output<false>(it->res).front())[it->arg.i[1]];
+          iwork[it->arg.i[0]] |= reinterpret_cast<bvec_t*>(&output<false>(it->res).front())[it->arg.i[1]];
           break;
         default: // Unary or binary operation
           seed = iwork[it->res];
