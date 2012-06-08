@@ -144,11 +144,6 @@ void XFunctionInternal<DerivedType,MatType,NodeType>::sort_depth_first(std::stac
         s.pop();
       }
     }
-
-  // Reset the node counters
-  for(typename std::vector<NodeType*>::iterator it=nodes.begin(); it!=nodes.end(); ++it){
-    (**it).temp = 0;
-  }
 }
 
 template<typename DerivedType, typename MatType, typename NodeType>

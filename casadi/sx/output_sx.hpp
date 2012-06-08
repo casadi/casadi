@@ -35,13 +35,13 @@ class OutputSX : public SXNode{
   private:
     
     /** \brief  Constructor is private, use "create" below (binary version) */
-    OutputSX(const SX& dep, int oind) : dep_(dep), oind_(oind){}
+    OutputSX(const SX& dep, int ind, int nz) : dep_(dep), ind_(ind), nz_(nz){}
     
   public:
     
     /** \brief  Create an auxillary output */
-    inline static SX create(const SX& dep, int oind){
-      return SX::create(new OutputSX(dep,oind));
+    inline static SX create(const SX& dep, int ind, int nz){
+      return SX::create(new OutputSX(dep,ind,nz));
     }
     
     /** \brief Destructor
@@ -65,20 +65,19 @@ class OutputSX : public SXNode{
     
     /** \brief  Print the expression (recursively with a maximum number of levels) */
     virtual void print(std::ostream &stream, long& remaining_calls) const{
-
+      
       // Print dependency
       dep_->print(stream,remaining_calls);
       
-      // Print the index
-      stream << "[" << oind_ << "]";
+      // Print storage location
+      stream << " -> output(" << ind_ << ")[" << nz_ << "]";
     }
-      
     
-    /** \brief The main function which includes the first output */
+    /** \brief The entry to be stored */
     SX dep_;
     
-    /** \brief Output index */
-    int oind_;
+    /** \brief Output index and nonzero */
+    int ind_, nz_;
 };
 
  

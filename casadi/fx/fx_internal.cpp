@@ -155,37 +155,7 @@ void FXInternal::repr(ostream &stream) const{
 FX FXInternal::hessian(int iind, int oind){
   casadi_error("FXInternal::hessian: hessian not defined for class " << typeid(*this).name());
 }
-
-FunctionIO& FXInternal::iStruct(int i){
-  try{
-    return input_.at(i);
-  } catch(std::out_of_range&){
-      std::stringstream ss;
-      ss <<  "In function " << getOption("name") << ": input " << i << " not in interval [0," << getNumInputs() << ")";
-      if (!isInit()) ss << endl << "Did you forget to initialize?";
-      throw CasadiException(ss.str());
-  }
-}
-
-const FunctionIO& FXInternal::iStruct(int i) const{
-  return const_cast<FXInternal*>(this)->iStruct(i);
-}
   
-FunctionIO& FXInternal::oStruct(int i){
-  try{
-    return output_.at(i);
-  } catch(std::out_of_range&){
-      std::stringstream ss;
-      ss <<  "In function " << getOption("name") << ": output " << i << " not in interval [0," << getNumOutputs() << ")";
-      if (!isInit()) ss << endl << "Did you forget to initialize?";
-      throw CasadiException(ss.str());
-  }
-}
-
-const FunctionIO& FXInternal::oStruct(int i) const{
-  return const_cast<FXInternal*>(this)->oStruct(i);
-}
-
 void FXInternal::log(const string& msg) const{
   if(verbose()){
     cout << "CasADi log message: " << msg << endl;
@@ -204,82 +174,6 @@ bool FXInternal::verbose() const{
 
 bool FXInternal::monitored(const string& mod) const{
   return monitors_.count(mod)>0;
-}
-
-Matrix<double>& FXInternal::fwdSeed(int iind, int dir){
-  try{
-    return iStruct(iind).dataF.at(dir);
-  } catch(out_of_range&){
-    stringstream ss;
-    if(iStruct(iind).dataF.empty()){
-      ss << "No forward directions ";
-    } else {
-      ss << "Forward direction " << dir << " is out of range [0," << iStruct(iind).dataF.size() << ") ";
-    }
-    ss << "for function " << getOption("name");
-    throw CasadiException(ss.str());
-  }
-}
-    
-const Matrix<double>& FXInternal::fwdSeed(int iind, int dir) const{
-  return const_cast<FXInternal*>(this)->fwdSeed(iind,dir);
-}
-
-Matrix<double>& FXInternal::fwdSens(int oind, int dir){
-  try{
-    return oStruct(oind).dataF.at(dir);
-  } catch(out_of_range&){
-    stringstream ss;
-    if(oStruct(oind).dataF.empty()){
-      ss << "No forward directions ";
-    } else {
-      ss << "Forward direction " << dir << " is out of range [0," << oStruct(oind).dataF.size() << ") ";
-    }
-    ss << "for function " << getOption("name");
-    throw CasadiException(ss.str());
-  }
-}
-    
-const Matrix<double>& FXInternal::fwdSens(int oind, int dir) const{
-  return const_cast<FXInternal*>(this)->fwdSens(oind,dir);
-}
-
-Matrix<double>& FXInternal::adjSeed(int oind, int dir){
-  try{
-    return oStruct(oind).dataA.at(dir);
-  } catch(out_of_range&){
-    stringstream ss;
-    if(oStruct(oind).dataA.empty()){
-      ss << "No adjoint directions ";
-    } else {
-      ss << "Adjoint direction " << dir << " is out of range [0," << oStruct(oind).dataA.size() << ") ";
-    }
-    ss << "for function " << getOption("name");
-    throw CasadiException(ss.str());
-  }
-}
-    
-const Matrix<double>& FXInternal::adjSeed(int oind, int dir) const{
-  return const_cast<FXInternal*>(this)->adjSeed(oind,dir);
-}
-
-Matrix<double>& FXInternal::adjSens(int iind, int dir){
-  try{
-    return iStruct(iind).dataA.at(dir);
-  } catch(out_of_range&){
-    stringstream ss;
-    if(iStruct(iind).dataA.empty()){
-      ss << "No adjoint directions ";
-    } else {
-      ss << "Adjoint direction " << dir << " is out of range [0," << iStruct(iind).dataA.size() << ") ";
-    }
-    ss << "for function " << getOption("name");
-    throw CasadiException(ss.str());
-  }
-}
-    
-const Matrix<double>& FXInternal::adjSens(int iind, int dir) const{
-  return const_cast<FXInternal*>(this)->adjSens(iind,dir);
 }
 
 void FXInternal::setNumInputs(int num_in){
@@ -805,6 +699,22 @@ FX FXInternal::derivative(int nfwd, int nadj){
 
 FX FXInternal::getDerivative(int nfwd, int nadj){
   casadi_error("FXInternal::getDerivative not defined for class " << typeid(*this).name());
+}
+
+int FXInternal::getNumScalarInputs() const{
+  int ret=0;
+  for(int iind=0; iind<getNumInputs(); ++iind){
+    ret += input(iind).size();
+  }
+  return ret;
+}
+
+int FXInternal::getNumScalarOutputs() const{
+  int ret=0;
+  for(int oind=0; oind<getNumOutputs(); ++oind){
+    ret += output(oind).size();
+  }
+  return ret;
 }
 
 } // namespace CasADi

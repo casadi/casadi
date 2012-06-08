@@ -189,19 +189,11 @@ int FX::getNumOutputs() const{
 }
 
 int FX::getNumScalarInputs() const{
-  int ret=0;
-  for(int iind=0; iind<getNumInputs(); ++iind){
-    ret += input(iind).size();
-  }
-  return ret;
+  return (*this)->getNumScalarInputs();
 }
 
 int FX::getNumScalarOutputs() const{
-  int ret=0;
-  for(int oind=0; oind<getNumOutputs(); ++oind){
-    ret += output(oind).size();
-  }
-  return ret;
+  return (*this)->getNumScalarOutputs();
 }
 
 

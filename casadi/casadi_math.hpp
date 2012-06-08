@@ -289,6 +289,7 @@ inline int casadi_math<T>::ndeps(unsigned char op){
   switch(op){
     case OP_CONST:
     case OP_PARAMETER:
+    case OP_INPUT:
       return 0;
     CASADI_MATH_BINARY_BUILTIN
       return 2;
