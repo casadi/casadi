@@ -127,9 +127,6 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   // Quick return if no sensitivities
   if(!taping) return;
 
-  // Clear the seeds (not necessary if constants and parameters have zero value!)
-  if(nfdir>0) fill(work_.begin(),work_.end(),0);
-  
   // Calculate forward sensitivities
   for(int dir=0; dir<nfdir; ++dir){
     vector<TapeEl<double> >::const_iterator it2 = pdwork_.begin();
@@ -146,11 +143,9 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
       }
     }
   }
-  
-  // Clear the seeds
-  if(nadir>0) fill(work_.begin(),work_.end(),0);
-  
+    
   // Calculate adjoint sensitivities
+  if(nadir>0) fill(work_.begin(),work_.end(),0);
   for(int dir=0; dir<nadir; ++dir){
     vector<TapeEl<double> >::const_reverse_iterator it2 = pdwork_.rbegin();
     for(vector<AlgEl>::const_reverse_iterator it = algorithm_.rbegin(); it!=algorithm_.rend(); ++it, ++it2){
@@ -562,25 +557,19 @@ void SXFunctionInternal::init(){
     constants_.push_back(SX::create(*it));
   }
 
-  // Place in the work vector for each of the nodes in the tree
-  vector<int> place(nodes.size(),-1);
-
   // Use live variables?
   bool live_variables = getOption("live_variables");
 
   // Evaluate with inplace operations (experimental)
   evaluate_inplace_ = getOption("inplace");
   if(evaluate_inplace_){
-    casadi_warning("Inplace variables disabled.");
+    casadi_warning("Inplace variables not available for the current version of CasADi.");
     evaluate_inplace_ = false;
   }
-  
-  
-  vector<int> refcount_copy;
-  if(evaluate_inplace_){
-    casadi_assert_message(live_variables,"\"evaluate_inplace\" requires \"live_variables\"");
-  }
 
+  // Place in the work vector for each of the nodes in the tree
+  vector<int> place(nodes.size(),-1);
+  
   if(live_variables){
     // Count the number of times each node is used
     vector<int> refcount(nodes.size(),0);
@@ -604,11 +593,6 @@ void SXFunctionInternal::init(){
 
     // Place the work vector
     int p=0;
-
-    // Make a copy of refcount for later
-    if(evaluate_inplace_){
-      refcount_copy = refcount;
-    }
 
     // Place the constants in the work vector
     for(vector<SXNode*>::iterator it=cnodes.begin(); it!=cnodes.end(); ++it){
@@ -656,15 +640,6 @@ void SXFunctionInternal::init(){
     binops_[i] = SX::create(bnodes[i]);
   }
   bnodes.clear();
-  
-  // Number of inplace functions
-  int num_inplace=0;
-  
-  // Index currently assigned to a node
-  vector<int> curr_assign;
-  if(evaluate_inplace_){
-    curr_assign.resize(worksize_,-1);
-  }
   
   // Allocate work vectors (symbolic/numeric)
   work_.resize(worksize_,numeric_limits<double>::quiet_NaN());
@@ -734,101 +709,6 @@ void SXFunctionInternal::init(){
       // Save the indices of the children
       ae.arg.i[0] = place[n->dep(0).get()->temp];
       ae.arg.i[1] = place[n->dep(1).get()->temp];
-      
-
-      // Replace inplace operations
-      if(evaluate_inplace_){
-        // Check if the operation can be performed inplace
-        if(ae.arg.i[0]==ae.res){
-          int ip;
-          switch(ae.op){
-            case OP_ADD: ip=1; break;
-            case OP_SUB: ip=2; break;
-            case OP_MUL: ip=3; break;
-            case OP_DIV: ip=4; break;
-            default:  ip=0; break;
-          }
-          
-          // if the operation can be performed inplace
-          if(ip!=0){
-            
-            // Reference to the child node
-            SX& c = n->dep(1);
-            
-            // Number of dependencies
-            int c_ndep = c->ndep();
-            
-            // If the dependent variable is a unary variable
-            if(c_ndep==1){
-
-              int c_temp = c.get()->temp;
-              int c_curr = curr_assign[place[c_temp]];
-
-              // Check if the node is used exactly one time
-              bool ok_replace = refcount_copy.at(c_temp)==1;
-                      
-              int c_temp0 = c->dep(0).get()->temp;
-              int c_curr0 = curr_assign[place[c_temp0]];
-                                              
-              // Check if the values of the children are still available in the work vector or was assigned during the child operation
-              ok_replace = ok_replace && (c_curr0<0 || c_curr0==c_temp0 || c_curr0==c_curr);
-              
-              if(ok_replace){
-                
-                // Mark the node negative so that we can remove it later
-                refcount_copy.at(c.get()->temp) = -1;
-                
-                // Save the indices of the children
-                ae.arg.i[0] = place[c_temp0];
-
-                // Replace operation with an inplace operation
-                ae.op = ip*NUM_BUILT_IN_OPS + c->getOp();
-                
-                // Increase the inplace counter
-                num_inplace++;
-              }
-            }
-                    
-            // If the dependent variable is a binary variable
-            if(c_ndep==2){
-
-              int c_temp = c.get()->temp;
-              int c_curr = curr_assign[place[c_temp]];
-
-              // Check if the node is used exactly one time
-              bool ok_replace = refcount_copy.at(c_temp)==1;
-                      
-              int c_temp0 = c->dep(0).get()->temp;
-              int c_curr0 = curr_assign[place[c_temp0]];
-                      
-              int c_temp1 = c->dep(1).get()->temp;
-              int c_curr1 = curr_assign[place[c_temp1]];
-                          
-              // Check if the values of the children are still available in the work vector or was assigned during the child operation
-              ok_replace = ok_replace && (c_curr0<0 || c_curr0==c_temp0 || c_curr0==c_curr);
-              ok_replace = ok_replace && (c_curr1<1 || c_curr1==c_temp1 || c_curr1==c_curr);
-              
-              if(ok_replace){
-                
-                // Mark the node negative so that we can remove it later
-                refcount_copy.at(c.get()->temp) = -1;
-                
-                // Save the indices of the children
-                ae.arg.i[0] = place[c_temp0];
-                ae.arg.i[1] = place[c_temp1];
-
-                // Replace operation with an inplace operation
-                ae.op = ip*NUM_BUILT_IN_OPS + c->getOp();
-                
-                // Increase the inplace counter
-                num_inplace++;
-              }
-            }
-          }
-        }
-        // Save index
-        curr_assign[ae.res] = n->temp;
-      }
     }
     
     // Add to algorithm
@@ -837,34 +717,6 @@ void SXFunctionInternal::init(){
     
   // Work vector for partial derivatives
   pdwork_.resize(algorithm_.size());
-  
-  if(num_inplace>0){
-    if(verbose()){
-      cout << "SXFunctionInternal::init Replacing " << num_inplace << " inplace operators" << endl;
-    }
-    
-    vector<AlgEl> algorithm_new;
-    algorithm_new.reserve(binops_.size()-num_inplace);
-    
-    for(int i=0; i<binops_.size(); ++i){
-      
-      // Check if marked
-      bool marked = refcount_copy[binops_[i].get()->temp]<0;
-      
-      // Add if not marked
-      if(marked){
-        num_inplace--;
-      } else {
-        algorithm_new.push_back(algorithm_[i]);
-      }
-    }
-    
-    // Consistency check
-    casadi_assert(num_inplace==0);
-    
-    // Save modified algorithm
-    algorithm_new.swap(algorithm_);
-  }
 
   // Indices corresponding to each non-zero outputs
   output_ind_.resize(output_.size());
@@ -1350,21 +1202,14 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
   // Quick return if no sensitivities
   if(!taping) return;
 
-  // Clear the seeds (do once instead of for every direction?)
-  // if(nfdir>0) fill(s_work_.begin(),s_work_.end(),0);
-  
-  // Loop over all forward directions
+  // Calculate forward sensitivities
   for(int dir=0; dir<nfdir; ++dir){
-
-    // Clear the seeds (needed?)
-    fill(s_work_.begin(),s_work_.end(),0);
-    
-    // Evaluate the algorithm for the sensitivities
     vector<TapeEl<SX> >::const_iterator it2 = s_pdwork.begin();
     for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it, ++it2){
       switch(it->op){
         case OP_CONST:
         case OP_PARAMETER:
+          s_work_[it->res] = 0;
           break;
         case OP_INPUT:
           s_work_[it->res] = fwdSeed[dir][it->arg.i[0]].data()[it->arg.i[1]]; break;
@@ -1378,15 +1223,9 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
     }
   }
 
-  // Clear the seeds (do once instead of for every direction?)
-  // if(nadir>0) fill(s_work_.begin(),s_work_.end(),0);
-  
-  // Loop over all adjoint directions
+  // Calculate adjoint sensitivities
+  if(nadir>0) fill(s_work_.begin(),s_work_.end(),0);
   for(int dir=0; dir<nadir; ++dir){
-    
-    // Clear the seeds (needed?)
-    fill(s_work_.begin(),s_work_.end(),0);
-    
     vector<TapeEl<SX> >::const_reverse_iterator it2 = s_pdwork.rbegin();
     for(vector<AlgEl>::const_reverse_iterator it = algorithm_.rbegin(); it!=algorithm_.rend(); ++it, ++it2){
       SX seed;
@@ -1402,11 +1241,16 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
         case OP_OUTPUT:
           s_work_[it->arg.i[0]] += adjSeed[dir][it->res].data()[it->arg.i[1]];
           break;
-        default: // Unary or binary operation
+        CASADI_MATH_BINARY_BUILTIN // Binary operation
           seed = s_work_[it->res];
           s_work_[it->res] = 0;
           s_work_[it->arg.i[0]] += it2->d[0] * seed;
           s_work_[it->arg.i[1]] += it2->d[1] * seed;
+          break;
+        default: // Unary operation
+          seed = s_work_[it->res];
+          s_work_[it->res] = 0;
+          s_work_[it->arg.i[0]] += it2->d[0] * seed;
       }
     }
   }
@@ -1451,7 +1295,7 @@ void SXFunctionInternal::spInit(bool fwd){
   // We need a work array containing unsigned long rather than doubles. Since the two datatypes have the same size (64 bits)
   // we can save overhead by reusing the double array
   bvec_t *iwork = get_bvec_t(work_);
-  fill_n(iwork,work_.size(),0);
+  if(!fwd) fill_n(iwork,work_.size(),0);
 }
 
 void SXFunctionInternal::spEvaluate(bool fwd){
