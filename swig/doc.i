@@ -1261,6 +1261,17 @@ Get the number of function inputs. ";
 
 Get the number of function outputs. ";
 
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getNumScalarOutputs
+"
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::AcadoIntegratorInternal::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -2456,6 +2467,16 @@ Get the number of function inputs. ";
 
 Get the number of function outputs. ";
 
+%feature("docstring")  CasADi::AcadoOCPInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::AcadoOCPInternal::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -2594,6 +2615,96 @@ Assert that the object has been initialized. ";
 // File: structCasADi_1_1AddBinaryOperation.xml
 %feature("docstring") CasADi::AddBinaryOperation "C++ includes:
 casadi_calculus.hpp ";
+
+
+// File: classCasADi_1_1AuxOutputSX.xml
+%feature("docstring") CasADi::AuxOutputSX "
+
+Represents an auxillary output of a function.
+
+Joel Andersson
+
+C++ includes: aux_output_sx.hpp ";
+
+%feature("docstring")  CasADi::AuxOutputSX::isConstant "
+
+check properties of a node ";
+
+%feature("docstring")  CasADi::AuxOutputSX::isInteger "";
+
+%feature("docstring")  CasADi::AuxOutputSX::isSymbolic "";
+
+%feature("docstring")  CasADi::AuxOutputSX::isZero "";
+
+%feature("docstring")  CasADi::AuxOutputSX::isOne "";
+
+%feature("docstring")  CasADi::AuxOutputSX::isMinusOne "";
+
+%feature("docstring")  CasADi::AuxOutputSX::isNan "";
+
+%feature("docstring")  CasADi::AuxOutputSX::isInf "";
+
+%feature("docstring")  CasADi::AuxOutputSX::isMinusInf "";
+
+%feature("docstring")  CasADi::AuxOutputSX::getValue "
+
+Get value of a constant node. ";
+
+%feature("docstring")  CasADi::AuxOutputSX::getIntValue "";
+
+%feature("docstring")  CasADi::AuxOutputSX::~AuxOutputSX "
+
+Destructor This might need fixing to avoid stack overflow due to recursive
+calling. ";
+
+%feature("docstring")  CasADi::AuxOutputSX::isSmooth "
+
+Check if smooth. ";
+
+%feature("docstring")  CasADi::AuxOutputSX::hasDep "";
+
+%feature("docstring")  CasADi::AuxOutputSX::ndep "
+
+Number of dependencies. ";
+
+%feature("docstring")  CasADi::AuxOutputSX::dep "
+
+get the reference of a dependency ";
+
+%feature("docstring")  CasADi::AuxOutputSX::dep "
+
+get the reference of a child ";
+
+%feature("docstring")  CasADi::AuxOutputSX::getOp "
+
+Get the operation. ";
+
+%feature("docstring")  CasADi::AuxOutputSX::print "
+
+Print the expression (recursively with a maximum number of levels) ";
+
+%feature("docstring")  CasADi::AuxOutputSX::getName "";
+
+%feature("docstring")  CasADi::AuxOutputSX::isEqual "
+
+comparison ";
+
+%feature("docstring")  CasADi::AuxOutputSX::isEqual "
+
+comparison ";
+
+%feature("docstring")  CasADi::AuxOutputSX::init "
+
+Initialize the node (currently used only to give a similar interface to
+MXNode) ";
+
+%feature("docstring")  CasADi::AuxOutputSX::print "
+
+print ";
+
+%feature("docstring")  CasADi::AuxOutputSX::marked "";
+
+%feature("docstring")  CasADi::AuxOutputSX::mark "";
 
 
 // File: structCasADi_1_1BinaryChecker.xml
@@ -4248,6 +4359,16 @@ Get the number of function inputs. ";
 %feature("docstring")  CasADi::CFunctionInternal::getNumOutputs "
 
 Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::CFunctionInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
 
 %feature("docstring")  CasADi::CFunctionInternal::getStats "
 
@@ -6451,6 +6572,18 @@ Get the number of function inputs. ";
 
 Get the number of function outputs. ";
 
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::CollocationIntegratorInternal::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -7057,6 +7190,18 @@ Get the number of function inputs. ";
 CasADi::OptimalControl::CollocationInternal::getNumOutputs "
 
 Get the number of function outputs. ";
+
+%feature("docstring")
+CasADi::OptimalControl::CollocationInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")
+CasADi::OptimalControl::CollocationInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
 
 %feature("docstring")  CasADi::OptimalControl::CollocationInternal::getStats
 "
@@ -8815,6 +8960,18 @@ Get the number of function inputs. ";
 
 Get the number of function outputs. ";
 
+%feature("docstring")  CasADi::ControlSimulatorInternal::getNumScalarInputs
+"
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::getNumScalarOutputs
+"
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::ControlSimulatorInternal::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -9429,6 +9586,16 @@ Get the number of function inputs. ";
 %feature("docstring")  CasADi::CplexInternal::getNumOutputs "
 
 Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::CplexInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::CplexInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
 
 %feature("docstring")  CasADi::CplexInternal::getStats "
 
@@ -12124,6 +12291,18 @@ Get the number of function inputs. ";
 
 Get the number of function outputs. ";
 
+%feature("docstring")
+CasADi::Interfaces::CSparseInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")
+CasADi::Interfaces::CSparseInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -13960,6 +14139,18 @@ Get the number of function inputs. ";
 
 Get the number of function outputs. ";
 
+%feature("docstring")  CasADi::Sundials::CVodesInternal::getNumScalarInputs
+"
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::getNumScalarOutputs
+"
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::Sundials::CVodesInternal::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -15611,6 +15802,18 @@ Get the number of function inputs. ";
 
 Get the number of function outputs. ";
 
+%feature("docstring")  CasADi::ExternalFunctionInternal::getNumScalarInputs
+"
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::getNumScalarOutputs
+"
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::ExternalFunctionInternal::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -17054,6 +17257,16 @@ Get the number of function inputs. ";
 %feature("docstring")  CasADi::FXInternal::getNumOutputs "
 
 Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::FXInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::FXInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
 
 %feature("docstring")  CasADi::FXInternal::getStats "
 
@@ -19412,6 +19625,16 @@ Get the number of function inputs. ";
 
 Get the number of function outputs. ";
 
+%feature("docstring")  CasADi::Sundials::IdasInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::Sundials::IdasInternal::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -20728,6 +20951,18 @@ Get the number of function inputs. ";
 %feature("docstring")  CasADi::ImplicitFunctionInternal::getNumOutputs "
 
 Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::getNumScalarInputs
+"
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::getNumScalarOutputs
+"
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::getStats "
 
@@ -22230,6 +22465,16 @@ Get the number of function inputs. ";
 
 Get the number of function outputs. ";
 
+%feature("docstring")  CasADi::IntegratorInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::IntegratorInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::IntegratorInternal::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -22841,6 +23086,16 @@ Get the number of function inputs. ";
 %feature("docstring")  CasADi::IPInternal::getNumOutputs "
 
 Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::IPInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::IPInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
 
 %feature("docstring")  CasADi::IPInternal::getStats "
 
@@ -26864,6 +27119,16 @@ Get the number of function inputs. ";
 
 Get the number of function outputs. ";
 
+%feature("docstring")  CasADi::IpoptInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::IpoptInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::IpoptInternal::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -27859,6 +28124,18 @@ Get the number of function inputs. ";
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::getNumOutputs "
 
 Get the number of function outputs. ";
+
+%feature("docstring")
+CasADi::Interfaces::IpoptQPInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")
+CasADi::Interfaces::IpoptQPInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::getStats "
 
@@ -33565,6 +33842,16 @@ Get the number of function inputs. ";
 
 Get the number of function outputs. ";
 
+%feature("docstring")  CasADi::JacobianInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::JacobianInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::JacobianInternal::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -34371,6 +34658,18 @@ Get the number of function inputs. ";
 %feature("docstring")  CasADi::Sundials::KinsolInternal::getNumOutputs "
 
 Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::Sundials::KinsolInternal::getNumScalarInputs
+"
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::Sundials::KinsolInternal::getNumScalarOutputs
+"
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
 
 %feature("docstring")  CasADi::Sundials::KinsolInternal::getStats "
 
@@ -35958,6 +36257,16 @@ Get the number of function inputs. ";
 %feature("docstring")  CasADi::KnitroInternal::getNumOutputs "
 
 Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::KnitroInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::KnitroInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
 
 %feature("docstring")  CasADi::KnitroInternal::getStats "
 
@@ -38046,6 +38355,18 @@ CasADi::Interfaces::LapackLUDenseInternal::getNumOutputs "
 
 Get the number of function outputs. ";
 
+%feature("docstring")
+CasADi::Interfaces::LapackLUDenseInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackLUDenseInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -39236,6 +39557,18 @@ Get the number of function inputs. ";
 CasADi::Interfaces::LapackQRDenseInternal::getNumOutputs "
 
 Get the number of function outputs. ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackQRDenseInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackQRDenseInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::getStats "
 
@@ -40835,6 +41168,16 @@ Get the number of function inputs. ";
 
 Get the number of function outputs. ";
 
+%feature("docstring")  CasADi::LiftedSQPInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::LiftedSQPInternal::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -41460,6 +41803,18 @@ Get the number of function inputs. ";
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::getNumOutputs "
 
 Get the number of function outputs. ";
+
+%feature("docstring")
+CasADi::Interfaces::LiftoptInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")
+CasADi::Interfaces::LiftoptInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::getStats "
 
@@ -43387,6 +43742,16 @@ Get the number of function inputs. ";
 %feature("docstring")  CasADi::LinearSolverInternal::getNumOutputs "
 
 Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
 
 %feature("docstring")  CasADi::LinearSolverInternal::getStats "
 
@@ -46210,6 +46575,18 @@ CasADi::OptimalControl::MultipleShootingInternal::getNumOutputs "
 Get the number of function outputs. ";
 
 %feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
+%feature("docstring")
 CasADi::OptimalControl::MultipleShootingInternal::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -48710,6 +49087,16 @@ Get the number of function inputs. ";
 
 Get the number of function outputs. ";
 
+%feature("docstring")  CasADi::MXFunctionInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::MXFunctionInternal::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -50410,6 +50797,16 @@ Get the number of function inputs. ";
 %feature("docstring")  CasADi::NLPSolverInternal::getNumOutputs "
 
 Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
 
 %feature("docstring")  CasADi::NLPSolverInternal::getStats "
 
@@ -53262,6 +53659,16 @@ Get the number of function inputs. ";
 
 Get the number of function outputs. ";
 
+%feature("docstring")  CasADi::OCPSolverInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::OCPSolverInternal::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -53898,6 +54305,18 @@ Get the number of function inputs. ";
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::getNumOutputs "
 
 Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::getNumScalarInputs
+"
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::getNumScalarOutputs
+"
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::getStats "
 
@@ -55287,96 +55706,6 @@ Input nonzero and dependency index.
 C++ includes: mapping.hpp ";
 
 
-// File: classCasADi_1_1OutputSX.xml
-%feature("docstring") CasADi::OutputSX "
-
-Represents an auxillary output of a function.
-
-Joel Andersson
-
-C++ includes: output_sx.hpp ";
-
-%feature("docstring")  CasADi::OutputSX::isConstant "
-
-check properties of a node ";
-
-%feature("docstring")  CasADi::OutputSX::isInteger "";
-
-%feature("docstring")  CasADi::OutputSX::isSymbolic "";
-
-%feature("docstring")  CasADi::OutputSX::isZero "";
-
-%feature("docstring")  CasADi::OutputSX::isOne "";
-
-%feature("docstring")  CasADi::OutputSX::isMinusOne "";
-
-%feature("docstring")  CasADi::OutputSX::isNan "";
-
-%feature("docstring")  CasADi::OutputSX::isInf "";
-
-%feature("docstring")  CasADi::OutputSX::isMinusInf "";
-
-%feature("docstring")  CasADi::OutputSX::getValue "
-
-Get value of a constant node. ";
-
-%feature("docstring")  CasADi::OutputSX::getIntValue "";
-
-%feature("docstring")  CasADi::OutputSX::~OutputSX "
-
-Destructor This might need fixing to avoid stack overflow due to recursive
-calling. ";
-
-%feature("docstring")  CasADi::OutputSX::isSmooth "
-
-Check if smooth. ";
-
-%feature("docstring")  CasADi::OutputSX::hasDep "";
-
-%feature("docstring")  CasADi::OutputSX::ndep "
-
-Number of dependencies. ";
-
-%feature("docstring")  CasADi::OutputSX::dep "
-
-get the reference of a dependency ";
-
-%feature("docstring")  CasADi::OutputSX::dep "
-
-get the reference of a child ";
-
-%feature("docstring")  CasADi::OutputSX::getOp "
-
-Get the operation. ";
-
-%feature("docstring")  CasADi::OutputSX::print "
-
-Print the expression (recursively with a maximum number of levels) ";
-
-%feature("docstring")  CasADi::OutputSX::getName "";
-
-%feature("docstring")  CasADi::OutputSX::isEqual "
-
-comparison ";
-
-%feature("docstring")  CasADi::OutputSX::isEqual "
-
-comparison ";
-
-%feature("docstring")  CasADi::OutputSX::init "
-
-Initialize the node (currently used only to give a similar interface to
-MXNode) ";
-
-%feature("docstring")  CasADi::OutputSX::print "
-
-print ";
-
-%feature("docstring")  CasADi::OutputSX::marked "";
-
-%feature("docstring")  CasADi::OutputSX::mark "";
-
-
 // File: classCasADi_1_1Parallelizer.xml
 %feature("docstring") CasADi::Parallelizer "
 
@@ -56389,6 +56718,16 @@ Get the number of function inputs. ";
 
 Get the number of function outputs. ";
 
+%feature("docstring")  CasADi::ParallelizerInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::ParallelizerInternal::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -56969,6 +57308,18 @@ Get the number of function inputs. ";
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::getNumOutputs "
 
 Get the number of function outputs. ";
+
+%feature("docstring")
+CasADi::Interfaces::QPOasesInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")
+CasADi::Interfaces::QPOasesInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::getStats "
 
@@ -58877,6 +59228,16 @@ Get the number of function inputs. ";
 
 Get the number of function outputs. ";
 
+%feature("docstring")  CasADi::QPSolverInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::QPSolverInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::QPSolverInternal::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -60295,6 +60656,16 @@ Get the number of function inputs. ";
 %feature("docstring")  CasADi::RKIntegratorInternal::getNumOutputs "
 
 Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
 
 %feature("docstring")  CasADi::RKIntegratorInternal::getStats "
 
@@ -61878,6 +62249,16 @@ Get the number of function inputs. ";
 
 Get the number of function outputs. ";
 
+%feature("docstring")  CasADi::SimulatorInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::SimulatorInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::SimulatorInternal::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -62857,6 +63238,16 @@ Get the number of function inputs. ";
 %feature("docstring")  CasADi::SQPInternal::getNumOutputs "
 
 Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::SQPInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::SQPInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
 
 %feature("docstring")  CasADi::SQPInternal::getStats "
 
@@ -65481,6 +65872,18 @@ Get the number of function inputs. ";
 
 Get the number of function outputs. ";
 
+%feature("docstring")
+CasADi::Sundials::SundialsInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")
+CasADi::Sundials::SundialsInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::Sundials::SundialsInternal::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -66707,6 +67110,16 @@ Get the number of function inputs. ";
 %feature("docstring")  CasADi::SuperLUInternal::getNumOutputs "
 
 Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::SuperLUInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::SuperLUInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
 
 %feature("docstring")  CasADi::SuperLUInternal::getStats "
 
@@ -68058,10 +68471,6 @@ Initialize. ";
 Update the number of sensitivity directions during or after initialization.
 ";
 
-%feature("docstring")  CasADi::SXFunctionInternal::printOperation "
-
-Print operation i to a stream. ";
-
 %feature("docstring")  CasADi::SXFunctionInternal::generateCode "
 
 Print to a c file. ";
@@ -68211,6 +68620,16 @@ Get the number of function inputs. ";
 %feature("docstring")  CasADi::SXFunctionInternal::getNumOutputs "
 
 Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::getStats "
 
@@ -71076,6 +71495,16 @@ Get the number of function inputs. ";
 
 Get the number of function outputs. ";
 
+%feature("docstring")  CasADi::WorhpInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::WorhpInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
 %feature("docstring")  CasADi::WorhpInternal::getStats "
 
 Get all statistics obtained at the end of the last evaluate call. ";
@@ -73060,6 +73489,16 @@ Get the number of function inputs. ";
 %feature("docstring")  CasADi::XFunctionInternal::getNumOutputs "
 
 Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::XFunctionInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
 
 %feature("docstring")  CasADi::XFunctionInternal::getStats "
 
@@ -75297,6 +75736,9 @@ h:  internal expressions which the user may wish to inspect ";
 // File: all_8hpp.xml
 
 
+// File: aux__output__sx_8hpp.xml
+
+
 // File: b0__options_8hpp.xml
 
 
@@ -75972,9 +76414,6 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: options__functionality_8hpp.xml
-
-
-// File: output__sx_8hpp.xml
 
 
 // File: parallelizer_8cpp.xml
