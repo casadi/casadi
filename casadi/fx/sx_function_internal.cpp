@@ -57,7 +57,7 @@ using namespace std;
 SXFunctionInternal::SXFunctionInternal(const vector<Matrix<SX> >& inputv, const vector<Matrix<SX> >& outputv) : 
   XFunctionInternal<SXFunctionInternal,Matrix<SX>,SXNode>(inputv,outputv) {
   setOption("name","unnamed_sx_function");
-  addOption("live_variables",OT_BOOLEAN,false,"Reuse variables in the work vector");
+  addOption("live_variables",OT_BOOLEAN,true,"Reuse variables in the work vector");
   addOption("inplace",OT_BOOLEAN,false,"Evaluate with inplace operations (experimental)");
   addOption("just_in_time",OT_BOOLEAN,false,"Just-in-time compilation for numeric evaluation (experimental)");
 

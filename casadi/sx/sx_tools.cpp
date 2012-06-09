@@ -190,6 +190,7 @@ void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, std::vector<Matrix
     
   // Write the mapping function
   SXFunction f(v,f_out);
+  f.setOption("live_variables",false);
   f.init();
 
   // Get references to the internal data structures
