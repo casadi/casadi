@@ -112,24 +112,30 @@ void XFunctionInternal<DerivedType,MatType,NodeType>::sort_depth_first(std::stac
       // If the last element on the stack has not yet been added
       if (t && !t->temp){
         
-        // If a dependent node was added to the stack
-        bool added_dep = false;
-        
         // Initialize the node
         t->init();
-    
-        // Add dependent nodes if not already added
+
+        // Find out which not yet added dependency has most number of dependencies
+        int max_deps = -1, dep_with_max_deps = -1;
         for(int i=0; i<t->ndep(); ++i){
           if(t->dep(i).get() !=0 && static_cast<NodeType*>(t->dep(i).get())->temp == 0) {
-            // if the first child has not yet been added
-            s.push(static_cast<NodeType*>(t->dep(i).get()));
-            added_dep=true;
-            break;
+            int ndep_i = t->dep(i)->ndep();
+            if(ndep_i>max_deps){
+              max_deps = ndep_i;
+              dep_with_max_deps = i;
+            }
           }
         }
         
-        if(!added_dep){  // if no dependencies were added
-          // Add to algorithm
+        // If there is any dependency which has not yet been added
+        if(dep_with_max_deps>=0){
+          
+          // Add to the stack the dependency with the most number of dependencies (so that constants, inputs etc are added last)
+          s.push(static_cast<NodeType*>(t->dep(dep_with_max_deps).get()));
+          
+        } else {
+          
+          // if no dependencies need to be added, we can add the node to the algorithm
           nodes.push_back(t);
 
           // Mark the node as found
@@ -137,7 +143,6 @@ void XFunctionInternal<DerivedType,MatType,NodeType>::sort_depth_first(std::stac
 
           // Remove from stack
           s.pop();
-          
         }
       } else {
         // If the last element on the stack has already been added
