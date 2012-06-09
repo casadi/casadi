@@ -312,19 +312,19 @@ CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
 
     // Clear the forward seeds/adjoint sensitivities
     for(int ind=0; ind<getNumInputs(); ++ind){
-      vector<double> &v = input(ind).data();
-      if(!v.empty()) fill_n(get_bvec_t(v),v.size(),0);
+      vector<double> &v = input<false>(ind).data();
+      if(!v.empty()) fill_n(get_bvec_t(v),v.size(),bvec_t(0));
     }
 
     // Clear the adjoint seeds/forward sensitivities
     for(int ind=0; ind<getNumOutputs(); ++ind){
-      vector<double> &v = output(ind).data();
-      if(!v.empty()) fill_n(get_bvec_t(v),v.size(),0);
+      vector<double> &v = output<false>(ind).data();
+      if(!v.empty()) fill_n(get_bvec_t(v),v.size(),bvec_t(0));
     }
     
     // Get seeds and sensitivities
-    bvec_t* input_v = get_bvec_t(input(iind).data());
-    bvec_t* output_v = get_bvec_t(output(oind).data());
+    bvec_t* input_v = get_bvec_t(input<false>(iind).data());
+    bvec_t* output_v = get_bvec_t(output<false>(oind).data());
     bvec_t* seed_v = use_fwd ? input_v : output_v;
     bvec_t* sens_v = use_fwd ? output_v : input_v;
     

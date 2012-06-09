@@ -568,6 +568,11 @@ void SXFunctionInternal::init(){
     for(int c=0; c<ndeps; ++c){
       it->arg.i[c] = place[it->arg.i[c]];
     }
+    
+    // If binary, make sure that the second argument is the same as the first one (in order to treat all operations as binary) NOTE: ugly
+    if(ndeps==1 && it->op!=OP_OUTPUT){
+      it->arg.i[1] = it->arg.i[0];
+    }
   }
   
   if(verbose()){
@@ -577,7 +582,7 @@ void SXFunctionInternal::init(){
       cout << "Not using live variables" << endl;
     }
   }
-    
+      
   // Allocate work vectors (symbolic/numeric)
   work_.resize(worksize,numeric_limits<double>::quiet_NaN());
   s_work_.resize(worksize);
