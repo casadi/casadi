@@ -107,10 +107,10 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
     }
   } else {
     vector<TapeEl<double> >::iterator it1 = pdwork_.begin();
-    for(vector<AlgEl>::iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it, ++it1){
+    for(vector<AlgEl>::iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
       switch(it->op){
         // Start by adding all of the built operations
-        CASADI_MATH_DERF_BUILTIN(work_[it->arg.i[0]],work_[it->arg.i[1]],work_[it->res],it1->d)
+        CASADI_MATH_DERF_BUILTIN(work_[it->arg.i[0]],work_[it->arg.i[1]],work_[it->res],it1++->d)
 
         // Constant
         case OP_CONST: work_[it->res] = it->arg.d; break;
@@ -130,7 +130,7 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   // Calculate forward sensitivities
   for(int dir=0; dir<nfdir; ++dir){
     vector<TapeEl<double> >::const_iterator it2 = pdwork_.begin();
-    for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it, ++it2){
+    for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
       switch(it->op){
         case OP_CONST:
           work_[it->res] = 0; break;
@@ -139,7 +139,7 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
         case OP_OUTPUT: 
           fwdSens<false>(it->res,dir).data()[it->arg.i[1]] = work_[it->arg.i[0]]; break;
         default: // Unary or binary operation
-          work_[it->res] = it2->d[0] * work_[it->arg.i[0]] + it2->d[1] * work_[it->arg.i[1]];  break;
+          work_[it->res] = it2->d[0] * work_[it->arg.i[0]] + it2->d[1] * work_[it->arg.i[1]]; ++it2; break;
       }
     }
   }
@@ -148,7 +148,7 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   if(nadir>0) fill(work_.begin(),work_.end(),0);
   for(int dir=0; dir<nadir; ++dir){
     vector<TapeEl<double> >::const_reverse_iterator it2 = pdwork_.rbegin();
-    for(vector<AlgEl>::const_reverse_iterator it = algorithm_.rbegin(); it!=algorithm_.rend(); ++it, ++it2){
+    for(vector<AlgEl>::const_reverse_iterator it = algorithm_.rbegin(); it!=algorithm_.rend(); ++it){
       double seed;
       switch(it->op){
         case OP_CONST:
@@ -166,6 +166,7 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
           work_[it->res] = 0;
           work_[it->arg.i[0]] += it2->d[0] * seed;
           work_[it->arg.i[1]] += it2->d[1] * seed;
+          ++it2;
       }
     }
   }
@@ -620,7 +621,7 @@ void SXFunctionInternal::init(){
   s_work_.resize(worksize);
       
   // Work vector for partial derivatives
-  pdwork_.resize(algorithm_.size());
+  pdwork_.resize(operations_.size());
   
   // Reset the temporary variables
   for(int i=0; i<nodes.size(); ++i){
@@ -952,96 +953,68 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
   
   // Tape
   std::vector<TapeEl<SX> > s_pdwork;
+  vector<TapeEl<SX> >::iterator it1;
+  if(taping){
+    s_pdwork.resize(operations_.size());
+    it1 = s_pdwork.begin();
+  }
 
   // Evaluate the algorithm
-  if(!taping){
-    for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it<algorithm_.end(); ++it){
-      if(it->op==OP_INPUT){
-        s_work_[it->res] = input[it->arg.i[0]].data()[it->arg.i[1]];
-      } else if(it->op==OP_OUTPUT){
-        output[it->res].data()[it->arg.i[1]] = s_work_[it->arg.i[0]];
-      } else if(output_given){
-        // Assign to the symbolic work vector
-        s_work_[it->res] = it->op == OP_CONST ? c_it != constants_.end() ? *c_it++ : SX(it->arg.d) : it->op==OP_PARAMETER ? *p_it++ : *b_it++;
-      } else {
-        // Get the arguments
-        switch(it->op){
-          // Start by adding all of the built operations
-          CASADI_MATH_FUN_ALL_BUILTIN(s_work_[it->arg.i[0]],s_work_[it->arg.i[1]],s_work_[it->res])
-
-          // Constant
-          case OP_CONST: s_work_[it->res] = c_it != constants_.end() ? *c_it++ : SX(it->arg.d); break;
-
-          // Parameter
-          case OP_PARAMETER: s_work_[it->res] = *p_it++; break;
+  for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it<algorithm_.end(); ++it){
+    switch(it->op){
+      case OP_INPUT:
+        s_work_[it->res] = input[it->arg.i[0]].data()[it->arg.i[1]]; break;
+      case OP_OUTPUT:
+        output[it->res].data()[it->arg.i[1]] = s_work_[it->arg.i[0]]; break;
+      case OP_CONST:
+        s_work_[it->res] = *c_it++; break;
+      case OP_PARAMETER:
+        s_work_[it->res] = *p_it++; break;
+      default:
+      {
+        // Evaluate the function to a temporary value (as it might overwrite the children in the work vector)
+        SX f;
+        if(output_given){
+          f = *b_it++;
+        } else {
+          switch(it->op){
+            CASADI_MATH_FUN_ALL_BUILTIN(s_work_[it->arg.i[0]],s_work_[it->arg.i[1]],f)
+          }
         }
-      }
-    }
-  } else {
-    s_pdwork.resize(pdwork_.size());
-    vector<TapeEl<SX> >::iterator it1 = s_pdwork.begin();
-    for(vector<AlgEl>::iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it, ++it1){
-      if(it->op==OP_INPUT){
-        s_work_[it->res] = input[it->arg.i[0]].data()[it->arg.i[1]];
-        it1->d[0] = it1->d[1] = 0;
-      } else if(it->op==OP_OUTPUT){
-        output[it->res].data()[it->arg.i[1]] = s_work_[it->arg.i[0]];
-        it1->d[0] = it1->d[1] = 0;
-      } else if(output_given){
-        // Assign to the symbolic work vector
-        SX f = it->op == OP_CONST ? c_it != constants_.end() ? *c_it++ : SX(it->arg.d) : it->op==OP_PARAMETER ? *p_it++ : *b_it++;
-        switch(it->op){
-          // Start by adding all of the built operations
-          CASADI_MATH_DER_BUILTIN(s_work_[it->arg.i[0]],s_work_[it->arg.i[1]],f,it1->d)
-
-          // Constant
-          case OP_CONST: 
-          case OP_PARAMETER:
-            it1->d[0] = it1->d[1] = 0; 
-            break;
+        
+        // Get the partial derivatives, if requested
+        if(taping){
+          switch(it->op){
+            CASADI_MATH_DER_BUILTIN(s_work_[it->arg.i[0]],s_work_[it->arg.i[1]],f,it1++->d)
+          }
         }
+        
+        // Finally save the function value
         s_work_[it->res] = f;
-      } else {
-        switch(it->op){
-          // Start by adding all of the built operations
-          CASADI_MATH_DERF_BUILTIN(s_work_[it->arg.i[0]],s_work_[it->arg.i[1]],s_work_[it->res],it1->d)
-
-          // Constant
-          case OP_CONST: 
-            s_work_[it->res] = c_it != constants_.end() ? *c_it++ : SX(it->arg.d); 
-            it1->d[0] = it1->d[1] = 0;
-            break;
-
-          // Parameter
-          case OP_PARAMETER: 
-            s_work_[it->res] = *p_it++;
-            it1->d[0] = it1->d[1] = 0;
-            break;
-        }
       }
     }
   }
-      
+  
   // Quick return if no sensitivities
   if(!taping) return;
 
   // Calculate forward sensitivities
   for(int dir=0; dir<nfdir; ++dir){
     vector<TapeEl<SX> >::const_iterator it2 = s_pdwork.begin();
-    for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it, ++it2){
+    for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
       switch(it->op){
-        case OP_CONST:
-        case OP_PARAMETER:
-          s_work_[it->res] = 0;
-          break;
         case OP_INPUT:
           s_work_[it->res] = fwdSeed[dir][it->arg.i[0]].data()[it->arg.i[1]]; break;
         case OP_OUTPUT:
           fwdSens[dir][it->res].data()[it->arg.i[1]] = s_work_[it->arg.i[0]]; break;
+        case OP_CONST:
+        case OP_PARAMETER:
+          s_work_[it->res] = 0;
+          break;
         CASADI_MATH_BINARY_BUILTIN // Binary operation
-          s_work_[it->res] = it2->d[0] * s_work_[it->arg.i[0]] + it2->d[1] * s_work_[it->arg.i[1]]; break;
+          s_work_[it->res] = it2->d[0] * s_work_[it->arg.i[0]] + it2->d[1] * s_work_[it->arg.i[1]]; it2++; break;
         default: // Unary operation
-          s_work_[it->res] = it2->d[0] * s_work_[it->arg.i[0]];
+          s_work_[it->res] = it2->d[0] * s_work_[it->arg.i[0]]; it2++; 
       }
     }
   }
@@ -1050,13 +1023,9 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
   if(nadir>0) fill(s_work_.begin(),s_work_.end(),0);
   for(int dir=0; dir<nadir; ++dir){
     vector<TapeEl<SX> >::const_reverse_iterator it2 = s_pdwork.rbegin();
-    for(vector<AlgEl>::const_reverse_iterator it = algorithm_.rbegin(); it!=algorithm_.rend(); ++it, ++it2){
+    for(vector<AlgEl>::const_reverse_iterator it = algorithm_.rbegin(); it!=algorithm_.rend(); ++it){
       SX seed;
       switch(it->op){
-        case OP_CONST:
-        case OP_PARAMETER:
-          s_work_[it->res] = 0;
-          break;
         case OP_INPUT:
           adjSens[dir][it->arg.i[0]].data()[it->arg.i[1]] = s_work_[it->res];
           s_work_[it->res] = 0;
@@ -1064,16 +1033,22 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
         case OP_OUTPUT:
           s_work_[it->arg.i[0]] += adjSeed[dir][it->res].data()[it->arg.i[1]];
           break;
+        case OP_CONST:
+        case OP_PARAMETER:
+          s_work_[it->res] = 0;
+          break;
         CASADI_MATH_BINARY_BUILTIN // Binary operation
           seed = s_work_[it->res];
           s_work_[it->res] = 0;
           s_work_[it->arg.i[0]] += it2->d[0] * seed;
           s_work_[it->arg.i[1]] += it2->d[1] * seed;
+          it2++;
           break;
         default: // Unary operation
           seed = s_work_[it->res];
           s_work_[it->res] = 0;
           s_work_[it->arg.i[0]] += it2->d[0] * seed;
+          it2++; 
       }
     }
   }
