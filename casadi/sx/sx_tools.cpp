@@ -194,22 +194,33 @@ void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, std::vector<Matrix
   f.init();
 
   // Get references to the internal data structures
-  const std::vector<int>& input_ind = f->input_ind_.front();
-  std::vector<int>& output_ind = f->output_ind_.front();
   std::vector<SXAlgEl>& algorithm = f->algorithm_;
   
-  // Create the filter
-  vector<int> filter = range(f->work_.size());
-  casadi_assert(input_ind.size()==output_ind.size());
-  
-  // Replace expression
-  for(int k=0; k<input_ind.size(); ++k){
-    if(reverse){
-      filter[output_ind[k]] = input_ind[k];
-    } else {
-      output_ind[k] = filter[output_ind[k]];
-      filter[input_ind[k]] = output_ind[k];
+  // Find out which places in the work vector corresponds to the inputs and outputs
+  vector<pair<int,int> > mapping(f.input(0).size());
+  casadi_assert(mapping.size()==f.output(0).size());
+  for(vector<SXAlgEl>::iterator it=algorithm.begin(); it!=algorithm.end(); ++it){
+    if(it->op==OP_INPUT){
+      int loc = it->res;
+      int ind = it->arg.i[0];
+      int nz = it->arg.i[1];
+      if(ind==0){
+        mapping.at(nz).first = loc;
+      }
+    } else if(it->op==OP_OUTPUT){
+      int loc = it->arg.i[0];
+      int ind = it->res;
+      int nz = it->arg.i[1];
+      if(ind==0){
+        mapping.at(nz).second = loc;
+      }
     }
+  }
+
+  // Create a filter which contains a new storage location in the algorithm for each old storage location
+  vector<int> filter = range(f->work_.size());
+  for(vector<pair<int,int> >::const_iterator it=mapping.begin(); it!=mapping.end(); ++it){
+    filter[it->first] = it->second;
   }
   
   // Now filter out the variables from the algorithm
@@ -219,15 +230,7 @@ void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, std::vector<Matrix
       it->arg.i[c] = filter[it->arg.i[c]];
     }
   }
-  
-  // Filter the variables from the dependent expressions
-  for(int i=0; i<ex.size(); ++i){
-    std::vector<int>& ex_ind = f->output_ind_.at(i+1);
-    for(std::vector<int>::iterator it=ex_ind.begin(); it!=ex_ind.end(); ++it){
-      *it = filter[*it];
-    }
-  }
-  
+    
   // No sensitivities
   vector<vector<SXMatrix> > dummy;
 

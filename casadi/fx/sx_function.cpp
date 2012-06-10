@@ -97,48 +97,15 @@ bool SXFunction::checkNode() const{
 }
 
 SXMatrix SXFunction::jac(int iind, int oind, bool compact, bool symmetric){
-  if(input(iind).empty() || output(oind).empty()) return Matrix<SX>(); // quick return
   return (*this)->jac(iind,oind,compact,symmetric);
 }
 
 SXMatrix SXFunction::grad(int iind, int oind){
-  return trans(jac(iind,oind));
+  return (*this)->grad(iind,oind);
 }
 
 SXMatrix SXFunction::hess(int iind, int oind){
-  if(output(oind).numel() != 1)
-    throw CasadiException("SXFunctionInternal::hess: function must be scalar");
-  
-  // Reverse mode to calculate gradient
-  if((*this)->verbose()){
-    cout << "SXFunction::hess: calculating gradient " << endl;
-  }
-  Matrix<SX> g = grad(iind,oind);
-  if((*this)->verbose()){
-    cout << "SXFunction::hess: calculating gradient done " << endl;
-  }
-
-  makeDense(g);
-  if((*this)->verbose()){
-    cout << "SXFunction::hessian: made gradient dense (workaround!) " << endl;
-  }
-
-  // Create function
-  SXFunction gfcn(inputSX(iind),g);
-  gfcn.setOption("verbose",getOption("verbose"));
-  gfcn.init();
-  
-  // Calculate jacobian of gradient
-  if((*this)->verbose()){
-    cout << "SXFunction::hess: calculating Jacobian " << endl;
-  }
-  SXMatrix ret = gfcn.jac(0,0,false,true);
-  if((*this)->verbose()){
-    cout << "SXFunction::hess: calculating Jacobian done" << endl;
-  }
-  
-  // Return jacobian of the gradient
-  return ret;
+  return (*this)->hess(iind,oind);
 }
 
 const SXMatrix& SXFunction::inputSX(int ind) const{

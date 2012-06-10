@@ -54,8 +54,8 @@ namespace CasADi{
 using namespace std;
 
 
-SXFunctionInternal::SXFunctionInternal(const vector<Matrix<SX> >& inputv, const vector<Matrix<SX> >& outputv) : 
-  XFunctionInternal<SXFunctionInternal,Matrix<SX>,SXNode>(inputv,outputv) {
+SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix >& inputv, const vector<SXMatrix >& outputv) : 
+  XFunctionInternal<SXFunctionInternal,SXMatrix,SXNode>(inputv,outputv) {
   setOption("name","unnamed_sx_function");
   addOption("live_variables",OT_BOOLEAN,true,"Reuse variables in the work vector");
   addOption("inplace",OT_BOOLEAN,false,"Evaluate with inplace operations (experimental)");
@@ -171,8 +171,40 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   }
 }
 
+SXMatrix SXFunctionInternal::grad(int iind, int oind){
+  return trans(jac(iind,oind));
+}
+
+SXMatrix SXFunctionInternal::hess(int iind, int oind){
+  casadi_assert_message(output(oind).numel() == 1, "Function must be scalar");
+  SXMatrix g = grad(iind,oind);
+  makeDense(g);
+  if(verbose())  cout << "SXFunctionInternal::hess: calculating gradient done " << endl;
+
+  // Create function
+  SXFunction gfcn(inputv_.at(iind),g);
+  gfcn.setOption("verbose",getOption("verbose"));
+  gfcn.init();
+  
+  // Calculate jacobian of gradient
+  if(verbose()){
+    cout << "SXFunctionInternal::hess: calculating Jacobian " << endl;
+  }
+  SXMatrix ret = gfcn.jac(0,0,false,true);
+  if(verbose()){
+    cout << "SXFunctionInternal::hess: calculating Jacobian done" << endl;
+  }
+  
+  // Return jacobian of the gradient
+  return ret;
+}
+
 SXMatrix SXFunctionInternal::jac(int iind, int oind, bool compact, bool symmetric){
-  return jacGen(iind,oind,compact,symmetric);
+  if(input(iind).empty() || output(oind).empty()){
+    return Matrix<SX>(); // quick return
+  } else {
+    return jacGen(iind,oind,compact,symmetric);
+  }
 }
 
 bool SXFunctionInternal::isSmooth() const{
@@ -398,7 +430,7 @@ void SXFunctionInternal::generateCode(const string& src_name){
 
 void SXFunctionInternal::init(){
   // Call the init function of the base class
-  XFunctionInternal<SXFunctionInternal,Matrix<SX>,SXNode>::init();
+  XFunctionInternal<SXFunctionInternal,SXMatrix,SXNode>::init();
 
   // Stack used to sort the computational graph
   stack<SXNode*> s;
@@ -408,7 +440,7 @@ void SXFunctionInternal::init(){
 
   // Add the list of nodes
   int ind=0;
-  for(vector<Matrix<SX> >::const_iterator it = outputv_.begin(); it != outputv_.end(); ++it, ++ind){
+  for(vector<SXMatrix >::const_iterator it = outputv_.begin(); it != outputv_.end(); ++it, ++ind){
     int nz=0;
     for(vector<SX>::const_iterator itc = it->begin(); itc != it->end(); ++itc, ++nz){
       // Add outputs to the list
@@ -421,7 +453,7 @@ void SXFunctionInternal::init(){
   }
   
   // Make sure that all inputs have been added also // TODO REMOVE THIS
-  for(vector<Matrix<SX> >::const_iterator it = inputv_.begin(); it != inputv_.end(); ++it){
+  for(vector<SXMatrix >::const_iterator it = inputv_.begin(); it != inputv_.end(); ++it){
     for(vector<SX>::const_iterator itc = it->begin(); itc != it->end(); ++itc){
       if(!itc->getTemp()){
         nodes.push_back(itc->get());
@@ -579,49 +611,16 @@ void SXFunctionInternal::init(){
     if(live_variables){
       cout << "Using live variables: work array is " <<  worksize << " instead of " << nodes.size() << endl;
     } else {
-      cout << "Not using live variables" << endl;
+      cout << "Live variables disabled." << endl;
     }
   }
-      
+  
   // Allocate work vectors (symbolic/numeric)
   work_.resize(worksize,numeric_limits<double>::quiet_NaN());
   s_work_.resize(worksize);
-  
-    
+      
   // Work vector for partial derivatives
   pdwork_.resize(algorithm_.size());
-
-  // Indices corresponding to each non-zero outputs // TODO: remove!
-  output_ind_.resize(output_.size());
-  for(int i=0; i<outputv_.size(); ++i){
-    // References
-    const Matrix<SX>& op = outputv_[i];
-    
-    // Allocate space for the indices
-    vector<int>& oi = output_ind_[i];  
-    oi.resize(op.size());
-
-    // save the indices
-    for(int j=0; j<op.size(); ++j){
-      oi[j] = place[op.data()[j].get()->temp];
-    }
-  }
-  
-  // Indices corresponding to the inputs // TODO: remove!
-  input_ind_.resize(inputv_.size());
-  for(int i=0; i<inputv_.size(); ++i){
-    // References
-    Matrix<SX>& ip = inputv_[i];
-
-    // Allocate space for the indices
-    vector<int>& ii = input_ind_[i];
-    ii.resize(ip.size());
-
-    // save the indices
-    for(int j=0; j<ip.size(); ++j){
-      ii[j] = place[ip.data()[j].get()->temp];
-    }
-  }
   
   // Reset the temporary variables
   for(int i=0; i<nodes.size(); ++i){
@@ -880,39 +879,25 @@ void SXFunctionInternal::init(){
 
 void SXFunctionInternal::updateNumSens(bool recursive){
   // Call the base class if needed
-  if(recursive) XFunctionInternal<SXFunctionInternal,Matrix<SX>,SXNode>::updateNumSens(recursive);
+  if(recursive) XFunctionInternal<SXFunctionInternal,SXMatrix,SXNode>::updateNumSens(recursive);
 }
 
 FX SXFunctionInternal::hessian(int iind, int oind){
-  if(output(oind).numel() != 1)
-    throw CasadiException("SXFunctionInternal::hess: function must be scalar");
-
-  // Reverse mode to calculate gradient
-  if(verbose()){
-    cout << "SXFunctionInternal::hessian: calculating gradient " << endl;
-  }
-  SXFunction this_;
-  this_.assignNode(this);
-  Matrix<SX> g = this_.grad(iind,oind);
-
-  if(verbose()){
-    cout << "SXFunctionInternal::hessian: calculating gradient done " << endl;
-  }
-
-  makeDense(g);
-  if(verbose()){
-    cout << "SXFunctionInternal::hessian: made gradient dense (workaround!) " << endl;
-  }
+  casadi_assert_message(output(oind).numel() == 1, "Function must be scalar");
 
   // Numeric or symbolic hessian
   bool numeric_hessian = getOption("numeric_hessian");
   
-  // Hessian function
-  FX hfcn;
-  
   if(numeric_hessian){
-    // Create function including all inputs
+    // Calculate gradiant expression
+    if(verbose()) cout << "SXFunctionInternal::hessian: calculating gradient expression " << endl;
+    SXMatrix g = grad(iind,oind);
+    makeDense(g);
+    
+    // Create gradient function
     SXFunction gfcn(inputv_,g);
+    
+    // Create function including all inputs
     gfcn.setOption("verbose",getOption("verbose"));
     gfcn.setOption("numeric_jacobian",true);
     gfcn.setOption("number_of_fwd_dir",getOption("number_of_fwd_dir"));
@@ -920,51 +905,16 @@ FX SXFunctionInternal::hessian(int iind, int oind){
     gfcn.init();
     
     if(verbose()) cout << "SXFunctionInternal::hessian: calculating numeric Jacobian " << endl;
-    hfcn = static_cast<FX&>(gfcn).jacobian(iind,0); // TODO: SXFunction::Jacobian cannot return SXFunction!!!
+    return static_cast<FX&>(gfcn).jacobian(iind,0); // TODO: SXFunction::Jacobian cannot return SXFunction!!!
     
   } else {
-    // Create function including only input to be differentiated
-    SXFunction gfcn(inputv_.at(iind),g);
-    gfcn.setOption("verbose",getOption("verbose"));
-    gfcn.setOption("numeric_jacobian",false);
-    gfcn.init();
-    if(verbose()) cout << "SXFunctionInternal::hessian: calculating symbolic Jacobian" << endl;
-    SXMatrix h = gfcn.jac(0,0,false,true);
+    // Calculate Hessian expression
+    if(verbose()) cout << "SXFunctionInternal::hessian: calculating hessian expression " << endl;
+    SXMatrix h = hess(iind,oind);
     
-    if(false){ // Does not appear to help
-      // Calculate the transpose of the sparsity pattern
-      vector<int> mapping;
-      CRSSparsity h_sp_trans = h.sparsity().transpose(mapping);
-      
-      // Make sure that the Hesssian is indeed symmetric
-      casadi_assert(h_sp_trans == h.sparsity());
-      
-      // Access sparsity pattern
-      int h_nrow=h.sparsity().size1();
-      const vector<int> h_rowind =h.sparsity().rowind();
-      const vector<int> h_col =h.sparsity().col();
-      vector<SX>& h_data = h.data();
-      
-      // Loop over the rows of the hessian
-      for(int i=0; i<h_nrow; ++i){
-        // Loop over the strictly lower triangular part of the matrix
-        for(int el=h_rowind[i]; el<h_rowind[i+1] && h_col[el]<i; ++el){
-          // Mirror upper triangular part
-          // h_data[el] = h_data[mapping[el]];
-          h_data[mapping[el]] = h_data[el];
-        }
-      }
-    }
-    
-    // Create the hessian function
-    hfcn = SXFunction(inputv_,h);
+    // Use the expression to create a function
+    return SXFunction(inputv_,h);
   }
-  
-  // Calculate jacobian of gradient
-  if(verbose()) cout << "SXFunctionInternal::hessian: calculating Hessian done" << endl;
-
-  // Return jacobian of the gradient
-  return hfcn;
 }
 
 void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 

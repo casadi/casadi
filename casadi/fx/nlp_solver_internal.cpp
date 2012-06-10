@@ -251,8 +251,6 @@ void NLPSolverInternal::init(){
         // Hessian of the Lagrangian
         H_ = static_cast<FX&>(lfcn).hessian();
         H_.setOption("verbose",getOption("verbose"));
-        H_.setOption("live_variables",true);
-/*        H_.setOption("inplace",true);*/
         log("SX Hessian function generated");
         
       } else { // !F_sx.isNull() && !G_sx.isNull()
