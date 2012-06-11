@@ -67579,7 +67579,7 @@ Joel Andersson
 |              |              |              | experimental |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| live_variabl | OT_BOOLEAN   | false        | Reuse        | CasADi::SXFu |
+| live_variabl | OT_BOOLEAN   | true         | Reuse        | CasADi::SXFu |
 | es           |              |              | variables in | nctionIntern |
 |              |              |              | the work     | al           |
 |              |              |              | vector       |              |
@@ -68324,7 +68324,7 @@ Joel Andersson
 |              |              |              | experimental |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| live_variabl | OT_BOOLEAN   | false        | Reuse        | CasADi::SXFu |
+| live_variabl | OT_BOOLEAN   | true         | Reuse        | CasADi::SXFu |
 | es           |              |              | variables in | nctionIntern |
 |              |              |              | the work     | al           |
 |              |              |              | vector       |              |
@@ -68456,6 +68456,14 @@ Hessian of output oind with respect to input iind. ";
 Calculate the expression for the jacobian of a number of function outputs
 with respect to a number of function inputs, optionally include the function
 outputs. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::grad "
+
+Gradient via source code transformation. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::hess "
+
+Hessian (forward over adjoint) via source code transformation. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::getDerivative "
 
