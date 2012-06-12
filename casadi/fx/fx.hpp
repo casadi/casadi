@@ -145,8 +145,9 @@ class FX : public OptionsFunctionality{
   void solve();
     
   /** \brief Calculate jacobian of output oind with respect to input iind
+  * \param oind The index of the output
+  * \param iind The index of the input
   *
-  * This method calls the method \em jacobian on the \em internal twin of this class.
   * The default behaviour for FX is to use CasADi::Jacobian, which uses (numerical) directional
   * derivatives (i.e. operator overloading) to form the Jacobian.
   */
