@@ -450,7 +450,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -1779,7 +1785,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -3726,7 +3738,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -4958,7 +4976,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -5764,7 +5788,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -8239,7 +8269,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -10260,7 +10296,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -11632,7 +11674,13 @@ Evaluate. ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -13142,7 +13190,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -15170,7 +15224,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -16603,7 +16663,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -18530,7 +18596,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -20313,7 +20385,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -21732,7 +21810,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -23721,7 +23805,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -29118,7 +29208,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -32534,7 +32630,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -33217,7 +33319,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -35240,7 +35348,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -36997,7 +37111,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -37672,7 +37792,13 @@ Evaluate. ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -38885,7 +39011,13 @@ Evaluate. ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -40298,7 +40430,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -42455,7 +42593,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -43096,7 +43240,13 @@ Evaluate. ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -45766,7 +45916,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -48421,7 +48577,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -50016,7 +50178,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -52930,7 +53098,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -54859,7 +55033,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -56045,7 +56225,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -57869,7 +58055,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -58548,7 +58740,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -59908,7 +60106,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -61585,7 +61789,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -63970,7 +64180,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -64916,7 +65132,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -66415,7 +66637,13 @@ Evaluate. ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
@@ -72850,7 +73078,13 @@ the same as evaluate(0,0) ";
 
 Calculate jacobian of output oind with respect to input iind.
 
-This method calls the method jacobian on the internal twin of this class.
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
 The default behaviour for FX is to use CasADi::Jacobian, which uses
 (numerical) directional derivatives (i.e. operator overloading) to form the
 Jacobian. ";
