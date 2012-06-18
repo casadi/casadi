@@ -135,9 +135,6 @@ class FX : public OptionsFunctionality{
   /** \brief  Update the number of sensitivity directions during or after initialization (normally invoked internally) */
   void updateNumSens();
   
-  /** \brief  Evaluate (old style) */
-  void evaluate_old(int fsens_order=0, int asens_order=0);
-  
   /** \brief  Evaluate */
   void evaluate(int nfdir=0, int nadir=0);
   

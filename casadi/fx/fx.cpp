@@ -171,11 +171,6 @@ void FX::evaluate(int nfdir, int nadir){
   (*this)->evaluate_switch(nfdir,nadir);
 }
 
-void FX::evaluate_old(int fsens_order, int asens_order){
-  evaluate(fsens_order * (*this)->nfdir_, 
-           asens_order * (*this)->nadir_);
-}
-
 void FX::solve(){
   evaluate(0,0);
 }

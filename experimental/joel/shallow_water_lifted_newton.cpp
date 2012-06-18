@@ -112,8 +112,8 @@ int main(){
   //   int num_measurements = 20;
 
     // The largest dimensions which work with SX and exact Hessian
-    int numboxes = 15; // (but e.g. 10 fails with the error message "Initial QP could not be solved due to unboundedness"
-    int num_eulersteps = 10;
+    int numboxes = 25; // (but e.g. 10 fails with the error message "Initial QP could not be solved due to unboundedness"
+    int num_eulersteps = 20;
     int num_measurements = 25;
 
     // The largest dimensions which work with SX and Gauss-Newton Hessian
