@@ -297,7 +297,7 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
 
     //@{
     /// Get a set of nonzeros
-    const Matrix<T> getNZ(int k) const;
+    const Matrix<T> getNZ(int k) const{ return at(k);}
     const Matrix<T> getNZ(const std::vector<int>& k) const;
     const Matrix<T> getNZ(const Slice& k) const{ return getNZ(k.getAll(size()));}
     const Matrix<T> getNZ(const Matrix<int>& k) const;

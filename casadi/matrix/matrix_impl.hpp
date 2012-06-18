@@ -276,27 +276,33 @@ void Matrix<T>::setSub(const CRSSparsity& sp, int dummy, const Matrix<T>& el) {
 }
 
 template<class T>
-const Matrix<T> Matrix<T>::getNZ(int k) const{
-  if (k<0) k+=size();
-  return at(k);
-}
-
-template<class T>
 const Matrix<T> Matrix<T>::getNZ(const std::vector<int>& k) const{
-  Matrix<T> ret(k.size(),1,0);
-  for(int el=0; el<k.size(); ++el)
-    ret.data()[el] = data().at(k[el]);
+  try{
+    Matrix<T> ret(k.size(),1,0);
+    for(int el=0; el<k.size(); ++el)
+      ret.data()[el] = data().at(k[el]);
   
-  return ret;
+    return ret;
+  } catch(std::out_of_range& ex){
+    std::stringstream ss;
+    ss << "Out of range error in Matrix<>::getNZ: " << k << " not all in range [0," << size() << ")";
+    throw CasadiException(ss.str());
+  }
 }
 
 template<class T>
 const Matrix<T> Matrix<T>::getNZ(const Matrix<int>& k) const{
-  Matrix<T> ret(k.sparsity(),0);
-  for(int el=0; el<k.size(); ++el)
-    ret.data()[el] = data().at(k.at(el));
+  try{
+    Matrix<T> ret(k.sparsity(),0);
+    for(int el=0; el<k.size(); ++el)
+      ret.data()[el] = data().at(k.at(el));
   
-  return ret;
+    return ret;
+  } catch(std::out_of_range& ex){
+    std::stringstream ss;
+    ss << "Out of range error in Matrix<>::getNZ: " << k << " not all in range [0," << size() << ")";
+    throw CasadiException(ss.str());
+  }
 }
 
 template<class T>
