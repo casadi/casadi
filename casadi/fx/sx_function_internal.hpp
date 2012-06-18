@@ -80,17 +80,17 @@ class SXFunctionInternal : public XFunctionInternal<SXFunctionInternal,Matrix<SX
   /** \brief Calculate the expression for the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs */
   SXMatrix jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
   
+  /** \brief Gradient via source code transformation */
+  SXMatrix grad(int iind=0, int oind=0);
+
+  /** \brief Hessian (forward over adjoint) via source code transformation */
+  SXMatrix hess(int iind=0, int oind=0);
+  
   /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
   virtual FX getDerivative(int nfwd, int nadj);
 
   /** \brief  DATA MEMBERS */
   
-  /** \brief  Indices of the nodes corresponding to the inputs */
-  std::vector<std::vector<int> > input_ind_;
-  
-  /** \brief  Indices of the nodes corresponding the non-zeros of the outputs */
-  std::vector<std::vector<int> > output_ind_;
-
   /** \brief  An elemenent of the algorithm, namely a binary operation */
   typedef SXAlgEl AlgEl;
   
@@ -105,17 +105,14 @@ class SXFunctionInternal : public XFunctionInternal<SXFunctionInternal,Matrix<SX
 
   /** \brief  Working vector for numeric calculation */
   std::vector<double> work_;
-  std::vector<double> dwork_;
   std::vector<TapeEl<double> > pdwork_;
-  int worksize_;
 
   /// work vector for symbolic calculations (allocated first time)
   std::vector<SX> s_work_;
   std::vector<SX> free_vars_;
-  std::vector<int> refcount_;
   
   /// The expressions corresponding to each binary operation
-  std::vector<SX> binops_;
+  std::vector<SX> operations_;
   
   /// The expressions corresponding to each constant
   std::vector<SX> constants_;
@@ -129,9 +126,6 @@ class SXFunctionInternal : public XFunctionInternal<SXFunctionInternal,Matrix<SX
   /** \brief  Print to a c file */
   static void printVector(std::ostream &cfile, const std::string& name, const std::vector<int>& v);
 
-  /** \brief  Print operation i to a stream */
-  void printOperation(std::ostream &stream, int i) const;
-  
   /** \brief  Print to a c file */
   void generateCode(const std::string& filename);
       

@@ -671,7 +671,7 @@ Matrix<T> Matrix<T>::unary(int op, const Matrix<T> &x){
 
 template<class T>
 Matrix<T> Matrix<T>::operator-() const{
-  return unary(NEG,*this);
+  return unary(OP_NEG,*this);
 }
 
 template<class T>
@@ -681,22 +681,22 @@ Matrix<T> Matrix<T>::operator+() const{
 
 template<class T>
 Matrix<T> Matrix<T>::__add__(const Matrix<T> &y) const{
-  return binary(ADD,*this,y);
+  return binary(OP_ADD,*this,y);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::__sub__(const Matrix<T> &y) const{
-  return binary(SUB,*this,y);
+  return binary(OP_SUB,*this,y);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::__mul__(const Matrix<T> &y) const{
-  return binary(MUL,*this,y);
+  return binary(OP_MUL,*this,y);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::__div__(const Matrix<T> &y) const{
-  return binary(DIV,*this,y);
+  return binary(OP_DIV,*this,y);
 }
 
 template<class T>
@@ -891,72 +891,72 @@ void Matrix<T>::setArray(const T* val){
 
 template<class T>
 Matrix<T> Matrix<T>::__pow__(const Matrix<T>& y) const{
-  return binary(POW,*this,y);
+  return binary(OP_POW,*this,y);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::__constpow__(const Matrix<T>& y) const{
-  return binary(CONSTPOW,*this,y);
+  return binary(OP_CONSTPOW,*this,y);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::sin() const{
-  return unary(SIN,*this);
+  return unary(OP_SIN,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::cos() const{
-  return unary(COS,*this);
+  return unary(OP_COS,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::tan() const{
-  return unary(TAN,*this);
+  return unary(OP_TAN,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::erf() const{
-  return unary(ERF,*this);
+  return unary(OP_ERF,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::arcsin() const{
-  return unary(ASIN,*this);
+  return unary(OP_ASIN,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::arccos() const{
-  return unary(ACOS,*this);
+  return unary(OP_ACOS,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::arctan() const{
-  return unary(ATAN,*this);
+  return unary(OP_ATAN,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::sinh() const{
-  return unary(SINH,*this);
+  return unary(OP_SINH,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::cosh() const{
-  return unary(COSH,*this);
+  return unary(OP_COSH,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::tanh() const{
-  return unary(TANH,*this);
+  return unary(OP_TANH,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::exp() const{
-  return unary(EXP,*this);
+  return unary(OP_EXP,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::log() const{
-  return unary(LOG,*this);
+  return unary(OP_LOG,*this);
 }
 
 template<class T>
@@ -966,47 +966,47 @@ Matrix<T> Matrix<T>::log10() const{
 
 template<class T>
 Matrix<T> Matrix<T>::sqrt() const{
-  return unary(SQRT,*this);
+  return unary(OP_SQRT,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::floor() const{
-  return unary(FLOOR,*this);
+  return unary(OP_FLOOR,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::ceil() const{
-  return unary(CEIL,*this);
+  return unary(OP_CEIL,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::fabs() const{
-  return unary(FABS,*this);
+  return unary(OP_FABS,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::sign() const{
-  return unary(SIGN,*this);
+  return unary(OP_SIGN,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::erfinv() const{
-  return unary(ERFINV,*this);
+  return unary(OP_ERFINV,*this);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::fmin(const Matrix<T>& y) const{
-  return binary(FMIN,*this,y);
+  return binary(OP_FMIN,*this,y);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::arctan2(const Matrix<T>& y) const{
-  return binary(ATAN2,*this,y);
+  return binary(OP_ATAN2,*this,y);
 }
 
 template<class T>
 Matrix<T> Matrix<T>::fmax(const Matrix<T>& y) const{
-  return binary(FMAX,*this,y);
+  return binary(OP_FMAX,*this,y);
 }
 
 template<class T>

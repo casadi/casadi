@@ -172,11 +172,6 @@ void FX::evaluate(int nfdir, int nadir){
   (*this)->evaluate_switch(nfdir,nadir);
 }
 
-void FX::evaluate_old(int fsens_order, int asens_order){
-  evaluate(fsens_order * (*this)->nfdir_, 
-           asens_order * (*this)->nadir_);
-}
-
 void FX::solve(){
   evaluate(0,0);
 }
@@ -190,19 +185,11 @@ int FX::getNumOutputs() const{
 }
 
 int FX::getNumScalarInputs() const{
-  int ret=0;
-  for(int iind=0; iind<getNumInputs(); ++iind){
-    ret += input(iind).size();
-  }
-  return ret;
+  return (*this)->getNumScalarInputs();
 }
 
 int FX::getNumScalarOutputs() const{
-  int ret=0;
-  for(int oind=0; oind<getNumOutputs(); ++oind){
-    ret += output(oind).size();
-  }
-  return ret;
+  return (*this)->getNumScalarOutputs();
 }
 
 

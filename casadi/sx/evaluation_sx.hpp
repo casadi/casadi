@@ -24,7 +24,7 @@
 #define EVALUATION_SX_HPP
 
 #include "sx_node.hpp"
-#include "output_sx.hpp"
+#include "aux_output_sx.hpp"
 #include "../fx/fx.hpp"
 #include <vector>
 #include <stack>
@@ -57,7 +57,7 @@ class EvaluationSX : public SXNode{
       
       // Create auxillary outputs
       for(int oind=1; oind<ret.size(); ++oind){
-	ret[oind] = OutputSX::create(ret[0],oind);
+	ret[oind] = AuxOutputSX::create(ret[0],oind);
       }
       
       return ret;

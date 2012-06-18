@@ -247,6 +247,12 @@ class SX : public GenericExpression<SX>{
     // Set the temporary variable
     void setTemp(int t);
     
+    // Check if marked (i.e. temporary is negative)
+    bool marked() const;
+    
+    // Mark by flipping the sign of the temporary and decreasing by one
+    void mark();
+    
     /** \brief Set or reset the maximum number of calls to the printing function when printing an expression */
     static void setMaxNumCallsInPrint(long num=10000);
 

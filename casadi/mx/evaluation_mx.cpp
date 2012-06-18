@@ -29,9 +29,6 @@
 
 using namespace std;
 
-const bool NEW_EVAL = true;
-const bool NEW_EVAL_SP = true;
-
 namespace CasADi {
 
 EvaluationMX::EvaluationMX(const FX& fcn, const std::vector<MX> &arg,
@@ -88,6 +85,7 @@ void EvaluationMX::printPart(std::ostream &stream, int part) const {
 void EvaluationMX::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res,
     const DMatrixPtrVV& fseed, DMatrixPtrVV& fsens,
     const DMatrixPtrVV& aseed, DMatrixPtrVV& asens) {
+  
   // Check if the function is differentiated
   bool is_diff = nfwd_f_ > 0 || nadj_f_ > 0;
 
@@ -244,8 +242,7 @@ void EvaluationMX::evaluateMX(const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fse
   int nadj = aseed.size();
   bool no_diff = nfwd == 0 && nadj == 0; // no differentiation
 
-#if 1
-  if (NEW_EVAL && !no_diff && fcn_.spCanEvaluate(true) && fcn_.spCanEvaluate(false)) {
+  if (no_diff || fcn_.spCanEvaluate(true) && fcn_.spCanEvaluate(false)) { // NOTE: should handle _all_ cases
     // Get/generate the derivative function
     FX d = fcn_.derivative(nfwd, nadj);
 
@@ -274,7 +271,7 @@ void EvaluationMX::evaluateMX(const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fse
 
     // Collect the nondifferentiated results
     for (MXPtrV::iterator i = res.begin(); i != res.end(); ++i, ++d_res_it) {
-      if (*i) **i = *d_res_it;
+      if (!output_given && *i) **i = *d_res_it;
     }
 
     // Collect the forward sensitivities
@@ -299,8 +296,11 @@ void EvaluationMX::evaluateMX(const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fse
     // Quick return
     return;
   }
-#endif
 
+    
+  // Old implentation starts here, should be removed when the above works with all classes
+  
+  
   // Evaluate function
   if (!output_given) {
     // Evaluate the function symbolically
@@ -389,7 +389,7 @@ void EvaluationMX::deepCopyMembers(
 }
 
 void EvaluationMX::propagateSparsity(DMatrixPtrV& arg, DMatrixPtrV& res,bool use_fwd) {
-  if (NEW_EVAL_SP && fcn_.spCanEvaluate(use_fwd)) {
+  if (fcn_.spCanEvaluate(use_fwd)) {
     // Propagating sparsity pattern supported
     
     // Pass/clear forward seeds/adjoint sensitivities

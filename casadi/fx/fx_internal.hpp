@@ -121,16 +121,50 @@ class FXInternal : public OptionsFunctionalityNode{
     virtual FX getDerivative(int nfwd, int nadj);
 
     /** \brief  Access an input */
-    FunctionIO& iStruct(int i=0);
+    template<bool check=true>
+    FunctionIO& iStruct(int i=0){
+      if(check){
+        try{
+          return input_.at(i);
+        } catch(std::out_of_range&){
+            std::stringstream ss;
+            ss <<  "In function " << getOption("name") << ": input " << i << " not in interval [0," << getNumInputs() << ")";
+            if (!isInit()) ss << std::endl << "Did you forget to initialize?";
+            throw CasadiException(ss.str());
+        }
+      } else {
+        return input_[i];
+      }
+    }
 
     /** \brief  Const access an input */
-    const FunctionIO& iStruct(int i=0) const;
+    template<bool check=true>
+    inline const FunctionIO& iStruct(int i=0) const{
+      return const_cast<FXInternal*>(this)->iStruct<check>(i);
+    }
     
     /** \brief  Access an output*/
-    FunctionIO& oStruct(int i=0);
+    template<bool check=true>
+    FunctionIO& oStruct(int i=0){
+      if(check){
+        try{
+          return output_.at(i);
+        } catch(std::out_of_range&){
+            std::stringstream ss;
+            ss <<  "In function " << getOption("name") << ": output " << i << " not in interval [0," << getNumOutputs() << ")";
+            if (!isInit()) ss << std::endl << "Did you forget to initialize?";
+            throw CasadiException(ss.str());
+        }
+      } else {
+        return output_[i];
+      }
+    }
 
     /** \brief  Const access an output*/
-    const FunctionIO& oStruct(int i=0) const;
+    template<bool check=true>
+    inline const FunctionIO& oStruct(int i=0) const{
+      return const_cast<FXInternal*>(this)->oStruct<check>(i);
+    }
       
     /** \brief  Print */
     virtual void print(std::ostream &stream) const;
@@ -154,40 +188,128 @@ class FXInternal : public OptionsFunctionalityNode{
     bool monitored(const std::string& mod) const;
     
       /// Access input argument
+    template<bool check=true>
     inline Matrix<double>& input(int iind=0){ return iStruct(iind).data;}
       
     /// Const access input argument
+    template<bool check=true>
     inline const Matrix<double>& input(int iind=0) const{ return iStruct(iind).data;}
 
     /// Access input argument
-    inline Matrix<double>& output(int oind=0){ return oStruct(oind).data;}
+    template<bool check=true>
+    inline Matrix<double>& output(int oind=0){ return oStruct<check>(oind).data;}
       
     /// Const access input argument
-    inline const Matrix<double>& output(int oind=0) const{ return oStruct(oind).data;}
+    template<bool check=true>
+    inline const Matrix<double>& output(int oind=0) const{ return oStruct<check>(oind).data;}
 
     /// Access forward seed
-    Matrix<double>& fwdSeed(int iind=0, int dir=0);
+    template<bool check=true>
+    Matrix<double>& fwdSeed(int iind=0, int dir=0){
+      if(check){
+        try{
+          return iStruct(iind).dataF.at(dir);
+        } catch(std::out_of_range&){
+          std::stringstream ss;
+          if(iStruct(iind).dataF.empty()){
+            ss << "No forward directions ";
+          } else {
+            ss << "Forward direction " << dir << " is out of range [0," << iStruct(iind).dataF.size() << ") ";
+          }
+          ss << "for function " << getOption("name");
+          throw CasadiException(ss.str());
+        }
+      } else {
+        return iStruct<check>(iind).dataF[dir];
+      }
+    }
       
     /// Const access forward seed
-    const Matrix<double>& fwdSeed(int iind=0, int dir=0) const;
+    template<bool check=true>
+    const Matrix<double>& fwdSeed(int iind=0, int dir=0) const{
+      return const_cast<FXInternal*>(this)->fwdSeed<check>(iind,dir);
+    }
 
     /// Access forward sensitivity
-    Matrix<double>& fwdSens(int oind=0, int dir=0);
+    template<bool check=true>
+    Matrix<double>& fwdSens(int oind=0, int dir=0){
+      if(check){
+        try{
+          return oStruct(oind).dataF.at(dir);
+        } catch(std::out_of_range&){
+          std::stringstream ss;
+          if(oStruct(oind).dataF.empty()){
+            ss << "No forward directions ";
+          } else {
+            ss << "Forward direction " << dir << " is out of range [0," << oStruct(oind).dataF.size() << ") ";
+          }
+          ss << "for function " << getOption("name");
+          throw CasadiException(ss.str());
+        }
+      } else {
+        return oStruct<check>(oind).dataF[dir];
+      }
+    }
       
     /// Const access forward sensitivity
-    const Matrix<double>& fwdSens(int oind=0, int dir=0) const;
+    template<bool check=true>
+    const Matrix<double>& fwdSens(int oind=0, int dir=0) const{
+      return const_cast<FXInternal*>(this)->fwdSens<check>(oind,dir);
+    }
 
     /// Access adjoint seed
-    Matrix<double>& adjSeed(int oind=0, int dir=0);
+    template<bool check=true>
+    Matrix<double>& adjSeed(int oind=0, int dir=0){
+      if(check){
+        try{
+          return oStruct(oind).dataA.at(dir);
+        } catch(std::out_of_range&){
+          std::stringstream ss;
+          if(oStruct(oind).dataA.empty()){
+            ss << "No adjoint directions ";
+          } else {
+            ss << "Adjoint direction " << dir << " is out of range [0," << oStruct(oind).dataA.size() << ") ";
+          }
+          ss << "for function " << getOption("name");
+          throw CasadiException(ss.str());
+        }
+      } else {
+        return oStruct<check>(oind).dataA[dir];
+      }
+    }
       
     /// Const access adjoint seed
-    const Matrix<double>& adjSeed(int oind=0, int dir=0) const;
+    template<bool check=true>
+    const Matrix<double>& adjSeed(int oind=0, int dir=0) const{
+      return const_cast<FXInternal*>(this)->adjSeed<check>(oind,dir);
+    }
 
     /// Access forward sensitivity
-    Matrix<double>& adjSens(int iind=0, int dir=0);
+    template<bool check=true>
+    Matrix<double>& adjSens(int iind=0, int dir=0){
+      if(check){
+        try{
+          return iStruct(iind).dataA.at(dir);
+        } catch(std::out_of_range&){
+          std::stringstream ss;
+          if(iStruct(iind).dataA.empty()){
+            ss << "No adjoint directions ";
+          } else {
+            ss << "Adjoint direction " << dir << " is out of range [0," << iStruct(iind).dataA.size() << ") ";
+          }
+          ss << "for function " << getOption("name");
+          throw CasadiException(ss.str());
+        }
+      } else {
+        return iStruct<check>(iind).dataA[dir];
+      }
+    }
       
     /// Const access forward sensitivity
-    const Matrix<double>& adjSens(int iind=0, int dir=0) const;
+    template<bool check=true>
+    const Matrix<double>& adjSens(int iind=0, int dir=0) const{
+      return const_cast<FXInternal*>(this)->adjSens<check>(iind,dir);
+    }
 
     /// Set the number of function inputs
     void setNumInputs(int num_in);
@@ -200,6 +322,12 @@ class FXInternal : public OptionsFunctionalityNode{
 
     /// Get the number of function outputs
     inline int getNumOutputs() const{ return output_.size();}
+    
+    /// Get total number of scalar inputs (i.e. the number of nonzeros in all of the matrix-valued inputs)
+    int getNumScalarInputs() const;
+
+    /// Get total number of scalar outputs (i.e. the number of nonzeros in all of the matrix-valued outputs)
+    int getNumScalarOutputs() const;
     
     /// Get all statistics obtained at the end of the last evaluate call
     const Dictionary & getStats() const;

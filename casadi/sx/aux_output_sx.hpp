@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef OUTPUT_SX_HPP
-#define OUTPUT_SX_HPP
+#ifndef AUX_OUTPUT_SX_HPP
+#define AUX_OUTPUT_SX_HPP
 
 #include "sx_node.hpp"
 
@@ -31,23 +31,23 @@ namespace CasADi{
   \author Joel Andersson 
   \date 2012
 */
-class OutputSX : public SXNode{
+class AuxOutputSX : public SXNode{
   private:
     
     /** \brief  Constructor is private, use "create" below (binary version) */
-    OutputSX(const SX& dep, int oind) : dep_(dep), oind_(oind){}
+    AuxOutputSX(const SX& dep, int oind) : dep_(dep), oind_(oind){}
     
   public:
     
     /** \brief  Create an auxillary output */
     inline static SX create(const SX& dep, int oind){
-      return SX::create(new OutputSX(dep,oind));
+      return SX::create(new AuxOutputSX(dep,oind));
     }
     
     /** \brief Destructor
     This might need fixing to avoid stack overflow due to recursive calling.
     */
-    virtual ~OutputSX(){}
+    virtual ~AuxOutputSX(){}
     
     virtual bool isSmooth() const{ return false;}
     
@@ -61,7 +61,7 @@ class OutputSX : public SXNode{
     virtual SX& dep(int i){ return dep_;}
     
     /** \brief  Get the operation */
-    virtual int getOp() const{ return OP_OUTPUT;}
+    virtual int getOp() const{ return OP_FOUTPUT;}
     
     /** \brief  Print the expression (recursively with a maximum number of levels) */
     virtual void print(std::ostream &stream, long& remaining_calls) const{
@@ -85,4 +85,4 @@ class OutputSX : public SXNode{
 } // namespace CasADi
 
 
-#endif // OUTPUT_SX_HPP
+#endif // AUX_OUTPUT_SX_HPP

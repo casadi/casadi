@@ -71,7 +71,7 @@ class XFunctionInternal : public FXInternal{
 template<typename DerivedType, typename MatType, typename NodeType>
 XFunctionInternal<DerivedType,MatType,NodeType>::XFunctionInternal(
     const std::vector<MatType>& inputv, const std::vector<MatType>& outputv) : inputv_(inputv),  outputv_(outputv){
-      addOption("topological_sorting",OT_STRING,"breadth-first","Topological sorting algorithm","depth-first|breadth-first");
+      addOption("topological_sorting",OT_STRING,"depth-first","Topological sorting algorithm","depth-first|breadth-first");
   
   // Make sure that inputs are symbolic
   for(int i=0; i<inputv.size(); ++i){
@@ -112,24 +112,30 @@ void XFunctionInternal<DerivedType,MatType,NodeType>::sort_depth_first(std::stac
       // If the last element on the stack has not yet been added
       if (t && !t->temp){
         
-        // If a dependent node was added to the stack
-        bool added_dep = false;
-        
         // Initialize the node
         t->init();
-    
-        // Add dependent nodes if not already added
+
+        // Find out which not yet added dependency has most number of dependencies
+        int max_deps = -1, dep_with_max_deps = -1;
         for(int i=0; i<t->ndep(); ++i){
           if(t->dep(i).get() !=0 && static_cast<NodeType*>(t->dep(i).get())->temp == 0) {
-            // if the first child has not yet been added
-            s.push(static_cast<NodeType*>(t->dep(i).get()));
-            added_dep=true;
-            break;
+            int ndep_i = t->dep(i)->ndep();
+            if(ndep_i>max_deps){
+              max_deps = ndep_i;
+              dep_with_max_deps = i;
+            }
           }
         }
         
-        if(!added_dep){  // if no dependencies were added
-          // Add to algorithm
+        // If there is any dependency which has not yet been added
+        if(dep_with_max_deps>=0){
+          
+          // Add to the stack the dependency with the most number of dependencies (so that constants, inputs etc are added last)
+          s.push(static_cast<NodeType*>(t->dep(dep_with_max_deps).get()));
+          
+        } else {
+          
+          // if no dependencies need to be added, we can add the node to the algorithm
           nodes.push_back(t);
 
           // Mark the node as found
@@ -137,18 +143,12 @@ void XFunctionInternal<DerivedType,MatType,NodeType>::sort_depth_first(std::stac
 
           // Remove from stack
           s.pop();
-          
         }
       } else {
         // If the last element on the stack has already been added
         s.pop();
       }
     }
-
-  // Reset the node counters
-  for(typename std::vector<NodeType*>::iterator it=nodes.begin(); it!=nodes.end(); ++it){
-    (**it).temp = 0;
-  }
 }
 
 template<typename DerivedType, typename MatType, typename NodeType>

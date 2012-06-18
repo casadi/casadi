@@ -43,7 +43,7 @@ public:
   virtual const std::string& getName() const{ return name; }
   
     /** \brief  Get the operation */
-  virtual int getOp() const{ return OP_VAR;}
+  virtual int getOp() const{ return OP_PARAMETER;}
   
   /** \brief  Name */
   std::string name;

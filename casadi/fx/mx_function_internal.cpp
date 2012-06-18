@@ -41,7 +41,6 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv, const std:
   XFunctionInternal<MXFunctionInternal,MX,MXNode>(inputv,outputv) {
   
   setOption("name", "unnamed_mx_function");
-  setOption("topological_sorting","depth-first"); // breadth-first not working
   setOption("numeric_jacobian", true);
 
   liftfun_ = 0;
@@ -83,6 +82,11 @@ void MXFunctionInternal::init(){
   // Order the nodes in the order of dependencies using a depth-first topological sorting
   sort_depth_first(s,nodes);
 
+  // Reset the node markers
+  for(std::vector<MXNode*>::iterator it=nodes.begin(); it!=nodes.end(); ++it){
+    (*it)->temp = 0;
+  }
+  
   // TODO: Make sure that the output nodes are placed directly after the corresponding multiple output node
 
   // Get the sorting algorithm

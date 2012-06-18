@@ -38,27 +38,14 @@ f = det(x)
 x = vec(x)
 x0 = [random.rand() for xi in x.data()]
 
-fcn = SXFunction([x],[[f]])
+fcn = SXFunction([x],[f])
 fcn.init()
 
 # adjoint
 gf = fcn.grad()
 
 gfcn = SXFunction([x],[gf])
-#gfcn.setOption("live_variables",True) # NOTE: leads to less efficient code for smaller problems but required for 8-by-8 or larger since gcc otherwise crashes with "add_stack_var_conflict"
-#gfcn.setOption("topological_sorting","depth-first")
 gfcn.init()
-
-gfcn_live = SXFunction([x],[gf])
-gfcn_live.setOption("live_variables",True)
-gfcn_live.setOption("verbose",True)
-gfcn_live.init()
-
-gfcn_inplace = SXFunction([x],[gf])
-gfcn_inplace.setOption("live_variables",True)
-gfcn_inplace.setOption("inplace",True)
-gfcn_inplace.setOption("verbose",True)
-gfcn_inplace.init()
 
 srcname = "grad_det.c"
 gfcn.generateCode(srcname)
@@ -95,7 +82,7 @@ efcn_no_opt.init()
 efcn_O3_opt.init()
 efcn_Os_opt.init()
 
-for f in [gfcn,gfcn_live,gfcn_inplace,efcn_no_opt,efcn_O3_opt,efcn_Os_opt]:
+for f in [gfcn,efcn_no_opt,efcn_O3_opt,efcn_Os_opt]:
   f.setInput(x0)
   t1 = time.time()
   nrep = 10000

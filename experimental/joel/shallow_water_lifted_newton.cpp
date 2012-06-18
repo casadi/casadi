@@ -41,7 +41,7 @@ bool inititialize_at_measurements = true;
 bool with_ipopt = false;
 
 // Use Gauss-Newton
-// bool gauss_newton = true;
+bool gauss_newton = true;
 
 // Lifted
 bool lifted = true;
@@ -56,184 +56,10 @@ using namespace CasADi;
 using namespace std;
 
 int main(){
-
-  // Physical parameters
-  double g = 9.81; // gravity
-  double poolwidth = 0.2;
-  double sprad = 0.03;
-  double spheight = 0.01;
-  double endtime = 1.0;
-
+ 
   // Optimization parameters
   double drag_true = 2.0; // => u(0)
   double depth_true = 0.01; // => u(1)
-  
-  // Discretization
-
-  // The largest dimensions which work with SX and IPOPT
-//   int numboxes = 3;
-//   int num_eulersteps = 20;
-//   int num_measurements = 20;
-
-  // The largest dimensions which work with SX and exact Hessian
-  int numboxes = 20; // (but e.g. 10 fails with the error message "Initial QP could not be solved due to unboundedness"
-  int num_eulersteps = 10;
-  int num_measurements = 25;
-
-  // The largest dimensions which work with SX and Gauss-Newton Hessian
-  //   int numboxes = 20;
-  //   int num_eulersteps = 10;
-  //   int num_measurements = 50;
-
-  // Plotting
-  bool plot_progress = false;
-  int numboxes_per_plot = 1;
-
-  // Discretization
-  int ntimesteps = num_eulersteps*num_measurements;
-  double dt = endtime/ntimesteps;
-  double dx = poolwidth/numboxes;
-  double dy = poolwidth/numboxes;
-  vector<double> x(numboxes), y(numboxes);
-  for(int i=0; i<numboxes; ++i){
-    x[i] = (i+0.5)*dx;
-    y[i] = (i+0.5)*dy;
-  }
-
-  // Initial conditions
-  DMatrix u0 = DMatrix::zeros(numboxes+1,numboxes  );
-  DMatrix v0 = DMatrix::zeros(numboxes  ,numboxes+1);
-  DMatrix h0 = DMatrix::zeros(numboxes  ,numboxes  ); 
-  for(int i=0; i<numboxes; ++i){
-    for(int j=0; j<numboxes; ++j){
-      double spdist = sqrt(pow((x[i]-0.04),2.) + pow((y[j]-0.04),2.));
-      if(spdist<sprad/3.0){
-	h0.elem(i,j) = spheight * cos(3.0*M_PI*spdist/(2.0*sprad));
-      }
-    }
-  }
-  
-  // Free parameters
-  SX drag("b");
-  SX depth("H");
-  vector<SX> p(2); p[0]=drag; p[1]=depth;
-  vector<double> p_true(2); p_true[0]=drag_true; p_true[1]=depth_true;
-  
-  // The state at a measurement
-  SXMatrix uk = ssym("uk",numboxes+1, numboxes);
-  SXMatrix vk = ssym("vk",numboxes  , numboxes+1);
-  SXMatrix hk = ssym("hk",numboxes  , numboxes);
-  
-  // Take one step of the integrator
-  SXMatrix u = uk;
-  SXMatrix v = vk;
-  SXMatrix h = hk;
-  
-  // Temporaries
-  SX d1 = -dt*g/dx;
-  SX d2 = dt*drag;
-  
-  // Update u
-  for(int i=0; i<numboxes-1; ++i){
-    for(int j=0; j<numboxes; ++j){
-      u.elem(1+i,j) += d1*(h.elem(1+i,j)-h.elem(i,j))- d2*u.elem(1+i,j);
-    }
-  }
-  
-  // Update v
-  d1 = -dt*g/dy;
-  for(int i=0; i<numboxes; ++i){
-    for(int j=0; j<numboxes-1; ++j){
-      v.elem(i,j+1) += d1*(h.elem(i,j+1)-h.elem(i,j))- d2*v.elem(i,j+1);
-    }
-  }
-    
-  // Update h
-  d1 = (-depth*dt)*(1.0/dx);
-  d2 = (-depth*dt)*(1.0/dy);
-  for(int i=0; i<numboxes; ++i){
-    for(int j=0; j<numboxes; ++j){
-      h.elem(i,j) += d1*(u.elem(1+i,j)-u.elem(i,j)) + d2*(v.elem(i,j+1)-v.elem(i,j));
-    }
-  }
-  
-  SXFunction f_step;
-  {
-    // Create an integrator function
-    vector<SXMatrix> f_step_in(4);
-    f_step_in[0] = p;
-    f_step_in[1] = uk;
-    f_step_in[2] = vk;
-    f_step_in[3] = hk;
-    vector<SXMatrix> f_step_out(3);
-    f_step_out[0] = u;
-    f_step_out[1] = v;
-    f_step_out[2] = h;
-    f_step = SXFunction(f_step_in,f_step_out);
-//     f_step.setOption("live_variables",true);
-    f_step.init();
-    cout << "generated single step dynamics (" << f_step.getAlgorithmSize() << " nodes)" << endl;
-  }
-
-  // Integrate over one interval
-  vector<MX> f_in(4);
-  MX P = msym("P",2);
-  MX Uk = msym("Uk",numboxes+1, numboxes);
-  MX Vk = msym("Vk",numboxes  , numboxes+1);
-  MX Hk = msym("Hk",numboxes  , numboxes);
-  f_in[0] = P;
-  f_in[1] = Uk;
-  f_in[2] = Vk;
-  f_in[3] = Hk;
-  vector<MX> f_inter = f_in;
-  vector<MX> f_out;
-  for(int j=0; j<num_eulersteps; ++j){
-    // Create a call node
-    f_out = f_step.call(f_inter);
-    
-    // Save intermediate state
-    f_inter[1] = f_out[0];
-    f_inter[2] = f_out[1];
-    f_inter[3] = f_out[2];
-  }
-
-  // Create an integrator function
-  FX f = MXFunction(f_in,f_out);
-  f.init();
-  cout << "generated discrete dynamics, MX (" << shared_cast<MXFunction>(f).countNodes() << " nodes)" << endl;
-
-  // Expand the discrete dynamics
-  if(false){
-    f = SXFunction(shared_cast<MXFunction>(f));
-    f.init();
-    cout << "generated discrete dynamics, SX (" << shared_cast<SXFunction>(f).getAlgorithmSize() << " nodes)" << endl;
-  }
-
-  // Measurements
-  vector<DMatrix> H_meas;
-  H_meas.reserve(num_measurements);
-
-  // Simulate once to generate "measurements"
-  f.setInput(p_true,0);
-  f.setInput(u0,1);
-  f.setInput(v0,2);
-  f.setInput(h0,3);
-  clock_t time1 = clock();
-  for(int k=0; k<num_measurements; ++k){
-    f.evaluate();
-    const DMatrix& u = f.output(0);
-    const DMatrix& v = f.output(1);
-    const DMatrix& h = f.output(2);
-    f.setInput(u,1);
-    f.setInput(v,2);
-    f.setInput(h,3);
-    
-    // Save a copy of h
-    H_meas.push_back(h);
-  }
-  clock_t time2 = clock();
-  double t_elapsed = double(time2-time1)/CLOCKS_PER_SEC;
-  cout << "measurements generated in " << t_elapsed << " seconds." << endl;
 
   // Initial guesses
   vector<double> drag_guess, depth_guess;
@@ -268,8 +94,183 @@ int main(){
   vector<double> depth_est_eh(n_tests,-1);
   
   for(int sol=0; sol<2; ++sol){
-    bool gauss_newton = sol==0;
-  
+    single_shooting = sol==0;
+//     gauss_newton = sol!=0;
+
+    // Physical parameters
+    double g = 9.81; // gravity
+    double poolwidth = 0.2;
+    double sprad = 0.03;
+    double spheight = 0.01;
+    double endtime = 1.0;
+    
+    // Discretization
+
+    // The largest dimensions which work with SX and IPOPT
+  //   int numboxes = 3;
+  //   int num_eulersteps = 20;
+  //   int num_measurements = 20;
+
+    // The largest dimensions which work with SX and exact Hessian
+    int numboxes = 25; // (but e.g. 10 fails with the error message "Initial QP could not be solved due to unboundedness"
+    int num_eulersteps = 20;
+    int num_measurements = 25;
+
+    // The largest dimensions which work with SX and Gauss-Newton Hessian
+    //   int numboxes = 20;
+    //   int num_eulersteps = 10;
+    //   int num_measurements = 50;
+
+    // Plotting
+    bool plot_progress = false;
+    int numboxes_per_plot = 1;
+
+    // Discretization
+    int ntimesteps = num_eulersteps*num_measurements;
+    double dt = endtime/ntimesteps;
+    double dx = poolwidth/numboxes;
+    double dy = poolwidth/numboxes;
+    vector<double> x(numboxes), y(numboxes);
+    for(int i=0; i<numboxes; ++i){
+      x[i] = (i+0.5)*dx;
+      y[i] = (i+0.5)*dy;
+    }
+
+    // Initial conditions
+    DMatrix u0 = DMatrix::zeros(numboxes+1,numboxes  );
+    DMatrix v0 = DMatrix::zeros(numboxes  ,numboxes+1);
+    DMatrix h0 = DMatrix::zeros(numboxes  ,numboxes  ); 
+    for(int i=0; i<numboxes; ++i){
+      for(int j=0; j<numboxes; ++j){
+        double spdist = sqrt(pow((x[i]-0.04),2.) + pow((y[j]-0.04),2.));
+        if(spdist<sprad/3.0){
+          h0.elem(i,j) = spheight * cos(3.0*M_PI*spdist/(2.0*sprad));
+        }
+      }
+    }
+    
+    // Free parameters
+    SX drag("b");
+    SX depth("H");
+    vector<SX> p(2); p[0]=drag; p[1]=depth;
+    vector<double> p_true(2); p_true[0]=drag_true; p_true[1]=depth_true;
+    
+    // The state at a measurement
+    SXMatrix uk = ssym("uk",numboxes+1, numboxes);
+    SXMatrix vk = ssym("vk",numboxes  , numboxes+1);
+    SXMatrix hk = ssym("hk",numboxes  , numboxes);
+    
+    // Take one step of the integrator
+    SXMatrix u = uk;
+    SXMatrix v = vk;
+    SXMatrix h = hk;
+    
+    // Temporaries
+    SX d1 = -dt*g/dx;
+    SX d2 = dt*drag;
+    
+    // Update u
+    for(int i=0; i<numboxes-1; ++i){
+      for(int j=0; j<numboxes; ++j){
+        u.elem(1+i,j) += d1*(h.elem(1+i,j)-h.elem(i,j))- d2*u.elem(1+i,j);
+      }
+    }
+    
+    // Update v
+    d1 = -dt*g/dy;
+    for(int i=0; i<numboxes; ++i){
+      for(int j=0; j<numboxes-1; ++j){
+        v.elem(i,j+1) += d1*(h.elem(i,j+1)-h.elem(i,j))- d2*v.elem(i,j+1);
+      }
+    }
+      
+    // Update h
+    d1 = (-depth*dt)*(1.0/dx);
+    d2 = (-depth*dt)*(1.0/dy);
+    for(int i=0; i<numboxes; ++i){
+      for(int j=0; j<numboxes; ++j){
+        h.elem(i,j) += d1*(u.elem(1+i,j)-u.elem(i,j)) + d2*(v.elem(i,j+1)-v.elem(i,j));
+      }
+    }
+    
+    SXFunction f_step;
+    {
+      // Create an integrator function
+      vector<SXMatrix> f_step_in(4);
+      f_step_in[0] = p;
+      f_step_in[1] = uk;
+      f_step_in[2] = vk;
+      f_step_in[3] = hk;
+      vector<SXMatrix> f_step_out(3);
+      f_step_out[0] = u;
+      f_step_out[1] = v;
+      f_step_out[2] = h;
+      f_step = SXFunction(f_step_in,f_step_out);
+  //     f_step.setOption("live_variables",true);
+      f_step.init();
+      cout << "generated single step dynamics (" << f_step.getAlgorithmSize() << " nodes)" << endl;
+    }
+
+    // Integrate over one interval
+    vector<MX> f_in(4);
+    MX P = msym("P",2);
+    MX Uk = msym("Uk",numboxes+1, numboxes);
+    MX Vk = msym("Vk",numboxes  , numboxes+1);
+    MX Hk = msym("Hk",numboxes  , numboxes);
+    f_in[0] = P;
+    f_in[1] = Uk;
+    f_in[2] = Vk;
+    f_in[3] = Hk;
+    vector<MX> f_inter = f_in;
+    vector<MX> f_out;
+    for(int j=0; j<num_eulersteps; ++j){
+      // Create a call node
+      f_out = f_step.call(f_inter);
+      
+      // Save intermediate state
+      f_inter[1] = f_out[0];
+      f_inter[2] = f_out[1];
+      f_inter[3] = f_out[2];
+    }
+
+    // Create an integrator function
+    FX f = MXFunction(f_in,f_out);
+    f.init();
+    cout << "generated discrete dynamics, MX (" << shared_cast<MXFunction>(f).countNodes() << " nodes)" << endl;
+
+    // Expand the discrete dynamics
+    if(false){
+      f = SXFunction(shared_cast<MXFunction>(f));
+      f.init();
+      cout << "generated discrete dynamics, SX (" << shared_cast<SXFunction>(f).getAlgorithmSize() << " nodes)" << endl;
+    }
+
+    // Measurements
+    vector<DMatrix> H_meas;
+    H_meas.reserve(num_measurements);
+
+    // Simulate once to generate "measurements"
+    f.setInput(p_true,0);
+    f.setInput(u0,1);
+    f.setInput(v0,2);
+    f.setInput(h0,3);
+    clock_t time1 = clock();
+    for(int k=0; k<num_measurements; ++k){
+      f.evaluate();
+      const DMatrix& u = f.output(0);
+      const DMatrix& v = f.output(1);
+      const DMatrix& h = f.output(2);
+      f.setInput(u,1);
+      f.setInput(v,2);
+      f.setInput(h,3);
+      
+      // Save a copy of h
+      H_meas.push_back(h);
+    }
+    clock_t time2 = clock();
+    double t_elapsed = double(time2-time1)/CLOCKS_PER_SEC;
+    cout << "measurements generated in " << t_elapsed << " seconds." << endl;
+    
     // Number of NLP variables
     int nX = 2;
     if(!single_shooting) 
@@ -415,10 +416,10 @@ int main(){
 	time2 = clock();
 	
 	// Solution statistics
-	int& iter_count   = gauss_newton ? iter_count_gn[test] : iter_count_eh[test];
-	double& sol_time  = gauss_newton ? sol_time_gn[test] : sol_time_eh[test];
-	double& drag_est  = gauss_newton ? drag_est_gn[test] : drag_est_eh[test];
-	double& depth_est = gauss_newton ? depth_est_gn[test] : depth_est_eh[test];
+	int& iter_count   = sol==0 ? iter_count_gn[test] : iter_count_eh[test];
+	double& sol_time  = sol==0 ? sol_time_gn[test] : sol_time_eh[test];
+	double& drag_est  = sol==0 ? drag_est_gn[test] : drag_est_eh[test];
+	double& depth_est = sol==0 ? depth_est_gn[test] : depth_est_eh[test];
 	
 	iter_count = nlp_solver.getStat("iter_count");
 	sol_time = double(time2-time1)/CLOCKS_PER_SEC;
@@ -438,14 +439,14 @@ int main(){
   cout << 
   setw(10) << "drag" <<  "  &" <<
   setw(10) << "depth" << "  &" << 
-  setw(10) << "iter_gn" << "  &" << 
-  setw(10) << "time_gn" << "  &" <<
-  setw(10) << "iter_en" << "  &" << 
-  setw(10) << "time_eh" << "  \\\\ \%" <<
-  setw(10) << "edrag_gn" << 
-  setw(10) << "edepth_gn" <<
-  setw(10) << "edrag_eh" << 
-  setw(10) << "edepth_eh" << endl;
+  setw(10) << "iter_ss" << "  &" << 
+  setw(10) << "time_ss" << "  &" <<
+  setw(10) << "iter_ms" << "  &" << 
+  setw(10) << "time_ms" << "  \\\\ \%" <<
+  setw(10) << "edrag_ss" << 
+  setw(10) << "edepth_ss" <<
+  setw(10) << "edrag_ms" << 
+  setw(10) << "edepth_ms" << endl;
   for(int test=0; test<n_tests; ++test){
     cout << setw(10) << drag_guess[test] << "  &";
     cout << setw(10) << depth_guess[test] << "  &";

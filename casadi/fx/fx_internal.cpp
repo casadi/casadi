@@ -135,7 +135,7 @@ void FXInternal::print(ostream &stream) const{
   } else{
     stream << " Inputs (" << getNumInputs() << "):" << std::endl;
     for (int i=0;i<getNumInputs();i++) {
-       stream << "  " << i+1 << ". " << input(i).dimString() << std::endl;
+      stream << "  " << i+1 << ". " << input(i).dimString() << std::endl;
     }
   }
   if (getNumOutputs()==1) {
@@ -143,7 +143,7 @@ void FXInternal::print(ostream &stream) const{
   } else {
     stream << " Outputs (" << getNumOutputs() << "):" << std::endl;
     for (int i=0;i<getNumOutputs();i++) {
-       stream << "  " << i+1 << ". " << output(i).dimString() << std::endl;
+      stream << "  " << i+1 << ". " << output(i).dimString() << std::endl;
     }
   }
 }
@@ -155,37 +155,7 @@ void FXInternal::repr(ostream &stream) const{
 FX FXInternal::hessian(int iind, int oind){
   casadi_error("FXInternal::hessian: hessian not defined for class " << typeid(*this).name());
 }
-
-FunctionIO& FXInternal::iStruct(int i){
-  try{
-    return input_.at(i);
-  } catch(std::out_of_range&){
-      std::stringstream ss;
-      ss <<  "In function " << getOption("name") << ": input " << i << " not in interval [0," << getNumInputs() << ")";
-      if (!isInit()) ss << endl << "Did you forget to initialize?";
-      throw CasadiException(ss.str());
-  }
-}
-
-const FunctionIO& FXInternal::iStruct(int i) const{
-  return const_cast<FXInternal*>(this)->iStruct(i);
-}
   
-FunctionIO& FXInternal::oStruct(int i){
-  try{
-    return output_.at(i);
-  } catch(std::out_of_range&){
-      std::stringstream ss;
-      ss <<  "In function " << getOption("name") << ": output " << i << " not in interval [0," << getNumOutputs() << ")";
-      if (!isInit()) ss << endl << "Did you forget to initialize?";
-      throw CasadiException(ss.str());
-  }
-}
-
-const FunctionIO& FXInternal::oStruct(int i) const{
-  return const_cast<FXInternal*>(this)->oStruct(i);
-}
-
 void FXInternal::log(const string& msg) const{
   if(verbose()){
     cout << "CasADi log message: " << msg << endl;
@@ -204,82 +174,6 @@ bool FXInternal::verbose() const{
 
 bool FXInternal::monitored(const string& mod) const{
   return monitors_.count(mod)>0;
-}
-
-Matrix<double>& FXInternal::fwdSeed(int iind, int dir){
-  try{
-    return iStruct(iind).dataF.at(dir);
-  } catch(out_of_range&){
-    stringstream ss;
-    if(iStruct(iind).dataF.empty()){
-      ss << "No forward directions ";
-    } else {
-      ss << "Forward direction " << dir << " is out of range [0," << iStruct(iind).dataF.size() << ") ";
-    }
-    ss << "for function " << getOption("name");
-    throw CasadiException(ss.str());
-  }
-}
-    
-const Matrix<double>& FXInternal::fwdSeed(int iind, int dir) const{
-  return const_cast<FXInternal*>(this)->fwdSeed(iind,dir);
-}
-
-Matrix<double>& FXInternal::fwdSens(int oind, int dir){
-  try{
-    return oStruct(oind).dataF.at(dir);
-  } catch(out_of_range&){
-    stringstream ss;
-    if(oStruct(oind).dataF.empty()){
-      ss << "No forward directions ";
-    } else {
-      ss << "Forward direction " << dir << " is out of range [0," << oStruct(oind).dataF.size() << ") ";
-    }
-    ss << "for function " << getOption("name");
-    throw CasadiException(ss.str());
-  }
-}
-    
-const Matrix<double>& FXInternal::fwdSens(int oind, int dir) const{
-  return const_cast<FXInternal*>(this)->fwdSens(oind,dir);
-}
-
-Matrix<double>& FXInternal::adjSeed(int oind, int dir){
-  try{
-    return oStruct(oind).dataA.at(dir);
-  } catch(out_of_range&){
-    stringstream ss;
-    if(oStruct(oind).dataA.empty()){
-      ss << "No adjoint directions ";
-    } else {
-      ss << "Adjoint direction " << dir << " is out of range [0," << oStruct(oind).dataA.size() << ") ";
-    }
-    ss << "for function " << getOption("name");
-    throw CasadiException(ss.str());
-  }
-}
-    
-const Matrix<double>& FXInternal::adjSeed(int oind, int dir) const{
-  return const_cast<FXInternal*>(this)->adjSeed(oind,dir);
-}
-
-Matrix<double>& FXInternal::adjSens(int iind, int dir){
-  try{
-    return iStruct(iind).dataA.at(dir);
-  } catch(out_of_range&){
-    stringstream ss;
-    if(iStruct(iind).dataA.empty()){
-      ss << "No adjoint directions ";
-    } else {
-      ss << "Adjoint direction " << dir << " is out of range [0," << iStruct(iind).dataA.size() << ") ";
-    }
-    ss << "for function " << getOption("name");
-    throw CasadiException(ss.str());
-  }
-}
-    
-const Matrix<double>& FXInternal::adjSens(int iind, int dir) const{
-  return const_cast<FXInternal*>(this)->adjSens(iind,dir);
 }
 
 void FXInternal::setNumInputs(int num_in){
@@ -418,19 +312,19 @@ CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
 
     // Clear the forward seeds/adjoint sensitivities
     for(int ind=0; ind<getNumInputs(); ++ind){
-      vector<double> &v = input(ind).data();
-      if(!v.empty()) fill_n(get_bvec_t(v),v.size(),0);
+      vector<double> &v = input<false>(ind).data();
+      if(!v.empty()) fill_n(get_bvec_t(v),v.size(),bvec_t(0));
     }
 
     // Clear the adjoint seeds/forward sensitivities
     for(int ind=0; ind<getNumOutputs(); ++ind){
-      vector<double> &v = output(ind).data();
-      if(!v.empty()) fill_n(get_bvec_t(v),v.size(),0);
+      vector<double> &v = output<false>(ind).data();
+      if(!v.empty()) fill_n(get_bvec_t(v),v.size(),bvec_t(0));
     }
     
     // Get seeds and sensitivities
-    bvec_t* input_v = get_bvec_t(input(iind).data());
-    bvec_t* output_v = get_bvec_t(output(oind).data());
+    bvec_t* input_v = get_bvec_t(input<false>(iind).data());
+    bvec_t* output_v = get_bvec_t(output<false>(oind).data());
     bvec_t* seed_v = use_fwd ? input_v : output_v;
     bvec_t* sens_v = use_fwd ? output_v : input_v;
     
@@ -462,12 +356,12 @@ CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
       
       // Print progress
       if(verbose()){
-  int progress_new = (s*100)/nsweep;
-  // Print when entering a new decade
-  if(progress_new / 10 > progress / 10){
-    progress = progress_new;
-    std::cout << progress << " %"  << std::endl;
-  }
+        int progress_new = (s*100)/nsweep;
+        // Print when entering a new decade
+        if(progress_new / 10 > progress / 10){
+          progress = progress_new;
+          std::cout << progress << " %"  << std::endl;
+        }
       }
       
       // Nonzero offset
@@ -477,7 +371,7 @@ CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
       int ndir_local = std::min(bvec_size,nz_seed-offset);
 
       for(int i=0; i<ndir_local; ++i){
-  seed_v[offset+i] |= bvec_t(1)<<i;
+        seed_v[offset+i] |= bvec_t(1)<<i;
       }
       
       // Propagate the dependencies
@@ -486,33 +380,33 @@ CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
       // Loop over the nonzeros of the output
       for(int el=0; el<nz_sens; ++el){
 
-  // Get the sparsity sensitivity
-  bvec_t spsens = sens_v[el];
+        // Get the sparsity sensitivity
+        bvec_t spsens = sens_v[el];
 
-  // Clear the sensitivities for the next sweep
-  if(!use_fwd){
-    sens_v[el] = 0;
-  }
+        // Clear the sensitivities for the next sweep
+        if(!use_fwd){
+          sens_v[el] = 0;
+        }
   
-  // If there is a dependency in any of the directions
-  if(0!=spsens){
-    
-    // Loop over seed directions
-    for(int i=0; i<ndir_local; ++i){
-      
-      // If dependents on the variable
-      if((bvec_t(1) << i) & spsens){
-        // Add to pattern
-        jrow.push_back(el);
-        jcol.push_back(i+offset);
-      }
-    }
-  }
+        // If there is a dependency in any of the directions
+        if(0!=spsens){
+          
+          // Loop over seed directions
+          for(int i=0; i<ndir_local; ++i){
+            
+            // If dependents on the variable
+            if((bvec_t(1) << i) & spsens){
+              // Add to pattern
+              jrow.push_back(el);
+              jcol.push_back(i+offset);
+            }
+          }
+        }
       }
       
       // Remove the seeds
       for(int i=0; i<bvec_size && offset+i<nz_seed; ++i){
-  seed_v[offset+i] = 0;
+        seed_v[offset+i] = 0;
       }
     }
     
@@ -805,6 +699,22 @@ FX FXInternal::derivative(int nfwd, int nadj){
 
 FX FXInternal::getDerivative(int nfwd, int nadj){
   casadi_error("FXInternal::getDerivative not defined for class " << typeid(*this).name());
+}
+
+int FXInternal::getNumScalarInputs() const{
+  int ret=0;
+  for(int iind=0; iind<getNumInputs(); ++iind){
+    ret += input(iind).size();
+  }
+  return ret;
+}
+
+int FXInternal::getNumScalarOutputs() const{
+  int ret=0;
+  for(int oind=0; oind<getNumOutputs(); ++oind){
+    ret += output(oind).size();
+  }
+  return ret;
 }
 
 } // namespace CasADi
