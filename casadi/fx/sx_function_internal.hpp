@@ -59,6 +59,26 @@ class SXFunctionInternal : public XFunctionInternal<SXFunctionInternal,Matrix<SX
   /** \brief  Evaluate the function numerically */
   virtual void evaluate(int nfdir, int nadir);
 
+  /** \brief  Helper class to be plugged into evaluateGen when working with a value known only at runtime */
+  struct int_runtime{
+    const int value;
+    int_runtime(int v) : value(v){}
+  };
+  
+  /** \brief  Helper class to be plugged into evaluateGen when working with a value known already at compiletime */
+  template<int v>
+  struct int_compiletime{
+    static const int value = v;
+  };
+  
+  /** \brief  Evaluate the function numerically, first argument generic */
+  template<typename T1>
+  void evaluateGen1(T1 nfdir_c, int nadir);
+  
+  /** \brief  Evaluate the function numerically, both arguments generic */
+  template<typename T1, typename T2>
+  void evaluateGen(T1 nfdir_c, T2 nadir_c);
+  
   /** \brief  evaluate symbolically while also propagating directional derivatives */
   virtual void evalSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
                       const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 

@@ -305,7 +305,11 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
       } else if(onode.checkName("opt:IntervalFinalTime")) {
 	// TODO
       } else if(onode.checkName("opt:TimePoints")) {
-	// TODO
+        // TODO
+      } else if(onode.checkName("opt:PathConstraints")) {
+        // TODO
+      } else if(onode.checkName("opt:PointConstraints")) {
+        // TODO
       } else if(onode.checkName("opt:Constraints")) {
 	
 	for(int i=0; i<onode.size(); ++i){
@@ -331,11 +335,11 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
 	    path_max.append(0.);
 	  } else {
 	    cerr << "unknown constraint type" << constr_i.getName() << endl;
-	    throw "SymbolicOCP::addConstraints";
+	    throw CasadiException("SymbolicOCP::addConstraints");
 	  }
 	}
 	
-      } else throw "SymbolicOCP::addOptimization: Unknown node";
+      } else throw CasadiException(string("SymbolicOCP::addOptimization: Unknown node ")+onode.getName());
     }
   }
   
@@ -477,7 +481,7 @@ SX SymbolicOCP::readExpr(const XMLNode& node){
   }
 
   // throw error if reached this point
-  throw CasadiException(string("SymbolicOCP::readExpr: unknown node: ") + name);
+  throw CasadiException(string("SymbolicOCP::readExpr: Unknown node: ") + name);
   
 }
 

@@ -1045,7 +1045,6 @@ void IdasInternal::idas_error(const string& module, int flag){
     (module=="IDASolve" && flag ==IDA_ERR_FAIL )
     ) {
     ss << "Some common causes for this error: " << std::endl;
-    ss << "  - forgetting to set the 'is_differential' option. " << std::endl;
     ss << "  - providing an initial guess for which 0=g(y,z,t) is not invertible wrt y. " << std::endl;
     ss << "  - having a DAE-index higher than 1 such that 0=g(y,z,t) is not invertible wrt y over the whole domain." << std::endl;
     ss << "  - having set abstol or reltol too small." << std::endl;

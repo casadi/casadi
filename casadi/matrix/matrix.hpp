@@ -217,13 +217,33 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
 
     #ifndef SWIG
     /// Get a non-zero element
-    const T& at(int k) const{ if (k<0) k+=size(); return data().at(k); }
+    inline const T& at(int k) const{
+      return const_cast<Matrix<T>*>(this)->at(k);
+    }
     
     /// Access a non-zero element
-    T& at(int k){if (k<0) k+=size(); return data().at(k); }
+    inline T& at(int k){
+      try{
+        if (k<0) k+=size(); 
+        return data().at(k);
+      } catch(std::out_of_range& ex){
+        std::stringstream ss;
+        ss << "Out of range error in Matrix<>::at: " << k << " not in range [0," << size() << ")";
+        throw CasadiException(ss.str());
+      }
+    }
     #else // SWIG
     /// Access a non-zero element
-    T at(int k){if (k<0) k+=size(); return data().at(k); }
+    T at(int k){
+      try{
+        if (k<0) k+=size(); 
+        return data().at(k);
+      } catch(std::out_of_range& ex){
+        std::stringstream ss;
+        ss << "Out of range error in Matrix<>::at: " << k << " not in range [0," << size() << ")";
+        throw CasadiException(ss.str());
+      }
+    }
     #endif // SWIG
     
     #ifndef SWIG
@@ -277,7 +297,7 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
 
     //@{
     /// Get a set of nonzeros
-    const Matrix<T> getNZ(int k) const;
+    const Matrix<T> getNZ(int k) const{ return at(k);}
     const Matrix<T> getNZ(const std::vector<int>& k) const;
     const Matrix<T> getNZ(const Slice& k) const{ return getNZ(k.getAll(size()));}
     const Matrix<T> getNZ(const Matrix<int>& k) const;

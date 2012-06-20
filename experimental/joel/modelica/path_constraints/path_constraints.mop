@@ -1,0 +1,13 @@
+optimization TimedVariablesTest(objective=cost(finalTime),startTime=0,finalTime=1)
+  Real cost(start=0,fixed=true);
+  input Real u;
+  Real x(start=1,fixed=true);
+equation
+ der(cost) = x^2 + u^2;
+ der(x) = -x + u;
+constraint
+ u<=1;
+ u + x(startTime) >=-1;
+ x(startTime) = x(finalTime);
+ cost(finalTime)>=1; 
+end TimedVariablesTest;

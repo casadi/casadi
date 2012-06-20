@@ -67,8 +67,41 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix >& inputv, const ve
 SXFunctionInternal::~SXFunctionInternal(){
 }
 
-
 void SXFunctionInternal::evaluate(int nfdir, int nadir){
+  // Compiletime optimization for certain common cases
+  switch(nfdir){
+    case 0:
+      evaluateGen1(int_compiletime<0>(),nadir); break;
+    case 1:
+      evaluateGen1(int_compiletime<1>(),nadir); break;
+    case optimized_num_dir:
+      evaluateGen1(int_compiletime<optimized_num_dir>(),nadir); break;
+    default:
+      evaluateGen1(int_runtime(nfdir),nadir); break;
+  }
+}
+
+template<typename T1>
+void SXFunctionInternal::evaluateGen1(T1 nfdir_c, int nadir){
+  // Compiletime optimization for certain common cases
+  switch(nadir){
+    case 0:
+      evaluateGen(nfdir_c,int_compiletime<0>()); break;
+    case 1:
+      evaluateGen(nfdir_c,int_compiletime<1>()); break;
+    case optimized_num_dir:
+      evaluateGen(nfdir_c,int_compiletime<optimized_num_dir>()); break;
+    default:
+      evaluateGen(nfdir_c,int_runtime(nadir)); break;
+  }
+}
+
+template<typename T1, typename T2>
+void SXFunctionInternal::evaluateGen(T1 nfdir_c, T2 nadir_c){
+  // The following parameters are known either at runtime or at compiletime
+  const int nfdir = nfdir_c.value;
+  const int nadir = nadir_c.value;
+  
   // NOTE: The implementation of this function is very delicate. Small changes in the class structure
   // can cause large performance losses. For this reason, the preprocessor macros are used below
   if (!free_vars_.empty()) {
@@ -86,7 +119,7 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
   #endif // WITH_LLVM
   
   // Do we need taping?
-  bool taping = nfdir>0 || nadir>0;
+  const bool taping = nfdir>0 || nadir>0;
 
   // Evaluate the algorithm
   if(!taping){
@@ -449,7 +482,7 @@ void SXFunctionInternal::init(){
       sort_depth_first(s,nodes);
       
       // A null pointer means an output instruction
-      nodes.push_back(0);
+      nodes.push_back(static_cast<SXNode*>(0));
     }
   }
   

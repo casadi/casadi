@@ -64,6 +64,9 @@ namespace CasADi{
   typedef CRSSparsity (*SparsityGenerator)(FX& fcn, int iind, int oind, void* user_data);
   
 #ifndef SWIG
+  // The number of derivative directions for which the tool has been optimized
+  const int optimized_num_dir = 64;
+  
   // Type with a size corresponding to that of double (or smaller) that can be used to hold a set of booleans
   // If the compiler supports C99 or has defined __SIZEOF_LONG_LONG__, we shall use the long long datatype, which is 64 bit, otherwise long
   #if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L || defined(__SIZEOF_LONG_LONG__))

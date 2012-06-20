@@ -434,10 +434,6 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
-%feature("docstring")  CasADi::AcadoIntegrator::evaluate_old "
-
-Evaluate (old style) ";
-
 %feature("docstring")  CasADi::AcadoIntegrator::evaluate "
 
 Evaluate. ";
@@ -1768,10 +1764,6 @@ Set number of outputs (normally invoked internally) ";
 
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
-
-%feature("docstring")  CasADi::AcadoOCP::evaluate_old "
-
-Evaluate (old style) ";
 
 %feature("docstring")  CasADi::AcadoOCP::evaluate "
 
@@ -3722,10 +3714,6 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
-%feature("docstring")  CasADi::CFunction::evaluate_old "
-
-Evaluate (old style) ";
-
 %feature("docstring")  CasADi::CFunction::evaluate "
 
 Evaluate. ";
@@ -4960,10 +4948,6 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
-%feature("docstring")  CasADi::OptimalControl::Collocation::evaluate_old "
-
-Evaluate (old style) ";
-
 %feature("docstring")  CasADi::OptimalControl::Collocation::evaluate "
 
 Evaluate. ";
@@ -5771,10 +5755,6 @@ Set number of outputs (normally invoked internally) ";
 
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
-
-%feature("docstring")  CasADi::CollocationIntegrator::evaluate_old "
-
-Evaluate (old style) ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::evaluate "
 
@@ -8253,10 +8233,6 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
-%feature("docstring")  CasADi::ControlSimulator::evaluate_old "
-
-Evaluate (old style) ";
-
 %feature("docstring")  CasADi::ControlSimulator::evaluate "
 
 Evaluate. ";
@@ -10280,10 +10256,6 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
-%feature("docstring")  CasADi::CplexSolver::evaluate_old "
-
-Evaluate (old style) ";
-
 %feature("docstring")  CasADi::CplexSolver::evaluate "
 
 Evaluate. ";
@@ -11661,10 +11633,6 @@ Set number of outputs (normally invoked internally) ";
 
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
-
-%feature("docstring")  CasADi::Interfaces::CSparse::evaluate_old "
-
-Evaluate (old style) ";
 
 %feature("docstring")  CasADi::Interfaces::CSparse::evaluate "
 
@@ -13173,10 +13141,6 @@ Set number of outputs (normally invoked internally) ";
 
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
-
-%feature("docstring")  CasADi::Sundials::CVodesIntegrator::evaluate_old "
-
-Evaluate (old style) ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::evaluate "
 
@@ -15208,10 +15172,6 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
-%feature("docstring")  CasADi::ExternalFunction::evaluate_old "
-
-Evaluate (old style) ";
-
 %feature("docstring")  CasADi::ExternalFunction::evaluate "
 
 Evaluate. ";
@@ -16646,10 +16606,6 @@ Set number of outputs (normally invoked internally) ";
 
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
-
-%feature("docstring")  CasADi::FX::evaluate_old "
-
-Evaluate (old style) ";
 
 %feature("docstring")  CasADi::FX::evaluate "
 
@@ -18580,10 +18536,6 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
-%feature("docstring")  CasADi::Sundials::IdasIntegrator::evaluate_old "
-
-Evaluate (old style) ";
-
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::evaluate "
 
 Evaluate. ";
@@ -20369,10 +20321,6 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
-%feature("docstring")  CasADi::ImplicitFunction::evaluate_old "
-
-Evaluate (old style) ";
-
 %feature("docstring")  CasADi::ImplicitFunction::evaluate "
 
 Evaluate. ";
@@ -21793,10 +21741,6 @@ Set number of outputs (normally invoked internally) ";
 
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
-
-%feature("docstring")  CasADi::Integrator::evaluate_old "
-
-Evaluate (old style) ";
 
 %feature("docstring")  CasADi::Integrator::evaluate "
 
@@ -23788,10 +23732,6 @@ Set number of outputs (normally invoked internally) ";
 
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
-
-%feature("docstring")  CasADi::IPMethod::evaluate_old "
-
-Evaluate (old style) ";
 
 %feature("docstring")  CasADi::IPMethod::evaluate "
 
@@ -29192,10 +29132,6 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
-%feature("docstring")  CasADi::Interfaces::IpoptQPSolver::evaluate_old "
-
-Evaluate (old style) ";
-
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::evaluate "
 
 Evaluate. ";
@@ -32614,10 +32550,6 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
-%feature("docstring")  CasADi::IpoptSolver::evaluate_old "
-
-Evaluate (old style) ";
-
 %feature("docstring")  CasADi::IpoptSolver::evaluate "
 
 Evaluate. ";
@@ -33302,10 +33234,6 @@ Set number of outputs (normally invoked internally) ";
 
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
-
-%feature("docstring")  CasADi::Jacobian::evaluate_old "
-
-Evaluate (old style) ";
 
 %feature("docstring")  CasADi::Jacobian::evaluate "
 
@@ -35332,10 +35260,6 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
-%feature("docstring")  CasADi::Sundials::KinsolSolver::evaluate_old "
-
-Evaluate (old style) ";
-
 %feature("docstring")  CasADi::Sundials::KinsolSolver::evaluate "
 
 Evaluate. ";
@@ -37095,10 +37019,6 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
-%feature("docstring")  CasADi::KnitroSolver::evaluate_old "
-
-Evaluate (old style) ";
-
 %feature("docstring")  CasADi::KnitroSolver::evaluate "
 
 Evaluate. ";
@@ -37779,10 +37699,6 @@ Set number of outputs (normally invoked internally) ";
 
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
-
-%feature("docstring")  CasADi::Interfaces::LapackLUDense::evaluate_old "
-
-Evaluate (old style) ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::evaluate "
 
@@ -38998,10 +38914,6 @@ Set number of outputs (normally invoked internally) ";
 
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
-
-%feature("docstring")  CasADi::Interfaces::LapackQRDense::evaluate_old "
-
-Evaluate (old style) ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::evaluate "
 
@@ -40413,10 +40325,6 @@ Set number of outputs (normally invoked internally) ";
 
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
-
-%feature("docstring")  CasADi::LiftedSQP::evaluate_old "
-
-Evaluate (old style) ";
 
 %feature("docstring")  CasADi::LiftedSQP::evaluate "
 
@@ -42577,10 +42485,6 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
-%feature("docstring")  CasADi::Interfaces::LiftoptSolver::evaluate_old "
-
-Evaluate (old style) ";
-
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::evaluate "
 
 Evaluate. ";
@@ -43227,10 +43131,6 @@ Set number of outputs (normally invoked internally) ";
 
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
-
-%feature("docstring")  CasADi::LinearSolver::evaluate_old "
-
-Evaluate (old style) ";
 
 %feature("docstring")  CasADi::LinearSolver::evaluate "
 
@@ -45899,11 +45799,6 @@ CasADi::OptimalControl::MultipleShooting::updateNumSens "
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
-%feature("docstring")
-CasADi::OptimalControl::MultipleShooting::evaluate_old "
-
-Evaluate (old style) ";
-
 %feature("docstring")  CasADi::OptimalControl::MultipleShooting::evaluate "
 
 Evaluate. ";
@@ -48561,10 +48456,6 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
-%feature("docstring")  CasADi::MXFunction::evaluate_old "
-
-Evaluate (old style) ";
-
 %feature("docstring")  CasADi::MXFunction::evaluate "
 
 Evaluate. ";
@@ -50161,10 +50052,6 @@ Set number of outputs (normally invoked internally) ";
 
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
-
-%feature("docstring")  CasADi::NLPSolver::evaluate_old "
-
-Evaluate (old style) ";
 
 %feature("docstring")  CasADi::NLPSolver::evaluate "
 
@@ -53082,10 +52969,6 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
-%feature("docstring")  CasADi::OCPSolver::evaluate_old "
-
-Evaluate (old style) ";
-
 %feature("docstring")  CasADi::OCPSolver::evaluate "
 
 Evaluate. ";
@@ -55017,10 +54900,6 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
-%feature("docstring")  CasADi::Interfaces::OOQPSolver::evaluate_old "
-
-Evaluate (old style) ";
-
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::evaluate "
 
 Evaluate. ";
@@ -56208,10 +56087,6 @@ Set number of outputs (normally invoked internally) ";
 
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
-
-%feature("docstring")  CasADi::Parallelizer::evaluate_old "
-
-Evaluate (old style) ";
 
 %feature("docstring")  CasADi::Parallelizer::evaluate "
 
@@ -58039,10 +57914,6 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
-%feature("docstring")  CasADi::Interfaces::QPOasesSolver::evaluate_old "
-
-Evaluate (old style) ";
-
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::evaluate "
 
 Evaluate. ";
@@ -58723,10 +58594,6 @@ Set number of outputs (normally invoked internally) ";
 
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
-
-%feature("docstring")  CasADi::QPSolver::evaluate_old "
-
-Evaluate (old style) ";
 
 %feature("docstring")  CasADi::QPSolver::evaluate "
 
@@ -60089,10 +59956,6 @@ Set number of outputs (normally invoked internally) ";
 
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
-
-%feature("docstring")  CasADi::RKIntegrator::evaluate_old "
-
-Evaluate (old style) ";
 
 %feature("docstring")  CasADi::RKIntegrator::evaluate "
 
@@ -61772,10 +61635,6 @@ Set number of outputs (normally invoked internally) ";
 
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
-
-%feature("docstring")  CasADi::Simulator::evaluate_old "
-
-Evaluate (old style) ";
 
 %feature("docstring")  CasADi::Simulator::evaluate "
 
@@ -64164,10 +64023,6 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
-%feature("docstring")  CasADi::SQPMethod::evaluate_old "
-
-Evaluate (old style) ";
-
 %feature("docstring")  CasADi::SQPMethod::evaluate "
 
 Evaluate. ";
@@ -65115,10 +64970,6 @@ Set number of outputs (normally invoked internally) ";
 
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
-
-%feature("docstring")  CasADi::Sundials::SundialsIntegrator::evaluate_old "
-
-Evaluate (old style) ";
 
 %feature("docstring")  CasADi::Sundials::SundialsIntegrator::evaluate "
 
@@ -66624,10 +66475,6 @@ Set number of outputs (normally invoked internally) ";
 
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
-
-%feature("docstring")  CasADi::SuperLU::evaluate_old "
-
-Evaluate (old style) ";
 
 %feature("docstring")  CasADi::SuperLU::evaluate "
 
@@ -68178,10 +68025,6 @@ Set number of outputs (normally invoked internally) ";
 
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
-
-%feature("docstring")  CasADi::SXFunction::evaluate_old "
-
-Evaluate (old style) ";
 
 %feature("docstring")  CasADi::SXFunction::evaluate "
 
@@ -73061,10 +72904,6 @@ Set number of outputs (normally invoked internally) ";
 
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
-
-%feature("docstring")  CasADi::WorhpSolver::evaluate_old "
-
-Evaluate (old style) ";
 
 %feature("docstring")  CasADi::WorhpSolver::evaluate "
 
