@@ -482,7 +482,7 @@ void SXFunctionInternal::init(){
       sort_depth_first(s,nodes);
       
       // A null pointer means an output instruction
-      nodes.push_back(0);
+      nodes.push_back(static_cast<SXNode*>(0));
     }
   }
   
