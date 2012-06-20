@@ -271,24 +271,6 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
     // Terminal time
     tf = opts["opt:IntervalFinalTime"]["opt:Value"].getText();
 
-    // Time points
-    const XMLNode& tpnode = opts["opt:TimePoints"];
-    tp.resize(tpnode.size());
-    for(int i=0; i<tp.size(); ++i){
-      // Get index
-      int index = tpnode[i].attribute("index");
-      
-      // Get value
-      double value = tpnode[i].attribute("value");
-      tp[i] = value;
-      
-      // Allocate all the timed variables
-      for(int k=0; k<tpnode[i].size(); ++k){
-        string qn = qualifiedName(tpnode[i][k]);
-        variable(qn).atTime(value,true);
-      }
-    }
-    
     for(int i=0; i<opts.size(); ++i){
       
       // Get a reference to the node
@@ -300,73 +282,38 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
 	  // Add components
 	  for(int i=0; i<onode.size(); ++i){
 	    const XMLNode& var = onode[i];
-            
-            // If string literal, ignore
-            if(var.checkName("exp:StringLiteral"))
-              continue;
-            
-            // Read expression
 	    SX v = readExpr(var);
 	    mterm.append(v);
 	  }
 	} catch(exception& ex){
 	  if(verbose){
-            throw CasadiException(std::string("addObjectiveFunction failed: ") + ex.what());
+	    cout << "WARNING: addObjectiveFunction" << ex.what() << endl;
 	  }
 	}
       } else if(onode.checkName("opt:IntegrandObjectiveFunction")){
 	try{
 	  for(int i=0; i<onode.size(); ++i){
 	    const XMLNode& var = onode[i];
-
-            // If string literal, ignore
-            if(var.checkName("exp:StringLiteral"))
-              continue;
-            
-            // Read expression
-            SX v = readExpr(var);
+	    SX v = readExpr(var);
 	    lterm.append(v);
 	  }
 	} catch(exception& ex){
-            throw CasadiException(std::string("addIntegrandObjectiveFunction failed: ") + ex.what());
+	  cout << "WARNING: addIntegrandObjectiveFunction" << ex.what() << endl;
 	}
       } else if(onode.checkName("opt:IntervalStartTime")) {
-	// Ignore, treated above
+	// TODO
       } else if(onode.checkName("opt:IntervalFinalTime")) {
-        // Ignore, treated above
+	// TODO
       } else if(onode.checkName("opt:TimePoints")) {
-        // Ignore, treated above
+        // TODO
+      } else if(onode.checkName("opt:PathConstraints")) {
+        // TODO
       } else if(onode.checkName("opt:PointConstraints")) {
-
-        for(int i=0; i<onode.size(); ++i){
-          const XMLNode& constr_i = onode[i];
-          if(constr_i.checkName("opt:ConstraintLeq")){
-            SX ex = readExpr(constr_i[0]);
-            SX ub = readExpr(constr_i[1]);
-            point.append(ex-ub);
-            point_min.append(-numeric_limits<double>::infinity());
-            point_max.append(0.);
-          } else if(constr_i.checkName("opt:ConstraintGeq")){
-            SX ex = readExpr(constr_i[0]);
-            SX lb = readExpr(constr_i[1]);
-            point.append(ex-lb);
-            point_min.append(0.);
-            point_max.append(numeric_limits<double>::infinity());
-          } else if(constr_i.checkName("opt:ConstraintEq")){
-            SX ex = readExpr(constr_i[0]);
-            SX eq = readExpr(constr_i[1]);
-            point.append(ex-eq);
-            point_min.append(0.);
-            point_max.append(0.);
-          } else {
-            cerr << "unknown constraint type" << constr_i.getName() << endl;
-            throw CasadiException("SymbolicOCP::addConstraints");
-          }
-        }
-        
-      } else if(onode.checkName("opt:Constraints") || onode.checkName("opt:PathConstraints")) {
+        // TODO
+      } else if(onode.checkName("opt:Constraints")) {
 	
 	for(int i=0; i<onode.size(); ++i){
+
 	  const XMLNode& constr_i = onode[i];
 	  if(constr_i.checkName("opt:ConstraintLeq")){
 	    SX ex = readExpr(constr_i[0]);
@@ -530,9 +477,7 @@ SX SymbolicOCP::readExpr(const XMLNode& node){
   } else if(name.compare("Time")==0){
     return t.toScalar();
   } else if(name.compare("TimedVariable")==0){
-    // Get the index of the time point
-    int index = node.attribute("timePointIndex");
-    return readVariable(node[0]).atTime(tp[index]);
+    return readVariable(node[0]).atTime(double(node[1].getText()),true);
   }
 
   // throw error if reached this point
@@ -547,7 +492,7 @@ void SymbolicOCP::repr(std::ostream &stream) const{
 void SymbolicOCP::print(ostream &stream) const{
   stream << "Dimensions: "; 
   stream << "s = " << x.size() << ", ";
-  stream << "#x = " << xd.size() << ", ";
+  stream << "#xd = " << xd.size() << ", ";
   stream << "#z = " << xa.size() << ", ";
   stream << "#q = " << xq.size() << ", ";
   stream << "#y = " << y.size() << ", ";
@@ -562,7 +507,7 @@ void SymbolicOCP::print(ostream &stream) const{
   stream << "{" << endl;
   stream << "  t = " << t << endl;
   stream << "  s =  " << x << endl;
-  stream << "  x = " << xd << endl;
+  stream << "  xd = " << xd << endl;
   stream << "  z =  " << xa << endl;
   stream << "  q =  " << xq << endl;
   stream << "  y =  " << y << endl;
@@ -624,23 +569,17 @@ void SymbolicOCP::print(ostream &stream) const{
     stream << lterm.at(i) << endl;
   stream << endl;
   
-  // Path constraint functions
-  stream << "Path constraint functions" << endl;
+  // Constraint functions
+  stream << "Constraint functions" << endl;
   for(int i=0; i<path.size(); ++i)
     stream << path_min.at(i) << " <= " << path.at(i) << " <= " << path_max.at(i) << endl;
-  stream << endl;
-  
-  // Point constraint functions
-  stream << "Point constraint functions" << endl;
-  for(int i=0; i<point.size(); ++i)
-    stream << point_min.at(i) << " <= " << point.at(i) << " <= " << point_max.at(i) << endl;
   stream << endl;
   
   // Constraint functions
   stream << "Time horizon" << endl;
   stream << "t0 = " << t0 << endl;
   stream << "tf = " << tf << endl;
-  stream << "tp = " << tp << endl;
+  
 }
 
 void SymbolicOCP::eliminateInterdependencies(){
