@@ -50,9 +50,6 @@ class FXInternal : public OptionsFunctionalityNode{
     /** \brief  Destructor */
     virtual ~FXInternal() = 0;
 
-    /** \brief  Evaluate switch*/
-    void evaluate_switch(int nfdir, int nadir);
-
     /** \brief  Evaluate */
     virtual void evaluate(int nfdir, int nadir) = 0;
 
@@ -350,9 +347,6 @@ class FXInternal : public OptionsFunctionalityNode{
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<SXMatrix> symbolicInputSX() const;
   
-    /// Get the Jacobian of all outputs with respect to all inputs
-    void getFullJacobian();
-
     /** \brief  Number of forward and adjoint derivatives */
     int nfdir_, nadir_;
 
@@ -393,13 +387,7 @@ class FXInternal : public OptionsFunctionalityNode{
     /// User-set field
     void* user_data_;
     
-    /// Full jacobian function used to calculate directional derivatives instead of the using directional derivatives
-    bool jac_for_sens_;
-    FX full_jacobian_;
-    
-    bool monitor_inputs_;
-    
-    bool monitor_outputs_;
+    bool monitor_inputs_, monitor_outputs_;
 };
 
 

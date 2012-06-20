@@ -708,11 +708,6 @@ void SXFunctionInternal::init(){
   // Allocate memory for directional derivatives
   SXFunctionInternal::updateNumSens(false);
   
-  // Get the full Jacobian already now
-  if(jac_for_sens_){
-    getFullJacobian();
-  }
-  
   // Initialize just-in-time compilation
   just_in_time_ = getOption("just_in_time");
   if(just_in_time_){

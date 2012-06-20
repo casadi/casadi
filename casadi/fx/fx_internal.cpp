@@ -56,7 +56,6 @@ FXInternal::FXInternal(){
   jacgen_ = 0;
   spgen_ = 0;
   user_data_ = 0;
-  jac_for_sens_ = false;
   monitor_inputs_ = false;
   monitor_outputs_ = false;
 }
@@ -68,7 +67,8 @@ void FXInternal::init(){
   verbose_ = getOption("verbose");
   store_jacobians_ = getOption("store_jacobians");
   numeric_jacobian_ = getOption("numeric_jacobian");
-  jac_for_sens_ = getOption("jac_for_sens");
+  bool jac_for_sens = getOption("jac_for_sens");
+  casadi_assert_warning(jac_for_sens==false,"The option \"jac_for_sens\" has been deprecated. Ignored.");
   
   // Allocate data for sensitivities (only the method in this class)
   FXInternal::updateNumSens(false);
@@ -540,95 +540,6 @@ void FXInternal::getPartition(int iind, int oind, CRSSparsity& D1, CRSSparsity& 
         D2=CRSSparsity();
       } else {
         D1=CRSSparsity();
-      }
-    }
-  }
-}
-
-void FXInternal::getFullJacobian(){
-  // Quick return if it has been calculated
-  if(!full_jacobian_.isNull()) return;
-
-  // We want all the jacobian blocks
-  vector<pair<int,int> > jblocks;
-  jblocks.reserve((1+getNumInputs())+getNumOutputs());
-  for(int oind=0; oind<getNumOutputs(); ++oind){
-    for(int iind=-1; iind<getNumInputs(); ++iind){
-      if(iind>=0) jacSparsity(iind,oind,false);
-      jblocks.push_back(pair<int,int>(oind,iind));
-    }
-  }
-  full_jacobian_ = jacobian_switch(jblocks);
-  full_jacobian_.init();
-}
-
-void FXInternal::evaluate_switch(int nfdir, int nadir){
-  if (monitor_inputs_) {
-    std::cout << "FXInternal::evaluate_switch:Inputs:" << std::endl;
-    for (int i=0;i<getNumInputs();++i) {
-      std::cout << "#" << i << ": " << input(i) << std::endl;
-    }
-  }
-  if(!jac_for_sens_ || (nfdir==0 && nadir==0)){     // Default, directional derivatives
-    evaluate(nfdir,nadir);
-  } else { // Calculate complete Jacobian and multiply
-    // Generate the Jacobian if it does not exist
-    if(full_jacobian_.isNull()){
-      getFullJacobian();
-    }
-        
-    // Make sure inputs and outputs dense
-    for(int iind=0; iind<getNumInputs(); ++iind){
-      casadi_assert_message(isDense(input(iind)),"sparse input currently not supported");
-    }
-    for(int oind=0; oind<getNumOutputs(); ++oind){
-      casadi_assert_message(isDense(output(oind)),"sparse output currently not supported");
-    }
-    
-    // Pass inputs to the Jacobian function
-    for(int iind=0; iind<getNumInputs(); ++iind){
-      full_jacobian_.setInput(input(iind),iind);
-    }
-    
-    // Evaluate Jacobian function
-    full_jacobian_.evaluate();
-
-    // Reset forward sensitivities
-    for(int dir=0; dir<nfdir; ++dir){
-      for(int oind=0; oind<getNumOutputs(); ++oind){
-        fwdSens(oind,dir).setAll(0.0);
-      }
-    }
-    
-    // Reset adjoint sensitivities
-    for(int dir=0; dir<nadir; ++dir){
-      for(int iind=0; iind<getNumInputs(); ++iind){
-        adjSens(iind,dir).setAll(0.0);
-      }
-    }
-    
-    // Jacobian output index
-    int oind_jac = 0;
-
-    // Loop over outputs
-    for(int oind=0; oind<getNumOutputs(); ++oind){
-      // Get undifferentiated result
-      full_jacobian_.getOutput(output(oind),oind_jac++);
-      
-      // Get get contribution from Jacobian block
-      for(int iind=0; iind<getNumInputs(); ++iind){
-        // Get Jacobian block
-        const Matrix<double>& Jblock = full_jacobian_.output(oind_jac++);
-        
-        // Forward sensitivities
-        for(int dir=0; dir<nfdir; ++dir){
-          addMultiple(Jblock,fwdSeed(iind,dir).data(),fwdSens(oind,dir).data(),false);
-        }
-        
-        // Adjoint sensitivities
-        for(int dir=0; dir<nadir; ++dir){
-          addMultiple(Jblock,adjSeed(oind,dir).data(),adjSens(iind,dir).data(),true);
-        }
       }
     }
   }

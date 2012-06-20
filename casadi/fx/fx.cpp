@@ -168,7 +168,7 @@ void FX::evaluate(int nfdir, int nadir){
   assertInit();
   casadi_assert(nfdir<=(*this)->nfdir_);
   casadi_assert(nadir<=(*this)->nadir_);
-  (*this)->evaluate_switch(nfdir,nadir);
+  (*this)->evaluate(nfdir,nadir);
 }
 
 void FX::solve(){
