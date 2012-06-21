@@ -1098,10 +1098,6 @@ evaluate ";
 
 Set dimensions (to be removed) ";
 
-%feature("docstring")  CasADi::AcadoIntegratorInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::AcadoIntegratorInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -1303,10 +1299,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::AcadoIntegratorInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::AcadoIntegratorInternal::log "
 
@@ -2306,10 +2298,6 @@ Solve the problem. ";
 
 %feature("docstring")  CasADi::AcadoOCPInternal::returnRef "";
 
-%feature("docstring")  CasADi::AcadoOCPInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::AcadoOCPInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -2510,10 +2498,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::AcadoOCPInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::AcadoOCPInternal::log "
 
@@ -4201,10 +4185,6 @@ Evaluate. ";
 
 Initialize. ";
 
-%feature("docstring")  CasADi::CFunctionInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::CFunctionInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -4405,10 +4385,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::CFunctionInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::CFunctionInternal::log "
 
@@ -6409,11 +6385,6 @@ Create a new integrator, new, not yet ready implementation. ";
 
 Set dimensions (to be removed) ";
 
-%feature("docstring")
-CasADi::CollocationIntegratorInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::CollocationIntegratorInternal::updateNumSens
 "
 
@@ -6627,11 +6598,6 @@ CasADi::CollocationIntegratorInternal::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")
-CasADi::CollocationIntegratorInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::CollocationIntegratorInternal::log "
 
@@ -7008,11 +6974,6 @@ CasADi::OptimalControl::CollocationInternal::setOptimalSolution "";
 CasADi::OptimalControl::CollocationInternal::reportConstraints "";
 
 %feature("docstring")
-CasADi::OptimalControl::CollocationInternal::evaluate_switch "
-
-Evaluate switch. ";
-
-%feature("docstring")
 CasADi::OptimalControl::CollocationInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -7249,11 +7210,6 @@ CasADi::OptimalControl::CollocationInternal::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")
-CasADi::OptimalControl::CollocationInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::OptimalControl::CollocationInternal::log "
 
@@ -8812,10 +8768,6 @@ timescale. ";
 
 Get the index i such that gridfine[i] == gridcoarse. ";
 
-%feature("docstring")  CasADi::ControlSimulatorInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::ControlSimulatorInternal::jacobian "
 
 Calculate the jacobian of a number of function outputs with respect to a
@@ -9013,10 +8965,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::ControlSimulatorInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::ControlSimulatorInternal::log "
 
@@ -9434,10 +9382,6 @@ all constraints. ";
 Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
 ";
 
-%feature("docstring")  CasADi::CplexInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::CplexInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -9638,10 +9582,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::CplexInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::CplexInternal::log "
 
@@ -12139,11 +12079,6 @@ Evaluate. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::rowind "";
 
-%feature("docstring")  CasADi::Interfaces::CSparseInternal::evaluate_switch
-"
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -12349,11 +12284,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::Interfaces::CSparseInternal::getFullJacobian
-"
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::log "
 
@@ -14002,10 +13932,6 @@ evaluate ";
 
 Set dimensions (to be removed) ";
 
-%feature("docstring")  CasADi::Sundials::CVodesInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::Sundials::CVodesInternal::jacobian_switch "
 
 Switch between numeric and symbolic jacobian. ";
@@ -14194,10 +14120,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::Sundials::CVodesInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesInternal::log "
 
@@ -15657,10 +15579,6 @@ Evaluate. ";
 
 Initialize. ";
 
-%feature("docstring")  CasADi::ExternalFunctionInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::ExternalFunctionInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -15863,10 +15781,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::ExternalFunctionInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::ExternalFunctionInternal::log "
 
@@ -17104,10 +17018,6 @@ C++ includes: fx_internal.hpp ";
 
 Destructor. ";
 
-%feature("docstring")  CasADi::FXInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::FXInternal::evaluate "
 
 Evaluate. ";
@@ -17319,10 +17229,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::FXInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::FXInternal::log "
 
@@ -19494,10 +19400,6 @@ evaluate ";
 
 Set dimensions (to be removed) ";
 
-%feature("docstring")  CasADi::Sundials::IdasInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::Sundials::IdasInternal::jacobian_switch "
 
 Switch between numeric and symbolic jacobian. ";
@@ -19684,10 +19586,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::Sundials::IdasInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::Sundials::IdasInternal::log "
 
@@ -20813,10 +20711,6 @@ Initialize. ";
 
 Solve the system of equations. ";
 
-%feature("docstring")  CasADi::ImplicitFunctionInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::ImplicitFunctionInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -21019,10 +20913,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::ImplicitFunctionInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::log "
 
@@ -21257,6 +21147,27 @@ Check if smooth. ";
 %feature("docstring")  CasADi::InfSX::marked "";
 
 %feature("docstring")  CasADi::InfSX::mark "";
+
+
+// File: structCasADi_1_1SXFunctionInternal_1_1int__compiletime.xml
+%feature("docstring") CasADi::SXFunctionInternal::int_compiletime "
+
+Helper class to be plugged into evaluateGen when working with a value known
+already at compiletime.
+
+C++ includes: sx_function_internal.hpp ";
+
+
+// File: structCasADi_1_1SXFunctionInternal_1_1int__runtime.xml
+%feature("docstring") CasADi::SXFunctionInternal::int_runtime "
+
+Helper class to be plugged into evaluateGen when working with a value known
+only at runtime.
+
+C++ includes: sx_function_internal.hpp ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::int_runtime::int_runtime
+"";
 
 
 // File: classCasADi_1_1IntegerSX.xml
@@ -22328,10 +22239,6 @@ Initialize. ";
 
 Set dimensions (to be removed) ";
 
-%feature("docstring")  CasADi::IntegratorInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::IntegratorInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -22532,10 +22439,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::IntegratorInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::IntegratorInternal::log "
 
@@ -22950,10 +22853,6 @@ all constraints. ";
 Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
 ";
 
-%feature("docstring")  CasADi::IPInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::IPInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -23154,10 +23053,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::IPInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::IPInternal::log "
 
@@ -26984,10 +26879,6 @@ all constraints. ";
 Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
 ";
 
-%feature("docstring")  CasADi::IpoptInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::IpoptInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -27188,10 +27079,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::IpoptInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::IpoptInternal::log "
 
@@ -27987,11 +27874,6 @@ Evaluate. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::solve "";
 
-%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::evaluate_switch
-"
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -28197,11 +28079,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::getFullJacobian
-"
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::log "
 
@@ -33713,10 +33590,6 @@ Evaluate the jacobian. ";
 
 Initialize. ";
 
-%feature("docstring")  CasADi::JacobianInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::JacobianInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -33917,10 +33790,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::JacobianInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::JacobianInternal::log "
 
@@ -34530,10 +34399,6 @@ Residual. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolInternal::kinsol_error "";
 
-%feature("docstring")  CasADi::Sundials::KinsolInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::Sundials::KinsolInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -34736,10 +34601,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::Sundials::KinsolInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolInternal::log "
 
@@ -36131,10 +35992,6 @@ all constraints. ";
 Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
 ";
 
-%feature("docstring")  CasADi::KnitroInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::KnitroInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -36335,10 +36192,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::KnitroInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::KnitroInternal::log "
 
@@ -38219,11 +38072,6 @@ Evaluate. ";
 %feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::rowind "";
 
 %feature("docstring")
-CasADi::Interfaces::LapackLUDenseInternal::evaluate_switch "
-
-Evaluate switch. ";
-
-%feature("docstring")
 CasADi::Interfaces::LapackLUDenseInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -38443,11 +38291,6 @@ CasADi::Interfaces::LapackLUDenseInternal::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")
-CasADi::Interfaces::LapackLUDenseInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::log "
 
@@ -39424,11 +39267,6 @@ Evaluate. ";
 %feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::rowind "";
 
 %feature("docstring")
-CasADi::Interfaces::LapackQRDenseInternal::evaluate_switch "
-
-Evaluate switch. ";
-
-%feature("docstring")
 CasADi::Interfaces::LapackQRDenseInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -39648,11 +39486,6 @@ CasADi::Interfaces::LapackQRDenseInternal::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")
-CasADi::Interfaces::LapackQRDenseInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::log "
 
@@ -41049,10 +40882,6 @@ all constraints. ";
 Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
 ";
 
-%feature("docstring")  CasADi::LiftedSQPInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::LiftedSQPInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -41253,10 +41082,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::LiftedSQPInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::LiftedSQPInternal::log "
 
@@ -41682,11 +41507,6 @@ CasADi::Interfaces::LiftoptInternal::checkInitialBounds "
 Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
 ";
 
-%feature("docstring")  CasADi::Interfaces::LiftoptInternal::evaluate_switch
-"
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -41892,11 +41712,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::Interfaces::LiftoptInternal::getFullJacobian
-"
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::log "
 
@@ -43628,10 +43443,6 @@ Evaluate. ";
 
 %feature("docstring")  CasADi::LinearSolverInternal::rowind "";
 
-%feature("docstring")  CasADi::LinearSolverInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::LinearSolverInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -43832,10 +43643,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::LinearSolverInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::LinearSolverInternal::log "
 
@@ -46421,11 +46228,6 @@ CasADi::OptimalControl::MultipleShootingInternal::setOptimalSolution "";
 CasADi::OptimalControl::MultipleShootingInternal::reportConstraints "";
 
 %feature("docstring")
-CasADi::OptimalControl::MultipleShootingInternal::evaluate_switch "
-
-Evaluate switch. ";
-
-%feature("docstring")
 CasADi::OptimalControl::MultipleShootingInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -46673,11 +46475,6 @@ CasADi::OptimalControl::MultipleShootingInternal::symbolicInputSX "
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")
-CasADi::OptimalControl::MultipleShootingInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::OptimalControl::MultipleShootingInternal::log
 "
@@ -49019,10 +48816,6 @@ Reset the sparsity propagation. ";
 
 Construct a complete Jacobian by compression. ";
 
-%feature("docstring")  CasADi::MXFunctionInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::MXFunctionInternal::jacobian_switch "
 
 Switch between numeric and symbolic jacobian. ";
@@ -49174,10 +48967,6 @@ Get, if necessary generate, the sparsity of a Jacobian block. ";
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::MXFunctionInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::log "
 
@@ -50684,10 +50473,6 @@ all constraints. ";
 Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
 ";
 
-%feature("docstring")  CasADi::NLPSolverInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::NLPSolverInternal::evaluate "
 
 Evaluate. ";
@@ -50892,10 +50677,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::NLPSolverInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::NLPSolverInternal::log "
 
@@ -53547,10 +53328,6 @@ Destructor. ";
 
 Initialize. ";
 
-%feature("docstring")  CasADi::OCPSolverInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::OCPSolverInternal::evaluate "
 
 Evaluate. ";
@@ -53755,10 +53532,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::OCPSolverInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::OCPSolverInternal::log "
 
@@ -54198,10 +53971,6 @@ Evaluate. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::solve "";
 
-%feature("docstring")  CasADi::Interfaces::OOQPInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -54404,10 +54173,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::Interfaces::OOQPInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::log "
 
@@ -56619,10 +56384,6 @@ Generate the sparsity of a Jacobian block. ";
 
 Deep copy data members. ";
 
-%feature("docstring")  CasADi::ParallelizerInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::ParallelizerInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -56814,10 +56575,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::ParallelizerInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::ParallelizerInternal::log "
 
@@ -57202,11 +56959,6 @@ Evaluate. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::solve "";
 
-%feature("docstring")  CasADi::Interfaces::QPOasesInternal::evaluate_switch
-"
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -57412,11 +57164,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::Interfaces::QPOasesInternal::getFullJacobian
-"
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::log "
 
@@ -59128,10 +58875,6 @@ Evaluate. ";
 
 %feature("docstring")  CasADi::QPSolverInternal::solve "";
 
-%feature("docstring")  CasADi::QPSolverInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::QPSolverInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -59332,10 +59075,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::QPSolverInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::QPSolverInternal::log "
 
@@ -60564,10 +60303,6 @@ Create a new integrator, new, not yet ready implementation. ";
 
 Set dimensions (to be removed) ";
 
-%feature("docstring")  CasADi::RKIntegratorInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::RKIntegratorInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -60759,10 +60494,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::RKIntegratorInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::RKIntegratorInternal::log "
 
@@ -62158,10 +61889,6 @@ Integrate. ";
 Update the number of sensitivity directions during or after initialization.
 ";
 
-%feature("docstring")  CasADi::SimulatorInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::SimulatorInternal::jacobian "
 
 Calculate the jacobian of a number of function outputs with respect to a
@@ -62357,10 +62084,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::SimulatorInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::SimulatorInternal::log "
 
@@ -63143,10 +62866,6 @@ all constraints. ";
 Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
 ";
 
-%feature("docstring")  CasADi::SQPInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::SQPInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -63347,10 +63066,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::SQPInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::SQPInternal::log "
 
@@ -65784,10 +65499,6 @@ evaluate ";
 
 Set dimensions (to be removed) ";
 
-%feature("docstring")  CasADi::Sundials::SundialsInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::Sundials::SundialsInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -65982,10 +65693,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::Sundials::SundialsInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::Sundials::SundialsInternal::log "
 
@@ -67021,10 +66728,6 @@ Evaluate. ";
 
 %feature("docstring")  CasADi::SuperLUInternal::rowind "";
 
-%feature("docstring")  CasADi::SuperLUInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::SuperLUInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -67225,10 +66928,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::SuperLUInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::SuperLUInternal::log "
 
@@ -68501,6 +68200,14 @@ Destructor. ";
 
 Evaluate the function numerically. ";
 
+%feature("docstring")  CasADi::SXFunctionInternal::evaluateGen1 "
+
+Evaluate the function numerically, first argument generic. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::evaluateGen "
+
+Evaluate the function numerically, both arguments generic. ";
+
 %feature("docstring")  CasADi::SXFunctionInternal::evalSX "
 
 evaluate symbolically while also propagating directional derivatives ";
@@ -68574,10 +68281,6 @@ Reset the sparsity propagation. ";
 %feature("docstring")  CasADi::SXFunctionInternal::jacGen "
 
 Construct a complete Jacobian by compression. ";
-
-%feature("docstring")  CasADi::SXFunctionInternal::evaluate_switch "
-
-Evaluate switch. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::jacobian_switch "
 
@@ -68739,10 +68442,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::SXFunctionInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::log "
 
@@ -71409,10 +71108,6 @@ all constraints. ";
 Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
 ";
 
-%feature("docstring")  CasADi::WorhpInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::WorhpInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -71613,10 +71308,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::WorhpInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::WorhpInternal::log "
 
@@ -73395,10 +73086,6 @@ Destructor. ";
 
 Construct a complete Jacobian by compression. ";
 
-%feature("docstring")  CasADi::XFunctionInternal::evaluate_switch "
-
-Evaluate switch. ";
-
 %feature("docstring")  CasADi::XFunctionInternal::evaluate "
 
 Evaluate. ";
@@ -73610,10 +73297,6 @@ Get a vector of symbolic variables with the same dimensions as the inputs.
 
 Get a vector of symbolic variables with the same dimensions as the inputs.
 ";
-
-%feature("docstring")  CasADi::XFunctionInternal::getFullJacobian "
-
-Get the Jacobian of all outputs with respect to all inputs. ";
 
 %feature("docstring")  CasADi::XFunctionInternal::log "
 
