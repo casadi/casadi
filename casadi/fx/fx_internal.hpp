@@ -117,6 +117,12 @@ class FXInternal : public OptionsFunctionalityNode{
     /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
     virtual FX getDerivative(int nfwd, int nadj);
 
+    /// Access a Jacobian function (cached)
+    FX jacobian_new(int iind, int oind);
+    
+    /// Generate a function that calculates a Jacobian function
+    virtual FX getJacobian(int iind, int oind);
+    
     /** \brief  Access an input */
     template<bool check=true>
     FunctionIO& iStruct(int i=0){
@@ -365,11 +371,10 @@ class FXInternal : public OptionsFunctionalityNode{
     /** \brief  Dictionary of statistics (resulting from evaluate) */
     Dictionary stats_;
 
-    /** \brief  Stored Jacobians */
-    bool store_jacobians_;
-    std::vector<std::vector<FX> > jacs_;
+    /// Cache for full jacobian functions
+    std::vector<std::vector<WeakRef> > jacobian_fcn_;
     
-    // Functions to evaluate directional derivatives
+    /// Cache for functions to evaluate directional derivatives
     std::vector<std::vector<WeakRef> > derivative_fcn_;
 
     /// Sparsity of the Jacobian blocks

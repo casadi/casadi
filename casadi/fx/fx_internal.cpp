@@ -65,7 +65,9 @@ FXInternal::~FXInternal(){
 
 void FXInternal::init(){
   verbose_ = getOption("verbose");
-  store_jacobians_ = getOption("store_jacobians");
+  bool store_jacobians = getOption("store_jacobians");
+  casadi_assert_warning(!store_jacobians,"Option \"store_jacobians\" has been deprecated. Jacobians are now always cached.");
+  
   numeric_jacobian_ = getOption("numeric_jacobian");
   bool jac_for_sens = getOption("jac_for_sens");
   casadi_assert_warning(jac_for_sens==false,"The option \"jac_for_sens\" has been deprecated. Ignored.");
@@ -73,14 +75,6 @@ void FXInternal::init(){
   // Allocate data for sensitivities (only the method in this class)
   FXInternal::updateNumSens(false);
   
-  // Generate storage for generated Jacobians
-  if(store_jacobians_){
-    jacs_.resize(getNumInputs());
-    for(int i=0; i<jacs_.size(); ++i){
-      jacs_[i].resize(getNumOutputs());
-    }
-  }
-
   // Resize the matrix that holds the sparsity of the Jacobian blocks
   jac_sparsity_compact_.resize(getNumInputs(),vector<CRSSparsity>(getNumOutputs()));
   jac_sparsity_.resize(getNumInputs(),vector<CRSSparsity>(getNumOutputs()));
@@ -561,6 +555,55 @@ void FXInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res,
 
 void FXInternal::spEvaluate(bool fwd){
   casadi_error("FXInternal::spEvaluate not defined for class " << typeid(*this).name());
+}
+
+FX FXInternal::jacobian_new(int iind, int oind){
+  casadi_assert(iind>=0 && iind<getNumInputs());
+  casadi_assert(oind>=0 && oind<getNumOutputs());
+  
+  // Make sure that enough cache entries have been allocated
+  if(jacobian_fcn_.size()!=getNumInputs() || jacobian_fcn_[iind].size()!=getNumOutputs()){
+    jacobian_fcn_.resize(getNumInputs());
+    for(vector<vector<WeakRef> >::iterator it=jacobian_fcn_.begin(); it!=jacobian_fcn_.end(); ++it){
+      it->resize(getNumOutputs());
+    }
+  }
+  
+  // Weak reference
+  WeakRef& ref = jacobian_fcn_[iind][oind];
+
+  // Return value
+  FX ret;
+
+  // Check if already cached
+  if(ref.isNull()){
+    // Generate a new function
+    ret = getJacobian(iind,oind);
+    
+    // Give it a suitable name
+    stringstream ss;
+    ss << "jacobian[" << iind << "," << oind << "](" << getOption("name") << ")";
+    ret.setOption("name",ss.str());
+    
+    // Initialize it
+    ret.init();
+
+    // Cache function for later reference
+    ref = ret;
+    
+  } else {
+    // Retrieve cached function
+    ret = ref;
+  }
+
+  // Return cached or generated function
+  return ret;
+}
+
+FX FXInternal::getJacobian(int iind, int oind){
+  vector<pair<int,int> > jblocks;
+  jblocks.push_back(pair<int,int>(oind,iind));
+  return jacobian_switch(jblocks);
 }
 
 FX FXInternal::derivative(int nfwd, int nadj){
