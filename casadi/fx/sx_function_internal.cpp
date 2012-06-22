@@ -1095,7 +1095,7 @@ void SXFunctionInternal::clearSymbolic(){
 }
 
 // FX SXFunctionInternal::getJacobian(int iind, int oind){
-//   // Return function output
+//   // Return function expression
 //   vector<SXMatrix> ret_out;
 //   ret_out.reserve(1+outputv_.size());
 //   ret_out.push_back(jac(iind,oind));

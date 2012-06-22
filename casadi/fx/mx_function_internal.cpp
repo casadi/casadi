@@ -618,6 +618,17 @@ void MXFunctionInternal::spEvaluate(bool fwd){
   }
 }
 
+// FX MXFunctionInternal::getJacobian(int iind, int oind){
+//   // Return function expression
+//   vector<MX> ret_out;
+//   ret_out.reserve(1+outputv_.size());
+//   ret_out.push_back(jac(iind,oind));
+//   ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
+//   
+//   // Return function
+//   return MXFunction(inputv_,ret_out);
+// }
+
 FX MXFunctionInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks){
   // Jacobian blocks
   vector<MX> jac_out(jblocks.size());
