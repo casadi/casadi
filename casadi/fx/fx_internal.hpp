@@ -50,9 +50,6 @@ class FXInternal : public OptionsFunctionalityNode{
     /** \brief  Destructor */
     virtual ~FXInternal() = 0;
 
-    /** \brief  Evaluate switch*/
-    void evaluate_switch(int nfdir, int nadir);
-
     /** \brief  Evaluate */
     virtual void evaluate(int nfdir, int nadir) = 0;
 
@@ -120,6 +117,12 @@ class FXInternal : public OptionsFunctionalityNode{
     /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
     virtual FX getDerivative(int nfwd, int nadj);
 
+    /// Access a Jacobian function (cached)
+    FX jacobian_new(int iind, int oind);
+    
+    /// Generate a function that calculates a Jacobian function
+    virtual FX getJacobian(int iind, int oind);
+    
     /** \brief  Access an input */
     template<bool check=true>
     FunctionIO& iStruct(int i=0){
@@ -350,9 +353,6 @@ class FXInternal : public OptionsFunctionalityNode{
     /// Get a vector of symbolic variables with the same dimensions as the inputs
     virtual std::vector<SXMatrix> symbolicInputSX() const;
   
-    /// Get the Jacobian of all outputs with respect to all inputs
-    void getFullJacobian();
-
     /** \brief  Number of forward and adjoint derivatives */
     int nfdir_, nadir_;
 
@@ -371,11 +371,10 @@ class FXInternal : public OptionsFunctionalityNode{
     /** \brief  Dictionary of statistics (resulting from evaluate) */
     Dictionary stats_;
 
-    /** \brief  Stored Jacobians */
-    bool store_jacobians_;
-    std::vector<std::vector<FX> > jacs_;
+    /// Cache for full jacobian functions
+    std::vector<std::vector<WeakRef> > jacobian_fcn_;
     
-    // Functions to evaluate directional derivatives
+    /// Cache for functions to evaluate directional derivatives
     std::vector<std::vector<WeakRef> > derivative_fcn_;
 
     /// Sparsity of the Jacobian blocks
@@ -393,13 +392,7 @@ class FXInternal : public OptionsFunctionalityNode{
     /// User-set field
     void* user_data_;
     
-    /// Full jacobian function used to calculate directional derivatives instead of the using directional derivatives
-    bool jac_for_sens_;
-    FX full_jacobian_;
-    
-    bool monitor_inputs_;
-    
-    bool monitor_outputs_;
+    bool monitor_inputs_, monitor_outputs_;
 };
 
 

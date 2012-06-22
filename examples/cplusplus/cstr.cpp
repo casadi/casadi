@@ -100,13 +100,11 @@ int main(){
   integrator_options["quad_err_con"]=true;
   integrator_options["abstol"]=1e-8;
   integrator_options["reltol"]=1e-8;
-  integrator_options["store_jacobians"]=true;
   integrator_options["tf"]=ocp.tf/num_nodes;
 
   // Mayer objective function
   SXMatrix xf = ssym("xf",x.size(),1);
   SXFunction mterm(xf, xf[0]);
-  mterm.setOption("store_jacobians",true);
   
   // Create a multiple shooting discretization
   MultipleShooting ocp_solver;
