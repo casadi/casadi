@@ -1159,6 +1159,14 @@ derivatives (cached) ";
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
 
+%feature("docstring")  CasADi::AcadoIntegratorInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
+
 %feature("docstring")  CasADi::AcadoIntegratorInternal::iStruct "
 
 Access an input. ";
@@ -2358,6 +2366,14 @@ derivatives (cached) ";
 
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
 
 %feature("docstring")  CasADi::AcadoOCPInternal::iStruct "
 
@@ -4245,6 +4261,14 @@ derivatives (cached) ";
 
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::CFunctionInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
 
 %feature("docstring")  CasADi::CFunctionInternal::iStruct "
 
@@ -6451,6 +6475,14 @@ derivatives (cached) ";
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
 
+%feature("docstring")  CasADi::CollocationIntegratorInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
+
 %feature("docstring")  CasADi::CollocationIntegratorInternal::iStruct "
 
 Access an input. ";
@@ -7042,6 +7074,16 @@ CasADi::OptimalControl::CollocationInternal::getDerivative "
 
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
+
+%feature("docstring")
+CasADi::OptimalControl::CollocationInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")
+CasADi::OptimalControl::CollocationInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
 
 %feature("docstring")  CasADi::OptimalControl::CollocationInternal::iStruct
 "
@@ -8824,6 +8866,14 @@ derivatives (cached) ";
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
 
+%feature("docstring")  CasADi::ControlSimulatorInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
+
 %feature("docstring")  CasADi::ControlSimulatorInternal::iStruct "
 
 Access an input. ";
@@ -9442,6 +9492,14 @@ derivatives (cached) ";
 
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
+
+%feature("docstring")  CasADi::CplexInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::CplexInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
 
 %feature("docstring")  CasADi::CplexInternal::iStruct "
 
@@ -12142,6 +12200,14 @@ derivatives (cached) ";
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
 
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
+
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::iStruct "
 
 Access an input. ";
@@ -13898,6 +13964,10 @@ mapping from CasADi::Sundials::MInput to CasADi::Sundials::MOutput. ";
 
 Get the Linear solver. ";
 
+%feature("docstring")  CasADi::Sundials::CVodesInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
+
 %feature("docstring")  CasADi::Sundials::CVodesInternal::jac "
 
 Create an integrator which integrates the ODE/DAE augmented with the forward
@@ -13982,6 +14052,10 @@ derivatives (cached) ";
 
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
 
 %feature("docstring")  CasADi::Sundials::CVodesInternal::iStruct "
 
@@ -15640,6 +15714,14 @@ derivatives (cached) ";
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
 
+%feature("docstring")  CasADi::ExternalFunctionInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
+
 %feature("docstring")  CasADi::ExternalFunctionInternal::iStruct "
 
 Access an input. ";
@@ -17089,6 +17171,14 @@ derivatives (cached) ";
 
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
+
+%feature("docstring")  CasADi::FXInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::FXInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
 
 %feature("docstring")  CasADi::FXInternal::iStruct "
 
@@ -19366,6 +19456,10 @@ CasADi::Sundials::IdasInternal::setForwardSensitivities "";
 %feature("docstring")
 CasADi::Sundials::IdasInternal::setAdjointSensitivities "";
 
+%feature("docstring")  CasADi::Sundials::IdasInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
+
 %feature("docstring")  CasADi::Sundials::IdasInternal::jac "
 
 Create an integrator which integrates the ODE/DAE augmented with the forward
@@ -19450,6 +19544,10 @@ derivatives (cached) ";
 
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
 
 %feature("docstring")  CasADi::Sundials::IdasInternal::iStruct "
 
@@ -20771,6 +20869,14 @@ derivatives (cached) ";
 
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::iStruct "
 
@@ -22300,6 +22406,14 @@ derivatives (cached) ";
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
 
+%feature("docstring")  CasADi::IntegratorInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::IntegratorInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
+
 %feature("docstring")  CasADi::IntegratorInternal::iStruct "
 
 Access an input. ";
@@ -22913,6 +23027,14 @@ derivatives (cached) ";
 
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
+
+%feature("docstring")  CasADi::IPInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::IPInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
 
 %feature("docstring")  CasADi::IPInternal::iStruct "
 
@@ -26940,6 +27062,14 @@ derivatives (cached) ";
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
 
+%feature("docstring")  CasADi::IpoptInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::IpoptInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
+
 %feature("docstring")  CasADi::IpoptInternal::iStruct "
 
 Access an input. ";
@@ -27936,6 +28066,14 @@ derivatives (cached) ";
 
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::iStruct "
 
@@ -33651,6 +33789,14 @@ derivatives (cached) ";
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
 
+%feature("docstring")  CasADi::JacobianInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::JacobianInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
+
 %feature("docstring")  CasADi::JacobianInternal::iStruct "
 
 Access an input. ";
@@ -34459,6 +34605,14 @@ derivatives (cached) ";
 
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
+
+%feature("docstring")  CasADi::Sundials::KinsolInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::Sundials::KinsolInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolInternal::iStruct "
 
@@ -36052,6 +36206,14 @@ derivatives (cached) ";
 
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
+
+%feature("docstring")  CasADi::KnitroInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::KnitroInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
 
 %feature("docstring")  CasADi::KnitroInternal::iStruct "
 
@@ -38139,6 +38301,16 @@ CasADi::Interfaces::LapackLUDenseInternal::getDerivative "
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
 
+%feature("docstring")
+CasADi::Interfaces::LapackLUDenseInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackLUDenseInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
+
 %feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::iStruct "
 
 Access an input. ";
@@ -39333,6 +39505,16 @@ CasADi::Interfaces::LapackQRDenseInternal::getDerivative "
 
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackQRDenseInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackQRDenseInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::iStruct "
 
@@ -40943,6 +41125,14 @@ derivatives (cached) ";
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
 
+%feature("docstring")  CasADi::LiftedSQPInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
+
 %feature("docstring")  CasADi::LiftedSQPInternal::iStruct "
 
 Access an input. ";
@@ -41569,6 +41759,14 @@ derivatives (cached) ";
 
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::iStruct "
 
@@ -43503,6 +43701,14 @@ derivatives (cached) ";
 
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
 
 %feature("docstring")  CasADi::LinearSolverInternal::iStruct "
 
@@ -46303,6 +46509,16 @@ Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
 
 %feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")
 CasADi::OptimalControl::MultipleShootingInternal::iStruct "
 
 Access an input. ";
@@ -48837,6 +49053,14 @@ Evaluate symbolically, MX type (overloaded) ";
 Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives (cached) ";
 
+%feature("docstring")  CasADi::MXFunctionInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
+
 %feature("docstring")  CasADi::MXFunctionInternal::iStruct "
 
 Access an input. ";
@@ -50537,6 +50761,14 @@ derivatives (cached) ";
 
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
 
 %feature("docstring")  CasADi::NLPSolverInternal::iStruct "
 
@@ -53393,6 +53625,14 @@ derivatives (cached) ";
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
 
+%feature("docstring")  CasADi::OCPSolverInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
+
 %feature("docstring")  CasADi::OCPSolverInternal::iStruct "
 
 Access an input. ";
@@ -54031,6 +54271,14 @@ derivatives (cached) ";
 
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::iStruct "
 
@@ -56440,6 +56688,14 @@ derivatives (cached) ";
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
 
+%feature("docstring")  CasADi::ParallelizerInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
+
 %feature("docstring")  CasADi::ParallelizerInternal::iStruct "
 
 Access an input. ";
@@ -57021,6 +57277,14 @@ derivatives (cached) ";
 
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::iStruct "
 
@@ -58936,6 +59200,14 @@ derivatives (cached) ";
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
 
+%feature("docstring")  CasADi::QPSolverInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::QPSolverInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
+
 %feature("docstring")  CasADi::QPSolverInternal::iStruct "
 
 Access an input. ";
@@ -60358,6 +60630,14 @@ derivatives (cached) ";
 
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
 
 %feature("docstring")  CasADi::RKIntegratorInternal::iStruct "
 
@@ -61945,6 +62225,14 @@ derivatives (cached) ";
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
 
+%feature("docstring")  CasADi::SimulatorInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::SimulatorInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
+
 %feature("docstring")  CasADi::SimulatorInternal::iStruct "
 
 Access an input. ";
@@ -62926,6 +63214,14 @@ derivatives (cached) ";
 
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
+
+%feature("docstring")  CasADi::SQPInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::SQPInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
 
 %feature("docstring")  CasADi::SQPInternal::iStruct "
 
@@ -65556,6 +65852,14 @@ derivatives (cached) ";
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
 
+%feature("docstring")  CasADi::Sundials::SundialsInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::Sundials::SundialsInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
+
 %feature("docstring")  CasADi::Sundials::SundialsInternal::iStruct "
 
 Access an input. ";
@@ -66788,6 +67092,14 @@ derivatives (cached) ";
 
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
+
+%feature("docstring")  CasADi::SuperLUInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::SuperLUInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
 
 %feature("docstring")  CasADi::SuperLUInternal::iStruct "
 
@@ -68306,6 +68618,14 @@ Evaluate symbolically, MX type (overloaded) ";
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives (cached) ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::iStruct "
 
@@ -71169,6 +71489,14 @@ derivatives (cached) ";
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
 
+%feature("docstring")  CasADi::WorhpInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::WorhpInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
+
 %feature("docstring")  CasADi::WorhpInternal::iStruct "
 
 Access an input. ";
@@ -73157,6 +73485,14 @@ derivatives (cached) ";
 
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::jacobian_new "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::XFunctionInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
 
 %feature("docstring")  CasADi::XFunctionInternal::iStruct "
 
