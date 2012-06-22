@@ -31,7 +31,7 @@
 using namespace std;
 namespace CasADi{
 
-RKIntegratorInternal::RKIntegratorInternal(const FX& fd, const FX& fq) : IntegratorInternal(fd,fq){
+RKIntegratorInternal::RKIntegratorInternal(const FX& f, const FX& g) : IntegratorInternal(f,g){
   addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
   addOption("interpolation_order",           OT_INTEGER,  4,  "Order of the interpolating polynomials");
   addOption("expand_f",                      OT_BOOLEAN,  false, "Expand the ODE/DAE residual function in an SX graph");
@@ -45,30 +45,9 @@ RKIntegratorInternal::~RKIntegratorInternal(){
 }
 
 void RKIntegratorInternal::init(){
-  
-  // Init ODE rhs function and quadrature functions, jacobian function
-  if(!fd_.isInit()) fd_.init();
-  if(!fq_.isNull() && !fq_.isInit()) fq_.init();
-  
-  log("RKIntegratorInternal::init","functions initialized");
-  
-  // Check dimensions
-  casadi_assert_message(fd_.getNumInputs()==DAE_NUM_IN, "RKIntegratorInternal: f has wrong number of inputs");
-  casadi_assert_message(fd_.getNumOutputs()==DAE_NUM_OUT, "RKIntegratorInternal: f has wrong number of outputs");
-  if(!fq_.isNull()){
-    casadi_assert_message(fq_.getNumInputs()==DAE_NUM_IN, "RKIntegratorInternal: q has wrong number of inputs");
-    casadi_assert_message(fq_.getNumOutputs()==DAE_NUM_OUT, "RKIntegratorInternal: q has wrong number of outputs");
-  }
-
-  ny_ = fd_.input(DAE_Y).numel();
-  nq_ = fq_.isNull() ? 0 : fq_.output().numel();
-  casadi_assert_message(nq_==0, "Quadratures not supported.");
-  
-  int np = fd_.input(DAE_P).numel();
-  setDimensions(ny_+nq_,np);
-
   // Call the base class init
   IntegratorInternal::init();
+  casadi_assert_message(nq_==0, "Quadratures not supported.");
   
   // Number of finite elements
   int nk = getOption("number_of_finite_elements");
@@ -77,7 +56,7 @@ void RKIntegratorInternal::init(){
   int deg = getOption("interpolation_order");
 
   // Assume explicit ODE
-  bool explicit_ode = fd_.input(DAE_YDOT).size()==0;
+  bool explicit_ode = f_.input(DAE_XDOT).size()==0;
 
   // Expand f?
   bool expand_f = getOption("expand_f");
@@ -89,7 +68,7 @@ void RKIntegratorInternal::init(){
   MX h_mx = h;
     
   // Initial state
-  MX Y0("Y0",ny_);
+  MX Y0("Y0",nx_);
   
   // Free parameters
   MX P("P",np_);
@@ -109,11 +88,11 @@ void RKIntegratorInternal::init(){
     // Call the ode right hand side function
     vector<MX> f_in(DAE_NUM_IN);
     f_in[DAE_T] = T;
-    f_in[DAE_Y] = Y;
-    f_in[DAE_YDOT] = YDOT;
+    f_in[DAE_X] = Y;
+    f_in[DAE_XDOT] = YDOT;
     f_in[DAE_P] = P;
-    vector<MX> f_out = fd_.call(f_in);
-    MX ode_rhs = f_out[DAE_RES];
+    vector<MX> f_out = f_.call(f_in);
+    MX ode_rhs = f_out[DAE_ODE];
     
     // Explicit Euler step
     Y += h_mx*ode_rhs;
@@ -218,11 +197,7 @@ FX RKIntegratorInternal::jacobian(const std::vector<std::pair<int,int> >& jblock
 }
 
 CRSSparsity RKIntegratorInternal::getJacSparsity(int iind, int oind){
-  if(iind==INTEGRATOR_XP0 || oind==INTEGRATOR_XPF){
-    return CRSSparsity();
-  } else {
-    return yf_fun_.jacSparsity(iind, oind, true);
-  }
+  return yf_fun_.jacSparsity(iind, oind, true);
 }
 
 } // namespace CasADi

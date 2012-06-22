@@ -38,7 +38,7 @@ rhs = vertcat( [(1 - x[1]*x[1])*x[0] - x[1] + u, \
                 x[0]*x[0] + x[1]*x[1] + u*u] )
 
 # DAE residual function
-f = SXFunction([t,x,u,xd],[rhs-xd])
+f = SXFunction(daeIn(x,[],u,t,xd),daeOut(rhs-xd))
 
 # Create an integrator
 f_d = CVodesIntegrator(f)
@@ -54,12 +54,9 @@ U = msym("U",nk) # nk-by-1 symbolic variable
 # The initial state (x_0=0, x_1=1, x_2=0)
 X  = msym([0,1,0])
 
-# State derivative (only relevant for DAEs)
-Xp = msym([0,0,0])
-
 # Build a graph of integrator calls
 for k in range(nk):
-  [X,Xp] = f_d.call([X,U[k],Xp])
+  X,_,_,_ = f_d.call([X,U[k]])
   
 # Objective function: x_2(T)
 F = MXFunction([U],[X[2]])

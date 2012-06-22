@@ -49,8 +49,8 @@ namespace Sundials{
 // Forward declaration of internal class
 class IdasInternal;
 
-/// Input arguments of a jacobian function: J = df/dy + cj*df/dydot
-enum JACInput{JAC_T, JAC_Y, JAC_YDOT, JAC_P, JAC_CJ, JAC_NUM_IN};
+/// Input arguments of a jacobian function: J = [df/dx + cj*df/dxdot, df/dz]
+enum JACInput{JAC_T, JAC_X, JAC_Z, JAC_XDOT, JAC_P, JAC_CJ, JAC_NUM_IN};
 
 /// Output arguments of an DAE residual function
 enum JACOutput{JAC_J, JAC_NUM_OUT};
@@ -79,7 +79,7 @@ public:
   * \copydoc scheme_DAEOutput
   *
   */
-  explicit IdasIntegrator(const FX& fd, const FX& fq=FX());
+  explicit IdasIntegrator(const FX& f, const FX& g=FX());
 
   /// Access functions of the node
   IdasInternal* operator->();
@@ -97,7 +97,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static Integrator creator(const FX& fd, const FX& fq){ return IdasIntegrator(fd,fq);}
+  static Integrator creator(const FX& f, const FX& g){ return IdasIntegrator(f,g);}
   #ifdef SWIG
   %nocallback;
   #endif

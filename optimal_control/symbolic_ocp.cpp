@@ -1077,8 +1077,8 @@ vector<SXMatrix> SymbolicOCP::daeArg() const{
   // Return value
   vector<SXMatrix> ret(DAE_NUM_IN);
   ret[DAE_T] = t;
-  ret[DAE_Y] = var(_x);
-  ret[DAE_YDOT] = der(_x);
+  ret[DAE_X] = var(_x);
+  ret[DAE_XDOT] = der(_x);
   ret[DAE_P] = vertcat<SX>(var(p),var(u));
   return ret;
 }

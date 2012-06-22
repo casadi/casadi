@@ -96,7 +96,7 @@ void MultipleShootingInternal::init(){
   int v_offset=np_; 
   
   // Disretized variables for each shooting node
-  vector<MX> X(nk_+1), U(nk_), XP(nk_);
+  vector<MX> X(nk_+1), U(nk_);
   for(int k=0; k<=nk_; ++k){ // interior nodes
     // Local state
     X[k] = V[range(v_offset,v_offset+nx_)];
@@ -119,7 +119,6 @@ void MultipleShootingInternal::init(){
     int_in[k].resize(INTEGRATOR_NUM_IN);
     int_in[k][INTEGRATOR_P] = vertcat(P,U[k]);
     int_in[k][INTEGRATOR_X0] = X[k];
-    int_in[k][INTEGRATOR_XP0] = XP[k];
   }
 
   // Input to the parallel function evaluation
@@ -128,8 +127,7 @@ void MultipleShootingInternal::init(){
     fcn_in[k].resize(DAE_NUM_IN);
     fcn_in[k][DAE_T] = input(OCP_T).at(k);
     fcn_in[k][DAE_P] = vertcat(P,U.at(k));
-    fcn_in[k][DAE_Y] = X[k];
-    fcn_in[k][DAE_YDOT] = XP[k];
+    fcn_in[k][DAE_X] = X[k];
   }
 
   // Options for the parallelizer

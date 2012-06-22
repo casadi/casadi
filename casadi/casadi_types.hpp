@@ -49,7 +49,7 @@ namespace CasADi{
   typedef LinearSolver (*linearSolverCreator)(const CRSSparsity& sparsity);
 
   /// Function pointer to an integrator creator function
-  typedef Integrator (*integratorCreator)(const FX& f, const FX& q);
+  typedef Integrator (*integratorCreator)(const FX& f, const FX& g);
 
   /// Function pointer to a QP solver creator function
   typedef QPSolver (*QPSolverCreator)(const CRSSparsity& H, const CRSSparsity& A);

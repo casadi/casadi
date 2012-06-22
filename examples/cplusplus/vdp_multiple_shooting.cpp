@@ -39,12 +39,8 @@ int main(){
   
   // DAE residual
   SXMatrix xxdot = ssym("xxdot",xx.size());
-  vector<Matrix<SX> > res_in(DAE_NUM_IN);
-  res_in[DAE_T] = t;
-  res_in[DAE_Y] = xx;
-  res_in[DAE_YDOT] = xxdot;
-  res_in[DAE_P] = u;
-  SXFunction res(res_in,f-xxdot);
+  vector<SXMatrix> res_in = daeIn<SXMatrix>(xx,SXMatrix(),u,t,xxdot);
+  SXFunction res(res_in,daeOut<SXMatrix>(f-xxdot));
   
   Dictionary integrator_options;
   integrator_options["abstol"]=1e-8; //abs. tolerance

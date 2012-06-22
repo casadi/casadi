@@ -70,10 +70,9 @@ f = vertcat((xdot,ldot))
 f = substitute(f,u,u_opt)
 
 # Create the right hand side function
-rhs_in = DAE_NUM_IN*[[]]
+rhs_in = daeIn(vertcat((x,lam)))
 rhs_in[DAE_T] = t
-rhs_in[DAE_Y] = vertcat((x,lam))
-rhs = SXFunction(rhs_in,[f])
+rhs = SXFunction(rhs_in,daeOut(f))
 
 # Create an integrator (CVodes)
 I = CVodesIntegrator(rhs)
@@ -96,7 +95,7 @@ l_init = msym("l_init",2)
 X = vertcat((x_init,l_init))
 
 # Call the integrator
-X,XP = I.call([X,MX(),MX()])
+X,_,_,_ = I.call([X])
 
 # Costate at the final time
 lam_f = X[2:4]

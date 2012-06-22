@@ -82,7 +82,7 @@ u_ = DMatrix([[ 0, 0 ]]*(N-1))
 p = SX("p")
 
 tn = np.linspace(0,te,N)
-cdae = SXFunction({'NUM':CONTROL_DAE_NUM_IN, CONTROL_DAE_Y: y,  CONTROL_DAE_YDOT: dy, CONTROL_DAE_U: u},[mul(A,y)+mul(B,u)])
+cdae = SXFunction({'NUM':CONTROL_DAE_NUM_IN, CONTROL_DAE_X: y,  CONTROL_DAE_XDOT: dy, CONTROL_DAE_U: u},[mul(A,y)+mul(B,u)])
 cdae.init()
 
 
@@ -208,7 +208,7 @@ rhs.eAt = mul(A,eAt)
 rhs.Wt  = mul([eAt,B,B.T,eAt.T])
 rhs.freeze()
 
-dae = SXFunction({'NUM':DAE_NUM_IN, DAE_Y: states.veccat()},[rhs.veccat()])
+dae = SXFunction({'NUM':DAE_NUM_IN, DAE_X: states.veccat()},daeOut(rhs.veccat()))
 dae.init()
 
 integrator = CVodesIntegrator(dae)
@@ -244,11 +244,11 @@ rhs.y   = mul(A,y)+mul(B,u)
 rhs.eAt = -mul(A,eAt)
 rhs.freeze()
 
-cdae = SXFunction({'NUM':CONTROL_DAE_NUM_IN, CONTROL_DAE_Y: states.veccat(), CONTROL_DAE_YDOT: ssym("dy",states.shape)},[rhs.veccat()])
+cdae = SXFunction({'NUM':CONTROL_DAE_NUM_IN, CONTROL_DAE_X: states.veccat(), CONTROL_DAE_XDOT: ssym("dy",states.shape)},[rhs.veccat()])
 cdae.init()
 
 # Output function
-out = SXFunction({'NUM':CONTROL_DAE_NUM_IN, CONTROL_DAE_Y: states.veccat(), CONTROL_DAE_YDOT: ssym("dy",states.shape)},[states.veccat(),u])
+out = SXFunction({'NUM':CONTROL_DAE_NUM_IN, CONTROL_DAE_X: states.veccat(), CONTROL_DAE_XDOT: ssym("dy",states.shape)},[states.veccat(),u])
 out.init()
 
 sim = ControlSimulator(cdae,out,tn)
@@ -288,7 +288,7 @@ P = ssym("P",ns,ns)
 
 ric = (Q + mul(A.T,P) + mul(P,A) - mul([P,B,inv(R),B.T,P]))
 
-dae = SXFunction({'NUM':DAE_NUM_IN, DAE_Y: flatten(P)},[ric])
+dae = SXFunction({'NUM':DAE_NUM_IN, DAE_X: flatten(P)},daeOut(flatten(ric)))
 dae.init()
 
 # We solve the ricatti equation by simulating backwards in time until steady state is reached.
@@ -322,7 +322,7 @@ print "(positive definite)"
 
 
 # Check that it does indeed satisfy the ricatti equation
-dae.setInput(integrator.output(),DAE_Y)
+dae.setInput(integrator.output(),DAE_X)
 dae.evaluate()
 assert(max(fabs(dae.output()))<1e-9)
 
@@ -336,7 +336,7 @@ print "feedback matrix= ", K
 print "Open-loop eigenvalues: ", D
 
 # Check what happens if we integrate the Riccati equation forward in time
-dae = SXFunction({'NUM':DAE_NUM_IN, DAE_Y: flatten(P)},[-ric])
+dae = SXFunction({'NUM':DAE_NUM_IN, DAE_X: flatten(P)},daeOut(-ric))
 dae.init()
 
 integrator = CVodesIntegrator(dae)
@@ -392,10 +392,10 @@ figure(6)
 for k,yref in enumerate([ vertcat([-1,sqrt(t)]) , vertcat([-1,-0.5]), vertcat([-1,sin(t)])]):
   u = -mul(K,y) + mul(mul(K,F)+Nm,yref)
   rhs = mul(A,y)+mul(B,u)
-  cdae = SXFunction({'NUM':CONTROL_DAE_NUM_IN, CONTROL_DAE_T: t, CONTROL_DAE_Y: y,  CONTROL_DAE_YDOT: dy},[rhs])
+  cdae = SXFunction({'NUM':CONTROL_DAE_NUM_IN, CONTROL_DAE_T: t, CONTROL_DAE_X: y,  CONTROL_DAE_XDOT: dy},[rhs])
 
   # Output function
-  out = SXFunction({'NUM':CONTROL_DAE_NUM_IN, CONTROL_DAE_T: t, CONTROL_DAE_Y: y, CONTROL_DAE_YDOT: dy},[y,mul(C,y),u,yref])
+  out = SXFunction({'NUM':CONTROL_DAE_NUM_IN, CONTROL_DAE_T: t, CONTROL_DAE_X: y, CONTROL_DAE_XDOT: dy},[y,mul(C,y),u,yref])
   out.init()
 
   sim = ControlSimulator(cdae,out,tn)
@@ -453,11 +453,11 @@ rhs.yref   =  mul(A,states.yref)+mul(B,uref)
 rhs.eAt    = -mul(A,eAt)
 rhs.freeze()
 
-cdae = SXFunction({'NUM':CONTROL_DAE_NUM_IN, CONTROL_DAE_Y: states.veccat(), CONTROL_DAE_YDOT: ssym("dy",states.shape), CONTROL_DAE_P: param.veccat()},[rhs.veccat()])
+cdae = SXFunction({'NUM':CONTROL_DAE_NUM_IN, CONTROL_DAE_X: states.veccat(), CONTROL_DAE_XDOT: ssym("dy",states.shape), CONTROL_DAE_P: param.veccat()},[rhs.veccat()])
 cdae.init()
 
 # Output function
-out = SXFunction({'NUM':CONTROL_DAE_NUM_IN, CONTROL_DAE_Y: states.veccat(), CONTROL_DAE_YDOT: ssym("dy",states.shape), CONTROL_DAE_P: param.veccat()},[states.veccat(),u,uref,states.yref])
+out = SXFunction({'NUM':CONTROL_DAE_NUM_IN, CONTROL_DAE_X: states.veccat(), CONTROL_DAE_XDOT: ssym("dy",states.shape), CONTROL_DAE_P: param.veccat()},[states.veccat(),u,uref,states.yref])
 out.init()
 
 sim = ControlSimulator(cdae,out,tn)
@@ -533,10 +533,10 @@ dy    = ssym("dy",ns)
 u     = controls.uref-mul(param.K,y-controls.yref)
 rhs   = mul(A,y)+mul(B,u)
 
-cdae = SXFunction({'NUM':CONTROL_DAE_NUM_IN, CONTROL_DAE_Y: y,  CONTROL_DAE_YDOT: dy, CONTROL_DAE_U: controls.veccat(), CONTROL_DAE_P: param.veccat()},[rhs])
+cdae = SXFunction({'NUM':CONTROL_DAE_NUM_IN, CONTROL_DAE_X: y,  CONTROL_DAE_XDOT: dy, CONTROL_DAE_U: controls.veccat(), CONTROL_DAE_P: param.veccat()},[rhs])
 
 # Output function
-out = SXFunction({'NUM':CONTROL_DAE_NUM_IN,  CONTROL_DAE_Y: y,  CONTROL_DAE_YDOT: dy, CONTROL_DAE_U: controls.veccat(), CONTROL_DAE_P: param.veccat()},[y,u,controls.uref,controls.yref])
+out = SXFunction({'NUM':CONTROL_DAE_NUM_IN,  CONTROL_DAE_X: y,  CONTROL_DAE_XDOT: dy, CONTROL_DAE_U: controls.veccat(), CONTROL_DAE_P: param.veccat()},[y,u,controls.uref,controls.yref])
 out.init()
 
 sim = ControlSimulator(cdae,out,tn)
@@ -588,10 +588,10 @@ y0     = ssym("y0",ns)
 u     = controls.uref-mul(param.K,y0-controls.yref)
 rhs   = mul(A,y)+mul(B,u)
 
-cdae = SXFunction({'NUM':CONTROL_DAE_NUM_IN, CONTROL_DAE_Y: y,  CONTROL_DAE_YDOT: dy, CONTROL_DAE_Y_MAJOR: y0, CONTROL_DAE_U: controls.veccat(), CONTROL_DAE_P: param.veccat()},[rhs])
+cdae = SXFunction({'NUM':CONTROL_DAE_NUM_IN, CONTROL_DAE_X: y,  CONTROL_DAE_XDOT: dy, CONTROL_DAE_X_MAJOR: y0, CONTROL_DAE_U: controls.veccat(), CONTROL_DAE_P: param.veccat()},[rhs])
 
 # Output function
-out = SXFunction({'NUM':CONTROL_DAE_NUM_IN,  CONTROL_DAE_Y: y,  CONTROL_DAE_YDOT: dy, CONTROL_DAE_Y_MAJOR: y0, CONTROL_DAE_U: controls.veccat(), CONTROL_DAE_P: param.veccat()},[y,u,controls.uref,controls.yref])
+out = SXFunction({'NUM':CONTROL_DAE_NUM_IN,  CONTROL_DAE_X: y,  CONTROL_DAE_XDOT: dy, CONTROL_DAE_X_MAJOR: y0, CONTROL_DAE_U: controls.veccat(), CONTROL_DAE_P: param.veccat()},[y,u,controls.uref,controls.yref])
 out.init()
 
 sim = ControlSimulator(cdae,out,tn)

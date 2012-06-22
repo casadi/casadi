@@ -74,45 +74,48 @@ const bool sparse_direct = true;
 const bool second_order = true;
 
 // The DAE residual in plain c (for IDAS)
-void dae_res_c(double tt, const double *yy, const double* yydot, const double* pp, double* res){
+void dae_res_c(double t, const double *x, const double* xdot, const double* p, double* ode, double* quad){
   // Get the arguments
-  //double s = yy[0];
-  double v = yy[1];
-  double m = yy[2];
-  double u = pp[0];
-  double sdot = yydot[0], vdot = yydot[1], mdot = yydot[2];
+  //double s = x[0];
+  double v = x[1];
+  double m = x[2];
+  double u = p[0];
+  double sdot = xdot[0], vdot = xdot[1], mdot = xdot[2];
 
   // Calculate the DAE residual
-  res[0] = sdot - v;
-  res[1] = vdot - (u-0.02*v*v)/m;
-  res[2] = mdot - (-0.01*u*u);
+  ode[0] = sdot - v;
+  ode[1] = vdot - (u-0.02*v*v)/m;
+  ode[2] = mdot - (-0.01*u*u);
+  
+  double u_ref = 3-sin(t);
+  double u_dev = u-u_dev;
+  quad[0] = u_dev*u_dev;
 }
 
 // Wrap the function to allow creating an CasADi function
 void dae_res_c_wrapper(CFunction &f, int nfwd, int nadj, void* user_data){
   casadi_assert(nfwd==0 && nadj==0);
-  dae_res_c(f.input(DAE_T).front(), &f.input(DAE_Y).front(), &f.input(DAE_YDOT).front(), &f.input(DAE_P).front(), &f.output(DAE_RES).front());
+  dae_res_c(f.input(DAE_T).front(), &f.input(DAE_X).front(), &f.input(DAE_XDOT).front(), &f.input(DAE_P).front(), &f.output(DAE_ODE).front(), &f.output(DAE_QUAD).front());
 }
 
 // Create an IDAS instance (fully implicit integrator)
 Integrator create_Sundials(){
-  
   // Time 
   SX t("t");
 
   // Differential states
   SX s("s"), v("v"), m("m");
-  vector<SX> y(3); 
-  y[0] = s;
-  y[1] = v;
-  y[2] = m;
+  vector<SX> x(3); 
+  x[0] = s;
+  x[1] = v;
+  x[2] = m;
   
   // State derivatives
   SX sdot("sdot"), vdot("vdot"), mdot("mdot");
-  vector<SX> ydot(3); 
-  ydot[0] = sdot;
-  ydot[1] = vdot;
-  ydot[2] = mdot;
+  vector<SX> xdot(3); 
+  xdot[0] = sdot;
+  xdot[1] = vdot;
+  xdot[2] = mdot;
 
   // Control
   SX u("u");
@@ -130,15 +133,12 @@ Integrator create_Sundials(){
   res[1] = (u-0.02*v*v)/m - vdot;
   res[2] = -0.01*u*u - mdot;
 
-  // Input of the DAE residual function
-  vector<SXMatrix> ffcn_in(DAE_NUM_IN);
-  ffcn_in[DAE_T] = t;
-  ffcn_in[DAE_Y] = y;
-  ffcn_in[DAE_YDOT] = ydot;
-  ffcn_in[DAE_P] = u;
+  // Input/output of the DAE residual function
+  vector<SXMatrix> ffcn_in = daeIn<SXMatrix>(x,SXMatrix(),u,t,xdot);
+  vector<SXMatrix> ffcn_out = daeOut<SXMatrix>(res,SXMatrix(),u_dev);
 
   // DAE residual function
-  FX ffcn = SXFunction(ffcn_in,res);
+  FX ffcn = SXFunction(ffcn_in,ffcn_out);
 
   // Overwrite ffcn with a plain c function (avoid this!)
   if(plain_c){
@@ -151,28 +151,25 @@ Integrator create_Sundials(){
     
     // Specify dimensions of inputs and outputs
     ffcn.input(DAE_T)    = DMatrix(1,1,0);
-    ffcn.input(DAE_Y)    = DMatrix(3,1,0);
-    ffcn.input(DAE_YDOT) = DMatrix(3,1,0);
+    ffcn.input(DAE_X)    = DMatrix(3,1,0);
+    ffcn.input(DAE_XDOT) = DMatrix(3,1,0);
     ffcn.input(DAE_P)    = DMatrix(1,1,0);
-    ffcn.output(DAE_RES) = DMatrix(3,1,0);
+    ffcn.output(DAE_ODE) = DMatrix(3,1,0);
+    ffcn.output(DAE_QUAD) = DMatrix(1,1,0);
   }
   
-  // Quadrature function
-  SXFunction qfcn(ffcn_in,u_dev);
-
   if(implicit_integrator){
     // Create an IDAS instance
-    Sundials::IdasIntegrator integrator(ffcn,qfcn);
+    Sundials::IdasIntegrator integrator(ffcn);
     
     // Set IDAS specific options
     integrator.setOption("calc_ic",calc_ic);
-    integrator.setOption("is_differential",vector<int>(3,1));
 
     // Return the integrator
     return integrator;
   } else {
     // Create an CVodes instance
-    Sundials::CVodesIntegrator integrator(ffcn,qfcn);
+    Sundials::CVodesIntegrator integrator(ffcn);
 
     // Return the integrator
     return integrator;
@@ -187,15 +184,11 @@ int main(){
   double /*u_lb = -0.5, u_ub = 1.3,*/ u_init = 1;
 
   // Initial conditions
-  vector<double> y0(3);
-  y0[0] = 0;
-  y0[1] = 0;
-  y0[2] = 1;
+  vector<double> x0(3);
+  x0[0] = 0;
+  x0[1] = 0;
+  x0[2] = 1;
   
-  // Full state (includes quadratures)
-  vector<double> x0=y0;
-  x0.push_back(0);
-
   // Integrator
   Integrator integrator = create_Sundials();
   
@@ -236,17 +229,12 @@ int main(){
   // Set inital state
   integrator.setInput(x0,INTEGRATOR_X0);
   
-  // Set initial state derivative (if not to be calculated)
-  if(!calc_ic){
-    double yp0[] = {0,1,-0.01,0};
-    integrator.setInput(yp0,INTEGRATOR_XP0);
-  }
-  
   // Integrate
   integrator.evaluate();
 
   // Save the result
-  Matrix<double> res0 = integrator.output();
+  Matrix<double> res0_xf = integrator.output(INTEGRATOR_XF);
+  Matrix<double> res0_qf = integrator.output(INTEGRATOR_QF);
 
   // Perturb in some direction
   if(perturb_u){
@@ -265,11 +253,12 @@ int main(){
   integrator.printStats();
 
   // Calculate finite difference approximation
-  Matrix<double> fd = (integrator.output() - res0)/0.01;
+  Matrix<double> fd_xf = (integrator.output(INTEGRATOR_XF) - res0_xf)/0.01;
+  Matrix<double> fd_qf = (integrator.output(INTEGRATOR_QF) - res0_qf)/0.01;
 
-  cout << "unperturbed                     " << res0 << endl;
-  cout << "perturbed                       " << integrator.output() << endl;
-  cout << "finite_difference approximation " << fd << endl;
+  cout << "unperturbed                     " << res0_xf << "; " << res0_qf << endl;
+  cout << "perturbed                       " << integrator.output(INTEGRATOR_XF) << "; " << integrator.output(INTEGRATOR_QF) << endl;
+  cout << "finite_difference approximation " << fd_xf << "; " << fd_qf << endl;
 
   if(perturb_u){
     integrator.setFwdSeed(1.0,INTEGRATOR_P);
@@ -298,8 +287,9 @@ int main(){
     integrator.evaluate(1,0);
   }
     
-  Matrix<double> fsens = integrator.fwdSens();
-  cout << "forward sensitivities           " << fsens << endl;
+  Matrix<double> fsens_xf = integrator.fwdSens(INTEGRATOR_XF);
+  Matrix<double> fsens_qf = integrator.fwdSens(INTEGRATOR_QF);
+  cout << "forward sensitivities           " << fsens_xf << "; " << fsens_qf << endl;
 
   if(with_asens){
     cout << "adjoint sensitivities           ";
@@ -322,13 +312,18 @@ int main(){
     // evaluate again with forward sensitivities
     integrator.evaluate(1,0);
 
-    vector<double> fsens_pret = integrator.fwdSens().data();
-    cout << "forward sensitivities preturbed " << fsens_pret << endl;
+    vector<double> fsens_pret_xf = integrator.fwdSens(INTEGRATOR_XF).data();
+    vector<double> fsens_pret_qf = integrator.fwdSens(INTEGRATOR_QF).data();
+    cout << "forward sensitivities preturbed " << fsens_pret_xf << "; " << fsens_pret_qf << endl;
 
-    vector<double> fd2(fsens.size());
-    for(int i=0; i<fd2.size(); ++i)
-      fd2[i] = (fsens_pret.at(i)-fsens.at(i))/0.001;
-    cout << "finite differences, 2nd order   " << fd2 << endl;
+    vector<double> fd2_xf(fsens_xf.size());
+    vector<double> fd2_qf(fsens_qf.size());
+    for(int i=0; i<fd2_xf.size(); ++i)
+      fd2_xf[i] = (fsens_pret_xf.at(i)-fsens_xf.at(i))/0.001;
+    for(int i=0; i<fd2_qf.size(); ++i)
+      fd2_qf[i] = (fsens_pret_qf.at(i)-fsens_qf.at(i))/0.001;
+    
+    cout << "finite differences, 2nd order   " << fd2_xf << "; " << fd2_qf << endl;
     
     // Generate the jacobian by creating a new integrator for the sensitivity equations by source transformation
     FX intjac  = integrator.jacobian(INTEGRATOR_P,INTEGRATOR_XF);
@@ -350,7 +345,7 @@ int main(){
     intjac2.setInput(x0,INTEGRATOR_X0);
     
     // Set adjoint seed
-    vector<double> jacseed(4*1);
+    vector<double> jacseed(3*1,0);
     jacseed[0] = 1;
     intjac.setAdjSeed(jacseed);
     

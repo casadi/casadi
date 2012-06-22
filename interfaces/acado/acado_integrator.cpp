@@ -30,8 +30,8 @@ namespace CasADi{
 AcadoIntegrator::AcadoIntegrator(){ 
 }
 
-AcadoIntegrator::AcadoIntegrator(const FX& fd, const FX& fq){
-  assignNode(new AcadoIntegratorInternal(fd,fq));
+AcadoIntegrator::AcadoIntegrator(const FX& f, const FX& g){
+  assignNode(new AcadoIntegratorInternal(f,g));
 }
 
 AcadoIntegratorInternal* AcadoIntegrator::operator->(){
@@ -53,7 +53,6 @@ void AcadoIntegrator::freeze(){
 void AcadoIntegrator::unfreeze(){
   (*this)->frozen_grid_ = false;
 }
-
 
 } // namespace CasADi
 

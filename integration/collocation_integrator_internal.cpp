@@ -31,7 +31,7 @@
 using namespace std;
 namespace CasADi{
 
-CollocationIntegratorInternal::CollocationIntegratorInternal(const FX& fd, const FX& fq) : IntegratorInternal(fd,fq){
+CollocationIntegratorInternal::CollocationIntegratorInternal(const FX& f, const FX& g) : IntegratorInternal(f,g){
   addOption("number_of_finite_elements",     OT_INTEGER,  20, "Number of finite elements");
   addOption("interpolation_order",           OT_INTEGER,  3,  "Order of the interpolating polynomials");
   addOption("collocation_scheme",            OT_STRING,  "radau",  "Collocation scheme","radau|legendre");
@@ -55,28 +55,11 @@ CollocationIntegratorInternal::~CollocationIntegratorInternal(){
 
 void CollocationIntegratorInternal::init(){
   
-  // Init ODE rhs function and quadrature functions, jacobian function
-  if(!fd_.isInit()) fd_.init();
-  if(!fq_.isNull() && !fq_.isInit()) fq_.init();
-  
-  log("CollocationIntegratorInternal::init","functions initialized");
-  
-  // Check dimensions
-  casadi_assert_message(fd_.getNumInputs()==DAE_NUM_IN, "CollocationIntegratorInternal: f has wrong number of inputs");
-  casadi_assert_message(fd_.getNumOutputs()==DAE_NUM_OUT, "CollocationIntegratorInternal: f has wrong number of outputs");
-  if(!fq_.isNull()){
-    casadi_assert_message(fq_.getNumInputs()==DAE_NUM_IN, "CollocationIntegratorInternal: q has wrong number of inputs");
-    casadi_assert_message(fq_.getNumOutputs()==DAE_NUM_OUT, "CollocationIntegratorInternal: q has wrong number of outputs");
-  }
-
-  ny_ = fd_.input(DAE_Y).numel();
-  nq_ = fq_.isNull() ? 0 : fq_.output().numel();
-  
-  int np = fd_.input(DAE_P).numel();
-  setDimensions(ny_+nq_,np);
-
   // Call the base class init
   IntegratorInternal::init();
+  
+  // Differential states and quadrature states
+  ny_ = nx_ + nq_;
   
   // Legendre collocation points
   double legendre_points[][6] = {
@@ -114,7 +97,7 @@ void CollocationIntegratorInternal::init(){
   int deg = getOption("interpolation_order");
 
   // Assume explicit ODE
-  bool explicit_ode = fd_.input(DAE_YDOT).size()==0;
+  bool explicit_ode = f_.input(DAE_XDOT).size()==0;
   
   // All collocation time points
   double* tau_root = use_radau ? radau_points[deg] : legendre_points[deg];
@@ -257,17 +240,18 @@ void CollocationIntegratorInternal::init(){
       vector<MX> f_in(DAE_NUM_IN);
       f_in[DAE_T] = tk;
       f_in[DAE_P] = P;
-      f_in[DAE_Y] = Y[k][j];
+      f_in[DAE_X] = Y[k][j];
       
+      vector<MX> f_out;
       if(explicit_ode){
         // Assume equation of the form ydot = f(t,y,p)
-        vector<MX> f_out = fd_.call(f_in);
-        g.push_back(h_mx*f_out[DAE_RES] - yp_jk);
+        f_out = f_.call(f_in);
+        g.push_back(h_mx*f_out[DAE_ODE] - yp_jk);
       } else {
         // Assume equation of the form 0 = f(t,y,ydot,p)
-        f_in[DAE_YDOT] = yp_jk/h_mx;
-        vector<MX> f_out = fd_.call(f_in);
-        g.push_back(f_out[DAE_RES]);
+        f_in[DAE_XDOT] = yp_jk/h_mx;
+        f_out = f_.call(f_in);
+        g.push_back(f_out[DAE_ODE]);
       }
       
       if(nq_>0){
@@ -281,8 +265,7 @@ void CollocationIntegratorInternal::init(){
         }
 
         // Add quadrature collocation equations to the NLP
-        vector<MX> q_out = fq_.call(f_in);
-        q_rhs[jk] += h_mx*q_out[0];
+        q_rhs[jk] += h_mx*f_out[DAE_QUAD];
       }
     }
     
@@ -418,7 +401,7 @@ void CollocationIntegratorInternal::init(){
     integratorCreator startup_integrator_creator = getOption("startup_integrator");
     
     // Allocate an NLP solver
-    startup_integrator_ = startup_integrator_creator(fd_,FX());
+    startup_integrator_ = startup_integrator_creator(f_,g_);
     
     // Pass options
     startup_integrator_.setOption("number_of_fwd_dir",0); // not needed
@@ -520,8 +503,7 @@ void CollocationIntegratorInternal::reset(int nfdir, int nadir){
     // Check if an integrator for the startup trajectory has been supplied
     if(!startup_integrator_.isNull()){
       // Use supplied integrator, if any
-      startup_integrator_.input(INTEGRATOR_X0).setArray(&input(INTEGRATOR_X0).front(),ny_); // only the ny_ first elements
-      startup_integrator_.input(INTEGRATOR_XP0).setArray(&input(INTEGRATOR_XP0).front(),ny_); // only the ny_ first elements
+      startup_integrator_.input(INTEGRATOR_X0).setArray(&input(INTEGRATOR_X0).front(),ny_);
       startup_integrator_.input(INTEGRATOR_P).set(input(INTEGRATOR_P));
       
       // Reset the integrator
