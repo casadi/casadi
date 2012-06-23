@@ -1086,17 +1086,9 @@ Get the Linear solver. ";
 
 Deep copy data members. ";
 
-%feature("docstring")  CasADi::AcadoIntegratorInternal::create "
-
-Create a new integrator, new, not yet ready implementation. ";
-
 %feature("docstring")  CasADi::AcadoIntegratorInternal::evaluate "
 
 evaluate ";
-
-%feature("docstring")  CasADi::AcadoIntegratorInternal::setDimensions "
-
-Set dimensions (to be removed) ";
 
 %feature("docstring")  CasADi::AcadoIntegratorInternal::updateNumSens "
 
@@ -6399,15 +6391,6 @@ Print statistics. ";
 %feature("docstring")  CasADi::CollocationIntegratorInternal::setStopTime "
 
 Set the stop time of the forward integration. ";
-
-%feature("docstring")  CasADi::CollocationIntegratorInternal::create "
-
-Create a new integrator, new, not yet ready implementation. ";
-
-%feature("docstring")  CasADi::CollocationIntegratorInternal::setDimensions
-"
-
-Set dimensions (to be removed) ";
 
 %feature("docstring")  CasADi::CollocationIntegratorInternal::updateNumSens
 "
@@ -13990,17 +13973,9 @@ Set initial time (to be removed) ";
 
 Set final time (to be removed) ";
 
-%feature("docstring")  CasADi::Sundials::CVodesInternal::create "
-
-Create a new integrator, new, not yet ready implementation. ";
-
 %feature("docstring")  CasADi::Sundials::CVodesInternal::evaluate "
 
 evaluate ";
-
-%feature("docstring")  CasADi::Sundials::CVodesInternal::setDimensions "
-
-Set dimensions (to be removed) ";
 
 %feature("docstring")  CasADi::Sundials::CVodesInternal::jacobian_switch "
 
@@ -19438,24 +19413,6 @@ CasADi::Sundials::IdasInternal::initUserDefinedLinearSolver "";
 
 Set linear solver. ";
 
-%feature("docstring")  CasADi::Sundials::IdasInternal::copyNV "";
-
-%feature("docstring")  CasADi::Sundials::IdasInternal::copyNV "";
-
-%feature("docstring")  CasADi::Sundials::IdasInternal::getInitialState "";
-
-%feature("docstring")  CasADi::Sundials::IdasInternal::setFinalState "";
-
-%feature("docstring")  CasADi::Sundials::IdasInternal::getForwardSeeds "";
-
-%feature("docstring")
-CasADi::Sundials::IdasInternal::setForwardSensitivities "";
-
-%feature("docstring")  CasADi::Sundials::IdasInternal::getAdjointSeeds "";
-
-%feature("docstring")
-CasADi::Sundials::IdasInternal::setAdjointSensitivities "";
-
 %feature("docstring")  CasADi::Sundials::IdasInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
@@ -19482,17 +19439,9 @@ Set initial time (to be removed) ";
 
 Set final time (to be removed) ";
 
-%feature("docstring")  CasADi::Sundials::IdasInternal::create "
-
-Create a new integrator, new, not yet ready implementation. ";
-
 %feature("docstring")  CasADi::Sundials::IdasInternal::evaluate "
 
 evaluate ";
-
-%feature("docstring")  CasADi::Sundials::IdasInternal::setDimensions "
-
-Set dimensions (to be removed) ";
 
 %feature("docstring")  CasADi::Sundials::IdasInternal::jacobian_switch "
 
@@ -21375,18 +21324,18 @@ NOTE: The ODE/DAE initial-value problem formulation in CasADi is being
 replaced with a new formulation which solves an initial value problem (IVP)
 coupled to a terminal value problem with differential equation given as an
 implicit ODE coupled to an algebraic equation and a set of quadratures:
-Initial conditions at t=t0     x(t0)  = x_0     q(t0)  = 0 Forward
+Initial conditions at t=t0     x(t0)  = x0     q(t0)  = 0 Forward
 integration from t=t0 to t=tf          0 = fx(x,z,p,t,der(x)) Forward ODE
-0 = fz(x,z,p,t)           Forward algebraic equations     der(q) =
-fq(x,z,p,t)           Forward quadratures Terminal conditions at t=tf
-rx(tf)  = h(x(tf),q(tf),p)     rq(tf) = 0      Backward integration from
-t=tf to t=t0           0 = gx(x,z,rx,rz,p,t,der(rx)) Backward ODE
-0 = gz(x,z,rx,rz,p,t) Backward algebraic equations     der(rq) =
-gq(x,z,rx,rz,p,t) Backward quadratures    where we assume that both the
-forward and backwards integrations are index-1   (i.e. dfx/dxdot, dfz/dz,
-dgz/drz, dgx/drxdot are invertible) and furthermore that    gx, gz and gq
-have a linear dependency on rx and rz and that f_x and g_x have a    linear
-dependence on xdot and rxdot respectively.
+0 = fz(x,z,p,t)                  Forward algebraic equations     der(q) =
+fq(x,z,p,t)                  Forward quadratures      Terminal conditions at
+t=tf     rx(tf)  = rx0 rq(tf)  = 0      Backward integration from t=tf to
+t=t0           0 = gx(rx,rz,x,z,p,t,der(rx))   Backward ODE           0 =
+gz(rx,rz,x,z,p,t)           Backward algebraic equations     der(rq) =
+gq(rx,rz,x,z,p,t)           Backward quadratures    where we assume that
+both the forward and backwards integrations are index-1   (i.e. dfx/dxdot,
+dfz/dz, dgz/drz, dgx/drxdot are invertible) and furthermore that    gx, gz
+and gq have a linear dependency on rx and rz and that f_x and g_x have a
+linear dependence on xdot and rxdot respectively.
 
 The Integrator class provides some additional functionality, such as getting
 the value of the state and/or sensitivities at certain time points. Controls
@@ -22092,18 +22041,18 @@ NOTE: The ODE/DAE initial-value problem formulation in CasADi is being
 replaced with a new formulation which solves an initial value problem (IVP)
 coupled to a terminal value problem with differential equation given as an
 implicit ODE coupled to an algebraic equation and a set of quadratures:
-Initial conditions at t=t0     x(t0)  = x_0     q(t0)  = 0 Forward
+Initial conditions at t=t0     x(t0)  = x0     q(t0)  = 0 Forward
 integration from t=t0 to t=tf          0 = fx(x,z,p,t,der(x)) Forward ODE
-0 = fz(x,z,p,t)           Forward algebraic equations     der(q) =
-fq(x,z,p,t)           Forward quadratures Terminal conditions at t=tf
-rx(tf)  = h(x(tf),q(tf),p)     rq(tf) = 0      Backward integration from
-t=tf to t=t0           0 = gx(x,z,rx,rz,p,t,der(rx)) Backward ODE
-0 = gz(x,z,rx,rz,p,t) Backward algebraic equations     der(rq) =
-gq(x,z,rx,rz,p,t) Backward quadratures    where we assume that both the
-forward and backwards integrations are index-1   (i.e. dfx/dxdot, dfz/dz,
-dgz/drz, dgx/drxdot are invertible) and furthermore that    gx, gz and gq
-have a linear dependency on rx and rz and that f_x and g_x have a    linear
-dependence on xdot and rxdot respectively.
+0 = fz(x,z,p,t)                  Forward algebraic equations     der(q) =
+fq(x,z,p,t)                  Forward quadratures      Terminal conditions at
+t=tf     rx(tf)  = rx0 rq(tf)  = 0      Backward integration from t=tf to
+t=t0           0 = gx(rx,rz,x,z,p,t,der(rx))   Backward ODE           0 =
+gz(rx,rz,x,z,p,t)           Backward algebraic equations     der(rq) =
+gq(rx,rz,x,z,p,t)           Backward quadratures    where we assume that
+both the forward and backwards integrations are index-1   (i.e. dfx/dxdot,
+dfz/dz, dgz/drz, dgx/drxdot are invertible) and furthermore that    gx, gz
+and gq have a linear dependency on rx and rz and that f_x and g_x have a
+linear dependence on xdot and rxdot respectively.
 
 Joel Andersson
 
@@ -22305,10 +22254,6 @@ Deep copy data members. ";
 
 Create a new integrator. ";
 
-%feature("docstring")  CasADi::IntegratorInternal::create "
-
-Create a new integrator, new, not yet ready implementation. ";
-
 %feature("docstring")  CasADi::IntegratorInternal::setLinearSolver "
 
 Set linear solver. ";
@@ -22340,10 +22285,6 @@ evaluate ";
 %feature("docstring")  CasADi::IntegratorInternal::init "
 
 Initialize. ";
-
-%feature("docstring")  CasADi::IntegratorInternal::setDimensions "
-
-Set dimensions (to be removed) ";
 
 %feature("docstring")  CasADi::IntegratorInternal::updateNumSens "
 
@@ -48980,14 +48921,14 @@ Calculate the expression for the jacobian of a number of function outputs
 with respect to a number of function inputs, optionally include the function
 outputs. ";
 
-%feature("docstring")  CasADi::MXFunctionInternal::jacobian "
-
-Jacobian via source code transformation. ";
-
 %feature("docstring")  CasADi::MXFunctionInternal::getDerivative "
 
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::jacobian "
+
+Jacobian via source code transformation. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::collectFree "
 
@@ -60567,14 +60508,6 @@ Jacobian of the integrator. ";
 
 Generate the sparsity of a Jacobian block. ";
 
-%feature("docstring")  CasADi::RKIntegratorInternal::create "
-
-Create a new integrator, new, not yet ready implementation. ";
-
-%feature("docstring")  CasADi::RKIntegratorInternal::setDimensions "
-
-Set dimensions (to be removed) ";
-
 %feature("docstring")  CasADi::RKIntegratorInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -65759,10 +65692,6 @@ Clone. ";
 
 Create a new integrator. ";
 
-%feature("docstring")  CasADi::Sundials::SundialsInternal::create "
-
-Create a new integrator, new, not yet ready implementation. ";
-
 %feature("docstring")  CasADi::Sundials::SundialsInternal::setLinearSolver "
 
 Set linear solver. ";
@@ -65790,10 +65719,6 @@ Integrate backwards in time until a specified time point. ";
 %feature("docstring")  CasADi::Sundials::SundialsInternal::evaluate "
 
 evaluate ";
-
-%feature("docstring")  CasADi::Sundials::SundialsInternal::setDimensions "
-
-Set dimensions (to be removed) ";
 
 %feature("docstring")  CasADi::Sundials::SundialsInternal::updateNumSens "
 
@@ -68532,11 +68457,6 @@ Check if smooth. ";
 
 Print the algorithm. ";
 
-%feature("docstring")  CasADi::SXFunctionInternal::jacobian "
-
-Calculate the jacobian of a number of function outputs with respect to a
-number of function inputs, optionally include the function outputs. ";
-
 %feature("docstring")  CasADi::SXFunctionInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
@@ -68559,6 +68479,11 @@ Hessian (forward over adjoint) via source code transformation. ";
 
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::jacobian "
+
+Calculate the jacobian of a number of function outputs with respect to a
+number of function inputs, optionally include the function outputs. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::init "
 
@@ -74220,6 +74145,16 @@ arguments. ";
 Helper function to create DAE forward integration function output arguments.
 ";
 
+%feature("docstring")  CasADi::Interfaces::rdaeIn "
+
+Helper function to create ODE/DAE backward integration function input
+arguments. ";
+
+%feature("docstring")  CasADi::Interfaces::rdaeOut "
+
+Helper function to create ODE/DAE backward integration function output
+arguments. ";
+
 %feature("docstring")  CasADi::Interfaces::getptr "";
 
 %feature("docstring")  CasADi::Interfaces::linspace "
@@ -74473,6 +74408,11 @@ Get a pointer to the data contained in the vector. ";
 %feature("docstring")  CasADi::Interfaces::getPtr "
 
 Get a pointer to the data contained in the vector. ";
+
+%feature("docstring")  CasADi::Interfaces::project "
+
+Create a new matrix with a given sparsity pattern but with the nonzeros
+taken from an existing matrix. ";
 
 %feature("docstring")  CasADi::Interfaces::all "";
 

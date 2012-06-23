@@ -1,9 +1,11 @@
 /** \defgroup scheme_IntegratorOutput
 <table>
-<caption>Output scheme: CasADi::IntegratorOutput  (INTEGRATOR_NUM_OUT = 2) </caption>
+<caption>Output scheme: CasADi::IntegratorOutput  (INTEGRATOR_NUM_OUT = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>INTEGRATOR_XF</td><td>State at tf</td></tr>
-<tr><td>INTEGRATOR_XPF</td><td>State derivative at tf</td></tr>
+<tr><td>INTEGRATOR_XF</td><td>Differential state at the final time</td></tr>
+<tr><td>INTEGRATOR_QF</td><td>Quadrature state at the final time</td></tr>
+<tr><td>INTEGRATOR_RXF</td><td>Backward differential state at the initial time</td></tr>
+<tr><td>INTEGRATOR_RQF</td><td>Backward quadrature state at the initial time</td></tr>
 </table>
 */
 /** \defgroup scheme_QPInput
@@ -56,6 +58,19 @@
 <tr><td>ACADO_FCN_XDOT</td><td></td></tr>
 </table>
 */
+/** \defgroup scheme_RDAEInput
+<table>
+<caption>Input scheme: CasADi::RDAEInput  (RDAE_NUM_IN = 7) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>RDAE_RX</td><td>Backward differential state</td></tr>
+<tr><td>RDAE_RZ</td><td>Backward algebraic state</td></tr>
+<tr><td>RDAE_X</td><td>Forward differential state</td></tr>
+<tr><td>RDAE_Z</td><td>Forward algebraic state</td></tr>
+<tr><td>RDAE_P</td><td>Parameter vector</td></tr>
+<tr><td>RDAE_T</td><td>Explicit time dependence</td></tr>
+<tr><td>RDAE_RXDOT</td><td>Time derivative of backward differential state</td></tr>
+</table>
+*/
 /** \defgroup scheme_MUSCOD_FCN_Output
 <table>
 <caption>Output scheme: CasADi::MUSCOD_FCN_Output  (MUSCOD_FCN_NUM_OUT = 2) </caption>
@@ -87,12 +102,13 @@
 */
 /** \defgroup scheme_DAEInput
 <table>
-<caption>Input scheme: CasADi::DAEInput  (DAE_NUM_IN = 4) </caption>
+<caption>Input scheme: CasADi::DAEInput  (DAE_NUM_IN = 5) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>DAE_T</td><td>Explicit time dependence</td></tr>
-<tr><td>DAE_Y</td><td>Differential and algebraic states. NOTE: To be replaced by DAE_X and DAE_Z</td></tr>
+<tr><td>DAE_X</td><td>Differential state</td></tr>
+<tr><td>DAE_Z</td><td>Algebraic state</td></tr>
 <tr><td>DAE_P</td><td>Parameter</td></tr>
-<tr><td>DAE_YDOT</td><td>Time derivative of differential and algebraic states. NOTE: To be replaced by DAE_XDOT</td></tr>
+<tr><td>DAE_T</td><td>Explicit time dependence</td></tr>
+<tr><td>DAE_XDOT</td><td>Time derivative of differential states</td></tr>
 </table>
 */
 /** \defgroup scheme_ACADO_Output
@@ -107,9 +123,11 @@
 */
 /** \defgroup scheme_DAEOutput
 <table>
-<caption>Output scheme: CasADi::DAEOutput  (DAE_NUM_OUT = 1) </caption>
+<caption>Output scheme: CasADi::DAEOutput  (DAE_NUM_OUT = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>DAE_RES</td><td>DAE residual</td></tr>
+<tr><td>DAE_ODE</td><td>Right hand side of the implicit ODE</td></tr>
+<tr><td>DAE_ALG</td><td>Right hand side of algebraic equations</td></tr>
+<tr><td>DAE_QUAD</td><td>Right hand side of quadratures equations</td></tr>
 </table>
 */
 /** \defgroup scheme_MayerInput
@@ -125,12 +143,12 @@
 <caption>Input scheme: CasADi::ControlledDAEInput  (CONTROL_DAE_NUM_IN = 9) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>CONTROL_DAE_T</td><td>Global physical time. (1-by-1)</td></tr>
-<tr><td>CONTROL_DAE_Y</td><td>State vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES</td></tr>
+<tr><td>CONTROL_DAE_X</td><td>State vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES</td></tr>
 <tr><td>CONTROL_DAE_P</td><td>Parameter vector (dimension np-by-1).</td></tr>
 <tr><td>CONTROL_DAE_U</td><td>Control vector (dimension nu-by-1).</td></tr>
 <tr><td>CONTROL_DAE_U_INTERP</td><td>Control vector, linearly interpolated (dimension nu-by-1).</td></tr>
-<tr><td>CONTROL_DAE_YDOT</td><td>State derivative vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES</td></tr>
-<tr><td>CONTROL_DAE_Y_MAJOR</td><td>State vector (dimension nx-by-1) at the last major time-step</td></tr>
+<tr><td>CONTROL_DAE_XDOT</td><td>State derivative vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES</td></tr>
+<tr><td>CONTROL_DAE_X_MAJOR</td><td>State vector (dimension nx-by-1) at the last major time-step</td></tr>
 <tr><td>CONTROL_DAE_T0</td><td>Time at start of control interval (1-by-1)</td></tr>
 <tr><td>CONTROL_DAE_TF</td><td>Time at end of control interval (1-by-1)</td></tr>
 </table>
@@ -152,9 +170,9 @@
 <table>
 <caption>Input scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>INTEGRATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
-<tr><td>INTEGRATOR_P</td><td>Parameters p (dimension np-by-1)</td></tr>
-<tr><td>INTEGRATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) Only relevant for implicit intergators. This input may be changed during an IDASIntegrator::evaluate()</td></tr>
+<tr><td>INTEGRATOR_X0</td><td>Differential state at the initial time</td></tr>
+<tr><td>INTEGRATOR_P</td><td>Parameters</td></tr>
+<tr><td>INTEGRATOR_RX0</td><td>Backward differential state at the final time</td></tr>
 </table>
 */
 /** \defgroup scheme_MUSCOD_FCN_Input
@@ -166,6 +184,15 @@
 <tr><td>MUSCOD_FCN_XA</td><td></td></tr>
 <tr><td>MUSCOD_FCN_U</td><td></td></tr>
 <tr><td>MUSCOD_FCN_P</td><td></td></tr>
+</table>
+*/
+/** \defgroup scheme_RDAEOutput
+<table>
+<caption>Output scheme: CasADi::RDAEOutput  (RDAE_NUM_OUT = 3) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>RDAE_ODE</td><td>Right hand side of ODE.</td></tr>
+<tr><td>RDAE_ALG</td><td>Right hand side of algebraic equations.</td></tr>
+<tr><td>RDAE_QUAD</td><td>Right hand side of quadratures.</td></tr>
 </table>
 */
 /** \defgroup scheme_OCPInput
@@ -193,12 +220,11 @@
 */
 /** \defgroup scheme_ControlSimulatorInput
 <table>
-<caption>Input scheme: CasADi::ControlSimulatorInput  (CONTROLSIMULATOR_NUM_IN = 4) </caption>
+<caption>Input scheme: CasADi::ControlSimulatorInput  (CONTROLSIMULATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>CONTROLSIMULATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
 <tr><td>CONTROLSIMULATOR_P</td><td>Parameters that are fixed over the entire horizon (dimension np-by-1)</td></tr>
 <tr><td>CONTROLSIMULATOR_U</td><td>Parameters that change over the integration intervals (dimension (ns-1)-by-nu)</td></tr>
-<tr><td>CONTROLSIMULATOR_XP0</td><td>State derivative at t0 (dimension nx-by-1) Only relevant for implicit integrators.</td></tr>
 </table>
 */
 /** \defgroup scheme_OCPOutput
