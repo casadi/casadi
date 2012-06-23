@@ -134,25 +134,25 @@ SundialsIntegrator SundialsInternal::jac(bool with_x, bool with_p){
   int ns = ns_x + ns_p;
 
   // Sensitivities and derivatives of sensitivities
-  SXMatrix x_sens = ssym("x_sens",nx_,ns);
-  SXMatrix z_sens = ssym("z_sens",nz_,ns);
-  SXMatrix xdot_sens = ssym("xdot_sens",n_xdot,ns);
+  vector<SXMatrix> x_sens = ssym("x_sens",f.input(DAE_X).sparsity(),ns);
+  vector<SXMatrix> z_sens = ssym("z_sens",f.input(DAE_Z).sparsity(),ns);
+  vector<SXMatrix> xdot_sens = ssym("xdot_sens",f.input(DAE_XDOT).sparsity(),ns);
   
   // Directional derivative seeds
   vector<vector<SXMatrix> > fseed(ns);
   for(int d=0; d<ns; ++d){
     fseed[d].resize(DAE_NUM_IN);
-    fseed[d][DAE_X] = x_sens(range(nx_),d);
-    fseed[d][DAE_Z] = z_sens(range(nz_),d);
-    fseed[d][DAE_P] = SXMatrix(f.inputSX(DAE_P).sparsity());
+    fseed[d][DAE_X] = x_sens[d];
+    fseed[d][DAE_Z] = z_sens[d];
+    fseed[d][DAE_P] = SXMatrix(f.input(DAE_P).sparsity());
     if(with_p && d>=ns_x){
       fseed[d][DAE_P](d-ns_x) = 1;
     }
-    fseed[d][DAE_T] = SXMatrix(f.inputSX(DAE_T).sparsity());
+    fseed[d][DAE_T] = SXMatrix(f.input(DAE_T).sparsity());
     if(n_xdot>0){
-      fseed[d][DAE_XDOT] = xdot_sens(range(n_xdot),d);
+      fseed[d][DAE_XDOT] = xdot_sens[d];
     } else {
-      fseed[d][DAE_XDOT] = SXMatrix(f.inputSX(DAE_XDOT).sparsity());
+      fseed[d][DAE_XDOT] = SXMatrix(f.input(DAE_XDOT).sparsity());
     }
   }
   
@@ -182,9 +182,9 @@ SundialsIntegrator SundialsInternal::jac(bool with_x, bool with_p){
   // Input arguments for the augmented DAE
   vector<SXMatrix> faug_in(DAE_NUM_IN);
   faug_in[DAE_T] = f.inputSX(DAE_T);
-  faug_in[DAE_X] = vec(horzcat(f.inputSX(DAE_X),x_sens));
-  if(nz_>0)    faug_in[DAE_Z] = vec(horzcat(f.inputSX(DAE_Z),z_sens));
-  if(n_xdot>0) faug_in[DAE_XDOT] = vec(horzcat(f.inputSX(DAE_XDOT),xdot_sens));
+  faug_in[DAE_X] = vertcat(f.inputSX(DAE_X),vertcat(x_sens));
+  if(nz_>0) faug_in[DAE_Z] = vertcat(f.inputSX(DAE_Z),vertcat(z_sens));
+  if(n_xdot>0) faug_in[DAE_XDOT] = vertcat(f.inputSX(DAE_XDOT),vertcat(xdot_sens));
   faug_in[DAE_P] = f.inputSX(DAE_P);
   
   // Create augmented DAE function
