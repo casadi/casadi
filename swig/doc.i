@@ -39,29 +39,28 @@ thus x := [xd,xa]
 Joel Andersson
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| INTEGRATOR_X0                      | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) Only relevant for         |
-|                                    | implicit intergators. This input   |
-|                                    | may be changed during an           |
-|                                    | IDASIntegrator::evaluate()         |
-+------------------------------------+------------------------------------+
++----------------+-----------------------------------------------+
+|      Name      |                  Description                  |
++================+===============================================+
+| INTEGRATOR_X0  | Differential state at the initial time        |
++----------------+-----------------------------------------------+
+| INTEGRATOR_P   | Parameters                                    |
++----------------+-----------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time |
++----------------+-----------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
-+----------------+------------------------+
-|      Name      |      Description       |
-+================+========================+
-| INTEGRATOR_XF  | State at tf            |
-+----------------+------------------------+
-| INTEGRATOR_XPF | State derivative at tf |
-+----------------+------------------------+
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
++----------------+-------------------------------------------------+
+|      Name      |                   Description                   |
++================+=================================================+
+| INTEGRATOR_XF  | Differential state at the final time            |
++----------------+-------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time              |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
++----------------+-------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -816,29 +815,28 @@ differential states xd and the algebraic states xa. The complete state is
 thus x := [xd,xa]
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| INTEGRATOR_X0                      | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) Only relevant for         |
-|                                    | implicit intergators. This input   |
-|                                    | may be changed during an           |
-|                                    | IDASIntegrator::evaluate()         |
-+------------------------------------+------------------------------------+
++----------------+-----------------------------------------------+
+|      Name      |                  Description                  |
++================+===============================================+
+| INTEGRATOR_X0  | Differential state at the initial time        |
++----------------+-----------------------------------------------+
+| INTEGRATOR_P   | Parameters                                    |
++----------------+-----------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time |
++----------------+-----------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
-+----------------+------------------------+
-|      Name      |      Description       |
-+================+========================+
-| INTEGRATOR_XF  | State at tf            |
-+----------------+------------------------+
-| INTEGRATOR_XPF | State derivative at tf |
-+----------------+------------------------+
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
++----------------+-------------------------------------------------+
+|      Name      |                   Description                   |
++================+=================================================+
+| INTEGRATOR_XF  | Differential state at the final time            |
++----------------+-------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time              |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
++----------------+-------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -5287,29 +5285,28 @@ The method is still under development
 Joel Andersson
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| INTEGRATOR_X0                      | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) Only relevant for         |
-|                                    | implicit intergators. This input   |
-|                                    | may be changed during an           |
-|                                    | IDASIntegrator::evaluate()         |
-+------------------------------------+------------------------------------+
++----------------+-----------------------------------------------+
+|      Name      |                  Description                  |
++================+===============================================+
+| INTEGRATOR_X0  | Differential state at the initial time        |
++----------------+-----------------------------------------------+
+| INTEGRATOR_P   | Parameters                                    |
++----------------+-----------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time |
++----------------+-----------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
-+----------------+------------------------+
-|      Name      |      Description       |
-+================+========================+
-| INTEGRATOR_XF  | State at tf            |
-+----------------+------------------------+
-| INTEGRATOR_XPF | State derivative at tf |
-+----------------+------------------------+
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
++----------------+-------------------------------------------------+
+|      Name      |                   Description                   |
++================+=================================================+
+| INTEGRATOR_XF  | Differential state at the final time            |
++----------------+-------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time              |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
++----------------+-------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -5659,29 +5656,30 @@ Create an integrator for explicit ODEs.
 Parameters:
 -----------
 
-f:  dynamical system >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| DAE_T                              | Explicit time dependence           |
-+------------------------------------+------------------------------------+
-| DAE_Y                              | Differential and algebraic states. |
-|                                    | NOTE: To be replaced by DAE_X and  |
-|                                    | DAE_Z                              |
-+------------------------------------+------------------------------------+
-| DAE_P                              | Parameter                          |
-+------------------------------------+------------------------------------+
-| DAE_YDOT                           | Time derivative of differential    |
-|                                    | and algebraic states. NOTE: To be  |
-|                                    | replaced by DAE_XDOT               |
-+------------------------------------+------------------------------------+
+f:  dynamical system >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 5)
++----------+----------------------------------------+ |   Name   |
+Description               |
++==========+========================================+ | DAE_X    |
+Differential state                     |
++----------+----------------------------------------+ | DAE_Z    | Algebraic
+state                        |
++----------+----------------------------------------+ | DAE_P    | Parameter
+| +----------+----------------------------------------+ | DAE_T    |
+Explicit time dependence               |
++----------+----------------------------------------+ | DAE_XDOT | Time
+derivative of differential states |
++----------+----------------------------------------+
 
->Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 1)
-+---------+--------------+
-|  Name   | Description  |
-+=========+==============+
-| DAE_RES | DAE residual |
-+---------+--------------+
+>Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 3)
++----------+------------------------------------------+
+|   Name   |               Description                |
++==========+==========================================+
+| DAE_ODE  | Right hand side of the implicit ODE      |
++----------+------------------------------------------+
+| DAE_ALG  | Right hand side of algebraic equations   |
++----------+------------------------------------------+
+| DAE_QUAD | Right hand side of quadratures equations |
++----------+------------------------------------------+
 ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::checkNode "
@@ -6072,29 +6070,28 @@ Return a string with a destription (for SWIG) ";
 %feature("docstring") CasADi::CollocationIntegratorInternal "
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| INTEGRATOR_X0                      | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) Only relevant for         |
-|                                    | implicit intergators. This input   |
-|                                    | may be changed during an           |
-|                                    | IDASIntegrator::evaluate()         |
-+------------------------------------+------------------------------------+
++----------------+-----------------------------------------------+
+|      Name      |                  Description                  |
++================+===============================================+
+| INTEGRATOR_X0  | Differential state at the initial time        |
++----------------+-----------------------------------------------+
+| INTEGRATOR_P   | Parameters                                    |
++----------------+-----------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time |
++----------------+-----------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
-+----------------+------------------------+
-|      Name      |      Description       |
-+================+========================+
-| INTEGRATOR_XF  | State at tf            |
-+----------------+------------------------+
-| INTEGRATOR_XPF | State derivative at tf |
-+----------------+------------------------+
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
++----------------+-------------------------------------------------+
+|      Name      |                   Description                   |
++================+=================================================+
+| INTEGRATOR_XF  | Differential state at the final time            |
++----------------+-------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time              |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
++----------------+-------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -7727,7 +7724,7 @@ per major interval
 
 Joris Gillis
 
->Input scheme: CasADi::ControlSimulatorInput (CONTROLSIMULATOR_NUM_IN = 4)
+>Input scheme: CasADi::ControlSimulatorInput (CONTROLSIMULATOR_NUM_IN = 3)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
@@ -7740,10 +7737,6 @@ Joris Gillis
 | CONTROLSIMULATOR_U                 | Parameters that change over the    |
 |                                    | integration intervals (dimension   |
 |                                    | (ns-1)-by-nu)                      |
-+------------------------------------+------------------------------------+
-| CONTROLSIMULATOR_XP0               | State derivative at t0 (dimension  |
-|                                    | nx-by-1) Only relevant for         |
-|                                    | implicit integrators.              |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -8071,7 +8064,7 @@ ffcn:  Continuous time dynamics, an CasADi::FX with the folowing mapping:
 +====================================+====================================+
 | CONTROL_DAE_T                      | Global physical time. (1-by-1)     |
 +------------------------------------+------------------------------------+
-| CONTROL_DAE_Y                      | State vector (dimension nx-by-1).  |
+| CONTROL_DAE_X                      | State vector (dimension nx-by-1).  |
 |                                    | Should have same amount of non-    |
 |                                    | zeros as DAEOutput:DAE_RES         |
 +------------------------------------+------------------------------------+
@@ -8084,11 +8077,11 @@ ffcn:  Continuous time dynamics, an CasADi::FX with the folowing mapping:
 | CONTROL_DAE_U_INTERP               | Control vector, linearly           |
 |                                    | interpolated (dimension nu-by-1).  |
 +------------------------------------+------------------------------------+
-| CONTROL_DAE_YDOT                   | State derivative vector (dimension |
+| CONTROL_DAE_XDOT                   | State derivative vector (dimension |
 |                                    | nx-by-1). Should have same amount  |
 |                                    | of non-zeros as DAEOutput:DAE_RES  |
 +------------------------------------+------------------------------------+
-| CONTROL_DAE_Y_MAJOR                | State vector (dimension nx-by-1)   |
+| CONTROL_DAE_X_MAJOR                | State vector (dimension nx-by-1)   |
 |                                    | at the last major time-step        |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_T0                     | Time at start of control interval  |
@@ -8098,30 +8091,31 @@ ffcn:  Continuous time dynamics, an CasADi::FX with the folowing mapping:
 |                                    | (1-by-1)                           |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 1)
-+---------+--------------+
-|  Name   | Description  |
-+=========+==============+
-| DAE_RES | DAE residual |
-+---------+--------------+
+>Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 3)
++----------+------------------------------------------+
+|   Name   |               Description                |
++==========+==========================================+
+| DAE_ODE  | Right hand side of the implicit ODE      |
++----------+------------------------------------------+
+| DAE_ALG  | Right hand side of algebraic equations   |
++----------+------------------------------------------+
+| DAE_QUAD | Right hand side of quadratures equations |
++----------+------------------------------------------+
 
 output_fcn:  output function which maps ControlledDAEInput or DAEInput to n
-outputs. >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| DAE_T                              | Explicit time dependence           |
-+------------------------------------+------------------------------------+
-| DAE_Y                              | Differential and algebraic states. |
-|                                    | NOTE: To be replaced by DAE_X and  |
-|                                    | DAE_Z                              |
-+------------------------------------+------------------------------------+
-| DAE_P                              | Parameter                          |
-+------------------------------------+------------------------------------+
-| DAE_YDOT                           | Time derivative of differential    |
-|                                    | and algebraic states. NOTE: To be  |
-|                                    | replaced by DAE_XDOT               |
-+------------------------------------+------------------------------------+
+outputs. >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 5)
++----------+----------------------------------------+ |   Name   |
+Description               |
++==========+========================================+ | DAE_X    |
+Differential state                     |
++----------+----------------------------------------+ | DAE_Z    | Algebraic
+state                        |
++----------+----------------------------------------+ | DAE_P    | Parameter
+| +----------+----------------------------------------+ | DAE_T    |
+Explicit time dependence               |
++----------+----------------------------------------+ | DAE_XDOT | Time
+derivative of differential states |
++----------+----------------------------------------+
 
 >Input scheme: CasADi::ControlledDAEInput (CONTROL_DAE_NUM_IN = 9)
 +------------------------------------+------------------------------------+
@@ -8129,7 +8123,7 @@ outputs. >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
 +====================================+====================================+
 | CONTROL_DAE_T                      | Global physical time. (1-by-1)     |
 +------------------------------------+------------------------------------+
-| CONTROL_DAE_Y                      | State vector (dimension nx-by-1).  |
+| CONTROL_DAE_X                      | State vector (dimension nx-by-1).  |
 |                                    | Should have same amount of non-    |
 |                                    | zeros as DAEOutput:DAE_RES         |
 +------------------------------------+------------------------------------+
@@ -8142,11 +8136,11 @@ outputs. >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
 | CONTROL_DAE_U_INTERP               | Control vector, linearly           |
 |                                    | interpolated (dimension nu-by-1).  |
 +------------------------------------+------------------------------------+
-| CONTROL_DAE_YDOT                   | State derivative vector (dimension |
+| CONTROL_DAE_XDOT                   | State derivative vector (dimension |
 |                                    | nx-by-1). Should have same amount  |
 |                                    | of non-zeros as DAEOutput:DAE_RES  |
 +------------------------------------+------------------------------------+
-| CONTROL_DAE_Y_MAJOR                | State vector (dimension nx-by-1)   |
+| CONTROL_DAE_X_MAJOR                | State vector (dimension nx-by-1)   |
 |                                    | at the last major time-step        |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_T0                     | Time at start of control interval  |
@@ -8545,7 +8539,7 @@ ControlSimulator data storage classs.
 
 Joel Andersson
 
->Input scheme: CasADi::ControlSimulatorInput (CONTROLSIMULATOR_NUM_IN = 4)
+>Input scheme: CasADi::ControlSimulatorInput (CONTROLSIMULATOR_NUM_IN = 3)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
@@ -8558,10 +8552,6 @@ Joel Andersson
 | CONTROLSIMULATOR_U                 | Parameters that change over the    |
 |                                    | integration intervals (dimension   |
 |                                    | (ns-1)-by-nu)                      |
-+------------------------------------+------------------------------------+
-| CONTROLSIMULATOR_XP0               | State derivative at t0 (dimension  |
-|                                    | nx-by-1) Only relevant for         |
-|                                    | implicit integrators.              |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -12457,29 +12447,28 @@ call: Call reset. Then call integrate(t_i) and getOuput for a series of
 times t_i.
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| INTEGRATOR_X0                      | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) Only relevant for         |
-|                                    | implicit intergators. This input   |
-|                                    | may be changed during an           |
-|                                    | IDASIntegrator::evaluate()         |
-+------------------------------------+------------------------------------+
++----------------+-----------------------------------------------+
+|      Name      |                  Description                  |
++================+===============================================+
+| INTEGRATOR_X0  | Differential state at the initial time        |
++----------------+-----------------------------------------------+
+| INTEGRATOR_P   | Parameters                                    |
++----------------+-----------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time |
++----------------+-----------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
-+----------------+------------------------+
-|      Name      |      Description       |
-+================+========================+
-| INTEGRATOR_XF  | State at tf            |
-+----------------+------------------------+
-| INTEGRATOR_XPF | State derivative at tf |
-+----------------+------------------------+
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
++----------------+-------------------------------------------------+
+|      Name      |                   Description                   |
++================+=================================================+
+| INTEGRATOR_XF  | Differential state at the final time            |
++----------------+-------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time              |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
++----------------+-------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -12639,14 +12628,6 @@ times t_i.
 |              |              |              | itivities (h |              |
 |              |              |              | ermite|polyn |              |
 |              |              |              | omial)       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| is_different | OT_INTEGERVE | GenericType( | A vector     | CasADi::Sund |
-| ial          | CTOR         | )            | with a       | ials::Sundia |
-|              |              |              | boolean      | lsInternal   |
-|              |              |              | describing   |              |
-|              |              |              | the nature   |              |
-|              |              |              | for each     |              |
-|              |              |              | state.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
 | lver         |              |              | ab|tfqmr)    | ials::Sundia |
@@ -13006,29 +12987,30 @@ Create an integrator for explicit ODEs.
 Parameters:
 -----------
 
-f:  dynamical system >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| DAE_T                              | Explicit time dependence           |
-+------------------------------------+------------------------------------+
-| DAE_Y                              | Differential and algebraic states. |
-|                                    | NOTE: To be replaced by DAE_X and  |
-|                                    | DAE_Z                              |
-+------------------------------------+------------------------------------+
-| DAE_P                              | Parameter                          |
-+------------------------------------+------------------------------------+
-| DAE_YDOT                           | Time derivative of differential    |
-|                                    | and algebraic states. NOTE: To be  |
-|                                    | replaced by DAE_XDOT               |
-+------------------------------------+------------------------------------+
+f:  dynamical system >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 5)
++----------+----------------------------------------+ |   Name   |
+Description               |
++==========+========================================+ | DAE_X    |
+Differential state                     |
++----------+----------------------------------------+ | DAE_Z    | Algebraic
+state                        |
++----------+----------------------------------------+ | DAE_P    | Parameter
+| +----------+----------------------------------------+ | DAE_T    |
+Explicit time dependence               |
++----------+----------------------------------------+ | DAE_XDOT | Time
+derivative of differential states |
++----------+----------------------------------------+
 
->Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 1)
-+---------+--------------+
-|  Name   | Description  |
-+=========+==============+
-| DAE_RES | DAE residual |
-+---------+--------------+
+>Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 3)
++----------+------------------------------------------+
+|   Name   |               Description                |
++==========+==========================================+
+| DAE_ODE  | Right hand side of the implicit ODE      |
++----------+------------------------------------------+
+| DAE_ALG  | Right hand side of algebraic equations   |
++----------+------------------------------------------+
+| DAE_QUAD | Right hand side of quadratures equations |
++----------+------------------------------------------+
 ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::checkNode "
@@ -13458,29 +13440,28 @@ xdot == f(t,x,p)   from t0 to tf      given the initial condition x(t0) ==
 x0;
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| INTEGRATOR_X0                      | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) Only relevant for         |
-|                                    | implicit intergators. This input   |
-|                                    | may be changed during an           |
-|                                    | IDASIntegrator::evaluate()         |
-+------------------------------------+------------------------------------+
++----------------+-----------------------------------------------+
+|      Name      |                  Description                  |
++================+===============================================+
+| INTEGRATOR_X0  | Differential state at the initial time        |
++----------------+-----------------------------------------------+
+| INTEGRATOR_P   | Parameters                                    |
++----------------+-----------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time |
++----------------+-----------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
-+----------------+------------------------+
-|      Name      |      Description       |
-+================+========================+
-| INTEGRATOR_XF  | State at tf            |
-+----------------+------------------------+
-| INTEGRATOR_XPF | State derivative at tf |
-+----------------+------------------------+
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
++----------------+-------------------------------------------------+
+|      Name      |                   Description                   |
++================+=================================================+
+| INTEGRATOR_XF  | Differential state at the final time            |
++----------------+-------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time              |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
++----------------+-------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -13640,14 +13621,6 @@ x0;
 |              |              |              | itivities (h |              |
 |              |              |              | ermite|polyn |              |
 |              |              |              | omial)       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| is_different | OT_INTEGERVE | GenericType( | A vector     | CasADi::Sund |
-| ial          | CTOR         | )            | with a       | ials::Sundia |
-|              |              |              | boolean      | lsInternal   |
-|              |              |              | describing   |              |
-|              |              |              | the nature   |              |
-|              |              |              | for each     |              |
-|              |              |              | state.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
 | lver         |              |              | ab|tfqmr)    | ials::Sundia |
@@ -17778,29 +17751,28 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 Joel Andersson
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| INTEGRATOR_X0                      | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) Only relevant for         |
-|                                    | implicit intergators. This input   |
-|                                    | may be changed during an           |
-|                                    | IDASIntegrator::evaluate()         |
-+------------------------------------+------------------------------------+
++----------------+-----------------------------------------------+
+|      Name      |                  Description                  |
++================+===============================================+
+| INTEGRATOR_X0  | Differential state at the initial time        |
++----------------+-----------------------------------------------+
+| INTEGRATOR_P   | Parameters                                    |
++----------------+-----------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time |
++----------------+-----------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
-+----------------+------------------------+
-|      Name      |      Description       |
-+================+========================+
-| INTEGRATOR_XF  | State at tf            |
-+----------------+------------------------+
-| INTEGRATOR_XPF | State derivative at tf |
-+----------------+------------------------+
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
++----------------+-------------------------------------------------+
+|      Name      |                   Description                   |
++================+=================================================+
+| INTEGRATOR_XF  | Differential state at the final time            |
++----------------+-------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time              |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
++----------------+-------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -18017,14 +17989,6 @@ Joel Andersson
 |              |              |              | itivities (h |              |
 |              |              |              | ermite|polyn |              |
 |              |              |              | omial)       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| is_different | OT_INTEGERVE | GenericType( | A vector     | CasADi::Sund |
-| ial          | CTOR         | )            | with a       | ials::Sundia |
-|              |              |              | boolean      | lsInternal   |
-|              |              |              | describing   |              |
-|              |              |              | the nature   |              |
-|              |              |              | for each     |              |
-|              |              |              | state.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
 | lver         |              |              | ab|tfqmr)    | ials::Sundia |
@@ -18387,29 +18351,30 @@ the number of states not to be included in the state vector)
 Parameters:
 -----------
 
-f:  dynamical system >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| DAE_T                              | Explicit time dependence           |
-+------------------------------------+------------------------------------+
-| DAE_Y                              | Differential and algebraic states. |
-|                                    | NOTE: To be replaced by DAE_X and  |
-|                                    | DAE_Z                              |
-+------------------------------------+------------------------------------+
-| DAE_P                              | Parameter                          |
-+------------------------------------+------------------------------------+
-| DAE_YDOT                           | Time derivative of differential    |
-|                                    | and algebraic states. NOTE: To be  |
-|                                    | replaced by DAE_XDOT               |
-+------------------------------------+------------------------------------+
+f:  dynamical system >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 5)
++----------+----------------------------------------+ |   Name   |
+Description               |
++==========+========================================+ | DAE_X    |
+Differential state                     |
++----------+----------------------------------------+ | DAE_Z    | Algebraic
+state                        |
++----------+----------------------------------------+ | DAE_P    | Parameter
+| +----------+----------------------------------------+ | DAE_T    |
+Explicit time dependence               |
++----------+----------------------------------------+ | DAE_XDOT | Time
+derivative of differential states |
++----------+----------------------------------------+
 
->Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 1)
-+---------+--------------+
-|  Name   | Description  |
-+=========+==============+
-| DAE_RES | DAE residual |
-+---------+--------------+
+>Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 3)
++----------+------------------------------------------+
+|   Name   |               Description                |
++==========+==========================================+
+| DAE_ODE  | Right hand side of the implicit ODE      |
++----------+------------------------------------------+
+| DAE_ALG  | Right hand side of algebraic equations   |
++----------+------------------------------------------+
+| DAE_QUAD | Right hand side of quadratures equations |
++----------+------------------------------------------+
 ";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::checkNode "
@@ -18845,29 +18810,28 @@ quadrature part (g). In the same way, the state vector is also composed of
 two parts, the differential states and the quadrature states, i.e. x = [y,q]
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| INTEGRATOR_X0                      | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) Only relevant for         |
-|                                    | implicit intergators. This input   |
-|                                    | may be changed during an           |
-|                                    | IDASIntegrator::evaluate()         |
-+------------------------------------+------------------------------------+
++----------------+-----------------------------------------------+
+|      Name      |                  Description                  |
++================+===============================================+
+| INTEGRATOR_X0  | Differential state at the initial time        |
++----------------+-----------------------------------------------+
+| INTEGRATOR_P   | Parameters                                    |
++----------------+-----------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time |
++----------------+-----------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
-+----------------+------------------------+
-|      Name      |      Description       |
-+================+========================+
-| INTEGRATOR_XF  | State at tf            |
-+----------------+------------------------+
-| INTEGRATOR_XPF | State derivative at tf |
-+----------------+------------------------+
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
++----------------+-------------------------------------------------+
+|      Name      |                   Description                   |
++================+=================================================+
+| INTEGRATOR_XF  | Differential state at the final time            |
++----------------+-------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time              |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
++----------------+-------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -19084,14 +19048,6 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 |              |              |              | itivities (h |              |
 |              |              |              | ermite|polyn |              |
 |              |              |              | omial)       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| is_different | OT_INTEGERVE | GenericType( | A vector     | CasADi::Sund |
-| ial          | CTOR         | )            | with a       | ials::Sundia |
-|              |              |              | boolean      | lsInternal   |
-|              |              |              | describing   |              |
-|              |              |              | the nature   |              |
-|              |              |              | for each     |              |
-|              |              |              | state.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
 | lver         |              |              | ab|tfqmr)    | ials::Sundia |
@@ -21349,29 +21305,28 @@ ODE/DAE is defined in the derived classes.
 Joel Andersson
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| INTEGRATOR_X0                      | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) Only relevant for         |
-|                                    | implicit intergators. This input   |
-|                                    | may be changed during an           |
-|                                    | IDASIntegrator::evaluate()         |
-+------------------------------------+------------------------------------+
++----------------+-----------------------------------------------+
+|      Name      |                  Description                  |
++================+===============================================+
+| INTEGRATOR_X0  | Differential state at the initial time        |
++----------------+-----------------------------------------------+
+| INTEGRATOR_P   | Parameters                                    |
++----------------+-----------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time |
++----------------+-----------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
-+----------------+------------------------+
-|      Name      |      Description       |
-+================+========================+
-| INTEGRATOR_XF  | State at tf            |
-+----------------+------------------------+
-| INTEGRATOR_XPF | State derivative at tf |
-+----------------+------------------------+
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
++----------------+-------------------------------------------------+
+|      Name      |                   Description                   |
++================+=================================================+
+| INTEGRATOR_XF  | Differential state at the final time            |
++----------------+-------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time              |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
++----------------+-------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -22057,29 +22012,28 @@ linear dependence on xdot and rxdot respectively.
 Joel Andersson
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| INTEGRATOR_X0                      | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) Only relevant for         |
-|                                    | implicit intergators. This input   |
-|                                    | may be changed during an           |
-|                                    | IDASIntegrator::evaluate()         |
-+------------------------------------+------------------------------------+
++----------------+-----------------------------------------------+
+|      Name      |                  Description                  |
++================+===============================================+
+| INTEGRATOR_X0  | Differential state at the initial time        |
++----------------+-----------------------------------------------+
+| INTEGRATOR_P   | Parameters                                    |
++----------------+-----------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time |
++----------------+-----------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
-+----------------+------------------------+
-|      Name      |      Description       |
-+================+========================+
-| INTEGRATOR_XF  | State at tf            |
-+----------------+------------------------+
-| INTEGRATOR_XPF | State derivative at tf |
-+----------------+------------------------+
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
++----------------+-------------------------------------------------+
+|      Name      |                   Description                   |
++================+=================================================+
+| INTEGRATOR_XF  | Differential state at the final time            |
++----------------+-------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time              |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
++----------------+-------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -45615,29 +45569,30 @@ Parameters:
 -----------
 
 ffcn:  Continuous time dynamics, an CasADi::FX with the folowing mapping:
->Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| DAE_T                              | Explicit time dependence           |
-+------------------------------------+------------------------------------+
-| DAE_Y                              | Differential and algebraic states. |
-|                                    | NOTE: To be replaced by DAE_X and  |
-|                                    | DAE_Z                              |
-+------------------------------------+------------------------------------+
-| DAE_P                              | Parameter                          |
-+------------------------------------+------------------------------------+
-| DAE_YDOT                           | Time derivative of differential    |
-|                                    | and algebraic states. NOTE: To be  |
-|                                    | replaced by DAE_XDOT               |
-+------------------------------------+------------------------------------+
+>Input scheme: CasADi::DAEInput (DAE_NUM_IN = 5)
++----------+----------------------------------------+ |   Name   |
+Description               |
++==========+========================================+ | DAE_X    |
+Differential state                     |
++----------+----------------------------------------+ | DAE_Z    | Algebraic
+state                        |
++----------+----------------------------------------+ | DAE_P    | Parameter
+| +----------+----------------------------------------+ | DAE_T    |
+Explicit time dependence               |
++----------+----------------------------------------+ | DAE_XDOT | Time
+derivative of differential states |
++----------+----------------------------------------+
 
->Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 1)
-+---------+--------------+
-|  Name   | Description  |
-+=========+==============+
-| DAE_RES | DAE residual |
-+---------+--------------+
+>Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 3)
++----------+------------------------------------------+
+|   Name   |               Description                |
++==========+==========================================+
+| DAE_ODE  | Right hand side of the implicit ODE      |
++----------+------------------------------------------+
+| DAE_ALG  | Right hand side of algebraic equations   |
++----------+------------------------------------------+
+| DAE_QUAD | Right hand side of quadratures equations |
++----------+------------------------------------------+
 
 Important notes: In the above table, INTEGRATOR_P input is not really of
 shape (np x 1), but rather ( (np+nu) x 1 ).
@@ -45660,22 +45615,19 @@ parameters (np x 1)               |
 +---------+-------------------------------------------+
 
 cfcn:  Path constraints, CasADi::FX mapping to (nh x 1) >Input scheme:
-CasADi::DAEInput (DAE_NUM_IN = 4)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| DAE_T                              | Explicit time dependence           |
-+------------------------------------+------------------------------------+
-| DAE_Y                              | Differential and algebraic states. |
-|                                    | NOTE: To be replaced by DAE_X and  |
-|                                    | DAE_Z                              |
-+------------------------------------+------------------------------------+
-| DAE_P                              | Parameter                          |
-+------------------------------------+------------------------------------+
-| DAE_YDOT                           | Time derivative of differential    |
-|                                    | and algebraic states. NOTE: To be  |
-|                                    | replaced by DAE_XDOT               |
-+------------------------------------+------------------------------------+
+CasADi::DAEInput (DAE_NUM_IN = 5)
++----------+----------------------------------------+ |   Name   |
+Description               |
++==========+========================================+ | DAE_X    |
+Differential state                     |
++----------+----------------------------------------+ | DAE_Z    | Algebraic
+state                        |
++----------+----------------------------------------+ | DAE_P    | Parameter
+| +----------+----------------------------------------+ | DAE_T    |
+Explicit time dependence               |
++----------+----------------------------------------+ | DAE_XDOT | Time
+derivative of differential states |
++----------+----------------------------------------+
 
 rfcn:  Initial value constraints ";
 
@@ -59498,29 +59450,28 @@ The method is still under development
 Joel Andersson
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| INTEGRATOR_X0                      | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) Only relevant for         |
-|                                    | implicit intergators. This input   |
-|                                    | may be changed during an           |
-|                                    | IDASIntegrator::evaluate()         |
-+------------------------------------+------------------------------------+
++----------------+-----------------------------------------------+
+|      Name      |                  Description                  |
++================+===============================================+
+| INTEGRATOR_X0  | Differential state at the initial time        |
++----------------+-----------------------------------------------+
+| INTEGRATOR_P   | Parameters                                    |
++----------------+-----------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time |
++----------------+-----------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
-+----------------+------------------------+
-|      Name      |      Description       |
-+================+========================+
-| INTEGRATOR_XF  | State at tf            |
-+----------------+------------------------+
-| INTEGRATOR_XPF | State derivative at tf |
-+----------------+------------------------+
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
++----------------+-------------------------------------------------+
+|      Name      |                   Description                   |
++================+=================================================+
+| INTEGRATOR_XF  | Differential state at the final time            |
++----------------+-------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time              |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
++----------------+-------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -59820,29 +59771,30 @@ Create an integrator for explicit ODEs.
 Parameters:
 -----------
 
-f:  dynamical system >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| DAE_T                              | Explicit time dependence           |
-+------------------------------------+------------------------------------+
-| DAE_Y                              | Differential and algebraic states. |
-|                                    | NOTE: To be replaced by DAE_X and  |
-|                                    | DAE_Z                              |
-+------------------------------------+------------------------------------+
-| DAE_P                              | Parameter                          |
-+------------------------------------+------------------------------------+
-| DAE_YDOT                           | Time derivative of differential    |
-|                                    | and algebraic states. NOTE: To be  |
-|                                    | replaced by DAE_XDOT               |
-+------------------------------------+------------------------------------+
+f:  dynamical system >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 5)
++----------+----------------------------------------+ |   Name   |
+Description               |
++==========+========================================+ | DAE_X    |
+Differential state                     |
++----------+----------------------------------------+ | DAE_Z    | Algebraic
+state                        |
++----------+----------------------------------------+ | DAE_P    | Parameter
+| +----------+----------------------------------------+ | DAE_T    |
+Explicit time dependence               |
++----------+----------------------------------------+ | DAE_XDOT | Time
+derivative of differential states |
++----------+----------------------------------------+
 
->Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 1)
-+---------+--------------+
-|  Name   | Description  |
-+=========+==============+
-| DAE_RES | DAE residual |
-+---------+--------------+
+>Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 3)
++----------+------------------------------------------+
+|   Name   |               Description                |
++==========+==========================================+
+| DAE_ODE  | Right hand side of the implicit ODE      |
++----------+------------------------------------------+
+| DAE_ALG  | Right hand side of algebraic equations   |
++----------+------------------------------------------+
+| DAE_QUAD | Right hand side of quadratures equations |
++----------+------------------------------------------+
 ";
 
 %feature("docstring")  CasADi::RKIntegrator::checkNode "
@@ -60233,29 +60185,28 @@ Return a string with a destription (for SWIG) ";
 %feature("docstring") CasADi::RKIntegratorInternal "
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| INTEGRATOR_X0                      | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) Only relevant for         |
-|                                    | implicit intergators. This input   |
-|                                    | may be changed during an           |
-|                                    | IDASIntegrator::evaluate()         |
-+------------------------------------+------------------------------------+
++----------------+-----------------------------------------------+
+|      Name      |                  Description                  |
++================+===============================================+
+| INTEGRATOR_X0  | Differential state at the initial time        |
++----------------+-----------------------------------------------+
+| INTEGRATOR_P   | Parameters                                    |
++----------------+-----------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time |
++----------------+-----------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
-+----------------+------------------------+
-|      Name      |      Description       |
-+================+========================+
-| INTEGRATOR_XF  | State at tf            |
-+----------------+------------------------+
-| INTEGRATOR_XPF | State derivative at tf |
-+----------------+------------------------+
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
++----------------+-------------------------------------------------+
+|      Name      |                   Description                   |
++================+=================================================+
+| INTEGRATOR_XF  | Differential state at the final time            |
++----------------+-------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time              |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
++----------------+-------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -61228,20 +61179,15 @@ for each time step.
 Joel Andersson
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| INTEGRATOR_X0                      | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) Only relevant for         |
-|                                    | implicit intergators. This input   |
-|                                    | may be changed during an           |
-|                                    | IDASIntegrator::evaluate()         |
-+------------------------------------+------------------------------------+
++----------------+-----------------------------------------------+
+|      Name      |                  Description                  |
++================+===============================================+
+| INTEGRATOR_X0  | Differential state at the initial time        |
++----------------+-----------------------------------------------+
+| INTEGRATOR_P   | Parameters                                    |
++----------------+-----------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time |
++----------------+-----------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -61519,23 +61465,19 @@ Parameters:
 -----------
 
 output_fcn:  output function which maps to n outputs. >Input scheme:
-CasADi::DAEInput (DAE_NUM_IN = 4)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| DAE_T                              | Explicit time dependence           |
-+------------------------------------+------------------------------------+
-| DAE_Y                              | Differential and algebraic states. |
-|                                    | NOTE: To be replaced by DAE_X and  |
-|                                    | DAE_Z                              |
-+------------------------------------+------------------------------------+
-| DAE_P                              | Parameter                          |
-+------------------------------------+------------------------------------+
-| DAE_YDOT                           | Time derivative of differential    |
-|                                    | and algebraic states. NOTE: To be  |
-|                                    | replaced by DAE_XDOT               |
-+------------------------------------+------------------------------------+
-";
+CasADi::DAEInput (DAE_NUM_IN = 5)
++----------+----------------------------------------+ |   Name   |
+Description               |
++==========+========================================+ | DAE_X    |
+Differential state                     |
++----------+----------------------------------------+ | DAE_Z    | Algebraic
+state                        |
++----------+----------------------------------------+ | DAE_P    | Parameter
+| +----------+----------------------------------------+ | DAE_T    |
+Explicit time dependence               |
++----------+----------------------------------------+ | DAE_XDOT | Time
+derivative of differential states |
++----------+----------------------------------------+ ";
 
 %feature("docstring")  CasADi::Simulator::Simulator "";
 
@@ -61912,20 +61854,15 @@ Simulator data storage classs.
 Joel Andersson
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| INTEGRATOR_X0                      | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) Only relevant for         |
-|                                    | implicit intergators. This input   |
-|                                    | may be changed during an           |
-|                                    | IDASIntegrator::evaluate()         |
-+------------------------------------+------------------------------------+
++----------------+-----------------------------------------------+
+|      Name      |                  Description                  |
++================+===============================================+
+| INTEGRATOR_X0  | Differential state at the initial time        |
++----------------+-----------------------------------------------+
+| INTEGRATOR_P   | Parameters                                    |
++----------------+-----------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time |
++----------------+-----------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -64322,29 +64259,28 @@ Constructor. ";
 %feature("docstring") CasADi::Sundials::SundialsIntegrator "
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| INTEGRATOR_X0                      | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) Only relevant for         |
-|                                    | implicit intergators. This input   |
-|                                    | may be changed during an           |
-|                                    | IDASIntegrator::evaluate()         |
-+------------------------------------+------------------------------------+
++----------------+-----------------------------------------------+
+|      Name      |                  Description                  |
++================+===============================================+
+| INTEGRATOR_X0  | Differential state at the initial time        |
++----------------+-----------------------------------------------+
+| INTEGRATOR_P   | Parameters                                    |
++----------------+-----------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time |
++----------------+-----------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
-+----------------+------------------------+
-|      Name      |      Description       |
-+================+========================+
-| INTEGRATOR_XF  | State at tf            |
-+----------------+------------------------+
-| INTEGRATOR_XPF | State derivative at tf |
-+----------------+------------------------+
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
++----------------+-------------------------------------------------+
+|      Name      |                   Description                   |
++================+=================================================+
+| INTEGRATOR_XF  | Differential state at the final time            |
++----------------+-------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time              |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
++----------------+-------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -64490,14 +64426,6 @@ Constructor. ";
 |              |              |              | itivities (h |              |
 |              |              |              | ermite|polyn |              |
 |              |              |              | omial)       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| is_different | OT_INTEGERVE | GenericType( | A vector     | CasADi::Sund |
-| ial          | CTOR         | )            | with a       | ials::Sundia |
-|              |              |              | boolean      | lsInternal   |
-|              |              |              | describing   |              |
-|              |              |              | the nature   |              |
-|              |              |              | for each     |              |
-|              |              |              | state.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
 | lver         |              |              | ab|tfqmr)    | ials::Sundia |
@@ -65251,29 +65179,28 @@ Return a string with a destription (for SWIG) ";
 %feature("docstring") CasADi::Sundials::SundialsInternal "
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| INTEGRATOR_X0                      | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_P                       | Parameters p (dimension np-by-1)   |
-+------------------------------------+------------------------------------+
-| INTEGRATOR_XP0                     | State derivative at t0 (dimension  |
-|                                    | nx-by-1) Only relevant for         |
-|                                    | implicit intergators. This input   |
-|                                    | may be changed during an           |
-|                                    | IDASIntegrator::evaluate()         |
-+------------------------------------+------------------------------------+
++----------------+-----------------------------------------------+
+|      Name      |                  Description                  |
++================+===============================================+
+| INTEGRATOR_X0  | Differential state at the initial time        |
++----------------+-----------------------------------------------+
+| INTEGRATOR_P   | Parameters                                    |
++----------------+-----------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time |
++----------------+-----------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 2)
-+----------------+------------------------+
-|      Name      |      Description       |
-+================+========================+
-| INTEGRATOR_XF  | State at tf            |
-+----------------+------------------------+
-| INTEGRATOR_XPF | State derivative at tf |
-+----------------+------------------------+
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
++----------------+-------------------------------------------------+
+|      Name      |                   Description                   |
++================+=================================================+
+| INTEGRATOR_XF  | Differential state at the final time            |
++----------------+-------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time              |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
++----------------+-------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -65419,14 +65346,6 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | itivities (h |              |
 |              |              |              | ermite|polyn |              |
 |              |              |              | omial)       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| is_different | OT_INTEGERVE | GenericType( | A vector     | CasADi::Sund |
-| ial          | CTOR         | )            | with a       | ials::Sundia |
-|              |              |              | boolean      | lsInternal   |
-|              |              |              | describing   |              |
-|              |              |              | the nature   |              |
-|              |              |              | for each     |              |
-|              |              |              | state.       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
 | lver         |              |              | ab|tfqmr)    | ials::Sundia |
@@ -69266,22 +69185,20 @@ Transform the fully implicit DAE to a explicit or semi-explicit form. ";
 Get the ODE/DAE input arguments Returns a vector of inputs using the
 following scheme:
 
->Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| DAE_T                              | Explicit time dependence           |
-+------------------------------------+------------------------------------+
-| DAE_Y                              | Differential and algebraic states. |
-|                                    | NOTE: To be replaced by DAE_X and  |
-|                                    | DAE_Z                              |
-+------------------------------------+------------------------------------+
-| DAE_P                              | Parameter                          |
-+------------------------------------+------------------------------------+
-| DAE_YDOT                           | Time derivative of differential    |
-|                                    | and algebraic states. NOTE: To be  |
-|                                    | replaced by DAE_XDOT               |
-+------------------------------------+------------------------------------+
+>Input scheme: CasADi::DAEInput (DAE_NUM_IN = 5)
++----------+----------------------------------------+
+|   Name   |              Description               |
++==========+========================================+
+| DAE_X    | Differential state                     |
++----------+----------------------------------------+
+| DAE_Z    | Algebraic state                        |
++----------+----------------------------------------+
+| DAE_P    | Parameter                              |
++----------+----------------------------------------+
+| DAE_T    | Explicit time dependence               |
++----------+----------------------------------------+
+| DAE_XDOT | Time derivative of differential states |
++----------+----------------------------------------+
 ";
 
 %feature("docstring")  CasADi::SymbolicOCP::substituteDependents "
@@ -76790,6 +76707,9 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__ACADO__FCN__Input.xml
 
 
+// File: group__scheme__RDAEInput.xml
+
+
 // File: group__scheme__MUSCOD__FCN__Output.xml
 
 
@@ -76821,6 +76741,9 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: group__scheme__MUSCOD__FCN__Input.xml
+
+
+// File: group__scheme__RDAEOutput.xml
 
 
 // File: group__scheme__OCPInput.xml
