@@ -55,8 +55,10 @@ IdasInternal::IdasInternal(const FX& f, const FX& g) : SundialsInternal(f,g){
   addOption("cj_scaling",                  OT_BOOLEAN, false, "IDAS scaling on cj for the user-defined linear solver module");
   addOption("extra_fsens_calc_ic",         OT_BOOLEAN, false, "Call calc ic an extra time, with fsens=0");
   addOption("disable_internal_warnings",   OT_BOOLEAN,false, "Disable IDAS internal warning messages");
-  addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "correctInitialConditions|res|resS", true);
-    
+  addOption("monitor",                     OT_STRINGVECTOR, GenericType(),  "", "correctInitialConditions|res|resS", true);
+  addOption("init_xdot",                   OT_REALVECTOR, GenericType(), "Initial values for the state derivatives");
+  addOption("init_z",                      OT_REALVECTOR, GenericType(), "Initial values for the algebraic states");
+  
   mem_ = 0;
   
   xz_  = 0; 
@@ -127,6 +129,24 @@ void IdasInternal::init(){
         linsol_.init();
       }
     }
+  }
+  
+  // Get initial conditions for the state derivatives
+  if(hasSetOption("init_xdot")){
+    init_xdot_ = getOption("init_xdot").toDoubleVector();
+    casadi_assert_message(init_xdot_.size()==nx_,"Option \"init_xdot\" has incorrect length.");
+  } else {
+    init_xdot_.resize(nx_);
+    fill(init_xdot_.begin(),init_xdot_.end(),0);
+  }
+  
+  // Get initial conditions for the algebraic state
+  if(hasSetOption("init_z")){
+    init_z_ = getOption("init_z").toDoubleVector();
+    casadi_assert_message(init_z_.size()==nz_,"Option \"init_z\" has incorrect length.");
+  } else {
+    init_z_.resize(nz_);
+    fill(init_z_.begin(),init_z_.end(),0);
   }
 
   // Get the number of forward and adjoint directions
@@ -205,7 +225,7 @@ void IdasInternal::init(){
   // attach a linear solver
   if(getOption("linear_solver")=="dense"){
     // Dense jacobian
-    flag = IDADense(mem_, nx_);
+    flag = IDADense(mem_, nx_+nz_);
     if(flag != IDA_SUCCESS) idas_error("IDADense",flag);
     if(exact_jacobian_){
       // Generate jacobians if not already provided
@@ -220,7 +240,7 @@ void IdasInternal::init(){
     }
   } else if(getOption("linear_solver")=="banded") {
     // Banded jacobian
-    flag = IDABand(mem_, nx_, getOption("upper_bandwidth").toInt(), getOption("lower_bandwidth").toInt());
+    flag = IDABand(mem_, nx_+nz_, getOption("upper_bandwidth").toInt(), getOption("lower_bandwidth").toInt());
     if(flag != IDA_SUCCESS) idas_error("IDABand",flag);
     
     // Banded Jacobian information
@@ -297,8 +317,8 @@ void IdasInternal::init(){
       xzdotF_.resize(nfdir_,0);
       qF_.resize(nfdir_,0);
       for(int i=0; i<nfdir_; ++i){
-        xzF_[i] = N_VNew_Serial(nx_);
-        xzdotF_[i] = N_VNew_Serial(nx_);
+        xzF_[i] = N_VNew_Serial(nx_+nz_);
+        xzdotF_[i] = N_VNew_Serial(nx_+nz_);
 	if(nq_>0){
 	  qF_[i] = N_VMake_Serial(nq_,&fwdSens(INTEGRATOR_QF,i).front());
 	}
@@ -405,8 +425,8 @@ void IdasInternal::init(){
       xzA_.resize(nadir_);
       xzdotA_.resize(nadir_);
       for(int i=0; i<nadir_; ++i){
-        xzA_[i] = N_VNew_Serial(nx_);
-        xzdotA_[i] = N_VNew_Serial(nx_);
+        xzA_[i] = N_VNew_Serial(nx_+nz_);
+        xzdotA_[i] = N_VNew_Serial(nx_+nz_);
       }
 
       // Allocate n-vectors for the adjoint sensitivities of the parameters
@@ -481,11 +501,11 @@ void IdasInternal::initAdj(){
     // attach linear solver
     if(getOption("asens_linear_solver")=="dense"){
       // Dense jacobian
-      flag = IDADenseB(mem_, whichB_[dir], nx_);
+      flag = IDADenseB(mem_, whichB_[dir], nx_+nz_);
       if(flag != IDA_SUCCESS) idas_error("IDADenseB",flag);
     } else if(getOption("asens_linear_solver")=="banded") {
       // Banded jacobian
-      flag = IDABandB(mem_, whichB_[dir], nx_, getOption("asens_upper_bandwidth").toInt(), getOption("asens_lower_bandwidth").toInt());
+      flag = IDABandB(mem_, whichB_[dir], nx_+nz_, getOption("asens_upper_bandwidth").toInt(), getOption("asens_lower_bandwidth").toInt());
       if(flag != IDA_SUCCESS) idas_error("IDABand",flag);
     } else if(getOption("asens_linear_solver")=="iterative") {
       // Sparse solver  
@@ -553,7 +573,7 @@ void IdasInternal::res(double t, const double* xz, const double* xzdot, double* 
   }
 
   // Check the result for consistency
-  for(int i=0; i<nx_; ++i){
+  for(int i=0; i<nx_+nz_; ++i){
     if(isnan(r[i]) || isinf(r[i])){
       if(verbose_){
         stringstream ss;
@@ -727,7 +747,8 @@ void IdasInternal::reset(int nfdir, int nadir){
   // Copy to N_Vectors
   const Matrix<double>& x0 = input(INTEGRATOR_X0);
   copy(x0.begin(), x0.begin()+nx_, NV_DATA_S(xz_));
-  N_VConst(0.0,xzdot_);
+  copy(init_z_.begin(), init_z_.end(), NV_DATA_S(xz_)+nx_);
+  copy(init_xdot_.begin(), init_xdot_.end(), NV_DATA_S(xzdot_));
   
   // Re-initialize
   flag = IDAReInit(mem_, t0_, xz_, xzdot_);
@@ -1238,7 +1259,7 @@ void IdasInternal::djac(SUNDIALS_INT Neq, double t, double cj, N_Vector xz, N_Ve
   time1 = clock();
   
   // Pass input to the Jacobian function
-  jac_.setInput(t,JAC_T);
+  jac_.setInput(&t,JAC_T);
   jac_.setInput(NV_DATA_S(xz),JAC_X);
   jac_.setInput(NV_DATA_S(xz)+nx_,JAC_Z);
   jac_.setInput(NV_DATA_S(xzdot),JAC_XDOT);
@@ -1526,7 +1547,7 @@ FX IdasInternal::getJacobian(){
     if(nz_>0){
       SXMatrix jac_alg_x = f_sx.jac(DAE_X,DAE_ALG);
       SXMatrix jac_alg_z = f_sx.jac(DAE_Z,DAE_ALG);
-      SXMatrix jac_ode_z = f_sx.jac(DAE_Z,DAE_ALG);
+      SXMatrix jac_ode_z = f_sx.jac(DAE_Z,DAE_ODE);
       jac = horzcat(vertcat(jac,jac_alg_x),vertcat(jac_ode_z,jac_alg_z));
     }
     
