@@ -29,26 +29,28 @@ from pylab import *
 #$ $\dot{x_1} = x_2$
 #$ $\dot{x_2} = -(-w_0^2 x_1 + a_3 x_1^3 + a_5 x_1^5) - (2 mu_1 x_2 + mu_3 x_2^3) + f$.
 
-t = SX("t")
+x  = ssym("x",2)
+x1 = x[0]
+x2 = x[1]
 
-x1,x2 = x  = ssym("x",2)
-dx = ssym("dx",2)
-
-w0 = SX("w0")
-a3 = SX("a3")
-a5 = SX("a5")
-mu1 = SX("mu1")
-mu3 = SX("mu3")
-ff = SX("f")
+w0 = ssym("w0")
+a3 = ssym("a3")
+a5 = ssym("a5")
+mu1 = ssym("mu1")
+mu3 = ssym("mu3")
+ff = ssym("f")
 
 tf = 40
 
-params = [w0,a3,a5,mu1,mu3,ff]
-rhs    = [x2,(-(-w0**2 *x1 + a3*x1**3 + a5*x1**5) - (2 *mu1 *x2 + mu3 * x2**3))/100+ff]
+params = vertcat([w0,a3,a5,mu1,mu3,ff])
+rhs    = vertcat([x2,(-(-w0**2 *x1 + a3*x1**3 + a5*x1**5) - (2 *mu1 *x2 + mu3 * x2**3))/100+ff])
 
-f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_Y: x, DAE_P: params, DAE_YDOT: dx},[rhs])
+f=SXFunction(daeIn(x,(),params),daeOut(rhs))
 f.init()
-cf=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_T: t, CONTROL_DAE_Y: x, CONTROL_DAE_P: [w0,a3,a5,mu1,mu3], CONTROL_DAE_YDOT: dx, CONTROL_DAE_U: [ff]},[rhs])
+
+t = SX("t")
+dx  = ssym("dx",2)
+cf=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_T: t, CONTROL_DAE_X: x, CONTROL_DAE_P: [w0,a3,a5,mu1,mu3], CONTROL_DAE_XDOT: dx, CONTROL_DAE_U: [ff]},[rhs])
 cf.init()
 
 integrator = CVodesIntegrator(f)

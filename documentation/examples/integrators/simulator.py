@@ -29,22 +29,23 @@ from pylab import *
 #!
 #$ $\ddot{u}+\dot{u}-\epsilon (2 \mu \dot{u}+\alpha u^3+2 k u \cos(\Omega t))$ with $\Omega = 2 + \epsilon \sigma$.
 
-t = SX("t")
+t = ssym("t")
 
-u = SX("u") 
-v = SX("v") 
+u = ssym("u") 
+v = ssym("v") 
+states = vertcat([u,v])
 
-eps   = SX("eps")
-mu    = SX("mu")
-alpha = SX("alpha")
-k     = SX("k")
-sigma = SX("sigma")
+eps   = ssym("eps")
+mu    = ssym("mu")
+alpha = ssym("alpha")
+k     = ssym("k")
+sigma = ssym("sigma")
 Omega = 2 + eps*sigma
 
-params = [eps,mu,alpha,k,sigma]
-rhs    = [v,-u-eps*(2*mu*v+alpha*u**3+2*k*u*cos(Omega*t))]
+params = vertcat([eps,mu,alpha,k,sigma])
+rhs    = vertcat([v,-u-eps*(2*mu*v+alpha*u**3+2*k*u*cos(Omega*t))])
 
-f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_Y: [u,v], DAE_P: params},[rhs])
+f=SXFunction(daeIn(states,(),params,t),daeOut(rhs))
 f.init()
 
 integrator = CVodesIntegrator(f)
@@ -54,8 +55,8 @@ ts = linspace(0,50,1000)
 
 sim=Simulator(integrator,ts)
 sim.init()
-sim.input(INTEGRATOR_X0).set([1,0])
-sim.input(INTEGRATOR_P).set([0.1,0.1,0.1,0.3,0.1])
+sim.setInput([1,0],INTEGRATOR_X0)
+sim.setInput([0.1,0.1,0.1,0.3,0.1],INTEGRATOR_P)
 sim.evaluate()
 
 #! Plot the solution
