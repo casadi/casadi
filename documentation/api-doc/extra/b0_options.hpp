@@ -2727,6 +2727,8 @@
 <tr><td>fsens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the forward sensitivity solution [default: equal to reltol]</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>fsens_scaling_factors</td><td>OT_REALVECTOR</td><td></td><td>scaling factor for the components if finite differences is used</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>fsens_sensitiviy_parameters</td><td>OT_INTEGERVECTOR</td><td></td><td>specifies which components will be used when estimating the sensitivity equations</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>init_xdot</td><td>OT_REALVECTOR</td><td>GenericType()</td><td>Initial values for the state derivatives</td><td>CasADi::Sundials::IdasInternal</td></tr>
+<tr><td>init_z</td><td>OT_REALVECTOR</td><td>GenericType()</td><td>Initial values for the algebraic states</td><td>CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
@@ -2796,6 +2798,8 @@
 <tr><td>fsens_reltol</td><td>OT_REAL</td><td></td><td>relative tolerence for the forward sensitivity solution [default: equal to reltol]</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>fsens_scaling_factors</td><td>OT_REALVECTOR</td><td></td><td>scaling factor for the components if finite differences is used</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>fsens_sensitiviy_parameters</td><td>OT_INTEGERVECTOR</td><td></td><td>specifies which components will be used when estimating the sensitivity equations</td><td>CasADi::Sundials::SundialsInternal</td></tr>
+<tr><td>init_xdot</td><td>OT_REALVECTOR</td><td>GenericType()</td><td>Initial values for the state derivatives</td><td>CasADi::Sundials::IdasInternal</td></tr>
+<tr><td>init_z</td><td>OT_REALVECTOR</td><td>GenericType()</td><td>Initial values for the algebraic states</td><td>CasADi::Sundials::IdasInternal</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::Sundials::SundialsInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
