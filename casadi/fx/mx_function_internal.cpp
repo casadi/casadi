@@ -43,6 +43,19 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv, const std:
   setOption("name", "unnamed_mx_function");
   setOption("numeric_jacobian", true);
 
+  // Check for duplicate entries among the input expressions
+  bool has_duplicates = false;
+  for(vector<MX>::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
+    has_duplicates = has_duplicates || it->getTemp()!=0;
+    it->setTemp(1);
+  }
+  
+  // Reset temporaries
+  for(vector<MX>::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
+    it->setTemp(0);
+  }
+  casadi_assert_message(!has_duplicates, "The input expressions are not independent.");
+  
   liftfun_ = 0;
   liftfun_ud_ = 0;
 }

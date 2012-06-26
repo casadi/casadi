@@ -61,7 +61,24 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix >& inputv, const ve
   addOption("inplace",OT_BOOLEAN,false,"Evaluate with inplace operations (experimental)");
   addOption("just_in_time",OT_BOOLEAN,false,"Just-in-time compilation for numeric evaluation (experimental)");
 
-  casadi_assert(!outputv_.empty());
+  // Check for duplicate entries among the input expressions
+  bool has_duplicates = false;
+  for(vector<SXMatrix >::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
+    for(vector<SX>::iterator itc = it->begin(); itc != it->end(); ++itc){
+      has_duplicates = has_duplicates || itc->getTemp()!=0;
+      itc->setTemp(1);
+    }
+  }
+  
+  // Reset temporaries
+  for(vector<SXMatrix >::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
+    for(vector<SX>::iterator itc = it->begin(); itc != it->end(); ++itc){
+      itc->setTemp(0);
+    }
+  }
+  casadi_assert_message(!has_duplicates, "The input expressions are not independent.");
+  
+  casadi_assert(!outputv_.empty()); // NOTE: Remove?
 }
 
 SXFunctionInternal::~SXFunctionInternal(){
@@ -466,7 +483,7 @@ void SXFunctionInternal::init(){
   
   // Call the init function of the base class
   XFunctionInternal<SXFunctionInternal,SXMatrix,SXNode>::init();
-
+  
   // Stack used to sort the computational graph
   stack<SXNode*> s;
 
