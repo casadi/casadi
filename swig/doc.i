@@ -17982,6 +17982,17 @@ Joel Andersson
 |              |              |              | sensitivity  |              |
 |              |              |              | equations    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| init_xdot    | OT_REALVECTO | GenericType( | Initial      | CasADi::Sund |
+|              | R            | )            | values for   | ials::IdasIn |
+|              |              |              | the state    | ternal       |
+|              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
+| init_z       | OT_REALVECTO | GenericType( | Initial      | CasADi::Sund |
+|              | R            | )            | values for   | ials::IdasIn |
+|              |              |              | the          | ternal       |
+|              |              |              | algebraic    |              |
+|              |              |              | states       |              |
++--------------+--------------+--------------+--------------+--------------+
 | interpolatio | OT_STRING    | \"hermite\"    | type of inte | CasADi::Sund |
 | n_type       |              |              | rpolation    | ials::Sundia |
 |              |              |              | for the      | lsInternal   |
@@ -19040,6 +19051,17 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 |              |              |              | the          |              |
 |              |              |              | sensitivity  |              |
 |              |              |              | equations    |              |
++--------------+--------------+--------------+--------------+--------------+
+| init_xdot    | OT_REALVECTO | GenericType( | Initial      | CasADi::Sund |
+|              | R            | )            | values for   | ials::IdasIn |
+|              |              |              | the state    | ternal       |
+|              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
+| init_z       | OT_REALVECTO | GenericType( | Initial      | CasADi::Sund |
+|              | R            | )            | values for   | ials::IdasIn |
+|              |              |              | the          | ternal       |
+|              |              |              | algebraic    |              |
+|              |              |              | states       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | interpolatio | OT_STRING    | \"hermite\"    | type of inte | CasADi::Sund |
 | n_type       |              |              | rpolation    | ials::Sundia |
