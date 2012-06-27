@@ -70,7 +70,7 @@ f = vertcat((xdot,ldot))
 f = substitute(f,u,u_opt)
 
 # Create the right hand side function
-rhs_in = daeIn(vertcat((x,lam)))
+rhs_in = list(daeIn(vertcat((x,lam))))
 rhs_in[DAE_T] = t
 rhs = SXFunction(rhs_in,daeOut(f))
 
