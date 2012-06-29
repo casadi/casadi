@@ -26,9 +26,6 @@
 #include "idas_integrator.hpp"
 #include "sundials_internal.hpp"
 #include "casadi/fx/linear_solver.hpp"
-#include <nvector/nvector_serial.h>   /* serial N_Vector types, fcts., and macros */
-#include <sundials/sundials_dense.h>  /* definitions DlsMat DENSE_ELEM */
-#include <sundials/sundials_types.h>  /* definition of type double */
 #include <idas/idas.h>            /* prototypes for CVODE fcts. and consts. */
 #include <idas/idas_dense.h>
 #include <idas/idas_band.h> 
@@ -174,8 +171,29 @@ class IdasInternal : public SundialsInternal{
   // Throw error
   static void idas_error(const std::string& module, int flag);
   
-  // Set the user defined linear solver
+  // Initialize the dense linear solver
+  void initDenseLinearSolver();
+  
+  // Initialize the banded linear solver
+  void initBandedLinearSolver();
+  
+  // Initialize the iterative linear solver
+  void initIterativeLinearSolver();
+  
+  // Initialize the user defined linear solver
   void initUserDefinedLinearSolver();
+  
+  // Initialize the dense linear solver (backward integration)
+  void initDenseLinearSolverB(int dir);
+  
+  // Initialize the banded linear solver (backward integration)
+  void initBandedLinearSolverB(int dir);
+  
+  // Initialize the iterative linear solver (backward integration)
+  void initIterativeLinearSolverB(int dir);
+  
+  // Initialize the user defined linear solver (backward integration)
+  void initUserDefinedLinearSolverB(int dir);
   
   // Ids of backward problem
   std::vector<int> whichB_;
@@ -192,10 +210,7 @@ class IdasInternal : public SundialsInternal{
   double t_lsolve; // preconditioner/linear solver solve function
   double t_lsetup_jac; // preconditioner/linear solver setup function, generate jacobian
   double t_lsetup_fac; // preconditioner setup function, factorize jacobian
-  
-  // number of checkpoints stored so far
-  int ncheck_; 
-  
+    
   // Has the adjoint problem been initialized
   bool isInitAdj_;
   bool isInitTaping_;

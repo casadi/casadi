@@ -71,11 +71,11 @@ ocp.makeExplicit()
 # Create an integrator
 dae_in = DAE_NUM_IN * [[]]
 dae_in[DAE_T] = ocp.t
-dae_in[DAE_Y] = var(ocp.xd)
-dae_in[DAE_YDOT] = der(ocp.xd)
+dae_in[DAE_X] = var(ocp.xd)
+dae_in[DAE_XDOT] = der(ocp.xd)
 dae_in[DAE_P] = var(ocp.p)
 dae_out = DAE_NUM_OUT * [[]]
-dae_out[DAE_RES] = ocp.ode
+dae_out[DAE_ODE] = ocp.ode
 dae = SXFunction(dae_in,dae_out)
 integrator = CVodesIntegrator(dae)
 
@@ -127,11 +127,11 @@ ocp.makeExplicit()
 # Create an integrator
 dae_in = DAE_NUM_IN * [[]]
 dae_in[DAE_T] = ocp.t
-dae_in[DAE_Y] = var(ocp.xd)
-dae_in[DAE_YDOT] = der(ocp.xd)
+dae_in[DAE_X] = var(ocp.xd)
+dae_in[DAE_XDOT] = der(ocp.xd)
 dae_in[DAE_P] = var(ocp.p)
 dae_out = DAE_NUM_OUT * [[]]
-dae_out[DAE_RES] = ocp.ode
+dae_out[DAE_ODE] = ocp.ode
 dae = SXFunction(dae_in,dae_out)
 integrator = CVodesIntegrator(dae)
 
@@ -175,11 +175,11 @@ ocp.makeExplicit()
 # Create an integrator
 dae_in = DAE_NUM_IN * [[]]
 dae_in[DAE_T] = ocp.t
-dae_in[DAE_Y] = var(ocp.xd)
-dae_in[DAE_YDOT] = der(ocp.xd)
+dae_in[DAE_X] = var(ocp.xd)
+dae_in[DAE_XDOT] = der(ocp.xd)
 dae_in[DAE_P] = var(ocp.p)
 dae_out = DAE_NUM_OUT * [[]]
-dae_out[DAE_RES] = ocp.ode
+dae_out[DAE_ODE] = ocp.ode
 dae = SXFunction(dae_in,dae_out)
 integrator = CVodesIntegrator(dae)
 

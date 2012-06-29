@@ -26,9 +26,6 @@
 #include "cvodes_integrator.hpp"
 #include "sundials_internal.hpp"
 #include "casadi/fx/linear_solver.hpp"
-#include <nvector/nvector_serial.h>   /* serial N_Vector types, fcts., and macros */
-#include <sundials/sundials_dense.h>  /* definitions DlsMat DENSE_ELEM */
-#include <sundials/sundials_types.h>  /* definition of type double */
 #include <cvodes/cvodes.h>            /* prototypes for CVode fcts. and consts. */
 #include <cvodes/cvodes_dense.h>
 #include <cvodes/cvodes_band.h> 
@@ -184,8 +181,29 @@ public:
   // Number of forward and adjoint seeds for the functions f and q
   int nfdir_f_, nadir_f_;
 
-  // Set the user defined linear solver
+  // Initialize the dense linear solver
+  void initDenseLinearSolver();
+  
+  // Initialize the banded linear solver
+  void initBandedLinearSolver();
+  
+  // Initialize the iterative linear solver
+  void initIterativeLinearSolver();
+  
+  // Initialize the user defined linear solver
   void initUserDefinedLinearSolver();
+  
+  // Initialize the dense linear solver (backward integration)
+  void initDenseLinearSolverB(int dir);
+  
+  // Initialize the banded linear solver (backward integration)
+  void initBandedLinearSolverB(int dir);
+  
+  // Initialize the iterative linear solver (backward integration)
+  void initIterativeLinearSolverB(int dir);
+  
+  // Initialize the user defined linear solver (backward integration)
+  void initUserDefinedLinearSolverB(int dir);
 
   // Set linear solver
   virtual void setLinearSolver(const LinearSolver& linsol, const FX& jac);

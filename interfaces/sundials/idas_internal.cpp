@@ -109,7 +109,6 @@ void IdasInternal::init(){
 
   // Free memory if already initialized
   if(is_init) freeIDAS();
-  ncheck_ = 0;
   
   if(hasSetOption("linear_solver_creator")){
     // Make sure that a Jacobian has been provided
@@ -223,69 +222,21 @@ void IdasInternal::init(){
   if(flag != IDA_SUCCESS) idas_error("IDASetId",flag);
     
   // attach a linear solver
-  if(getOption("linear_solver")=="dense"){
-    // Dense jacobian
-    flag = IDADense(mem_, nx_+nz_);
-    if(flag != IDA_SUCCESS) idas_error("IDADense",flag);
-    if(exact_jacobian_){
-      // Generate jacobians if not already provided
-      if(jac_.isNull()){
-        getJacobian();
-        jac_.init();
-      }
-      
-      // Pass to IDA
-      flag = IDADlsSetDenseJacFn(mem_, djac_wrapper);
-      if(flag!=IDA_SUCCESS) idas_error("IDADlsSetDenseJacFn",flag);
-    }
-  } else if(getOption("linear_solver")=="banded") {
-    // Banded jacobian
-    flag = IDABand(mem_, nx_+nz_, getOption("upper_bandwidth").toInt(), getOption("lower_bandwidth").toInt());
-    if(flag != IDA_SUCCESS) idas_error("IDABand",flag);
-    
-    // Banded Jacobian information
-    if(exact_jacobian_){
-      flag = IDADlsSetBandJacFn(mem_, bjac_wrapper);
-      if(flag != IDA_SUCCESS) idas_error("IDADlsSetBandJacFn",flag);
-    }
-  } else if(getOption("linear_solver")=="iterative") {
-    // Max dimension of the Krylov space
-    int maxl = getOption("max_krylov");
-    
-    // Attach an iterative solver
-    if(getOption("iterative_solver")=="gmres"){
-      flag = IDASpgmr(mem_, maxl);
-      if(flag != IDA_SUCCESS) idas_error("IDASpgmr",flag);
-    } else if(getOption("iterative_solver")=="bcgstab"){
-      flag = IDASpbcg(mem_, maxl);
-      if(flag != IDA_SUCCESS) idas_error("IDASpbcg",flag);
-    } else if(getOption("iterative_solver")=="tfqmr") {
-      flag = IDASptfqmr(mem_, maxl);
-      if(flag != IDA_SUCCESS) idas_error("IDASptfqmr",flag);
-    } else throw CasadiException("Unknown sparse solver");
-       
-    // Attach functions for jacobian information
-    if(exact_jacobian_){
-      flag = IDASpilsSetJacTimesVecFn(mem_, jtimes_wrapper);
-      if(flag != IDA_SUCCESS) idas_error("IDASpilsSetJacTimesVecFn",flag);
-    }
-    
-    // Add a preconditioner
-    if(bool(getOption("use_preconditioner"))){
-      // Make sure that a Jacobian has been provided
-      if(jac_.isNull()) throw CasadiException("IdasInternal::init(): No Jacobian has been provided.");
-
-      // Make sure that a linear solver has been providided
-      if(linsol_.isNull()) throw CasadiException("IdasInternal::init(): No user defined linear solver has been provided.");
-
-      // Pass to IDA
-      flag = IDASpilsSetPreconditioner(mem_, psetup_wrapper, psolve_wrapper);
-      if(flag != IDA_SUCCESS) idas_error("IDASpilsSetPreconditioner",flag);
-    }
-  } else if(getOption("linear_solver")=="user_defined") {
-    initUserDefinedLinearSolver();
-  } else throw CasadiException("IDAS: Unknown linear solver");
-
+  switch(linsol_f_){
+    case SD_DENSE:
+      initDenseLinearSolver();
+      break;
+    case SD_BANDED:
+      initBandedLinearSolver();
+      break;
+    case SD_ITERATIVE:
+      initIterativeLinearSolver();
+      break;
+    case SD_USER_DEFINED:
+      initUserDefinedLinearSolver();
+      break;
+  }
+  
   // Quadrature equations
   if(nq_>0){
 
@@ -499,30 +450,21 @@ void IdasInternal::initAdj(){
     if(flag != IDA_SUCCESS) idas_error("IDASetIdB",flag);
       
     // attach linear solver
-    if(getOption("asens_linear_solver")=="dense"){
-      // Dense jacobian
-      flag = IDADenseB(mem_, whichB_[dir], nx_+nz_);
-      if(flag != IDA_SUCCESS) idas_error("IDADenseB",flag);
-    } else if(getOption("asens_linear_solver")=="banded") {
-      // Banded jacobian
-      flag = IDABandB(mem_, whichB_[dir], nx_+nz_, getOption("asens_upper_bandwidth").toInt(), getOption("asens_lower_bandwidth").toInt());
-      if(flag != IDA_SUCCESS) idas_error("IDABand",flag);
-    } else if(getOption("asens_linear_solver")=="iterative") {
-      // Sparse solver  
-      int maxl = getOption("asens_max_krylov");
-      GenericType is = getOption("asens_iterative_solver");
-      if(is=="gmres"){
-        flag = IDASpgmrB(mem_, whichB_[dir], maxl);
-        if(flag != IDA_SUCCESS) idas_error("IDASpgmrB",flag);
-      } else if(is=="bcgstab"){
-        flag = IDASpbcgB(mem_, whichB_[dir], maxl);
-        if(flag != IDA_SUCCESS) idas_error("IDASpbcgB",flag);
-      } else if(is=="tfqmr") {
-        flag = IDASptfqmrB(mem_, whichB_[dir], maxl);
-        if(flag != IDA_SUCCESS) idas_error("IDASptfqmrB",flag);
-      } else throw CasadiException("Unknown sparse solver for backward problem");
-    } else throw CasadiException("Unknown linear solver for backward problem");
-      
+    switch(linsol_g_){
+      case SD_DENSE:
+        initDenseLinearSolverB(dir);
+        break;
+      case SD_BANDED:
+        initBandedLinearSolverB(dir);
+        break;
+      case SD_ITERATIVE:
+        initIterativeLinearSolverB(dir);
+        break;
+      case SD_USER_DEFINED:
+        initUserDefinedLinearSolverB(dir);
+        break;
+    }
+    
     // Quadratures for the adjoint problem
     N_VConst(0.0,qA_[dir]);
     flag = IDAQuadInitB(mem_,whichB_[dir],rhsQB_wrapper,qA_[dir]);
@@ -977,54 +919,52 @@ void IdasInternal::integrateAdj(double t_out){
 }
 
 void IdasInternal::printStats(std::ostream &stream) const{
-    long nsteps, nfevals, nlinsetups, netfails;
-    int qlast, qcur;
-    double hinused, hlast, hcur, tcur;
+  long nsteps, nfevals, nlinsetups, netfails;
+  int qlast, qcur;
+  double hinused, hlast, hcur, tcur;
+  int flag = IDAGetIntegratorStats(mem_, &nsteps, &nfevals, &nlinsetups,&netfails, &qlast, &qcur, &hinused,&hlast, &hcur, &tcur);
+  if(flag!=IDA_SUCCESS) idas_error("IDAGetIntegratorStats",flag);
+  
+  // Get the number of right hand side evaluations in the linear solver
+  long nfevals_linsol=0;
+  switch(linsol_f_){
+    case SD_DENSE:
+    case SD_BANDED:
+      flag = IDADlsGetNumResEvals(mem_, &nfevals_linsol);
+      if(flag!=IDA_SUCCESS) idas_error("IDADlsGetNumResEvals",flag);
+      break;
+    case SD_ITERATIVE:
+      flag = IDASpilsGetNumResEvals(mem_, &nfevals_linsol);
+      if(flag!=IDA_SUCCESS) idas_error("IDASpilsGetNumResEvals",flag);
+      break;
+    default:
+      nfevals_linsol = 0;
+  }
+  
+  stream << "number of steps taken by IDAS:            " << nsteps << std::endl;
+  stream << "number of calls to the user's f function: " << (nfevals + nfevals_linsol) << std::endl;
+  stream << "   step calculation:                      " << nfevals << std::endl;
+  stream << "   linear solver:                         " << nfevals_linsol << std::endl;
+  stream << "number of calls made to the linear solver setup function: " << nlinsetups << std::endl;
+  stream << "number of error test failures: " << netfails << std::endl;
+  stream << "method order used on the last internal step: " << qlast << std::endl;
+  stream << "method order to be used on the next internal step: " << qcur << std::endl;
+  stream << "actual value of initial step size: " << hinused << std::endl;
+  stream << "step size taken on the last internal step: " << hlast << std::endl;
+  stream << "step size to be attempted on the next internal step: " << hcur << std::endl;
+  stream << "current internal time reached: " << tcur << std::endl;
+  stream << std::endl;
 
-    int flag = IDAGetIntegratorStats(mem_, &nsteps, &nfevals, &nlinsetups,&netfails, &qlast, &qcur, &hinused,&hlast, &hcur, &tcur);
-    if(flag!=IDA_SUCCESS) idas_error("IDAGetIntegratorStats",flag);
-    
-    //long nfevalsS=0;
-    //if (nfdir_>0) {
-    //  flag = IDAGetNumResEvalsSens(mem_, &nfevalsS);
-    //  if(flag!=IDA_SUCCESS) idas_error("IDAGetNumResEvalsSens",flag);
-    //}
-    
-    long nrevalsLS_spils=0, nrevalsLS_dls=0;
-    
-    flag = IDASpilsGetNumResEvals(mem_, &nrevalsLS_spils);
-    if(flag!=IDA_SUCCESS) idas_error("IDASpilsGetNumResEvals",flag);
-    
-    
-    flag = IDADlsGetNumResEvals(mem_, &nrevalsLS_dls);
-    if(flag!=IDA_SUCCESS) idas_error("IDADlsGetNumResEvals",flag);
-    
-    stream << "number of steps taken by IDAS: " << nsteps << std::endl;
-    stream << "number of calls to the user's res function: " << nfevals + nrevalsLS_spils + nrevalsLS_dls << std::endl;
-    stream << "      main solver                      : " << nfevals << std::endl;
-    //stream << "number of calls to the user's res function for finite difference of the sensitivity residuals: " << nfevalsS << std::endl;
-    stream << "      finite diff (SPILS linear solver): " << nrevalsLS_spils << std::endl;
-    stream << "      finite diff (DLS linear solver)  : " << nrevalsLS_dls << std::endl;
-    stream << "number of calls made to the linear solver setup function: " << nlinsetups << std::endl;
-    stream << "number of error test failures: " << netfails << std::endl;
-    stream << "method order used on the last internal step: " << qlast << std::endl;
-    stream << "method order to be used on the next internal step: " << qcur << std::endl;
-    stream << "actual value of initial step size: " << hinused << std::endl;
-    stream << "step size taken on the last internal step: " << hlast << std::endl;
-    stream << "step size to be attempted on the next internal step: " << hcur << std::endl;
-    stream << "current internal time reached: " << tcur << std::endl;
-    stream << std::endl;
-
-    stream << "number of checkpoints stored: " << ncheck_ << endl;
-    stream << std::endl;
-    
-    stream << "Time spent in the DAE residual: " << t_res << " s." << endl;
-    stream << "Time spent in the forward sensitivity residual: " << t_fres << " s." << endl;
-    stream << "Time spent in the jacobian function or jacobian times vector function: " << t_jac << " s." << endl;
-    stream << "Time spent in the linear solver solve function: " << t_lsolve << " s." << endl;
-    stream << "Time spent to generate the jacobian in the linear solver setup function: " << t_lsetup_jac << " s." << endl;
-    stream << "Time spent to factorize the jacobian in the linear solver setup function: " << t_lsetup_fac << " s." << endl;
-    
+  stream << "number of checkpoints stored: " << ncheck_ << endl;
+  stream << std::endl;
+  
+  stream << "Time spent in the DAE residual: " << t_res << " s." << endl;
+  stream << "Time spent in the forward sensitivity residual: " << t_fres << " s." << endl;
+  stream << "Time spent in the jacobian function or jacobian times vector function: " << t_jac << " s." << endl;
+  stream << "Time spent in the linear solver solve function: " << t_lsolve << " s." << endl;
+  stream << "Time spent to generate the jacobian in the linear solver setup function: " << t_lsetup_jac << " s." << endl;
+  stream << "Time spent to factorize the jacobian in the linear solver setup function: " << t_lsetup_fac << " s." << endl;
+  stream << std::endl;
 }
 
 map<int,string> IdasInternal::calc_flagmap(){
@@ -1148,55 +1088,29 @@ int IdasInternal::rhsQS_wrapper(int Ns, double t, N_Vector xz, N_Vector xzdot, N
 
 void IdasInternal::resB(double t, const double* xz, const double* xzdot, const double* xzA, const double* xzdotA, double* rrA){
   log("IdasInternal::resB","begin");
-  // Pass input
-  f_.setInput(&t,DAE_T);
-  f_.setInput(xz,DAE_X);
-  f_.setInput(xz+nx_,DAE_Z);
-  f_.setInput(xzdot,DAE_XDOT);
-  f_.setInput(input(INTEGRATOR_P),DAE_P);
   
-  // Pass adjoint seeds
-  f_.setAdjSeed(xzA,DAE_ODE);
-  f_.setAdjSeed(xzA+nx_,DAE_ALG);
-  if(nq_>0){
-    f_.adjSeed(DAE_QUAD).setZero();
-  }
-
+  // Pass inputs
+  g_new_.setInput(&t,RDAE_T);
+  g_new_.setInput(xz,RDAE_X);
+  g_new_.setInput(xz+nx_,RDAE_Z);
+//   g_new_.setInput(xzdot,RDAE_XDOT);
+  g_new_.setInput(input(INTEGRATOR_P),RDAE_P);
+  g_new_.setInput(xzA,RDAE_RX);
+  g_new_.setInput(xzA+nx_,RDAE_RZ);
+  g_new_.setInput(adjSeed(INTEGRATOR_QF).data(),RDAE_RP);
+  g_new_.setInput(xzdotA,RDAE_RXDOT);
+  
   // Evaluate
-  f_.evaluate(0,1);
+  g_new_.evaluate();
 
   // Save to output
-  f_.getAdjSens(rrA,DAE_X);
-  f_.getAdjSens(rrA+nx_,DAE_Z);
-
-  // Pass adjoint seeds
-  f_.setAdjSeed(xzdotA,DAE_ODE);
-  f_.setAdjSeed(xzdotA+nx_,DAE_ALG);
+  g_new_.getOutput(rrA,RDAE_ODE);
+  g_new_.getOutput(rrA+nx_,RDAE_ALG);
   
-  // Evaluate AD adjoint
-  f_.evaluate(0,1);
+  // Negate as we are integrating backwards in time
+  for(int i=0; i<nx_+nz_; ++i)
+    rrA[i] *= -1;
 
-  // Save to output
-  const vector<double>& asens_ydot = f_.adjSens(DAE_XDOT).data();
-  for(int i=0; i<nx_; ++i)
-    rrA[i] -= asens_ydot[i];
-  
-  // If quadratures are included
-  if(nq_>0){
-    // Pass adjoint seeds
-    f_.adjSeed(DAE_ODE).setZero();
-    f_.adjSeed(DAE_ALG).setZero();
-    f_.setAdjSeed(adjSeed(INTEGRATOR_QF).data(),DAE_QUAD);
-
-    // Evaluate
-    f_.evaluate(0,1);
-    
-    // Get the input seeds
-    const vector<double>& asens_x = f_.adjSens(DAE_X).data();
-    for(int i=0; i<nx_; ++i) rrA[i] += asens_x[i];
-    const vector<double>& asens_z = f_.adjSens(DAE_Z).data();
-    for(int i=0; i<nz_; ++i) rrA[i+nx_] += asens_z[i];
-  }
   log("IdasInternal::resB","end");
 }
 
@@ -1213,30 +1127,27 @@ int IdasInternal::resB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector x
   
 void IdasInternal::rhsQB(double t, const double* xz, const double* xzdot, const double* xzA, const double* xzdotA, double *qdotA){
   log("IdasInternal::rhsQB","begin");
-  // Pass input
-  f_.setInput(&t,DAE_T);
-  f_.setInput(xz,DAE_X);
-  f_.setInput(xz+nx_,DAE_Z);
-  f_.setInput(xzdot,DAE_XDOT);
-  f_.setInput(input(INTEGRATOR_P),DAE_P);
 
-  // Pass adjoint seeds
-  f_.setAdjSeed(xzA,DAE_ODE);
-  f_.setAdjSeed(xzA+nx_,DAE_ALG);
-  if(nq_>0){
-    f_.setAdjSeed(adjSeed(INTEGRATOR_QF),DAE_QUAD);
-  }
-
+    // Pass inputs
+  g_new_.setInput(&t,RDAE_T);
+  g_new_.setInput(xz,RDAE_X);
+  g_new_.setInput(xz+nx_,RDAE_Z);
+//   g_new_.setInput(xzdot,RDAE_XDOT);
+  g_new_.setInput(input(INTEGRATOR_P),RDAE_P);
+  g_new_.setInput(xzA,RDAE_RX);
+  g_new_.setInput(xzA+nx_,RDAE_RZ);
+  g_new_.setInput(adjSeed(INTEGRATOR_QF).data(),RDAE_RP);
+  g_new_.setInput(xzdotA,RDAE_RXDOT);
+  
   // Evaluate
-  f_.evaluate(0,1);
+  g_new_.evaluate();
 
   // Save to output
-  f_.getAdjSens(qdotA,DAE_P);
-    
-  // Negate as we are integrating backwards
-  for(int i=0; i<np_; ++i){
+  g_new_.getOutput(qdotA,RDAE_QUAD);
+  
+  // Negate as we are integrating backwards in time
+  for(int i=0; i<np_; ++i)
     qdotA[i] *= -1;
-  }
   
   log("IdasInternal::rhsQB","end");
 }
@@ -1507,6 +1418,76 @@ void IdasInternal::lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector 
   log("IdasInternal::lsolve","end");
 }
 
+void IdasInternal::initDenseLinearSolver(){
+  // Dense jacobian
+  int flag = IDADense(mem_, nx_+nz_);
+  if(flag != IDA_SUCCESS) idas_error("IDADense",flag);
+  if(exact_jacobian_){
+    // Generate jacobians if not already provided
+    if(jac_.isNull()){
+      getJacobian();
+      jac_.init();
+    }
+    
+    // Pass to IDA
+    flag = IDADlsSetDenseJacFn(mem_, djac_wrapper);
+    if(flag!=IDA_SUCCESS) idas_error("IDADlsSetDenseJacFn",flag);
+  }
+}
+  
+void IdasInternal::initBandedLinearSolver(){
+  // Banded jacobian
+  int flag = IDABand(mem_, nx_+nz_, getOption("upper_bandwidth").toInt(), getOption("lower_bandwidth").toInt());
+  if(flag != IDA_SUCCESS) idas_error("IDABand",flag);
+  
+  // Banded Jacobian information
+  if(exact_jacobian_){
+    flag = IDADlsSetBandJacFn(mem_, bjac_wrapper);
+    if(flag != IDA_SUCCESS) idas_error("IDADlsSetBandJacFn",flag);
+  }
+}
+  
+void IdasInternal::initIterativeLinearSolver(){
+  // Max dimension of the Krylov space
+  int maxl = getOption("max_krylov");
+      
+  // Attach an iterative solver
+  int flag;
+  switch(itsol_f_){
+    case SD_GMRES:
+      flag = IDASpgmr(mem_, maxl);
+      if(flag != IDA_SUCCESS) idas_error("IDASpgmr",flag);
+      break;
+    case SD_BCGSTAB:
+      flag = IDASpbcg(mem_, maxl);
+      if(flag != IDA_SUCCESS) idas_error("IDASpbcg",flag);
+      break;
+    case SD_TFQMR:
+      flag = IDASptfqmr(mem_, maxl);
+      if(flag != IDA_SUCCESS) idas_error("IDASptfqmr",flag);
+      break;
+  }
+        
+  // Attach functions for jacobian information
+  if(exact_jacobian_){
+    flag = IDASpilsSetJacTimesVecFn(mem_, jtimes_wrapper);
+    if(flag != IDA_SUCCESS) idas_error("IDASpilsSetJacTimesVecFn",flag);
+  }
+  
+  // Add a preconditioner
+  if(use_preconditioner_){
+    // Make sure that a Jacobian has been provided
+    if(jac_.isNull()) throw CasadiException("IdasInternal::init(): No Jacobian has been provided.");
+
+    // Make sure that a linear solver has been providided
+    if(linsol_.isNull()) throw CasadiException("IdasInternal::init(): No user defined linear solver has been provided.");
+
+    // Pass to IDA
+    flag = IDASpilsSetPreconditioner(mem_, psetup_wrapper, psolve_wrapper);
+    if(flag != IDA_SUCCESS) idas_error("IDASpilsSetPreconditioner",flag);
+  }
+}
+
 void IdasInternal::initUserDefinedLinearSolver(){
   // Make sure that a Jacobian has been provided
   casadi_assert(!jac_.isNull());
@@ -1520,6 +1501,39 @@ void IdasInternal::initUserDefinedLinearSolver(){
   IDA_mem->ida_lsetup = lsetup_wrapper;
   IDA_mem->ida_lsolve = lsolve_wrapper;
   IDA_mem->ida_setupNonNull = TRUE;
+}
+
+void IdasInternal::initDenseLinearSolverB(int dir){
+  int flag = IDADenseB(mem_, whichB_[dir], nx_+nz_);
+  if(flag != IDA_SUCCESS) idas_error("IDADenseB",flag);
+}
+  
+void IdasInternal::initBandedLinearSolverB(int dir){
+  int flag = IDABandB(mem_, whichB_[dir], nx_+nz_, getOption("asens_upper_bandwidth").toInt(), getOption("asens_lower_bandwidth").toInt());
+  if(flag != IDA_SUCCESS) idas_error("IDABand",flag);
+}
+  
+void IdasInternal::initIterativeLinearSolverB(int dir){
+  int maxl = getOption("asens_max_krylov");
+  int flag;
+  switch(itsol_g_){
+    case SD_GMRES:
+      flag = IDASpgmrB(mem_, whichB_[dir], maxl);
+      if(flag != IDA_SUCCESS) idas_error("IDASpgmrB",flag);
+      break;
+    case SD_BCGSTAB:
+      flag = IDASpbcgB(mem_, whichB_[dir], maxl);
+      if(flag != IDA_SUCCESS) idas_error("IDASpbcgB",flag);
+      break;
+    case SD_TFQMR:
+      flag = IDASptfqmrB(mem_, whichB_[dir], maxl);
+      if(flag != IDA_SUCCESS) idas_error("IDASptfqmrB",flag);
+      break;
+  }
+}
+  
+void IdasInternal::initUserDefinedLinearSolverB(int dir){
+  casadi_assert_message(false, "Not implemented");
 }
 
 void IdasInternal::setLinearSolver(const LinearSolver& linsol, const FX& jac){
