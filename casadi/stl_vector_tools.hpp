@@ -193,6 +193,51 @@ namespace CasADi{
   void sort(const std::vector<T> &values,std::vector<T> &sorted_values,std::vector<int> &indices);
   #endif //SWIG
   
+  /** \brief Make a vector of a certain length with its entries specified
+  *  Usage C++: 
+  *     makeVector<ClassName>(LENGTH, ENTRY_INDEX_1, ENTRY_VALUE_1, ENTRY_INDEX_2, ENTRY_VALUE_2, ...)
+  *  Usage Python: 
+  *     makeVector(ClassName,(LENGTH, ENTRY_INDEX_1, ENTRY_VALUE_1, ENTRY_INDEX_2, ENTRY_VALUE_2 ...)
+  */
+  #ifndef SWIG
+  template<typename T>
+  std::vector<T> makeVector(int size, 
+                            int ind0=-1, const T& val0=T(),
+                            int ind1=-1, const T& val1=T(),
+                            int ind2=-1, const T& val2=T(),
+                            int ind3=-1, const T& val3=T(),
+                            int ind4=-1, const T& val4=T(),
+                            int ind5=-1, const T& val5=T(),
+                            int ind6=-1, const T& val6=T(),
+                            int ind7=-1, const T& val7=T(),
+                            int ind8=-1, const T& val8=T(),
+                            int ind9=-1, const T& val9=T(),
+                            int ind10=-1, const T& val10=T(),
+                            int ind11=-1, const T& val11=T(),
+                            int ind12=-1, const T& val12=T(),
+                            int ind13=-1, const T& val13=T(),
+                            int ind14=-1, const T& val14=T(),
+                            int ind15=-1, const T& val15=T(),
+                            int ind16=-1, const T& val16=T(),
+                            int ind17=-1, const T& val17=T(),
+                            int ind18=-1, const T& val18=T(),
+                            int ind19=-1, const T& val19=T());
+  #else // SWIG
+  #ifdef SWIGPYTHON
+%pythoncode %{
+   def makeVector(T,size,*elems):
+      assert len(elems) % 2 == 0, "The number of provided indices does not the number of provided values"
+      num_elem = len(elems)/2
+      ret = [T()]*size
+      for i in range(num_elem):
+        ind = elems[2*i]
+        val = elems[2*i+1]
+        ret[ind] = val
+      return ret
+%}
+  #endif // SWIGPYTHON
+  #endif // SWIG
+  
 } // namespace CasADi
 
 // Implementations
@@ -442,6 +487,53 @@ namespace CasADi{
     
   }
 
+  template<typename T>
+  std::vector<T> makeVector(int size, 
+                            int ind0, const T& val0,
+                            int ind1, const T& val1,
+                            int ind2, const T& val2,
+                            int ind3, const T& val3,
+                            int ind4, const T& val4,
+                            int ind5, const T& val5,
+                            int ind6, const T& val6,
+                            int ind7, const T& val7,
+                            int ind8, const T& val8,
+                            int ind9, const T& val9,
+                            int ind10, const T& val10,
+                            int ind11, const T& val11,
+                            int ind12, const T& val12,
+                            int ind13, const T& val13,
+                            int ind14, const T& val14,
+                            int ind15, const T& val15,
+                            int ind16, const T& val16,
+                            int ind17, const T& val17,
+                            int ind18, const T& val18,
+                            int ind19, const T& val19){
+    
+    // Maximum size supported
+    const int max_size = 20;
+                              
+    // Collect all arguments                          
+    int ind[max_size] = {ind0,ind1,ind2,ind3,ind4,ind5,ind6,ind7,ind8,ind9,ind10,ind11,ind12,ind13,ind14,ind15,ind16,ind17,ind18,ind19};
+    int val[max_size] = {val0,val1,val2,val3,val4,val5,val6,val7,val8,val9,val10,val11,val12,val13,val14,val15,val16,val17,val18,val19};
+    
+    // Return value
+    std::vector<T> ret(size);
+    
+    // Assign all values
+    for(int i=0; i<max_size; ++i){
+      // Break if not assigned
+      if(ind[i]<0) break;
+      
+      // Assign value
+      ret.at(ind[i]) = val[i];
+    }
+    
+    return ret;
+  }
+  
+  
+  
 } // namespace CasADi
 
 #endif // SWIG
