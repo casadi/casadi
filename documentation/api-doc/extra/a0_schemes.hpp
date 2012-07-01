@@ -60,10 +60,11 @@
 */
 /** \defgroup scheme_RDAEInput
 <table>
-<caption>Input scheme: CasADi::RDAEInput  (RDAE_NUM_IN = 7) </caption>
+<caption>Input scheme: CasADi::RDAEInput  (RDAE_NUM_IN = 8) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>RDAE_RX</td><td>Backward differential state</td></tr>
 <tr><td>RDAE_RZ</td><td>Backward algebraic state</td></tr>
+<tr><td>RDAE_RP</td><td>Backward parameter</td></tr>
 <tr><td>RDAE_X</td><td>Forward differential state</td></tr>
 <tr><td>RDAE_Z</td><td>Forward algebraic state</td></tr>
 <tr><td>RDAE_P</td><td>Parameter vector</td></tr>

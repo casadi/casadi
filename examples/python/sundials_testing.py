@@ -89,14 +89,11 @@ def create_IDAS():
   ode_res = vertcat([v - sdot,  (u-0.02*v*v)/m - vdot, -0.01*u*u - mdot])
 
   # Input of the DAE residual function
-  ffcn_in = DAE_NUM_IN * [[]]
-  ffcn_in[DAE_T] = t
-  ffcn_in[DAE_X] = y
-  ffcn_in[DAE_XDOT] = xdot
-  ffcn_in[DAE_P] = u
+  ffcn_in = makeVector(SXMatrix,DAE_NUM_IN,DAE_T,t,DAE_X,y,DAE_XDOT,xdot,DAE_P,u)
+  ffcn_out = makeVector(SXMatrix,DAE_NUM_OUT,DAE_ODE,ode_res,DAE_QUAD,u_dev)
 
   # DAE residual function
-  ffcn = SXFunction(ffcn_in,daeOut(ode_res,(),u_dev))
+  ffcn = SXFunction(ffcn_in,ffcn_out)
   
   if collocation_integrator:
     # Create a collocation integrator
