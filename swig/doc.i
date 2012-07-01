@@ -74876,6 +74876,13 @@ sorted_values:  the sorted vector
 
 indices:  The indices into 'values' that cast it into 'sorted_values' ";
 
+%feature("docstring")  CasADi::Interfaces::makeVector "
+
+Make a vector of a certain length with its entries specified Usage C++:
+makeVector<ClassName>(LENGTH, ENTRY_INDEX_1, ENTRY_VALUE_1, ENTRY_INDEX_2,
+ENTRY_VALUE_2, ...) Usage Python: makeVector(ClassName,(LENGTH,
+ENTRY_INDEX_1, ENTRY_VALUE_1, ENTRY_INDEX_2, ENTRY_VALUE_2 ...) ";
+
 %feature("docstring")  CasADi::Interfaces::if_else "";
 
 %feature("docstring")  CasADi::Interfaces::typeName< SX > " ";
