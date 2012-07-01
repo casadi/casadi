@@ -231,6 +231,70 @@ void SundialsInternal::init(){
     
     g_new_ = SXFunction(rdae_in,rdae_out);
     g_new_.init();
+  } else { // Not SXFunction
+
+    // Formulate backwards integration problem
+    MXFunction f = shared_cast<MXFunction>(f_);
+    if(!f.isNull()){
+      vector<MX> arg = f.inputsMX();
+      vector<MX> res = f.outputsMX();
+      casadi_assert(arg.size()==DAE_NUM_IN);
+      casadi_assert(res.size()==DAE_NUM_OUT);
+    
+      MX x = arg[DAE_X];
+      MX z = arg[DAE_Z];
+      MX p = arg[DAE_P];
+      MX t = arg[DAE_T];
+      MX xdot = arg[DAE_XDOT];
+    
+      MX rx = msym("rx",res[DAE_ODE].sparsity());
+      MX rz = msym("rz",res[DAE_ALG].sparsity());
+      MX rxdot = msym("rxdot",res[DAE_ODE].sparsity());
+      MX rp = msym("rp",res[DAE_QUAD].sparsity());
+    
+      // Is the ODE part explicit?
+      bool ode_is_explict = xdot.size()==0;
+    
+      // Number of adjoint sweeps needed
+      int n_sweep = ode_is_explict ? 1 : 2;
+    
+      vector<vector<MX> > dummy;
+      vector<vector<MX> > aseed(n_sweep,res);
+      aseed[0][DAE_ODE] = rx;
+      aseed[0][DAE_ALG] = rz;
+      aseed[0][DAE_QUAD] = rp;
+      if(!ode_is_explict){
+        aseed[1][DAE_ODE] = -rxdot;
+        aseed[1][DAE_ALG] = MX::zeros(rz.size());
+        aseed[1][DAE_QUAD] = MX::zeros(rp.size());
+      }
+      vector<vector<MX> > asens(n_sweep,arg);
+      f.evalMX(arg,res,dummy,dummy,aseed,asens,true);
+    
+      // Formulate the backwards integration problem
+      vector<MX> rdae_in(RDAE_NUM_IN);
+      rdae_in[RDAE_RX] = rx;
+      rdae_in[RDAE_RZ] = rz;
+      rdae_in[RDAE_RP] = rp;
+      rdae_in[RDAE_X] = x;
+      rdae_in[RDAE_Z] = z;
+      rdae_in[RDAE_P] = p;
+      rdae_in[RDAE_T] = t;
+      rdae_in[RDAE_RXDOT] = rxdot;
+    
+      vector<MX> rdae_out(RDAE_NUM_OUT);
+      rdae_out[RDAE_ODE] = asens[0][DAE_X];
+      if(ode_is_explict){
+        rdae_out[RDAE_ODE] += rxdot;
+      } else {
+        rdae_out[RDAE_ODE] += asens[1][DAE_XDOT];
+      }
+      rdae_out[RDAE_ALG] = asens[0][DAE_Z];
+      rdae_out[RDAE_QUAD] = asens[0][DAE_P];
+      
+      g_new_ = MXFunction(rdae_in,rdae_out);
+      g_new_.init();
+    }
   }
 }
 
