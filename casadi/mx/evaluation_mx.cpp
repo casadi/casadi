@@ -242,7 +242,7 @@ void EvaluationMX::evaluateMX(const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fse
   int nadj = aseed.size();
   bool no_diff = nfwd == 0 && nadj == 0; // no differentiation
 
-  if (no_diff || fcn_.spCanEvaluate(true) && fcn_.spCanEvaluate(false)) { // NOTE: should handle _all_ cases
+  if (no_diff || (fcn_.spCanEvaluate(true) && fcn_.spCanEvaluate(false))) { // NOTE: should handle _all_ cases
     // Get/generate the derivative function
     FX d = fcn_.derivative(nfwd, nadj);
 

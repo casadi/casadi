@@ -287,6 +287,7 @@ bool IpoptInternal::intermediate_callback(const double* x, const double* z_L, co
     } else {
       throw ex;
     }
+    return 1;
   }
 }
 

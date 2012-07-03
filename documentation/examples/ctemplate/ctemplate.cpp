@@ -11,7 +11,7 @@
 #include <optimal_control/multiple_shooting.hpp>
 #include <optimal_control/multiple_shooting_internal.hpp>
 
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   /** This file does absolutely nothing but including all headers */
 }

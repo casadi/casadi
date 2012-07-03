@@ -569,7 +569,7 @@ std::string getOperatorRepresentation(const MX& x, const std::vector<std::string
   }
 
   
-  if (args.size() == 0 || casadi_math<double>::ndeps(x.getOp())==2 && args.size() < 2) throw CasadiException("getOperatorRepresentation: not enough arguments supplied");
+  if (args.size() == 0 || (casadi_math<double>::ndeps(x.getOp())==2 && args.size() < 2)) throw CasadiException("getOperatorRepresentation: not enough arguments supplied");
   std::stringstream s;
   casadi_math<double>::print(x.getOp(),s,args[0],args[1]);
   return s.str();
