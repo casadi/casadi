@@ -25,14 +25,12 @@ from casadi import *
 from numpy import *
 from pylab import *
 
-t=SX("t")
+x=ssym("x") 
+dx=ssym("dx")
+states = vertcat([x,dx])
 
-x=SX("x") 
-dx=SX("dx")
-
-f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_Y: [x,dx]},[[dx,-x]])
+f=SXFunction(daeIn(states),daeOut(vertcat([dx,-x])))
 f.init()
-
 
 tend = 2*pi*3
 ts = linspace(0,tend,1000)

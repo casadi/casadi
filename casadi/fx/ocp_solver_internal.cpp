@@ -52,7 +52,7 @@ void OCPSolverInternal::init(){
   nk_ = getOption("number_of_grid_points");
 
   // Get the number of differential states
-  nx_ = ffcn_.input(DAE_Y).size();
+  nx_ = ffcn_.input(DAE_X).size();
 
   // Get the number of parameters
   np_ = getOption("number_of_parameters");

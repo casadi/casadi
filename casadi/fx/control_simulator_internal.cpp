@@ -63,8 +63,8 @@ void ControlSimulatorInternal::init(){
     vector<MX> control_dae_in_(CONTROL_DAE_NUM_IN);
     vector<MX> dae_in_ = control_dae_.symbolicInput();
     control_dae_in_[CONTROL_DAE_T]    = dae_in_[DAE_T];
-    control_dae_in_[CONTROL_DAE_Y]    = dae_in_[DAE_Y];
-    control_dae_in_[CONTROL_DAE_YDOT] = dae_in_[DAE_YDOT];
+    control_dae_in_[CONTROL_DAE_X]    = dae_in_[DAE_X];
+    control_dae_in_[CONTROL_DAE_XDOT] = dae_in_[DAE_XDOT];
     control_dae_in_[CONTROL_DAE_P]    = dae_in_[DAE_P];
     control_dae_ = MXFunction(control_dae_in_,control_dae_.call(dae_in_));
     control_dae_.init();
@@ -75,8 +75,8 @@ void ControlSimulatorInternal::init(){
   vector<MX> dae_in_(DAE_NUM_IN);
   
   dae_in_[DAE_T]    = MX("tau",control_dae_.input(CONTROL_DAE_T).sparsity());
-  dae_in_[DAE_Y]    = MX("x",control_dae_.input(CONTROL_DAE_Y).sparsity());
-  dae_in_[DAE_YDOT] = MX("xdot",control_dae_.input(CONTROL_DAE_YDOT).sparsity());
+  dae_in_[DAE_X]    = MX("x",control_dae_.input(CONTROL_DAE_X).sparsity());
+  dae_in_[DAE_XDOT] = MX("xdot",control_dae_.input(CONTROL_DAE_XDOT).sparsity());
   
   np_ = control_dae_.input(CONTROL_DAE_P).size();
   
@@ -94,7 +94,7 @@ void ControlSimulatorInternal::init(){
   int nu_end   = control_dae_.input(CONTROL_DAE_U_INTERP).size();
   nu_ = std::max(nu_end,nu_);
 
-  ny_ = control_dae_.input(CONTROL_DAE_Y).size();
+  ny_ = control_dae_.input(CONTROL_DAE_X).size();
   
   // Structure of DAE_P : T0 TF P Ustart Uend Y_MAJOR 
   
@@ -106,8 +106,8 @@ void ControlSimulatorInternal::init(){
   IMatrix iUstart  = 2+np_ + IMatrix(u_sparsity,range(nu_));
   IMatrix iUend    = 2+np_ + nu_ + IMatrix(control_dae_.input(CONTROL_DAE_U_INTERP).sparsity(),range(nu_end));
   IMatrix iYM;
-  if (!control_dae_.input(CONTROL_DAE_Y_MAJOR).empty()) {
-    iYM = 2+np_ + nu_ + nu_end + IMatrix(control_dae_.input(CONTROL_DAE_Y_MAJOR).sparsity(),range(ny_));
+  if (!control_dae_.input(CONTROL_DAE_X_MAJOR).empty()) {
+    iYM = 2+np_ + nu_ + nu_end + IMatrix(control_dae_.input(CONTROL_DAE_X_MAJOR).sparsity(),range(ny_));
   }
   
   vector<MX> control_dae_in_(CONTROL_DAE_NUM_IN);
@@ -118,9 +118,9 @@ void ControlSimulatorInternal::init(){
     control_dae_in_[CONTROL_DAE_T0]       = dae_in_[DAE_P](iT0);
   if (!control_dae_.input(CONTROL_DAE_TF).empty())
     control_dae_in_[CONTROL_DAE_TF]       = dae_in_[DAE_P](iTF);
-  control_dae_in_[CONTROL_DAE_Y]        = dae_in_[DAE_Y];
-  if (!control_dae_.input(CONTROL_DAE_YDOT).empty())
-    control_dae_in_[CONTROL_DAE_YDOT]     = dae_in_[DAE_YDOT]/(dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0));
+  control_dae_in_[CONTROL_DAE_X]        = dae_in_[DAE_X];
+  if (!control_dae_.input(CONTROL_DAE_XDOT).empty())
+    control_dae_in_[CONTROL_DAE_XDOT]     = dae_in_[DAE_XDOT]/(dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0));
   control_dae_in_[CONTROL_DAE_P]        = dae_in_[DAE_P](iP);
   if (!control_dae_.input(CONTROL_DAE_U).empty())
     control_dae_in_[CONTROL_DAE_U]        = dae_in_[DAE_P](iUstart);
@@ -128,11 +128,11 @@ void ControlSimulatorInternal::init(){
     MX tau = (dae_in_[DAE_P](iTF)-dae_in_[DAE_T])/(dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0));
     control_dae_in_[CONTROL_DAE_U_INTERP] = dae_in_[DAE_P](iUstart) * (1-tau) + tau* dae_in_[DAE_P](iUend);
   }
-  if (!control_dae_.input(CONTROL_DAE_Y_MAJOR).empty())
-    control_dae_in_[CONTROL_DAE_Y_MAJOR] = dae_in_[DAE_P](iYM);
+  if (!control_dae_.input(CONTROL_DAE_X_MAJOR).empty())
+    control_dae_in_[CONTROL_DAE_X_MAJOR] = dae_in_[DAE_P](iYM);
 
   
-  dae_ = MXFunction(dae_in_,(dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0))*control_dae_.call(control_dae_in_)[0]);
+  dae_ = MXFunction(dae_in_,daeOut((dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0))*control_dae_.call(control_dae_in_)[0]));
   
   dae_.init();
  
@@ -189,19 +189,19 @@ void ControlSimulatorInternal::init(){
     SXMatrix t        = ssym("t",control_dae_.input(CONTROL_DAE_T).sparsity());
     SXMatrix t0       = ssym("t0",control_dae_.input(CONTROL_DAE_T0).sparsity());
     SXMatrix tf       = ssym("tf",control_dae_.input(CONTROL_DAE_TF).sparsity());
-    SXMatrix x        = ssym("x",control_dae_.input(CONTROL_DAE_Y).sparsity());
-    SXMatrix xdot     = ssym("xp",control_dae_.input(CONTROL_DAE_Y).sparsity());
+    SXMatrix x        = ssym("x",control_dae_.input(CONTROL_DAE_X).sparsity());
+    SXMatrix xdot     = ssym("xp",control_dae_.input(CONTROL_DAE_X).sparsity());
     SXMatrix p        = ssym("p",control_dae_.input(CONTROL_DAE_P).sparsity());
     SXMatrix u        = ssym("u",control_dae_.input(CONTROL_DAE_U).sparsity());
     SXMatrix u_interp = ssym("u_interp",control_dae_.input(CONTROL_DAE_U_INTERP).sparsity());
-    SXMatrix x0       = ssym("x0",control_dae_.input(CONTROL_DAE_Y_MAJOR).sparsity());
+    SXMatrix x0       = ssym("x0",control_dae_.input(CONTROL_DAE_X_MAJOR).sparsity());
   
     vector<SXMatrix> arg(CONTROL_DAE_NUM_IN);
     arg[CONTROL_DAE_T]  = t;
-    arg[CONTROL_DAE_Y]  = x;
+    arg[CONTROL_DAE_X]  = x;
     arg[CONTROL_DAE_P]  = p;
-    arg[CONTROL_DAE_YDOT] = xdot;
-    arg[CONTROL_DAE_Y_MAJOR] = x0;
+    arg[CONTROL_DAE_XDOT] = xdot;
+    arg[CONTROL_DAE_X_MAJOR] = x0;
     arg[CONTROL_DAE_U] = u;
     arg[CONTROL_DAE_U_INTERP] = u_interp;
     arg[CONTROL_DAE_T0] = t0;
@@ -209,11 +209,10 @@ void ControlSimulatorInternal::init(){
     
     vector<SXMatrix> out(INTEGRATOR_NUM_OUT);
     out[INTEGRATOR_XF] = x;
-    out[INTEGRATOR_XPF] = xdot;
 
     // Create the output function
     output_fcn_ = SXFunction(arg,out);
-    output_fcn_.setOption("name","output function");
+    output_fcn_.setOption("name","output ");
   } else {
     output_fcn_ = orig_output_fcn_;
   }
@@ -223,12 +222,12 @@ void ControlSimulatorInternal::init(){
   // Initialize the output function
   output_fcn_.init();
     
-  // Extend the output function two extra outputs at the start: DAE_Y and DAE_YDOT
+  // Extend the output function two extra outputs at the start: DAE_X and DAE_XDOT
   vector<MX> output_fcn_in_ = output_fcn_.symbolicInput();
   
   vector<MX> output_fcn_out_(2 + output_fcn_.getNumOutputs());
-  output_fcn_out_[0] = output_fcn_in_[CONTROL_DAE_Y];
-  output_fcn_out_[1] = output_fcn_in_[CONTROL_DAE_YDOT];
+  output_fcn_out_[0] = output_fcn_in_[CONTROL_DAE_X];
+  output_fcn_out_[1] = output_fcn_in_[CONTROL_DAE_XDOT];
   
   vector<MX> output_fcn_call_ = output_fcn_.call(output_fcn_in_);
     
@@ -245,8 +244,8 @@ void ControlSimulatorInternal::init(){
   if (!output_fcn_.input(CONTROL_DAE_U_INTERP).empty() && control_dae_.input(CONTROL_DAE_U_INTERP).empty()) {
     casadi_error("ControlSimulatorInternal::init: output function has CONTROL_DAE_U_INTERP input. The supplied DAE should have it as well.");
   }
-  if (!output_fcn_.input(CONTROL_DAE_Y_MAJOR).empty() && control_dae_.input(CONTROL_DAE_Y_MAJOR).empty()) {
-    casadi_error("ControlSimulatorInternal::init: output function has CONTROL_DAE_Y_MAJOR input. The supplied DAE should have it as well.");
+  if (!output_fcn_.input(CONTROL_DAE_X_MAJOR).empty() && control_dae_.input(CONTROL_DAE_X_MAJOR).empty()) {
+    casadi_error("ControlSimulatorInternal::init: output function has CONTROL_DAE_X_MAJOR input. The supplied DAE should have it as well.");
   }
    
   output_fcn_in_ = vector<MX>(CONTROL_DAE_NUM_IN);
@@ -259,17 +258,17 @@ void ControlSimulatorInternal::init(){
     output_fcn_in_[CONTROL_DAE_T0]       = dae_in_[DAE_P](iT0);
   if (!output_fcn_.input(CONTROL_DAE_TF).empty())
     output_fcn_in_[CONTROL_DAE_TF]       = dae_in_[DAE_P](iTF);
-  output_fcn_in_[CONTROL_DAE_Y]        = dae_in_[DAE_Y];
-  if (!output_fcn_.input(CONTROL_DAE_YDOT).empty())
-    output_fcn_in_[CONTROL_DAE_YDOT]     = dae_in_[DAE_YDOT]/(dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0));
+  output_fcn_in_[CONTROL_DAE_X]        = dae_in_[DAE_X];
+  if (!output_fcn_.input(CONTROL_DAE_XDOT).empty())
+    output_fcn_in_[CONTROL_DAE_XDOT]     = dae_in_[DAE_XDOT]/(dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0));
   output_fcn_in_[CONTROL_DAE_P]        = dae_in_[DAE_P](iP);
   if (!output_fcn_.input(CONTROL_DAE_U).empty())
     output_fcn_in_[CONTROL_DAE_U]        = dae_in_[DAE_P](iUstart);
   if (!output_fcn_.input(CONTROL_DAE_U_INTERP).empty()) {
     output_fcn_in_[CONTROL_DAE_U_INTERP] = dae_in_[DAE_P](iUstart) * (1-dae_in_[DAE_T]) + dae_in_[DAE_T]* dae_in_[DAE_P](iUend);
   }
-  if (!output_fcn_.input(CONTROL_DAE_Y_MAJOR).empty())
-    output_fcn_in_[CONTROL_DAE_Y_MAJOR] = dae_in_[DAE_P](iYM);
+  if (!output_fcn_.input(CONTROL_DAE_X_MAJOR).empty())
+    output_fcn_in_[CONTROL_DAE_X_MAJOR] = dae_in_[DAE_P](iYM);
 
   // Transform the output_fcn_ with CONTROL_DAE input scheme to a DAE input scheme
   output_fcn_ = MXFunction(dae_in_,output_fcn_.call(output_fcn_in_));
@@ -286,10 +285,9 @@ void ControlSimulatorInternal::init(){
   
   // Allocate inputs
   input_.resize(CONTROLSIMULATOR_NUM_IN);
-  input(CONTROLSIMULATOR_X0)  = DMatrix(dae_.input(DAE_Y));
+  input(CONTROLSIMULATOR_X0)  = DMatrix(dae_.input(DAE_X));
   input(CONTROLSIMULATOR_P)   = control_dae_.input(CONTROL_DAE_P);
   input(CONTROLSIMULATOR_U)   = DMatrix(ns_ - 1 + (control_endpoint ? 1 : 0) ,nu_,0);
-  input(CONTROLSIMULATOR_XP0) = DMatrix(dae_.input(DAE_Y));
 
   // Allocate outputs
   output_.resize(output_fcn_->output_.size()-2);
@@ -301,14 +299,12 @@ void ControlSimulatorInternal::init(){
   
   // Variables on which the chain of simulator calls (all_output_) depend
   MX Xk("Xk", input(CONTROLSIMULATOR_X0).size());
-  MX XPk("XPk", input(CONTROLSIMULATOR_XP0).size());
   MX P("P",input(CONTROLSIMULATOR_P).size());
   MX U("U",input(CONTROLSIMULATOR_U).sparsity());
  
   // Group these variables as an input list for all_output_
   vector<MX> all_output_in(CONTROLSIMULATOR_NUM_IN);
   all_output_in[CONTROLSIMULATOR_X0] = Xk;
-  all_output_in[CONTROLSIMULATOR_XP0] = XPk;
   all_output_in[CONTROLSIMULATOR_P] = P;
   all_output_in[CONTROLSIMULATOR_U] = U;
   
@@ -327,7 +323,6 @@ void ControlSimulatorInternal::init(){
   for(int k=0; k<ns_-1; ++k){
     // Set the appropriate inputs for the k'th simulator call
     simulator_in[INTEGRATOR_X0] = Xk;
-    simulator_in[INTEGRATOR_XP0] = XPk;
     P_eval[0] = MX(gridc_[k]);
     P_eval[1] = MX(gridc_[k+1]);
     if (nu_>0) {
@@ -348,10 +343,11 @@ void ControlSimulatorInternal::init(){
     
     // Remember the end state and dstate for next iteration in this loop
     Xk = trans(simulator_out[0](simulator_out[0].size1()-1,range(simulator_out[0].size2())));
-    XPk = trans(simulator_out[1](simulator_out[1].size1()-1,range(simulator_out[1].size2())));  
     
     // Copy all the outputs (but not those 2 extra we introduced)
     for (int i=0;i<simulator_out.size()-2;++i) {
+      if(simulator_out[i+2].isNull()) continue; // NOTE: Joel: quick-fix
+      
       simulator_outputs[i].push_back(simulator_out[i+2](range(nf_),range(simulator_out[i+2].size2())));
       if (k+1==ns_-1) {  // Output of the last minor step of the last major step
         simulator_outputs[i].push_back(simulator_out[i+2](std::vector<int>(1,nf_),range(simulator_out[i+2].size2())));

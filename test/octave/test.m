@@ -304,15 +304,15 @@ is_differential_ivec
 is_differential_gentype
 assert(is_differential_gentype.isDoubleVector())
 
-x=SX("x")
-f = SXFunction({x},{x})
+x=ssym("x")
+f = SXFunction(daeIn(x),daeOut(x))
 
 integrator = CVodesIntegrator(f)
 
-integrator.setOption('is_differential',[1,3]);
-integrator.setOption('is_differential',is_differential_gentype);
-disp("hier brandt de lamp")
-assert(integrator.getOption('is_differential').isDoubleVector())
+%  integrator.setOption('is_differential',[1,3]);
+%  integrator.setOption('is_differential',is_differential_gentype);
+%  disp("hier brandt de lamp")
+%  assert(integrator.getOption('is_differential').isDoubleVector())
 
 x=ssym("x",3,4)
 size(x)
@@ -325,8 +325,8 @@ T_dot = SX("T_dot")
 
 ffcn_in = cell(1,DAE_NUM_IN);
 ffcn_in{1+DAE_T} = t;
-ffcn_in{1+DAE_Y} = T;
-ffcn_in{1+DAE_YDOT} = T_dot;
+ffcn_in{1+DAE_X} = T;
+ffcn_in{1+DAE_XDOT} = T_dot;
 
 ffcn_in
 

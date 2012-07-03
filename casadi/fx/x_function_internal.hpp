@@ -455,17 +455,6 @@ MatType XFunctionInternal<DerivedType,MatType,NodeType>::jacGen(int iind, int oi
   // Get the number of forward and adjoint sweeps
   int nfwd = D1.isNull() ? 0 : D1.size1();
   int nadj = D2.isNull() ? 0 : D2.size1();
-
-  if(false)  { // commented out: too verbose
-    std::cout << "XFunctionInternal::jac partitioning" << std::endl;
-    std::cout << "             D1 " << D1 << std::endl;
-    if (!D1.isNull()) {
-      std::cout << "                  col        " << D1.col() << std::endl;
-      std::cout << "                  rowind     " << D1.rowind() << std::endl;
-      std::cout << "                  spy        " << DMatrix(D1,1) << std::endl;
-    }
-    std::cout << "             D2 " << D2 << std::endl;
-  }
   
   // Forward seeds
   std::vector<std::vector<MatType> > fseed(nfwd);
@@ -536,12 +525,6 @@ MatType XFunctionInternal<DerivedType,MatType,NodeType>::jacGen(int iind, int oi
   CRSSparsity sp_trans;
   if(nfwd>0){
     sp_trans = jacSparsity(iind,oind,true).transpose(mapping);
-    if(false)  { // commented out, not interesting
-      std::cout << "   mapping " << mapping << std::endl;
-      std::cout << "   sp_trans " << DMatrix(sp_trans,1) << std::endl;
-      std::cout << "   sp_trans.col() " << sp_trans.col() << std::endl;
-      std::cout << "   sp_trans.rowind() " << sp_trans.rowind() << std::endl;
-    }
   }
 
   // The nonzeros of the sensitivity matrix

@@ -100,13 +100,11 @@ int main(){
   integrator_options["quad_err_con"]=true;
   integrator_options["abstol"]=1e-8;
   integrator_options["reltol"]=1e-8;
-  integrator_options["store_jacobians"]=true;
   integrator_options["tf"]=ocp.tf/num_nodes;
 
   // Mayer objective function
   SXMatrix xf = ssym("xf",x.size(),1);
   SXFunction mterm(xf, xf[0]);
-  mterm.setOption("store_jacobians",true);
   
   // Create a multiple shooting discretization
   MultipleShooting ocp_solver;
@@ -115,7 +113,7 @@ int main(){
     vector<SXMatrix > impres_in(DAE_NUM_IN+1);
     impres_in[0] = xdot;
     impres_in[1+DAE_T] = t;
-    impres_in[1+DAE_Y] = x;
+    impres_in[1+DAE_X] = x;
     impres_in[1+DAE_P] = u;
     SXFunction impres(impres_in,ocp.dae);
 
@@ -128,14 +126,8 @@ int main(){
     ocp_solver = MultipleShooting(ode,mterm);
     ocp_solver.setOption("integrator",CVodesIntegrator::creator);
   } else {
-    
     // DAE residual function
-    vector<SXMatrix > dae_in(DAE_NUM_IN);
-    dae_in[DAE_T] = t;
-    dae_in[DAE_Y] = x;
-    dae_in[DAE_YDOT] = xdot;
-    dae_in[DAE_P] = u;
-    SXFunction dae(dae_in,ocp.dae);
+    SXFunction dae(daeIn(x,SXMatrix(),u,t,xdot),daeOut(ocp.dae));
     
     ocp_solver = MultipleShooting(dae,mterm);
     ocp_solver.setOption("integrator",IdasIntegrator::creator);

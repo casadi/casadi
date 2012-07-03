@@ -35,7 +35,7 @@ using namespace std;
 namespace CasADi{
 namespace Sundials{
   
-SundialsInternal::SundialsInternal(const FX& fd, const FX& fq) : IntegratorInternal(fd,fq){
+SundialsInternal::SundialsInternal(const FX& f, const FX& g) : IntegratorInternal(f,g){
   addOption("max_num_steps",               OT_INTEGER, 10000); // maximum number of steps
   addOption("reltol",                      OT_REAL,    1e-6); // relative tolerence for the IVP solution
   addOption("abstol",                      OT_REAL,    1e-8); // absolute tolerence  for the IVP solution
@@ -46,7 +46,6 @@ SundialsInternal::SundialsInternal(const FX& fd, const FX& fq) : IntegratorInter
   addOption("iterative_solver",            OT_STRING, "gmres","","gmres|bcgstab|tfqmr");
   addOption("pretype",                     OT_STRING, "none","","none|left|right|both");
   addOption("max_krylov",                  OT_INTEGER,  10);        // maximum krylov subspace size
-  addOption("is_differential",             OT_INTEGERVECTOR, GenericType(), "A vector with a boolean describing the nature for each state.");
   addOption("sensitivity_method",          OT_STRING,  "simultaneous","","simultaneous|staggered");
   addOption("max_multistep_order",         OT_INTEGER, 5);
   addOption("use_preconditioner",          OT_BOOLEAN, false); // precondition an iterative solver
@@ -123,14 +122,11 @@ SundialsIntegrator SundialsInternal::jac(bool with_x, bool with_p){
   casadi_assert(with_x || with_p);
   
   // Type cast to SXMatrix (currently supported)
-  SXFunction f = shared_cast<SXFunction>(fd_);
-  if(f.isNull() != fd_.isNull()) return SundialsIntegrator();
+  SXFunction f = shared_cast<SXFunction>(f_);
+  if(f.isNull() != f_.isNull()) return SundialsIntegrator();
   
-  SXFunction q = shared_cast<SXFunction>(fq_);
-  if(q.isNull() != fq_.isNull()) return SundialsIntegrator();
-    
   // Number of state derivatives
-  int nyp = fd_.input(DAE_YDOT).numel();
+  int n_xdot = f_.input(DAE_XDOT).numel();
   
   // Number of sensitivities
   int ns_x = with_x*nx_;
@@ -138,72 +134,69 @@ SundialsIntegrator SundialsInternal::jac(bool with_x, bool with_p){
   int ns = ns_x + ns_p;
 
   // Sensitivities and derivatives of sensitivities
-  SXMatrix ysens = ssym("ysens",ny_,ns);
-  SXMatrix ypsens = ssym("ypsens",nyp,ns);
-    
-  // Sensitivity equation
-  SXMatrix res_s = mul(f.jac(DAE_Y,DAE_RES),ysens);
-  if(nyp>0) res_s += mul(f.jac(DAE_YDOT,DAE_RES),ypsens);
-  if(with_p) res_s += horzcat(SXMatrix(ny_,ns_x),f.jac(DAE_P,DAE_RES));
+  vector<SXMatrix> x_sens = ssym("x_sens",f.input(DAE_X).sparsity(),ns);
+  vector<SXMatrix> z_sens = ssym("z_sens",f.input(DAE_Z).sparsity(),ns);
+  vector<SXMatrix> xdot_sens = ssym("xdot_sens",f.input(DAE_XDOT).sparsity(),ns);
+  
+  // Directional derivative seeds
+  vector<vector<SXMatrix> > fseed(ns);
+  for(int d=0; d<ns; ++d){
+    fseed[d].resize(DAE_NUM_IN);
+    fseed[d][DAE_X] = x_sens[d];
+    fseed[d][DAE_Z] = z_sens[d];
+    fseed[d][DAE_P] = SXMatrix(f.input(DAE_P).sparsity());
+    if(with_p && d>=ns_x){
+      fseed[d][DAE_P](d-ns_x) = 1;
+    }
+    fseed[d][DAE_T] = SXMatrix(f.input(DAE_T).sparsity());
+    if(n_xdot>0){
+      fseed[d][DAE_XDOT] = xdot_sens[d];
+    } else {
+      fseed[d][DAE_XDOT] = SXMatrix(f.input(DAE_XDOT).sparsity());
+    }
+  }
+  
+  // Calculate directional derivatives
+  vector<vector<SXMatrix> > fsens(ns,f.outputsSX());
+  vector<vector<SXMatrix> > aseedsens;
+  f.evalSX(f.inputsSX(),const_cast<vector<SXMatrix>&>(f.outputsSX()),fseed,fsens,aseedsens,aseedsens,true);
+  
+  // Sensitivity equation (ODE)
+  SXMatrix ode_aug = f.outputSX(DAE_ODE);
+  for(int d=0; d<ns; ++d){
+    ode_aug.append(fsens[d][DAE_ODE]);
+  }
 
-  // Augmented DAE
-  SXMatrix faug = vec(horzcat(f.outputSX(INTEGRATOR_XF),res_s));
-  makeDense(faug); // NOTE: possible alternative: skip structural zeros (messes up the sparsity pattern of the augmented system)
-
+  // Sensitivity equation (ALG)
+  SXMatrix alg_aug = f.outputSX(DAE_ALG);
+  for(int d=0; d<ns; ++d){
+    alg_aug.append(fsens[d][DAE_ALG]);
+  }
+  
+  // Sensitivity equation (QUAD)
+  SXMatrix quad_aug = f.outputSX(DAE_QUAD);
+  for(int d=0; d<ns; ++d){
+    quad_aug.append(fsens[d][DAE_QUAD]);
+  }
+  
   // Input arguments for the augmented DAE
   vector<SXMatrix> faug_in(DAE_NUM_IN);
   faug_in[DAE_T] = f.inputSX(DAE_T);
-  faug_in[DAE_Y] = vec(horzcat(f.inputSX(DAE_Y),ysens));
-  if(nyp>0) faug_in[DAE_YDOT] = vec(horzcat(f.inputSX(DAE_YDOT),ypsens));
+  faug_in[DAE_X] = vertcat(f.inputSX(DAE_X),vertcat(x_sens));
+  if(nz_>0) faug_in[DAE_Z] = vertcat(f.inputSX(DAE_Z),vertcat(z_sens));
+  if(n_xdot>0) faug_in[DAE_XDOT] = vertcat(f.inputSX(DAE_XDOT),vertcat(xdot_sens));
   faug_in[DAE_P] = f.inputSX(DAE_P);
   
   // Create augmented DAE function
-  SXFunction ffcn_aug(faug_in,faug);
-  
-  // Augmented quadratures
-  SXFunction qfcn_aug;
-  
-  // Now lets do the same for the quadrature states
-  if(!q.isNull()){
-    
-    // Sensitivity quadratures
-    SXMatrix q_s = mul(q.jac(DAE_Y,DAE_RES),ysens);
-    if(nyp>0) q_s += mul(q.jac(DAE_YDOT,DAE_RES),ypsens);
-    if(with_p) q_s += horzcat(SXMatrix(nq_,ns_x),q.jac(DAE_P,DAE_RES));
+  SXFunction ffcn_aug(faug_in,daeOut(ode_aug,alg_aug,quad_aug));
 
-    // Augmented quadratures
-    SXMatrix qaug = vec(horzcat(q.outputSX(INTEGRATOR_XF),q_s));
-    makeDense(qaug); // NOTE: se above
-
-    // Input to the augmented DAE (start with old)
-    vector<SXMatrix> qaug_in(DAE_NUM_IN);
-    qaug_in[DAE_T] = q.inputSX(DAE_T);
-    qaug_in[DAE_Y] = vec(horzcat(q.inputSX(DAE_Y),ysens));
-    if(nyp>0) qaug_in[DAE_YDOT] = vec(horzcat(q.inputSX(DAE_YDOT),ypsens));
-    qaug_in[DAE_P] = q.inputSX(DAE_P);
-
-    // Create augmented DAE function
-    qfcn_aug = SXFunction(qaug_in,qaug);
-  }
-  
   // Create integrator instance
   SundialsIntegrator integrator;
-  integrator.assignNode(create(ffcn_aug,qfcn_aug));
+  integrator.assignNode(create(ffcn_aug,FX()));
 
   // Set options
   integrator.setOption(dictionary());
   integrator.setOption("nrhs",1+ns);
-  
-  // Transmit information on derivative states
-  if(hasSetOption("is_differential")){
-    vector<int> is_diff = getOption("is_differential");
-    casadi_assert_message(is_diff.size()==ny_,"is_differential has incorrect length");
-    vector<int> is_diff_aug(ny_*(1+ns));
-    for(int i=0; i<1+ns; ++i)
-      for(int j=0; j<ny_; ++j)
-        is_diff_aug[j+i*ny_] = is_diff[j];
-    integrator.setOption("is_differential",is_diff_aug);
-  }
   
   // Pass linear solver
   if(!linsol_.isNull()){
@@ -217,13 +210,8 @@ SundialsIntegrator SundialsInternal::jac(bool with_x, bool with_p){
 }
 
 CRSSparsity SundialsInternal::getJacSparsity(int iind, int oind){
-  if(iind==INTEGRATOR_XP0){
-    // Function value does not depend on the state derivative initial guess
-    return CRSSparsity();
-  } else {
-    // Default (dense) sparsity
+  // Default (dense) sparsity
     return FXInternal::getJacSparsity(iind,oind);
-  }
 }
 
 FX SundialsInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks){
@@ -261,76 +249,41 @@ FX SundialsInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks){
     
     // Get the state
     MX x0 = jac_in[INTEGRATOR_X0];
-    MX xp0 = jac_in[INTEGRATOR_XP0];
-    
-    // Separate the quadrature states from the rest of the states
-    MX y0 = x0[range(ny_)];
-    MX q0 = x0[range(ny_,nx_)];
-    MX yp0 = xp0[range(ny_)];
-    MX qp0 = xp0[range(ny_,nx_)];
     
     // Initial condition for the sensitivitiy equations
-    DMatrix y0_sens(ns*ny_,1,0);
-    DMatrix q0_sens(ns*nq_,1,0);
+    DMatrix x0_sens(ns*nx_,1,0);
     
     if(with_x){
-        for(int i=0; i<ny_; ++i)
-          y0_sens.data()[i + i*ns_x] = 1;
-      
-      for(int i=0; i<nq_; ++i)
-        q0_sens.data()[ny_ + i + i*ns_x] = 1;
+      for(int i=0; i<nx_; ++i){
+	x0_sens.data()[i + i*ns_x] = 1;
+      }
     }
-    
-    // Augmented initial condition
-    MX y0_aug = vertcat(y0,MX(y0_sens));
-    MX q0_aug = vertcat(q0,MX(q0_sens));
-    MX yp0_aug = vertcat(yp0,MX(y0_sens.sparsity(),0));
-    MX qp0_aug = vertcat(qp0,MX(q0_sens.sparsity(),0));
 
     // Finally, we are ready to pass the initial condition for the state and state derivative
-    fwdint_in[INTEGRATOR_X0] = vertcat(y0_aug,q0_aug);
-    fwdint_in[INTEGRATOR_XP0] = vertcat(yp0_aug,qp0_aug);
+    fwdint_in[INTEGRATOR_X0] = vertcat(x0,MX(x0_sens));
     
     // Call the integrator with the constructed input (in fact, create a call node)
     vector<MX> fwdint_out = fwdint.call(fwdint_in);
     MX xf_aug = fwdint_out[INTEGRATOR_XF];
-    MX xpf_aug = fwdint_out[INTEGRATOR_XPF];
+    MX qf_aug = fwdint_out[INTEGRATOR_QF];
     
-    // Separate the quadrature states from the rest of the states
-    MX yf_aug = xf_aug[range((ns+1)*ny_)];
-    MX qf_aug = xf_aug[range((ns+1)*ny_,(ns+1)*nx_)];
-    MX ypf_aug = xpf_aug[range((ns+1)*ny_)];
-    MX qpf_aug = xpf_aug[range((ns+1)*ny_,(ns+1)*nx_)];
-    
-    // Get the state and state derivative at the final time
-    MX yf = yf_aug[range(ny_)];
+    // Get the state and quadrature at the final time
+    MX xf = xf_aug[range(nx_)];
     MX qf = qf_aug[range(nq_)];
-    MX xf = vertcat(yf,qf);
-    MX ypf = ypf_aug[range(ny_)];
-    MX qpf = qpf_aug[range(nq_)];
-    MX xpf = vertcat(ypf,qpf);
     
     // Get the sensitivitiy equations state at the final time
-    MX yf_sens = yf_aug[range(ny_,(ns+1)*ny_)];
+    MX xf_sens = xf_aug[range(nx_,(ns+1)*nx_)];
     MX qf_sens = qf_aug[range(nq_,(ns+1)*nq_)];
-    MX ypf_sens = yf_aug[range(ny_,(ns+1)*ny_)];
-    MX qpf_sens = qf_aug[range(nq_,(ns+1)*nq_)];
 
     // Reshape the sensitivity state and state derivatives
-    yf_sens = trans(reshape(yf_sens,ns,ny_));
-    ypf_sens = trans(reshape(ypf_sens,ns,ny_));
+    xf_sens = trans(reshape(xf_sens,ns,nx_));
     qf_sens = trans(reshape(qf_sens,ns,nq_));
-    qpf_sens = trans(reshape(qpf_sens,ns,nq_));
     
-    // We are now able to get the Jacobian
-    MX J_xf = vertcat(yf_sens,qf_sens);
-    MX J_xpf = vertcat(ypf_sens,qpf_sens);
-
     // Split up the Jacobians in parts for x0 and p
-    MX J_xf_x0 = J_xf(range(J_xf.size1()),range(ns_x));
-    MX J_xpf_x0 = J_xpf(range(J_xpf.size1()),range(ns_x));
-    MX J_xf_p = J_xf(range(J_xf.size1()),range(ns_x,ns));
-    MX J_xpf_p = J_xpf(range(J_xpf.size1()),range(ns_x,ns));
+    MX J_xf_x0 = xf_sens(range(xf_sens.size1()),range(ns_x));
+    MX J_xf_p  = xf_sens(range(xf_sens.size1()),range(ns_x,ns));
+    MX J_qf_x0 = qf_sens(range(qf_sens.size1()),range(ns_x));
+    MX J_qf_p  = qf_sens(range(qf_sens.size1()),range(ns_x,ns));
     
     // Output of the Jacobian
     vector<MX> jac_out(jblocks.size());
@@ -340,12 +293,12 @@ FX SundialsInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks){
       bool is_xf = jblocks[i].first==INTEGRATOR_XF;
       if(is_jac){
         if(is_x0){
-          jac_out[i] = is_xf ? J_xf_x0 : J_xpf_x0;
+          jac_out[i] = is_xf ? J_xf_x0 : J_qf_x0;
         } else {
-          jac_out[i] = is_xf ? J_xf_p : J_xpf_p;
+          jac_out[i] = is_xf ? J_xf_p : J_qf_p;
         }
       } else {
-        jac_out[i] = is_xf ? xf : xpf;
+        jac_out[i] = is_xf ? xf : qf;
       }
     }
     MXFunction intjac(jac_in,jac_out);

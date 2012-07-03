@@ -35,7 +35,7 @@ class RKIntegratorInternal : public IntegratorInternal{
 public:
   
   /// Constructor
-  explicit RKIntegratorInternal(const FX& fd, const FX& fq);
+  explicit RKIntegratorInternal(const FX& f, const FX& g);
 
   /// Deep copy data members
   virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
@@ -44,7 +44,7 @@ public:
   virtual RKIntegratorInternal* clone() const{ return new RKIntegratorInternal(*this);}
 
   /// Create a new integrator
-  virtual RKIntegratorInternal* create(const FX& fd, const FX& fq) const{ return new RKIntegratorInternal(fd,fq);}
+  virtual RKIntegratorInternal* create(const FX& f, const FX& g) const{ return new RKIntegratorInternal(f,g);}
   
   /// Destructor
   virtual ~RKIntegratorInternal();
@@ -96,6 +96,7 @@ public:
 
   // Number of sensitivity directions
   int nfdir_, nadir_;
+  
 };
 
 } // namespace CasADi

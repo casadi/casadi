@@ -43,6 +43,19 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv, const std:
   setOption("name", "unnamed_mx_function");
   setOption("numeric_jacobian", true);
 
+  // Check for duplicate entries among the input expressions
+  bool has_duplicates = false;
+  for(vector<MX>::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
+    has_duplicates = has_duplicates || it->getTemp()!=0;
+    it->setTemp(1);
+  }
+  
+  // Reset temporaries
+  for(vector<MX>::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
+    it->setTemp(0);
+  }
+  casadi_assert_message(!has_duplicates, "The input expressions are not independent.");
+  
   liftfun_ = 0;
   liftfun_ud_ = 0;
 }
@@ -357,11 +370,6 @@ void MXFunctionInternal::init(){
       }
     }
   }
-  
-  // Get the full Jacobian already now
-  if(jac_for_sens_){
-    getFullJacobian();
-  }
 
 log("MXFunctionInternal::init end");
 }
@@ -622,6 +630,17 @@ void MXFunctionInternal::spEvaluate(bool fwd){
     }
   }
 }
+
+// FX MXFunctionInternal::getJacobian(int iind, int oind){
+//   // Return function expression
+//   vector<MX> ret_out;
+//   ret_out.reserve(1+outputv_.size());
+//   ret_out.push_back(jac(iind,oind));
+//   ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
+//   
+//   // Return function
+//   return MXFunction(inputv_,ret_out);
+// }
 
 FX MXFunctionInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks){
   // Jacobian blocks

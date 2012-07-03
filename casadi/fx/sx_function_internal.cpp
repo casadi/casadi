@@ -61,7 +61,24 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix >& inputv, const ve
   addOption("inplace",OT_BOOLEAN,false,"Evaluate with inplace operations (experimental)");
   addOption("just_in_time",OT_BOOLEAN,false,"Just-in-time compilation for numeric evaluation (experimental)");
 
-  casadi_assert(!outputv_.empty());
+  // Check for duplicate entries among the input expressions
+  bool has_duplicates = false;
+  for(vector<SXMatrix >::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
+    for(vector<SX>::iterator itc = it->begin(); itc != it->end(); ++itc){
+      has_duplicates = has_duplicates || itc->getTemp()!=0;
+      itc->setTemp(1);
+    }
+  }
+  
+  // Reset temporaries
+  for(vector<SXMatrix >::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
+    for(vector<SX>::iterator itc = it->begin(); itc != it->end(); ++itc){
+      itc->setTemp(0);
+    }
+  }
+  casadi_assert_message(!has_duplicates, "The input expressions are not independent.");
+  
+  casadi_assert(!outputv_.empty()); // NOTE: Remove?
 }
 
 SXFunctionInternal::~SXFunctionInternal(){
@@ -463,9 +480,10 @@ void SXFunctionInternal::generateCode(const string& src_name){
 }
 
 void SXFunctionInternal::init(){
+  
   // Call the init function of the base class
   XFunctionInternal<SXFunctionInternal,SXMatrix,SXNode>::init();
-
+  
   // Stack used to sort the computational graph
   stack<SXNode*> s;
 
@@ -531,7 +549,7 @@ void SXFunctionInternal::init(){
   // Current output and nonzero, start with the first one
   int curr_oind, curr_nz=0;
   for(curr_oind=0; curr_oind<outputv_.size(); ++curr_oind){
-    if(!outputv_[curr_oind].empty()){
+    if(outputv_[curr_oind].size()!=0){
       break;
     }
   }
@@ -573,7 +591,7 @@ void SXFunctionInternal::init(){
           curr_nz=0;
           curr_oind++;
           for(; curr_oind<outputv_.size(); ++curr_oind){
-            if(!outputv_[curr_oind].empty()){
+            if(outputv_[curr_oind].size()!=0){
               break;
             }
           }
@@ -707,11 +725,6 @@ void SXFunctionInternal::init(){
   
   // Allocate memory for directional derivatives
   SXFunctionInternal::updateNumSens(false);
-  
-  // Get the full Jacobian already now
-  if(jac_for_sens_){
-    getFullJacobian();
-  }
   
   // Initialize just-in-time compilation
   just_in_time_ = getOption("just_in_time");
@@ -1098,6 +1111,17 @@ void SXFunctionInternal::clearSymbolic(){
   s_work_.clear();
 }
 
+// FX SXFunctionInternal::getJacobian(int iind, int oind){
+//   // Return function expression
+//   vector<SXMatrix> ret_out;
+//   ret_out.reserve(1+outputv_.size());
+//   ret_out.push_back(jac(iind,oind));
+//   ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
+//   
+//   // Return function
+//   return SXFunction(inputv_,ret_out);
+// }
+
 FX SXFunctionInternal::jacobian(const vector<pair<int,int> >& jblocks){
   // Jacobian blocks
   vector<SXMatrix> jac_out(jblocks.size());
@@ -1116,10 +1140,8 @@ FX SXFunctionInternal::jacobian(const vector<pair<int,int> >& jblocks){
     }
   }
   
-  vector<SXMatrix> inputv_v(inputv_);
-  
   // Return function
-  return SXFunction(inputv_v,jac_out);
+  return SXFunction(inputv_,jac_out);
 }
 
 void SXFunctionInternal::spInit(bool fwd){

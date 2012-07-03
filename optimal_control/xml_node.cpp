@@ -50,7 +50,7 @@ StrArg XMLNode::attribute(const string& attribute_name) const{
 
   // check that the attribute was indeed found
   if(it == attributes.end()){
-    throw CasadiException("Error in XMLNode::attribute: could not find \"" + attribute_name + "\"");
+    throw CasadiException("Error in XMLNode::attribute: could not find " + attribute_name);
   }
 
   // Return an instance of the XMLArg class (that automatically typeconverts into other types)

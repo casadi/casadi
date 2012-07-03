@@ -28,15 +28,14 @@ from pylab import *
 #! ODE integration
 #! -----------------
 #! Let's construct a simple Van der Pol oscillator.
-u = SX("u")
-x = SX("x")
-y = SX("y")
-f  = SXFunction([[x,y],[u]], [[(1-y*y)*x-y+u,x]])
+u = ssym("u")
+x = ssym("x")
+y = ssym("y")
+f  = SXFunction([vertcat([x,y]),u], [vertcat([(1-y*y)*x-y+u,x])])
 #! Manipulate the function to adhere to the integrator's
 #! input/output signature
 #! f(time;states;parameters)
-t = SX("t")
-fmod=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_Y: f.inputSX(0), DAE_P: f.inputSX(1)},[f.outputSX(0)])
+fmod=SXFunction(daeIn(f.inputSX(0),(),f.inputSX(1)),daeOut(f.outputSX(0)))
 fmod.setOption("name","ODE right hand side")
 #! Create the CVodesIntegrator
 integrator = CVodesIntegrator(fmod)
@@ -195,7 +194,7 @@ show()
 #! - a free symbolic input, held constant during integration interval
 u=MX("u")
 integrator.setFinalTime(tend)
-[w,_]=integrator.call({'NUM': INTEGRATOR_NUM_IN, INTEGRATOR_X0: MX([1,0]), INTEGRATOR_P: u})
+w,_,_,_ = integrator.call({'NUM': INTEGRATOR_NUM_IN, INTEGRATOR_X0: MX([1,0]), INTEGRATOR_P: u})
 
 #! We construct an MXfunction and a python help function 'out'
 f=MXFunction([u],[w])

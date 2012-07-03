@@ -187,10 +187,10 @@ void Mapping::assign(const MX& d, const std::vector<int>& inz, bool add){
 }
 
 void Mapping::assign(const MX& d, const std::vector<int>& inz, const std::vector<int>& onz, bool add){
-  casadi_assert(!d.isNull());
-  
   // Quick return if no elements
   if(inz.empty()) return;
+  
+  casadi_assert(!d.isNull());
   
   if(ELIMINATE_NESTED && d->isMapping()){ // Move this logic to init!
     // Clear the existing element if we are not adding

@@ -20,26 +20,6 @@
 # 
 # 
 # -*- coding: utf-8 -*-
-
- #    This file is part of CasADi.
- #
- #    CasADi -- A symbolic framework for dynamic optimization.
- #    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
- #
- #    CasADi is free software; you can redistribute it and/or
- #    modify it under the terms of the GNU Lesser General Public
- #    License as published by the Free Software Foundation; either
- #    version 3 of the License, or (at your option) any later version.
- #
- #    CasADi is distributed in the hope that it will be useful,
- #    but WITHOUT ANY WARRANTY; without even the implied warranty of
- #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- #    Lesser General Public License for more details.
- #
- #    You should have received a copy of the GNU Lesser General Public
- #    License along with CasADi; if not, write to the Free Software
- #    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-
 from casadi import *
 from numpy import *
 import matplotlib.pyplot as plt
@@ -84,19 +64,19 @@ def create_IDAS():
   t = SX("t")
 
   # Differential states
-  s = SX("s")
-  v = SX("v")
-  m = SX("m")
-  y = [s,v,m]
+  s = ssym("s")
+  v = ssym("v")
+  m = ssym("m")
+  y = vertcat([s,v,m])
   
   # State derivatives
-  sdot = SX("sdot")
-  vdot = SX("vdot")
-  mdot = SX("mdot")
-  ydot = [sdot,vdot,mdot]
+  sdot = ssym("sdot")
+  vdot = ssym("vdot")
+  mdot = ssym("mdot")
+  xdot = vertcat([sdot,vdot,mdot])
 
   # Control
-  u = SX("u")
+  u = ssym("u")
   
   # Reference trajectory
   u_ref = 3-sin(t)
@@ -106,24 +86,18 @@ def create_IDAS():
   u_dev *= u_dev
   
   # Differential equation (fully implicit form)
-  res = [v - sdot,  (u-0.02*v*v)/m - vdot, -0.01*u*u - mdot]
+  ode_res = vertcat([v - sdot,  (u-0.02*v*v)/m - vdot, -0.01*u*u - mdot])
 
   # Input of the DAE residual function
-  ffcn_in = DAE_NUM_IN * [[]]
-  ffcn_in[DAE_T] = [t]
-  ffcn_in[DAE_Y] = y
-  ffcn_in[DAE_YDOT] = ydot
-  ffcn_in[DAE_P] = [u]
+  ffcn_in = makeVector(SXMatrix,DAE_NUM_IN,DAE_T,t,DAE_X,y,DAE_XDOT,xdot,DAE_P,u)
+  ffcn_out = makeVector(SXMatrix,DAE_NUM_OUT,DAE_ODE,ode_res,DAE_QUAD,u_dev)
 
   # DAE residual function
-  ffcn = SXFunction(ffcn_in,[res])
+  ffcn = SXFunction(ffcn_in,ffcn_out)
   
-  # Quadrature function
-  qfcn = SXFunction(ffcn_in,[[u_dev]])
-
   if collocation_integrator:
     # Create a collocation integrator
-    integrator = CollocationIntegrator(ffcn,qfcn)
+    integrator = CollocationIntegrator(ffcn)
   
     # Set some options
     integrator.setOption("implicit_solver",KinsolSolver)
@@ -135,11 +109,10 @@ def create_IDAS():
     
   else:
     # Create an integrator
-    integrator = IdasIntegrator(ffcn,qfcn)
+    integrator = IdasIntegrator(ffcn)
 
     # Set IDAS specific options
     integrator.setOption("calc_ic",calc_ic)
-    integrator.setOption("is_differential",[1,1,1])
 
   # Return the integrator
   return integrator
@@ -147,16 +120,16 @@ def create_IDAS():
 # Create an CVODES instance (ODE integrator)
 def create_CVODES():
   # Time 
-  t = SX("t")
+  t = ssym("t")
 
   # Differential states
-  s = SX("s")
-  v = SX("v")
-  m = SX("m")
-  y = [s,v,m]
+  s = ssym("s")
+  v = ssym("v")
+  m = ssym("m")
+  y = vertcat([s,v,m])
   
   # Control
-  u = SX("u")
+  u = ssym("u")
   
   # Reference trajectory
   u_ref = 3-sin(t)
@@ -166,23 +139,20 @@ def create_CVODES():
   u_dev *= u_dev
   
   # Differential equation (fully implicit form)
-  rhs = [v, (u-0.02*v*v)/m, -0.01*u*u]
+  rhs = vertcat([v, (u-0.02*v*v)/m, -0.01*u*u])
 
   # Input of the DAE residual function
   ffcn_in = DAE_NUM_IN * [[]]
-  ffcn_in[DAE_T] = [t]
-  ffcn_in[DAE_Y] = y
-  ffcn_in[DAE_P] = [u]
+  ffcn_in[DAE_T] = t
+  ffcn_in[DAE_X] = y
+  ffcn_in[DAE_P] = u
 
   # DAE residual function
-  ffcn = SXFunction(ffcn_in,[rhs])
+  ffcn = SXFunction(ffcn_in,daeOut(rhs,[],u_dev))
   
-  # Quadrature function
-  qfcn = SXFunction(ffcn_in,[[u_dev]])
-
   if collocation_integrator:
     # Create a collocation integrator
-    integrator = CollocationIntegrator(ffcn,qfcn)
+    integrator = CollocationIntegrator(ffcn)
   
     # Set some options
     integrator.setOption("implicit_solver",KinsolSolver)
@@ -194,7 +164,7 @@ def create_CVODES():
     
   else:
     # Create an integrator
-    integrator = CVodesIntegrator(ffcn,qfcn)
+    integrator = CVodesIntegrator(ffcn)
   
   # Return the integrator
   return integrator
@@ -209,12 +179,8 @@ u_ub = 1.3
 u_init = 1
 
 # Initial conditions
-y0 = [0,0,1]
+x0 = [0,0,1]
   
-# Full state including quadratures
-x0 = list(y0)
-x0.append(0)
-
 # Integrator
 if implicit_integrator:
   integrator = create_IDAS()
@@ -259,10 +225,6 @@ integrator.setInput(u_init,INTEGRATOR_P)
 # Set inital state
 integrator.setInput(x0,INTEGRATOR_X0)
 
-# Set initial state derivative (if not to be calculated)
-if not calc_ic:
-  integrator.setInput([0,1,-0.01,0],INTEGRATOR_XP0)
-  
 # Integrate
 integrator.evaluate()
 

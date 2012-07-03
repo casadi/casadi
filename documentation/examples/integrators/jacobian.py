@@ -28,22 +28,23 @@ from numpy import *
 #!
 #$ $\ddot{u}+\dot{u}-\epsilon (2 \mu \dot{u}+\alpha u^3+2 k u \cos(\Omega t))$ with $\Omega = 2 + \epsilon \sigma$.
 
-t = SX("t")
+t = ssym("t")
 
-u = SX("u") 
-v = SX("v") 
+u = ssym("u") 
+v = ssym("v") 
 
-eps   = SX("eps")
-mu    = SX("mu")
-alpha = SX("alpha")
-k     = SX("k")
-sigma = SX("sigma")
+eps   = ssym("eps")
+mu    = ssym("mu")
+alpha = ssym("alpha")
+k     = ssym("k")
+sigma = ssym("sigma")
 Omega = 2 + eps*sigma
 
-params = [eps,mu,alpha,k,sigma]
-rhs    = [v,-u-eps*(2*mu*v+alpha*u**3+2*k*u*cos(Omega*t))]
+params = vertcat([eps,mu,alpha,k,sigma])
+states = vertcat([u,v])
+rhs    = vertcat([v,-u-eps*(2*mu*v+alpha*u**3+2*k*u*cos(Omega*t))])
 
-f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_Y: [u,v], DAE_P: params},[rhs])
+f=SXFunction(daeIn(states,(),params,t),daeOut(rhs))
 f.init()
 
 integrator = CVodesIntegrator(f)

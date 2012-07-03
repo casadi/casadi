@@ -37,7 +37,7 @@ namespace CasADi{
 class IntegratorInternal : public FXInternal{
 public:
   /** \brief  Constructor */
-  IntegratorInternal(const FX& fd, const FX& fq);
+  IntegratorInternal(const FX& f, const FX& g);
 
   /** \brief  Destructor */
   virtual ~IntegratorInternal()=0;
@@ -49,10 +49,7 @@ public:
   virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
   
   /** \brief  Create a new integrator */
-  virtual IntegratorInternal* create(const FX& fd, const FX& fq) const{ return 0;}
-  
-  /** \brief  Create a new integrator, new, not yet ready implementation */
-  virtual IntegratorInternal* create(const FX& f, const FX& g, const FX& h) const{ return 0;}
+  virtual IntegratorInternal* create(const FX& f, const FX& g) const = 0;
   
   /** \brief  Set linear solver */
   virtual void setLinearSolver(const LinearSolver& linsol, const FX& jac)=0;
@@ -90,30 +87,11 @@ public:
   /// Integration horizon
   double t0_, tf_;
   
-  /// Are we using the new integrator class
-  bool new_design_;
-  
   /// ODE/DAE forward integration function
   FX f_;
   
   /// ODE/DAE backward integration function, if any
   FX g_;
-  
-  /// Terminal constraint function, if any
-  FX h_;
-  
-  /// Set dimensions (to be removed)
-  void setDimensions(int nx, int np);
-
-
-  /// DAE residual function (to be removed)
-  FX fd_;
-
-  /// Quadrature function (to be removed)
-  FX fq_;
-  
-  /// number of states, excluding quadrature states (to be removed)
-  int ny_;  
   
   /// Number of right hand sides
   int nrhs_;
