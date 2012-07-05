@@ -271,6 +271,12 @@ bool SXFunctionInternal::isSmooth() const{
 void SXFunctionInternal::print(ostream &stream) const{
  FXInternal::print(stream);
 
+ // Quick return if not initialized
+ if(!isInit()){
+   stream << "Function not initialized" << endl;
+   return;
+ }
+ 
  // If JIT, dump LLVM IR
   #ifdef WITH_LLVM
   if(just_in_time_){
