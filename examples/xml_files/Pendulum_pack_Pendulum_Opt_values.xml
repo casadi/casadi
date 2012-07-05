@@ -1,9 +1,0 @@
-<IndependentParameters>
-	 <RealParameter name="pend.th0" value="0.1"/>
-	 <RealParameter name="pend.dth0" value="0.0"/>
-	 <RealParameter name="pend.x0" value="0.0"/>
-	 <RealParameter name="pend.dx0" value="0.0"/>
-	 <RealParameter name="x_ref" value="0.0"/>
-	 <RealParameter name="startTime" value="0.0"/>
-	 <RealParameter name="finalTime" value="8.0"/>
-</IndependentParameters>
