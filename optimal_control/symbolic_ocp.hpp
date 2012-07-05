@@ -183,6 +183,10 @@ class SymbolicOCP : public PrintableObject{
     
     /// Interval final time is free
     bool tf_free;
+    
+    /// Time points
+    std::vector<double> tp;
+    
     //@}
 
     /** @name Objective function terms
@@ -197,18 +201,26 @@ class SymbolicOCP : public PrintableObject{
     SXMatrix lterm;
     //@}
 
-    /** @name Constraints of the optimal control problem
+    /** @name Path constraints of the optimal control problem
     */
     //@{
 
     /// Path constraint functions
     SXMatrix path;
     
-    /// Path constraint functions upper bounds
-    DMatrix path_min;
+    /// Path constraint functions bounds
+    DMatrix path_min, path_max;
+    //@}
 
-    /// Path constraint functions upper bounds
-    DMatrix path_max;
+    /** @name Point constraints of the optimal control problem
+    */
+    //@{
+
+    /// Point constraint functions
+    SXMatrix point;
+    
+    /// Path constraint functions bounds
+    DMatrix point_min, point_max;
     //@}
 
     /// Parse from XML to C++ format
