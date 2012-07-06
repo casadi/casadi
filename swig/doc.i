@@ -69168,7 +69168,9 @@ C++ includes: symbolic_ocp.hpp ";
 
 */
 
-/*  Constraints of the optimal control problem  */
+/*  Path constraints of the optimal control problem  */
+
+/*  Point constraints of the optimal control problem  */
 
 /*  Manipulation  */
 
