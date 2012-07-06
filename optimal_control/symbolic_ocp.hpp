@@ -29,30 +29,28 @@ namespace CasADi{
   
   // Forward declarations
   class XMLNode;
-  
-  
+    
 /** \brief A flat OCP representation coupled to an XML file
 
  <H3>Variables:  </H3>
   \verbatim
+   x:      differential states
+   z:      algebraic states
+   p :     independent parameters
    t :     time
-   x :     differential and algebraic states defined by a fully-implicit DAE
-   xd:     differential states defined by an explicit ODE
-   xa:     algebraic states defined by an algebraic equation
+   u :     control signals
    q :     quadrature states
    y :     dependent variables
-   p :     independent parameters
-   u :     control signals
   \endverbatim 
-  
+
   <H3>Equations:  </H3>
   \verbatim
-  fully implicit DAE:       0 = dae(t,x,\dot{x},xd,xa,u,p)
-  explicit ODE:      \dot{xd} = ode(t,x,xd,xa,u,p)
-  quadratures:        \dot{q} = quad(t,x,xd,xa,u,p)
-  algebraic equations:      0 = alg(t,x,xd,xa,u,p)
-  dependent equations:      y = dep(t,x,xd,xa,u,p)
-  initial equations:        0 = initial(t,x,\dot{x},xd,xa,u,p)
+  implicit ODE/DAE:         0 = dae(t,x,z,\dot{x},u,p_free,pi,pd)
+  explicit ODE:       \dot{x} = ode(t,x,z,u,p_free,pi,pd)
+  algebraic equations:      0 = alg(t,x,z,u,p_free,pi,pd)
+  quadratures:        \dot{q} = quad(t,x,z,u,p_free,pi,pd)
+  dependent equations:      y = dep(t,x,z,u,p_free,pi,pd)
+  initial equations:        0 = initial(t,x,z,u,p_free,pi,pd)
   \endverbatim 
 
   <H3>Objective function terms:  </H3>
@@ -61,14 +59,10 @@ namespace CasADi{
   Lagrange terms:       \sum{\integral{mterm}}
   \endverbatim
 
-  Note that when parsed, all dynamic states, differential and algebraic, end up in the category "x" 
-  and all dynamic equations end up in the implicit category "dae". At a later state, the DAE can be
-  reformulated, for example in semi-explicit form, possibly in addition to a set of quadrature states.
+  Note that when parsed, all dynamic equations end up in the implicit category "dae". 
+  At a later state, the DAE can be reformulated, for example in semi-explicit form, 
+  possibly in addition to a set of quadrature states.
  
-  Also note that division of the states into three categories for states defined by a DAE, states
-  defined by an ODE and states defined by an algebraic equation. The category "xd" does thus _not_
-  include differential states that are implicitly defined by the DAE.
-
   The functions for reformulation is are provided as member functions to this class or as independent
   functions located in the header file "ocp_tools.hpp".
 
@@ -106,14 +100,14 @@ class SymbolicOCP : public PrintableObject{
     /// Differential and algebraic states defined by a fully-implicit DAE (length == dae().size())
     std::vector<Variable> x;
     
-    /// Differential states defined by an explicit ODE (length == ode().size())
+    /// Differential states
     std::vector<Variable> xd;
     
-    /// Algebraic states defined by an algebraic equation (length == alg().size())
-    std::vector<Variable> xa;
+    /// Algebraic states
+    std::vector<Variable> z;
     
     /// Quadrature states (length == quad().size())
-    std::vector<Variable> xq;
+    std::vector<Variable> q;
 
     /** \brief Independent constants */
     std::vector<Variable> ci;
@@ -149,19 +143,19 @@ class SymbolicOCP : public PrintableObject{
     */
     //@{
       
-    /// Fully implicit DAE (length == x().size())
+    /// Fully implicit DAE or implicit ODE
     SXMatrix dae;
     
-    /// Explicit ODE  (length == xd().size())
+    /// Explicit ODE
     SXMatrix ode;
     
-    /// Algebraic equations (length == xa().size())
+    /// Algebraic equations
     SXMatrix alg;
     
-    /// Quadrature states (length == q().size())
+    /// Quadrature equations
     SXMatrix quad;
     
-    /// Dependent equations (length == y().size())
+    /// Dependent equations
     SXMatrix dep;
     
     /// Initial equations (remove?)

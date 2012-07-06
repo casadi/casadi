@@ -402,8 +402,8 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
   // Make sure that the dimensions are consistent at this point
   casadi_assert(x.size()==dae.size());
   casadi_assert(xd.size()==ode.size());
-  casadi_assert(xa.size()==alg.size());
-  casadi_assert(xq.size()==quad.size());
+  casadi_assert(z.size()==alg.size());
+  casadi_assert(q.size()==quad.size());
   casadi_assert(y.size()==dep.size());
   
   // Return a reference to the created ocp
@@ -548,8 +548,8 @@ void SymbolicOCP::print(ostream &stream) const{
   stream << "Dimensions: "; 
   stream << "s = " << x.size() << ", ";
   stream << "#x = " << xd.size() << ", ";
-  stream << "#z = " << xa.size() << ", ";
-  stream << "#q = " << xq.size() << ", ";
+  stream << "#z = " << z.size() << ", ";
+  stream << "#q = " << q.size() << ", ";
   stream << "#y = " << y.size() << ", ";
   stream << "#p = " << p.size() << ", ";
   stream << "#u = " << u.size() << ", ";
@@ -563,8 +563,8 @@ void SymbolicOCP::print(ostream &stream) const{
   stream << "  t = " << t << endl;
   stream << "  s =  " << x << endl;
   stream << "  x = " << xd << endl;
-  stream << "  z =  " << xa << endl;
-  stream << "  q =  " << xq << endl;
+  stream << "  z =  " << z << endl;
+  stream << "  q =  " << q << endl;
   stream << "  y =  " << y << endl;
   stream << "  p =  " << p << endl;
   stream << "  pi =  " << pi << endl;
@@ -589,14 +589,14 @@ void SymbolicOCP::print(ostream &stream) const{
   stream << endl;
 
   stream << "Algebraic equations" << endl;
-  for(int k=0; k<xa.size(); ++k){
-    stream << xa.at(k) << " == " << alg.at(k) << endl;
+  for(int k=0; k<z.size(); ++k){
+    stream << z.at(k) << " == " << alg.at(k) << endl;
   }
   stream << endl;
   
   stream << "Quadrature equations" << endl;
-  for(int k=0; k<xq.size(); ++k){
-    stream << xq.at(k).der() << " == " << quad.at(k) << endl;
+  for(int k=0; k<q.size(); ++k){
+    stream << q.at(k).der() << " == " << quad.at(k) << endl;
   }
   stream << endl;
 
@@ -701,7 +701,7 @@ void SymbolicOCP::eliminateLagrangeTerms(){
     addVariable(q_name.str(),qv);
     
     // Add to the quadrature states
-    xq.push_back(qv);
+    q.push_back(qv);
 
     // Add the Lagrange term to the list of quadratures
     quad.append(*it);
@@ -717,8 +717,8 @@ void SymbolicOCP::eliminateLagrangeTerms(){
 void SymbolicOCP::eliminateQuadratureStates(){
   
   // Move all the quadratures to the list of differential states
-  xd.insert(xd.end(),xq.begin(),xq.end());
-  xq.clear();
+  xd.insert(xd.end(),q.begin(),q.end());
+  q.clear();
   
   // Move the equations to the list of ODEs
   ode.append(quad);
@@ -729,7 +729,7 @@ void SymbolicOCP::sortType(bool sort_by_variable_category){
   // Clear variables
   x.clear();
   xd.clear();
-  xa.clear();
+  z.clear();
   u.clear();
   cd.clear();
   ci.clear();
@@ -833,7 +833,7 @@ void SymbolicOCP::scaleVariables(){
   Matrix<SX> _x = var(x);
   Matrix<SX> _xdot = der(x);
   Matrix<SX> _xd = var(xd);
-  Matrix<SX> _xa = var(xa);
+  Matrix<SX> _z = var(z);
   Matrix<SX> _p = var(p);
   Matrix<SX> _u = var(u);
   
@@ -843,7 +843,7 @@ void SymbolicOCP::scaleVariables(){
   v.append(_x);
   v.append(_xdot);
   v.append(_xd);
-  v.append(_xa);
+  v.append(_z);
   v.append(_p);
   v.append(_u);
   
@@ -851,7 +851,7 @@ void SymbolicOCP::scaleVariables(){
   Matrix<SX> t_n = 1.;
   Matrix<SX> x_n = getNominal(x);
   Matrix<SX> xd_n = getNominal(xd);
-  Matrix<SX> xa_n = getNominal(xa);
+  Matrix<SX> z_n = getNominal(z);
   Matrix<SX> p_n = getNominal(p);
   Matrix<SX> u_n = getNominal(u);
   
@@ -861,7 +861,7 @@ void SymbolicOCP::scaleVariables(){
   v_old.append(_x*x_n);
   v_old.append(_xdot*x_n);
   v_old.append(_xd*xd_n);
-  v_old.append(_xa*xa_n);
+  v_old.append(_z*z_n);
   v_old.append(_p*p_n);
   v_old.append(_u*u_n);
   
@@ -899,7 +899,7 @@ void SymbolicOCP::scaleEquations(){
   v[T] = t;
   v[X] = var(xd);
   v[XDOT] = der(xd);
-  v[Z] = var(xa);
+  v[Z] = var(z);
   v[P] = var(p);
   v[U] = var(u);
 
@@ -917,7 +917,7 @@ void SymbolicOCP::scaleEquations(){
   J.setInput(0.0,T);
   J.setInput(getStart(xd,true),X);
   J.input(XDOT).setAll(0.0);
-  J.setInput(getStart(xa,true),Z);
+  J.setInput(getStart(z,true),Z);
   J.setInput(getStart(p,true),P);
   J.setInput(getStart(u,true),U);
   J.evaluate();
@@ -1065,7 +1065,7 @@ void SymbolicOCP::makeExplicit(){
         alg.append(fb);
         
         // ... and the variables accordingly
-        xa.insert(xa.end(),xab.begin(),xab.end());
+        z.insert(z.end(),xab.begin(),xab.end());
       } else { // The block contains differential states
         casadi_error("Cannot find an explicit expression for variable(s) " << xdb);
       }
@@ -1127,7 +1127,7 @@ vector<Variable> SymbolicOCP::x_all() const{
   vector<Variable> ret;
   ret.insert(ret.end(),x.begin(),x.end());
   ret.insert(ret.end(),xd.begin(),xd.end());
-  ret.insert(ret.end(),xa.begin(),xa.end());
+  ret.insert(ret.end(),z.begin(),z.end());
   return ret;
 }
 
@@ -1137,7 +1137,7 @@ vector<SXMatrix> SymbolicOCP::daeArg() const{
   vector<SXMatrix> ret(DAE_NUM_IN);
   ret[DAE_T] = t;
   ret[DAE_X] = var(xd);
-  ret[DAE_Z] = var(xa);
+  ret[DAE_Z] = var(z);
   ret[DAE_XDOT] = der(xd);
   ret[DAE_P] = vertcat<SX>(var(p),var(u));
   return ret;
@@ -1153,7 +1153,7 @@ void SymbolicOCP::makeAlgebraic(const Variable& v){
     if(xd[k].get()==v.get()){
       
       // Add to list of algebraic variables and to the list of algebraic equations
-      xa.push_back(v);
+      z.push_back(v);
       alg.append(ode.at(k));
       
       // Remove from list of differential variables and the list of differential equations
@@ -1413,47 +1413,47 @@ void SymbolicOCP::generateMuscodDatFile(const std::string& filename, const Dicti
   }
   
   // Algebraic state properties
-  if(!xa.empty()){
+  if(!z.empty()){
     datfile << "*  algebraic state start values, scale factors, and bounds" << endl;
     datfile << "sa(*,*)" << endl;
-    for(int k=0; k<xa.size(); ++k){
-      datfile << k << ": " << xa[k].getStart() << endl;
+    for(int k=0; k<z.size(); ++k){
+      datfile << k << ": " << z[k].getStart() << endl;
     }
     datfile << endl;
     
     datfile << "sa_sca(*,*)" << endl;
-    for(int k=0; k<xa.size(); ++k){
-      datfile << k << ": " << xa[k].getNominal() << endl;
+    for(int k=0; k<z.size(); ++k){
+      datfile << k << ": " << z[k].getNominal() << endl;
     }
     datfile << endl;
     
     datfile << "sa_min(*,*)" << endl;
-    for(int k=0; k<xa.size(); ++k){
-      datfile << k << ": " << xa[k].getMin() << endl;
+    for(int k=0; k<z.size(); ++k){
+      datfile << k << ": " << z[k].getMin() << endl;
     }
     datfile << endl;
     
     datfile << "sa_max(*,*)" << endl;
-    for(int k=0; k<xa.size(); ++k){
-      datfile << k << ": " << xa[k].getMax() << endl;
+    for(int k=0; k<z.size(); ++k){
+      datfile << k << ": " << z[k].getMax() << endl;
     }
     datfile << endl;
     
     datfile << "sa_fix(*,*)" << endl;
-    for(int k=0; k<xa.size(); ++k){
-      datfile << k << ": " << (xa[k].getMin()==xa[k].getMax()) << endl;
+    for(int k=0; k<z.size(); ++k){
+      datfile << k << ": " << (z[k].getMin()==z[k].getMax()) << endl;
     }
     datfile << endl;
 
     datfile << "xa_name" << endl;
-    for(int k=0; k<xa.size(); ++k){
-      datfile << k << ": " << xa[k].getName() << endl;
+    for(int k=0; k<z.size(); ++k){
+      datfile << k << ": " << z[k].getName() << endl;
     }
     datfile << endl;
     
     datfile << "xa_unit" << endl;
-    for(int k=0; k<xa.size(); ++k){
-      datfile << k << ": " << xa[k].getUnit() << endl;
+    for(int k=0; k<z.size(); ++k){
+      datfile << k << ": " << z[k].getUnit() << endl;
     }
     datfile << endl;
   }
