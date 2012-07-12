@@ -401,7 +401,7 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
   
   // Make sure that the dimensions are consistent at this point
   casadi_assert(xz.size()==dae.size());
-  casadi_assert(xd.size()==ode.size());
+  casadi_assert(x.size()==ode.size());
   casadi_assert(z.size()==alg.size());
   casadi_assert(q.size()==quad.size());
   casadi_assert(y.size()==dep.size());
@@ -547,7 +547,7 @@ void SymbolicOCP::repr(std::ostream &stream) const{
 void SymbolicOCP::print(ostream &stream) const{
   stream << "Dimensions: "; 
   stream << "#xz = " << xz.size() << ", ";
-  stream << "#x = " << xd.size() << ", ";
+  stream << "#x = " << x.size() << ", ";
   stream << "#z = " << z.size() << ", ";
   stream << "#q = " << q.size() << ", ";
   stream << "#y = " << y.size() << ", ";
@@ -566,7 +566,7 @@ void SymbolicOCP::print(ostream &stream) const{
   stream << "{" << endl;
   stream << "  t = " << t << endl;
   stream << "  xz =  " << xz << endl;
-  stream << "  x = " << xd << endl;
+  stream << "  x = " << x << endl;
   stream << "  z =  " << z << endl;
   stream << "  q =  " << q << endl;
   stream << "  y =  " << y << endl;
@@ -586,8 +586,8 @@ void SymbolicOCP::print(ostream &stream) const{
   stream << endl;
   
   stream << "Explicit differential equations" << endl;
-  for(int k=0; k<xd.size(); ++k){
-    stream << xd.at(k).der() << " == " << ode.at(k) << endl;
+  for(int k=0; k<x.size(); ++k){
+    stream << x.at(k).der() << " == " << ode.at(k) << endl;
   }
   stream << endl;
 
@@ -720,7 +720,7 @@ void SymbolicOCP::eliminateLagrangeTerms(){
 void SymbolicOCP::eliminateQuadratureStates(){
   
   // Move all the quadratures to the list of differential states
-  xd.insert(xd.end(),q.begin(),q.end());
+  x.insert(x.end(),q.begin(),q.end());
   q.clear();
   
   // Move the equations to the list of ODEs
@@ -733,7 +733,7 @@ void SymbolicOCP::sortType(bool sort_by_variable_category){
   
   // Clear variables
   xz.clear();
-  xd.clear();
+  x.clear();
   z.clear();
   u.clear();
   cd.clear();
@@ -791,7 +791,7 @@ void SymbolicOCP::scaleVariables(){
   // Variables
   Matrix<SX> _xz = var(xz);
   Matrix<SX> _xdot = der(xz);
-  Matrix<SX> _xd = var(xd);
+  Matrix<SX> _x = var(x);
   Matrix<SX> _z = var(z);
   Matrix<SX> _pi = var(pi);
   Matrix<SX> _pf = var(pf);
@@ -802,7 +802,7 @@ void SymbolicOCP::scaleVariables(){
   v.append(t);
   v.append(_xz);
   v.append(_xdot);
-  v.append(_xd);
+  v.append(_x);
   v.append(_z);
   v.append(_pi);
   v.append(_pf);
@@ -811,7 +811,7 @@ void SymbolicOCP::scaleVariables(){
   // Nominal values
   Matrix<SX> t_n = 1.;
   Matrix<SX> xz_n = getNominal(xz);
-  Matrix<SX> xd_n = getNominal(xd);
+  Matrix<SX> x_n = getNominal(x);
   Matrix<SX> z_n = getNominal(z);
   Matrix<SX> pi_n = getNominal(pi);
   Matrix<SX> pf_n = getNominal(pf);
@@ -822,7 +822,7 @@ void SymbolicOCP::scaleVariables(){
   v_old.append(t*t_n);
   v_old.append(_xz*xz_n);
   v_old.append(_xdot*xz_n);
-  v_old.append(_xd*xd_n);
+  v_old.append(_x*x_n);
   v_old.append(_z*z_n);
   v_old.append(_pi*pi_n);
   v_old.append(_pf*pf_n);
@@ -860,8 +860,8 @@ void SymbolicOCP::scaleEquations(){
   enum Variables{T,X,XDOT,Z,PI,PF,U,NUM_VAR};
   vector<Matrix<SX> > v(NUM_VAR); // all variables
   v[T] = t;
-  v[X] = var(xd);
-  v[XDOT] = der(xd);
+  v[X] = var(x);
+  v[XDOT] = der(x);
   v[Z] = var(z);
   v[PI] = var(pi);
   v[PF] = var(pf);
@@ -880,7 +880,7 @@ void SymbolicOCP::scaleEquations(){
   // Evaluate the Jacobian in the starting point
   J.init();
   J.setInput(0.0,T);
-  J.setInput(getStart(xd,true),X);
+  J.setInput(getStart(x,true),X);
   J.input(XDOT).setAll(0.0);
   J.setInput(getStart(z,true),Z);
   J.setInput(getStart(pi,true),PI);
@@ -1071,7 +1071,7 @@ void SymbolicOCP::makeExplicit(){
     // Check if differential state
     if(x_exp[k].isDifferential()){
       // Add to the ODE
-      xd.push_back(x_exp[k]);
+      x.push_back(x_exp[k]);
       ode.append(f_exp[k]);
     } else {
       // Add to the list of the dependent variables
@@ -1092,7 +1092,7 @@ void SymbolicOCP::makeExplicit(){
 vector<Variable> SymbolicOCP::x_all() const{
   vector<Variable> ret;
   ret.insert(ret.end(),xz.begin(),xz.end());
-  ret.insert(ret.end(),xd.begin(),xd.end());
+  ret.insert(ret.end(),x.begin(),x.end());
   ret.insert(ret.end(),z.begin(),z.end());
   return ret;
 }
@@ -1103,15 +1103,15 @@ void SymbolicOCP::makeAlgebraic(const std::string& name){
 
 void SymbolicOCP::makeAlgebraic(const Variable& v){
   // Find variable among the explicit variables
-  for(int k=0; k<xd.size(); ++k){
-    if(xd[k].get()==v.get()){
+  for(int k=0; k<x.size(); ++k){
+    if(x[k].get()==v.get()){
       
       // Add to list of algebraic variables and to the list of algebraic equations
       z.push_back(v);
       alg.append(ode.at(k));
       
       // Remove from list of differential variables and the list of differential equations
-      xd.erase(xd.begin()+k);
+      x.erase(x.begin()+k);
       vector<SX> ode_ = ode.data();
       ode_.erase(ode_.begin()+k);
       ode = ode_;
@@ -1324,47 +1324,47 @@ void SymbolicOCP::generateMuscodDatFile(const std::string& filename, const Dicti
   }
 
   // Differential state properties
-  if(!xd.empty()){
+  if(!x.empty()){
     datfile << "*  differential state start values, scale factors, and bounds" << endl;
     datfile << "sd(*,*)" << endl;
-    for(int k=0; k<xd.size(); ++k){
-      datfile << k << ": " << xd[k].getStart() << endl;
+    for(int k=0; k<x.size(); ++k){
+      datfile << k << ": " << x[k].getStart() << endl;
     }
     datfile << endl;
     
     datfile << "sd_sca(*,*)" << endl;
-    for(int k=0; k<xd.size(); ++k){
-      datfile << k << ": " << xd[k].getNominal() << endl;
+    for(int k=0; k<x.size(); ++k){
+      datfile << k << ": " << x[k].getNominal() << endl;
     }
     datfile << endl;
     
     datfile << "sd_min(*,*)" << endl;
-    for(int k=0; k<xd.size(); ++k){
-      datfile << k << ": " << xd[k].getMin() << endl;
+    for(int k=0; k<x.size(); ++k){
+      datfile << k << ": " << x[k].getMin() << endl;
     }
     datfile << endl;
     
     datfile << "sd_max(*,*)" << endl;
-    for(int k=0; k<xd.size(); ++k){
-      datfile << k << ": " << xd[k].getMax() << endl;
+    for(int k=0; k<x.size(); ++k){
+      datfile << k << ": " << x[k].getMax() << endl;
     }
     datfile << endl;
     
     datfile << "sd_fix(*,*)" << endl;
-    for(int k=0; k<xd.size(); ++k){
-      datfile << k << ": " << (xd[k].getMin()==xd[k].getMax()) << endl;
+    for(int k=0; k<x.size(); ++k){
+      datfile << k << ": " << (x[k].getMin()==x[k].getMax()) << endl;
     }
     datfile << endl;
 
     datfile << "xd_name" << endl;
-    for(int k=0; k<xd.size(); ++k){
-      datfile << k << ": " << xd[k].getName() << endl;
+    for(int k=0; k<x.size(); ++k){
+      datfile << k << ": " << x[k].getName() << endl;
     }
     datfile << endl;
 
     datfile << "xd_unit" << endl;
-    for(int k=0; k<xd.size(); ++k){
-      datfile << k << ": " << xd[k].getUnit() << endl;
+    for(int k=0; k<x.size(); ++k){
+      datfile << k << ": " << x[k].getUnit() << endl;
     }
     datfile << endl;
   }

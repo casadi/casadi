@@ -101,7 +101,7 @@ class SymbolicOCP : public PrintableObject{
     std::vector<Variable> xz;
     
     /// Differential states
-    std::vector<Variable> xd;
+    std::vector<Variable> x;
     
     /// Algebraic states
     std::vector<Variable> z;
