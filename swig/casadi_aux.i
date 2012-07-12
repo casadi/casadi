@@ -37,13 +37,20 @@ def _swig_repr(self):
   if hasattr(self,'getRepresentation'):
     return self.getRepresentation()
   else:
-    return self._swig_repr_default()
+    return _swig_repr_default(self)
 %}
 #endif // SWIGPYTHON
 
 %include "casadi/stl_vector_tools.hpp"
 VECTOR_TOOLS_TEMPLATES(int)
 VECTOR_TOOLS_TEMPLATES(double)
+
+%define VECTOR_REPR(type)
+%extend std::vector< type >{
+  std::string __repr__(){ return CasADi::getRepresentation(*$self); }
+  std::string __str__(){ return CasADi::getDescription(*$self); }
+};
+%enddef
 
 %include "casadi/printable_object.hpp"
 %include "casadi/shared_object.hpp"
