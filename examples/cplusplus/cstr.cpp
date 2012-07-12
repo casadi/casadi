@@ -75,7 +75,6 @@ int main(){
   SXMatrix t = ocp.t;
   SXMatrix x = var(ocp.x);
   SXMatrix xdot = der(ocp.x);
-  SXMatrix p = var(ocp.p);
   SXMatrix u = var(ocp.u);
     
   // Initial guess and bounds for the state

@@ -397,7 +397,7 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
   }
   
   // Sort the variables according to type
-  sortType();
+  sortType(true);
   
   // Make sure that the dimensions are consistent at this point
   casadi_assert(x.size()==dae.size());
@@ -546,12 +546,16 @@ void SymbolicOCP::repr(std::ostream &stream) const{
 
 void SymbolicOCP::print(ostream &stream) const{
   stream << "Dimensions: "; 
-  stream << "s = " << x.size() << ", ";
+  stream << "#s = " << x.size() << ", ";
   stream << "#x = " << xd.size() << ", ";
   stream << "#z = " << z.size() << ", ";
   stream << "#q = " << q.size() << ", ";
   stream << "#y = " << y.size() << ", ";
-  stream << "#p = " << p.size() << ", ";
+  stream << "#pi = " << pi.size() << ", ";
+  stream << "#pd = " << pd.size() << ", ";
+  stream << "#pf = " << pf.size() << ", ";
+  stream << "#ci =  " << ci.size() << ", ";
+  stream << "#cd =  " << cd.size() << ", ";
   stream << "#u = " << u.size() << ", ";
   stream << endl << endl;
 
@@ -566,10 +570,9 @@ void SymbolicOCP::print(ostream &stream) const{
   stream << "  z =  " << z << endl;
   stream << "  q =  " << q << endl;
   stream << "  y =  " << y << endl;
-  stream << "  p =  " << p << endl;
   stream << "  pi =  " << pi << endl;
   stream << "  pd =  " << pd << endl;
-  stream << "  p_free =  " << p_free << endl;
+  stream << "  pf =  " << pf << endl;
   stream << "  ci =  " << ci << endl;
   stream << "  cd =  " << cd << endl;
   stream << "  u =  " << u << endl;
@@ -726,6 +729,8 @@ void SymbolicOCP::eliminateQuadratureStates(){
 }
 
 void SymbolicOCP::sortType(bool sort_by_variable_category){
+  casadi_assert(sort_by_variable_category);
+  
   // Clear variables
   x.clear();
   xd.clear();
@@ -735,92 +740,46 @@ void SymbolicOCP::sortType(bool sort_by_variable_category){
   ci.clear();
   pd.clear();
   pi.clear();
-  p_free.clear();
+  pf.clear();
   
-  // To be removed
-  p.clear();
-  
-  if(sort_by_variable_category){
-
-    // Loop over variables
-    for(map<string,Variable>::iterator it=varmap_.begin(); it!=varmap_.end(); ++it){
-      // Get the variable
-      Variable& v = it->second;
-      
-      // Sort by category
-      switch(v.getCategory()){
-	case CAT_DERIVATIVE:
-	  // Skip derivatives
-	  break;
-	case CAT_STATE:
-	  x.push_back(v);
-	  break;
-	case CAT_DEPENDENT_CONSTANT:
-	  cd.push_back(v);
-	  break;
-	case CAT_INDEPENDENT_CONSTANT:
-	  ci.push_back(v);
-	  break;
-	case CAT_DEPENDENT_PARAMETER:
-	  pd.push_back(v);
-	  break;
-	case CAT_INDEPENDENT_PARAMETER:
-	  if(v.getFree()){
-	    p_free.push_back(v);
-	  } else {
-	    pi.push_back(v);
-	  }
-	  break;
-	case CAT_ALGEBRAIC:
-	  if(v.getCausality() == INTERNAL){
-	    x.push_back(v);
-	  } else if(v.getCausality() == INPUT){
-	    u.push_back(v);
-	  }
-	  break;
-	default:
-	  casadi_assert_message(0,"Unknown category");
-      }
-    }
-   
-   // Old implementation
-  } else {
-  
-    // Mark all dependent variables
-    for(vector<Variable>::iterator it=y.begin(); it!=y.end(); ++it){
-      it->var().setTemp(1);
-    }
+  // Loop over variables
+  for(map<string,Variable>::iterator it=varmap_.begin(); it!=varmap_.end(); ++it){
+    // Get the variable
+    Variable& v = it->second;
     
-    // Loop over variables
-    for(map<string,Variable>::iterator it=varmap_.begin(); it!=varmap_.end(); ++it){
-      // Get the variable
-      Variable& v = it->second;
-      
-      // If not dependent
-      if(v.var().getTemp()!=1){
-	// Try to determine the type
-	if(v.getVariability() == PARAMETER){
-	  if(v.getFree()){
-	    p.push_back(v); 
-	  } else {
-	    casadi_assert(0);
-	  }
-	} else if(v.getVariability() == CONTINUOUS) {
-	  if(v.getCausality() == INTERNAL){
-	    x.push_back(v);
-	  } else if(v.getCausality() == INPUT){
-	    u.push_back(v);
-	  }
-	} else if(v.getVariability() == CONSTANT){
-	  y.push_back(v);
-	  dep.append(v.getNominal());
-	}
-      }
-    }
-
-    // Unmark all dependent variables
-    for(vector<Variable>::iterator it=y.begin(); it!=y.end(); ++it){
-      it->var().setTemp(0);
+    // Sort by category
+    switch(v.getCategory()){
+      case CAT_DERIVATIVE:
+        // Skip derivatives
+        break;
+      case CAT_STATE:
+        x.push_back(v);
+        break;
+      case CAT_DEPENDENT_CONSTANT:
+        cd.push_back(v);
+        break;
+      case CAT_INDEPENDENT_CONSTANT:
+        ci.push_back(v);
+        break;
+      case CAT_DEPENDENT_PARAMETER:
+        pd.push_back(v);
+        break;
+      case CAT_INDEPENDENT_PARAMETER:
+        if(v.getFree()){
+          pf.push_back(v);
+        } else {
+          pi.push_back(v);
+        }
+        break;
+      case CAT_ALGEBRAIC:
+        if(v.getCausality() == INTERNAL){
+          x.push_back(v);
+        } else if(v.getCausality() == INPUT){
+          u.push_back(v);
+        }
+        break;
+      default:
+        casadi_assert_message(0,"Unknown category");
     }
   }
 }
@@ -834,7 +793,8 @@ void SymbolicOCP::scaleVariables(){
   Matrix<SX> _xdot = der(x);
   Matrix<SX> _xd = var(xd);
   Matrix<SX> _z = var(z);
-  Matrix<SX> _p = var(p);
+  Matrix<SX> _pi = var(pi);
+  Matrix<SX> _pf = var(pf);
   Matrix<SX> _u = var(u);
   
   // Collect all the variables
@@ -844,7 +804,8 @@ void SymbolicOCP::scaleVariables(){
   v.append(_xdot);
   v.append(_xd);
   v.append(_z);
-  v.append(_p);
+  v.append(_pi);
+  v.append(_pf);
   v.append(_u);
   
   // Nominal values
@@ -852,7 +813,8 @@ void SymbolicOCP::scaleVariables(){
   Matrix<SX> x_n = getNominal(x);
   Matrix<SX> xd_n = getNominal(xd);
   Matrix<SX> z_n = getNominal(z);
-  Matrix<SX> p_n = getNominal(p);
+  Matrix<SX> pi_n = getNominal(pi);
+  Matrix<SX> pf_n = getNominal(pf);
   Matrix<SX> u_n = getNominal(u);
   
   // Get all the old variables in expressed in the nominal ones
@@ -862,7 +824,8 @@ void SymbolicOCP::scaleVariables(){
   v_old.append(_xdot*x_n);
   v_old.append(_xd*xd_n);
   v_old.append(_z*z_n);
-  v_old.append(_p*p_n);
+  v_old.append(_pi*pi_n);
+  v_old.append(_pf*pf_n);
   v_old.append(_u*u_n);
   
   // Temporary variable
@@ -894,20 +857,22 @@ void SymbolicOCP::scaleEquations(){
   double time1 = clock();
 
   // Variables
-  enum Variables{T,X,XDOT,Z,P,U,NUM_VAR};
+  enum Variables{T,X,XDOT,Z,PI,PF,U,NUM_VAR};
   vector<Matrix<SX> > v(NUM_VAR); // all variables
   v[T] = t;
   v[X] = var(xd);
   v[XDOT] = der(xd);
   v[Z] = var(z);
-  v[P] = var(p);
+  v[PI] = var(pi);
+  v[PF] = var(pf);
   v[U] = var(u);
 
   // Create the jacobian of the implicit equations with respect to [x,z,p,u] 
   Matrix<SX> xz;
   xz.append(v[X]);
   xz.append(v[Z]);
-  xz.append(v[P]);
+  xz.append(v[PI]);
+  xz.append(v[PF]);
   xz.append(v[U]);
   SXFunction fcn = SXFunction(xz,dae);
   SXFunction J(v,fcn.jac());
@@ -918,7 +883,8 @@ void SymbolicOCP::scaleEquations(){
   J.setInput(getStart(xd,true),X);
   J.input(XDOT).setAll(0.0);
   J.setInput(getStart(z,true),Z);
-  J.setInput(getStart(p,true),P);
+  J.setInput(getStart(pi,true),PI);
+  J.setInput(getStart(pf,true),PF);
   J.setInput(getStart(u,true),U);
   J.evaluate();
   
@@ -1131,18 +1097,6 @@ vector<Variable> SymbolicOCP::x_all() const{
   return ret;
 }
 
-vector<SXMatrix> SymbolicOCP::daeArg() const{
-  
-  // Return value
-  vector<SXMatrix> ret(DAE_NUM_IN);
-  ret[DAE_T] = t;
-  ret[DAE_X] = var(xd);
-  ret[DAE_Z] = var(z);
-  ret[DAE_XDOT] = der(xd);
-  ret[DAE_P] = vertcat<SX>(var(p),var(u));
-  return ret;
-}
-
 void SymbolicOCP::makeAlgebraic(const std::string& name){
   makeAlgebraic(variable(name));
 }
@@ -1321,6 +1275,9 @@ void SymbolicOCP::generateMuscodDatFile(const std::string& filename, const Dicti
   datfile << endl;
     
   // Parameter properties
+  vector<Variable> p;
+  p.insert(p.end(),pi.begin(),pi.end());
+  p.insert(p.end(),pf.begin(),pf.end());
   if(!p.empty()){
     datfile << "*  global model parameter start values, scale factors, and bounds" << endl;
     datfile << "p" << endl;

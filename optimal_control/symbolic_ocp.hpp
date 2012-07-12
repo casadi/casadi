@@ -125,15 +125,12 @@ class SymbolicOCP : public PrintableObject{
 
     /** \brief Free parameters 
      A free parameter (which is Optimica specific without correspondance in Modelica) is a parameter that the optimization algorithm can change in order to minimize the cost function: "parameter Real x(free=true)". Note that these parameters in contrast to dependent/independent parameters may change after the DAE has been initialized. A free parameter should not have any binding expression since it would then no longer be free. The compiler will transform non-free parameters to free parameters if they depend on a free parameters. The "free" attribute thus propagage through the parameter binding equations. */
-    std::vector<Variable> p_free;
+    std::vector<Variable> pf;
     
-    /// Dependent variables (length == dep().size())
+    /** \brief Dependent variables (length == dep().size()) */
     std::vector<Variable> y;
     
-    /// Independent parameters (to be removed and replaced by pi, pd and p_free)
-    std::vector<Variable> p;
-    
-    /// Control signals
+    /** \brief Control signals */
     std::vector<Variable> u;
 
     //@}
@@ -256,12 +253,6 @@ class SymbolicOCP : public PrintableObject{
 
     /// Transform the fully implicit DAE to a explicit or semi-explicit form
     void makeExplicit();
-
-    /** \brief Get the ODE/DAE input arguments
-    * Returns a vector of inputs using the following scheme:
-    * @copydoc scheme_DAEInput 
-    */
-    std::vector<SXMatrix> daeArg() const;
     
     /// Substitute the dependents from a set of expressions
     std::vector<SXMatrix> substituteDependents(const std::vector<SXMatrix>& x) const;
@@ -284,7 +275,7 @@ class SymbolicOCP : public PrintableObject{
     Variable& readVariable(const XMLNode& node);
 
     /// Sort variables according to type
-    void sortType(bool sort_by_variable_category=false);
+    void sortType(bool sort_by_variable_category);
     
     /// Scale the variables
     void scaleVariables();
