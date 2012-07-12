@@ -396,9 +396,6 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
     }
   }
   
-  // Sort the variables according to type
-  sortType(true);
-  
   // Make sure that the dimensions are consistent at this point
   casadi_assert(xz.size()==dae.size());
   casadi_assert(x.size()==ode.size());
@@ -726,62 +723,6 @@ void SymbolicOCP::eliminateQuadratureStates(){
   // Move the equations to the list of ODEs
   ode.append(quad);
   quad.clear();
-}
-
-void SymbolicOCP::sortType(bool sort_by_variable_category){
-  casadi_assert(sort_by_variable_category);
-  
-  // Clear variables
-  xz.clear();
-  x.clear();
-  z.clear();
-  u.clear();
-  cd.clear();
-  ci.clear();
-  pd.clear();
-  pi.clear();
-  pf.clear();
-  
-  // Loop over variables
-  for(map<string,Variable>::iterator it=varmap_.begin(); it!=varmap_.end(); ++it){
-    // Get the variable
-    Variable& v = it->second;
-    
-    // Sort by category
-    switch(v.getCategory()){
-      case CAT_DERIVATIVE:
-        // Skip derivatives
-        break;
-      case CAT_STATE:
-        xz.push_back(v);
-        break;
-      case CAT_DEPENDENT_CONSTANT:
-        cd.push_back(v);
-        break;
-      case CAT_INDEPENDENT_CONSTANT:
-        ci.push_back(v);
-        break;
-      case CAT_DEPENDENT_PARAMETER:
-        pd.push_back(v);
-        break;
-      case CAT_INDEPENDENT_PARAMETER:
-        if(v.getFree()){
-          pf.push_back(v);
-        } else {
-          pi.push_back(v);
-        }
-        break;
-      case CAT_ALGEBRAIC:
-        if(v.getCausality() == INTERNAL){
-          xz.push_back(v);
-        } else if(v.getCausality() == INPUT){
-          u.push_back(v);
-        }
-        break;
-      default:
-        casadi_assert_message(0,"Unknown category");
-    }
-  }
 }
 
 void SymbolicOCP::scaleVariables(){
@@ -1160,7 +1101,43 @@ void SymbolicOCP::addVariable(const std::string& name, const Variable& var){
     throw CasadiException(ss.str());
   }
   
+  // Add to the map of all variables
   varmap_[name] = var;
+  
+  // Sort by category
+  switch(var.getCategory()){
+    case CAT_DERIVATIVE:
+      // Skip derivatives
+      break;
+    case CAT_STATE:
+      xz.push_back(var);
+      break;
+    case CAT_DEPENDENT_CONSTANT:
+      cd.push_back(var);
+      break;
+    case CAT_INDEPENDENT_CONSTANT:
+      ci.push_back(var);
+      break;
+    case CAT_DEPENDENT_PARAMETER:
+      pd.push_back(var);
+      break;
+    case CAT_INDEPENDENT_PARAMETER:
+      if(var.getFree()){
+        pf.push_back(var);
+      } else {
+        pi.push_back(var);
+      }
+      break;
+    case CAT_ALGEBRAIC:
+      if(var.getCausality() == INTERNAL){
+        xz.push_back(var);
+      } else if(var.getCausality() == INPUT){
+        u.push_back(var);
+      }
+      break;
+    default:
+      casadi_assert_message(0,"Unknown category");
+  }
 }
 
 std::string SymbolicOCP::qualifiedName(const XMLNode& nn){

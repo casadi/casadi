@@ -94,19 +94,19 @@ class SymbolicOCP : public PrintableObject{
     *  Public data members
     */
     //@{
-    /// Time
+    /** \brief Time */
     SXMatrix t;
     
     /// Differential and algebraic states defined by a fully-implicit DAE (length == dae().size())
     std::vector<Variable> xz;
     
-    /// Differential states
+    /** \brief Differential states */
     std::vector<Variable> x;
     
-    /// Algebraic states
+    /** \brief Algebraic states */
     std::vector<Variable> z;
     
-    /// Quadrature states (length == quad().size())
+    /** \brief Quadrature states (length == quad().size()) */
     std::vector<Variable> q;
 
     /** \brief Independent constants */
@@ -274,9 +274,6 @@ class SymbolicOCP : public PrintableObject{
     /// Read a variable
     Variable& readVariable(const XMLNode& node);
 
-    /// Sort variables according to type
-    void sortType(bool sort_by_variable_category);
-    
     /// Scale the variables
     void scaleVariables();
     
