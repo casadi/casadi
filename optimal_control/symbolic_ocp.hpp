@@ -98,7 +98,7 @@ class SymbolicOCP : public PrintableObject{
     SXMatrix t;
     
     /// Differential and algebraic states defined by a fully-implicit DAE (length == dae().size())
-    std::vector<Variable> x;
+    std::vector<Variable> xz;
     
     /// Differential states
     std::vector<Variable> xd;

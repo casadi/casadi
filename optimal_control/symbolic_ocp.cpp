@@ -400,7 +400,7 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
   sortType(true);
   
   // Make sure that the dimensions are consistent at this point
-  casadi_assert(x.size()==dae.size());
+  casadi_assert(xz.size()==dae.size());
   casadi_assert(xd.size()==ode.size());
   casadi_assert(z.size()==alg.size());
   casadi_assert(q.size()==quad.size());
@@ -546,7 +546,7 @@ void SymbolicOCP::repr(std::ostream &stream) const{
 
 void SymbolicOCP::print(ostream &stream) const{
   stream << "Dimensions: "; 
-  stream << "#s = " << x.size() << ", ";
+  stream << "#xz = " << xz.size() << ", ";
   stream << "#x = " << xd.size() << ", ";
   stream << "#z = " << z.size() << ", ";
   stream << "#q = " << q.size() << ", ";
@@ -565,7 +565,7 @@ void SymbolicOCP::print(ostream &stream) const{
   // Print the variables
   stream << "{" << endl;
   stream << "  t = " << t << endl;
-  stream << "  s =  " << x << endl;
+  stream << "  xz =  " << xz << endl;
   stream << "  x = " << xd << endl;
   stream << "  z =  " << z << endl;
   stream << "  q =  " << q << endl;
@@ -732,7 +732,7 @@ void SymbolicOCP::sortType(bool sort_by_variable_category){
   casadi_assert(sort_by_variable_category);
   
   // Clear variables
-  x.clear();
+  xz.clear();
   xd.clear();
   z.clear();
   u.clear();
@@ -753,7 +753,7 @@ void SymbolicOCP::sortType(bool sort_by_variable_category){
         // Skip derivatives
         break;
       case CAT_STATE:
-        x.push_back(v);
+        xz.push_back(v);
         break;
       case CAT_DEPENDENT_CONSTANT:
         cd.push_back(v);
@@ -773,7 +773,7 @@ void SymbolicOCP::sortType(bool sort_by_variable_category){
         break;
       case CAT_ALGEBRAIC:
         if(v.getCausality() == INTERNAL){
-          x.push_back(v);
+          xz.push_back(v);
         } else if(v.getCausality() == INPUT){
           u.push_back(v);
         }
@@ -789,8 +789,8 @@ void SymbolicOCP::scaleVariables(){
   double time1 = clock();
   
   // Variables
-  Matrix<SX> _x = var(x);
-  Matrix<SX> _xdot = der(x);
+  Matrix<SX> _xz = var(xz);
+  Matrix<SX> _xdot = der(xz);
   Matrix<SX> _xd = var(xd);
   Matrix<SX> _z = var(z);
   Matrix<SX> _pi = var(pi);
@@ -800,7 +800,7 @@ void SymbolicOCP::scaleVariables(){
   // Collect all the variables
   Matrix<SX> v;
   v.append(t);
-  v.append(_x);
+  v.append(_xz);
   v.append(_xdot);
   v.append(_xd);
   v.append(_z);
@@ -810,7 +810,7 @@ void SymbolicOCP::scaleVariables(){
   
   // Nominal values
   Matrix<SX> t_n = 1.;
-  Matrix<SX> x_n = getNominal(x);
+  Matrix<SX> xz_n = getNominal(xz);
   Matrix<SX> xd_n = getNominal(xd);
   Matrix<SX> z_n = getNominal(z);
   Matrix<SX> pi_n = getNominal(pi);
@@ -820,8 +820,8 @@ void SymbolicOCP::scaleVariables(){
   // Get all the old variables in expressed in the nominal ones
   Matrix<SX> v_old;
   v_old.append(t*t_n);
-  v_old.append(_x*x_n);
-  v_old.append(_xdot*x_n);
+  v_old.append(_xz*xz_n);
+  v_old.append(_xdot*xz_n);
   v_old.append(_xd*xd_n);
   v_old.append(_z*z_n);
   v_old.append(_pi*pi_n);
@@ -922,8 +922,8 @@ void SymbolicOCP::scaleEquations(){
 
 void SymbolicOCP::sortDAE(){
   // Get the sparsity of the Jacobian df/fx + tau*df/xdot
-  SXMatrix dae_only_x = substitute(dae,der(x),ssym("tau")*var(x));
-  SXFunction f(var(x),dae_only_x);
+  SXMatrix dae_only_x = substitute(dae,der(xz),ssym("tau")*var(xz));
+  SXFunction f(var(xz),dae_only_x);
   f.init();
   CRSSparsity sp = f.jacSparsity();
   
@@ -939,20 +939,20 @@ void SymbolicOCP::sortDAE(){
   dae_new.swap(dae.data());
   
   // Permute variables
-  vector<Variable> x_new(x.size());
-  for(int i=0; i<x.size(); ++i){
-    x_new[i]= x[colperm[i]];
+  vector<Variable> xz_new(xz.size());
+  for(int i=0; i<xz.size(); ++i){
+    xz_new[i]= xz[colperm[i]];
   }
-  x_new.swap(x);
+  xz_new.swap(xz);
 }
 
 void SymbolicOCP::makeExplicit(){
   
   // Quick return if there are no implicitly defined states
-  if(x.empty()) return;
+  if(xz.empty()) return;
   
   // Write the DAE as a function of the highest unknown derivatives (algebraic states and state derivatives)
-  SXFunction f(highest(x),dae);
+  SXFunction f(highest(xz),dae);
   f.init();
 
   // Get the sparsity of the Jacobian which can be used to determine which variable can be calculated from which other
@@ -971,15 +971,15 @@ void SymbolicOCP::makeExplicit(){
   dae_new.clear();
   
   // Permute variables
-  vector<Variable> x_new(x.size());
-  for(int i=0; i<x.size(); ++i){
-    x_new[i]= x[colperm[i]];
+  vector<Variable> xz_new(xz.size());
+  for(int i=0; i<xz.size(); ++i){
+    xz_new[i]= xz[colperm[i]];
   }
-  x_new.swap(x);
-  x_new.clear();
+  xz_new.swap(xz);
+  xz_new.clear();
 
   // Rewrite the sorted DAE as a function of the highest unknown derivatives
-  f = SXFunction(highest(x),dae);
+  f = SXFunction(highest(xz),dae);
   f.init();
 
   // Get the Jacobian
@@ -1006,11 +1006,11 @@ void SymbolicOCP::makeExplicit(){
     xdb.clear();
     xab.clear();
     for(int i=colblock[b]; i<colblock[b+1]; ++i){
-      xb.push_back(x[i]);
-      if(x[i].isDifferential()){
-        xdb.push_back(x[i]);
+      xb.push_back(xz[i]);
+      if(xz[i].isDifferential()){
+        xdb.push_back(xz[i]);
       } else {
-        xab.push_back(x[i]);
+        xab.push_back(xz[i]);
       }
     }
 
@@ -1085,13 +1085,13 @@ void SymbolicOCP::makeExplicit(){
   dep = vertcat(SXMatrix(dep_new),dep);
   
   // Remove the eliminated variables and equations
-  x.clear();
+  xz.clear();
   dae.clear();
 }
 
 vector<Variable> SymbolicOCP::x_all() const{
   vector<Variable> ret;
-  ret.insert(ret.end(),x.begin(),x.end());
+  ret.insert(ret.end(),xz.begin(),xz.end());
   ret.insert(ret.end(),xd.begin(),xd.end());
   ret.insert(ret.end(),z.begin(),z.end());
   return ret;
@@ -1122,14 +1122,14 @@ void SymbolicOCP::makeAlgebraic(const Variable& v){
   }
   
   // Find the variable among the implicit variables
-  for(int k=0; k<x.size(); ++k){
-    if(x[k].get()==v.get()){
+  for(int k=0; k<xz.size(); ++k){
+    if(xz[k].get()==v.get()){
       
       // Substitute the state derivative with zero
-      dae = substitute(dae,x[k].der(),0.0);
+      dae = substitute(dae,xz[k].der(),0.0);
 
       // Remove the highest state derivative expression from the variable
-      x[k].setDifferential(false);
+      xz[k].setDifferential(false);
 
       // Successfull return
       return;
@@ -1188,7 +1188,7 @@ std::string SymbolicOCP::qualifiedName(const XMLNode& nn){
 
 void SymbolicOCP::generateMuscodDatFile(const std::string& filename, const Dictionary& mc2_ops) const{
   // Make sure that the OCP is in semi-explicit form
-  casadi_assert_message(x.empty(), "The DAE must be in semi-explicit form");
+  casadi_assert_message(xz.empty(), "The DAE must be in semi-explicit form");
   
   // Print
   cout << "Generating: " << filename << endl;

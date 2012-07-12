@@ -73,14 +73,14 @@ int main(){
   
   // Variables
   SXMatrix t = ocp.t;
-  SXMatrix x = var(ocp.x);
-  SXMatrix xdot = der(ocp.x);
+  SXMatrix x = var(ocp.xz);
+  SXMatrix xdot = der(ocp.xz);
   SXMatrix u = var(ocp.u);
     
   // Initial guess and bounds for the state
-  vector<double> x0 = getStart(ocp.x,true);
-  vector<double> xmin = getMin(ocp.x,true);
-  vector<double> xmax = getMax(ocp.x,true);
+  vector<double> x0 = getStart(ocp.xz,true);
+  vector<double> xmin = getMin(ocp.xz,true);
+  vector<double> xmax = getMax(ocp.xz,true);
   
   // Initial guess and bounds for the control
   vector<double> u0 = getStart(ocp.u,true);
