@@ -81,20 +81,9 @@
 
 #endif // SWIGPYTHON
 
-%extend std::vector<CasADi::SX>{
-  std::string __repr__(){ return CasADi::getRepresentation(*$self); }
-  std::string __str__(){ return CasADi::getDescription(*$self); }
-};
-
-%extend std::vector<CasADi::Matrix< CasADi::SX> >{
-  std::string __repr__(){ return CasADi::getRepresentation(*$self); }
-  std::string __str__(){ return CasADi::getDescription(*$self); }
-};
-
-%extend std::vector<std::vector< CasADi::SX> >{
-  std::string __repr__(){ return CasADi::getRepresentation(*$self); }
-  std::string __str__(){ return CasADi::getDescription(*$self); }
-};
+VECTOR_REPR(CasADi::SX)
+VECTOR_REPR(std::vector<CasADi::SX>)
+VECTOR_REPR(CasADi::Matrix<CasADi::SX>)
 
 #ifdef SWIGPYTHON
 %pythoncode %{

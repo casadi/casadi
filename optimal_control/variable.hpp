@@ -64,7 +64,10 @@ namespace CasADi{
     // Forward declaration
     class VariableInternal;
 
-  // Smart pointer class
+  /** \brief Smart pointer class to a Variable
+  *  
+  *  In a sense, a Variable is an SX expression with meta-data attached.
+  */
   class Variable : public SharedObject{
     public:
     

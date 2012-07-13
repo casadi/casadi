@@ -26,17 +26,20 @@ from numpy import Inf
 def reportBounds(value,lowerbound,upperbound,labels=None,tol=1e-8,showNonViolating=True):
   if isinstance(labels,Variables):
     labels = labels.getLabels()
-  
+    
+
   v = list(value.data())
   lb = list(lowerbound.data())
   ub = list(upperbound.data())
+
+  if labels is None:
+    labels = [""] * len(v) 
   
   if not(len(v)==len(lb) and len(lb)==len(ub)):
     raise Exception("value, lowerbound and upperbound must all be the same size, but got %d, %d and %d. " % (len(v),len(lb),len(ub)))
   
-  if (labels is None):
-    if len(labels)!=len(v):
-      raise Exception("Labels (%d) must be same size as values (%d)" % (len(labels),len(v)))
+  if len(labels)!=len(v):
+    raise Exception("Labels (%d) must be same size as values (%d)" % (len(labels),len(v)))
   
   if ( all(value <= upperbound + tol) and all(value >= lowerbound - tol) ):
     print "All %d bounds are met: " % value.size()

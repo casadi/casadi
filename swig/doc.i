@@ -69888,7 +69888,13 @@ print ";
 
 
 // File: classCasADi_1_1Variable.xml
-%feature("docstring") CasADi::Variable "C++ includes: variable.hpp ";
+%feature("docstring") CasADi::Variable "
+
+Smart pointer class to a Variable.
+
+In a sense, a Variable is an SX expression with meta-data attached.
+
+C++ includes: variable.hpp ";
 
 %feature("docstring")  CasADi::Variable::makeUnique "
 

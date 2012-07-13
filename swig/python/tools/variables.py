@@ -470,8 +470,15 @@ class Variables(object):
           
 class Numbers(object):
   def __init__(self,variables=None, recycle = False):
+    if (isinstance(variables,Numbers)):
+      self._variables = variables._variables
+      self._d_ = copy.deepcopy(variables._d_)
+      self._numbers = copy.deepcopy(variables._numbers)
+      return
+      
     if (variables is None or not(isinstance(variables,Variables)) or not(variables._frozen)):
       raise Exception("You must supply the Numbers constructor with a Variables instance in frozen configuration.")
+      
       
     self._variables = variables
     self._d_ = dict()
