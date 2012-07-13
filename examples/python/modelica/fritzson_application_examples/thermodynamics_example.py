@@ -68,12 +68,15 @@ ocp.parseFMI('BasicVolumeMassConservation.xml')
 # Make the OCP explicit
 ocp.makeExplicit()
 
+# Eliminate the algebraic states
+ocp.eliminateAlgebraic()
+
 # Create an integrator
 dae_in = DAE_NUM_IN * [[]]
 dae_in[DAE_T] = ocp.t
-dae_in[DAE_X] = var(ocp.xd)
-dae_in[DAE_XDOT] = der(ocp.xd)
-dae_in[DAE_P] = var(ocp.p)
+dae_in[DAE_X] = var(ocp.x)
+dae_in[DAE_XDOT] = der(ocp.x)
+dae_in[DAE_P] = vertcat((var(ocp.pi),var(ocp.pf)))
 dae_out = DAE_NUM_OUT * [[]]
 dae_out[DAE_ODE] = ocp.ode
 dae = SXFunction(dae_in,dae_out)
@@ -83,7 +86,7 @@ integrator = CVodesIntegrator(dae)
 m = ocp.variable("m").var()
 P = ocp.variable("P").var()
 output_fcn_out = ocp.substituteDependents([m,P])
-output_fcn_in = ocp.daeArg()
+output_fcn_in = daeIn(var(ocp.x),var(ocp.z),vertcat((var(ocp.pi),var(ocp.pf),var(ocp.u))),ocp.t,der(ocp.x))
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
 
 # Create a simulator
@@ -92,7 +95,7 @@ simulator = Simulator(integrator,output_fcn,grid)
 simulator.init()
 
 # Pass initial conditions
-x0 = getStart(ocp.xd)
+x0 = getStart(ocp.x)
 simulator.setInput(x0,INTEGRATOR_X0)
 
 # Simulate
@@ -124,12 +127,15 @@ ocp.parseFMI('BasicVolumeEnergyConservation.xml')
 # Make the OCP explicit
 ocp.makeExplicit()
 
+# Eliminate the algebraic states
+ocp.eliminateAlgebraic()
+
 # Create an integrator
 dae_in = DAE_NUM_IN * [[]]
 dae_in[DAE_T] = ocp.t
-dae_in[DAE_X] = var(ocp.xd)
-dae_in[DAE_XDOT] = der(ocp.xd)
-dae_in[DAE_P] = var(ocp.p)
+dae_in[DAE_X] = var(ocp.x)
+dae_in[DAE_XDOT] = der(ocp.x)
+dae_in[DAE_P] = vertcat((var(ocp.pi),var(ocp.pf)))
 dae_out = DAE_NUM_OUT * [[]]
 dae_out[DAE_ODE] = ocp.ode
 dae = SXFunction(dae_in,dae_out)
@@ -138,7 +144,7 @@ integrator = CVodesIntegrator(dae)
 # Output function
 T = ocp.variable("T").var()
 output_fcn_out = ocp.substituteDependents([T])
-output_fcn_in = ocp.daeArg()
+output_fcn_in = daeIn(var(ocp.x),var(ocp.z),vertcat((var(ocp.pi),var(ocp.pf),var(ocp.u))),ocp.t,der(ocp.x))
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
 
 # Create a simulator
@@ -147,7 +153,7 @@ simulator = Simulator(integrator,output_fcn,grid)
 simulator.init()
 
 # Pass initial conditions
-x0 = getStart(ocp.xd)
+x0 = getStart(ocp.x)
 simulator.setInput(x0,INTEGRATOR_X0)
 
 # Simulate
@@ -172,12 +178,15 @@ ocp.parseFMI('BasicVolumeTest.xml')
 # Make explicit
 ocp.makeExplicit()
 
+# Eliminate the algebraic states
+ocp.eliminateAlgebraic()
+
 # Create an integrator
 dae_in = DAE_NUM_IN * [[]]
 dae_in[DAE_T] = ocp.t
-dae_in[DAE_X] = var(ocp.xd)
-dae_in[DAE_XDOT] = der(ocp.xd)
-dae_in[DAE_P] = var(ocp.p)
+dae_in[DAE_X] = var(ocp.x)
+dae_in[DAE_XDOT] = der(ocp.x)
+dae_in[DAE_P] = vertcat((var(ocp.pi),var(ocp.pf)))
 dae_out = DAE_NUM_OUT * [[]]
 dae_out[DAE_ODE] = ocp.ode
 dae = SXFunction(dae_in,dae_out)
@@ -188,7 +197,7 @@ T = ocp.variable("T").var()
 U = ocp.variable("U").var()
 V = ocp.variable("V").var()
 output_fcn_out = ocp.substituteDependents([T,U,V])
-output_fcn_in = ocp.daeArg()
+output_fcn_in = daeIn(var(ocp.x),var(ocp.z),vertcat((var(ocp.pi),var(ocp.pf),var(ocp.u))),ocp.t,der(ocp.x))
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
 
 # Create a simulator
@@ -197,7 +206,7 @@ simulator = Simulator(integrator,output_fcn,grid)
 simulator.init()
 
 # Pass initial conditions
-x0 = getStart(ocp.xd)
+x0 = getStart(ocp.x)
 simulator.setInput(x0,INTEGRATOR_X0)
 
 # Simulate
