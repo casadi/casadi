@@ -68,6 +68,9 @@ ocp.parseFMI('BasicVolumeMassConservation.xml')
 # Make the OCP explicit
 ocp.makeExplicit()
 
+# Eliminate the algebraic states
+ocp.eliminateAlgebraic()
+
 # Create an integrator
 dae_in = DAE_NUM_IN * [[]]
 dae_in[DAE_T] = ocp.t
@@ -124,6 +127,9 @@ ocp.parseFMI('BasicVolumeEnergyConservation.xml')
 # Make the OCP explicit
 ocp.makeExplicit()
 
+# Eliminate the algebraic states
+ocp.eliminateAlgebraic()
+
 # Create an integrator
 dae_in = DAE_NUM_IN * [[]]
 dae_in[DAE_T] = ocp.t
@@ -171,6 +177,9 @@ ocp.parseFMI('BasicVolumeTest.xml')
 
 # Make explicit
 ocp.makeExplicit()
+
+# Eliminate the algebraic states
+ocp.eliminateAlgebraic()
 
 # Create an integrator
 dae_in = DAE_NUM_IN * [[]]

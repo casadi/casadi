@@ -212,8 +212,8 @@ class OCPtests(casadiTestCase):
     self.assertTrue(isinstance(ocp.t,SXMatrix))
     self.assertEquals(str(m),'cost.atTime(150)')
     print dir(ocp)
-    self.assertEquals(ocp.dae.size(),3)
-    self.assertEquals(len(ocp.xz),3) # there are three states
+    self.assertEquals(ocp.ode.size(),3)
+    self.assertEquals(len(ocp.x),3) # there are three states
     c = ocp.variable("cstr.c")
     T = ocp.variable("cstr.T")
     cost = ocp.variable("cost")

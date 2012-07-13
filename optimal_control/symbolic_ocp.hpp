@@ -97,9 +97,6 @@ class SymbolicOCP : public PrintableObject{
     /** \brief Time */
     SXMatrix t;
     
-    /// Differential and algebraic states defined by a fully-implicit DAE (length == dae().size())
-    std::vector<Variable> xz;
-    
     /** \brief Differential states */
     std::vector<Variable> x;
     
@@ -140,10 +137,7 @@ class SymbolicOCP : public PrintableObject{
     */
     //@{
       
-    /// Fully implicit DAE or implicit ODE
-    SXMatrix dae;
-    
-    /// Explicit ODE
+    /// Explicit or implicit ODE
     SXMatrix ode;
     
     /// Algebraic equations
@@ -229,9 +223,6 @@ class SymbolicOCP : public PrintableObject{
     /// Make a differential state algebraic by replacing its time derivative by 0
     void makeAlgebraic(const std::string& name);
     
-    /// All states, differential and algebraic (includes x, xd and xa)
-    std::vector<Variable> x_all() const;
-    
     /** @name Manipulation
     *  Reformulate the dynamic optimization problem.
     */
@@ -248,11 +239,17 @@ class SymbolicOCP : public PrintableObject{
     /// Eliminate quadrature states and turn them into ODE states
     void eliminateQuadratureStates();
     
-    /// Sort the DAE equations and variables
-    void sortDAE();
+    /// Sort the ODE and differential states
+    void sortODE();
 
-    /// Transform the fully implicit DAE to a explicit or semi-explicit form
+    /// Sort the algebraic equations and algebraic states
+    void sortALG();
+
+    /// Transform the implicit ODE to an explicit ODE
     void makeExplicit();
+    
+    /// Eliminate algebraic states, transforming them into outputs
+    void eliminateAlgebraic();
     
     /// Substitute the dependents from a set of expressions
     std::vector<SXMatrix> substituteDependents(const std::vector<SXMatrix>& x) const;
@@ -269,7 +266,7 @@ class SymbolicOCP : public PrintableObject{
     std::map<std::string,Variable> varmap_;
 
     /// Read an equation
-    SX readExpr(const XMLNode& odenode);
+    SX readExpr(const XMLNode& odenode, bool& has_der);
 
     /// Read a variable
     Variable& readVariable(const XMLNode& node);

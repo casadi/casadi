@@ -73,14 +73,14 @@ int main(){
   
   // Variables
   SXMatrix t = ocp.t;
-  SXMatrix x = var(ocp.xz);
-  SXMatrix xdot = der(ocp.xz);
+  SXMatrix x = var(ocp.x);
+  SXMatrix xdot = der(ocp.x);
   SXMatrix u = var(ocp.u);
     
   // Initial guess and bounds for the state
-  vector<double> x0 = getStart(ocp.xz,true);
-  vector<double> xmin = getMin(ocp.xz,true);
-  vector<double> xmax = getMax(ocp.xz,true);
+  vector<double> x0 = getStart(ocp.x,true);
+  vector<double> xmin = getMin(ocp.x,true);
+  vector<double> xmax = getMax(ocp.x,true);
   
   // Initial guess and bounds for the control
   vector<double> u0 = getStart(ocp.u,true);
@@ -114,7 +114,7 @@ int main(){
     impres_in[1+DAE_T] = t;
     impres_in[1+DAE_X] = x;
     impres_in[1+DAE_P] = u;
-    SXFunction impres(impres_in,ocp.dae);
+    SXFunction impres(impres_in,ocp.ode);
 
     // Create an implicit function (KINSOL)
     KinsolSolver ode(impres);
@@ -126,7 +126,7 @@ int main(){
     ocp_solver.setOption("integrator",CVodesIntegrator::creator);
   } else {
     // DAE residual function
-    SXFunction dae(daeIn(x,SXMatrix(),u,t,xdot),daeOut(ocp.dae));
+    SXFunction dae(daeIn(x,SXMatrix(),u,t,xdot),daeOut(ocp.ode));
     
     ocp_solver = MultipleShooting(dae,mterm);
     ocp_solver.setOption("integrator",IdasIntegrator::creator);
