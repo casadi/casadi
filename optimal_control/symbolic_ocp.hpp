@@ -45,12 +45,12 @@ namespace CasADi{
 
   <H3>Equations:  </H3>
   \verbatim
-  implicit ODE/DAE:         0 = dae(t,x,z,\dot{x},u,p_free,pi,pd)
-  explicit ODE:       \dot{x} = ode(t,x,z,u,p_free,pi,pd)
-  algebraic equations:      0 = alg(t,x,z,u,p_free,pi,pd)
-  quadratures:        \dot{q} = quad(t,x,z,u,p_free,pi,pd)
-  dependent equations:      y = dep(t,x,z,u,p_free,pi,pd)
-  initial equations:        0 = initial(t,x,z,u,p_free,pi,pd)
+  explicit or implicit ODE: \dot{x} = ode(t,x,z,u,p_free,pi,pd)
+     or                           0 = ode(t,x,z,\dot{x},u,p_free,pi,pd)
+  algebraic equations:            0 = alg(t,x,z,u,p_free,pi,pd)
+  quadratures:              \dot{q} = quad(t,x,z,u,p_free,pi,pd)
+  dependent equations:            y = dep(t,x,z,u,p_free,pi,pd)
+  initial equations:              0 = initial(t,x,z,u,p_free,pi,pd)
   \endverbatim 
 
   <H3>Objective function terms:  </H3>
