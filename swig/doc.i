@@ -69098,34 +69098,27 @@ A flat OCP representation coupled to an XML file.
 
 Variables:
 
-t :     time    x :     differential and algebraic states defined by a
-fully-implicit DAE    xd:     differential states defined by an explicit ODE
-xa:     algebraic states defined by an algebraic equation    q :
-quadrature states    y :     dependent variables p :     independent
-parameters    u :     control signals
+x:      differential states    z:      algebraic states    p : independent
+parameters    t :     time    u :     control signals    q :     quadrature
+states    y :     dependent variables
 
 Equations:
 
-fully implicit DAE:       0 = dae(t,x,\\\\dot{x},xd,xa,u,p) explicit ODE:
-\\\\dot{xd} = ode(t,x,xd,xa,u,p)   quadratures: \\\\dot{q} =
-quad(t,x,xd,xa,u,p)   algebraic equations:      0 = alg(t,x,xd,xa,u,p)
-dependent equations:      y = dep(t,x,xd,xa,u,p) initial equations:        0
-= initial(t,x,\\\\dot{x},xd,xa,u,p)
+explicit or implicit ODE: \\\\dot{x} = ode(t,x,z,u,p_free,pi,pd) or
+0 = ode(t,x,z,\\\\dot{x},u,p_free,pi,pd) algebraic equations:            0 =
+alg(t,x,z,u,p_free,pi,pd) quadratures:              \\\\dot{q} =
+quad(t,x,z,u,p_free,pi,pd) dependent equations:            y =
+dep(t,x,z,u,p_free,pi,pd) initial equations:              0 =
+initial(t,x,z,u,p_free,pi,pd)
 
 Objective function terms:
 
 Mayer terms:          \\\\sum{mterm_k}   Lagrange terms:
 \\\\sum{\\\\integral{mterm}}
 
-Note that when parsed, all dynamic states, differential and algebraic, end
-up in the category \"x\" and all dynamic equations end up in the implicit
-category \"dae\". At a later state, the DAE can be reformulated, for example
-in semi-explicit form, possibly in addition to a set of quadrature states.
-
-Also note that division of the states into three categories for states
-defined by a DAE, states defined by an ODE and states defined by an
-algebraic equation. The category \"xd\" does thus _not_ include differential
-states that are implicitly defined by the DAE.
+Note that when parsed, all dynamic equations end up in the implicit category
+\"dae\". At a later state, the DAE can be reformulated, for example in semi-
+explicit form, possibly in addition to a set of quadrature states.
 
 The functions for reformulation is are provided as member functions to this
 class or as independent functions located in the header file
@@ -69196,34 +69189,21 @@ quadrature states. ";
 
 Eliminate quadrature states and turn them into ODE states. ";
 
-%feature("docstring")  CasADi::SymbolicOCP::sortDAE "
+%feature("docstring")  CasADi::SymbolicOCP::sortODE "
 
-Sort the DAE equations and variables. ";
+Sort the ODE and differential states. ";
+
+%feature("docstring")  CasADi::SymbolicOCP::sortALG "
+
+Sort the algebraic equations and algebraic states. ";
 
 %feature("docstring")  CasADi::SymbolicOCP::makeExplicit "
 
-Transform the fully implicit DAE to a explicit or semi-explicit form. ";
+Transform the implicit ODE to an explicit ODE. ";
 
-%feature("docstring")  CasADi::SymbolicOCP::daeArg "
+%feature("docstring")  CasADi::SymbolicOCP::eliminateAlgebraic "
 
-Get the ODE/DAE input arguments Returns a vector of inputs using the
-following scheme:
-
->Input scheme: CasADi::DAEInput (DAE_NUM_IN = 5)
-+----------+----------------------------------------+
-|   Name   |              Description               |
-+==========+========================================+
-| DAE_X    | Differential state                     |
-+----------+----------------------------------------+
-| DAE_Z    | Algebraic state                        |
-+----------+----------------------------------------+
-| DAE_P    | Parameter                              |
-+----------+----------------------------------------+
-| DAE_T    | Explicit time dependence               |
-+----------+----------------------------------------+
-| DAE_XDOT | Time derivative of differential states |
-+----------+----------------------------------------+
-";
+Eliminate algebraic states, transforming them into outputs. ";
 
 %feature("docstring")  CasADi::SymbolicOCP::substituteDependents "
 
@@ -69259,10 +69239,6 @@ Make a differential state algebraic by replacing its time derivative by 0.
 Make a differential state algebraic by replacing its time derivative by 0.
 ";
 
-%feature("docstring")  CasADi::SymbolicOCP::x_all "
-
-All states, differential and algebraic (includes x, xd and xa) ";
-
 %feature("docstring")  CasADi::SymbolicOCP::readExpr "
 
 Read an equation. ";
@@ -69270,10 +69246,6 @@ Read an equation. ";
 %feature("docstring")  CasADi::SymbolicOCP::readVariable "
 
 Read a variable. ";
-
-%feature("docstring")  CasADi::SymbolicOCP::sortType "
-
-Sort variables according to type. ";
 
 %feature("docstring")  CasADi::SymbolicOCP::scaleVariables "
 
