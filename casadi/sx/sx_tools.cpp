@@ -435,51 +435,6 @@ const string& getName(const Matrix<SX>& ex) {
   return ex(0).toScalar()->getName();
 }
 
-Matrix<SX> operator<=(const Matrix<SX> &a, const Matrix<SX> &b){
-  casadi_assert_message(a.scalar() && b.scalar(), "conditional operators only defined for scalars");
-  return a.toScalar() <= b.toScalar();
-}
-
-Matrix<SX> operator>=(const Matrix<SX> &a, const Matrix<SX> &b){
-  casadi_assert_message(a.scalar() && b.scalar(), "conditional operators only defined for scalars");
-  return a.toScalar() >= b.toScalar();
-}
-
-Matrix<SX> operator<(const Matrix<SX> &a, const Matrix<SX> &b){
-  casadi_assert_message(a.scalar() && b.scalar(), "conditional operators only defined for scalars");
-  return a.toScalar() < b.toScalar();
-}
-
-Matrix<SX> operator>(const Matrix<SX> &a, const Matrix<SX> &b){
-  casadi_assert_message(a.scalar() && b.scalar(), "conditional operators only defined for scalars");
-  return a.toScalar() > b.toScalar();
-}
-
-Matrix<SX> operator&&(const Matrix<SX> &a, const Matrix<SX> &b){
-  casadi_assert_message(a.scalar() && b.scalar(), "conditional operators only defined for scalars");
-  return a.toScalar() && b.toScalar();
-}
-
-Matrix<SX> operator||(const Matrix<SX> &a, const Matrix<SX> &b){
-  casadi_assert_message(a.scalar() && b.scalar(), "conditional operators only defined for scalars");
-  return a.toScalar() || b.toScalar();
-}
-
-Matrix<SX> operator==(const Matrix<SX> &a, const Matrix<SX> &b){
-  casadi_assert_message(a.scalar() && b.scalar(), "conditional operators only defined for scalars");
-  return a.toScalar() == b.toScalar();
-}
-
-Matrix<SX> operator!=(const Matrix<SX> &a, const Matrix<SX> &b){
-  casadi_assert_message(a.scalar() && b.scalar(), "conditional operators only defined for scalars");
-  return a.toScalar() != b.toScalar();
-}
-
-Matrix<SX> operator!(const Matrix<SX> &a){
-  casadi_assert_message(a.scalar(), "conditional operators only defined for scalars");
-  return !a.toScalar();
-}
-
 void expand(const Matrix<SX>& ex2, Matrix<SX> &ww, Matrix<SX>& tt){
   casadi_assert(ex2.scalar());
   SX ex = ex2.toScalar();

@@ -327,17 +327,30 @@ void makeSparse(Matrix<T>& A);
 template<class T>
 bool hasNonStructuralZeros(const Matrix<T>& A);
 
-//template<class T>
-//Matrix<T> operator==(const Matrix<T>& a, const Matrix<T>& b);
-
-Matrix<double> operator==(const Matrix<double>& a, const Matrix<double>& b);
-
-Matrix<double> operator>=(const Matrix<double>& a, const Matrix<double>& b);
-
-Matrix<double> operator<=(const Matrix<double>& a, const Matrix<double>& b);
+template<class T>
+Matrix<T> operator<=(const Matrix<T> &a, const Matrix<T> &b);
 
 template<class T>
-Matrix<T> operator>=(const Matrix<T>& a, const Matrix<T>& b);
+Matrix<T> operator>=(const Matrix<T> &a, const Matrix<T> &b);
+
+template<class T>
+Matrix<T> operator<(const Matrix<T> &a, const Matrix<T> &b);
+
+template<class T>
+Matrix<T> operator>(const Matrix<T> &a, const Matrix<T> &b);
+#ifndef SWIG
+template<class T>
+Matrix<T> operator&&(const Matrix<T> &a, const Matrix<T> &b);
+template<class T>
+Matrix<T> operator||(const Matrix<T> &a, const Matrix<T> &b);
+template<class T>
+Matrix<T> operator!(const Matrix<T> &a);
+#endif
+template<class T>
+Matrix<T> operator==(const Matrix<T> &a, const Matrix<T> &b);
+template<class T>
+Matrix<T> operator!=(const Matrix<T> &a, const Matrix<T> &b);
+
 
 /// same as: res += mul(A,v)
 template<typename T>
@@ -1117,13 +1130,45 @@ bool hasNonStructuralZeros(const Matrix<T>& A){
   return false;
 }
 
-template<class T>
-Matrix<T> operator>=(const Matrix<T>& a, const Matrix<T>& b){
-  casadi_assert_message(0,"not implemented");
-  Matrix<T> ret;
+#define bin_operator(OPERATOR) \
+template<class T> \
+Matrix<T> operator OPERATOR (const Matrix<T>& a, const Matrix<T>& b){ \
+  Matrix<T> ret = a + b; \
+  if (a.sparsity()==b.sparsity()) { \
+    for (int i=0;i<a.size();++i) ret.at(i) = a.at(i) OPERATOR b.at(i); \
+  } else if (b.scalar()) { \
+    for (int i=0;i<a.size();++i) ret.at(i) = a.at(i) OPERATOR b.at(0); \
+  } else if (a.scalar()) { \
+    for (int i=0;i<b.size();++i) ret.at(i) = a.at(0) OPERATOR b.at(i); \
+  } else { \
+    casadi_assert_message(a.size1()==b.size1() && a.size2()==b.size2(),"Matrix comparison: comparands should have identical dimensions, but got " << a.dimString() << " and " << b.dimString() << "."); \
+    casadi_assert_message(0,"not implemented"); \
+  } \
+  return ret; \
+} \
+
+
+bin_operator(<=);
+bin_operator(>=);
+bin_operator(<);
+bin_operator(>);
+
+#ifndef SWIG
+bin_operator(&&);
+bin_operator(||);
+template<class T> 
+Matrix<T> operator!(const Matrix<T>& a){ 
+  Matrix<T> ret = a;
+  for (int i=0;i<a.size();++i) ret.at(i) = ! a.at(i);
   return ret;
 }
+#endif
 
+bin_operator(==);
+bin_operator(!=);
+
+#undef bin_operator
+  
 template<class T>
 Matrix<T> polyval(const Matrix<T>& p, const Matrix<T>& x){
   casadi_assert_message(isDense(p),"polynomial coefficients vector must be a vector");
@@ -1211,11 +1256,6 @@ void addMultiple(const Matrix<T>& A, const std::vector<T>& v, std::vector<T>& re
     return ret;
   }
 
-// template<class T>
-// Matrix<T> operator==(const Matrix<T>& a, const Matrix<T>& b){
-//   return a.binary_old(CasADi::casadi_operators<T>::equality, b);
-// }
-
 
 } // namespace CasADi
 
@@ -1229,7 +1269,7 @@ void addMultiple(const Matrix<T>& A, const std::vector<T>& v, std::vector<T>& re
 
 // map the template name to the instantiated name
 #define MTT_INST(T,function_name) \
-%template(function_name) CasADi::function_name< T >;
+%template(function_name) CasADi::function_name < T >;
 
 // Define template instanciations
 #define MATRIX_TOOLS_TEMPLATES(T) \
@@ -1283,6 +1323,12 @@ MTT_INST(T,addMultiple) \
 MTT_INST(T,veccat) \
 MTT_INST(T,vecNZcat) \
 MTT_INST(T,project) \
+%template(operator_leq) CasADi::operator <= < T >; \
+%template(operator_geq) CasADi::operator >= < T >; \
+%template(operator_le)  CasADi::operator <  < T >; \
+%template(operator_ge)  CasADi::operator >  < T >; \
+%template(operator_eq)  CasADi::operator == < T >; \
+%template(operator_neq) CasADi::operator != < T >; \
 
 #endif //SWIG
 

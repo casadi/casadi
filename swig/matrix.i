@@ -105,6 +105,8 @@ def dot(self,*args):
   __array_priority__ = arraypriority
 
   def __array_wrap__(self,out_arr,context=None):
+    if context is None:
+      return out_arr
     name = context[0].__name__
     args = list(context[1])
     
@@ -114,7 +116,7 @@ def dot(self,*args):
     if "vectorized" in name:
         name = name[:-len(" (vectorized)")]
     
-    conversion = {"multiply": "mul", "divide": "div", "subtract":"sub","power":"pow"}
+    conversion = {"multiply": "mul", "divide": "div", "subtract":"sub","power":"pow","greater_equal":"ge","less_equal": "le", "less": "lt", "greater": "gt"}
     if name in conversion:
       name = conversion[name]
     if len(context[1])==2 and context[1][1] is self and not(context[1][0] is self):
@@ -260,6 +262,18 @@ PyObject* arrayView() {
         return _casadi_global.__gt__(self,other)
       def __ge__(self,other):
         return _casadi_global.__ge__(self,other)
+      def __rlt__(self,other):
+        return _casadi_global.__lt__(other,self)
+      def __rle__(self,other):
+        return _casadi_global.__le__(other,self)
+      def __req__(self,other):
+        return _casadi_global.__eq__(other,self)
+      def __rne__(self,other):
+        return _casadi_global.__ne__(other,self)
+      def __rgt__(self,other):
+        return _casadi_global.__gt__(other,self)
+      def __rge__(self,other):
+        return _casadi_global.__ge__(other,self)
     %}
     #endif // SWIGPYTHON
     
@@ -351,6 +365,32 @@ binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
       return r
   %}
   
+  %pythoncode %{
+    def __lt__(self,other):
+      return _casadi_global.__lt__(self,other)
+    def __le__(self,other):
+      return _casadi_global.__le__(self,other)
+    def __eq__(self,other):
+      return _casadi_global.__eq__(self,other)
+    def __ne__(self,other):
+      return _casadi_global.__ne__(self,other)
+    def __gt__(self,other):
+      return _casadi_global.__gt__(self,other)
+    def __ge__(self,other):
+      return _casadi_global.__ge__(self,other)
+    def __rlt__(self,other):
+      return _casadi_global.__lt__(other,self)
+    def __rle__(self,other):
+      return _casadi_global.__le__(other,self)
+    def __req__(self,other):
+      return _casadi_global.__eq__(other,self)
+    def __rne__(self,other):
+      return _casadi_global.__ne__(other,self)
+    def __rgt__(self,other):
+      return _casadi_global.__gt__(other,self)
+    def __rge__(self,other):
+      return _casadi_global.__ge__(other,self)
+  %}
   
   %pythoncode %{
     def __float__(self):

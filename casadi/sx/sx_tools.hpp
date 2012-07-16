@@ -286,18 +286,6 @@ void getValue(const Matrix<SX> &ex, double *res); // for all constant expression
 void getIntValue(const Matrix<SX> &ex, int *res); // integer version
 const std::string& getName(const Matrix<SX> &ex); // get the name (only for scalar variables)
 
-Matrix<SX> operator<=(const Matrix<SX> &a, const Matrix<SX> &b);
-Matrix<SX> operator>=(const Matrix<SX> &a, const Matrix<SX> &b);
-Matrix<SX> operator<(const Matrix<SX> &a, const Matrix<SX> &b);
-Matrix<SX> operator>(const Matrix<SX> &a, const Matrix<SX> &b);
-#ifndef SWIG
-Matrix<SX> operator&&(const Matrix<SX> &a, const Matrix<SX> &b);
-Matrix<SX> operator||(const Matrix<SX> &a, const Matrix<SX> &b);
-Matrix<SX> operator!(const Matrix<SX> &a);
-#endif
-Matrix<SX> operator==(const Matrix<SX> &a, const Matrix<SX> &b);
-Matrix<SX> operator!=(const Matrix<SX> &a, const Matrix<SX> &b);
-
 /** \brief  Fill the matrix with the value val, make empty sparse if zero */
 void fill(Matrix<SX>& mat, const SX& val);
 

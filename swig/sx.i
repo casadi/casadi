@@ -183,6 +183,18 @@ namespace CasADi {
         return _casadi_global.__gt__(self,other)
       def __ge__(self,other):
         return _casadi_global.__ge__(self,other)
+      def __rlt__(self,other):
+        return _casadi_global.__lt__(other,self)
+      def __rle__(self,other):
+        return _casadi_global.__le__(other,self)
+      def __req__(self,other):
+        return _casadi_global.__eq__(other,self)
+      def __rne__(self,other):
+        return _casadi_global.__ne__(other,self)
+      def __rgt__(self,other):
+        return _casadi_global.__gt__(other,self)
+      def __rge__(self,other):
+        return _casadi_global.__ge__(other,self)
     %}
   
   %python_array_wrappers(1000.0)
