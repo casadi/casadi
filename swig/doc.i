@@ -74337,6 +74337,16 @@ taken from an existing matrix. ";
 
 %feature("docstring")  CasADi::Interfaces::any "";
 
+%feature("docstring")  CasADi::Interfaces::bin_operator "";
+
+%feature("docstring")  CasADi::Interfaces::bin_operator "";
+
+%feature("docstring")  CasADi::Interfaces::bin_operator "";
+
+%feature("docstring")  CasADi::Interfaces::bin_operator "";
+
+%feature("docstring")  CasADi::Interfaces::bin_operator "";
+
 %feature("docstring")  CasADi::Interfaces::sp_dense "
 
 Create a dense rectangular sparsity pattern. ";
