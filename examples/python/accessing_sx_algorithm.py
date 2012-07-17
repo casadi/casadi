@@ -63,7 +63,7 @@ for i in range(f.getAlgorithmSize()):
     i2,i3 = f.getAtomicInput(i)
     if op==OP_INPUT:
       work[i1] = input_val[i2][i3]
-      print 'work[', i1, '] = input[', i2, '][', i3,   '                ---> ' , work[i1]
+      print 'work[', i1, '] = input[', i2, '][', i3,  ']', '                ---> ' , work[i1]
     elif op==OP_OUTPUT:
       output_val[i1][i3] = work[i2]
       print 'output[', i1, '][', i3, '] = work[', i2, ']','             ---> ', output_val[i1][i3]
