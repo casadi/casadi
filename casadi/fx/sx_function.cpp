@@ -167,6 +167,9 @@ std::vector<SX> SXFunction::getFree() const{
   return (*this)->free_vars_;
 }
 
+int SXFunction::getWorkSize() const{
+  return (*this)->work_.size();
+}
 
 } // namespace CasADi
 

@@ -151,6 +151,9 @@ public:
   /** \brief Get the number of atomic operations */
   int getAlgorithmSize() const{ return algorithm().size();}
 
+  /** \brief Get the length of the work vector */
+  int getWorkSize() const;
+
   /** \brief Get an atomic operation operator index */
   int getAtomicOperation(int k) const{ return algorithm().at(k).op;}
 

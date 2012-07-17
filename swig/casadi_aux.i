@@ -28,6 +28,7 @@
 #include "casadi/cached_object.hpp"
 #include "casadi/generic_type.hpp"
 #include "casadi/options_functionality.hpp"
+#include "casadi/casadi_calculus.hpp"
 %}
 
 #ifdef SWIGPYTHON
@@ -58,6 +59,7 @@ VECTOR_TOOLS_TEMPLATES(double)
 %include "casadi/casadi_types.hpp"
 %include "casadi/generic_type.hpp"
 %include "casadi/options_functionality.hpp"
+%include "casadi/casadi_calculus.hpp"
 
 namespace CasADi {
   %extend OptionsFunctionality {
