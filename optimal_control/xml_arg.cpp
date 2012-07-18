@@ -21,6 +21,7 @@
  */
 
 #include "xml_arg.hpp"
+#include "casadi/casadi_exception.hpp"
 
 namespace CasADi{
 
@@ -29,6 +30,15 @@ StrArg::StrArg(const std::string& str) : str(str){
 
 StrArg::operator std::string() const{
   return str;
+}
+
+StrArg::operator bool() const{
+  if(str.compare("true")==0)
+    return true;
+  else if(str.compare("false")==0)
+    return false;
+  else
+    throw CasadiException("XML argument not true or false");
 }
 
 StrArg::operator int() const{

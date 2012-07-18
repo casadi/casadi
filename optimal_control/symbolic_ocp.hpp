@@ -169,6 +169,12 @@ class SymbolicOCP : public PrintableObject{
     /// Interval final time is free
     bool tf_free;
     
+    /// Interval start time initial guess
+    double t0_guess;
+    
+    /// Interval final time initial guess
+    double tf_guess;
+    
     /// Time points
     std::vector<double> tp;
     

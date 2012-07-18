@@ -45,8 +45,8 @@ namespace CasADi{
 
 SymbolicOCP::SymbolicOCP(){
   t = ssym("t");
-  t0 = numeric_limits<double>::quiet_NaN();
-  tf = numeric_limits<double>::quiet_NaN();
+  t0 = t0_guess = numeric_limits<double>::quiet_NaN();
+  tf = tf_guess = numeric_limits<double>::quiet_NaN();
   t0_free = false;
   tf_free = false;
 }
@@ -274,10 +274,22 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
     const XMLNode& opts = document[0]["opt:Optimization"];
     
     // Start time
-    t0  = opts["opt:IntervalStartTime"]["opt:Value"].getText();
+    const XMLNode& intervalStartTime = opts["opt:IntervalStartTime"];
+    if(intervalStartTime.hasChild("opt:Value"))
+      t0  = intervalStartTime["opt:Value"].getText();
+    if(intervalStartTime.hasChild("opt:Free"))
+      t0_free  = intervalStartTime["opt:Free"].getText();
+    if(intervalStartTime.hasChild("opt:InitialGuess"))
+      t0_guess  = intervalStartTime["opt:InitialGuess"].getText();
 
     // Terminal time
-    tf = opts["opt:IntervalFinalTime"]["opt:Value"].getText();
+    const XMLNode& IntervalFinalTime = opts["opt:IntervalFinalTime"];
+    if(IntervalFinalTime.hasChild("opt:Value"))
+      tf = IntervalFinalTime["opt:Value"].getText();
+    if(IntervalFinalTime.hasChild("opt:Free"))
+      tf_free = IntervalFinalTime["opt:Free"].getText();
+    if(IntervalFinalTime.hasChild("opt:InitialGuess"))
+      tf_guess  = IntervalFinalTime["opt:InitialGuess"].getText();
 
     // Time points
     const XMLNode& tpnode = opts["opt:TimePoints"];

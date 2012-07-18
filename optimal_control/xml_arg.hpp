@@ -34,6 +34,7 @@ class StrArg{
 
 /** \brief  automatic typeconversion to various types */
   operator std::string() const;
+  operator bool() const;
   operator int() const;
   operator double() const;
 
