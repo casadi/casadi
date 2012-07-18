@@ -88,7 +88,6 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
 
   // parse
   XMLNode document;
-  document.setName(filename);
   document.addNode(&doc);
 
   double time1 = clock();

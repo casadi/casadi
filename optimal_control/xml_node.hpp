@@ -37,14 +37,10 @@ namespace CasADi{
 class XMLNode{
 public:
   XMLNode();
-  XMLNode(const std::string& name);
   ~XMLNode();
 
-/** \brief  Add an attribute */
+  /** \brief  Add an attribute */
   void setAttribute(const std::string& attribute_name, const std::string& attribute);
-
-/** \brief  Add a child */
-  void addChild(XMLNode *child);
 
   /** \brief  Get an attribute by its name */
   std::string getAttribute(const std::string& attribute_name) const{
@@ -68,10 +64,16 @@ public:
   }
   
   /** \brief  Get a reference to a child by its index */
-  XMLNode& operator[](int i) const;
+  const XMLNode& operator[](int i) const;
+
+  /** \brief  Get a reference to a child by its index */
+  XMLNode& operator[](int i);
 
   /** \brief  Get a reference to a child by its name */
-  XMLNode& operator[](const std::string& childname) const;
+  const XMLNode& operator[](const std::string& childname) const;
+
+  /** \brief  Get a reference to a child by its name */
+  XMLNode& operator[](const std::string& childname);
 
   /** \brief  Check if a child is present */
   bool hasChild(const std::string& childname) const;
@@ -110,7 +112,7 @@ public:
   /** \brief  Read the double value of a string */
   static void readString(const std::string& str, double& val);
   
-  void addAttributes(TiXmlElement* el);
+  /** \brief  Read node from parsed XML file */
   void addNode(TiXmlNode* node);
 
   friend std::ostream& operator<<(std::ostream &stream, const XMLNode& node);
@@ -120,7 +122,7 @@ public:
   protected:
 
     std::map<std::string, std::string>  attributes_;
-    std::vector<XMLNode*>               children_;
+    std::vector<XMLNode>                children_;
     std::map<std::string,int>           child_indices_; // the index of the children sorted by their name
 
     std::string name_;

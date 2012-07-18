@@ -30,13 +30,7 @@ namespace CasADi{
 XMLNode::XMLNode(){
 }
 
-XMLNode::XMLNode(const string& name) : name_(name) {  
-}
-
 XMLNode::~XMLNode(){
-  // delete all children
-  for(int i=0; i<children_.size(); ++i)
-    delete children_[i];
 }
 
 bool XMLNode::hasAttribute(const string& attribute_name) const{
@@ -44,19 +38,22 @@ bool XMLNode::hasAttribute(const string& attribute_name) const{
   return it!=attributes_.end();
 }
 
-XMLNode& XMLNode::operator[](int i) const{
+XMLNode& XMLNode::operator[](int i){
   casadi_assert_message(i>=0 && i < size(), "XMLNode::operator[]: index out of bounds for element " << i << " of node " << getName());
   
-  return *children_.at(i);
+  return children_.at(i);
+}
+
+const XMLNode& XMLNode::operator[](int i) const{
+  return const_cast<XMLNode*>(this)->operator[](i);
 }
 
 bool XMLNode::hasChild(const string& childname) const{
   map<string,int>::const_iterator it = child_indices_.find(childname);
   return it!=child_indices_.end();
 }
-  
 
-XMLNode& XMLNode::operator[](const string& childname) const{
+XMLNode& XMLNode::operator[](const string& childname){
   // Find the child
   map<string,int>::const_iterator it = child_indices_.find(childname);
 
@@ -66,47 +63,54 @@ XMLNode& XMLNode::operator[](const string& childname) const{
   }
 
   // Return an index to the child
-  return *children_[it->second];
+  return children_[it->second];
+}
+
+const XMLNode& XMLNode::operator[](const string& childname) const{
+  return const_cast<XMLNode*>(this)->operator[](childname);
 }
 
 void XMLNode::setAttribute(const string& attribute_name, const string& attribute){
   attributes_[attribute_name] = attribute;
 }
 
-void XMLNode::addChild(XMLNode* child){
-  children_.push_back(child);
-  child_indices_[child->name_] = children_.size()-1;
-}
-
-void XMLNode::addAttributes(TiXmlElement* el){
-
-  if ( !el) return;
-  for(TiXmlAttribute* pAttrib=el->FirstAttribute(); pAttrib; pAttrib=pAttrib->Next()){
-      setAttribute(pAttrib->Name(),pAttrib->Value());
-   }
-}
-
 void XMLNode::addNode(TiXmlNode* n){
   if (!n) throw CasadiException("Error in XMLNode::addNode: Node is 0");
 
+  // Save name
+  setName(n->Value());
+  
   // Save attributes
   int type = n->Type();  
   if(type == TiXmlNode::ELEMENT){
-    addAttributes(n->ToElement());
+    if(n->ToElement()!=0){
+      for(TiXmlAttribute* pAttrib=n->ToElement()->FirstAttribute(); pAttrib; pAttrib=pAttrib->Next()){
+          setAttribute(pAttrib->Name(),pAttrib->Value());
+      }
+    }
   } else if(type == TiXmlNode::DOCUMENT) {
     // do nothing
   } else {
     throw CasadiException("XMLNode::addNode");
   }
 
+  // Count the number of children
+  int num_children = 0;
+  for( TiXmlNode* child = n->FirstChild(); child != 0; child= child->NextSibling()){
+    num_children++;
+  }
+  children_.reserve(num_children);
+  
   // add children
-  for ( TiXmlNode* child = n->FirstChild(); child != 0; child= child->NextSibling()){ 
+  int ch = 0;
+  for ( TiXmlNode* child = n->FirstChild(); child != 0; child= child->NextSibling(), ++ch){ 
       int childtype = child->Type();  
 
       if(childtype == TiXmlNode::ELEMENT){
-	XMLNode *newnode = new XMLNode(child->Value());
-	newnode->addNode(child);
-	addChild(newnode);
+	XMLNode newnode;
+	newnode.addNode(child);
+        children_.push_back(newnode);
+        child_indices_[newnode.getName()] = ch;
       } else if(childtype == TiXmlNode::COMMENT){
 	comment_ = child->Value();
       } else if(childtype == TiXmlNode::TEXT){
