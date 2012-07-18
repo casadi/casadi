@@ -44,19 +44,6 @@ bool XMLNode::hasAttribute(const string& attribute_name) const{
   return it!=attributes_.end();
 }
 
-StrArg XMLNode::attribute(const string& attribute_name) const{
-  // find the attribute
-  map<string, string>::const_iterator it = attributes_.find(attribute_name);
-
-  // check that the attribute was indeed found
-  if(it == attributes_.end()){
-    throw CasadiException("Error in XMLNode::attribute: could not find " + attribute_name);
-  }
-
-  // Return an instance of the XMLArg class (that automatically typeconverts into other types)
-  return StrArg(it->second);
-}
-
 XMLNode& XMLNode::operator[](int i) const{
   casadi_assert_message(i>=0 && i < size(), "XMLNode::operator[]: index out of bounds for element " << i << " of node " << getName());
   
@@ -179,30 +166,26 @@ bool XMLNode::checkName(const string& str) const{
   return name_.compare(str) == 0;
 }
 
-std::string XMLNode::getText() const{
-  return text_;
-}
-
-void XMLNode::getText(std::string& val) const{
-  val = text_;
+void XMLNode::readString(const std::string& str, std::string& val){
+  val = str;
 }
   
-void XMLNode::getText(bool& val) const{
-  if(text_.compare("true")==0)
+void XMLNode::readString(const std::string& str, bool& val){
+  if(str.compare("true")==0)
     val = true;
-  else if(text_.compare("false")==0)
+  else if(str.compare("false")==0)
     val = false;
   else
     throw CasadiException("XML argument not true or false");
 }
 
-void XMLNode::getText(int& val) const{
-  std::istringstream buffer(text_);
+void XMLNode::readString(const std::string& str, int& val){
+  std::istringstream buffer(str);
   buffer >> val;
 }
   
-void XMLNode::getText(double& val) const{
-  std::istringstream buffer(text_);
+void XMLNode::readString(const std::string& str, double& val){
+  std::istringstream buffer(str);
   buffer >> val;
 }
   

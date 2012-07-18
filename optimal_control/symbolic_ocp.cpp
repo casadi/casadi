@@ -107,11 +107,12 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
       const XMLNode& vnode = modvars[i];
 
       // Get the attributes
-      string name        = vnode.attribute("name");
-      int valueReference = vnode.attribute("valueReference");
-      string variability = vnode.attribute("variability");
-      string causality   = vnode.attribute("causality");
-      string alias       = vnode.attribute("alias");
+      string name        = vnode.getAttribute("name");
+      int valueReference;
+      vnode.readAttribute("valueReference",valueReference);
+      string variability = vnode.getAttribute("variability");
+      string causality   = vnode.getAttribute("causality");
+      string alias       = vnode.getAttribute("alias");
       
       // Skip to the next variable if its an alias
       if(alias.compare("alias") == 0 || alias.compare("negatedAlias") == 0)
@@ -165,14 +166,14 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
 	// Other properties
 	if(vnode.hasChild("Real")){
 	  const XMLNode& props = vnode["Real"];
-	  if(props.hasAttribute("unit"))         var.setUnit(props.attribute("unit"));
-	  if(props.hasAttribute("displayUnit"))  var.setDisplayUnit(props.attribute("displayUnit"));
-	  if(props.hasAttribute("min"))          var.setMin(props.attribute("min"));
-	  if(props.hasAttribute("max"))          var.setMax(props.attribute("max"));
-	  if(props.hasAttribute("start"))        var.setStart(props.attribute("start"));
-	  if(props.hasAttribute("nominal"))      var.setNominal(props.attribute("nominal"));
-	  if(props.hasAttribute("free"))         var.setFree(string(props.attribute("free")).compare("true") == 0);
-	  if(props.hasAttribute("initialGuess")) var.setInitialGuess(props.attribute("initialGuess"));
+          props.readAttribute("unit",var.unit(),false);
+          props.readAttribute("displayUnit",var.displayUnit(),false);
+          props.readAttribute("min",var.min(),false);
+          props.readAttribute("max",var.max(),false);
+          props.readAttribute("start",var.start(),false);
+          props.readAttribute("nominal",var.nominal(),false);
+          props.readAttribute("free",var.free(),false);
+          props.readAttribute("initialGuess",var.initialGuess(),false);
 	}
 	
 	// Variable category
@@ -296,10 +297,12 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
     tp.resize(tpnode.size());
     for(int i=0; i<tp.size(); ++i){
       // Get index
-      int index = tpnode[i].attribute("index");
+      int index;
+      tpnode[i].readAttribute("index",index);
       
       // Get value
-      double value = tpnode[i].attribute("value");
+      double value;
+      tpnode[i].readAttribute("value",value);
       tp[i] = value;
       
       // Allocate all the timed variables
@@ -560,7 +563,8 @@ SX SymbolicOCP::readExpr(const XMLNode& node, bool& has_der){
     return t.toScalar();
   } else if(name.compare("TimedVariable")==0){
     // Get the index of the time point
-    int index = node.attribute("timePointIndex");
+    int index;
+    node.readAttribute("timePointIndex",index);
     return readVariable(node[0]).atTime(tp[index]);
   }
 
@@ -1256,8 +1260,7 @@ std::string SymbolicOCP::qualifiedName(const XMLNode& nn){
     if(i!=0) qn << ".";
     
     // Get the name part
-    string namepart = nn[i].attribute("name");
-    qn << namepart;
+    qn << nn[i].getAttribute("name");
 
     // Get the index, if any
     if(nn[i].size()>0){

@@ -5,7 +5,6 @@ SET(OPTIMAL_CONTROL
   variable_tools.hpp        variable_tools.cpp
   symbolic_ocp.hpp          symbolic_ocp.cpp
   xml_node.hpp              xml_node.cpp
-  xml_arg.hpp               xml_arg.cpp
   ocp_tools.hpp             ocp_tools.cpp
   multiple_shooting.hpp     multiple_shooting.cpp   multiple_shooting_internal.hpp   multiple_shooting_internal.cpp
   collocation.hpp           collocation.cpp         collocation_internal.hpp         collocation_internal.cpp

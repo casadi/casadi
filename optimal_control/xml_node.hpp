@@ -26,7 +26,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "xml_arg.hpp"
+#include "casadi/casadi_exception.hpp"
 
 /** \brief  Forward declarations */
 class TiXmlElement;
@@ -46,47 +46,69 @@ public:
 /** \brief  Add a child */
   void addChild(XMLNode *child);
 
-/** \brief  Get an attribute by its name */
-  StrArg attribute(const std::string& attribute_name) const;
+  /** \brief  Get an attribute by its name */
+  std::string getAttribute(const std::string& attribute_name) const{
+    std::string ret;
+    readAttribute(attribute_name,ret,true);
+    return ret;
+  }
 
-/** \brief  Get a reference to a child by its index */
+  /** \brief  Read the value of an attribute */
+  template<typename T>
+  void readAttribute(const std::string& attribute_name, T& val, bool assert_existance=true) const{ 
+    // find the attribute
+    std::map<std::string, std::string>::const_iterator it = attributes_.find(attribute_name);
+
+    // check if the attribute exists
+    if(it == attributes_.end()){
+      casadi_assert_message(!assert_existance, "Error in XMLNode::readAttribute: could not find " + attribute_name);
+    } else {
+      readString(it->second,val);
+    }
+  }
+  
+  /** \brief  Get a reference to a child by its index */
   XMLNode& operator[](int i) const;
 
-/** \brief  Get a reference to a child by its name */
+  /** \brief  Get a reference to a child by its name */
   XMLNode& operator[](const std::string& childname) const;
 
-/** \brief  Check if a child is present */
+  /** \brief  Check if a child is present */
   bool hasChild(const std::string& childname) const;
   
-/** \brief  Check if an attribute is present */
+  /** \brief  Check if an attribute is present */
   bool hasAttribute(const std::string& attribute_name) const;
 
-/** \brief  Get the number of children */
+  /** \brief  Get the number of children */
   int size() const;
 
-/** \brief  Get the name of the node */
+  /** \brief  Get the name of the node */
   const std::string& getName() const;
 
-/** \brief  Set the name of the node */
+  /** \brief  Set the name of the node */
   void setName(const std::string& name);
 
-/** \brief  check if the name is equal to something */
+  /** \brief  check if the name is equal to something */
   bool checkName(const std::string& str) const;
 
   /** \brief  Get the text field */
-  std::string getText() const;
+  std::string getText() const{ return text_; }
+
+  /** \brief  Get value of text field */
+  template<typename T>
+  void getText(T& val) const{ readString(text_,val);}
   
-  /** \brief  Get value of string text-attribute */
-  void getText(std::string& val) const;
+  /** \brief  Read the string value of a string (i.e. copy) */
+  static void readString(const std::string& str, std::string& val);
   
-  /** \brief  Get value of boolean text-attribute */
-  void getText(bool& val) const;
+  /** \brief  Read the boolean value of a string */
+  static void readString(const std::string& str, bool& val);
   
-  /** \brief  Get value of integer text-attribute */
-  void getText(int& val) const;
+  /** \brief  Read the integer value of a string */
+  static void readString(const std::string& str, int& val);
   
-  /** \brief  Get value of double text-attribute */
-  void getText(double& val) const;
+  /** \brief  Read the double value of a string */
+  static void readString(const std::string& str, double& val);
   
   void addAttributes(TiXmlElement* el);
   void addNode(TiXmlNode* node);
