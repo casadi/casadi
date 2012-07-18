@@ -30,26 +30,26 @@ namespace CasADi{
 XMLNode::XMLNode(){
 }
 
-XMLNode::XMLNode(const string& name) : name(name) {  
+XMLNode::XMLNode(const string& name) : name_(name) {  
 }
 
 XMLNode::~XMLNode(){
   // delete all children
-  for(int i=0; i<children.size(); ++i)
-    delete children[i];
+  for(int i=0; i<children_.size(); ++i)
+    delete children_[i];
 }
 
 bool XMLNode::hasAttribute(const string& attribute_name) const{
-  map<string, string>::const_iterator it = attributes.find(attribute_name);
-  return it!=attributes.end();
+  map<string, string>::const_iterator it = attributes_.find(attribute_name);
+  return it!=attributes_.end();
 }
 
 StrArg XMLNode::attribute(const string& attribute_name) const{
   // find the attribute
-  map<string, string>::const_iterator it = attributes.find(attribute_name);
+  map<string, string>::const_iterator it = attributes_.find(attribute_name);
 
   // check that the attribute was indeed found
-  if(it == attributes.end()){
+  if(it == attributes_.end()){
     throw CasadiException("Error in XMLNode::attribute: could not find " + attribute_name);
   }
 
@@ -60,35 +60,35 @@ StrArg XMLNode::attribute(const string& attribute_name) const{
 XMLNode& XMLNode::operator[](int i) const{
   casadi_assert_message(i>=0 && i < size(), "XMLNode::operator[]: index out of bounds for element " << i << " of node " << getName());
   
-  return *children.at(i);
+  return *children_.at(i);
 }
 
 bool XMLNode::hasChild(const string& childname) const{
-  map<string,int>::const_iterator it = child_indices.find(childname);
-  return it!=child_indices.end();
+  map<string,int>::const_iterator it = child_indices_.find(childname);
+  return it!=child_indices_.end();
 }
   
 
 XMLNode& XMLNode::operator[](const string& childname) const{
   // Find the child
-  map<string,int>::const_iterator it = child_indices.find(childname);
+  map<string,int>::const_iterator it = child_indices_.find(childname);
 
   // check that the child was indeed found
-  if(it == child_indices.end()){
+  if(it == child_indices_.end()){
     throw CasadiException("Error in XMLNode::operator[]: could not find " + childname);
   }
 
   // Return an index to the child
-  return *children[it->second];
+  return *children_[it->second];
 }
 
 void XMLNode::setAttribute(const string& attribute_name, const string& attribute){
-  attributes[attribute_name] = attribute;
+  attributes_[attribute_name] = attribute;
 }
 
 void XMLNode::addChild(XMLNode* child){
-  children.push_back(child);
-  child_indices[child->name] = children.size()-1;
+  children_.push_back(child);
+  child_indices_[child->name_] = children_.size()-1;
 }
 
 void XMLNode::addAttributes(TiXmlElement* el){
@@ -121,9 +121,9 @@ void XMLNode::addNode(TiXmlNode* n){
 	newnode->addNode(child);
 	addChild(newnode);
       } else if(childtype == TiXmlNode::COMMENT){
-	comment = child->Value();
+	comment_ = child->Value();
       } else if(childtype == TiXmlNode::TEXT){
-	text = child->ToText()->Value();
+	text_ = child->ToText()->Value();
       } else if (childtype == TiXmlNode::DECLARATION){
 	cout << "Warning: Skipped TiXmlNode::DECLARATION" << endl;
       } else {
@@ -138,34 +138,34 @@ ostream& operator<<(ostream &stream, const XMLNode& node){
 }
 
 int XMLNode::size() const{
-  return children.size();
+  return children_.size();
 }
 
 const string& XMLNode::getName() const{
-  return name;
+  return name_;
 }
 
 void XMLNode::setName(const string& name){
-  this->name = name;
+  name_ = name;
 }
 
 void XMLNode::dump(ostream &stream, int indent) const{
   // Print name
-  stream << string( indent,' ') << "Node: " << name << endl;
+  stream << string( indent,' ') << "Node: " << name_ << endl;
 
   // Print comment
-  if(!comment.empty()){
+  if(!comment_.empty()){
     stream << string( indent,' ') << "----- comment starts ----- "  << endl;
-    stream << comment << endl;
+    stream << comment_ << endl;
     stream << string( indent,' ') << "----- comment ends ----- "  << endl;
   }
 
   // Print text
-  if(!text.empty())
-    stream << string( indent+2,' ') << "Text: " << text << endl;
+  if(!text_.empty())
+    stream << string( indent+2,' ') << "Text: " << text_ << endl;
 
   // Print attributes
-  for(map<string, string>::const_iterator it=attributes.begin(); it != attributes.end(); ++it)
+  for(map<string, string>::const_iterator it=attributes_.begin(); it != attributes_.end(); ++it)
     stream << string( indent+2,' ') << "attribute " << it->first << " = " << it->second << endl;
 
   // Print Children
@@ -175,12 +175,38 @@ void XMLNode::dump(ostream &stream, int indent) const{
   }
 }
 
-StrArg XMLNode::getText() const{
-  return StrArg(text);
+bool XMLNode::checkName(const string& str) const{
+  return name_.compare(str) == 0;
 }
 
-bool XMLNode::checkName(const string& str) const{
-  return name.compare(str) == 0;
+std::string XMLNode::getText() const{
+  return text_;
 }
+
+void XMLNode::getText(std::string& val) const{
+  val = text_;
+}
+  
+void XMLNode::getText(bool& val) const{
+  if(text_.compare("true")==0)
+    val = true;
+  else if(text_.compare("false")==0)
+    val = false;
+  else
+    throw CasadiException("XML argument not true or false");
+}
+
+void XMLNode::getText(int& val) const{
+  std::istringstream buffer(text_);
+  buffer >> val;
+}
+  
+void XMLNode::getText(double& val) const{
+  std::istringstream buffer(text_);
+  buffer >> val;
+}
+  
+
+
 
 } // namespace CasADi

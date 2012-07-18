@@ -73,9 +73,21 @@ public:
 /** \brief  check if the name is equal to something */
   bool checkName(const std::string& str) const;
 
-/** \brief  Get the value of the text field */
-  StrArg getText() const;
-
+  /** \brief  Get the text field */
+  std::string getText() const;
+  
+  /** \brief  Get value of string text-attribute */
+  void getText(std::string& val) const;
+  
+  /** \brief  Get value of boolean text-attribute */
+  void getText(bool& val) const;
+  
+  /** \brief  Get value of integer text-attribute */
+  void getText(int& val) const;
+  
+  /** \brief  Get value of double text-attribute */
+  void getText(double& val) const;
+  
   void addAttributes(TiXmlElement* el);
   void addNode(TiXmlNode* node);
 
@@ -84,15 +96,14 @@ public:
   void dump(std::ostream &stream, int indent=0) const;
 
   protected:
-/** \brief  Attributes and children (binary search tree) */
-  std::map<std::string, std::string>  attributes;
-  std::vector<XMLNode*>               children;
-  std::map<std::string,int>           child_indices; // the index of the children sorted by their name
 
-  std::string name;
-  std::string comment;
-  std::string text;
+    std::map<std::string, std::string>  attributes_;
+    std::vector<XMLNode*>               children_;
+    std::map<std::string,int>           child_indices_; // the index of the children sorted by their name
 
+    std::string name_;
+    std::string comment_;
+    std::string text_;
 };
 
 } // namespace CasADi

@@ -276,20 +276,20 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
     // Start time
     const XMLNode& intervalStartTime = opts["opt:IntervalStartTime"];
     if(intervalStartTime.hasChild("opt:Value"))
-      t0  = intervalStartTime["opt:Value"].getText();
+      intervalStartTime["opt:Value"].getText(t0);
     if(intervalStartTime.hasChild("opt:Free"))
-      t0_free  = intervalStartTime["opt:Free"].getText();
+      intervalStartTime["opt:Free"].getText(t0_free);
     if(intervalStartTime.hasChild("opt:InitialGuess"))
-      t0_guess  = intervalStartTime["opt:InitialGuess"].getText();
+      intervalStartTime["opt:InitialGuess"].getText(t0_guess);
 
     // Terminal time
     const XMLNode& IntervalFinalTime = opts["opt:IntervalFinalTime"];
     if(IntervalFinalTime.hasChild("opt:Value"))
-      tf = IntervalFinalTime["opt:Value"].getText();
+      IntervalFinalTime["opt:Value"].getText(tf);
     if(IntervalFinalTime.hasChild("opt:Free"))
-      tf_free = IntervalFinalTime["opt:Free"].getText();
+      IntervalFinalTime["opt:Free"].getText(tf_free);
     if(IntervalFinalTime.hasChild("opt:InitialGuess"))
-      tf_guess  = IntervalFinalTime["opt:InitialGuess"].getText();
+      IntervalFinalTime["opt:InitialGuess"].getText(tf_guess);
 
     // Time points
     const XMLNode& tpnode = opts["opt:TimePoints"];
@@ -512,9 +512,13 @@ SX SymbolicOCP::readExpr(const XMLNode& node, bool& has_der){
   } else if(name.compare("Identifier")==0){
     return readVariable(node).var();
   } else if(name.compare("IntegerLiteral")==0){
-    return int(node.getText());
+    int val;
+    node.getText(val);
+    return val;
   } else if(name.compare("Instant")==0){
-    return double(node.getText());
+    double val;
+    node.getText(val);
+    return val;
   } else if(name.compare("Log")==0){
     return log(readExpr(node[0],has_der));
   } else if(name.compare("LogLt")==0){ // Logical less than
@@ -539,13 +543,15 @@ SX SymbolicOCP::readExpr(const XMLNode& node, bool& has_der){
   } else if(name.compare("Pow")==0){
     return pow(readExpr(node[0],has_der),readExpr(node[1],has_der));
   } else if(name.compare("RealLiteral")==0){
-    return double(node.getText());
+    double val;
+    node.getText(val);
+    return val;
   } else if(name.compare("Sin")==0){
     return sin(readExpr(node[0],has_der));
   } else if(name.compare("Sqrt")==0){
     return sqrt(readExpr(node[0],has_der));
   } else if(name.compare("StringLiteral")==0){
-    throw CasadiException(string(node.getText()));
+    throw CasadiException(node.getText());
   } else if(name.compare("Sub")==0){
     return readExpr(node[0],has_der) - readExpr(node[1],has_der);
   } else if(name.compare("Tan")==0){
@@ -1255,7 +1261,8 @@ std::string SymbolicOCP::qualifiedName(const XMLNode& nn){
 
     // Get the index, if any
     if(nn[i].size()>0){
-      int ind = nn[i]["exp:ArraySubscripts"]["exp:IndexExpression"]["exp:IntegerLiteral"].getText();
+      int ind;
+      nn[i]["exp:ArraySubscripts"]["exp:IndexExpression"]["exp:IntegerLiteral"].getText(ind);
       qn << "[" << ind << "]";
     }
   }
