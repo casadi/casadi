@@ -67839,6 +67839,10 @@ Access the algorithm directly. ";
 
 Get the number of atomic operations. ";
 
+%feature("docstring")  CasADi::SXFunction::getWorkSize "
+
+Get the length of the work vector. ";
+
 %feature("docstring")  CasADi::SXFunction::getAtomicOperation "
 
 Get an atomic operation operator index. ";
