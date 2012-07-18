@@ -30,6 +30,9 @@ namespace CasADi{
   // Forward declarations
   class XMLNode;
     
+  // All the types of variables in the SymbolicOCP class
+  enum SymbolicOCPVariables{VAR_X, VAR_Z, VAR_Q, VAR_CI, VAR_CD, VAR_PI, VAR_PD, VAR_PF, VAR_Y, VAR_U, NUM_VAR};
+  
 /** \brief A flat OCP representation coupled to an XML file
 
  <H3>Variables:  </H3>
@@ -130,6 +133,11 @@ class SymbolicOCP : public PrintableObject{
     /** \brief Control signals */
     std::vector<Variable> u;
 
+    /** \brief Get all variables of a certain type */
+    std::vector<Variable>& variableByType(SymbolicOCPVariables type);
+    
+    /** \brief Get all variables of a certain type */
+    const std::vector<Variable>& variableByType(SymbolicOCPVariables type) const;
     //@}
     
     /** @name Equations

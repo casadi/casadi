@@ -1549,5 +1549,25 @@ void SymbolicOCP::generateMuscodDatFile(const std::string& filename, const Dicti
   datfile.close();
 }
 
+std::vector<Variable>& SymbolicOCP::variableByType(SymbolicOCPVariables type){
+  switch(type){
+    case VAR_X: return x;
+    case VAR_Z: return z;
+    case VAR_Q: return q;
+    case VAR_CI: return ci;
+    case VAR_CD: return cd;
+    case VAR_PI: return pi;
+    case VAR_PD: return pd;
+    case VAR_PF: return pf;
+    case VAR_Y: return y;
+    case VAR_U: return u;
+  }
+}
+    
+const std::vector<Variable>& SymbolicOCP::variableByType(SymbolicOCPVariables type) const{
+  return const_cast<SymbolicOCP*>(this)->variableByType(type);
+}
+
+
 } // namespace CasADi
 

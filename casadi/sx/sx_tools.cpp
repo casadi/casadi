@@ -992,6 +992,54 @@ SXMatrix getFree(const SXMatrix& ex){
   return f.getFree();
 }
 
+Matrix<SX> jacobianTimesVector(const Matrix<SX> &ex, const Matrix<SX> &arg, const Matrix<SX> &v, bool transpose_jacobian){
+  SXFunction f(arg,ex);
+  f.init();
+  
+  // Dimension of v
+  int v1 = v.size1(), v2 = v.size2();
+  
+  // Make sure well-posed
+  casadi_assert(v2 >= 1);
+  casadi_assert(ex.size2()==1);
+  casadi_assert(arg.size2()==1);
+  if(transpose_jacobian){
+    casadi_assert(v1==ex.size1());
+  } else {
+    casadi_assert(v1==arg.size1());
+  }
+  
+  // Number of sensitivities
+  int nfsens = transpose_jacobian ? 0 : v2;
+  int nasens = transpose_jacobian ? v2 : 0;
+  
+  // Assemble arguments and directional derivatives
+  vector<SXMatrix> argv = f.inputsSX();
+  vector<SXMatrix> resv = f.outputsSX();
+  vector<vector<SXMatrix> > fseed(nfsens,argv), fsens(nfsens,resv), aseed(nasens,resv), asens(nasens,argv);
+  for(int dir=0; dir<v2; ++dir){
+    if(transpose_jacobian){
+      aseed[dir][0].set(v(Slice(0,v1),dir));
+    } else {
+      fseed[dir][0].set(v(Slice(0,v1),dir));
+    }
+  }
+  
+  // Evaluate with directional derivatives, output is the same as the funciton inputs
+  f.evalSX(argv,resv,fseed,fsens,aseed,asens,true);
+  
+  // Get the results
+  vector<SXMatrix> dirder(v2);
+  for(int dir=0; dir<v2; ++dir){
+    if(transpose_jacobian){
+      dirder[dir] = asens[dir][0];
+    } else {
+      dirder[dir] = fsens[dir][0];
+    }
+  }
+  return horzcat(dirder);
+}
+
 
 } // namespace CasADi
 
