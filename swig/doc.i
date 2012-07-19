@@ -64225,12 +64225,6 @@ Return a string with a representation (for SWIG) ";
 Return a string with a destription (for SWIG) ";
 
 
-// File: classCasADi_1_1StrArg.xml
-%feature("docstring") CasADi::StrArg "C++ includes: xml_arg.hpp ";
-
-%feature("docstring")  CasADi::StrArg::StrArg "";
-
-
 // File: structCasADi_1_1SubBinaryOperation.xml
 %feature("docstring") CasADi::SubBinaryOperation "C++ includes:
 casadi_calculus.hpp ";
@@ -69126,6 +69120,14 @@ C++ includes: symbolic_ocp.hpp ";
 
 */
 
+%feature("docstring")  CasADi::SymbolicOCP::variableByType "
+
+Get all variables of a certain type. ";
+
+%feature("docstring")  CasADi::SymbolicOCP::variableByType "
+
+Get all variables of a certain type. ";
+
 /*  Equations  */
 
 /* Get all equations of a particular type
@@ -69958,6 +69960,10 @@ Get the lower bound. ";
 
 Set the lower bound. ";
 
+%feature("docstring")  CasADi::Variable::min "
+
+Access the lower bound. ";
+
 %feature("docstring")  CasADi::Variable::getMax "
 
 Get the upper bound. ";
@@ -69965,6 +69971,10 @@ Get the upper bound. ";
 %feature("docstring")  CasADi::Variable::setMax "
 
 Set the upper bound. ";
+
+%feature("docstring")  CasADi::Variable::max "
+
+Access the upper bound. ";
 
 %feature("docstring")  CasADi::Variable::getNominal "
 
@@ -69974,17 +69984,21 @@ Get the nominal value of the variable. ";
 
 Set the nominal value of the variable. ";
 
+%feature("docstring")  CasADi::Variable::nominal "
+
+Access the nominal value of the variable. ";
+
 %feature("docstring")  CasADi::Variable::getStart "
 
 Get the value at time 0. ";
 
-%feature("docstring")  CasADi::Variable::getDerivativeStart "
-
-Get the derivative at time 0. ";
-
 %feature("docstring")  CasADi::Variable::setStart "
 
 Set the value at time 0. ";
+
+%feature("docstring")  CasADi::Variable::start "
+
+Access the value at time 0. ";
 
 %feature("docstring")  CasADi::Variable::getInitialGuess "
 
@@ -69994,9 +70008,21 @@ Get the lower bound. ";
 
 Set the lower bound. ";
 
+%feature("docstring")  CasADi::Variable::initialGuess "
+
+Access the lower bound. ";
+
+%feature("docstring")  CasADi::Variable::getDerivativeStart "
+
+Get the derivative at time 0. ";
+
 %feature("docstring")  CasADi::Variable::setDerivativeStart "
 
 Set the derivative at time 0. ";
+
+%feature("docstring")  CasADi::Variable::derivativeStart "
+
+Access the derivative at time 0. ";
 
 %feature("docstring")  CasADi::Variable::getUnit "
 
@@ -70006,6 +70032,10 @@ Get the unit. ";
 
 Set the unit. ";
 
+%feature("docstring")  CasADi::Variable::unit "
+
+Access the unit. ";
+
 %feature("docstring")  CasADi::Variable::getDisplayUnit "
 
 Get the display unit. ";
@@ -70013,6 +70043,10 @@ Get the display unit. ";
 %feature("docstring")  CasADi::Variable::setDisplayUnit "
 
 Set the display unit. ";
+
+%feature("docstring")  CasADi::Variable::displayUnit "
+
+Get the display unit. ";
 
 %feature("docstring")  CasADi::Variable::setExpression "
 
@@ -70045,6 +70079,10 @@ Get the the free attribute. ";
 %feature("docstring")  CasADi::Variable::setFree "
 
 Set the the free attribute. ";
+
+%feature("docstring")  CasADi::Variable::free "
+
+Access the the free attribute. ";
 
 %feature("docstring")  CasADi::Variable::checkNode "
 
@@ -73563,21 +73601,19 @@ Assert that the object has been initialized. ";
 
 %feature("docstring")  CasADi::XMLNode::XMLNode "";
 
-%feature("docstring")  CasADi::XMLNode::XMLNode "";
-
 %feature("docstring")  CasADi::XMLNode::~XMLNode "";
 
 %feature("docstring")  CasADi::XMLNode::setAttribute "
 
 Add an attribute. ";
 
-%feature("docstring")  CasADi::XMLNode::addChild "
-
-Add a child. ";
-
-%feature("docstring")  CasADi::XMLNode::attribute "
+%feature("docstring")  CasADi::XMLNode::getAttribute "
 
 Get an attribute by its name. ";
+
+%feature("docstring")  CasADi::XMLNode::readAttribute "
+
+Read the value of an attribute. ";
 
 %feature("docstring")  CasADi::XMLNode::hasChild "
 
@@ -73609,23 +73645,11 @@ Get the text field. ";
 
 %feature("docstring")  CasADi::XMLNode::getText "
 
-Get value of string text-attribute. ";
+Get value of text field. ";
 
-%feature("docstring")  CasADi::XMLNode::getText "
+%feature("docstring")  CasADi::XMLNode::addNode "
 
-Get value of boolean text-attribute. ";
-
-%feature("docstring")  CasADi::XMLNode::getText "
-
-Get value of integer text-attribute. ";
-
-%feature("docstring")  CasADi::XMLNode::getText "
-
-Get value of double text-attribute. ";
-
-%feature("docstring")  CasADi::XMLNode::addAttributes "";
-
-%feature("docstring")  CasADi::XMLNode::addNode "";
+Read node from parsed XML file. ";
 
 %feature("docstring")  CasADi::XMLNode::dump "";
 
@@ -75062,6 +75086,15 @@ Get a string representation for a binary SX, using custom arguments. ";
 %feature("docstring")  CasADi::Interfaces::getFree "
 
 Get all the free variables in an expression. ";
+
+%feature("docstring")  CasADi::Interfaces::jacobianTimesVector "
+
+Calculate the Jacobian and multiply by a vector from the left This is
+equivalent to mul(jacobian(ex,arg),v) or mul(jacobian(ex,arg).T,v) for
+transpose_jacobian set to false and true respectively. If contrast to these
+expressions, it will use directional derivatives which is typically (but not
+necessarily) more efficient if the complete Jacobian is not needed and v has
+few columns. ";
 
 %feature("docstring")  CasADi::Interfaces::contains "
 
@@ -76674,12 +76707,6 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: xfunction__tools_8hpp.xml
-
-
-// File: xml__arg_8cpp.xml
-
-
-// File: xml__arg_8hpp.xml
 
 
 // File: xml__node_8cpp.xml
