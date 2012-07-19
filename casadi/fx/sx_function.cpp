@@ -135,7 +135,7 @@ const vector<SXAlgEl>& SXFunction::algorithm() const{
 
 int SXFunction::countNodes() const{
   assertInit();
-  return algorithm().size();
+  return algorithm().size() - getNumScalarOutputs();
 }
 
 void SXFunction::clearSymbolic(){
