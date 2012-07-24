@@ -75096,6 +75096,14 @@ expressions, it will use directional derivatives which is typically (but not
 necessarily) more efficient if the complete Jacobian is not needed and v has
 few columns. ";
 
+%feature("docstring")  CasADi::Interfaces::extractSubexpressions "
+
+Extract all subexpressions from an expression. ";
+
+%feature("docstring")  CasADi::Interfaces::extractSubexpressions "
+
+Extract all subexpressions from an set of expressions. ";
+
 %feature("docstring")  CasADi::Interfaces::contains "
 
 Returns true if at least one element in list contains the scalar e. ";
