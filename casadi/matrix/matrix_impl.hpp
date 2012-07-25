@@ -1420,7 +1420,7 @@ Matrix<T> Matrix<T>::matrix_scalar(int op, const Matrix<T> &x, const Matrix<T> &
 template<class T>
 Matrix<T> Matrix<T>::matrix_matrix(int op, const Matrix<T> &x, const Matrix<T> &y){
   casadi_assert_message(x.size1() == y.size1() && x.size2() == y.size2(),
-    "matrix_matrix: dimension mismatch." << std::endl << "Left argument has shape " << x.dimString() << ", right has shape " << y.dimString()
+    "matrix_matrix: dimension mismatch in element-wise matrix operation." << std::endl << "Left argument has shape " << x.dimString() << ", right has shape " << ". They should be equal."
   ); 
 
   // Nonzeros
