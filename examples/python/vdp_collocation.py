@@ -33,9 +33,9 @@ u  = ssym("u")    # control
 x  = ssym("x",3)  # state
 
 # ODE right hand side function
-rhs = [(1 - x[1]*x[1])*x[0] - x[1] + u, \
-       x[0], \
-       x[0]*x[0] + x[1]*x[1] + u*u]
+rhs = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, \
+               x[0], \
+               x[0]*x[0] + x[1]*x[1] + u*u])
 f = SXFunction([t,x,u],[rhs])
 
 # Objective function (meyer term)
