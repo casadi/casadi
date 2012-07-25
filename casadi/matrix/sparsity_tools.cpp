@@ -38,6 +38,14 @@ CRSSparsity sp_sparse(int n, int m) {
   return CRSSparsity(n,m,false);
 }
 
+CRSSparsity sp_dense(const std::pair<int,int> &nm) {
+  return CRSSparsity(nm.first,nm.second,true);
+}
+
+CRSSparsity sp_sparse(const std::pair<int,int> &nm) {
+  return CRSSparsity(nm.first,nm.second,false);
+}
+
 CRSSparsity sp_tril(int n) {
   if (n<0)
     throw CasadiException("sp_tril expects a positive integer as argument");
