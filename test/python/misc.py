@@ -285,6 +285,14 @@ class Misctests(casadiTestCase):
       self.assertFalse(isMonotone(l))
       self.assertFalse(isStrictlyMonotone(l))
     
+  def test_regression418(self):
+    self.message("Segfault regression check")
+    f = ControlSimulator()
+    try:
+      f.setOption("integrator_options",None) # This should not give a segfault
+    except:
+      pass
+      
 if __name__ == '__main__':
     unittest.main()
     

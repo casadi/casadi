@@ -212,7 +212,7 @@ template<> bool meta< CasADi::GenericType::Dictionary >::toPython(CasADi::Generi
 
 
 /// CasADi::GenericType
-template<> char meta< CasADi::GenericType >::expected_message[] = "Expecting number, string, vector(number)";
+template<> char meta< CasADi::GenericType >::expected_message[] = "Expecting any type (None might be an exception)";
 
 template <>
 int meta< CasADi::GenericType >::as(PyObject * p,CasADi::GenericType &s) {
