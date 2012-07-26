@@ -25,6 +25,8 @@ namespace CasADi{
 %extend CFunction {
   void __setUserData__(PyObject * obj) {
     $self->setOption("user_data",static_cast<void*>(obj));
+    Py_INCREF(obj); // This avoids a segfault when the python function goes out of scope
+                    // This fix introduces a memory leak though
   }
 }
 }
