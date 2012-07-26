@@ -34,6 +34,8 @@ namespace CasADi{
 
 class PyFunction(CFunction):
    def __init__(self,fun, inputscheme=None, outputscheme=None):
+     if not(callable(fun)):
+        raise Exception("PyFunction(fun, inputscheme, outputscheme): fun must be callable. i.e. be a function or implement the __call__ method.")
      if inputscheme == None:
         inputscheme = []
      if outputscheme == None:
