@@ -74374,6 +74374,14 @@ Create a dense rectangular sparsity pattern. ";
 
 Create a sparse rectangular sparsity pattern. ";
 
+%feature("docstring")  CasADi::Interfaces::sp_dense "
+
+Create a dense rectangular sparsity pattern. ";
+
+%feature("docstring")  CasADi::Interfaces::sp_sparse "
+
+Create a dense rectangular sparsity pattern. ";
+
 %feature("docstring")  CasADi::Interfaces::sp_tril "
 
 Create a lower triangular square sparsity pattern.
