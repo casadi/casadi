@@ -222,8 +222,10 @@ void IpoptQPInternal::evaluate(int nfdir, int nadir) {
   solver.evaluate();
   
   // Read the outputs from Ipopt
-  output(NLP_X_OPT).set(solver.output(NLP_X_OPT));
-  output(NLP_COST).set(solver.output(NLP_COST));
+  output(QP_PRIMAL).set(solver.output(NLP_X_OPT));
+  output(QP_COST).set(solver.output(NLP_COST));
+  output(QP_LAMBDA_A).set(solver.output(NLP_LAMBDA_G));
+  output(QP_LAMBDA_X).set(solver.output(NLP_LAMBDA_X));
 }
 
 void IpoptQPInternal::init(){
