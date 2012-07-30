@@ -26,6 +26,10 @@
 // The declaration of the class is in a separate file
 #include "matrix.hpp"
 
+#ifdef WITH_EIGEN3
+#include <Eigen/Dense>
+#endif
+
 namespace CasADi{
 // Implementations
 
@@ -1215,7 +1219,17 @@ void Matrix<T>::mul_no_alloc(const Matrix<T> &x, const Matrix<T> &y_trans, Matri
   const std::vector<T> &x_data = x.data();
   const std::vector<T> &y_trans_data = y_trans.data();
   std::vector<T> &z_data = z.data();
-
+  
+  #ifdef WITH_EIGEN3
+  if (x.dense() && y_trans.dense() && z.dense()) {
+    Eigen::Map< const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic , Eigen::RowMajor > > X(&x_data[0],x.size1(),x.size2());
+    Eigen::Map< const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic > > Y(&y_trans_data[0],y_trans.size1(),y_trans.size2());
+    Eigen::Map< Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic , Eigen::RowMajor> > Z(&z.data()[0],z.size1(),z.size2());
+    Z = X*Y;
+    return;
+  }
+  #endif
+  
   // loop over the rows of the resulting matrix)
   for(int i=0; i<z_rowind.size()-1; ++i){
     for(int el=z_rowind[i]; el<z_rowind[i+1]; ++el){ // loop over the non-zeros of the resulting matrix
