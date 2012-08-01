@@ -261,6 +261,10 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
 
+  /** \brief Generate a augmented DAE system with nfwd forward sensitivities and nadj adjoint sensitivities
+   */
+  std::pair<FX,FX> getAugmented(int nfwd, int nadj);
+  
   /// Get the DAE
   FX getDAE();
 };

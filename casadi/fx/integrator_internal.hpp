@@ -75,6 +75,12 @@ public:
   /** \brief  Initialize */
   virtual void init();
 
+  /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
+  virtual FX getDerivative(int nfwd, int nadj);
+
+  /// Generate a augmented DAE system with nfwd forward sensitivities and nadj adjoint sensitivities
+  virtual std::pair<FX,FX> getAugmented(int nfwd, int nadj);
+  
   /// Number of states for the forward integration
   int nx_, nz_, nq_;
   

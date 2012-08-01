@@ -71,7 +71,10 @@ void Integrator::integrateAdj(double t_out){
 FX Integrator::getDAE(){
   return (*this)->f_;
 }
-  
+
+std::pair<FX,FX> Integrator::getAugmented(int nfwd, int nadj){
+  return (*this)->getAugmented(nfwd,nadj);
+}
  
 } // namespace CasADi
 

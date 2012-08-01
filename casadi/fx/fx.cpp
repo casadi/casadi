@@ -407,7 +407,7 @@ void FX::spInit(bool fwd){
 }
 
 FX FX::derivative(int nfwd, int nadj){
-	  return (*this)->derivative(nfwd,nadj);
+  return (*this)->derivative(nfwd,nadj);
 }
 
 
