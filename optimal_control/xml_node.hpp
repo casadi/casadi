@@ -26,7 +26,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "xml_arg.hpp"
+#include "casadi/casadi_exception.hpp"
 
 /** \brief  Forward declarations */
 class TiXmlElement;
@@ -37,46 +37,82 @@ namespace CasADi{
 class XMLNode{
 public:
   XMLNode();
-  XMLNode(const std::string& name);
   ~XMLNode();
 
-/** \brief  Add an attribute */
+  /** \brief  Add an attribute */
   void setAttribute(const std::string& attribute_name, const std::string& attribute);
 
-/** \brief  Add a child */
-  void addChild(XMLNode *child);
+  /** \brief  Get an attribute by its name */
+  std::string getAttribute(const std::string& attribute_name) const{
+    std::string ret;
+    readAttribute(attribute_name,ret,true);
+    return ret;
+  }
 
-/** \brief  Get an attribute by its name */
-  StrArg attribute(const std::string& attribute_name) const;
+  /** \brief  Read the value of an attribute */
+  template<typename T>
+  void readAttribute(const std::string& attribute_name, T& val, bool assert_existance=true) const{ 
+    // find the attribute
+    std::map<std::string, std::string>::const_iterator it = attributes_.find(attribute_name);
 
-/** \brief  Get a reference to a child by its index */
-  XMLNode& operator[](int i) const;
+    // check if the attribute exists
+    if(it == attributes_.end()){
+      casadi_assert_message(!assert_existance, "Error in XMLNode::readAttribute: could not find " + attribute_name);
+    } else {
+      readString(it->second,val);
+    }
+  }
+  
+  /** \brief  Get a reference to a child by its index */
+  const XMLNode& operator[](int i) const;
 
-/** \brief  Get a reference to a child by its name */
-  XMLNode& operator[](const std::string& childname) const;
+  /** \brief  Get a reference to a child by its index */
+  XMLNode& operator[](int i);
 
-/** \brief  Check if a child is present */
+  /** \brief  Get a reference to a child by its name */
+  const XMLNode& operator[](const std::string& childname) const;
+
+  /** \brief  Get a reference to a child by its name */
+  XMLNode& operator[](const std::string& childname);
+
+  /** \brief  Check if a child is present */
   bool hasChild(const std::string& childname) const;
   
-/** \brief  Check if an attribute is present */
+  /** \brief  Check if an attribute is present */
   bool hasAttribute(const std::string& attribute_name) const;
 
-/** \brief  Get the number of children */
+  /** \brief  Get the number of children */
   int size() const;
 
-/** \brief  Get the name of the node */
+  /** \brief  Get the name of the node */
   const std::string& getName() const;
 
-/** \brief  Set the name of the node */
+  /** \brief  Set the name of the node */
   void setName(const std::string& name);
 
-/** \brief  check if the name is equal to something */
+  /** \brief  check if the name is equal to something */
   bool checkName(const std::string& str) const;
 
-/** \brief  Get the value of the text field */
-  StrArg getText() const;
+  /** \brief  Get the text field */
+  std::string getText() const{ return text_; }
 
-  void addAttributes(TiXmlElement* el);
+  /** \brief  Get value of text field */
+  template<typename T>
+  void getText(T& val) const{ readString(text_,val);}
+  
+  /** \brief  Read the string value of a string (i.e. copy) */
+  static void readString(const std::string& str, std::string& val);
+  
+  /** \brief  Read the boolean value of a string */
+  static void readString(const std::string& str, bool& val);
+  
+  /** \brief  Read the integer value of a string */
+  static void readString(const std::string& str, int& val);
+  
+  /** \brief  Read the double value of a string */
+  static void readString(const std::string& str, double& val);
+  
+  /** \brief  Read node from parsed XML file */
   void addNode(TiXmlNode* node);
 
   friend std::ostream& operator<<(std::ostream &stream, const XMLNode& node);
@@ -84,15 +120,14 @@ public:
   void dump(std::ostream &stream, int indent=0) const;
 
   protected:
-/** \brief  Attributes and children (binary search tree) */
-  std::map<std::string, std::string>  attributes;
-  std::vector<XMLNode*>               children;
-  std::map<std::string,int>           child_indices; // the index of the children sorted by their name
 
-  std::string name;
-  std::string comment;
-  std::string text;
+    std::map<std::string, std::string>  attributes_;
+    std::vector<XMLNode>                children_;
+    std::map<std::string,int>           child_indices_; // the index of the children sorted by their name
 
+    std::string name_;
+    std::string comment_;
+    std::string text_;
 };
 
 } // namespace CasADi

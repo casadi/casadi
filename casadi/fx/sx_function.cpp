@@ -135,7 +135,7 @@ const vector<SXAlgEl>& SXFunction::algorithm() const{
 
 int SXFunction::countNodes() const{
   assertInit();
-  return algorithm().size();
+  return algorithm().size() - getNumScalarOutputs();
 }
 
 void SXFunction::clearSymbolic(){
@@ -167,6 +167,9 @@ std::vector<SX> SXFunction::getFree() const{
   return (*this)->free_vars_;
 }
 
+int SXFunction::getWorkSize() const{
+  return (*this)->work_.size();
+}
 
 } // namespace CasADi
 

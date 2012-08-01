@@ -29,7 +29,7 @@ Interface to ACADO Integrator from the ACADO Toolkit.
 Creates an integrator instance which solves initial value problems in
 differential-algebraic equations of the semi-explicit form:
 
-der(xd) = fd(t,[xd,xa],p)       0   = fa(t,[xd,xa],p)
+der(xd) = fd(t,[xd,xa],p)     0   = fa(t,[xd,xa],p)
 
 The DAE thus consists of an differential part (fd) and an algebraic part
 (fa). In the same way, the state vector is also composed of two parts, the
@@ -232,7 +232,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -807,7 +807,7 @@ CasADi::AcadoIntegratorBackend::getNumberOfRejectedSteps "";
 Creates an integrator instance which solves initial value problems in
 differential-algebraic equations of the semi-explicit form:
 
-der(xd) = fd(t,[xd,xa],p)       0   = fa(t,[xd,xa],p)
+der(xd) = fd(t,[xd,xa],p)     0   = fa(t,[xd,xa],p)
 
 The DAE thus consists of an differential part (fd) and an algebraic part
 (fa). In the same way, the state vector is also composed of two parts, the
@@ -1008,7 +1008,7 @@ thus x := [xd,xa]
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -1587,7 +1587,7 @@ Assert that the object has been initialized. ";
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -1714,7 +1714,7 @@ Default constructor. ";
 %feature("docstring")  CasADi::AcadoOCP::AcadoOCP "
 
 Constructor taking a DAE rhs function, an objective function and a
-constraint function -- for use with ACADO integrators. ";
+constraint function for use with ACADO integrators. ";
 
 %feature("docstring")  CasADi::AcadoOCP::setIntegrators "
 
@@ -2270,7 +2270,7 @@ Return a string with a destription (for SWIG) ";
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -3537,7 +3537,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -4165,7 +4165,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -4735,7 +4735,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -5523,7 +5523,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -6308,7 +6308,7 @@ Return a string with a destription (for SWIG) ";
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -6945,7 +6945,7 @@ Assert that the object has been initialized. ";
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -7926,7 +7926,7 @@ Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -8741,7 +8741,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -9220,9 +9220,8 @@ Assert that the object has been initialized. ";
 |              |              |              | iteration.   |              |
 |              |              |              | Input scheme |              |
 |              |              |              | is the same  |              |
-|              |              |              | as           |              |
-|              |              |              | NLPSolver's  |              |
-|              |              |              | output       |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
@@ -9360,7 +9359,7 @@ Assert that the object has been initialized. ";
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
@@ -9721,10 +9720,9 @@ Assert that the object has been initialized. ";
 CplexMatrix is a class used to convert CasADi matrices to CPLEX format
 (similar to CSC). The class definition can be found in cplex_internal.cpp.
 
-Solves the following nonlinear optimization problem:   min          F(x,p)
-x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
-<= UBX                      n: number of decision variables (x)       m:
-number of constraints (A)
+Solves the following nonlinear optimization problem:min          F(x,p)  x
+subject to             LBG <= G(x,p) <= UBG LBX <= x    <= UBX
+n: number of decision variables (x)     m: number of constraints (A)
 
 Carlo Savorgnan
 
@@ -9756,12 +9754,11 @@ returns row numbers ";
 
 Interface to CPLEX solver.
 
-Solves the following nonlinear optimization problem:   min          F(x,p)
-x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
-<= UBX                      n: number of decision variables (x)       m:
-number of constraints (A)   Attention! The interface is not complete yet.
-Also if a quadratic term can be set with this interface, it is ignored!
-Carlo Savorgnan
+Solves the following nonlinear optimization problem:min          F(x,p)  x
+subject to             LBG <= G(x,p) <= UBG LBX <= x    <= UBX
+n: number of decision variables (x)     m: number of constraints (A)
+Attention! The interface is not complete yet. Also if a quadratic term can
+be set with this interface, it is ignored! Carlo Savorgnan
 
 >Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
 +------------------------------------+------------------------------------+
@@ -9889,9 +9886,8 @@ Carlo Savorgnan
 |              |              |              | iteration.   |              |
 |              |              |              | Input scheme |              |
 |              |              |              | is the same  |              |
-|              |              |              | as           |              |
-|              |              |              | NLPSolver's  |              |
-|              |              |              | output       |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
@@ -10029,7 +10025,7 @@ Carlo Savorgnan
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
@@ -10566,13 +10562,13 @@ In addition to the dimension ( size1(), size2()), (i.e. the number of rows
 and the number of columns respectively), there are also two vectors of
 integers:
 
-1. \"rowind\" [length size1()+1], which contains the index to the first non-
+\"rowind\" [length size1()+1], which contains the index to the first non-
 zero element on or after the corresponding row. All the non-zero elements of
 a particular i are thus the elements with index el that fulfils: rowind[i]
 <= el < rowind[i+1].
 
-2. \"col\" [same length as the number of non-zero elements, size()] The
-columns for each of the structural non-zeros.
+\"col\" [same length as the number of non-zero elements, size()] The columns
+for each of the structural non-zeros.
 
 Note that with this format, it is cheap to loop over all the non-zero
 elements of a particular row, constant time per elment, but expensive to
@@ -11422,7 +11418,7 @@ therefore more expensive if A is invariant.
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -12064,7 +12060,7 @@ Solves the linear system A.x = b for x
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -12437,8 +12433,7 @@ Function that integrates the ODE:
 
 Solves the following initial value problem (IVP):
 
-xdot == f(t,x,p)   from t0 to tf      given the initial condition x(t0) ==
-x0;
+xdot == f(t,x,p) from t0 to tf  given the initial condition x(t0) == x0;
 
 A call to evaluate will integrate to the end.
 
@@ -12837,7 +12832,7 @@ times t_i.
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -13436,8 +13431,7 @@ Return a string with a destription (for SWIG) ";
 
 Solves the following initial value problem (IVP):
 
-xdot == f(t,x,p)   from t0 to tf      given the initial condition x(t0) ==
-x0;
+xdot == f(t,x,p) from t0 to tf  given the initial condition x(t0) == x0;
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
 +----------------+-----------------------------------------------+
@@ -13830,7 +13824,7 @@ x0;
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -14951,7 +14945,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -15573,7 +15567,7 @@ Return a string with a destription (for SWIG) ";
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -16242,10 +16236,14 @@ $\\\\vec{s}_f$
 
 NOTE: FX's are allowed to modify their input arguments when evaluating:
 implicitFunction, IDAS solver Futher releases may disallow this. for
-developers Each function consists of 4 files:  1. public class headerfile:
-imported in python  2. public class implementation  3. internal class
-headerfile: should only be used by derived classes  4. internal class
-implementation
+developers Each function consists of 4 files: public class header file:
+imported in python
+
+public class implementation
+
+internal class header file: should only be used by derived classes
+
+internal class implementation
 
 python and c++ should be 1-to-1  There should be no extra features in 1.
 All the functionality should exist in 1.  If it means that c++ will be more
@@ -16383,7 +16381,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -17029,7 +17027,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -17742,7 +17740,7 @@ form:
 Creates an integrator instance which solves initial value problems in
 differential-algebraic equations of the form:
 
-f(t,y,der(y),z,p) == 0   der(q) = g(t,y,z,p)
+f(t,y,der(y),z,p) == 0 der(q) = g(t,y,z,p)
 
 The DAE thus consists of a fully implicit part (f) and an explicit
 quadrature part (g). In the same way, the state vector is also composed of
@@ -18201,7 +18199,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -18803,7 +18801,7 @@ form:
 Creates an integrator instance which solves initial value problems in
 differential-algebraic equations of the form:
 
-f(t,y,der(y),z,p) == 0   der(q) = g(t,y,z,p)
+f(t,y,der(y),z,p) == 0 der(q) = g(t,y,z,p)
 
 The DAE thus consists of a fully implicit part (f) and an explicit
 quadrature part (g). In the same way, the state vector is also composed of
@@ -19260,7 +19258,7 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -20067,7 +20065,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -20685,7 +20683,7 @@ Internal class.
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -21274,24 +21272,24 @@ Check if smooth. ";
 Integrator abstract base class Solves the following initial value problem
 (IVP):
 
-F(t,x,der(x),z,p) == 0   x(t0) = x0   over a time interval [t0, tf].
+F(t,x,der(x),z,p) == 0 x(t0) = x0 over a time interval [t0, tf].
 
 NOTE: The ODE/DAE initial-value problem formulation in CasADi is being
 replaced with a new formulation which solves an initial value problem (IVP)
 coupled to a terminal value problem with differential equation given as an
-implicit ODE coupled to an algebraic equation and a set of quadratures:
-Initial conditions at t=t0     x(t0)  = x0     q(t0)  = 0 Forward
-integration from t=t0 to t=tf          0 = fx(x,z,p,t,der(x)) Forward ODE
-0 = fz(x,z,p,t)                  Forward algebraic equations     der(q) =
-fq(x,z,p,t)                  Forward quadratures      Terminal conditions at
-t=tf     rx(tf)  = rx0 rq(tf)  = 0      Backward integration from t=tf to
-t=t0           0 = gx(rx,rz,x,z,p,t,der(rx))   Backward ODE           0 =
-gz(rx,rz,x,z,p,t)           Backward algebraic equations     der(rq) =
-gq(rx,rz,x,z,p,t)           Backward quadratures    where we assume that
-both the forward and backwards integrations are index-1   (i.e. dfx/dxdot,
-dfz/dz, dgz/drz, dgx/drxdot are invertible) and furthermore that    gx, gz
-and gq have a linear dependency on rx and rz and that f_x and g_x have a
-linear dependence on xdot and rxdot respectively.
+implicit ODE coupled to an algebraic equation and a set of
+quadratures:Initial conditions at t=t0   x(t0)  = x0   q(t0)  = 0  Forward
+integration from t=t0 to t=tf        0 = fx(x,z,p,t,der(x)) Forward ODE
+0 = fz(x,z,p,t)                  Forward algebraic equations   der(q) =
+fq(x,z,p,t)                  Forward quadratures Terminal conditions at t=tf
+rx(tf)  = rx0   rq(tf)  = 0  Backward integration from t=tf to t=t0
+0 = gx(rx,rz,x,z,p,t,der(rx)) Backward ODE         0 = gz(rx,rz,x,z,p,t)
+Backward algebraic equations   der(rq) = gq(rx,rz,x,z,p,t)
+Backward quadratures  where we assume that both the forward and backwards
+integrations are index-1 (i.e. dfx/dxdot, dfz/dz, dgz/drz, dgx/drxdot are
+invertible) and furthermore that  gx, gz and gq have a linear dependency on
+rx and rz and that f_x and g_x have a  linear dependence on xdot and rxdot
+respectively.
 
 The Integrator class provides some additional functionality, such as getting
 the value of the state and/or sensitivities at certain time points. Controls
@@ -21475,7 +21473,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -21990,24 +21988,24 @@ Internal storage for integrator related data.
 
 Solves the following initial value problem (IVP):
 
-F(t,x,der(x),z,p) == 0   x(t0) = x0   over a time interval [t0, tf].
+F(t,x,der(x),z,p) == 0 x(t0) = x0 over a time interval [t0, tf].
 
 NOTE: The ODE/DAE initial-value problem formulation in CasADi is being
 replaced with a new formulation which solves an initial value problem (IVP)
 coupled to a terminal value problem with differential equation given as an
-implicit ODE coupled to an algebraic equation and a set of quadratures:
-Initial conditions at t=t0     x(t0)  = x0     q(t0)  = 0 Forward
-integration from t=t0 to t=tf          0 = fx(x,z,p,t,der(x)) Forward ODE
-0 = fz(x,z,p,t)                  Forward algebraic equations     der(q) =
-fq(x,z,p,t)                  Forward quadratures      Terminal conditions at
-t=tf     rx(tf)  = rx0 rq(tf)  = 0      Backward integration from t=tf to
-t=t0           0 = gx(rx,rz,x,z,p,t,der(rx))   Backward ODE           0 =
-gz(rx,rz,x,z,p,t)           Backward algebraic equations     der(rq) =
-gq(rx,rz,x,z,p,t)           Backward quadratures    where we assume that
-both the forward and backwards integrations are index-1   (i.e. dfx/dxdot,
-dfz/dz, dgz/drz, dgx/drxdot are invertible) and furthermore that    gx, gz
-and gq have a linear dependency on rx and rz and that f_x and g_x have a
-linear dependence on xdot and rxdot respectively.
+implicit ODE coupled to an algebraic equation and a set of
+quadratures:Initial conditions at t=t0   x(t0)  = x0   q(t0)  = 0  Forward
+integration from t=t0 to t=tf        0 = fx(x,z,p,t,der(x)) Forward ODE
+0 = fz(x,z,p,t)                  Forward algebraic equations   der(q) =
+fq(x,z,p,t)                  Forward quadratures Terminal conditions at t=tf
+rx(tf)  = rx0   rq(tf)  = 0  Backward integration from t=tf to t=t0
+0 = gx(rx,rz,x,z,p,t,der(rx)) Backward ODE         0 = gz(rx,rz,x,z,p,t)
+Backward algebraic equations   der(rq) = gq(rx,rz,x,z,p,t)
+Backward quadratures  where we assume that both the forward and backwards
+integrations are index-1 (i.e. dfx/dxdot, dfz/dz, dgz/drz, dgx/drxdot are
+invertible) and furthermore that  gx, gz and gq have a linear dependency on
+rx and rz and that f_x and g_x have a  linear dependence on xdot and rxdot
+respectively.
 
 Joel Andersson
 
@@ -22182,7 +22180,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -22675,9 +22673,8 @@ Assert that the object has been initialized. ";
 |              |              |              | iteration.   |              |
 |              |              |              | Input scheme |              |
 |              |              |              | is the same  |              |
-|              |              |              | as           |              |
-|              |              |              | NLPSolver's  |              |
-|              |              |              | output       |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
@@ -22821,7 +22818,7 @@ Assert that the object has been initialized. ";
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
@@ -23309,9 +23306,8 @@ Joel Andersson
 |              |              |              | iteration.   |              |
 |              |              |              | Input scheme |              |
 |              |              |              | is the same  |              |
-|              |              |              | as           |              |
-|              |              |              | NLPSolver's  |              |
-|              |              |              | output       |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
@@ -23455,7 +23451,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
@@ -23972,10 +23968,9 @@ Return a string with a destription (for SWIG) ";
 // File: classCasADi_1_1IpoptInternal.xml
 %feature("docstring") CasADi::IpoptInternal "
 
-Solves the following nonlinear optimization problem:   min          F(x,p)
-x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
-<= UBX                      n: number of decision variables (x)       m:
-number of constraints (A)
+Solves the following nonlinear optimization problem:min          F(x,p)  x
+subject to             LBG <= G(x,p) <= UBG LBX <= x    <= UBX
+n: number of decision variables (x)     m: number of constraints (A)
 
 >Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
 +------------------------------------+------------------------------------+
@@ -24823,9 +24818,8 @@ number of constraints (A)
 |              |              |              | iteration.   |              |
 |              |              |              | Input scheme |              |
 |              |              |              | is the same  |              |
-|              |              |              | as           |              |
-|              |              |              | NLPSolver's  |              |
-|              |              |              | output       |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
@@ -26586,7 +26580,7 @@ number of constraints (A)
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | False        | verbose      | CasADi::Ipop |
 |              |              |              | evaluation   | tInternal    |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | warm_start_b | OT_REAL      | 0.001        | same as      | CasADi::Ipop |
@@ -27213,9 +27207,9 @@ Internal class for IpoptQPSolver.
 
 Solves the following problem:
 
-min          x'.H.x + G'.x     x      subject to               LBA <= A.x <=
-UBA               LBX <= x   <= UBX                      nx: number of
-decision variables (x)       nc: number of constraints (A)
+min          x'.H.x + G'.x   x  subject to             LBA <= A.x <= UBA
+LBX <= x   <= UBX                  nx: number of decision variables (x)
+nc: number of constraints (A)
 
 >Input scheme: CasADi::QPInput (QP_NUM_IN = 9)
 +------------------------------------+------------------------------------+
@@ -27804,7 +27798,7 @@ decision variables (x)       nc: number of constraints (A)
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | warm_start_b | OT_REAL      |              |              | CasADi::Inte |
@@ -28226,9 +28220,9 @@ IPOPT QP Solver for quadratic programming.
 
 Solves the following problem:
 
-min          x'.H.x + G'.x     x      subject to               LBA <= A.x <=
-UBA               LBX <= x   <= UBX                      nx: number of
-decision variables (x)       nc: number of constraints (A)
+min          x'.H.x + G'.x   x  subject to             LBA <= A.x <= UBA
+LBX <= x   <= UBX                  nx: number of decision variables (x)
+nc: number of constraints (A)
 
 Joris Gillis
 
@@ -28819,7 +28813,7 @@ Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | warm_start_b | OT_REAL      |              |              | CasADi::Inte |
@@ -29377,10 +29371,9 @@ Return a string with a destription (for SWIG) ";
 
 interface to IPOPT NLP solver
 
-Solves the following nonlinear optimization problem:   min          F(x,p)
-x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
-<= UBX                      n: number of decision variables (x)       m:
-number of constraints (A)
+Solves the following nonlinear optimization problem:min          F(x,p)  x
+subject to             LBG <= G(x,p) <= UBG LBX <= x    <= UBX
+n: number of decision variables (x)     m: number of constraints (A)
 
 NOTE: Even when max_iter == 0, it is not guaranteed that input(NLP_X_INIT)
 == output(NLP_X_OPT). Indeed if bounds on X or constraints are unmet, they
@@ -30238,9 +30231,8 @@ Yorktown, USA
 |              |              |              | iteration.   |              |
 |              |              |              | Input scheme |              |
 |              |              |              | is the same  |              |
-|              |              |              | as           |              |
-|              |              |              | NLPSolver's  |              |
-|              |              |              | output       |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
@@ -32001,7 +31993,7 @@ Yorktown, USA
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | False        | verbose      | CasADi::Ipop |
 |              |              |              | evaluation   | tInternal    |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | warm_start_b | OT_REAL      | 0.001        | same as      | CasADi::Ipop |
@@ -32982,7 +32974,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -33593,7 +33585,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -34355,7 +34347,7 @@ Assert that the object has been initialized. ";
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -34969,7 +34961,7 @@ See:   ImplicitFunction for more information
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -35621,10 +35613,9 @@ ddqn=[0 0 0 0]; ";
 // File: classCasADi_1_1KnitroInternal.xml
 %feature("docstring") CasADi::KnitroInternal "
 
-Solves the following nonlinear optimization problem:   min          F(x,p)
-x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
-<= UBX                      n: number of decision variables (x)       m:
-number of constraints (A)
+Solves the following nonlinear optimization problem:min          F(x,p)  x
+subject to             LBG <= G(x,p) <= UBG LBX <= x    <= UBX
+n: number of decision variables (x)     m: number of constraints (A)
 
 >Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
 +------------------------------------+------------------------------------+
@@ -35858,9 +35849,8 @@ number of constraints (A)
 |              |              |              | iteration.   |              |
 |              |              |              | Input scheme |              |
 |              |              |              | is the same  |              |
-|              |              |              | as           |              |
-|              |              |              | NLPSolver's  |              |
-|              |              |              | output       |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
@@ -35994,7 +35984,7 @@ number of constraints (A)
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
@@ -36354,10 +36344,9 @@ Assert that the object has been initialized. ";
 // File: classCasADi_1_1KnitroSolver.xml
 %feature("docstring") CasADi::KnitroSolver "
 
-Solves the following nonlinear optimization problem:   min          F(x,p)
-x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
-<= UBX                      n: number of decision variables (x)       m:
-number of constraints (A)
+Solves the following nonlinear optimization problem:min          F(x,p)  x
+subject to             LBG <= G(x,p) <= UBG LBX <= x    <= UBX
+n: number of decision variables (x)     m: number of constraints (A)
 
 >Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
 +------------------------------------+------------------------------------+
@@ -36591,9 +36580,8 @@ number of constraints (A)
 |              |              |              | iteration.   |              |
 |              |              |              | Input scheme |              |
 |              |              |              | is the same  |              |
-|              |              |              | as           |              |
-|              |              |              | NLPSolver's  |              |
-|              |              |              | output       |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
@@ -36727,7 +36715,7 @@ number of constraints (A)
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
@@ -37425,7 +37413,7 @@ therefore more expensive if A is invariant.
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -38085,7 +38073,7 @@ Internal class.
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -38640,7 +38628,7 @@ therefore more expensive if A is invariant.
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -39290,7 +39278,7 @@ Internal class.
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -39826,9 +39814,8 @@ Joel Andersson
 |              |              |              | iteration.   |              |
 |              |              |              | Input scheme |              |
 |              |              |              | is the same  |              |
-|              |              |              | as           |              |
-|              |              |              | NLPSolver's  |              |
-|              |              |              | output       |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
@@ -40018,7 +40005,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
@@ -40698,9 +40685,8 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | iteration.   |              |
 |              |              |              | Input scheme |              |
 |              |              |              | is the same  |              |
-|              |              |              | as           |              |
-|              |              |              | NLPSolver's  |              |
-|              |              |              | output       |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
@@ -40890,7 +40876,7 @@ Return a string with a destription (for SWIG) ";
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
@@ -41272,10 +41258,9 @@ Assert that the object has been initialized. ";
 // File: classCasADi_1_1Interfaces_1_1LiftoptInternal.xml
 %feature("docstring") CasADi::Interfaces::LiftoptInternal "
 
-Solves the following nonlinear optimization problem:   min          F(x,p)
-x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
-<= UBX                      n: number of decision variables (x)       m:
-number of constraints (A)
+Solves the following nonlinear optimization problem:min          F(x,p)  x
+subject to             LBG <= G(x,p) <= UBG LBX <= x    <= UBX
+n: number of decision variables (x)     m: number of constraints (A)
 
 >Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
 +------------------------------------+------------------------------------+
@@ -41403,9 +41388,8 @@ number of constraints (A)
 |              |              |              | iteration.   |              |
 |              |              |              | Input scheme |              |
 |              |              |              | is the same  |              |
-|              |              |              | as           |              |
-|              |              |              | NLPSolver's  |              |
-|              |              |              | output       |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
@@ -41547,7 +41531,7 @@ number of constraints (A)
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
@@ -41915,10 +41899,9 @@ Assert that the object has been initialized. ";
 // File: classCasADi_1_1Interfaces_1_1LiftoptSolver.xml
 %feature("docstring") CasADi::Interfaces::LiftoptSolver "
 
-Solves the following nonlinear optimization problem:   min          F(x,p)
-x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
-<= UBX                      n: number of decision variables (x)       m:
-number of constraints (A)
+Solves the following nonlinear optimization problem:min          F(x,p)  x
+subject to             LBG <= G(x,p) <= UBG LBX <= x    <= UBX
+n: number of decision variables (x)     m: number of constraints (A)
 
 >Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
 +------------------------------------+------------------------------------+
@@ -42046,9 +42029,8 @@ number of constraints (A)
 |              |              |              | iteration.   |              |
 |              |              |              | Input scheme |              |
 |              |              |              | is the same  |              |
-|              |              |              | as           |              |
-|              |              |              | NLPSolver's  |              |
-|              |              |              | output       |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
@@ -42190,7 +42172,7 @@ number of constraints (A)
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
@@ -42865,7 +42847,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -43499,7 +43481,7 @@ Internal class Solves the linear system A.x = b for x
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -44289,7 +44271,7 @@ Create nodes by their ID. ";
 
 %feature("docstring")  CasADi::Matrix::__add__ "
 
-Elementwise operations -- Octave/Python naming. ";
+Elementwise operations Octave/Python naming. ";
 
 %feature("docstring")  CasADi::Matrix::__sub__ "";
 
@@ -44674,9 +44656,9 @@ Legacy - use setArray instead. ";
 
 %feature("docstring")  CasADi::Matrix::getBand "
 
-Save the result to the LAPACK banded format -- see LAPACK documentation kl:
-The number of subdiagonals in res ku: The number of superdiagonals in res
-ldres: The leading dimension in res res: The number of superdiagonals. ";
+Save the result to the LAPACK banded format see LAPACK documentation kl: The
+number of subdiagonals in res ku: The number of superdiagonals in res ldres:
+The leading dimension in res res: The number of superdiagonals. ";
 
 %feature("docstring")  CasADi::Matrix::isNull "
 
@@ -45421,7 +45403,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -46283,7 +46265,7 @@ Return a string with a destription (for SWIG) ";
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -48143,7 +48125,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -48823,7 +48805,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -49505,10 +49487,9 @@ Check if smooth. ";
 
 NLPSolver.
 
-Solves the following nonlinear optimization problem:   min          F(x,p)
-x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
-<= UBX                      n: number of decision variables (x)       m:
-number of constraints (A)
+Solves the following nonlinear optimization problem:min          F(x,p)  x
+subject to             LBG <= G(x,p) <= UBG LBX <= x    <= UBX
+n: number of decision variables (x)     m: number of constraints (A)
 
 Joel Andersson
 
@@ -49638,9 +49619,8 @@ Joel Andersson
 |              |              |              | iteration.   |              |
 |              |              |              | Input scheme |              |
 |              |              |              | is the same  |              |
-|              |              |              | as           |              |
-|              |              |              | NLPSolver's  |              |
-|              |              |              | output       |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
@@ -49774,7 +49754,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
@@ -50288,10 +50268,9 @@ Return a string with a destription (for SWIG) ";
 
 NLP solver storage class.
 
-Solves the following nonlinear optimization problem:   min          F(x,p)
-x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
-<= UBX                      n: number of decision variables (x)       m:
-number of constraints (A)
+Solves the following nonlinear optimization problem:min          F(x,p)  x
+subject to             LBG <= G(x,p) <= UBG LBX <= x    <= UBX
+n: number of decision variables (x)     m: number of constraints (A)
 
 Joel Andersson
 
@@ -50421,9 +50400,8 @@ Joel Andersson
 |              |              |              | iteration.   |              |
 |              |              |              | Input scheme |              |
 |              |              |              | is the same  |              |
-|              |              |              | as           |              |
-|              |              |              | NLPSolver's  |              |
-|              |              |              | output       |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
@@ -50557,7 +50535,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
@@ -52712,7 +52690,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -53412,7 +53390,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -53865,9 +53843,9 @@ Internal class for OOQPSolver.
 
 Solves the following problem:
 
-min          x'.H.x + G'.x     x      subject to               LBA <= A.x <=
-UBA               LBX <= x   <= UBX                      nx: number of
-decision variables (x)       nc: number of constraints (A)
+min          x'.H.x + G'.x   x  subject to             LBA <= A.x <= UBA
+LBX <= x   <= UBX                  nx: number of decision variables (x)
+nc: number of constraints (A)
 
 >Input scheme: CasADi::QPInput (QP_NUM_IN = 9)
 +------------------------------------+------------------------------------+
@@ -54067,7 +54045,7 @@ decision variables (x)       nc: number of constraints (A)
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -54424,9 +54402,9 @@ OOQP Solver for quadratic programming:
 
 Solves the following problem:
 
-min          x'.H.x + G'.x     x      subject to               LBA <= A.x <=
-UBA               LBX <= x   <= UBX                      nx: number of
-decision variables (x)       nc: number of constraints (A)
+min          x'.H.x + G'.x   x  subject to             LBA <= A.x <= UBA
+LBX <= x   <= UBX                  nx: number of decision variables (x)
+nc: number of constraints (A)
 
 The current implementation assumes that OOQP is configured with the MA27
 sparse linear solver.
@@ -54632,7 +54610,7 @@ reInit();
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -55816,7 +55794,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -56467,7 +56445,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -56855,9 +56833,9 @@ Internal class for QPOasesSolver.
 
 Solves the following problem:
 
-min          x'.H.x + G'.x     x      subject to               LBA <= A.x <=
-UBA               LBX <= x   <= UBX                      nx: number of
-decision variables (x)       nc: number of constraints (A)
+min          x'.H.x + G'.x   x  subject to             LBA <= A.x <= UBA
+LBX <= x   <= UBX                  nx: number of decision variables (x)
+nc: number of constraints (A)
 
 >Input scheme: CasADi::QPInput (QP_NUM_IN = 9)
 +------------------------------------+------------------------------------+
@@ -57073,7 +57051,7 @@ decision variables (x)       nc: number of constraints (A)
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -57435,9 +57413,9 @@ Interface to QPOases Solver for quadratic programming.
 
 Solves the following problem:
 
-min          x'.H.x + G'.x     x      subject to               LBA <= A.x <=
-UBA               LBX <= x   <= UBX                      nx: number of
-decision variables (x)       nc: number of constraints (A)
+min          x'.H.x + G'.x   x  subject to             LBA <= A.x <= UBA
+LBX <= x   <= UBX                  nx: number of decision variables (x)
+nc: number of constraints (A)
 
 Joris Gillis, Joel Andersson
 
@@ -57655,7 +57633,7 @@ Joris Gillis, Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -58155,9 +58133,9 @@ QPSolver.
 
 Solves the following problem:
 
-min          x'.H.x + G'.x     x      subject to               LBA <= A.x <=
-UBA               LBX <= x   <= UBX                      nx: number of
-decision variables (x)       nc: number of constraints (A)
+min          x'.H.x + G'.x   x  subject to             LBA <= A.x <= UBA
+LBX <= x   <= UBX                  nx: number of decision variables (x)
+nc: number of constraints (A)
 
 Joel Andersson
 
@@ -58340,7 +58318,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -59007,7 +58985,7 @@ Internal class.
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -59640,7 +59618,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -60375,7 +60353,7 @@ Return a string with a destription (for SWIG) ";
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -61320,7 +61298,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -61995,7 +61973,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -62760,9 +62738,8 @@ Assert that the object has been initialized. ";
 |              |              |              | iteration.   |              |
 |              |              |              | Input scheme |              |
 |              |              |              | is the same  |              |
-|              |              |              | as           |              |
-|              |              |              | NLPSolver's  |              |
-|              |              |              | output       |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
@@ -62945,7 +62922,7 @@ Assert that the object has been initialized. ";
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
@@ -63343,10 +63320,9 @@ Hessian approximation. Line search is carried out via backtracking until
 with the Armijo condition applied to the T1 (in Nocedal phi1) merit function
 is satisfied.
 
-The method solved can be written in the form:   min          F(x1,x2)
-x1,x2      subject to             LBG1 <= G1(x1,x2) <= UBG1               x2
-== G2(x1,x2)             LBX1 <= x1    <= UBX1             LBX2 <=     x2
-<= UBX2
+The method solved can be written in the form:min          F(x1,x2) x1,x2
+subject to           LBG1 <= G1(x1,x2) <= UBG1             x2 == G2(x1,x2)
+LBX1 <=     x1    <= UBX1 LBX2 <=     x2    <= UBX2
 
 We thus assume that the variable vector x can be divided into two parts,
 where the second part is given recursively by the equations x2 == G2(x1,x2).
@@ -63491,9 +63467,8 @@ Joel Andersson
 |              |              |              | iteration.   |              |
 |              |              |              | Input scheme |              |
 |              |              |              | is the same  |              |
-|              |              |              | as           |              |
-|              |              |              | NLPSolver's  |              |
-|              |              |              | output       |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
@@ -63676,7 +63651,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
@@ -64228,12 +64203,6 @@ Return a string with a representation (for SWIG) ";
 Return a string with a destription (for SWIG) ";
 
 
-// File: classCasADi_1_1StrArg.xml
-%feature("docstring") CasADi::StrArg "C++ includes: xml_arg.hpp ";
-
-%feature("docstring")  CasADi::StrArg::StrArg "";
-
-
 // File: structCasADi_1_1SubBinaryOperation.xml
 %feature("docstring") CasADi::SubBinaryOperation "C++ includes:
 casadi_calculus.hpp ";
@@ -64625,7 +64594,7 @@ Constructor. ";
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -65545,7 +65514,7 @@ Return a string with a destription (for SWIG) ";
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -66148,7 +66117,7 @@ therefore more expensive if A is invariant.
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -66833,7 +66802,7 @@ Solves the linear system A.x = b for x
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -67236,7 +67205,7 @@ Name:  of the symbol
 
 This is the name that wil be used by the \"operator<<\" and \"toSTring\"
 methods. The name is not used as identifier; you may construct distinct SX
-objects with non-unique names. Create an expression from a node: extra dummy
+objects with non-unique names.Create an expression from a node: extra dummy
 argument to avoid ambigousity for 0/NULL ";
 
 %feature("docstring")  CasADi::SX::SX "
@@ -67597,7 +67566,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -67816,6 +67785,10 @@ Access the algorithm directly. ";
 %feature("docstring")  CasADi::SXFunction::getAlgorithmSize "
 
 Get the number of atomic operations. ";
+
+%feature("docstring")  CasADi::SXFunction::getWorkSize "
+
+Get the length of the work vector. ";
 
 %feature("docstring")  CasADi::SXFunction::getAtomicOperation "
 
@@ -68338,7 +68311,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -69076,34 +69049,27 @@ A flat OCP representation coupled to an XML file.
 
 Variables:
 
-t :     time    x :     differential and algebraic states defined by a
-fully-implicit DAE    xd:     differential states defined by an explicit ODE
-xa:     algebraic states defined by an algebraic equation    q :
-quadrature states    y :     dependent variables p :     independent
-parameters    u :     control signals
+x:      differential states   z:      algebraic states   p : independent
+parameters   t :     time   u :     control signals   q : quadrature states
+y :     dependent variables
 
 Equations:
 
-fully implicit DAE:       0 = dae(t,x,\\\\dot{x},xd,xa,u,p) explicit ODE:
-\\\\dot{xd} = ode(t,x,xd,xa,u,p)   quadratures: \\\\dot{q} =
-quad(t,x,xd,xa,u,p)   algebraic equations:      0 = alg(t,x,xd,xa,u,p)
-dependent equations:      y = dep(t,x,xd,xa,u,p) initial equations:        0
-= initial(t,x,\\\\dot{x},xd,xa,u,p)
+explicit or implicit ODE: \\\\dot{x} = ode(t,x,z,u,p_free,pi,pd) or
+0 = ode(t,x,z,\\\\dot{x},u,p_free,pi,pd) algebraic equations:            0 =
+alg(t,x,z,u,p_free,pi,pd) quadratures:              \\\\dot{q} =
+quad(t,x,z,u,p_free,pi,pd) dependent equations:            y =
+dep(t,x,z,u,p_free,pi,pd)  initial equations:              0 =
+initial(t,x,z,u,p_free,pi,pd)
 
 Objective function terms:
 
-Mayer terms:          \\\\sum{mterm_k}   Lagrange terms:
+Mayer terms:          \\\\sum{mterm_k}  Lagrange terms:
 \\\\sum{\\\\integral{mterm}}
 
-Note that when parsed, all dynamic states, differential and algebraic, end
-up in the category \"x\" and all dynamic equations end up in the implicit
-category \"dae\". At a later state, the DAE can be reformulated, for example
-in semi-explicit form, possibly in addition to a set of quadrature states.
-
-Also note that division of the states into three categories for states
-defined by a DAE, states defined by an ODE and states defined by an
-algebraic equation. The category \"xd\" does thus _not_ include differential
-states that are implicitly defined by the DAE.
+Note that when parsed, all dynamic equations end up in the implicit category
+\"dae\". At a later state, the DAE can be reformulated, for example in semi-
+explicit form, possibly in addition to a set of quadrature states.
 
 The functions for reformulation is are provided as member functions to this
 class or as independent functions located in the header file
@@ -69111,11 +69077,11 @@ class or as independent functions located in the header file
 
 Usage skeleton:
 
-1. Call default constructor > SymbolicOCP ocp;
+Call default constructor  SymbolicOCP ocp;
 
-2. Parse an FMI conformant XML file  > ocp.parseFMI(xml_file_name)
+Parse an FMI conformant XML file ocp.parseFMI(xml_file_name)
 
-3. Modify/add variables, equations, optimization  > ...
+Modify/add variables, equations, optimization ...
 
 When the optimal control problem is in a suitable form, it is possible to
 either generate functions for numeric/symbolic evaluation or exporting the
@@ -69132,6 +69098,14 @@ C++ includes: symbolic_ocp.hpp ";
 
 */
 
+%feature("docstring")  CasADi::SymbolicOCP::variableByType "
+
+Get all variables of a certain type. ";
+
+%feature("docstring")  CasADi::SymbolicOCP::variableByType "
+
+Get all variables of a certain type. ";
+
 /*  Equations  */
 
 /* Get all equations of a particular type
@@ -69146,7 +69120,9 @@ C++ includes: symbolic_ocp.hpp ";
 
 */
 
-/*  Constraints of the optimal control problem  */
+/*  Path constraints of the optimal control problem  */
+
+/*  Point constraints of the optimal control problem  */
 
 /*  Manipulation  */
 
@@ -69172,34 +69148,21 @@ quadrature states. ";
 
 Eliminate quadrature states and turn them into ODE states. ";
 
-%feature("docstring")  CasADi::SymbolicOCP::sortDAE "
+%feature("docstring")  CasADi::SymbolicOCP::sortODE "
 
-Sort the DAE equations and variables. ";
+Sort the ODE and differential states. ";
+
+%feature("docstring")  CasADi::SymbolicOCP::sortALG "
+
+Sort the algebraic equations and algebraic states. ";
 
 %feature("docstring")  CasADi::SymbolicOCP::makeExplicit "
 
-Transform the fully implicit DAE to a explicit or semi-explicit form. ";
+Transform the implicit ODE to an explicit ODE. ";
 
-%feature("docstring")  CasADi::SymbolicOCP::daeArg "
+%feature("docstring")  CasADi::SymbolicOCP::eliminateAlgebraic "
 
-Get the ODE/DAE input arguments Returns a vector of inputs using the
-following scheme:
-
->Input scheme: CasADi::DAEInput (DAE_NUM_IN = 5)
-+----------+----------------------------------------+
-|   Name   |              Description               |
-+==========+========================================+
-| DAE_X    | Differential state                     |
-+----------+----------------------------------------+
-| DAE_Z    | Algebraic state                        |
-+----------+----------------------------------------+
-| DAE_P    | Parameter                              |
-+----------+----------------------------------------+
-| DAE_T    | Explicit time dependence               |
-+----------+----------------------------------------+
-| DAE_XDOT | Time derivative of differential states |
-+----------+----------------------------------------+
-";
+Eliminate algebraic states, transforming them into outputs. ";
 
 %feature("docstring")  CasADi::SymbolicOCP::substituteDependents "
 
@@ -69235,10 +69198,6 @@ Make a differential state algebraic by replacing its time derivative by 0.
 Make a differential state algebraic by replacing its time derivative by 0.
 ";
 
-%feature("docstring")  CasADi::SymbolicOCP::x_all "
-
-All states, differential and algebraic (includes x, xd and xa) ";
-
 %feature("docstring")  CasADi::SymbolicOCP::readExpr "
 
 Read an equation. ";
@@ -69246,10 +69205,6 @@ Read an equation. ";
 %feature("docstring")  CasADi::SymbolicOCP::readVariable "
 
 Read a variable. ";
-
-%feature("docstring")  CasADi::SymbolicOCP::sortType "
-
-Sort variables according to type. ";
 
 %feature("docstring")  CasADi::SymbolicOCP::scaleVariables "
 
@@ -69864,7 +69819,13 @@ print ";
 
 
 // File: classCasADi_1_1Variable.xml
-%feature("docstring") CasADi::Variable "C++ includes: variable.hpp ";
+%feature("docstring") CasADi::Variable "
+
+Smart pointer class to a Variable.
+
+In a sense, a Variable is an SX expression with meta-data attached.
+
+C++ includes: variable.hpp ";
 
 %feature("docstring")  CasADi::Variable::makeUnique "
 
@@ -69977,6 +69938,10 @@ Get the lower bound. ";
 
 Set the lower bound. ";
 
+%feature("docstring")  CasADi::Variable::min "
+
+Access the lower bound. ";
+
 %feature("docstring")  CasADi::Variable::getMax "
 
 Get the upper bound. ";
@@ -69984,6 +69949,10 @@ Get the upper bound. ";
 %feature("docstring")  CasADi::Variable::setMax "
 
 Set the upper bound. ";
+
+%feature("docstring")  CasADi::Variable::max "
+
+Access the upper bound. ";
 
 %feature("docstring")  CasADi::Variable::getNominal "
 
@@ -69993,17 +69962,21 @@ Get the nominal value of the variable. ";
 
 Set the nominal value of the variable. ";
 
+%feature("docstring")  CasADi::Variable::nominal "
+
+Access the nominal value of the variable. ";
+
 %feature("docstring")  CasADi::Variable::getStart "
 
 Get the value at time 0. ";
 
-%feature("docstring")  CasADi::Variable::getDerivativeStart "
-
-Get the derivative at time 0. ";
-
 %feature("docstring")  CasADi::Variable::setStart "
 
 Set the value at time 0. ";
+
+%feature("docstring")  CasADi::Variable::start "
+
+Access the value at time 0. ";
 
 %feature("docstring")  CasADi::Variable::getInitialGuess "
 
@@ -70013,9 +69986,21 @@ Get the lower bound. ";
 
 Set the lower bound. ";
 
+%feature("docstring")  CasADi::Variable::initialGuess "
+
+Access the lower bound. ";
+
+%feature("docstring")  CasADi::Variable::getDerivativeStart "
+
+Get the derivative at time 0. ";
+
 %feature("docstring")  CasADi::Variable::setDerivativeStart "
 
 Set the derivative at time 0. ";
+
+%feature("docstring")  CasADi::Variable::derivativeStart "
+
+Access the derivative at time 0. ";
 
 %feature("docstring")  CasADi::Variable::getUnit "
 
@@ -70025,6 +70010,10 @@ Get the unit. ";
 
 Set the unit. ";
 
+%feature("docstring")  CasADi::Variable::unit "
+
+Access the unit. ";
+
 %feature("docstring")  CasADi::Variable::getDisplayUnit "
 
 Get the display unit. ";
@@ -70032,6 +70021,10 @@ Get the display unit. ";
 %feature("docstring")  CasADi::Variable::setDisplayUnit "
 
 Set the display unit. ";
+
+%feature("docstring")  CasADi::Variable::displayUnit "
+
+Get the display unit. ";
 
 %feature("docstring")  CasADi::Variable::setExpression "
 
@@ -70064,6 +70057,10 @@ Get the the free attribute. ";
 %feature("docstring")  CasADi::Variable::setFree "
 
 Set the the free attribute. ";
+
+%feature("docstring")  CasADi::Variable::free "
+
+Access the the free attribute. ";
 
 %feature("docstring")  CasADi::Variable::checkNode "
 
@@ -70231,10 +70228,9 @@ Return a string with a destription (for SWIG) ";
 // File: classCasADi_1_1WorhpInternal.xml
 %feature("docstring") CasADi::WorhpInternal "
 
-Solves the following nonlinear optimization problem:   min          F(x,p)
-x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
-<= UBX                      n: number of decision variables (x)       m:
-number of constraints (A)
+Solves the following nonlinear optimization problem:min          F(x,p)  x
+subject to             LBG <= G(x,p) <= UBG LBX <= x    <= UBX
+n: number of decision variables (x)     m: number of constraints (A)
 
 >Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
 +------------------------------------+------------------------------------+
@@ -71070,9 +71066,8 @@ number of constraints (A)
 |              |              |              | iteration.   |              |
 |              |              |              | Input scheme |              |
 |              |              |              | is the same  |              |
-|              |              |              | as           |              |
-|              |              |              | NLPSolver's  |              |
-|              |              |              | output       |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
@@ -71203,7 +71198,7 @@ number of constraints (A)
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | False        | verbose      | CasADi::Worh |
 |              |              |              | evaluation   | pInternal    |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | warn_initial | OT_BOOLEAN   | False        | Warn if the  | CasADi::Worh |
@@ -71585,10 +71580,9 @@ Assert that the object has been initialized. ";
 
 interface to WORHP NLP solver
 
-Solves the following nonlinear optimization problem:   min          F(x,p)
-x      subject to               LBG <= G(x,p) <= UBG               LBX <= x
-<= UBX                      n: number of decision variables (x)       m:
-number of constraints (A)
+Solves the following nonlinear optimization problem:min          F(x,p)  x
+subject to             LBG <= G(x,p) <= UBG LBX <= x    <= UBX
+n: number of decision variables (x)     m: number of constraints (A)
 
 >Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
 +------------------------------------+------------------------------------+
@@ -72424,9 +72418,8 @@ number of constraints (A)
 |              |              |              | iteration.   |              |
 |              |              |              | Input scheme |              |
 |              |              |              | is the same  |              |
-|              |              |              | as           |              |
-|              |              |              | NLPSolver's  |              |
-|              |              |              | output       |              |
+|              |              |              | as NLPSolver |              |
+|              |              |              | 's output    |              |
 |              |              |              | scheme.      |              |
 |              |              |              | Output is    |              |
 |              |              |              | scalar.      |              |
@@ -72557,7 +72550,7 @@ number of constraints (A)
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | False        | verbose      | CasADi::Worh |
 |              |              |              | evaluation   | pInternal    |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | warn_initial | OT_BOOLEAN   | False        | Warn if the  | CasADi::Worh |
@@ -73229,7 +73222,7 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 | verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
 |              |              |              | evaluation   | ternal       |
-|              |              |              | -- for       |              |
+|              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
@@ -73586,21 +73579,19 @@ Assert that the object has been initialized. ";
 
 %feature("docstring")  CasADi::XMLNode::XMLNode "";
 
-%feature("docstring")  CasADi::XMLNode::XMLNode "";
-
 %feature("docstring")  CasADi::XMLNode::~XMLNode "";
 
 %feature("docstring")  CasADi::XMLNode::setAttribute "
 
 Add an attribute. ";
 
-%feature("docstring")  CasADi::XMLNode::addChild "
-
-Add a child. ";
-
-%feature("docstring")  CasADi::XMLNode::attribute "
+%feature("docstring")  CasADi::XMLNode::getAttribute "
 
 Get an attribute by its name. ";
+
+%feature("docstring")  CasADi::XMLNode::readAttribute "
+
+Read the value of an attribute. ";
 
 %feature("docstring")  CasADi::XMLNode::hasChild "
 
@@ -73628,11 +73619,15 @@ check if the name is equal to something ";
 
 %feature("docstring")  CasADi::XMLNode::getText "
 
-Get the value of the text field. ";
+Get the text field. ";
 
-%feature("docstring")  CasADi::XMLNode::addAttributes "";
+%feature("docstring")  CasADi::XMLNode::getText "
 
-%feature("docstring")  CasADi::XMLNode::addNode "";
+Get value of text field. ";
+
+%feature("docstring")  CasADi::XMLNode::addNode "
+
+Read node from parsed XML file. ";
 
 %feature("docstring")  CasADi::XMLNode::dump "";
 
@@ -73977,14 +73972,13 @@ Uses CasADi::SXFunction::jac ";
 Prints out a human readable report about possible constraint violations -
 specific constraints.
 
-Constraint visualiser strip: o-------=-------o Indicates that the value is
-nicely inbetween the bounds o-=-------------o Indicates that the value is
-closer to the lower bound X---------------o Indicates that the lower bound
-is active 8---------------o Indicates that the lower bound is -inifinity
-o------------=--o Indicates that the value is closer to the upper bound o
----------------X Indicates that the upper bound is active o---------------8
-Indicates that the upper bound is inifinity VIOLATED Indicates constraint
-violation ";
+Constraint visualiser strip: o----=----o Indicates that the value is nicely
+inbetween the bounds o-=----------o Indicates that the value is closer to
+the lower bound X------------o Indicates that the lower bound is active 8
+------------o Indicates that the lower bound is -inifinity o---------=o
+Indicates that the value is closer to the upper bound o------------X
+Indicates that the upper bound is active o------------8 Indicates that the
+upper bound is inifinity VIOLATED Indicates constraint violation ";
 
 %feature("docstring")  CasADi::Interfaces::parameterizeTime "
 
@@ -74212,11 +74206,16 @@ nearly linearly dependent See J. Demmel: Applied Numerical Linear Algebra
 
 Solve a system of equations: A*x = b The solve routine works similar to
 Matlab's backslash when A is square and nonsingular. The algorithm used is
-the following: 1. A simple forward or backward substitution if A is upper or
-lower triangular 2. If the linear system is at most 3-by-3, form the inverse
-via minor expansion and multiply 3. Permute the variables and equations as
-to get a (structurally) nonzero diagonal, then perform a QR factorization
-without pivoting and solve the factorized system.
+the following:
+
+A simple forward or backward substitution if A is upper or lower triangular
+
+If the linear system is at most 3-by-3, form the inverse via minor expansion
+and multiply
+
+Permute the variables and equations as to get a (structurally) nonzero
+diagonal, then perform a QR factorization without pivoting and solve the
+factorized system.
 
 Note 1: If there are entries of the linear system known to be zero, these
 will be removed. Elements that are very small, or will evaluate to be zero,
@@ -74335,6 +74334,16 @@ taken from an existing matrix. ";
 
 %feature("docstring")  CasADi::Interfaces::any "";
 
+%feature("docstring")  CasADi::Interfaces::bin_operator "";
+
+%feature("docstring")  CasADi::Interfaces::bin_operator "";
+
+%feature("docstring")  CasADi::Interfaces::bin_operator "";
+
+%feature("docstring")  CasADi::Interfaces::bin_operator "";
+
+%feature("docstring")  CasADi::Interfaces::bin_operator "";
+
 %feature("docstring")  CasADi::Interfaces::sp_dense "
 
 Create a dense rectangular sparsity pattern. ";
@@ -74342,6 +74351,14 @@ Create a dense rectangular sparsity pattern. ";
 %feature("docstring")  CasADi::Interfaces::sp_sparse "
 
 Create a sparse rectangular sparsity pattern. ";
+
+%feature("docstring")  CasADi::Interfaces::sp_dense "
+
+Create a dense rectangular sparsity pattern. ";
+
+%feature("docstring")  CasADi::Interfaces::sp_sparse "
+
+Create a dense rectangular sparsity pattern. ";
 
 %feature("docstring")  CasADi::Interfaces::sp_tril "
 
@@ -75055,6 +75072,23 @@ Get a string representation for a binary SX, using custom arguments. ";
 %feature("docstring")  CasADi::Interfaces::getFree "
 
 Get all the free variables in an expression. ";
+
+%feature("docstring")  CasADi::Interfaces::jacobianTimesVector "
+
+Calculate the Jacobian and multiply by a vector from the left This is
+equivalent to mul(jacobian(ex,arg),v) or mul(jacobian(ex,arg).T,v) for
+transpose_jacobian set to false and true respectively. If contrast to these
+expressions, it will use directional derivatives which is typically (but not
+necessarily) more efficient if the complete Jacobian is not needed and v has
+few columns. ";
+
+%feature("docstring")  CasADi::Interfaces::extractSubexpressions "
+
+Extract all subexpressions from an expression. ";
+
+%feature("docstring")  CasADi::Interfaces::extractSubexpressions "
+
+Extract all subexpressions from an set of expressions. ";
 
 %feature("docstring")  CasADi::Interfaces::contains "
 
@@ -76669,12 +76703,6 @@ This file does absolutely nothing but including all headers ";
 // File: xfunction__tools_8hpp.xml
 
 
-// File: xml__arg_8cpp.xml
-
-
-// File: xml__arg_8hpp.xml
-
-
 // File: xml__node_8cpp.xml
 
 
@@ -76780,124 +76808,124 @@ This file does absolutely nothing but including all headers ";
 // File: chapter6.xml
 
 
-// File: dir_5f4c7cd1f6b9eee860ac338ff55150b6.xml
+// File: dir_518018e50a8d69fd317c0713c0a6b543.xml
 
 
-// File: dir_d129cc46d7790994f9fa41dacdc8cdd0.xml
+// File: dir_0d31060fcf5e627b7fbda237ee0495ee.xml
 
 
-// File: dir_865eb757bba684eb6d1347e34b8809e7.xml
+// File: dir_48a9aa1c679b46779d9ebc692c422a52.xml
 
 
-// File: dir_67795830a2aff23d4db649a7dad3b6de.xml
+// File: dir_bfa47aa239c5ddba316b006395b4d72e.xml
 
 
-// File: dir_07667afcc54a3bd5f9392469a42306ce.xml
+// File: dir_4b867283e4ba89510ac21163a55c6da5.xml
 
 
-// File: dir_2542617892b3a023bc434c6b60ff06e5.xml
+// File: dir_5c75dd4d87a018782f6ca7a3aa94468c.xml
 
 
-// File: dir_39ebeabde9ffd9671e679aba8c65a4f4.xml
+// File: dir_ad0f453888861830b0b84aa7813e1fc5.xml
 
 
-// File: dir_81b37fa3dda04a022977f2518a724110.xml
+// File: dir_d83e58ba7d4b645d5d6386635d0a8d92.xml
 
 
-// File: dir_2fa25e4320617cf715dbed18b9666d8f.xml
+// File: dir_a4c19b94ad613e6c2f8716257266785d.xml
 
 
-// File: dir_175c682169f8cb2d8be7cdcb2e1e51ac.xml
+// File: dir_4abc65d653d0014ffa23ae7410185720.xml
 
 
-// File: dir_83090a96a9fe9e7cedbddcc3be5ec814.xml
+// File: dir_b9a767037e4a62f7c3eff7d6d5c88890.xml
 
 
-// File: dir_40ab3712138edabde036ea115a67fc6f.xml
+// File: dir_31b277648a83fb9e4f2036de3792f5c5.xml
 
 
-// File: dir_058b2f3a951ec00fa39cf0545c3e2ccf.xml
+// File: dir_3df8bf5979899f6ab41676a7c7ab80d7.xml
 
 
-// File: dir_e3dc74ca6b43151164e0d6c6e7047cff.xml
+// File: dir_ff6b5900125bb0123025c1cb24bdc726.xml
 
 
-// File: dir_2253d5d42cec80472dd941fe4c8903da.xml
+// File: dir_637e8164c5cc37870cf9ad98e98b98e1.xml
 
 
-// File: dir_1e7ed285b743725a577c6cdf380cf322.xml
+// File: dir_aee557d31622c3cc6ac571df133ae818.xml
 
 
-// File: dir_72ce9df779fc5a96499c342902ceb3c3.xml
+// File: dir_949a4ba8dd6e68e69830a3746f354062.xml
 
 
-// File: dir_d790cb618900a80a39e3632f9daecf12.xml
+// File: dir_9d54957a277add664aee0a9a94714379.xml
 
 
-// File: dir_c71fb2832026713371646abde24bfd25.xml
+// File: dir_29d0e9d0df9c280c96131db245d8ff94.xml
 
 
-// File: dir_d56e93be877b863cf9966fb9e2678201.xml
+// File: dir_beb85578cd6292c578ec08df202128a0.xml
 
 
-// File: dir_52716d91148b44f9f495ff6980fe4c6c.xml
+// File: dir_2289d577c17b8426f32155695a44652b.xml
 
 
-// File: dir_1a721c701b31175e0568393aba0e53e3.xml
+// File: dir_e16c9dca41a1a893e14b1f7289d84c30.xml
 
 
-// File: dir_dbaa90f951dc9534ec0d08a32fbac487.xml
+// File: dir_9cad90cd44ac86cf0b06989031bbf208.xml
 
 
-// File: dir_7f254306f700f86e9d25bb4c7da01fee.xml
+// File: dir_361c941862da9ade1091537cd0efc208.xml
 
 
-// File: dir_f6c3917dea5dc437f04400da98ad0624.xml
+// File: dir_a5fc685a01852a5828ab9d4652431b48.xml
 
 
-// File: dir_c7dc30330ad0826e0fa37794c96f7db1.xml
+// File: dir_b4e35aff6bc40f454218d091cb3eb5b7.xml
 
 
-// File: dir_6d9c90fb6a18a4aeca18e5a8ba207929.xml
+// File: dir_a48c2fa262b624eaae5efc19b6378eb0.xml
 
 
-// File: dir_22ffb6e97fd8d8f27d934c12d720294b.xml
+// File: dir_02c82909c27dcf966b0487db06d42b31.xml
 
 
-// File: dir_28893b33c9e4942b75198c25801a7c28.xml
+// File: dir_840a91bddbb7c7916ca1d41a3713d8f2.xml
 
 
-// File: dir_03a2db6a2c60634108499884643ac0ad.xml
+// File: dir_0c732fda042b2a2a64d684d7e3dddcb4.xml
 
 
-// File: dir_2daa5eef6a1edf30bcc7ac3938210574.xml
+// File: dir_afed54850d6f1ae352658de88df765ab.xml
 
 
-// File: dir_c5bd38fabe1208ba040e35d87361c2b7.xml
+// File: dir_f7021051b4e267bb27a68189ed170ddd.xml
 
 
-// File: dir_a80281c4544000787d65e06d44e540f9.xml
+// File: dir_29383115ac62e2180fad807250a8f6d1.xml
 
 
-// File: dir_268364c87bf6acef376d9d04ccfac8e7.xml
+// File: dir_e58319b8b5d872c65dc4506dd82bdb6c.xml
 
 
-// File: dir_c871556992ed7d284c48cca58151ed6e.xml
+// File: dir_9888c82898ca6e8c9e0df0305d194d5d.xml
 
 
-// File: dir_ca41ca4ddf2381bca8b68fc15872bab5.xml
+// File: dir_eb7443c9505fcfeb7bcc034b6baebeae.xml
 
 
-// File: dir_bf0fc637c79f11d27bc15c119d3b78fe.xml
+// File: dir_c307bc059ed56c09cf1caef4c1d96d78.xml
 
 
-// File: dir_315a04cf4185d821d7d871ea462d0256.xml
+// File: dir_339229baca865343171548c4d670ae12.xml
 
 
-// File: dir_df3e323757f171bb9cc08f0857fdb687.xml
+// File: dir_cf1beb539ef5c09a983cc00836e8c765.xml
 
 
-// File: dir_98534246d9c54ffabe5ab5a74c66a5d8.xml
+// File: dir_1301e351066c505891c0f2977beb165b.xml
 
 
 // File: algebra_2LinearSolver_8py-example.xml

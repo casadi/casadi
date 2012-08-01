@@ -29,30 +29,31 @@ namespace CasADi{
   
   // Forward declarations
   class XMLNode;
-  
+    
+  // All the types of variables in the SymbolicOCP class
+  enum SymbolicOCPVariables{VAR_X, VAR_Z, VAR_Q, VAR_CI, VAR_CD, VAR_PI, VAR_PD, VAR_PF, VAR_Y, VAR_U, NUM_VAR};
   
 /** \brief A flat OCP representation coupled to an XML file
 
  <H3>Variables:  </H3>
   \verbatim
+   x:      differential states
+   z:      algebraic states
+   p :     independent parameters
    t :     time
-   x :     differential and algebraic states defined by a fully-implicit DAE
-   xd:     differential states defined by an explicit ODE
-   xa:     algebraic states defined by an algebraic equation
+   u :     control signals
    q :     quadrature states
    y :     dependent variables
-   p :     independent parameters
-   u :     control signals
   \endverbatim 
-  
+
   <H3>Equations:  </H3>
   \verbatim
-  fully implicit DAE:       0 = dae(t,x,\dot{x},xd,xa,u,p)
-  explicit ODE:      \dot{xd} = ode(t,x,xd,xa,u,p)
-  quadratures:        \dot{q} = quad(t,x,xd,xa,u,p)
-  algebraic equations:      0 = alg(t,x,xd,xa,u,p)
-  dependent equations:      y = dep(t,x,xd,xa,u,p)
-  initial equations:        0 = initial(t,x,\dot{x},xd,xa,u,p)
+  explicit or implicit ODE: \dot{x} = ode(t,x,z,u,p_free,pi,pd)
+     or                           0 = ode(t,x,z,\dot{x},u,p_free,pi,pd)
+  algebraic equations:            0 = alg(t,x,z,u,p_free,pi,pd)
+  quadratures:              \dot{q} = quad(t,x,z,u,p_free,pi,pd)
+  dependent equations:            y = dep(t,x,z,u,p_free,pi,pd)
+  initial equations:              0 = initial(t,x,z,u,p_free,pi,pd)
   \endverbatim 
 
   <H3>Objective function terms:  </H3>
@@ -61,14 +62,10 @@ namespace CasADi{
   Lagrange terms:       \sum{\integral{mterm}}
   \endverbatim
 
-  Note that when parsed, all dynamic states, differential and algebraic, end up in the category "x" 
-  and all dynamic equations end up in the implicit category "dae". At a later state, the DAE can be
-  reformulated, for example in semi-explicit form, possibly in addition to a set of quadrature states.
+  Note that when parsed, all dynamic equations end up in the implicit category "dae". 
+  At a later state, the DAE can be reformulated, for example in semi-explicit form, 
+  possibly in addition to a set of quadrature states.
  
-  Also note that division of the states into three categories for states defined by a DAE, states
-  defined by an ODE and states defined by an algebraic equation. The category "xd" does thus _not_
-  include differential states that are implicitly defined by the DAE.
-
   The functions for reformulation is are provided as member functions to this class or as independent
   functions located in the header file "ocp_tools.hpp".
 
@@ -100,20 +97,17 @@ class SymbolicOCP : public PrintableObject{
     *  Public data members
     */
     //@{
-    /// Time
+    /** \brief Time */
     SXMatrix t;
     
-    /// Differential and algebraic states defined by a fully-implicit DAE (length == dae().size())
+    /** \brief Differential states */
     std::vector<Variable> x;
     
-    /// Differential states defined by an explicit ODE (length == ode().size())
-    std::vector<Variable> xd;
+    /** \brief Algebraic states */
+    std::vector<Variable> z;
     
-    /// Algebraic states defined by an algebraic equation (length == alg().size())
-    std::vector<Variable> xa;
-    
-    /// Quadrature states (length == quad().size())
-    std::vector<Variable> xq;
+    /** \brief Quadrature states (length == quad().size()) */
+    std::vector<Variable> q;
 
     /** \brief Independent constants */
     std::vector<Variable> ci;
@@ -131,17 +125,19 @@ class SymbolicOCP : public PrintableObject{
 
     /** \brief Free parameters 
      A free parameter (which is Optimica specific without correspondance in Modelica) is a parameter that the optimization algorithm can change in order to minimize the cost function: "parameter Real x(free=true)". Note that these parameters in contrast to dependent/independent parameters may change after the DAE has been initialized. A free parameter should not have any binding expression since it would then no longer be free. The compiler will transform non-free parameters to free parameters if they depend on a free parameters. The "free" attribute thus propagage through the parameter binding equations. */
-    std::vector<Variable> p_free;
+    std::vector<Variable> pf;
     
-    /// Dependent variables (length == dep().size())
+    /** \brief Dependent variables (length == dep().size()) */
     std::vector<Variable> y;
     
-    /// Independent parameters (to be removed and replaced by pi, pd and p_free)
-    std::vector<Variable> p;
-    
-    /// Control signals
+    /** \brief Control signals */
     std::vector<Variable> u;
 
+    /** \brief Get all variables of a certain type */
+    std::vector<Variable>& variableByType(SymbolicOCPVariables type);
+    
+    /** \brief Get all variables of a certain type */
+    const std::vector<Variable>& variableByType(SymbolicOCPVariables type) const;
     //@}
     
     /** @name Equations
@@ -149,19 +145,16 @@ class SymbolicOCP : public PrintableObject{
     */
     //@{
       
-    /// Fully implicit DAE (length == x().size())
-    SXMatrix dae;
-    
-    /// Explicit ODE  (length == xd().size())
+    /// Explicit or implicit ODE
     SXMatrix ode;
     
-    /// Algebraic equations (length == xa().size())
+    /// Algebraic equations
     SXMatrix alg;
     
-    /// Quadrature states (length == q().size())
+    /// Quadrature equations
     SXMatrix quad;
     
-    /// Dependent equations (length == y().size())
+    /// Dependent equations
     SXMatrix dep;
     
     /// Initial equations (remove?)
@@ -183,6 +176,16 @@ class SymbolicOCP : public PrintableObject{
     
     /// Interval final time is free
     bool tf_free;
+    
+    /// Interval start time initial guess
+    double t0_guess;
+    
+    /// Interval final time initial guess
+    double tf_guess;
+    
+    /// Time points
+    std::vector<double> tp;
+    
     //@}
 
     /** @name Objective function terms
@@ -197,18 +200,26 @@ class SymbolicOCP : public PrintableObject{
     SXMatrix lterm;
     //@}
 
-    /** @name Constraints of the optimal control problem
+    /** @name Path constraints of the optimal control problem
     */
     //@{
 
     /// Path constraint functions
     SXMatrix path;
     
-    /// Path constraint functions upper bounds
-    DMatrix path_min;
+    /// Path constraint functions bounds
+    DMatrix path_min, path_max;
+    //@}
 
-    /// Path constraint functions upper bounds
-    DMatrix path_max;
+    /** @name Point constraints of the optimal control problem
+    */
+    //@{
+
+    /// Point constraint functions
+    SXMatrix point;
+    
+    /// Path constraint functions bounds
+    DMatrix point_min, point_max;
     //@}
 
     /// Parse from XML to C++ format
@@ -226,9 +237,6 @@ class SymbolicOCP : public PrintableObject{
     /// Make a differential state algebraic by replacing its time derivative by 0
     void makeAlgebraic(const std::string& name);
     
-    /// All states, differential and algebraic (includes x, xd and xa)
-    std::vector<Variable> x_all() const;
-    
     /** @name Manipulation
     *  Reformulate the dynamic optimization problem.
     */
@@ -245,17 +253,17 @@ class SymbolicOCP : public PrintableObject{
     /// Eliminate quadrature states and turn them into ODE states
     void eliminateQuadratureStates();
     
-    /// Sort the DAE equations and variables
-    void sortDAE();
+    /// Sort the ODE and differential states
+    void sortODE();
 
-    /// Transform the fully implicit DAE to a explicit or semi-explicit form
+    /// Sort the algebraic equations and algebraic states
+    void sortALG();
+
+    /// Transform the implicit ODE to an explicit ODE
     void makeExplicit();
-
-    /** \brief Get the ODE/DAE input arguments
-    * Returns a vector of inputs using the following scheme:
-    * @copydoc scheme_DAEInput 
-    */
-    std::vector<SXMatrix> daeArg() const;
+    
+    /// Eliminate algebraic states, transforming them into outputs
+    void eliminateAlgebraic();
     
     /// Substitute the dependents from a set of expressions
     std::vector<SXMatrix> substituteDependents(const std::vector<SXMatrix>& x) const;
@@ -272,14 +280,11 @@ class SymbolicOCP : public PrintableObject{
     std::map<std::string,Variable> varmap_;
 
     /// Read an equation
-    SX readExpr(const XMLNode& odenode);
+    SX readExpr(const XMLNode& odenode, bool& has_der);
 
     /// Read a variable
     Variable& readVariable(const XMLNode& node);
 
-    /// Sort variables according to type
-    void sortType(bool sort_by_variable_category=false);
-    
     /// Scale the variables
     void scaleVariables();
     

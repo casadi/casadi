@@ -24,29 +24,8 @@
 
 namespace CasADi{
   
-  Matrix<double> operator==(const Matrix<double>& a, const Matrix<double>& b){
-    return Matrix<double>::binary(OP_EQUALITY,a,b);
-  }
+
   
-  Matrix<double> operator>=(const Matrix<double>& a, const Matrix<double>& b){
-    Matrix<double> ret = a + b;
-    if (a.sparsity()==b.sparsity()) {
-      for (int i=0;i<a.size();++i) ret.at(i) = a.at(i) >= b.at(i);
-    } else {
-      casadi_assert_message(0,"not implemented");
-    }
-    return ret;
-  }
-  
-  Matrix<double> operator<=(const Matrix<double>& a, const Matrix<double>& b){
-    Matrix<double> ret = a + b;
-    if (a.sparsity()==b.sparsity()) {
-      for (int i=0;i<a.size();++i) ret.at(i) = a.at(i) <= b.at(i);
-    } else {
-      casadi_assert_message(0,"not implemented");
-    }
-    return ret;
-  }
 
   
 } // namespace CasADi

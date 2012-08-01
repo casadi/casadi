@@ -101,9 +101,10 @@ class meta {
     static int as(GUESTOBJECT,T& m) {
         T *t = (T *)(0);
         int res = swig::asptr(p, &t);
-        if (SWIG_CheckState(res)) m=*t;
-        if (SWIG_IsNewObj(res)) delete t;
-        return SWIG_CheckState(res);
+        bool succes = SWIG_CheckState(res) && t;
+        if (succes) m=*t;
+        if (succes && SWIG_IsNewObj(res)) delete t;
+        return succes;
     }
     /// Check if Guest object could ultimately be converted to type T
     /// may return true when isa(GUESTOBJECT), but this is not required.

@@ -67,6 +67,9 @@ bool operation_checker(unsigned int op){
     case OP_PRINTME:       return F<OP_PRINTME>::check;
     case OP_ATAN2:         return F<OP_ATAN2>::check;
   }
+  
+  // False by default
+  return false;
 };
 
 

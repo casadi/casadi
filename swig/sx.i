@@ -81,20 +81,9 @@
 
 #endif // SWIGPYTHON
 
-%extend std::vector<CasADi::SX>{
-  std::string __repr__(){ return CasADi::getRepresentation(*$self); }
-  std::string __str__(){ return CasADi::getDescription(*$self); }
-};
-
-%extend std::vector<CasADi::Matrix< CasADi::SX> >{
-  std::string __repr__(){ return CasADi::getRepresentation(*$self); }
-  std::string __str__(){ return CasADi::getDescription(*$self); }
-};
-
-%extend std::vector<std::vector< CasADi::SX> >{
-  std::string __repr__(){ return CasADi::getRepresentation(*$self); }
-  std::string __str__(){ return CasADi::getDescription(*$self); }
-};
+VECTOR_REPR(CasADi::SX)
+VECTOR_REPR(std::vector<CasADi::SX>)
+VECTOR_REPR(CasADi::Matrix<CasADi::SX>)
 
 #ifdef SWIGPYTHON
 %pythoncode %{
@@ -194,6 +183,18 @@ namespace CasADi {
         return _casadi_global.__gt__(self,other)
       def __ge__(self,other):
         return _casadi_global.__ge__(self,other)
+      def __rlt__(self,other):
+        return _casadi_global.__lt__(other,self)
+      def __rle__(self,other):
+        return _casadi_global.__le__(other,self)
+      def __req__(self,other):
+        return _casadi_global.__eq__(other,self)
+      def __rne__(self,other):
+        return _casadi_global.__ne__(other,self)
+      def __rgt__(self,other):
+        return _casadi_global.__gt__(other,self)
+      def __rge__(self,other):
+        return _casadi_global.__ge__(other,self)
     %}
   
   %python_array_wrappers(1000.0)

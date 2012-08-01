@@ -435,51 +435,6 @@ const string& getName(const Matrix<SX>& ex) {
   return ex(0).toScalar()->getName();
 }
 
-Matrix<SX> operator<=(const Matrix<SX> &a, const Matrix<SX> &b){
-  casadi_assert_message(a.scalar() && b.scalar(), "conditional operators only defined for scalars");
-  return a.toScalar() <= b.toScalar();
-}
-
-Matrix<SX> operator>=(const Matrix<SX> &a, const Matrix<SX> &b){
-  casadi_assert_message(a.scalar() && b.scalar(), "conditional operators only defined for scalars");
-  return a.toScalar() >= b.toScalar();
-}
-
-Matrix<SX> operator<(const Matrix<SX> &a, const Matrix<SX> &b){
-  casadi_assert_message(a.scalar() && b.scalar(), "conditional operators only defined for scalars");
-  return a.toScalar() < b.toScalar();
-}
-
-Matrix<SX> operator>(const Matrix<SX> &a, const Matrix<SX> &b){
-  casadi_assert_message(a.scalar() && b.scalar(), "conditional operators only defined for scalars");
-  return a.toScalar() > b.toScalar();
-}
-
-Matrix<SX> operator&&(const Matrix<SX> &a, const Matrix<SX> &b){
-  casadi_assert_message(a.scalar() && b.scalar(), "conditional operators only defined for scalars");
-  return a.toScalar() && b.toScalar();
-}
-
-Matrix<SX> operator||(const Matrix<SX> &a, const Matrix<SX> &b){
-  casadi_assert_message(a.scalar() && b.scalar(), "conditional operators only defined for scalars");
-  return a.toScalar() || b.toScalar();
-}
-
-Matrix<SX> operator==(const Matrix<SX> &a, const Matrix<SX> &b){
-  casadi_assert_message(a.scalar() && b.scalar(), "conditional operators only defined for scalars");
-  return a.toScalar() == b.toScalar();
-}
-
-Matrix<SX> operator!=(const Matrix<SX> &a, const Matrix<SX> &b){
-  casadi_assert_message(a.scalar() && b.scalar(), "conditional operators only defined for scalars");
-  return a.toScalar() != b.toScalar();
-}
-
-Matrix<SX> operator!(const Matrix<SX> &a){
-  casadi_assert_message(a.scalar(), "conditional operators only defined for scalars");
-  return !a.toScalar();
-}
-
 void expand(const Matrix<SX>& ex2, Matrix<SX> &ww, Matrix<SX>& tt){
   casadi_assert(ex2.scalar());
   SX ex = ex2.toScalar();
@@ -841,7 +796,7 @@ int countNodes(const Matrix<SX>& A){
 
 std::string getOperatorRepresentation(const SX& x, const std::vector<std::string>& args) {
   if (!x.hasDep()) throw CasadiException("getOperatorRepresentation: SX must be binary operator");
-  if (args.size() == 0 || casadi_math<double>::ndeps(x.getOp())==2 && args.size() < 2) throw CasadiException("getOperatorRepresentation: not enough arguments supplied");
+  if (args.size() == 0 || (casadi_math<double>::ndeps(x.getOp())==2 && args.size() < 2)) throw CasadiException("getOperatorRepresentation: not enough arguments supplied");
   std::stringstream s;
   casadi_math<double>::print(x.getOp(),s,args[0],args[1]);
   return s.str();
@@ -1037,6 +992,166 @@ SXMatrix getFree(const SXMatrix& ex){
   return f.getFree();
 }
 
+Matrix<SX> jacobianTimesVector(const Matrix<SX> &ex, const Matrix<SX> &arg, const Matrix<SX> &v, bool transpose_jacobian){
+  SXFunction f(arg,ex);
+  f.init();
+  
+  // Dimension of v
+  int v1 = v.size1(), v2 = v.size2();
+  
+  // Make sure well-posed
+  casadi_assert(v2 >= 1);
+  casadi_assert(ex.size2()==1);
+  casadi_assert(arg.size2()==1);
+  if(transpose_jacobian){
+    casadi_assert(v1==ex.size1());
+  } else {
+    casadi_assert(v1==arg.size1());
+  }
+  
+  // Number of sensitivities
+  int nfsens = transpose_jacobian ? 0 : v2;
+  int nasens = transpose_jacobian ? v2 : 0;
+  
+  // Assemble arguments and directional derivatives
+  vector<SXMatrix> argv = f.inputsSX();
+  vector<SXMatrix> resv = f.outputsSX();
+  vector<vector<SXMatrix> > fseed(nfsens,argv), fsens(nfsens,resv), aseed(nasens,resv), asens(nasens,argv);
+  for(int dir=0; dir<v2; ++dir){
+    if(transpose_jacobian){
+      aseed[dir][0].set(v(Slice(0,v1),dir));
+    } else {
+      fseed[dir][0].set(v(Slice(0,v1),dir));
+    }
+  }
+  
+  // Evaluate with directional derivatives, output is the same as the funciton inputs
+  f.evalSX(argv,resv,fseed,fsens,aseed,asens,true);
+  
+  // Get the results
+  vector<SXMatrix> dirder(v2);
+  for(int dir=0; dir<v2; ++dir){
+    if(transpose_jacobian){
+      dirder[dir] = asens[dir][0];
+    } else {
+      dirder[dir] = fsens[dir][0];
+    }
+  }
+  return horzcat(dirder);
+}
+
+void extractSubexpressions(SXMatrix& ex, SXMatrix& v, SXMatrix& vdef){
+  std::vector<SXMatrix> exv(1,ex);
+  extractSubexpressions(exv,v,vdef);
+  ex = exv.front();
+}
+
+void extractSubexpressions(std::vector<SXMatrix>& ex, SXMatrix& v, SXMatrix& vdef){
+  
+  // Sort the expression
+  SXFunction f(vector<SXMatrix>(),ex);
+  f.init();
+
+  // Get references to the internal data structures
+  vector<SXAlgEl>& algorithm = f->algorithm_;
+  vector<SX>& s_work = f->s_work_;
+  vector<SX> s_work2 = s_work;
+  
+  // Iterator to the binary operations
+  vector<SX>::const_iterator b_it=f->operations_.begin();
+  
+  // Iterator to stack of constants
+  vector<SX>::const_iterator c_it = f->constants_.begin();
+
+  // Iterator to free variables
+  vector<SX>::const_iterator p_it = f->free_vars_.begin();
+
+  // Count how many times an expression has been used
+  vector<int> usecount(s_work.size(),0);
+  
+  // Definition of new variables
+  vector<SX> vvdef;
+  
+  // Evaluate the algorithm
+  for(vector<SXAlgEl>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it){
+    // Increase usage counters
+    switch(it->op){
+      case OP_CONST:
+      case OP_PARAMETER:
+        break;
+      CASADI_MATH_BINARY_BUILTIN // Binary operation
+        if(usecount[it->arg.i[1]]==0){
+          usecount[it->arg.i[1]]=1;
+        } else if(usecount[it->arg.i[1]]==1){
+          vvdef.push_back(s_work[it->arg.i[1]]);
+          usecount[it->arg.i[1]]=-1; // Extracted, do not extract again
+        }
+        // fall-through
+      case OP_OUTPUT: 
+      default: // Unary operation, binary operation or output
+        if(usecount[it->arg.i[0]]==0){
+          usecount[it->arg.i[0]]=1;
+        } else if(usecount[it->arg.i[0]]==1){
+          vvdef.push_back(s_work[it->arg.i[0]]);
+          usecount[it->arg.i[0]]=-1; // Extracted, do not extract again
+        }
+    }
+    
+    // Perform the operation
+    switch(it->op){
+      case OP_OUTPUT: 
+        break;
+      case OP_CONST:
+      case OP_PARAMETER:
+        usecount[it->res] = -1; // Never extract since it is a primitive type
+        break;
+      default:
+        s_work[it->res] = *b_it++; 
+        usecount[it->res] = 0; // Not (yet) extracted
+        break;
+    }
+  }
+  
+  // Create intermediate variables
+  vdef = vvdef;
+  v = ssym("v",vdef.sparsity());
+  
+  // Mark the above expressions
+  for(int i=0; i<vvdef.size(); ++i){
+    vvdef[i].setTemp(i+1);
+  }
+  
+  // Reset iterator
+  b_it=f->operations_.begin();
+  
+  // Evaluate the algorithm
+  for(vector<SXAlgEl>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it){
+    switch(it->op){
+      case OP_OUTPUT: ex[it->res].data()[it->arg.i[1]] = s_work[it->arg.i[0]]; break;
+      case OP_CONST:      s_work2[it->res] = s_work[it->res] = *c_it++; break;
+      case OP_PARAMETER:  s_work2[it->res] = s_work[it->res] = *p_it++; break;
+      default:
+      {
+        switch(it->op){
+          CASADI_MATH_FUN_ALL_BUILTIN(s_work[it->arg.i[0]],s_work[it->arg.i[1]],s_work[it->res])
+        }
+        s_work2[it->res] = *b_it++; 
+        
+        // Replace with intermediate variables
+        int ind = s_work2[it->res].getTemp()-1;
+        if(ind>=0){
+          vdef.at(ind) = s_work[it->res];
+          s_work[it->res] = v.at(ind);
+        }
+      }
+    }
+  }
+
+  // Unmark the expressions
+  for(int i=0; i<vvdef.size(); ++i){
+    vvdef[i].setTemp(0);
+  }
+}
 
 } // namespace CasADi
 

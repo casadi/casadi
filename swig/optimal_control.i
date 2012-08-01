@@ -46,4 +46,6 @@
 
 #endif // SWIGPYTHON
 
+VECTOR_REPR(CasADi::Variable)
+
 

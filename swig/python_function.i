@@ -25,6 +25,8 @@ namespace CasADi{
 %extend CFunction {
   void __setUserData__(PyObject * obj) {
     $self->setOption("user_data",static_cast<void*>(obj));
+    Py_INCREF(obj); // This avoids a segfault when the python function goes out of scope
+                    // This fix introduces a memory leak though
   }
 }
 }
@@ -34,6 +36,8 @@ namespace CasADi{
 
 class PyFunction(CFunction):
    def __init__(self,fun, inputscheme=None, outputscheme=None):
+     if not(callable(fun)):
+        raise Exception("PyFunction(fun, inputscheme, outputscheme): fun must be callable. i.e. be a function or implement the __call__ method.")
      if inputscheme == None:
         inputscheme = []
      if outputscheme == None:

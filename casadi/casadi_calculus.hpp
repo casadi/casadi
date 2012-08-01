@@ -30,6 +30,44 @@
 #include <algorithm>
 #include "casadi_exception.hpp"
 
+namespace CasADi{
+
+/// Enum for quick access to any node
+enum Operation{
+  // Simple assignment
+  OP_ASSIGN,
+  
+  // Standard unary and binary functions
+  OP_ADD,  OP_SUB,  OP_MUL,  OP_DIV,
+  OP_NEG,  OP_EXP,  OP_LOG,  OP_POW, OP_CONSTPOW,
+  OP_SQRT,  OP_SIN,  OP_COS,  OP_TAN,  
+  OP_ASIN,  OP_ACOS,  OP_ATAN,  
+  OP_STEP,  
+  OP_FLOOR,  OP_CEIL,  OP_EQUALITY, OP_FABS, OP_SIGN, 
+  OP_ERF,  OP_FMIN,  OP_FMAX,
+  OP_INV,
+  OP_SINH,  OP_COSH,  OP_TANH,
+  OP_ATAN2,
+  
+  // Double constant
+  OP_CONST,
+  
+  // Function input and output
+  OP_INPUT, OP_OUTPUT,
+  
+  // Free parameter
+  OP_PARAMETER,
+  
+  // Embedded function call
+  OP_FINPUT, OP_CALL, OP_FOUTPUT,
+  
+  OP_ERFINV,
+  OP_PRINTME,
+  NUM_BUILT_IN_OPS
+};
+
+#ifndef SWIG
+
 // Get GCC version if GCC is used
 #ifdef __GNUC__
 #ifdef __GNUC_MINOR__
@@ -50,8 +88,6 @@
 // warning C4800: 'int' : forcing value to bool 'true'or 'false'(performance warning)
 #pragma warning (disable:4800)
 #endif
-
-namespace CasADi{
 
   //@{
   /** \brief  Pre-C99 elementary functions from the math.h (cmath) header */
@@ -277,40 +313,6 @@ struct DerBinaryOpertion{
     /// Now save f
     f = tmp;
   }
-};
-
-/// Enum for quick access to any node
-enum Operation{
-  // Simple assignment
-  OP_ASSIGN,
-  
-  // Standard unary and binary functions
-  OP_ADD,  OP_SUB,  OP_MUL,  OP_DIV,
-  OP_NEG,  OP_EXP,  OP_LOG,  OP_POW, OP_CONSTPOW,
-  OP_SQRT,  OP_SIN,  OP_COS,  OP_TAN,  
-  OP_ASIN,  OP_ACOS,  OP_ATAN,  
-  OP_STEP,  
-  OP_FLOOR,  OP_CEIL,  OP_EQUALITY, OP_FABS, OP_SIGN, 
-  OP_ERF,  OP_FMIN,  OP_FMAX,
-  OP_INV,
-  OP_SINH,  OP_COSH,  OP_TANH,
-  OP_ATAN2,
-  
-  // Double constant
-  OP_CONST,
-  
-  // Function input and output
-  OP_INPUT, OP_OUTPUT,
-  
-  // Free parameter
-  OP_PARAMETER,
-  
-  // Embedded function call
-  OP_FINPUT, OP_CALL, OP_FOUTPUT,
-  
-  OP_ERFINV,
-  OP_PRINTME,
-  NUM_BUILT_IN_OPS
 };
 
 //@{
@@ -639,7 +641,7 @@ struct BinaryOperation<OP_ATAN2>{
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ T t = x*x+y*y; d[0]=y/t; d[1]=-x/t;}
 };
 
-
+#endif // SWIG
 
 } // namespace CasADi
 

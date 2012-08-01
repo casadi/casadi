@@ -49,9 +49,9 @@ void Multiplication::printPart(std::ostream &stream, int part) const{
   if(part==0){
     stream << "mul(";
   } else if(part==1){
-    stream << ",";
+    stream << ",trans(";
   } else {
-    stream << ")";
+    stream << "))";
   }
 }
 

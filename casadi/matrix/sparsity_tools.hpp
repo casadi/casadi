@@ -32,10 +32,22 @@ namespace CasADi{
 **/
 CRSSparsity sp_dense(int n, int m=1);
 
+
+/**
+ \brief Create a dense rectangular sparsity pattern
+**/
+CRSSparsity sp_dense(const std::pair<int,int> &nm );
+
+
 /**
  \brief Create a sparse rectangular sparsity pattern
 **/
 CRSSparsity sp_sparse(int n, int m=1);
+
+/**
+ \brief Create a dense rectangular sparsity pattern
+**/
+CRSSparsity sp_sparse(const std::pair<int,int> &nm);
 
 /**
  \brief Create a lower triangular square sparsity pattern

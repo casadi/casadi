@@ -539,6 +539,99 @@ class Matrixtests(casadiTestCase):
     A.remove([0,3],[1])
     self.checkarray(A, DMatrix([[5,7,8],[9,11,12],[17,19,20]]),"remove a column and two rows ")
     
+  def test_comparisons(self):
+    for m in [DMatrix,IMatrix]:
+      A = m([[5,4],[2,1]])
+      
+      for c in [6,6.0,DMatrix([6]),IMatrix([6]),matrix(6)]:
+        self.checkarray(A<=c,m([[1,1],[1,1]]),"<=")
+        self.checkarray(A<c,m([[1,1],[1,1]]),"<")
+        self.checkarray(A>c,m([[0,0],[0,0]]),">")
+        self.checkarray(A>=c,m([[0,0],[0,0]]),">=")
+        self.checkarray(A==c,m([[0,0],[0,0]]),"==")
+        self.checkarray(A!=c,m([[1,1],[1,1]]),"!=")
+        
+        self.checkarray(c>=A,m([[1,1],[1,1]]),"<=")
+        self.checkarray(c>A,m([[1,1],[1,1]]),"<")
+        self.checkarray(c<A,m([[0,0],[0,0]]),">")
+        self.checkarray(c<=A,m([[0,0],[0,0]]),">=")
+        self.checkarray(c==A,m([[0,0],[0,0]]),"==")
+        self.checkarray(c!=A,m([[1,1],[1,1]]),"!=")
+        
+      for c in [5,5.0,DMatrix([5]),IMatrix([5]),matrix(5)]:
+        self.checkarray(A<=c,m([[1,1],[1,1]]),"<=")
+        self.checkarray(A<c,m([[0,1],[1,1]]),"<")
+        self.checkarray(A>c,m([[0,0],[0,0]]),">")
+        self.checkarray(A>=c,m([[1,0],[0,0]]),">=")
+        self.checkarray(A==c,m([[1,0],[0,0]]),"==")
+        self.checkarray(A!=c,m([[0,1],[1,1]]),"!=")
+
+        self.checkarray(c>=A,m([[1,1],[1,1]]),"<=")
+        self.checkarray(c>A,m([[0,1],[1,1]]),"<")
+        self.checkarray(c<A,m([[0,0],[0,0]]),">")
+        self.checkarray(c<=A,m([[1,0],[0,0]]),">=")
+        self.checkarray(c==A,m([[1,0],[0,0]]),"==")
+        self.checkarray(c!=A,m([[0,1],[1,1]]),"!=")
+        
+      for c in [4,4.0,DMatrix([4]),IMatrix([4]),matrix(4)]:
+        self.checkarray(A<=c,m([[0,1],[1,1]]),"<=")
+        self.checkarray(A<c,m([[0,0],[1,1]]),"<")
+        self.checkarray(A>c,m([[1,0],[0,0]]),">")
+        self.checkarray(A>=c,m([[1,1],[0,0]]),">=")
+        self.checkarray(A==c,m([[0,1],[0,0]]),"==")
+        self.checkarray(A!=c,m([[1,0],[1,1]]),"!=")
+
+        self.checkarray(c>=A,m([[0,1],[1,1]]),"<=")
+        self.checkarray(c>A,m([[0,0],[1,1]]),"<")
+        self.checkarray(c<A,m([[1,0],[0,0]]),">")
+        self.checkarray(c<=A,m([[1,1],[0,0]]),">=")
+        self.checkarray(c==A,m([[0,1],[0,0]]),"==")
+        self.checkarray(c!=A,m([[1,0],[1,1]]),"!=")
+        
+      for c in [1,1.0,DMatrix([1]),IMatrix([1]),matrix(1)]:
+        self.checkarray(A<=c,m([[0,0],[0,1]]),"<=")
+        self.checkarray(A<c,m([[0,0],[0,0]]),"<")
+        self.checkarray(A>c,m([[1,1],[1,0]]),">")
+        self.checkarray(A>=c,m([[1,1],[1,1]]),">=")
+        self.checkarray(A==c,m([[0,0],[0,1]]),"==")
+        self.checkarray(A!=c,m([[1,1],[1,0]]),"!=")
+
+        self.checkarray(c>=A,m([[0,0],[0,1]]),"<=")
+        self.checkarray(c>A,m([[0,0],[0,0]]),"<")
+        self.checkarray(c<A,m([[1,1],[1,0]]),">")
+        self.checkarray(c<=A,m([[1,1],[1,1]]),">=")
+        self.checkarray(c==A,m([[0,0],[0,1]]),"==")
+        self.checkarray(c!=A,m([[1,1],[1,0]]),"!=")
+        
+      for c in [0,DMatrix([0]),IMatrix([0]),matrix(0)]:
+        self.checkarray(A<=c,m([[0,0],[0,0]]),"<=")
+        self.checkarray(A<c,m([[0,0],[0,0]]),"<")
+        self.checkarray(A>c,m([[1,1],[1,1]]),">")
+        self.checkarray(A>=c,m([[1,1],[1,1]]),">=")
+        self.checkarray(A==c,m([[0,0],[0,0]]),"==")
+        self.checkarray(A!=c,m([[1,1],[1,1]]),"!=")
+
+        self.checkarray(c>=A,m([[0,0],[0,0]]),"<=")
+        self.checkarray(c>A,m([[0,0],[0,0]]),"<")
+        self.checkarray(c<A,m([[1,1],[1,1]]),">")
+        self.checkarray(c<=A,m([[1,1],[1,1]]),">=")
+        self.checkarray(c==A,m([[0,0],[0,0]]),"==")
+        self.checkarray(c!=A,m([[1,1],[1,1]]),"!=")
+
+  def test_all_any(self):
+    for m in [DMatrix,IMatrix]:
+      A = m([[1,1],[1,1]])
+      self.assertTrue(all(A))
+      self.assertTrue(any(A))
+      
+      A = m([[1,0],[1,1]])
+      self.assertFalse(all(A))
+      self.assertTrue(any(A))
+
+      A = m([[0,0],[0,0]])
+      self.assertFalse(all(A))
+      self.assertFalse(any(A))
+    
 if __name__ == '__main__':
     unittest.main()
 

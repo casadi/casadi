@@ -84,6 +84,8 @@ void IntegratorInternal::init(){
   if(!f_.isInit()) f_.init();
   casadi_assert_message(f_.getNumInputs()==DAE_NUM_IN,"Wrong number of inputs for the DAE callback function");
   casadi_assert_message(f_.getNumOutputs()==DAE_NUM_OUT,"Wrong number of outputs for the DAE callback function");
+  casadi_assert_message(f_.input(DAE_X).dense(),"State vector must be dense in the DAE callback function");
+  casadi_assert_message(f_.output(DAE_ODE).dense(),"Right hand side vector must be dense in the DAE callback function");
   nx_ = f_.input(DAE_X).numel();
   nz_ = f_.input(DAE_Z).numel();
   nq_ = f_.output(DAE_QUAD).numel();

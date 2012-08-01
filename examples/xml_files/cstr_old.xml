@@ -1,0 +1,886 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmodelicaModelDescription xmlns:exp="https://svn.jmodelica.org/trunk/XML/daeExpressions.xsd" xmlns:equ="https://svn.jmodelica.org/trunk/XML/daeEquations.xsd" xmlns:fun="https://svn.jmodelica.org/trunk/XML/daeFunctions.xsd" xmlns:opt="https://svn.jmodelica.org/trunk/XML/daeOptimization.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+fmiVersion="1.0" modelName="CSTR.CSTR_Opt" modelIdentifier="CSTR_CSTR_Opt" guid="a6d9171dfe1be723823c96dfd6375bd6" generationDateAndTime="2011-06-15T15:07:07" variableNamingConvention="structured" numberOfContinuousStates="3" numberOfEventIndicators="0">
+	<UnitDefinitions>
+		<BaseUnit unit="K">
+			<DisplayUnitDefinition displayUnit="degC" gain="1" offset="0"/>
+		</BaseUnit>
+	</UnitDefinitions>
+	
+	
+	<VendorAnnotations>
+		<Tool name="JModelica">
+		</Tool>
+	</VendorAnnotations>		
+	<ModelVariables>
+		<ScalarVariable name="T_ref" valueReference="15" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="280.09919800536" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="T_ref"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="Tc_ref" valueReference="16" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="280.0" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="Tc_ref"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="c_ref" valueReference="14" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="338.775765506035" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="c_ref"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="cost" valueReference="25" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" nominal="1.0E7" start="0.0" fixed="true" free="false" initialGuess="500.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="cost"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>state</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="der(cost)" valueReference="22" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" nominal="1.0E7" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="cost"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>derivative</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="cstr.Cp" valueReference="9" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="239.0" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="Cp"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="cstr.EdivR" valueReference="6" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="8750.0" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="EdivR"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="cstr.F" valueReference="2" description="Outflow" variability="parameter" causality="internal" alias="noAlias">
+			<Real quantity="VolumeFlowRate" unit="m3/s" relativeQuantity="false" start="0.0016666666666666668" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="F"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="cstr.F0" valueReference="0" description="Inflow" variability="parameter" causality="internal" alias="noAlias">
+			<Real quantity="VolumeFlowRate" unit="m3/s" relativeQuantity="false" start="0.0016666666666666668" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="F0"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="cstr.T" valueReference="27" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" nominal="350.0" start="250.051971" fixed="true" free="false" initialGuess="300.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="T"/>
+			</QualifiedName>
+			<isLinear>false</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>state</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="cstr.der(T)" valueReference="24" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" nominal="350.0" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="T"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>derivative</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="cstr.T0" valueReference="3" variability="parameter" causality="internal" alias="noAlias">
+			<Real quantity="ThermodynamicTemperature" unit="K" displayUnit="degC" relativeQuantity="false" min="0.0" start="350.0" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="T0"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="cstr.T_init" valueReference="13" variability="parameter" causality="internal" alias="noAlias">
+			<Real quantity="ThermodynamicTemperature" unit="K" displayUnit="degC" relativeQuantity="false" min="0.0" start="250.051971" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="T_init"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="cstr.Tc" valueReference="28" description="Cooling temperature" variability="continuous" causality="internal" alias="alias" >
+			<Real relativeQuantity="false" free="false" initialGuess="350.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="Tc"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="cstr.U" valueReference="7" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="915.6" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="U"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="cstr.V" valueReference="11" description="Reactor Volume" variability="parameter" causality="internal" alias="noAlias">
+			<Real quantity="Volume" unit="m3" relativeQuantity="false" start="100.0" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="V"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="cstr.c" valueReference="26" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" nominal="1000.0" start="956.271065" fixed="true" free="false" initialGuess="300.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="c"/>
+			</QualifiedName>
+			<isLinear>false</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>state</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="cstr.der(c)" valueReference="23" variability="continuous" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" nominal="1000.0" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="c"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>derivative</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="cstr.c0" valueReference="1" description="Concentration of inflow" variability="parameter" causality="internal" alias="noAlias">
+			<Real quantity="Concentration" unit="mol/m3" relativeQuantity="false" start="1000.0" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="c0"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="cstr.c_init" valueReference="12" variability="parameter" causality="internal" alias="noAlias">
+			<Real quantity="Concentration" unit="mol/m3" relativeQuantity="false" start="956.271065" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="c_init"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="cstr.dH" valueReference="10" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="-50000.0" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="dH"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="cstr.k0" valueReference="5" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="1.2E9" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="k0"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="cstr.r" valueReference="4" variability="parameter" causality="internal" alias="noAlias">
+			<Real quantity="Length" unit="m" relativeQuantity="false" start="0.219" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="r"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="cstr.rho" valueReference="8" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="1000.0" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="rho"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="finalTime" valueReference="21" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="150.0" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="finalTime"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="q_T" valueReference="18" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="1.0" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="q_T"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="q_Tc" valueReference="19" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="1.0" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="q_Tc"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="q_c" valueReference="17" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="1.0" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="q_c"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="startTime" valueReference="20" variability="parameter" causality="internal" alias="noAlias">
+			<Real relativeQuantity="false" start="0.0" free="false" initialGuess="0.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="startTime"/>
+			</QualifiedName>
+			<isLinear>true</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>independentParameter</VariableCategory>
+		</ScalarVariable>
+		<ScalarVariable name="u" valueReference="28" variability="continuous" causality="input" alias="noAlias">
+			<Real relativeQuantity="false" nominal="280.0" start="350.0" free="false" initialGuess="350.0" />
+			<QualifiedName>
+				<exp:QualifiedNamePart name="u"/>
+			</QualifiedName>
+			<isLinear>false</isLinear>
+			 <isLinearTimedVariables>
+				 <TimePoint index="0" isLinear="true"/>
+			 </isLinearTimedVariables>
+			<VariableCategory>algebraic</VariableCategory>
+		</ScalarVariable>
+	</ModelVariables>
+	<equ:BindingEquations>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="F0"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:Div>
+					<exp:Div>
+						<exp:IntegerLiteral>100</exp:IntegerLiteral>
+						<exp:IntegerLiteral>1000</exp:IntegerLiteral>
+					</exp:Div>
+					<exp:IntegerLiteral>60</exp:IntegerLiteral>
+				</exp:Div>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="c0"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>1000</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="F"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:Div>
+					<exp:Div>
+						<exp:IntegerLiteral>100</exp:IntegerLiteral>
+						<exp:IntegerLiteral>1000</exp:IntegerLiteral>
+					</exp:Div>
+					<exp:IntegerLiteral>60</exp:IntegerLiteral>
+				</exp:Div>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="T0"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>350</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="r"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:RealLiteral>0.219</exp:RealLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="k0"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:Div>
+					<exp:RealLiteral>7.2e10</exp:RealLiteral>
+					<exp:IntegerLiteral>60</exp:IntegerLiteral>
+				</exp:Div>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="EdivR"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>8750</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="U"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:RealLiteral>915.6</exp:RealLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="rho"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>1000</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="Cp"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:Mul>
+					<exp:RealLiteral>0.239</exp:RealLiteral>
+					<exp:IntegerLiteral>1000</exp:IntegerLiteral>
+				</exp:Mul>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="dH"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:Neg>
+					<exp:RealLiteral>5e4</exp:RealLiteral>
+				</exp:Neg>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="V"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>100</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="c_init"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:RealLiteral>956.271065</exp:RealLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="cstr"/>
+				<exp:QualifiedNamePart name="T_init"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:RealLiteral>250.051971</exp:RealLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="c_ref"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:RealLiteral>338.77576550603499</exp:RealLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="T_ref"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:RealLiteral>280.09919800535999</exp:RealLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="Tc_ref"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>280</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="q_c"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>1</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="q_T"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>1</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="q_Tc"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>1</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="startTime"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:RealLiteral>0.0</exp:RealLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+		<equ:BindingEquation>
+			<equ:Parameter>				<exp:QualifiedNamePart name="finalTime"/>
+</equ:Parameter>
+			<equ:BindingExp>
+				<exp:IntegerLiteral>150</exp:IntegerLiteral>
+			</equ:BindingExp>
+		</equ:BindingEquation>
+	</equ:BindingEquations>
+
+	<equ:DynamicEquations>
+		<equ:Equation>
+			<exp:Sub>
+				<exp:Der>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="cost"/>
+					</exp:Identifier>
+				</exp:Der>
+				<exp:Add>
+					<exp:Add>
+						<exp:Mul>
+								<exp:Identifier>
+										<exp:QualifiedNamePart name="q_c"/>
+								</exp:Identifier>
+							<exp:Pow>
+								<exp:Sub>
+										<exp:Identifier>
+												<exp:QualifiedNamePart name="c_ref"/>
+										</exp:Identifier>
+										<exp:Identifier>
+												<exp:QualifiedNamePart name="cstr"/>
+												<exp:QualifiedNamePart name="c"/>
+										</exp:Identifier>
+								</exp:Sub>
+								<exp:IntegerLiteral>2</exp:IntegerLiteral>
+							</exp:Pow>
+						</exp:Mul>
+						<exp:Mul>
+								<exp:Identifier>
+										<exp:QualifiedNamePart name="q_T"/>
+								</exp:Identifier>
+							<exp:Pow>
+								<exp:Sub>
+										<exp:Identifier>
+												<exp:QualifiedNamePart name="T_ref"/>
+										</exp:Identifier>
+										<exp:Identifier>
+												<exp:QualifiedNamePart name="cstr"/>
+												<exp:QualifiedNamePart name="T"/>
+										</exp:Identifier>
+								</exp:Sub>
+								<exp:IntegerLiteral>2</exp:IntegerLiteral>
+							</exp:Pow>
+						</exp:Mul>
+					</exp:Add>
+					<exp:Mul>
+							<exp:Identifier>
+									<exp:QualifiedNamePart name="q_Tc"/>
+							</exp:Identifier>
+						<exp:Pow>
+							<exp:Sub>
+									<exp:Identifier>
+											<exp:QualifiedNamePart name="Tc_ref"/>
+									</exp:Identifier>
+									<exp:Identifier>
+											<exp:QualifiedNamePart name="u"/>
+									</exp:Identifier>
+							</exp:Sub>
+							<exp:IntegerLiteral>2</exp:IntegerLiteral>
+						</exp:Pow>
+					</exp:Mul>
+				</exp:Add>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+				<exp:Der>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="cstr"/>
+							<exp:QualifiedNamePart name="c"/>
+					</exp:Identifier>
+				</exp:Der>
+				<exp:Sub>
+					<exp:Div>
+						<exp:Mul>
+								<exp:Identifier>
+										<exp:QualifiedNamePart name="cstr"/>
+										<exp:QualifiedNamePart name="F0"/>
+								</exp:Identifier>
+							<exp:Sub>
+									<exp:Identifier>
+											<exp:QualifiedNamePart name="cstr"/>
+											<exp:QualifiedNamePart name="c0"/>
+									</exp:Identifier>
+									<exp:Identifier>
+											<exp:QualifiedNamePart name="cstr"/>
+											<exp:QualifiedNamePart name="c"/>
+									</exp:Identifier>
+							</exp:Sub>
+						</exp:Mul>
+							<exp:Identifier>
+									<exp:QualifiedNamePart name="cstr"/>
+									<exp:QualifiedNamePart name="V"/>
+							</exp:Identifier>
+					</exp:Div>
+					<exp:Mul>
+						<exp:Mul>
+								<exp:Identifier>
+										<exp:QualifiedNamePart name="cstr"/>
+										<exp:QualifiedNamePart name="k0"/>
+								</exp:Identifier>
+								<exp:Identifier>
+										<exp:QualifiedNamePart name="cstr"/>
+										<exp:QualifiedNamePart name="c"/>
+								</exp:Identifier>
+						</exp:Mul>
+						<exp:Exp>
+							<exp:Div>
+								<exp:Neg>
+										<exp:Identifier>
+												<exp:QualifiedNamePart name="cstr"/>
+												<exp:QualifiedNamePart name="EdivR"/>
+										</exp:Identifier>
+								</exp:Neg>
+									<exp:Identifier>
+											<exp:QualifiedNamePart name="cstr"/>
+											<exp:QualifiedNamePart name="T"/>
+									</exp:Identifier>
+							</exp:Div>
+						</exp:Exp>
+					</exp:Mul>
+				</exp:Sub>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+				<exp:Der>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="cstr"/>
+							<exp:QualifiedNamePart name="T"/>
+					</exp:Identifier>
+				</exp:Der>
+				<exp:Add>
+					<exp:Sub>
+						<exp:Div>
+							<exp:Mul>
+									<exp:Identifier>
+											<exp:QualifiedNamePart name="cstr"/>
+											<exp:QualifiedNamePart name="F0"/>
+									</exp:Identifier>
+								<exp:Sub>
+										<exp:Identifier>
+												<exp:QualifiedNamePart name="cstr"/>
+												<exp:QualifiedNamePart name="T0"/>
+										</exp:Identifier>
+										<exp:Identifier>
+												<exp:QualifiedNamePart name="cstr"/>
+												<exp:QualifiedNamePart name="T"/>
+										</exp:Identifier>
+								</exp:Sub>
+							</exp:Mul>
+								<exp:Identifier>
+										<exp:QualifiedNamePart name="cstr"/>
+										<exp:QualifiedNamePart name="V"/>
+								</exp:Identifier>
+						</exp:Div>
+						<exp:Mul>
+							<exp:Mul>
+								<exp:Mul>
+									<exp:Div>
+											<exp:Identifier>
+													<exp:QualifiedNamePart name="cstr"/>
+													<exp:QualifiedNamePart name="dH"/>
+											</exp:Identifier>
+										<exp:Mul>
+												<exp:Identifier>
+														<exp:QualifiedNamePart name="cstr"/>
+														<exp:QualifiedNamePart name="rho"/>
+												</exp:Identifier>
+												<exp:Identifier>
+														<exp:QualifiedNamePart name="cstr"/>
+														<exp:QualifiedNamePart name="Cp"/>
+												</exp:Identifier>
+										</exp:Mul>
+									</exp:Div>
+										<exp:Identifier>
+												<exp:QualifiedNamePart name="cstr"/>
+												<exp:QualifiedNamePart name="k0"/>
+										</exp:Identifier>
+								</exp:Mul>
+									<exp:Identifier>
+											<exp:QualifiedNamePart name="cstr"/>
+											<exp:QualifiedNamePart name="c"/>
+									</exp:Identifier>
+							</exp:Mul>
+							<exp:Exp>
+								<exp:Div>
+									<exp:Neg>
+											<exp:Identifier>
+													<exp:QualifiedNamePart name="cstr"/>
+													<exp:QualifiedNamePart name="EdivR"/>
+											</exp:Identifier>
+									</exp:Neg>
+										<exp:Identifier>
+												<exp:QualifiedNamePart name="cstr"/>
+												<exp:QualifiedNamePart name="T"/>
+										</exp:Identifier>
+								</exp:Div>
+							</exp:Exp>
+						</exp:Mul>
+					</exp:Sub>
+					<exp:Mul>
+						<exp:Div>
+							<exp:Mul>
+								<exp:IntegerLiteral>2</exp:IntegerLiteral>
+									<exp:Identifier>
+											<exp:QualifiedNamePart name="cstr"/>
+											<exp:QualifiedNamePart name="U"/>
+									</exp:Identifier>
+							</exp:Mul>
+							<exp:Mul>
+								<exp:Mul>
+										<exp:Identifier>
+												<exp:QualifiedNamePart name="cstr"/>
+												<exp:QualifiedNamePart name="r"/>
+										</exp:Identifier>
+										<exp:Identifier>
+												<exp:QualifiedNamePart name="cstr"/>
+												<exp:QualifiedNamePart name="rho"/>
+										</exp:Identifier>
+								</exp:Mul>
+									<exp:Identifier>
+											<exp:QualifiedNamePart name="cstr"/>
+											<exp:QualifiedNamePart name="Cp"/>
+									</exp:Identifier>
+							</exp:Mul>
+						</exp:Div>
+						<exp:Sub>
+								<exp:Identifier>
+										<exp:QualifiedNamePart name="u"/>
+								</exp:Identifier>
+								<exp:Identifier>
+										<exp:QualifiedNamePart name="cstr"/>
+										<exp:QualifiedNamePart name="T"/>
+								</exp:Identifier>
+						</exp:Sub>
+					</exp:Mul>
+				</exp:Add>
+			</exp:Sub>
+		</equ:Equation>
+	</equ:DynamicEquations>
+
+	<equ:InitialEquations>
+		<equ:Equation>
+			<exp:Sub>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="cost"/>
+					</exp:Identifier>
+				<exp:IntegerLiteral>0</exp:IntegerLiteral>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="cstr"/>
+							<exp:QualifiedNamePart name="c"/>
+					</exp:Identifier>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="cstr"/>
+							<exp:QualifiedNamePart name="c_init"/>
+					</exp:Identifier>
+			</exp:Sub>
+		</equ:Equation>
+		<equ:Equation>
+			<exp:Sub>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="cstr"/>
+							<exp:QualifiedNamePart name="T"/>
+					</exp:Identifier>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="cstr"/>
+							<exp:QualifiedNamePart name="T_init"/>
+					</exp:Identifier>
+			</exp:Sub>
+		</equ:Equation>
+	</equ:InitialEquations>
+
+	<opt:Optimization static="false" >
+		<opt:ObjectiveFunction>
+			<exp:TimedVariable>
+				<exp:Identifier>
+						<exp:QualifiedNamePart name="cost"/>
+				</exp:Identifier>
+				<exp:Instant>150.0</exp:Instant>
+			</exp:TimedVariable>
+		</opt:ObjectiveFunction>
+		<opt:IntegrandObjectiveFunction>
+			<exp:StringLiteral>No integrand objective function</exp:StringLiteral>
+		</opt:IntegrandObjectiveFunction>
+		<opt:IntervalStartTime>
+			<opt:Value>0.0</opt:Value>
+			<opt:Free>false</opt:Free>
+			<opt:InitialGuess>0.0</opt:InitialGuess>
+		</opt:IntervalStartTime>
+		<opt:IntervalFinalTime>
+			<opt:Value>150.0</opt:Value>
+			<opt:Free>false</opt:Free>
+			<opt:InitialGuess>1.0</opt:InitialGuess>
+		</opt:IntervalFinalTime>
+		<opt:TimePoints>
+			<opt:Index>0</opt:Index>
+			<opt:Value>150.0</opt:Value>
+		</opt:TimePoints>
+		<opt:Constraints>
+			<opt:ConstraintLeq>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="cstr"/>
+							<exp:QualifiedNamePart name="T"/>
+					</exp:Identifier>
+				<exp:IntegerLiteral>350</exp:IntegerLiteral>
+			</opt:ConstraintLeq>
+			<opt:ConstraintGeq>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="u"/>
+					</exp:Identifier>
+				<exp:IntegerLiteral>230</exp:IntegerLiteral>
+			</opt:ConstraintGeq>
+			<opt:ConstraintLeq>
+					<exp:Identifier>
+							<exp:QualifiedNamePart name="u"/>
+					</exp:Identifier>
+				<exp:IntegerLiteral>370</exp:IntegerLiteral>
+			</opt:ConstraintLeq>
+		</opt:Constraints>
+	</opt:Optimization>
+
+	<fun:FunctionsList>
+	</fun:FunctionsList>
+
+</jmodelicaModelDescription>

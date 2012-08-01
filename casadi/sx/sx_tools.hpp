@@ -279,24 +279,19 @@ Matrix<SX> hessian(const Matrix<SX> &ex, const Matrix<SX> &arg);
 void hessian(const Matrix<SX> &ex, const Matrix<SX> &arg, Matrix<SX> &H, Matrix<SX> &g); // hessian and gradient
 //@}
 
+/** \brief Calculate the Jacobian and multiply by a vector from the left
+    This is equivalent to mul(jacobian(ex,arg),v) or mul(jacobian(ex,arg).T,v) for transpose_jacobian set to false and
+    true respectively. If contrast to these expressions, it will use directional derivatives which is typically (but
+    not necessarily) more efficient if the complete Jacobian is not needed and v has few columns.
+ */
+Matrix<SX> jacobianTimesVector(const Matrix<SX> &ex, const Matrix<SX> &arg, const Matrix<SX> &v, bool transpose_jacobian=false);
+
 /** \brief  Obtain the values of a constant expression */
 double getValue(const Matrix<SX> &ex, int i=0, int j=0);          // for constant expressions only
 int getIntValue(const Matrix<SX> &ex, int i=0, int j=0);          // integer version
 void getValue(const Matrix<SX> &ex, double *res); // for all constant expressions
 void getIntValue(const Matrix<SX> &ex, int *res); // integer version
 const std::string& getName(const Matrix<SX> &ex); // get the name (only for scalar variables)
-
-Matrix<SX> operator<=(const Matrix<SX> &a, const Matrix<SX> &b);
-Matrix<SX> operator>=(const Matrix<SX> &a, const Matrix<SX> &b);
-Matrix<SX> operator<(const Matrix<SX> &a, const Matrix<SX> &b);
-Matrix<SX> operator>(const Matrix<SX> &a, const Matrix<SX> &b);
-#ifndef SWIG
-Matrix<SX> operator&&(const Matrix<SX> &a, const Matrix<SX> &b);
-Matrix<SX> operator||(const Matrix<SX> &a, const Matrix<SX> &b);
-Matrix<SX> operator!(const Matrix<SX> &a);
-#endif
-Matrix<SX> operator==(const Matrix<SX> &a, const Matrix<SX> &b);
-Matrix<SX> operator!=(const Matrix<SX> &a, const Matrix<SX> &b);
 
 /** \brief  Fill the matrix with the value val, make empty sparse if zero */
 void fill(Matrix<SX>& mat, const SX& val);
@@ -357,9 +352,23 @@ int countNodes(const Matrix<SX>& A);
 /** \brief Get a string representation for a binary SX, using custom arguments */
 std::string getOperatorRepresentation(const SX& x, const std::vector<std::string>& args);
 
-/** \brief Get all the free variables in an expression */
-SXMatrix getFree(const SXMatrix& ex);
+  /** \brief Get all the free variables in an expression */
+  SXMatrix getFree(const SXMatrix& ex);
 
+  /** \brief Extract all subexpressions from an expression */
+  #ifndef SWIG
+  void extractSubexpressions(SXMatrix& ex, SXMatrix& v, SXMatrix& vdef);
+  #else // SWIG
+  void extractSubexpressions(SXMatrix& INOUT, SXMatrix& OUTPUT, SXMatrix& OUTPUT);
+  #endif // SWIG
+
+  /** \brief Extract all subexpressions from an set of expressions */
+  #ifndef SWIG
+  void extractSubexpressions(std::vector<SXMatrix>& ex, SXMatrix& v, SXMatrix& vdef);
+  #else // SWIG
+  void extractSubexpressions(std::vector<SXMatrix>& INOUT, SXMatrix& OUTPUT, SXMatrix& OUTPUT);
+  #endif // SWIG
+  
 } // namespace CasADi
 
 #endif // SX_TOOLS_HPP

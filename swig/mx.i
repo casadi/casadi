@@ -47,4 +47,6 @@
   binopsrFull(CasADi::MX)
 };
 
+VECTOR_REPR(CasADi::MX)
+VECTOR_REPR(std::vector<CasADi::MX>)
 

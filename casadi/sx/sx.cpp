@@ -246,7 +246,7 @@ bool SX::isSquared() const{
 
 bool SX::isEquivalent(const SX&y, int depth) const{
   if (isEqual(y)) return true;
-  if (isConstant() && y.isConstant() && y.getValue()==getValue());
+  if (isConstant() && y.isConstant()) return y.getValue()==getValue();
   if (depth==0) return false;
   
   if (hasDep() && y.hasDep() && getOp()==y.getOp()) {

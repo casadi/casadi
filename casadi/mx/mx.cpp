@@ -525,6 +525,7 @@ MX MX::repmat(const MX& x, int nrow, int ncol){
     return MX(nrow,ncol,x);
   } else {
     casadi_assert_message(0,"not implemented");
+    return MX();
   }
 }
 

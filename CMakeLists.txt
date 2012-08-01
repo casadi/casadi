@@ -17,6 +17,7 @@ option(WITH_FORTRAN "Enable Fortran linking, if this is set to OFF, no Fortran l
 option(WITH_SWIG_SPLIT "Split SWIG wrapper generation into multiple modules" OFF) 
 option(WITH_WORHP "Compile the WORHP interface" OFF) 
 option(WITH_ACADO "Compile the interfaces to ACADO and qpOASES, if it can be found" OFF) 
+option(WITH_EIGEN3 "Use Eigen3 backend for matrix operations" OFF) 
 
 if(WITH_FORTRAN)
   # Enable Fortran linking (needed e.g. for LAPACK/BLAS), if Fortran is available
@@ -140,6 +141,7 @@ add_subdirectory(external_packages)
 add_subdirectory(interfaces)
 add_subdirectory(experimental/greg EXCLUDE_FROM_ALL)
 add_subdirectory(experimental/joel EXCLUDE_FROM_ALL)
+#add_subdirectory(experimental/andrew EXCLUDE_FROM_ALL)
 
 if(WITH_MUSCOD)
 add_subdirectory(muscod_interface)

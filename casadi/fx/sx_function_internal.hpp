@@ -157,7 +157,7 @@ class SXFunctionInternal : public XFunctionInternal<SXFunctionInternal,Matrix<SX
   
   /** \brief Clear the function from its symbolic representation, to free up memory, no symbolic evaluations are possible after this */
   void clearSymbolic();
-
+  
   /// Propagate a sparsity pattern through the algorithm
   virtual void spEvaluate(bool fwd);
 

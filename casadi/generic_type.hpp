@@ -89,7 +89,6 @@ namespace CasADi{
     operator const std::vector<int>& () const{ return toIntVector();}
     operator const std::vector<double>& () const{ return toDoubleVector();}
     operator const std::vector<std::string>& () const{ return toStringVector();}
-    operator const SharedObject& () const{ return toSharedObject();}
     operator const FX& () const{ return toFX();}
     //operator void*() const;
     operator const std::map<std::string, GenericType>& () const;
