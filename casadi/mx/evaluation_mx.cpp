@@ -558,7 +558,7 @@ void EvaluationMX::create(const FX& fcn, const std::vector<MX> &arg,
   // Create the output nodes corresponding to the nondifferented function
   res.resize(num_out);
   for (int i = 0; i < num_out; ++i, ++ind) {
-    if (fcn.output(i).numel() > 0) {
+    if (fcn.output(i).size1() > 0 && fcn.output(i).size2() > 0) {
       res[i].assignNode(new OutputNode(ev, ind));
     } else {
       res[i] = MX();
@@ -570,7 +570,7 @@ void EvaluationMX::create(const FX& fcn, const std::vector<MX> &arg,
   for (int dir = 0; dir < nfwd; ++dir) {
     fsens[dir].resize(num_out);
     for (int i = 0; i < num_out; ++i, ++ind) {
-      if (fcn.output(i).numel() > 0) {
+      if (fcn.output(i).size1() > 0 && fcn.output(i).size2() > 0) {
         fsens[dir][i].assignNode(new OutputNode(ev, ind));
       } else {
         fsens[dir][i] = MX();
@@ -583,7 +583,7 @@ void EvaluationMX::create(const FX& fcn, const std::vector<MX> &arg,
   for (int dir = 0; dir < nadj; ++dir) {
     asens[dir].resize(num_in);
     for (int i = 0; i < num_in; ++i, ++ind) {
-      if (fcn.input(i).numel() > 0) {
+      if (fcn.output(i).size1() > 0 && fcn.output(i).size2() > 0) {
         asens[dir][i].assignNode(new OutputNode(ev, ind));
       } else {
         asens[dir][i] = MX();
