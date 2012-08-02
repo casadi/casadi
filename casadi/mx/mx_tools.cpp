@@ -678,5 +678,11 @@ std::vector<std::vector<MX> > msym(const std::string& name, int n, int m, int p,
   return msym(name,sp_dense(n,m),p,r);
 }
 
+std::vector<MX> substitute(const std::vector<MX> &ex, const std::vector<MX> &v, const std::vector<MX> &vdef){
+  MXFunction F(v,ex);
+  F.init();
+  return F.evalMX(vdef);
+}
+
 } // namespace CasADi
 

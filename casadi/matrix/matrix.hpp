@@ -516,6 +516,12 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     /// Const access the non-zero elements
     const std::vector<T>& data() const;
     
+    /// Get a pointer to the data
+    T* ptr(){ return empty() ? static_cast<T*>(0) : &front();}
+    
+    /// Get a const pointer to the data
+    const T* ptr() const{ return empty() ? static_cast<const T*>(0) : &front();}
+        
     /// Const access the sparsity - reference to data member
     const CRSSparsity& sparsity() const{ return sparsity_; }
     

@@ -84,9 +84,6 @@ public:
   /// Linear solver
   LinearSolver linsol_;
   
-  /// Backwards integration function (to be replaced by g_)
-  FX g_new_;
-  
   //@{
   /// options
   bool exact_jacobian_;

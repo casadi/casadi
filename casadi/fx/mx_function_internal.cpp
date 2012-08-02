@@ -676,7 +676,9 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
                                 bool output_given){
   assertInit();
   casadi_assert_message(arg.size()==getNumInputs(),"Wrong number of input arguments");
-  casadi_assert_message(res.size()==getNumOutputs(),"Wrong number of output arguments");
+  if(output_given){
+    casadi_assert_message(res.size()==getNumOutputs(),"Wrong number of output arguments");
+  }
   
   // Symbolic work, non-differentiated
   std::vector<MX> swork(work_.size());

@@ -72,7 +72,7 @@ public:
   virtual void initAdj();
 
   /** \brief  Reset the solver and bring the time back to t0 */
-  virtual void reset(int nfdir, int nadir);
+  virtual void reset(int nfdir);
 
   /** \brief  Reset the solver of the adjoint problem and take time to tf */
   virtual void resetAdj();
@@ -103,8 +103,8 @@ public:
   void rhsS1(int Ns, double t, N_Vector x, N_Vector xdot, int iS, N_Vector xF, N_Vector xdotF, N_Vector tmp1, N_Vector tmp2);
   void rhsQ(double t, const double* x, double* qdot);
   void rhsQS(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot, N_Vector *qFdot, N_Vector tmp1, N_Vector tmp2);
-  void rhsB(double t, const double* x, const double *xA, double* xdotA);
-  void rhsQB(double t, const double* x, const double* xA, double* qAdot);
+  void rhsB(double t, const double* x, const double *rx, double* rxdot);
+  void rhsQB(double t, const double* x, const double* rx, double* rqdot);
   void jtimes(const double *v, double* Jv, double t, const double* x, const double* fy, double* tmp);
   void djac(SUNDIALS_INT N, double t, N_Vector x, N_Vector fy, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
   void bjac(SUNDIALS_INT N, SUNDIALS_INT mupper, SUNDIALS_INT mlower, double t, N_Vector x, N_Vector fy, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
@@ -150,15 +150,15 @@ public:
   double t_lsetup_jac; // preconditioner/linear solver setup function, generate jacobian
   double t_lsetup_fac; // preconditioner setup function, factorize jacobian
   
-  // N-vectors for the ODE integration
+  // N-vectors for the forward integration
   N_Vector x0_, x_, q_;
+  
+  // N-vectors for the backward integration
+  N_Vector rx0_, rx_, rq_;
 
   // N-vectors for the forward sensitivities
   std::vector<N_Vector> xF0_, xF_, qF_;
 
-  // N-vectors for the adjoint sensitivities
-  std::vector<N_Vector> xA0_, xA_, qA_;  
-  
   bool is_init;
   bool isInitAdj_;
 
@@ -174,7 +174,7 @@ public:
   static void cvodes_error(const std::string& module, int flag);
 
   // Ids of backward problem
-  std::vector<int> whichB_;
+  int whichB_;
 
   int fsens_order_, asens_order_; 
 
@@ -194,16 +194,16 @@ public:
   void initUserDefinedLinearSolver();
   
   // Initialize the dense linear solver (backward integration)
-  void initDenseLinearSolverB(int dir);
+  void initDenseLinearSolverB();
   
   // Initialize the banded linear solver (backward integration)
-  void initBandedLinearSolverB(int dir);
+  void initBandedLinearSolverB();
   
   // Initialize the iterative linear solver (backward integration)
-  void initIterativeLinearSolverB(int dir);
+  void initIterativeLinearSolverB();
   
   // Initialize the user defined linear solver (backward integration)
-  void initUserDefinedLinearSolverB(int dir);
+  void initUserDefinedLinearSolverB();
 
   // Set linear solver
   virtual void setLinearSolver(const LinearSolver& linsol, const FX& jac);

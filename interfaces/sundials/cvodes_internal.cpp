@@ -51,6 +51,9 @@ CVodesInternal::CVodesInternal(const FX& f, const FX& g) : SundialsInternal(f,g)
 
   x0_ = x_ = 0;
   q_ = 0;
+  
+  rx0_ = rx_ = 0;
+  rq_ = 0;
 
   is_init = false;
   isInitAdj_ = false;
@@ -60,20 +63,20 @@ CVodesInternal::CVodesInternal(const FX& f, const FX& g) : SundialsInternal(f,g)
 void CVodesInternal::freeCVodes(){
   if(mem_) CVodeFree(&mem_);
 
-  // ODE integration
+  // Forward integration
   if(x0_) N_VDestroy_Serial(x0_);
   if(x_) N_VDestroy_Serial(x_);
   if(q_) N_VDestroy_Serial(q_);
   
-  // Forward problem
+  // Backward integration
+  if(rx0_) N_VDestroy_Serial(rx0_);
+  if(rx_) N_VDestroy_Serial(rx_);
+  if(rq_) N_VDestroy_Serial(rq_);
+  
+  // Forward sensitivities
   for(vector<N_Vector>::iterator it=xF0_.begin(); it != xF0_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
   for(vector<N_Vector>::iterator it=xF_.begin(); it != xF_.end(); ++it)     if(*it) N_VDestroy_Serial(*it);
   for(vector<N_Vector>::iterator it=qF_.begin(); it != qF_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
-  
-  // Adjoint problem
-  for(vector<N_Vector>::iterator it=xA0_.begin(); it != xA0_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
-  for(vector<N_Vector>::iterator it=xA_.begin(); it != xA_.end(); ++it)     if(*it) N_VDestroy_Serial(*it);
-  for(vector<N_Vector>::iterator it=qA_.begin(); it != qA_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
 }
 
 CVodesInternal::~CVodesInternal(){
@@ -291,24 +294,15 @@ void CVodesInternal::init(){
   } // enable fsens
     
   // Adjoint sensitivity problem
-  whichB_.resize(nadir_);
+  if(!g_.isNull()){
+    
+    // Allocate n-vectors
+    rx0_ = N_VMake_Serial(nrx_,input(INTEGRATOR_RX0).ptr());
+    rx_ = N_VMake_Serial(nrx_,output(INTEGRATOR_RXF).ptr());
 
-  // Allocate n-vectors
-  xA0_.resize(nadir_,0);
-  xA_.resize(nadir_,0);
-  for(int i=0; i<nadir_; ++i){
-    xA0_[i] = N_VMake_Serial(nx_,&adjSeed(INTEGRATOR_XF,i).front());
-    xA_[i] = N_VMake_Serial(nx_,&adjSens(INTEGRATOR_X0,i).front());
-  }
-
-  // Allocate n-vectors for quadratures
-  qA_.resize(nadir_,0);
-  for(int i=0; i<nadir_; ++i){
-    casadi_assert(adjSens(INTEGRATOR_P,i).size()==np_);
-    qA_[i] = N_VMake_Serial(np_,&adjSens(INTEGRATOR_P,i).front());
-  }
-  
-  if(nadir_>0){
+    // Allocate n-vectors for quadratures
+    rq_ = N_VMake_Serial(nrq_,output(INTEGRATOR_RQF).ptr());
+    
     // Get the number of steos per checkpoint
     int Nd = getOption("steps_per_checkpoint");
 
@@ -323,62 +317,59 @@ void CVodesInternal::init(){
     // Initialize adjoint sensitivities
     flag = CVodeAdjInit(mem_, Nd, interpType);
     if(flag != CV_SUCCESS) cvodes_error("CVodeAdjInit",flag);
+          
+    is_init = true;
+    isInitAdj_ = false;
   }
-        
-  is_init = true;
-  isInitAdj_ = false;
 }
 
 
 void CVodesInternal::initAdj(){
-  int flag;
-  for(int dir=0; dir<nadir_; ++dir){
-    
-    // Create backward problem (use the same lmm and iter)
-    flag = CVodeCreateB(mem_, lmm_, iter_, &whichB_[dir]);
-    if(flag != CV_SUCCESS) cvodes_error("CVodeCreateB",flag);
-    
-    // Initialize the backward problem
-    double tB0 = tf_;
-    flag = CVodeInitB(mem_, whichB_[dir], rhsB_wrapper, tB0, xA0_[dir]);
-    if(flag != CV_SUCCESS) cvodes_error("CVodeInitB",flag);
+  
+  // Create backward problem (use the same lmm and iter)
+  int flag = CVodeCreateB(mem_, lmm_, iter_, &whichB_);
+  if(flag != CV_SUCCESS) cvodes_error("CVodeCreateB",flag);
+  
+  // Initialize the backward problem
+  double tB0 = tf_;
+  flag = CVodeInitB(mem_, whichB_, rhsB_wrapper, tB0, rx0_);
+  if(flag != CV_SUCCESS) cvodes_error("CVodeInitB",flag);
 
-    // Set tolerances
-    flag = CVodeSStolerancesB(mem_, whichB_[dir], asens_reltol_, asens_abstol_);
-    if(flag!=CV_SUCCESS) cvodes_error("CVodeSStolerancesB",flag);
+  // Set tolerances
+  flag = CVodeSStolerancesB(mem_, whichB_, asens_reltol_, asens_abstol_);
+  if(flag!=CV_SUCCESS) cvodes_error("CVodeSStolerancesB",flag);
 
-    // User data
-    flag = CVodeSetUserDataB(mem_, whichB_[dir], this);
-    if(flag != CV_SUCCESS) cvodes_error("CVodeSetUserDataB",flag);
+  // User data
+  flag = CVodeSetUserDataB(mem_, whichB_, this);
+  if(flag != CV_SUCCESS) cvodes_error("CVodeSetUserDataB",flag);
 
-    // attach linear solver to backward problem
-    switch(linsol_g_){
-      case SD_DENSE:
-        initDenseLinearSolverB(dir);
-        break;
-      case SD_BANDED:
-        initBandedLinearSolverB(dir);
-        break;
-      case SD_ITERATIVE:
-        initIterativeLinearSolverB(dir);
-        break;
-      case SD_USER_DEFINED:
-        initUserDefinedLinearSolverB(dir);
-        break;
-    }
+  // attach linear solver to backward problem
+  switch(linsol_g_){
+    case SD_DENSE:
+      initDenseLinearSolverB();
+      break;
+    case SD_BANDED:
+      initBandedLinearSolverB();
+      break;
+    case SD_ITERATIVE:
+      initIterativeLinearSolverB();
+      break;
+    case SD_USER_DEFINED:
+      initUserDefinedLinearSolverB();
+      break;
+  }
 
-    // Quadratures for the adjoint problem
-    N_VConst(0.0, qA_[dir]);
-    flag = CVodeQuadInitB(mem_,whichB_[dir],rhsQB_wrapper,qA_[dir]);
-    if(flag!=CV_SUCCESS) cvodes_error("CVodeQuadInitB",flag);
-    
-    if(getOption("quad_err_con").toInt()){
-      flag = CVodeSetQuadErrConB(mem_, whichB_[dir],true);
-      if(flag != CV_SUCCESS) cvodes_error("CVodeSetQuadErrConB",flag);
-        
-      flag = CVodeQuadSStolerancesB(mem_, whichB_[dir], asens_reltol_, asens_abstol_);
-      if(flag != CV_SUCCESS) cvodes_error("CVodeQuadSStolerancesB",flag);
-    }
+  // Quadratures for the adjoint problem
+  N_VConst(0.0, rq_);
+  flag = CVodeQuadInitB(mem_,whichB_,rhsQB_wrapper,rq_);
+  if(flag!=CV_SUCCESS) cvodes_error("CVodeQuadInitB",flag);
+  
+  if(getOption("quad_err_con").toInt()){
+    flag = CVodeSetQuadErrConB(mem_, whichB_,true);
+    if(flag != CV_SUCCESS) cvodes_error("CVodeSetQuadErrConB",flag);
+      
+    flag = CVodeQuadSStolerancesB(mem_, whichB_, asens_reltol_, asens_abstol_);
+    if(flag != CV_SUCCESS) cvodes_error("CVodeQuadSStolerancesB",flag);
   }
   
   // Mark initialized
@@ -435,7 +426,7 @@ try{
   }
 }
   
-void CVodesInternal::reset(int nfdir, int nadir){
+void CVodesInternal::reset(int nfdir){
   if(monitored("reset")){
     cout << "initial state: " << endl;
     cout << "p = " << input(INTEGRATOR_P) << endl;
@@ -446,7 +437,7 @@ void CVodesInternal::reset(int nfdir, int nadir){
   t_res = t_fres = t_jac = t_lsolve = t_lsetup_jac = t_lsetup_fac = 0;
   
   fsens_order_ = nfdir>0;
-  asens_order_ = nadir>0;
+  asens_order_ = !g_.isNull();
   
   // Get the time horizon
   t_ = t0_;
@@ -535,14 +526,13 @@ void CVodesInternal::resetAdj(){
   int flag;
   
   if(isInitAdj_){
-    for(int dir=0; dir<nadir_; ++dir){
-      flag = CVodeReInitB(mem_, whichB_[dir], tf_, xA0_[dir]);
-      if(flag != CV_SUCCESS) cvodes_error("CVodeReInitB",flag);
+    flag = CVodeReInitB(mem_, whichB_, tf_, rx0_);
+    if(flag != CV_SUCCESS) cvodes_error("CVodeReInitB",flag);
 
-      N_VConst(0.0,qA_.at(dir));
-      flag = CVodeQuadReInitB(mem_,whichB_[dir],qA_[dir]);
-      if(flag!=CV_SUCCESS) cvodes_error("CVodeQuadReInitB",flag);
-    }
+    N_VConst(0.0,rq_);
+    flag = CVodeQuadReInitB(mem_,whichB_,rq_);
+    if(flag!=CV_SUCCESS) cvodes_error("CVodeQuadReInitB",flag);
+    
   } else {
     // Initialize the adjoint integration
     initAdj();
@@ -558,13 +548,11 @@ void CVodesInternal::integrateAdj(double t_out){
 
   // Get the sensitivities
   double tret;
-  for(int dir=0; dir<nadir_; ++dir){
-    flag = CVodeGetB(mem_, whichB_[dir], &tret, xA_[dir]);
-    if(flag!=CV_SUCCESS) cvodes_error("CVodeGetB",flag);
+  flag = CVodeGetB(mem_, whichB_, &tret, rx_);
+  if(flag!=CV_SUCCESS) cvodes_error("CVodeGetB",flag);
 
-    flag = CVodeGetQuadB(mem_, whichB_[dir], &tret, qA_[dir]);
-    if(flag!=CV_SUCCESS) cvodes_error("CVodeGetQuadB",flag);
-  }
+  flag = CVodeGetQuadB(mem_, whichB_, &tret, rq_);
+  if(flag!=CV_SUCCESS) cvodes_error("CVodeGetQuadB",flag);
 }
 
 void CVodesInternal::printStats(std::ostream &stream) const{
@@ -838,52 +826,50 @@ try{
   }
 }
 
-void CVodesInternal::rhsB(double t, const double* x, const double *xA, double* xdotA){
+void CVodesInternal::rhsB(double t, const double* x, const double *rx, double* rxdot){
   if(monitor_rhsB_){
     cout << "CVodesInternal::rhsB: begin" << endl;
   }
   
   // Pass inputs
-  g_new_.setInput(&t,RDAE_T);
-  g_new_.setInput(x,RDAE_X);
-  // g_new_.input(RDAE_XDOT).setZero();
-  g_new_.setInput(input(INTEGRATOR_P),RDAE_P);
-  g_new_.setInput(xA,RDAE_RX);
-  g_new_.setInput(adjSeed(INTEGRATOR_QF).data(),RDAE_RP);
-  g_new_.input(RDAE_RXDOT).setZero();
+  g_.setInput(&t,RDAE_T);
+  g_.setInput(x,RDAE_X);
+  g_.input(RDAE_XDOT).setZero();
+  g_.setInput(input(INTEGRATOR_P),RDAE_P);
+  g_.setInput(rx,RDAE_RX);
+  g_.input(RDAE_RXDOT).setZero();
 
   if(monitor_rhsB_){
     cout << "t       = " << t << endl;
-    cout << "x       = " << g_new_.input(RDAE_X) << endl;
-    cout << "p       = " << g_new_.input(RDAE_P) << endl;
-    cout << "rx      = " << g_new_.input(RDAE_RX) << endl;
-    cout << "rp      = " << g_new_.input(RDAE_RP) << endl;
+    cout << "x       = " << g_.input(RDAE_X) << endl;
+    cout << "p       = " << g_.input(RDAE_P) << endl;
+    cout << "rx      = " << g_.input(RDAE_RX) << endl;
   }
   
   // Evaluate
-  g_new_.evaluate();
+  g_.evaluate();
 
   // Save to output
-  g_new_.getOutput(xdotA,RDAE_ODE);
+  g_.getOutput(rxdot,RDAE_ODE);
 
   if(monitor_rhsB_){
-    cout << "xdotA = " << g_new_.output(RDAE_ODE) << endl;
+    cout << "xdotA = " << g_.output(RDAE_ODE) << endl;
   }
   
   // Negate as we are integrating backward in time
-  for(int i=0; i<nx_; ++i)
-    xdotA[i] *= -1;
+  for(int i=0; i<nrx_; ++i)
+    rxdot[i] *= -1;
 
   if(monitor_rhsB_){
     cout << "CVodesInternal::rhsB: end" << endl;
   }
 }
 
-int CVodesInternal::rhsB_wrapper(double t, N_Vector x, N_Vector xA, N_Vector xdotA, void *user_data){
+int CVodesInternal::rhsB_wrapper(double t, N_Vector x, N_Vector rx, N_Vector rxdot, void *user_data){
 try{
     casadi_assert(user_data);
     CVodesInternal *this_ = (CVodesInternal*)user_data;
-    this_->rhsB(t,NV_DATA_S(x),NV_DATA_S(xA),NV_DATA_S(xdotA));
+    this_->rhsB(t,NV_DATA_S(x),NV_DATA_S(rx),NV_DATA_S(rxdot));
     return 0;
   } catch(exception& e){
     cerr << "rhsB failed: " << e.what() << endl;;
@@ -891,11 +877,11 @@ try{
   }
 }
 
-int CVodesInternal::rhsQB_wrapper(double t, N_Vector x, N_Vector xA, N_Vector qdotA, void *user_data){
+int CVodesInternal::rhsQB_wrapper(double t, N_Vector x, N_Vector rx, N_Vector rqdot, void *user_data){
   try{
     casadi_assert(user_data);
     CVodesInternal *this_ = (CVodesInternal*)user_data;
-    this_->rhsQB(t,NV_DATA_S(x),NV_DATA_S(xA),NV_DATA_S(qdotA));
+    this_->rhsQB(t,NV_DATA_S(x),NV_DATA_S(rx),NV_DATA_S(rqdot));
     return 0;
   } catch(exception& e){
     cerr << "rhsQB failed: " << e.what() << endl;;
@@ -903,41 +889,40 @@ int CVodesInternal::rhsQB_wrapper(double t, N_Vector x, N_Vector xA, N_Vector qd
   }
 }
 
-void CVodesInternal::rhsQB(double t, const double* x, const double* xA, double* qdotA){
+void CVodesInternal::rhsQB(double t, const double* x, const double* rx, double* rqdot){
   if(monitor_rhsQB_){
     cout << "CVodesInternal::rhsQB: begin" << endl;
   }
 
   // Pass inputs
-  g_new_.setInput(&t,RDAE_T);
-  g_new_.setInput(x,RDAE_X);
-  // g_new_.input(RDAE_XDOT).setZero();
-  g_new_.setInput(input(INTEGRATOR_P),RDAE_P);
-  g_new_.setInput(xA,RDAE_RX);
-  g_new_.setInput(adjSeed(INTEGRATOR_QF).data(),RDAE_RP);
-  g_new_.input(RDAE_RXDOT).setZero();
+  g_.setInput(&t,RDAE_T);
+  g_.setInput(x,RDAE_X);
+  g_.input(RDAE_XDOT).setZero();
+  g_.setInput(input(INTEGRATOR_P),RDAE_P);
+  g_.setInput(rx,RDAE_RX);
+  g_.input(RDAE_RXDOT).setZero();
 
   if(monitor_rhsB_){
     cout << "t       = " << t << endl;
-    cout << "x       = " << g_new_.input(RDAE_X) << endl;
-    cout << "p       = " << g_new_.input(RDAE_P) << endl;
-    cout << "rx      = " << g_new_.input(RDAE_RX) << endl;
-    cout << "rp      = " << g_new_.input(RDAE_RP) << endl;
+    cout << "x       = " << g_.input(RDAE_X) << endl;
+    cout << "p       = " << g_.input(RDAE_P) << endl;
+    cout << "rx      = " << g_.input(RDAE_RX) << endl;
   }
   
   // Evaluate
-  g_new_.evaluate();
+  g_.evaluate();
 
   // Save to output
-  g_new_.getOutput(qdotA,RDAE_QUAD);
+  casadi_assert(g_.output(RDAE_QUAD).size()==nrq_);
+  g_.getOutput(rqdot,RDAE_QUAD);
 
   if(monitor_rhsB_){
-    cout << "qdotA = " << g_new_.output(RDAE_QUAD) << endl;
+    cout << "qdotA = " << g_.output(RDAE_QUAD) << endl;
   }
   
   // Negate as we are integrating backward in time
-  for(int i=0; i<np_; ++i)
-    qdotA[i] *= -1;
+  for(int i=0; i<nrq_; ++i)
+    rqdot[i] *= -1;
       
   if(monitor_rhsQB_){
    cout << "CVodesInternal::rhsQB: end" << endl;
@@ -1285,36 +1270,36 @@ void CVodesInternal::initUserDefinedLinearSolver(){
   cv_mem->cv_setupNonNull = TRUE;
 }
 
-void CVodesInternal::initDenseLinearSolverB(int dir){
-  int flag = CVDenseB(mem_, whichB_[dir], nx_);
+void CVodesInternal::initDenseLinearSolverB(){
+  int flag = CVDenseB(mem_, whichB_, nx_);
   if(flag!=CV_SUCCESS) cvodes_error("CVDenseB",flag);
 }
   
-void CVodesInternal::initBandedLinearSolverB(int dir){
-  int flag = CVBandB(mem_, whichB_[dir], nx_, getOption("asens_upper_bandwidth").toInt(), getOption("asens_lower_bandwidth").toInt());
+void CVodesInternal::initBandedLinearSolverB(){
+  int flag = CVBandB(mem_, whichB_, nx_, getOption("asens_upper_bandwidth").toInt(), getOption("asens_lower_bandwidth").toInt());
   if(flag!=CV_SUCCESS) cvodes_error("CVBandB",flag);
 }
   
-void CVodesInternal::initIterativeLinearSolverB(int dir){
+void CVodesInternal::initIterativeLinearSolverB(){
   int maxl = getOption("asens_max_krylov");
   int flag;
   switch(itsol_g_){
     case SD_GMRES:
-      flag = CVSpgmrB(mem_, whichB_[dir], pretype_g_, maxl);
+      flag = CVSpgmrB(mem_, whichB_, pretype_g_, maxl);
       if(flag!=CV_SUCCESS) cvodes_error("CVSpgmrB",flag);
       break;
     case SD_BCGSTAB:
-      flag = CVSpbcgB(mem_, whichB_[dir], pretype_g_, maxl);
+      flag = CVSpbcgB(mem_, whichB_, pretype_g_, maxl);
       if(flag!=CV_SUCCESS) cvodes_error("CVSpbcgB",flag);
       break;
     case SD_TFQMR:
-      flag = CVSptfqmrB(mem_, whichB_[dir], pretype_g_, maxl);
+      flag = CVSptfqmrB(mem_, whichB_, pretype_g_, maxl);
       if(flag!=CV_SUCCESS) cvodes_error("CVSptfqmrB",flag);
       break;
   }
 }
 
-void CVodesInternal::initUserDefinedLinearSolverB(int dir){
+void CVodesInternal::initUserDefinedLinearSolverB(){
   casadi_assert_message(false, "Not implemented");
 }
 

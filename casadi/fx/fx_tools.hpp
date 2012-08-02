@@ -48,14 +48,14 @@ namespace CasADi{
     with tau dimensionless time.
     The Input/OuputScheme of the result is the same as the scheme of the dae, except for input(DAE_P), which is extended by t0 and tf at the top.
     */
-    MXFunction parameterizeTime(FX dae);
+    FX parameterizeTime(FX dae);
     
     /** \brief adapts an output function such that start and end time are parameters
     Applies the conversion  t = t0 + (tf-t0)*tau to the supplied dae.
     with tau dimensionless time.
     The InputScheme of the result is the same as the scheme of the dae, except for input(DAE_P), which is extended by t0 and tf at the top.
     */
-    MXFunction parameterizeTimeOutput(FX outputfcn);
+    FX parameterizeTimeOutput(FX outputfcn);
     
     /** \brief sample a function on a 1D grid
     * \param fx an initialized function mapping from single p-by-1 to single m-by-n

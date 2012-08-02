@@ -136,8 +136,6 @@ enum RDAEInput{
   RDAE_RX,
   /** Backward algebraic state */
   RDAE_RZ,
-  /** Backward parameter */
-  RDAE_RP,
   /** Forward differential state */
   RDAE_X,
   /** Forward algebraic state */
@@ -146,6 +144,8 @@ enum RDAEInput{
   RDAE_P,
   /** Explicit time dependence */
   RDAE_T,
+  /** Time derivative of differential states */
+  RDAE_XDOT,
   /** Time derivative of backward differential state */
   RDAE_RXDOT,
   /** Number of arguments. */
@@ -154,8 +154,8 @@ enum RDAEInput{
 
 /// Helper function to create ODE/DAE backward integration function input arguments
 template<class M>
-std::vector<M> rdaeIn(const M& rx, const M& rz=M(), const M& rp=M(), const M& x=M(), const M& z=M(), const M& p=M(), const M& t=M(), const M& rxdot=M()){
-  M ret[RDAE_NUM_IN] = {rx,rz,rp,x,z,p,t,rxdot};
+std::vector<M> rdaeIn(const M& rx, const M& rz=M(), const M& x=M(), const M& z=M(), const M& p=M(), const M& t=M(), const M& xdot=M(), const M& rxdot=M()){
+  M ret[RDAE_NUM_IN] = {rx,rz,x,z,p,t,xdot,rxdot};
   return std::vector<M>(ret,ret+RDAE_NUM_IN);
 }
 #ifdef SWIG
@@ -247,7 +247,7 @@ public:
   const IntegratorInternal* operator->() const;
   
   /// Reset the solver and bring the time back to t0 and state back to INTEGRATOR_X0
-  void reset(int nfdir=0, int nadir=0);
+  void reset(int nfdir=0);
 
   /// Integrate until a specified time point 
   void integrate(double t_out);

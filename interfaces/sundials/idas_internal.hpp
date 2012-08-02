@@ -80,7 +80,7 @@ class IdasInternal : public SundialsInternal{
   virtual void initAdj();
   
   /** \brief  Reset the solver and bring the time back to t0 */
-  virtual void reset(int nfdir, int nadir);
+  virtual void reset(int nfdir);
 
   /** \brief  Reset the solver of the adjoint problem and take time to tf */
   virtual void resetAdj();
@@ -145,14 +145,14 @@ class IdasInternal : public SundialsInternal{
   // Idas memory block
   void* mem_;
 
-  // N-vectors for the DAE integration
+  // N-vectors for the forward integration
   N_Vector xz_, xzdot_, q_;
+  
+  // N-vectors for the backward integration
+  N_Vector rxz_, rxzdot_, rq_;
 
   // N-vectors for the forward sensitivities
   std::vector<N_Vector> xzF_, xzdotF_, qF_;
-
-  // N-vectors for the adjoint sensitivities
-  std::vector<N_Vector> xzA_, xzdotA_, qA_;
 
   // Which components are differential
   N_Vector id_;
@@ -184,19 +184,19 @@ class IdasInternal : public SundialsInternal{
   void initUserDefinedLinearSolver();
   
   // Initialize the dense linear solver (backward integration)
-  void initDenseLinearSolverB(int dir);
+  void initDenseLinearSolverB();
   
   // Initialize the banded linear solver (backward integration)
-  void initBandedLinearSolverB(int dir);
+  void initBandedLinearSolverB();
   
   // Initialize the iterative linear solver (backward integration)
-  void initIterativeLinearSolverB(int dir);
+  void initIterativeLinearSolverB();
   
   // Initialize the user defined linear solver (backward integration)
-  void initUserDefinedLinearSolverB(int dir);
+  void initUserDefinedLinearSolverB();
   
   // Ids of backward problem
-  std::vector<int> whichB_;
+  int whichB_;
 
   int fsens_order_, asens_order_;
   

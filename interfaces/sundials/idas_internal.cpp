@@ -60,11 +60,15 @@ IdasInternal::IdasInternal(const FX& f, const FX& g) : SundialsInternal(f,g){
   addOption("init_z",                      OT_REALVECTOR, GenericType(), "Initial values for the algebraic states");
   
   mem_ = 0;
+  id_ = 0;
   
   xz_  = 0; 
   xzdot_ = 0, 
   q_ = 0;
-  id_ = 0;
+
+  rxz_ = 0;
+  rxzdot_ = 0;
+  rq_ = 0;
 
   is_init = false;
   isInitAdj_ = false;
@@ -78,22 +82,22 @@ IdasInternal::~IdasInternal(){
 
 void IdasInternal::freeIDAS(){
   if(mem_) IDAFree(&mem_);
+  if(id_) N_VDestroy_Serial(id_);
 
-  // N-vectors for the DAE integration
+  // Forward integration
   if(xz_) N_VDestroy_Serial(xz_);
   if(xzdot_) N_VDestroy_Serial(xzdot_);
   if(q_) N_VDestroy_Serial(q_);
-  if(id_) N_VDestroy_Serial(id_);
+  
+  // Backward integration
+  if(rxz_) N_VDestroy_Serial(rxz_);
+  if(rxzdot_) N_VDestroy_Serial(rxzdot_);
+  if(rq_) N_VDestroy_Serial(rq_);
   
     // Forward problem
   for(vector<N_Vector>::iterator it=xzF_.begin(); it != xzF_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
   for(vector<N_Vector>::iterator it=xzdotF_.begin(); it != xzdotF_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
   for(vector<N_Vector>::iterator it=qF_.begin(); it != qF_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
-
-  // Adjoint problem
-  for(vector<N_Vector>::iterator it=xzA_.begin(); it != xzA_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
-  for(vector<N_Vector>::iterator it=xzdotA_.begin(); it != xzdotA_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
-  for(vector<N_Vector>::iterator it=qA_.begin(); it != qA_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
 }
 
 void IdasInternal::updateNumSens(bool recursive){
@@ -368,25 +372,15 @@ void IdasInternal::init(){
     log("IdasInternal::init","initialized forward sensitivities");
   } // enable fsens
 
-  if(nadir_>0){
-      // Adjoint sensitivity problem
-      whichB_.resize(nadir_);
+  // Adjoint sensitivity problem
+  if(!g_.isNull()){
+    
+    // Allocate n-vectors
+    rxz_ = N_VNew_Serial(nx_+nz_);
+    rxzdot_ = N_VNew_Serial(nx_+nz_);
 
-      // Allocate n-vectors
-      xzA_.resize(nadir_);
-      xzdotA_.resize(nadir_);
-      for(int i=0; i<nadir_; ++i){
-        xzA_[i] = N_VNew_Serial(nx_+nz_);
-        xzdotA_[i] = N_VNew_Serial(nx_+nz_);
-      }
-
-      // Allocate n-vectors for the adjoint sensitivities of the parameters
-      if(np_>0){
-        qA_.resize(nadir_);
-        for(int i=0; i<nadir_; ++i){
-          qA_[i] = N_VMake_Serial(np_,&adjSens(INTEGRATOR_P,i).front());
-        }
-      }
+    // Allocate n-vectors for quadratures
+    rq_ = N_VMake_Serial(nrq_,output(INTEGRATOR_RQF).ptr());
   }
   log("IdasInternal::init","initialized adjoint sensitivities");
  
@@ -422,62 +416,59 @@ void IdasInternal::initAdj(){
   casadi_assert(!isInitAdj_);
   int flag;
   
-  for(int dir=0; dir<nadir_; ++dir){
+  // Create backward problem
+  flag = IDACreateB(mem_, &whichB_);
+  if(flag != IDA_SUCCESS) idas_error("IDACreateB",flag);
 
-    // Create backward problem
-    flag = IDACreateB(mem_, &whichB_[dir]);
-    if(flag != IDA_SUCCESS) idas_error("IDACreateB",flag);
-  
-    // Initialize the backward problem
-    double tB0 = tf_;
-    flag = IDAInitB(mem_, whichB_[dir], resB_wrapper, tB0, xzA_[dir], xzdotA_[dir]);
-    if(flag != IDA_SUCCESS) idas_error("IDAInitB",flag);
+  // Initialize the backward problem
+  double tB0 = tf_;
+  flag = IDAInitB(mem_, whichB_, resB_wrapper, tB0, rxz_, rxzdot_);
+  if(flag != IDA_SUCCESS) idas_error("IDAInitB",flag);
 
-    // Set tolerances
-    flag = IDASStolerancesB(mem_, whichB_[dir], asens_reltol_, asens_abstol_);
-    if(flag!=IDA_SUCCESS) idas_error("IDASStolerancesB",flag);
+  // Set tolerances
+  flag = IDASStolerancesB(mem_, whichB_, asens_reltol_, asens_abstol_);
+  if(flag!=IDA_SUCCESS) idas_error("IDASStolerancesB",flag);
 
-    // User data
-    flag = IDASetUserDataB(mem_, whichB_[dir], this);
-    if(flag != IDA_SUCCESS) idas_error("IDASetUserDataB",flag);
+  // User data
+  flag = IDASetUserDataB(mem_, whichB_, this);
+  if(flag != IDA_SUCCESS) idas_error("IDASetUserDataB",flag);
 
-    // Maximum number of steps
-    IDASetMaxNumStepsB(mem_, whichB_[dir], getOption("max_num_steps").toInt());
-    if(flag != IDA_SUCCESS) idas_error("IDASetMaxNumStepsB",flag);
-  
-    // Pass this information to IDAS
-    flag = IDASetIdB(mem_, whichB_[dir], id_);
-    if(flag != IDA_SUCCESS) idas_error("IDASetIdB",flag);
-      
-    // attach linear solver
-    switch(linsol_g_){
-      case SD_DENSE:
-        initDenseLinearSolverB(dir);
-        break;
-      case SD_BANDED:
-        initBandedLinearSolverB(dir);
-        break;
-      case SD_ITERATIVE:
-        initIterativeLinearSolverB(dir);
-        break;
-      case SD_USER_DEFINED:
-        initUserDefinedLinearSolverB(dir);
-        break;
-    }
+  // Maximum number of steps
+  IDASetMaxNumStepsB(mem_, whichB_, getOption("max_num_steps").toInt());
+  if(flag != IDA_SUCCESS) idas_error("IDASetMaxNumStepsB",flag);
+
+  // Pass this information to IDAS
+  flag = IDASetIdB(mem_, whichB_, id_);
+  if(flag != IDA_SUCCESS) idas_error("IDASetIdB",flag);
     
-    // Quadratures for the adjoint problem
-    N_VConst(0.0,qA_[dir]);
-    flag = IDAQuadInitB(mem_,whichB_[dir],rhsQB_wrapper,qA_[dir]);
-    if(flag!=IDA_SUCCESS) idas_error("IDAQuadInitB",flag);
+  // attach linear solver
+  switch(linsol_g_){
+    case SD_DENSE:
+      initDenseLinearSolverB();
+      break;
+    case SD_BANDED:
+      initBandedLinearSolverB();
+      break;
+    case SD_ITERATIVE:
+      initIterativeLinearSolverB();
+      break;
+    case SD_USER_DEFINED:
+      initUserDefinedLinearSolverB();
+      break;
+  }
   
-    // Quadrature error control
-    if(getOption("quad_err_con").toInt()){
-      flag = IDASetQuadErrConB(mem_, whichB_[dir],true);
-      if(flag != IDA_SUCCESS) idas_error("IDASetQuadErrConB",flag);
-      
-      flag = IDAQuadSStolerancesB(mem_, whichB_[dir], asens_reltol_, asens_abstol_);
-      if(flag != IDA_SUCCESS) idas_error("IDAQuadSStolerancesB",flag);
-    }
+  // Quadratures for the adjoint problem
+  N_VConst(0.0,rq_);
+  flag = IDAQuadInitB(mem_,whichB_,rhsQB_wrapper,rq_);
+  if(flag!=IDA_SUCCESS) idas_error("IDAQuadInitB",flag);
+
+  // Quadrature error control
+  if(getOption("quad_err_con").toInt()){
+    flag = IDASetQuadErrConB(mem_, whichB_,true);
+    if(flag != IDA_SUCCESS) idas_error("IDASetQuadErrConB",flag);
+    
+    flag = IDAQuadSStolerancesB(mem_, whichB_, asens_reltol_, asens_abstol_);
+    if(flag != IDA_SUCCESS) idas_error("IDAQuadSStolerancesB",flag);
   }
   
   // Mark initialized
@@ -664,21 +655,21 @@ int IdasInternal::resS_wrapper(int Ns, double t, N_Vector xz, N_Vector xzdot, N_
   }
 }
 
-void IdasInternal::reset(int nfdir, int nadir){
+void IdasInternal::reset(int nfdir){
   log("IdasInternal::reset","begin");
   
-  if(nadir>0 && !isInitTaping_)
+  if(!g_.isNull() && !isInitTaping_)
     initTaping();
   
   // If we have forward sensitivities, rest one extra time without forward sensitivities to get a consistent initial guess
   if(nfdir>0 && getOption("extra_fsens_calc_ic").toInt())
-    reset(0,nadir);
+    reset(0);
 
   // Reset timers
   t_res = t_fres = t_jac = t_lsolve = t_lsetup_jac = t_lsetup_fac = 0;
     
   fsens_order_ = nfdir>0;
-  asens_order_ = nadir>0;
+  asens_order_ = !g_.isNull();
   
   // Get the time horizon
   t_ = t0_;
@@ -846,30 +837,25 @@ void IdasInternal::integrate(double t_out){
 }
 
 void IdasInternal::resetAdj(){
-  
   int flag;
+  
   // Reset adjoint sensitivities for the parameters
-  for(int dir=0; dir<qA_.size(); ++dir)
-    N_VConst(0.0, qA_[dir]);
+  N_VConst(0.0, rq_);
   
   // Get the adjoint seeds
-  for(int i=0; i<nadir_; ++i){
-    const Matrix<double> &xf_aseed = adjSeed(INTEGRATOR_XF,i);
-    copy(xf_aseed.begin(),xf_aseed.end(),NV_DATA_S(xzA_[i]));
-  }
+  const Matrix<double> &xf_aseed = input(INTEGRATOR_RX0);
+  copy(xf_aseed.begin(),xf_aseed.end(),NV_DATA_S(rxz_));
     
   if(isInitAdj_){
-    for(int dir=0; dir<nadir_; ++dir){
-      flag = IDAReInitB(mem_, whichB_[dir], tf_, xzA_[dir], xzdotA_[dir]);
-      if(flag != IDA_SUCCESS) idas_error("IDAReInitB",flag);
-      
-      if(np_>0){
-	N_VConst(0.0,qA_[dir]);
-        flag = IDAQuadReInit(IDAGetAdjIDABmem(mem_, whichB_[dir]),qA_[dir]);
-        // flag = IDAQuadReInitB(mem_,whichB_[dir],qA_[dir]); // BUG in Sundials - do not use this!
-      }
-      if(flag!=IDA_SUCCESS) idas_error("IDAQuadReInitB",flag);
+    flag = IDAReInitB(mem_, whichB_, tf_, rxz_, rxzdot_);
+    if(flag != IDA_SUCCESS) idas_error("IDAReInitB",flag);
+    
+    if(np_>0){
+      N_VConst(0.0,rq_);
+      flag = IDAQuadReInit(IDAGetAdjIDABmem(mem_, whichB_),rq_);
+      // flag = IDAQuadReInitB(mem_,whichB_[dir],rq_[dir]); // BUG in Sundials - do not use this!
     }
+    if(flag!=IDA_SUCCESS) idas_error("IDAQuadReInitB",flag);
   } else {
     // Initialize the adjoint integration
     initAdj();
@@ -878,20 +864,18 @@ void IdasInternal::resetAdj(){
   // Correct initial values for the integration if necessary
   int calc_icB = getOption("calc_icB");
   if(calc_icB){
-    for(int dir=0; dir<nadir_; ++dir){
-      flag = IDACalcICB(mem_, whichB_[dir], t0_, xzA_[dir], xzdotA_[dir]);
-      if(flag != IDA_SUCCESS) idas_error("IDACalcICB",flag);
+    flag = IDACalcICB(mem_, whichB_, t0_, rxz_, rxzdot_);
+    if(flag != IDA_SUCCESS) idas_error("IDACalcICB",flag);
 
-      N_VPrint_Serial(xzA_[dir]);
-      N_VPrint_Serial(xzdotA_[dir]);
+    N_VPrint_Serial(rxz_);
+    N_VPrint_Serial(rxzdot_);
 
-      // Retrieve the initial values
-      flag = IDAGetConsistentICB(mem_, whichB_[dir], xzA_[dir], xzdotA_[dir]);
-      if(flag != IDA_SUCCESS) idas_error("IDAGetConsistentICB",flag);
-      
-      N_VPrint_Serial(xzA_[dir]);
-      N_VPrint_Serial(xzdotA_[dir]);
-    }
+    // Retrieve the initial values
+    flag = IDAGetConsistentICB(mem_, whichB_, rxz_, rxzdot_);
+    if(flag != IDA_SUCCESS) idas_error("IDAGetConsistentICB",flag);
+    
+    N_VPrint_Serial(rxz_);
+    N_VPrint_Serial(rxzdot_);
   }
 }
 
@@ -903,19 +887,15 @@ void IdasInternal::integrateAdj(double t_out){
 
   // Get the sensitivities
   double tret;
-  for(int dir=0; dir<nadir_; ++dir){
-    flag = IDAGetB(mem_, whichB_[dir], &tret, xzA_[dir], xzdotA_[dir]);
-    if(flag!=IDA_SUCCESS) idas_error("IDAGetB",flag);
+  flag = IDAGetB(mem_, whichB_, &tret, rxz_, rxzdot_);
+  if(flag!=IDA_SUCCESS) idas_error("IDAGetB",flag);
 
-    flag = IDAGetQuadB(mem_, whichB_[dir], &tret, qA_[dir]);
-    if(flag!=IDA_SUCCESS) idas_error("IDAGetQuadB",flag);
-  }
+  flag = IDAGetQuadB(mem_, whichB_, &tret, rq_);
+  if(flag!=IDA_SUCCESS) idas_error("IDAGetQuadB",flag);
   
   // Save the adjoint sensitivities
-  for(int i=0; i<nadir_; ++i){
-    const double *xz = NV_DATA_S(xzA_[i]);
-    copy(xz,xz+nx_,adjSens(INTEGRATOR_X0,i).begin());
-  }
+  const double *xz = NV_DATA_S(rxz_);
+  copy(xz,xz+nx_,output(INTEGRATOR_RXF).begin());
 }
 
 void IdasInternal::printStats(std::ostream &stream) const{
@@ -1090,22 +1070,21 @@ void IdasInternal::resB(double t, const double* xz, const double* xzdot, const d
   log("IdasInternal::resB","begin");
   
   // Pass inputs
-  g_new_.setInput(&t,RDAE_T);
-  g_new_.setInput(xz,RDAE_X);
-  g_new_.setInput(xz+nx_,RDAE_Z);
-//   g_new_.setInput(xzdot,RDAE_XDOT);
-  g_new_.setInput(input(INTEGRATOR_P),RDAE_P);
-  g_new_.setInput(xzA,RDAE_RX);
-  g_new_.setInput(xzA+nx_,RDAE_RZ);
-  g_new_.setInput(adjSeed(INTEGRATOR_QF).data(),RDAE_RP);
-  g_new_.setInput(xzdotA,RDAE_RXDOT);
+  g_.setInput(&t,RDAE_T);
+  g_.setInput(xz,RDAE_X);
+  g_.setInput(xz+nx_,RDAE_Z);
+  g_.setInput(xzdot,RDAE_XDOT);
+  g_.setInput(input(INTEGRATOR_P),RDAE_P);
+  g_.setInput(xzA,RDAE_RX);
+  g_.setInput(xzA+nx_,RDAE_RZ);
+  g_.setInput(xzdotA,RDAE_RXDOT);
   
   // Evaluate
-  g_new_.evaluate();
+  g_.evaluate();
 
   // Save to output
-  g_new_.getOutput(rrA,RDAE_ODE);
-  g_new_.getOutput(rrA+nx_,RDAE_ALG);
+  g_.getOutput(rrA,RDAE_ODE);
+  g_.getOutput(rrA+nx_,RDAE_ALG);
   
   // Negate as we are integrating backwards in time
   for(int i=0; i<nx_+nz_; ++i)
@@ -1129,24 +1108,23 @@ void IdasInternal::rhsQB(double t, const double* xz, const double* xzdot, const 
   log("IdasInternal::rhsQB","begin");
 
     // Pass inputs
-  g_new_.setInput(&t,RDAE_T);
-  g_new_.setInput(xz,RDAE_X);
-  g_new_.setInput(xz+nx_,RDAE_Z);
-//   g_new_.setInput(xzdot,RDAE_XDOT);
-  g_new_.setInput(input(INTEGRATOR_P),RDAE_P);
-  g_new_.setInput(xzA,RDAE_RX);
-  g_new_.setInput(xzA+nx_,RDAE_RZ);
-  g_new_.setInput(adjSeed(INTEGRATOR_QF).data(),RDAE_RP);
-  g_new_.setInput(xzdotA,RDAE_RXDOT);
+  g_.setInput(&t,RDAE_T);
+  g_.setInput(xz,RDAE_X);
+  g_.setInput(xz+nx_,RDAE_Z);
+  g_.setInput(xzdot,RDAE_XDOT);
+  g_.setInput(input(INTEGRATOR_P),RDAE_P);
+  g_.setInput(xzA,RDAE_RX);
+  g_.setInput(xzA+nx_,RDAE_RZ);
+  g_.setInput(xzdotA,RDAE_RXDOT);
   
   // Evaluate
-  g_new_.evaluate();
+  g_.evaluate();
 
   // Save to output
-  g_new_.getOutput(qdotA,RDAE_QUAD);
+  g_.getOutput(qdotA,RDAE_QUAD);
   
   // Negate as we are integrating backwards in time
-  for(int i=0; i<np_; ++i)
+  for(int i=0; i<nrq_; ++i)
     qdotA[i] *= -1;
   
   log("IdasInternal::rhsQB","end");
@@ -1503,36 +1481,36 @@ void IdasInternal::initUserDefinedLinearSolver(){
   IDA_mem->ida_setupNonNull = TRUE;
 }
 
-void IdasInternal::initDenseLinearSolverB(int dir){
-  int flag = IDADenseB(mem_, whichB_[dir], nx_+nz_);
+void IdasInternal::initDenseLinearSolverB(){
+  int flag = IDADenseB(mem_, whichB_, nx_+nz_);
   if(flag != IDA_SUCCESS) idas_error("IDADenseB",flag);
 }
   
-void IdasInternal::initBandedLinearSolverB(int dir){
-  int flag = IDABandB(mem_, whichB_[dir], nx_+nz_, getOption("asens_upper_bandwidth").toInt(), getOption("asens_lower_bandwidth").toInt());
+void IdasInternal::initBandedLinearSolverB(){
+  int flag = IDABandB(mem_, whichB_, nx_+nz_, getOption("asens_upper_bandwidth").toInt(), getOption("asens_lower_bandwidth").toInt());
   if(flag != IDA_SUCCESS) idas_error("IDABand",flag);
 }
   
-void IdasInternal::initIterativeLinearSolverB(int dir){
+void IdasInternal::initIterativeLinearSolverB(){
   int maxl = getOption("asens_max_krylov");
   int flag;
   switch(itsol_g_){
     case SD_GMRES:
-      flag = IDASpgmrB(mem_, whichB_[dir], maxl);
+      flag = IDASpgmrB(mem_, whichB_, maxl);
       if(flag != IDA_SUCCESS) idas_error("IDASpgmrB",flag);
       break;
     case SD_BCGSTAB:
-      flag = IDASpbcgB(mem_, whichB_[dir], maxl);
+      flag = IDASpbcgB(mem_, whichB_, maxl);
       if(flag != IDA_SUCCESS) idas_error("IDASpbcgB",flag);
       break;
     case SD_TFQMR:
-      flag = IDASptfqmrB(mem_, whichB_[dir], maxl);
+      flag = IDASptfqmrB(mem_, whichB_, maxl);
       if(flag != IDA_SUCCESS) idas_error("IDASptfqmrB",flag);
       break;
   }
 }
   
-void IdasInternal::initUserDefinedLinearSolverB(int dir){
+void IdasInternal::initUserDefinedLinearSolverB(){
   casadi_assert_message(false, "Not implemented");
 }
 

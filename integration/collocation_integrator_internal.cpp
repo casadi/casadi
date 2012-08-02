@@ -468,7 +468,7 @@ void CollocationIntegratorInternal::evaluate(int nfdir, int nadir){
   IntegratorInternal::evaluate(nfdir,nadir);
 }
 
-void CollocationIntegratorInternal::reset(int nfdir, int nadir){
+void CollocationIntegratorInternal::reset(int nfdir){
   
   // Pass the inputs
   const vector<double>& x0 = input(INTEGRATOR_X0).data();

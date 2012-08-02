@@ -112,7 +112,7 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
   }
   
   // Reset the integrator_
-  integrator_.reset(nfdir, nadir);
+  integrator_.reset(nfdir);
   
   // Advance solution in time
   for(int k=0; k<grid_.size(); ++k){

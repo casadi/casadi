@@ -168,10 +168,6 @@ void SundialsInternal::init(){
       linsol_.setOption(linear_solver_options);
     }
   }
-  
-  // Generate backwards integration problem
-  g_new_ = getAugmented(0,1).second;
-  g_new_.init();
 }
 
 void SundialsInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){

@@ -58,7 +58,7 @@ public:
   virtual void printStats(std::ostream &stream) const = 0;
 
     /** \brief  Reset the solver and bring the time back to t0 */
-  virtual void reset(int nfdir, int nadir) = 0;
+  virtual void reset(int nfdir) = 0;
 
     /** \brief  Reset the solver of the adjoint problem and take time to tf */
   virtual void resetAdj() = 0;

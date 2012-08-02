@@ -132,7 +132,7 @@ void RKIntegratorInternal::evaluate(int nfdir, int nadir){
   IntegratorInternal::evaluate(nfdir,nadir);
 }
 
-void RKIntegratorInternal::reset(int nfdir, int nadir){
+void RKIntegratorInternal::reset(int nfdir){
   // Pass the inputs
   yf_fun_.setInput(input(INTEGRATOR_X0),0);
   yf_fun_.setInput(input(INTEGRATOR_P),1);
@@ -149,7 +149,7 @@ void RKIntegratorInternal::reset(int nfdir, int nadir){
   }
   
   // Evaluate the function
-  yf_fun_.evaluate(nfdir,nadir);
+  yf_fun_.evaluate(nfdir);
   
   // Get the outputs
   yf_fun_.getOutput(output(INTEGRATOR_XF),0);
