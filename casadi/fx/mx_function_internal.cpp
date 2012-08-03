@@ -1001,66 +1001,68 @@ void MXFunctionInternal::collectFree(){
 }
 
 FX MXFunctionInternal::getDerivative(int nfwd, int nadj){
-	// Forward seeds
-	vector<vector<MX> > fseed(nfwd,inputv_);
-	for(int dir=0; dir<nfwd; ++dir){
-		// Replace symbolic inputs
-		for(vector<MX>::iterator i=fseed[dir].begin(); i!=fseed[dir].end(); ++i){
-			// Name of the forward seed
-			std::stringstream ss;
-			ss << "f";
-			if(nfwd>1) ss << dir;
-			ss << "_";
-			i->print(ss);
+  // Forward seeds
+  vector<vector<MX> > fseed(nfwd,inputv_);
+  for(int dir=0; dir<nfwd; ++dir){
+    // Replace symbolic inputs
+    for(vector<MX>::iterator i=fseed[dir].begin(); i!=fseed[dir].end(); ++i){
+      // Name of the forward seed
+      std::stringstream ss;
+      ss << "f";
+      if(nfwd>1) ss << dir;
+      ss << "_";
+      i->print(ss);
 
-			// Save to matrix
-			*i = MX(ss.str(),i->sparsity());
-		}
-	}
+      // Save to matrix
+      *i = MX(ss.str(),i->sparsity());
+      
+    }
+  }
+  
+  // Adjoint seeds
+  vector<vector<MX> > aseed(nadj,outputv_);
+  for(int dir=0; dir<nadj; ++dir){
+    // Replace symbolic inputs
+    int oind=0;
+    for(vector<MX>::iterator i=aseed[dir].begin(); i!=aseed[dir].end(); ++i, ++oind){
+      // Name of the adjoint seed
+      std::stringstream ss;
+      ss << "a";
+      if(nadj>1) ss << dir << "_";
+      ss << oind;
 
-	// Adjoint seeds
-	vector<vector<MX> > aseed(nadj,outputv_);
-	for(int dir=0; dir<nadj; ++dir){
-		// Replace symbolic inputs
-		int oind=0;
-		for(vector<MX>::iterator i=aseed[dir].begin(); i!=aseed[dir].end(); ++i, ++oind){
-			// Name of the adjoint seed
-			std::stringstream ss;
-			ss << "a";
-			if(nadj>1) ss << dir << "_";
-			ss << oind;
+      // Save to matrix
+      *i = MX(ss.str(),i->sparsity());
+      
+    }
+  }
+  
+  // Evaluate symbolically
+  vector<vector<MX> > fsens(nfwd,outputv_), asens(nadj,inputv_);
+  evalMX(inputv_,outputv_,fseed,fsens,aseed,asens,true);
 
-			// Save to matrix
-			*i = MX(ss.str(),i->sparsity());
-		}
-	}
+  // All inputs of the return function
+  vector<MX> ret_in;
+  ret_in.reserve(inputv_.size()*(1+nfwd) + outputv_.size()*nadj);
+  ret_in.insert(ret_in.end(),inputv_.begin(),inputv_.end());
+  for(int dir=0; dir<nfwd; ++dir)
+    ret_in.insert(ret_in.end(),fseed[dir].begin(),fseed[dir].end());
+  for(int dir=0; dir<nadj; ++dir)
+    ret_in.insert(ret_in.end(),aseed[dir].begin(),aseed[dir].end());
 
-	// Evaluate symbolically
-	vector<vector<MX> > fsens(nfwd,outputv_), asens(nadj,inputv_);
-    evalMX(inputv_,outputv_,fseed,fsens,aseed,asens,true);
+  // All outputs of the return function
+  vector<MX> ret_out;
+  ret_out.reserve(outputv_.size()*(1+nfwd) + inputv_.size()*nadj);
+  ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
+  for(int dir=0; dir<nfwd; ++dir)
+    ret_out.insert(ret_out.end(),fsens[dir].begin(),fsens[dir].end());
+  for(int dir=0; dir<nadj; ++dir)
+    ret_out.insert(ret_out.end(),asens[dir].begin(),asens[dir].end());
 
-    // All inputs of the return function
-    vector<MX> ret_in;
-    ret_in.reserve(inputv_.size()*(1+nfwd) + outputv_.size()*nadj);
-    ret_in.insert(ret_in.end(),inputv_.begin(),inputv_.end());
-	for(int dir=0; dir<nfwd; ++dir)
-		ret_in.insert(ret_in.end(),fseed[dir].begin(),fseed[dir].end());
-	for(int dir=0; dir<nadj; ++dir)
-		ret_in.insert(ret_in.end(),aseed[dir].begin(),aseed[dir].end());
-
-	// All outputs of the return function
-    vector<MX> ret_out;
-    ret_out.reserve(outputv_.size()*(1+nfwd) + inputv_.size()*nadj);
-    ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
-	for(int dir=0; dir<nfwd; ++dir)
-		ret_out.insert(ret_out.end(),fsens[dir].begin(),fsens[dir].end());
-	for(int dir=0; dir<nadj; ++dir)
-		ret_out.insert(ret_out.end(),asens[dir].begin(),asens[dir].end());
-
-	// Assemble function and return
-	MXFunction ret(ret_in,ret_out);
-	ret.init();
-	return ret;
+  // Assemble function and return
+  MXFunction ret(ret_in,ret_out);
+  ret.init();
+  return ret;
 }
 
 } // namespace CasADi

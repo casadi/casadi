@@ -36,11 +36,11 @@ using namespace std;
 namespace CasADi{
 
 MX vertcat(const vector<MX>& comp){
-  // Remove nulls
+  // Remove nulls and empty matrices
   vector<MX> c;
   c.reserve(comp.size());
   for(vector<MX>::const_iterator it=comp.begin(); it!=comp.end(); ++it)
-    if(!it->isNull())
+    if(!it->isNull() && !it->empty())
       c.push_back(*it);
   
   if(c.empty()){

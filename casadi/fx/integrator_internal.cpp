@@ -54,46 +54,7 @@ IntegratorInternal::~IntegratorInternal(){
 }
 
 void IntegratorInternal::evaluate(int nfdir, int nadir){
-  // Adjoint derivatives are calculated with source code transformation
-  if(nadir>0){
-    
-    // Get derivative function
-    FX dfcn = derivative(0,nadir);
-    
-    // Pass function values
-    dfcn.setInput(input(INTEGRATOR_X0),INTEGRATOR_X0);
-    input(INTEGRATOR_P).get(dfcn.input(INTEGRATOR_P).ptr());
-    adjSeed(INTEGRATOR_QF).get(dfcn.input(INTEGRATOR_P).ptr() + np_);
-    
-    // Pass forward seeds
-    for(int dir=0; dir<nfdir; ++dir){
-      fwdSeed(INTEGRATOR_X0,dir).get(dfcn.fwdSeed(INTEGRATOR_X0,dir));
-      dfcn.fwdSeed(INTEGRATOR_P,dir).setZero();
-      fwdSeed(INTEGRATOR_P,dir).get(dfcn.fwdSeed(INTEGRATOR_P,dir).ptr());
-    }
-    
-    // Pass adjoint seeds
-    casadi_assert(nadir==1);
-    dfcn.setInput(adjSeed(INTEGRATOR_XF),INTEGRATOR_RX0);
-    
-    // Evaluate with forward sensitivities
-    dfcn.evaluate(nfdir,0);
-    
-    // Get results
-    dfcn.getOutput(output(INTEGRATOR_XF),INTEGRATOR_XF);
-    
-    // Get forward sensitivities
-    for(int dir=0; dir<nfdir; ++dir){
-      dfcn.getFwdSens(fwdSens(INTEGRATOR_XF,dir),INTEGRATOR_XF,dir);
-      dfcn.getFwdSens(fwdSens(INTEGRATOR_QF,dir),INTEGRATOR_QF,dir);
-    }
-    
-    // Get adjoint sensitivities
-    casadi_assert(nadir==1);
-    dfcn.getOutput(adjSens(INTEGRATOR_X0),INTEGRATOR_RXF);
-    dfcn.getOutput(adjSens(INTEGRATOR_P),INTEGRATOR_RQF);
-    
-  } else {
+  if(nfdir>0 || nadir==0){
   
     // Reset solver
     reset(nfdir);
@@ -109,6 +70,43 @@ void IntegratorInternal::evaluate(int nfdir, int nadir){
 
       // Integrate backwards to the beginning
       integrateAdj(t0_);
+    }
+  }
+  
+  // Adjoint derivatives are calculated with source code transformation
+  if(nadir>0){ 
+    // NOTE: The following is a general functionality that should be moved to the base class
+    
+    // Get derivative function
+    FX dfcn = derivative(0,nadir);
+
+    // Pass function values
+    for(int i=0; i<INTEGRATOR_NUM_IN; ++i){
+      dfcn.setInput(input(i),i);
+    }
+    
+    // Pass adjoint seeds
+    for(int dir=0; dir<nadir; ++dir){
+      for(int i=0; i<INTEGRATOR_NUM_OUT; ++i){
+        dfcn.setInput(adjSeed(i,dir),INTEGRATOR_NUM_IN + dir*INTEGRATOR_NUM_OUT + i);
+      }
+    }
+    
+    // Evaluate to get function values and adjoint sensitivities
+    dfcn.evaluate();
+    
+    // Get nondifferentiated results
+    if(nfdir==0){
+      for(int i=0; i<INTEGRATOR_NUM_OUT; ++i){
+        dfcn.getOutput(output(i),i);
+      }
+    }
+    
+    // Get adjoint sensitivities 
+    for(int dir=0; dir<nadir; ++dir){
+      for(int i=0; i<INTEGRATOR_NUM_IN; ++i){
+        dfcn.getOutput(adjSens(i,dir),INTEGRATOR_NUM_OUT + dir*INTEGRATOR_NUM_IN + i);
+      }
     }
   }
   
@@ -359,13 +357,132 @@ FX IntegratorInternal::getDerivative(int nfwd, int nadj){
   std::pair<FX,FX> aug_dae = getAugmented(nfwd,nadj);
   
   // Create integrator for augmented DAE
-  Integrator ret;
-  ret.assignNode(create(aug_dae.first,aug_dae.second));
+  Integrator integrator;
+  integrator.assignNode(create(aug_dae.first,aug_dae.second));
   
   // Copy options
-  ret.setOption(dictionary());
+  integrator.setOption(dictionary());
   
-  return ret;
+  // Initialize the integrator since we will call it below
+  integrator.init();
+  
+  // All inputs of the return function
+  vector<MX> ret_in;
+  ret_in.reserve(INTEGRATOR_NUM_IN*(1+nfwd) + INTEGRATOR_NUM_OUT*nadj);
+  
+  // Augmented state
+  MX x0_aug, p_aug, rx0_aug;
+  
+  // Temp stringstream
+  stringstream ss;
+    
+  // Inputs or forward/adjoint seeds in one direction
+  vector<MX> dd;
+  
+  // Add nondifferentiated inputs and forward seeds
+  dd.resize(INTEGRATOR_NUM_IN);
+  for(int dir=-1; dir<nfwd; ++dir){
+    
+    // Differential state
+    ss.clear();
+    ss << "x0";
+    if(dir>=0) ss << "_" << dir;
+    dd[INTEGRATOR_X0] = msym(ss.str(),input(INTEGRATOR_X0).sparsity());
+    x0_aug.append(dd[INTEGRATOR_X0]);
+
+    // Parameter
+    ss.clear();
+    ss << "p";
+    if(dir>=0) ss << "_" << dir;
+    dd[INTEGRATOR_P] = msym(ss.str(),input(INTEGRATOR_P).sparsity());
+    p_aug.append(dd[INTEGRATOR_P]);
+    
+    // Backward state
+    ss.clear();
+    ss << "rx0";
+    if(dir>=0) ss << "_" << dir;
+    dd[INTEGRATOR_RX0] = msym(ss.str(),input(INTEGRATOR_RX0).sparsity());
+    rx0_aug.append(dd[INTEGRATOR_RX0]);
+    
+    // Add to input vector
+    ret_in.insert(ret_in.end(),dd.begin(),dd.end());
+  }
+    
+  // Add adjoint seeds
+  dd.resize(INTEGRATOR_NUM_OUT);
+  for(int dir=0; dir<nadj; ++dir){
+    
+    // Differential states become backward differential state
+    ss.clear();
+    ss << "xf" << "_" << dir;
+    dd[INTEGRATOR_XF] = msym(ss.str(),output(INTEGRATOR_XF).sparsity());
+    rx0_aug.append(dd[INTEGRATOR_XF]);
+
+    // Quadratures become parameters
+    ss.clear();
+    ss << "qf" << "_" << dir;
+    dd[INTEGRATOR_QF] = msym(ss.str(),output(INTEGRATOR_QF).sparsity());
+    p_aug.append(dd[INTEGRATOR_QF]);
+
+    // Backward differential states becomes forward differential states
+    ss.clear();
+    ss << "rxf" << "_" << dir;
+    dd[INTEGRATOR_RXF] = msym(ss.str(),output(INTEGRATOR_RXF).sparsity());
+    x0_aug.append(dd[INTEGRATOR_RXF]);
+    
+    // Backward quadratures becomes parameters
+    ss.clear();
+    ss << "rqf" << "_" << dir;
+    dd[INTEGRATOR_RQF] = msym(ss.str(),output(INTEGRATOR_RQF).sparsity());
+    p_aug.append(dd[INTEGRATOR_RQF]);
+    
+    // Add to input vector
+    ret_in.insert(ret_in.end(),dd.begin(),dd.end());
+  }
+  
+  // Call the integrator
+  vector<MX> integrator_in(INTEGRATOR_NUM_IN);
+  integrator_in[INTEGRATOR_X0] = x0_aug;
+  integrator_in[INTEGRATOR_P] = p_aug;
+  integrator_in[INTEGRATOR_RX0] = rx0_aug;
+  vector<MX> integrator_out = integrator.call(integrator_in);
+  
+  // Augmented results
+  MX xf_aug = integrator_out[INTEGRATOR_XF];
+  MX rxf_aug = integrator_out[INTEGRATOR_RXF];
+  MX qf_aug = integrator_out[INTEGRATOR_QF];
+  MX rqf_aug = integrator_out[INTEGRATOR_RQF];
+  
+  // Offset in each of the above vectors
+  int xf_offset = 0, rxf_offset = 0, qf_offset = 0, rqf_offset = 0;
+  
+  // All outputs of the return function
+  vector<MX> ret_out;
+  ret_out.reserve(INTEGRATOR_NUM_OUT*(1+nfwd) + INTEGRATOR_NUM_IN*nadj);
+  
+  // Collect the nondifferentiated results and forward sensitivities
+  dd.resize(INTEGRATOR_NUM_OUT);
+  fill(dd.begin(),dd.end(),MX());
+  for(int dir=-1; dir<nfwd; ++dir){
+    dd[INTEGRATOR_XF] = xf_aug[Slice(xf_offset,xf_offset+nx_)]; xf_offset += nx_;
+    if(nq_>0){ dd[INTEGRATOR_QF] = qf_aug[Slice(qf_offset,qf_offset+nq_)]; qf_offset += nq_; }
+    if(nrx_>0){ dd[INTEGRATOR_RXF] = rxf_aug[Slice(rxf_offset,rxf_offset+nrx_)]; rxf_offset += nrx_; }
+    if(nrq_>0){ dd[INTEGRATOR_RQF] = rqf_aug[Slice(rqf_offset,rqf_offset+nrq_)]; rqf_offset += nrq_; }
+    ret_out.insert(ret_out.end(),dd.begin(),dd.end());
+  }
+  
+  // Collect the adjoint sensitivities
+  dd.resize(INTEGRATOR_NUM_IN);
+  fill(dd.begin(),dd.end(),MX());
+  for(int dir=0; dir<nadj; ++dir){
+    dd[INTEGRATOR_X0] = rxf_aug[Slice(rxf_offset,rxf_offset+nx_)]; rxf_offset += nx_;
+    if(np_>0){ dd[INTEGRATOR_P] = rqf_aug[Slice(rqf_offset,rqf_offset+np_)]; rqf_offset += np_; }
+    if(nrx_>0){ dd[INTEGRATOR_RX0] = xf_aug[Slice(xf_offset,xf_offset+nrx_)]; xf_offset += nrx_; }
+    ret_out.insert(ret_out.end(),dd.begin(),dd.end());
+  }
+  
+  // Create derivative function and return
+  return MXFunction(ret_in,ret_out);
 }
 
 
