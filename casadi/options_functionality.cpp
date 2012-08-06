@@ -207,20 +207,23 @@ GenericType OptionsFunctionalityNode::getOption(const string &name) const{
 
   // Check if found
   if(it == dictionary_.end()){
-    stringstream ss;
-    if (allowed_options.find(name)!=allowed_options.end()) {
-      ss << "Option: '" << name << "' has not been set." << endl;
-      printOption(name,ss);
-    } else {
-      ss << "Option: '" << name << "' does not exist." << endl << endl;
-      std::vector<std::string> suggestions;
-      getBestMatches(name,suggestions,5);
-      ss << "Did you mean one of the following?" << endl;
-      for (int i=0;i<suggestions.size();++i)
-        printOption(suggestions[i],ss);
-      ss << "Use printOptions() to get a full list of options." << endl;
+    it = defaults_.find(name);
+    if(it == defaults_.end()){
+      stringstream ss;
+      if (allowed_options.find(name)!=allowed_options.end()) {
+        ss << "Option: '" << name << "' has not been set." << endl;
+        printOption(name,ss);
+      } else {
+        ss << "Option: '" << name << "' does not exist." << endl << endl;
+        std::vector<std::string> suggestions;
+        getBestMatches(name,suggestions,5);
+        ss << "Did you mean one of the following?" << endl;
+        for (int i=0;i<suggestions.size();++i)
+          printOption(suggestions[i],ss);
+        ss << "Use printOptions() to get a full list of options." << endl;
+      }
+      casadi_error(ss.str());
     }
-    casadi_error(ss.str());
   }
   
   // Return the option
@@ -267,9 +270,6 @@ void OptionsFunctionalityNode::addOption(const string &name, const opt_type& typ
   }
   // Insert current allowed_vals
   allowed_vals_vec.insert( allowed_vals_vec.end(), allowed_vals.begin(), allowed_vals.end() );
-  
-  if(!def_val.isNull())
-    dictionary_[name] = def_val;
 
   // Inherit description
   std::stringstream s;
@@ -295,10 +295,16 @@ void OptionsFunctionalityNode::printOption(const std::string &name, ostream &str
       
       // Check if the option has been set, and print it's value if it is.
       Dictionary::const_iterator dictionary_it=dictionary_.find(name);
-      if(dictionary_it==dictionary_.end())
-        stream << "(not set)";
-      else
+      if(dictionary_it==dictionary_.end()) {
+        dictionary_it = defaults_.find(name);
+        if (dictionary_it==defaults_.end()) {
+          stream << "(not set)";
+        } else {
+          stream << "(not set: defaulting to " << dictionary_it->second << ")";
+        }
+      } else {
         stream << "= " << dictionary_it->second;
+      }
       stream << endl;
       
       // Print out the description on a new line.
