@@ -250,6 +250,12 @@ class CRSSparsityInternal : public CachedObjectNode{
     
     /// Generate a script for Matlab or Octave which visualizes the sparsity using the spy command
     void spyMatlab(const std::string& mfile) const;
+ private: 
+    /// Time complexity: O(ii.size()*jj.size())
+    CRSSparsity getSub1(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
+    /// Time complexity: O(ii.size()*(nnz per row))
+    CRSSparsity getSub2(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
+
 };
 
 } // namespace CasADi

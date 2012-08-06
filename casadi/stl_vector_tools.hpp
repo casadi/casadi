@@ -102,6 +102,14 @@ namespace CasADi{
   */
   std::vector<int> complement(const std::vector<int> &v, int size);
   
+  /** \brief Returns a vector for quickly looking up entries of supplied list
+  *
+  *  lookupvector[i]!=-1     <=>  v contains i
+  *  v[lookupvector[i]] == i <=>  v contains i
+  *
+  */
+  std::vector<int> lookupvector(const std::vector<int> &v, int size);
+  
   /// Check if the vector is strictly increasing
   template<typename T>
   bool isIncreasing(const std::vector<T> &v);

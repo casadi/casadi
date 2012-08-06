@@ -168,6 +168,12 @@ class Matrixtests(casadiTestCase):
       y[-12:-9,2] = 0
     self.assertRaises(RuntimeError,test)
 
+  def huge_slice(self):
+    self.message("huge slice")
+    a = ssym("a",sp_diag(50000))
+
+    a[:,:]
+    
   def test_nonmonotonous_indexing(self):
     self.message("non-monotonous indexing")
     # Regression test for #354

@@ -2155,8 +2155,78 @@ CRSSparsity CRSSparsityInternal::getSub(const vector<int>& ii, const vector<int>
     casadi_error("Slicing [ii,jj] out of bounds. Your jj contains " << *std::min_element(jj.begin(),jj.end()) << " up to " << *std::max_element(jj.begin(),jj.end()) << ", which is outside of the matrix shape " << dimString() << ".");
   }
   
+  if (double(ii.size())*double(jj.size()) > size()) {
+    // Typical use case:
+    // a = ssym("a",sp_diag(50000))
+    // a[:,:]
+    return getSub2(ii,jj,mapping);
+  } else {
+    // Typical use case:
+    // a = DMatrix.ones(1000,1000)
+    // a[[0,1],[0,1]]
+    return getSub1(ii,jj,mapping);
+  }
 
+}
+
+CRSSparsity CRSSparsityInternal::getSub2(const vector<int>& ii, const vector<int>& jj, vector<int>& mapping) const{
+  std::vector<int> jj_sorted;
+  std::vector<int> jj_sorted_index;
+
+  std::vector<int> ii_sorted;
+  std::vector<int> ii_sorted_index;
+
+  sort(jj, jj_sorted, jj_sorted_index, true);
+  sort(ii, ii_sorted, ii_sorted_index, true);
+
+  std::vector<int> jjlookup = lookupvector(jj_sorted,ncol_);
   
+  // count the number of non-zeros
+  int nnz = 0;
+
+  // loop over the rows of the slice
+  for(int i=0;i<ii.size();++i){
+    int it = ii_sorted[i];
+    for(int el=rowind_[it]; el<rowind_[it+1]; ++el){ // loop over the non-zeros of the matrix
+      int j = col_[el];
+      if (jjlookup[j]!=-1) nnz++;
+    }
+  }
+
+  mapping.resize(nnz);
+  
+  vector<int> rows(nnz);
+  vector<int> cols(nnz);
+
+  int k = 0;
+  // loop over the row of the slice
+  for(int i=0;i<ii.size();++i){
+    int it = ii_sorted[i];
+    for(int el=rowind_[it]; el<rowind_[it+1]; ++el){ // loop over the non-zeros of the matrix
+      int jt = col_[el];
+      if (jjlookup[jt]!=-1) {
+        cols[k] = jj_sorted_index[jjlookup[jt]];
+        rows[k] = ii_sorted_index[i];
+        mapping[k] = el;
+        k++;
+      }
+    }
+  }
+
+  std::vector<int> sp_mapping;
+  std::vector<int> mapping_ = mapping;
+  CRSSparsity ret = sp_triplet(ii.size(),jj.size(),rows,cols,sp_mapping);
+  
+  for (int i=0;i<mapping.size();++i)
+    mapping[i] = mapping_[sp_mapping[i]];
+  
+  // Create sparsity pattern
+  return ret;
+}
+
+
+CRSSparsity CRSSparsityInternal::getSub1(const vector<int>& ii, const vector<int>& jj, vector<int>& mapping) const{
+
   std::vector<int> jj_sorted;
   std::vector<int> jj_sorted_index;
 
