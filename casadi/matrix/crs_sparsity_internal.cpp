@@ -2155,41 +2155,67 @@ CRSSparsity CRSSparsityInternal::getSub(const vector<int>& ii, const vector<int>
     casadi_error("Slicing [ii,jj] out of bounds. Your jj contains " << *std::min_element(jj.begin(),jj.end()) << " up to " << *std::max_element(jj.begin(),jj.end()) << ", which is outside of the matrix shape " << dimString() << ".");
   }
   
-  // NOTE: can be made more memory-efficient by making getNZ an iterator
-  // Get non-zeros
-  vector<int> kk = getNZ(ii,jj);
 
+  
+  std::vector<int> jj_sorted;
+  std::vector<int> jj_sorted_index;
+
+  std::vector<int> ii_sorted;
+  std::vector<int> ii_sorted_index;
+
+  sort(jj, jj_sorted, jj_sorted_index, true);
+  sort(ii, ii_sorted, ii_sorted_index, true);
+  
   // count the number of non-zeros
   int nnz = 0;
-  for(int k=0; k<kk.size(); ++k)
-    if(kk[k]!=-1)
-      nnz++;
-      
-  // Allocate sparsity vectors
-  vector<int> rowind(ii.size()+1,0);
-  vector<int> col(nnz);
+  
+  for(int i=0;i<ii.size();++i){
+    int it = ii_sorted[i];
+    int el=rowind_[it];
+    for(int j=0;j<jj_sorted.size();++j){
+      int jt=jj_sorted[j];
+      // Continue to the non-zero element
+      for(; el<rowind_[it+1] && col_[el]<jt; ++el){}
+      // Add the non-zero element, if there was an element in the location exists
+      if(el<rowind_[it+1] && col_[el]== jt) {
+        nnz++;
+      }
+    }
+  }
+  
   mapping.resize(nnz);
   
-  // Get sparsity
+  vector<int> rows(nnz);
+  vector<int> cols(nnz);
+  
+
   int k=0;
-  int el=0;
-  for(int i=0; i<ii.size(); ++i){
-    for(int j=0; j<jj.size(); ++j){
-      if(k<kk.size()){
-        if(kk[k]!=-1){
-          col[el] = j;
-          mapping[el] = kk[k];
-          el++;
-        }
+  for(int i=0;i<ii.size();++i){
+    int it = ii_sorted[i];
+    int K = rowind_[it];
+    for(int j=0;j<jj_sorted.size();++j){
+      int jt=jj_sorted[j];
+      // Continue to the non-zero element
+      for(; K<rowind_[it+1] && col_[K]<jt; ++K){}
+      // Add the non-zero element, if there was an element in the location exists
+      if(K<rowind_[it+1] && col_[K]== jt) {
+        cols[k] = jj_sorted_index[j];
+        rows[k] = ii_sorted_index[i];
+        mapping[k] = K;
         k++;
       }
     }
-    rowind[i+1]=el;
   }
   
+  std::vector<int> sp_mapping;
+  std::vector<int> mapping_ = mapping;
+  CRSSparsity ret = sp_triplet(ii.size(),jj.size(),rows,cols,sp_mapping);
+  
+  for (int i=0;i<mapping.size();++i)
+    mapping[i] = mapping_[sp_mapping[i]];
+  
   // Create sparsity pattern
-  CRSSparsity sp(ii.size(),jj.size(),col,rowind);
-  return sp;
+  return ret;
 }
 
 CRSSparsity CRSSparsityInternal::patternUnion(const CRSSparsity& y, vector<unsigned char>& mapping, bool f00_is_zero, bool f0x_is_zero, bool fx0_is_zero) const{
