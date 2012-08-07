@@ -74788,6 +74788,13 @@ The supplied vector may contain duplicates and may be non-monotonous The
 supplied vector will be checked for bounds The result vector is guaranteed
 to be monotonously increasing ";
 
+%feature("docstring")  CasADi::Interfaces::lookupvector "
+
+Returns a vector for quickly looking up entries of supplied list.
+
+lookupvector[i]!=-1 <=> v contains i v[lookupvector[i]] == i <=> v contains
+i ";
+
 %feature("docstring")  CasADi::Interfaces::get_bvec_t "
 
 Get an pointer of sets of booleans from a double vector. ";
@@ -74891,7 +74898,9 @@ values:  the vector that needs sorting
 
 sorted_values:  the sorted vector
 
-indices:  The indices into 'values' that cast it into 'sorted_values' ";
+indices:  The indices such that 'sorted_values= values[indices]'
+
+invert_indices:  Output indices such that 'sorted_values[indices=values' ";
 
 %feature("docstring")  CasADi::Interfaces::makeVector "
 
