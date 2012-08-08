@@ -33,6 +33,8 @@ enum ControlledDAEInput{
   CONTROL_DAE_T,
   /** State vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES */
   CONTROL_DAE_X,
+  /** Algebraic state vector (dimension np-by-1). */
+  CONTROL_DAE_Z,
   /** Parameter vector (dimension np-by-1). */
   CONTROL_DAE_P,
   /** Control vector (dimension nu-by-1). */
