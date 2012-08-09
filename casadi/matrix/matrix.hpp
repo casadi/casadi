@@ -33,6 +33,33 @@
 #include "generic_expression.hpp"
 
 namespace CasADi{
+
+template<class T>
+struct NonZero {
+  int k; // Non-zero index into matrix
+  int i; // Column into matrix
+  int j; // Row into matrix
+  T el;  // Element
+};
+
+template<class T>
+class NonZeroIterator : std::iterator< std::forward_iterator_tag, NonZero<T> > {
+public:
+    NonZeroIterator(const Matrix<T> & m);
+
+    NonZeroIterator<T>& operator++();
+
+    NonZero<T>& operator*();
+    
+    NonZeroIterator<T> begin();
+    NonZeroIterator<T> end();
+    bool operator==(const NonZeroIterator<T>& rhs);
+
+private:
+    Matrix<T> m_;
+    NonZero<T> nz;
+};
+
     
   //@{
   /** \brief Get typename */
