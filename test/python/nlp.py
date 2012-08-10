@@ -431,6 +431,34 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,str(Solver))
       self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,9,str(Solver))
       self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,9,str(Solver))
+
+  def testIPOPTrhb_gen_xnonfree(self):
+    self.message("rosenbrock, exact hessian generated, non-free x")
+    x=SX("x")
+    y=SX("y")
+    
+    obj=(1-x)**2+100*(y-x**2)**2
+    f=SXFunction([[x,y]],[obj])
+    
+    sigma=SX("sigma")
+    
+    for Solver in solvers:
+      if ("SQPMethod" in Solver.__name__):
+        continue # SQPMethod must have constraints
+      self.message(str(Solver))
+      solver = Solver(f)
+      for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
+        if solver.hasOption(k):
+          solver.setOption(k,v)
+      solver.setOption("verbose",True)
+      solver.setOption("generate_hessian",True)
+      solver.init()
+      solver.input(NLP_LBX).set([1,-10])
+      solver.input(NLP_UBX).set([1,10])
+      solver.solve()
+      self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,9,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,9,str(Solver))
       
   def testIPOPTrhb_par(self):
     self.message("rosenbrock, exact hessian, parametric")
