@@ -141,10 +141,11 @@
 */
 /** \defgroup scheme_ControlledDAEInput
 <table>
-<caption>Input scheme: CasADi::ControlledDAEInput  (CONTROL_DAE_NUM_IN = 9) </caption>
+<caption>Input scheme: CasADi::ControlledDAEInput  (CONTROL_DAE_NUM_IN = 10) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>CONTROL_DAE_T</td><td>Global physical time. (1-by-1)</td></tr>
 <tr><td>CONTROL_DAE_X</td><td>State vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES</td></tr>
+<tr><td>CONTROL_DAE_Z</td><td>Algebraic state vector (dimension np-by-1).</td></tr>
 <tr><td>CONTROL_DAE_P</td><td>Parameter vector (dimension np-by-1).</td></tr>
 <tr><td>CONTROL_DAE_U</td><td>Control vector (dimension nu-by-1).</td></tr>
 <tr><td>CONTROL_DAE_U_INTERP</td><td>Control vector, linearly interpolated (dimension nu-by-1).</td></tr>

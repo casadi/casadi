@@ -50908,6 +50908,20 @@ Check if the object has been initialized. ";
 Assert that the object has been initialized. ";
 
 
+// File: structCasADi_1_1NonZero.xml
+%feature("docstring") CasADi::NonZero "C++ includes: matrix.hpp ";
+
+
+// File: classCasADi_1_1NonZeroIterator.xml
+%feature("docstring") CasADi::NonZeroIterator "C++ includes: matrix.hpp ";
+
+%feature("docstring")  CasADi::NonZeroIterator::NonZeroIterator "";
+
+%feature("docstring")  CasADi::NonZeroIterator::begin "";
+
+%feature("docstring")  CasADi::NonZeroIterator::end "";
+
+
 // File: classCasADi_1_1NonZeros.xml
 %feature("docstring") CasADi::NonZeros "
 
