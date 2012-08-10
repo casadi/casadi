@@ -43,11 +43,13 @@ struct NonZero {
 };
 
 template<class T>
-class NonZeroIterator : std::iterator< std::forward_iterator_tag, NonZero<T> > {
+class NonZeroIterator : public std::iterator< std::forward_iterator_tag, NonZero<T> > {
 public:
     NonZeroIterator(const Matrix<T> & m);
 
+#ifndef SWIG
     NonZeroIterator<T>& operator++();
+#endif // SWIG
 
     NonZero<T>& operator*();
     
