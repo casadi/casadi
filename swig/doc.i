@@ -8058,7 +8058,7 @@ Parameters:
 -----------
 
 ffcn:  Continuous time dynamics, an CasADi::FX with the folowing mapping:
->Input scheme: CasADi::ControlledDAEInput (CONTROL_DAE_NUM_IN = 9)
+>Input scheme: CasADi::ControlledDAEInput (CONTROL_DAE_NUM_IN = 10)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
@@ -8067,6 +8067,9 @@ ffcn:  Continuous time dynamics, an CasADi::FX with the folowing mapping:
 | CONTROL_DAE_X                      | State vector (dimension nx-by-1).  |
 |                                    | Should have same amount of non-    |
 |                                    | zeros as DAEOutput:DAE_RES         |
++------------------------------------+------------------------------------+
+| CONTROL_DAE_Z                      | Algebraic state vector (dimension  |
+|                                    | np-by-1).                          |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_P                      | Parameter vector (dimension np-    |
 |                                    | by-1).                             |
@@ -8117,7 +8120,7 @@ Explicit time dependence               |
 derivative of differential states |
 +----------+----------------------------------------+
 
->Input scheme: CasADi::ControlledDAEInput (CONTROL_DAE_NUM_IN = 9)
+>Input scheme: CasADi::ControlledDAEInput (CONTROL_DAE_NUM_IN = 10)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
@@ -8126,6 +8129,9 @@ derivative of differential states |
 | CONTROL_DAE_X                      | State vector (dimension nx-by-1).  |
 |                                    | Should have same amount of non-    |
 |                                    | zeros as DAEOutput:DAE_RES         |
++------------------------------------+------------------------------------+
+| CONTROL_DAE_Z                      | Algebraic state vector (dimension  |
+|                                    | np-by-1).                          |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_P                      | Parameter vector (dimension np-    |
 |                                    | by-1).                             |
