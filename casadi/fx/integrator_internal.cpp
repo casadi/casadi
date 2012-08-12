@@ -206,49 +206,51 @@ std::pair<FX,FX> IntegratorInternal::getAugmented(int nfwd, int nadj){
     SXMatrix t = dae_in[DAE_T];
     SXMatrix xdot = dae_in[DAE_XDOT];
     
-    SXMatrix rx = ssym("rx",dae_out[DAE_ODE].sparsity());
-    SXMatrix rz = ssym("rz",dae_out[DAE_ALG].sparsity());
-    SXMatrix rxdot = ssym("rxdot",dae_out[DAE_ODE].sparsity());
-    SXMatrix rp = ssym("rp",dae_out[DAE_QUAD].sparsity());
+    vector<SXMatrix> rx = ssym("rx",dae_out[DAE_ODE].sparsity(),nadj);
+    vector<SXMatrix> rz = ssym("rz",dae_out[DAE_ALG].sparsity(),nadj);
+    vector<SXMatrix> rxdot = ssym("rxdot",dae_out[DAE_ODE].sparsity(),nadj);
+    vector<SXMatrix> rp = ssym("rp",dae_out[DAE_QUAD].sparsity(),nadj);
     
     // Is the ODE part explicit?
     bool ode_is_explict = xdot.size()==0;
     
     // Number of adjoint sweeps needed
-    int n_sweep = ode_is_explict ? 1 : 2;
+    int n_sweep = nadj*(ode_is_explict ? 1 : 2);
     
     vector<vector<SXMatrix> > dummy;
     vector<vector<SXMatrix> > aseed(n_sweep,dae_out);
-    aseed[0][DAE_ODE] = rx;
-    aseed[0][DAE_ALG] = rz;
-    aseed[0][DAE_QUAD] = rp;
-    if(!ode_is_explict){
-      aseed[1][DAE_ODE] = -rxdot;
-      aseed[1][DAE_ALG].setZero();
-      aseed[1][DAE_QUAD].setZero();
+    for(int dir=0; dir<nadj; ++dir){
+      aseed[dir][DAE_ODE] = rx[dir];
+      aseed[dir][DAE_ALG] = rz[dir];
+      aseed[dir][DAE_QUAD] = rp[dir];
+      if(!ode_is_explict){
+        aseed[nadj+dir][DAE_ODE] = -rxdot[dir];
+        aseed[nadj+dir][DAE_ALG].setZero();
+        aseed[nadj+dir][DAE_QUAD].setZero();
+      }
     }
     vector<vector<SXMatrix> > asens(n_sweep,dae_in);
     f.evalSX(dae_in,dae_out,dummy,dummy,aseed,asens,true);
     
     // Augment parameter vector
-    SXMatrix p_aug = vertcat(p,rp);
+    SXMatrix p_aug = vertcat(p,vertcat(rp));
     dae_in[DAE_P] = p_aug;
     
     // Formulate the backwards integration problem
     vector<SXMatrix> rdae_in(RDAE_NUM_IN);
-    rdae_in[RDAE_RX] = rx;
-    rdae_in[RDAE_RZ] = rz;
+    rdae_in[RDAE_RX] = rx.back();
+    rdae_in[RDAE_RZ] = rz.back();
     rdae_in[RDAE_X] = x;
     rdae_in[RDAE_Z] = z;
     rdae_in[RDAE_P] = p_aug;
     rdae_in[RDAE_T] = t;
     rdae_in[RDAE_XDOT] = xdot;
-    rdae_in[RDAE_RXDOT] = rxdot;
+    rdae_in[RDAE_RXDOT] = rxdot.back();
     
     vector<SXMatrix> rdae_out(RDAE_NUM_OUT);
     rdae_out[RDAE_ODE] = asens[0][DAE_X];
     if(ode_is_explict){
-      rdae_out[RDAE_ODE] += rxdot;
+      rdae_out[RDAE_ODE] += rxdot.back();
     } else {
       rdae_out[RDAE_ODE] += asens[1][DAE_XDOT];
     }
@@ -274,10 +276,10 @@ std::pair<FX,FX> IntegratorInternal::getAugmented(int nfwd, int nadj){
       MX t = dae_in[DAE_T];
       MX xdot = dae_in[DAE_XDOT];
     
-      MX rx = msym("rx",dae_out[DAE_ODE].sparsity());
-      MX rz = msym("rz",dae_out[DAE_ALG].sparsity());
-      MX rxdot = msym("rxdot",dae_out[DAE_ODE].sparsity());
-      MX rp = msym("rp",dae_out[DAE_QUAD].sparsity());
+      vector<MX> rx = msym("rx",dae_out[DAE_ODE].sparsity(),nadj);
+      vector<MX> rz = msym("rz",dae_out[DAE_ALG].sparsity(),nadj);
+      vector<MX> rxdot = msym("rxdot",dae_out[DAE_ODE].sparsity(),nadj);
+      vector<MX> rp = msym("rp",dae_out[DAE_QUAD].sparsity(),nadj);
     
       // Is the ODE part explicit?
       bool ode_is_explict = xdot.size()==0;
@@ -287,13 +289,13 @@ std::pair<FX,FX> IntegratorInternal::getAugmented(int nfwd, int nadj){
     
       vector<vector<MX> > dummy;
       vector<vector<MX> > aseed(n_sweep,dae_out);
-      aseed[0][DAE_ODE] = rx;
-      aseed[0][DAE_ALG] = rz;
-      aseed[0][DAE_QUAD] = rp;
+      aseed[0][DAE_ODE] = rx.back();
+      aseed[0][DAE_ALG] = rz.back();
+      aseed[0][DAE_QUAD] = rp.back();
       if(!ode_is_explict){
-        aseed[1][DAE_ODE] = -rxdot;
-        aseed[1][DAE_ALG] = MX::zeros(rz.size());
-        aseed[1][DAE_QUAD] = MX::zeros(rp.size());
+        aseed[1][DAE_ODE] = -rxdot.back();
+        aseed[1][DAE_ALG] = MX::zeros(rz.back().size());
+        aseed[1][DAE_QUAD] = MX::zeros(rp.back().size());
       }
       vector<vector<MX> > asens(n_sweep,dae_in);
       f.evalMX(dae_in,dae_out,dummy,dummy,aseed,asens,true);
@@ -304,7 +306,7 @@ std::pair<FX,FX> IntegratorInternal::getAugmented(int nfwd, int nadj){
       // Variables to replace
       vector<MX> v(2);
       v[0] = p;
-      v[1] = rp;
+      v[1] = rp.back();
       
       // What to replace with
       vector<MX> vdef(2);
@@ -320,20 +322,20 @@ std::pair<FX,FX> IntegratorInternal::getAugmented(int nfwd, int nadj){
       
       // Formulate the backwards integration problem, input...
       vector<MX> rdae_in(RDAE_NUM_IN);
-      rdae_in[RDAE_RX] = rx;
-      rdae_in[RDAE_RZ] = rz;
+      rdae_in[RDAE_RX] = rx.back();
+      rdae_in[RDAE_RZ] = rz.back();
       rdae_in[RDAE_X] = x;
       rdae_in[RDAE_Z] = z;
       rdae_in[RDAE_P] = p_aug;
       rdae_in[RDAE_T] = t;
       rdae_in[RDAE_XDOT] = xdot;
-      rdae_in[RDAE_RXDOT] = rxdot;
+      rdae_in[RDAE_RXDOT] = rxdot.back();
       
       // ... and output
       vector<MX> rdae_out(RDAE_NUM_OUT);
       rdae_out[RDAE_ODE] = asens[0][DAE_X];
       if(ode_is_explict){
-        rdae_out[RDAE_ODE] += rxdot;
+        rdae_out[RDAE_ODE] += rxdot.back();
       } else {
         rdae_out[RDAE_ODE] += asens[1][DAE_XDOT];
       }
