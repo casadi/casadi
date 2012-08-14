@@ -443,6 +443,7 @@ class Simulatortests(casadiTestCase):
     
     
   def test_simulator_sensitivities(self):
+    self.message("Forward sensitivities")
     t = SX("t")
 
     x  = SX("x") 
@@ -473,7 +474,7 @@ class Simulatortests(casadiTestCase):
     p_ = [b_,k_]
 
     # algebraic solution
-    sole = exp(-(b*t)/2)*((sin((sqrt(4-b**2)*t)/2)*(2*(dx0+x0*b)-x0*b))/sqrt(4-b**2)+x0*cos((sqrt(4-b**2)*t)/2))
+    sole = exp(-(b*t)/2)*((sin((sqrt(4*k-b**2)*t)/2)*(2*(dx0+x0*b)-x0*b))/sqrt(4*k-b**2)+x0*cos((sqrt(4*k-b**2)*t)/2))
     sol = SXFunction([[t],[x0,dx0],[b,k]],[vertcat([sole,jacobian(sole,t)])])
     sol.init()
     sol.input(0).set(50)
@@ -570,7 +571,113 @@ class Simulatortests(casadiTestCase):
       self.assertAlmostEqual(fwdSens_sim[1],fwdSens_exact[1], digits,"Forward sensitivity")
       self.assertAlmostEqual(fwdSens_csim[0],fwdSens_exact[0], digits,"Forward sensitivity")
       self.assertAlmostEqual(fwdSens_csim[1],fwdSens_exact[1], digits,"Forward sensitivity")
-        
+
+  def test_simulator_sensitivities_adj(self):
+    self.message("Adjoint sensitivities")
+    t = SX("t")
+
+    x  = SX("x") 
+    dx = SX("dx") 
+    v  = SX("v") 
+    dv = SX("dv") 
+
+    u = SX("u") 
+
+    b = SX("b")
+    b_ = 0.1
+    k = SX("k")
+    k_ = 1
+    
+
+    rhs = vertcat([v - dx, ( -  b*v - k*x) - dv ])
+    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_XDOT: [dx,dv], DAE_X: [x,v], DAE_P: [b,k]},daeOut(rhs))
+    f.init()
+    
+    cf=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_T: t, CONTROL_DAE_XDOT: [dx,dv], CONTROL_DAE_X: [x,v], CONTROL_DAE_P: [b,k]},[rhs])
+    cf.init()
+
+    x0 = SX("x0")
+    dx0 = SX("dx0")
+
+
+    X0 = DMatrix([1,0])
+    p_ = [b_,k_]
+    
+    
+    Te = 50
+
+    # algebraic solution
+    sole = exp(-(b*t)/2)*((sin((sqrt(4*k-b**2)*t)/2)*(2*(dx0+x0*b)-x0*b))/sqrt(4*k-b**2)+x0*cos((sqrt(4*k-b**2)*t)/2))
+    sol = SXFunction([[t],[x0,dx0],[b,k]],[vertcat([sole,jacobian(sole,t)])])
+    sol.init()
+    sol.input(0).set(Te)
+    sol.input(1).set(X0)
+    sol.input(2).set(p_)
+
+    Integrator = CVodesIntegrator
+  
+    integrator = Integrator(f)
+    #integrator.setOption("verbose",True)
+    #integrator.setOption("monitor",["integrate"])
+    integrator.setOption("asens_abstol",1e-12)
+    integrator.setOption("asens_reltol",1e-12)
+    integrator.setOption("fsens_err_con", True)
+    integrator.setOption("tf",Te)
+    integrator.init()
+
+    integrator.input(INTEGRATOR_X0).set(X0)
+    integrator.input(INTEGRATOR_P).set(p_)
+    integrator.adjSeed(INTEGRATOR_XF).set([1,0])
+    integrator.evaluate(0,1)
+    
+    adjSens_X0_int = DMatrix(integrator.adjSens(INTEGRATOR_X0))
+    adjSens_P_int = DMatrix(integrator.adjSens(INTEGRATOR_P))
+
+    N = 100
+    ts = linspace(0,Te,N)
+
+    sim=Simulator(integrator,ts)
+    sim.init()
+    sim.input(INTEGRATOR_X0).set(X0)
+    sim.input(INTEGRATOR_P).set(p_)
+    sim.adjSeed(0).set([0,0]*(N-1) + [1,0])
+    sim.evaluate(0,1)
+
+    adjSens_X0_sim = DMatrix(sim.adjSens(INTEGRATOR_X0))
+    adjSens_P_sim = DMatrix(sim.adjSens(INTEGRATOR_P))
+
+    
+    csim = ControlSimulator(cf,ts)
+    csim.setOption("integrator",Integrator)
+    csim.setOption("integrator_options",{"asens_abstol": 1e-12, "asens_reltol": 1e-12, "fsens_err_con": True, "steps_per_checkpoint":1000})
+    csim.init()
+    csim.input(CONTROLSIMULATOR_X0).set(X0)
+    csim.input(CONTROLSIMULATOR_P).set(p_)
+    csim.adjSeed(0).set([0,0]*(N-1) + [1,0])
+    csim.evaluate(0,1)
+    adjSens_X0_csim = DMatrix(sim.adjSens(INTEGRATOR_X0))
+    adjSens_P_csim = DMatrix(sim.adjSens(INTEGRATOR_P))
+    
+    sol.adjSeed().set([1,0])
+    sol.evaluate(0,1)
+    adjSens_X0_exact = sol.adjSens(1)
+    adjSens_P_exact = sol.adjSens(2)
+    
+    digits = 3
+
+    self.assertAlmostEqual(adjSens_X0_int[0],adjSens_X0_exact[0],digits,"Adjoint sensitivity")
+    self.assertAlmostEqual(adjSens_X0_int[1],adjSens_X0_exact[1],digits,"Adjoint sensitivity")
+    self.assertAlmostEqual(adjSens_X0_sim[0],adjSens_X0_exact[0],digits,"Adjoint sensitivity")
+    self.assertAlmostEqual(adjSens_X0_sim[1],adjSens_X0_exact[1],digits,"Adjoint sensitivity")
+    self.assertAlmostEqual(adjSens_X0_csim[0],adjSens_X0_exact[0],digits,"Adjoint sensitivity")
+    self.assertAlmostEqual(adjSens_X0_csim[1],adjSens_X0_exact[1],digits,"Adjoint sensitivity")
+
+    self.assertAlmostEqual(adjSens_P_int[0],adjSens_P_exact[0],digits,"Adjoint sensitivity")
+    self.assertAlmostEqual(adjSens_P_int[1],adjSens_P_exact[1],digits,"Adjoint sensitivity")
+    self.assertAlmostEqual(adjSens_P_sim[0],adjSens_P_exact[0],digits,"Adjoint sensitivity")
+    self.assertAlmostEqual(adjSens_P_sim[1],adjSens_P_exact[1],digits,"Adjoint sensitivity")
+    self.assertAlmostEqual(adjSens_P_csim[0],adjSens_P_exact[0],digits,"Adjoint sensitivity")
+    self.assertAlmostEqual(adjSens_P_csim[1],adjSens_P_exact[1],digits,"Adjoint sensitivity")
     
 if __name__ == '__main__':
     unittest.main()
