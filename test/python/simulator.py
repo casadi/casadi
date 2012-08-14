@@ -520,7 +520,7 @@ class Simulatortests(casadiTestCase):
       csim.fwdSeed(CONTROLSIMULATOR_X0).set([1,0])
       csim.fwdSeed(CONTROLSIMULATOR_P).set([0,0])
       csim.evaluate(1,0)
-      fwdSens_csim = DMatrix(sim.fwdSens(INTEGRATOR_XF)[-1,:])
+      fwdSens_csim = DMatrix(csim.fwdSens(INTEGRATOR_XF)[-1,:])
       
       sol.fwdSeed(1).set([1,0])
       sol.fwdSeed(2).set([0,0])
