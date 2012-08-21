@@ -55,7 +55,10 @@ public:
 
   Integrator integrator_;
   FX output_fcn_;
+  
   std::vector<double> grid_;
+  
+  std::vector< Matrix<double> > states_;
 };
   
 } // namespace CasADi

@@ -88,10 +88,21 @@ void SimulatorInternal::init(){
       casadi_assert_message(output_fcn_.output(i).size2()==1,"SimulatorInternal::init: Output function output #" << i << " has shape " << output_fcn_.output(i).dimString() << ", while a column-matrix shape is expected.");
     }
   }
+  
+  casadi_assert_message( output_fcn_.input(DAE_T).numel() <=1, "SimulatorInternal::init: output_fcn DAE_T argument must be scalar or empty, but got " << output_fcn_.input(DAE_T).dimString());
 
+  casadi_assert_message( output_fcn_.input(DAE_P).empty() || integrator_.input(INTEGRATOR_P).sparsity()== output_fcn_.input(DAE_P).sparsity(), "SimulatorInternal::init: output_fcn DAE_P argument must be empty or have dimension " << integrator_.input(INTEGRATOR_P).dimString() << ", but got " << output_fcn_.input(DAE_P).dimString());
+
+  casadi_assert_message( output_fcn_.input(DAE_X).empty() || integrator_.input(INTEGRATOR_X0).sparsity()== output_fcn_.input(DAE_X).sparsity(), "SimulatorInternal::init: output_fcn DAE_X argument must be empty or have dimension " << integrator_.input(INTEGRATOR_X0).dimString() << ", but got " << output_fcn_.input(DAE_X).dimString());
+  
   // Call base class method
   FXInternal::init();
   
+  states_.resize(grid_.size());
+  for (int k = 0; k < grid_.size(); ++k) {
+    states_[k]=Matrix<double>::zeros(integrator_.input(INTEGRATOR_X0).size1());
+  }
+    
 }
 
 void SimulatorInternal::evaluate(int nfdir, int nadir){
@@ -137,6 +148,9 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
       output_fcn_.setInput(integrator_.output(INTEGRATOR_XF),DAE_X);
     if(output_fcn_.input(DAE_P).size()!=0)
       output_fcn_.setInput(input(INTEGRATOR_P),DAE_P);
+      
+    // Save the states for use in backwards sensitivities
+    states_[k].set(integrator_.output(INTEGRATOR_XF));
 
     for(int dir=0; dir<nfdir; ++dir){
       // Pass the forward seed to the output function
@@ -167,45 +181,58 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
     }
   }
   
+  
+
   // Adjoint sensitivities
   if(nadir>0){
-    casadi_assert_message(0, "not implemented");
 
-    // Clear the seeds
+    adjSens(INTEGRATOR_X0).setAll(0);
+    adjSens(INTEGRATOR_P).setAll(0);
+
     for(int dir=0; dir<nadir; ++dir){
+      // Pass the adjoint seeds to the output function
       integrator_.adjSeed(INTEGRATOR_XF,dir).setAll(0);
     }
-
-    // Reset the integrator for backward integration
-    integrator_.resetAdj();
-
+      
+      
     // Integrate backwards
     for(int k=grid_.size()-1; k>=0; --k){
-      
-      // Integrate back to the previous grid point
-      integrator_.integrateAdj(grid_[k]);
-      
-      // HERE I NEED THE STATE VECTOR!
-      
-      // Pass the state to the 
-      
-      // Pass adjoint seeds to integrator
-/*      for(int i=0; i<xfs.size(); ++i)
-        xfs.at(i) = x0s.at(i) + xf_seed.at(k*xfs.size() + i);
-      
-      // Add the contribution to the parameter sensitivity
-      for(int i=0; i<ps.size(); ++i)
-        ps_sim[i] += ps[i];
 
-      // Reset the integrator to deal with the jump in seeds
-      integrator_->resetAdj();*/
+      // Pass integrator output to the output function
+      if(output_fcn_.input(DAE_T).size()!=0)
+        output_fcn_.setInput(grid_[k],DAE_T);
+      if(output_fcn_.input(DAE_X).size()!=0)
+        output_fcn_.setInput(states_[k],DAE_X);
+      if(output_fcn_.input(DAE_P).size()!=0)
+        output_fcn_.setInput(input(INTEGRATOR_P),DAE_P);
+
+      for(int dir=0; dir<nadir; ++dir){
+        // Pass the adjoint seeds to the output function
+        output_fcn_.setAdjSeed(trans(adjSeed(INTEGRATOR_XF,dir)(k,ALL)),INTEGRATOR_XF,dir);
+      }
+      
+      // Evaluate output function
+      output_fcn_.evaluate(0,nadir);
+    
+      for(int dir=0; dir<nadir; ++dir){
+        // Pass the adjoint seeds to the output function
+        adjSens(INTEGRATOR_P,dir).set(adjSens(INTEGRATOR_P,dir)+output_fcn_.adjSens(DAE_P,dir));
+        integrator_.setAdjSeed(integrator_.adjSeed(INTEGRATOR_XF,dir)+output_fcn_.adjSens(DAE_X,dir),INTEGRATOR_XF,dir);
+      }
+      
+      if (k>0) {
+        integrator_.resetAdj();
+        integrator_.integrateAdj(grid_[k-1]);
+      }
+
     }
     
-    // Save
-/*    vector<double> &x0_sim = input(SIMULATOR_X0).data(1);
-    copy(x0s.begin(),x0s.end(),x0_sim.begin());*/
-    
   }
+  
+ for(int dir=0; dir<nadir; ++dir){
+   adjSens(INTEGRATOR_X0,dir).set(integrator_.adjSens(INTEGRATOR_X0,dir));
+   adjSens(INTEGRATOR_P,dir).set(integrator_.adjSens(INTEGRATOR_P,dir));
+ }
 
 }
 
@@ -217,11 +244,13 @@ void SimulatorInternal::updateNumSens(bool recursive){
   
   if (!output_fcn_.isNull()) {
     output_fcn_.setOption("number_of_fwd_dir",getOption("number_of_fwd_dir"));
+    output_fcn_.setOption("number_of_adj_dir",getOption("number_of_adj_dir"));
     output_fcn_.updateNumSens();
   }
     
   if (!integrator_.isNull()) {
     integrator_.setOption("number_of_fwd_dir",getOption("number_of_fwd_dir"));
+    integrator_.setOption("number_of_adj_dir",getOption("number_of_adj_dir"));
     integrator_.updateNumSens();
   }
 }
