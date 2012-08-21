@@ -1223,7 +1223,7 @@ void Matrix<T>::mul_no_alloc(const Matrix<T> &x, const Matrix<T> &y_trans, Matri
   #ifdef WITH_EIGEN3
   if (x.dense() && y_trans.dense() && z.dense()) {
     Eigen::Map< const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic , Eigen::RowMajor > > X(&x_data[0],x.size1(),x.size2());
-    Eigen::Map< const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic > > Y(&y_trans_data[0],y_trans.size1(),y_trans.size2());
+    Eigen::Map< const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic > > Y(&y_trans_data[0],y_trans.size2(),y_trans.size1());
     Eigen::Map< Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic , Eigen::RowMajor> > Z(&z.data()[0],z.size1(),z.size2());
     Z = X*Y;
     return;
@@ -1433,9 +1433,13 @@ Matrix<T> Matrix<T>::matrix_scalar(int op, const Matrix<T> &x, const Matrix<T> &
 
 template<class T>
 Matrix<T> Matrix<T>::matrix_matrix(int op, const Matrix<T> &x, const Matrix<T> &y){
-  casadi_assert_message(x.size1() == y.size1() && x.size2() == y.size2(),
-    "matrix_matrix: dimension mismatch in element-wise matrix operation." << std::endl << "Left argument has shape " << x.dimString() << ", right has shape " << y.dimString() << ". They should be equal."
-  ); 
+
+  if (!(x.size1() == y.size1() && x.size2() == y.size2())) {
+    std::stringstream ss;
+    casadi_math<T>::print(op,ss,"lhs","rhs");
+    casadi_error("matrix_matrix: dimension mismatch in element-wise matrix operation " << ss.str() <<"." << std::endl << "Left argument has shape " << x.dimString() << ", right has shape " << y.dimString() << ". They should be equal."
+    ); 
+  }
 
   // Nonzeros
   const std::vector<T>& x_data = x.data();
@@ -1577,6 +1581,49 @@ void Matrix<T>::append(const Matrix<T>& y){
   // Add the non-zeros
   data().insert(end(),y.begin(),y.end());
 }
+
+template<class T>
+NonZeroIterator<T>::NonZeroIterator(const Matrix<T> & m) 
+                     : m_(m) {
+  nz.i  = 0;
+  nz.j  = 0;
+  nz.k  = 0;
+}
+
+template<class T>
+bool NonZeroIterator<T>::operator==(const NonZeroIterator<T>& rhs) {return (m_ == rhs.m_) && (nz.k==rhs.nz.k);}
+
+template<class T>
+NonZero<T>& NonZeroIterator<T>::operator*() {
+  
+  return nz;
+}
+    
+template<class T>
+NonZeroIterator<T>& NonZeroIterator<T>::operator++() {
+  nz.k ++;
+  
+  if (nz.k < m_.size()) {
+    nz.j = m_.col()[nz.k];
+    nz.el = m_.data()[nz.k];
+    while (nz.k>=m_.rowind(nz.i)) {nz.i++; }
+  }
+  return *this;
+}
+
+template<class T>
+NonZeroIterator<T> NonZeroIterator<T>::begin() {
+  NonZeroIterator<T> it = NonZeroIterator<T>(m_);
+  return it;
+
+}
+template<class T>
+NonZeroIterator<T> NonZeroIterator<T>::end() {
+  NonZeroIterator<T> it = NonZeroIterator<T>(m_);
+  it.nz.k = m_.size()-1;
+  return it;
+}
+
 
 } // namespace CasADi
 

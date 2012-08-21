@@ -100,6 +100,11 @@ class CasadiException : public std::exception{
 // String denoting where the assertation is situated
 #define CASADI_ASSERT_WHERE " on line " CASADI_ASSERT_STR(__LINE__) " of file " CASADI_ASSERT_STR(__FILE__)
 
+#define casadi_log(msg) \
+  if(verbose()){ \
+    std::cout << "CasADi log message: " << msg << std::endl; \
+  }
+  
 #define casadi_error(msg) \
  {\
   std::stringstream ss_internal_; \

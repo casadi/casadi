@@ -8058,7 +8058,7 @@ Parameters:
 -----------
 
 ffcn:  Continuous time dynamics, an CasADi::FX with the folowing mapping:
->Input scheme: CasADi::ControlledDAEInput (CONTROL_DAE_NUM_IN = 9)
+>Input scheme: CasADi::ControlledDAEInput (CONTROL_DAE_NUM_IN = 10)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
@@ -8067,6 +8067,9 @@ ffcn:  Continuous time dynamics, an CasADi::FX with the folowing mapping:
 | CONTROL_DAE_X                      | State vector (dimension nx-by-1).  |
 |                                    | Should have same amount of non-    |
 |                                    | zeros as DAEOutput:DAE_RES         |
++------------------------------------+------------------------------------+
+| CONTROL_DAE_Z                      | Algebraic state vector (dimension  |
+|                                    | np-by-1).                          |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_P                      | Parameter vector (dimension np-    |
 |                                    | by-1).                             |
@@ -8117,7 +8120,7 @@ Explicit time dependence               |
 derivative of differential states |
 +----------+----------------------------------------+
 
->Input scheme: CasADi::ControlledDAEInput (CONTROL_DAE_NUM_IN = 9)
+>Input scheme: CasADi::ControlledDAEInput (CONTROL_DAE_NUM_IN = 10)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
@@ -8126,6 +8129,9 @@ derivative of differential states |
 | CONTROL_DAE_X                      | State vector (dimension nx-by-1).  |
 |                                    | Should have same amount of non-    |
 |                                    | zeros as DAEOutput:DAE_RES         |
++------------------------------------+------------------------------------+
+| CONTROL_DAE_Z                      | Algebraic state vector (dimension  |
+|                                    | np-by-1).                          |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_P                      | Parameter vector (dimension np-    |
 |                                    | by-1).                             |
@@ -35670,6 +35676,109 @@ n: number of decision variables (x)     m: number of constraints (A)
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
+| BarRule      | OT_INTEGER   | 0            | Barrier Rule | CasADi::Knit |
+|              |              |              |              | roInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| Debug        | OT_INTEGER   | 0            | Debug level  | CasADi::Knit |
+|              |              |              |              | roInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| Delta        | OT_REAL      | 1            | Initial      | CasADi::Knit |
+|              |              |              | region       | roInternal   |
+|              |              |              | scaling      |              |
+|              |              |              | factor       |              |
++--------------+--------------+--------------+--------------+--------------+
+| FeasModeTol  | OT_REAL      | 0.000        | Feasible     | CasADi::Knit |
+|              |              |              | mode         | roInternal   |
+|              |              |              | tolerance    |              |
++--------------+--------------+--------------+--------------+--------------+
+| FeasTol      | OT_REAL      | 0.000        | Feasible     | CasADi::Knit |
+|              |              |              | tolerance    | roInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| FeasTolAbs   | OT_REAL      | 1            | Absolute     | CasADi::Knit |
+|              |              |              | feasible     | roInternal   |
+|              |              |              | tolerance    |              |
++--------------+--------------+--------------+--------------+--------------+
+| Feasible     | OT_BOOLEAN   | 0            | Allow        | CasADi::Knit |
+|              |              |              | infeasible   | roInternal   |
+|              |              |              | iterations   |              |
++--------------+--------------+--------------+--------------+--------------+
+| GradOpt      | OT_INTEGER   | 1            | Gradient     | CasADi::Knit |
+|              |              |              | calculation  | roInternal   |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| HessOpt      | OT_INTEGER   | 1            | Hessian      | CasADi::Knit |
+|              |              |              | calculation  | roInternal   |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| HonorBnds    | OT_BOOLEAN   | 0            | Enforce      | CasADi::Knit |
+|              |              |              | bounds       | roInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| InitPt       | OT_BOOLEAN   | 0            | Use initial  | CasADi::Knit |
+|              |              |              | point        | roInternal   |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
+| LPSolver     | OT_BOOLEAN   | 0            | Use LPSolver | CasADi::Knit |
+|              |              |              |              | roInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| LmSize       | OT_INTEGER   | 10           | Memory       | CasADi::Knit |
+|              |              |              | pairsize     | roInternal   |
+|              |              |              | limit        |              |
++--------------+--------------+--------------+--------------+--------------+
+| MaxCgIt      | OT_INTEGER   | 0            | Maximum      | CasADi::Knit |
+|              |              |              | conjugate    | roInternal   |
+|              |              |              | gradient     |              |
+|              |              |              | iterations   |              |
++--------------+--------------+--------------+--------------+--------------+
+| MaxIt        | OT_INTEGER   | 10000        | Iteration    | CasADi::Knit |
+|              |              |              | limit        | roInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| Mu           | OT_REAL      | 0.100        | Initial      | CasADi::Knit |
+|              |              |              | barrier      | roInternal   |
+|              |              |              | parameter    |              |
++--------------+--------------+--------------+--------------+--------------+
+| Multistart   | OT_BOOLEAN   | 0            | Use          | CasADi::Knit |
+|              |              |              | multistart   | roInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| NewPoint     | OT_BOOLEAN   | 0            | Select new-  | CasADi::Knit |
+|              |              |              | point        | roInternal   |
+|              |              |              | feature      |              |
++--------------+--------------+--------------+--------------+--------------+
+| ObjRange     | OT_REAL      | 0.000        | Maximum      | CasADi::Knit |
+|              |              |              | objective    | roInternal   |
+|              |              |              | value        |              |
++--------------+--------------+--------------+--------------+--------------+
+| OptTol       | OT_REAL      | 0.000        | Relative     | CasADi::Knit |
+|              |              |              | optimality   | roInternal   |
+|              |              |              | tolerance    |              |
++--------------+--------------+--------------+--------------+--------------+
+| OptTolAbs    | OT_REAL      | 0            | Absolute     | CasADi::Knit |
+|              |              |              | optimality   | roInternal   |
+|              |              |              | tolerance    |              |
++--------------+--------------+--------------+--------------+--------------+
+| OutLev       | OT_INTEGER   | 2            | Log output   | CasADi::Knit |
+|              |              |              | level        | roInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| Pivot        | OT_REAL      | 0.000        | Initial      | CasADi::Knit |
+|              |              |              | pivot        | roInternal   |
+|              |              |              | threshold    |              |
++--------------+--------------+--------------+--------------+--------------+
+| Scale        | OT_BOOLEAN   | 1            | Perform      | CasADi::Knit |
+|              |              |              | scaling      | roInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| ShiftInit    | OT_BOOLEAN   | 1            | Interior-    | CasADi::Knit |
+|              |              |              | point        | roInternal   |
+|              |              |              | shifting     |              |
+|              |              |              | initial      |              |
+|              |              |              | point        |              |
++--------------+--------------+--------------+--------------+--------------+
+| Soc          | OT_INTEGER   | 1            | Second order | CasADi::Knit |
+|              |              |              | correction   | roInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| XTol         | OT_REAL      | 0.000        | Relative     | CasADi::Knit |
+|              |              |              | solution     | roInternal   |
+|              |              |              | change       |              |
+|              |              |              | tolerance    |              |
++--------------+--------------+--------------+--------------+--------------+
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
@@ -35691,109 +35800,6 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | (forward|rev |              |
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
-+--------------+--------------+--------------+--------------+--------------+
-| algorithm    | OT_STRING    | GenericType( | Which        | CasADi::Knit |
-|              |              | )            | algorithm to | roInternal   |
-|              |              |              | use. See     |              |
-|              |              |              | KNITRO docum |              |
-|              |              |              | entation. (a |              |
-|              |              |              | uto|direct|c |              |
-|              |              |              | g|active)    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| bar_directin | OT_INTEGER   | GenericType( | When using   | CasADi::Knit |
-| terval       |              | )            | the Interior | roInternal   |
-|              |              |              | /Direct      |              |
-|              |              |              | algorithm,   |              |
-|              |              |              | this         |              |
-|              |              |              | parameter    |              |
-|              |              |              | controls the |              |
-|              |              |              | maximum      |              |
-|              |              |              | number of    |              |
-|              |              |              | consecutive  |              |
-|              |              |              | CG steps     |              |
-|              |              |              | before       |              |
-|              |              |              | trying to    |              |
-|              |              |              | force the    |              |
-|              |              |              | algorithm to |              |
-|              |              |              | take a       |              |
-|              |              |              | direct step  |              |
-|              |              |              | again. See   |              |
-|              |              |              | KNITRO docum |              |
-|              |              |              | entation.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| bar_feasible | OT_STRING    | GenericType( | Whether      | CasADi::Knit |
-|              |              | )            | feasibility  | roInternal   |
-|              |              |              | is given     |              |
-|              |              |              | special      |              |
-|              |              |              | emphasis.    |              |
-|              |              |              | See KNITRO d |              |
-|              |              |              | ocumentation |              |
-|              |              |              | . (no|stay|g |              |
-|              |              |              | et|get_stay) |              |
-+--------------+--------------+--------------+--------------+--------------+
-| bar_feasmode | OT_REAL      | GenericType( | Specifies    | CasADi::Knit |
-| tol          |              | )            | the          | roInternal   |
-|              |              |              | tolerance    |              |
-|              |              |              | for entering |              |
-|              |              |              | the stay     |              |
-|              |              |              | feasible     |              |
-|              |              |              | mode See     |              |
-|              |              |              | KNITRO docum |              |
-|              |              |              | entation.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| bar_initmu   | OT_INTEGER   | GenericType( | Initial      | CasADi::Knit |
-|              |              | )            | value for    | roInternal   |
-|              |              |              | the barrier  |              |
-|              |              |              | parameter.   |              |
-|              |              |              | See KNITRO d |              |
-|              |              |              | ocumentation |              |
-|              |              |              | .            |              |
-+--------------+--------------+--------------+--------------+--------------+
-| bar_initpt   | OT_STRING    | GenericType( | Whether to   | CasADi::Knit |
-|              |              | )            | use the      | roInternal   |
-|              |              |              | initial      |              |
-|              |              |              | point        |              |
-|              |              |              | strategy     |              |
-|              |              |              | with barrier |              |
-|              |              |              | algorithms.  |              |
-|              |              |              | See KNITRO d |              |
-|              |              |              | ocumentation |              |
-|              |              |              | . (auto|yes| |              |
-|              |              |              | no)          |              |
-+--------------+--------------+--------------+--------------+--------------+
-| bar_maxbackt | OT_INTEGER   | GenericType( | Maximum      | CasADi::Knit |
-| rack         |              | )            | allowable    | roInternal   |
-|              |              |              | number of    |              |
-|              |              |              | backtracks   |              |
-|              |              |              | during the   |              |
-|              |              |              | linesearch   |              |
-|              |              |              | of the       |              |
-|              |              |              | Interior     |              |
-|              |              |              | Direct       |              |
-|              |              |              | algorithm    |              |
-|              |              |              | before       |              |
-|              |              |              | reverting to |              |
-|              |              |              | a CG step.   |              |
-|              |              |              | See KNITRO d |              |
-|              |              |              | ocumentation |              |
-|              |              |              | .            |              |
-+--------------+--------------+--------------+--------------+--------------+
-| bar_maxrefac | OT_INTEGER   | GenericType( | Maximum      | CasADi::Knit |
-| tor          |              | )            | number of re | roInternal   |
-|              |              |              | factorizatio |              |
-|              |              |              | ns of the    |              |
-|              |              |              | KKT system   |              |
-|              |              |              | per          |              |
-|              |              |              | iteration of |              |
-|              |              |              | the Interior |              |
-|              |              |              | Direct       |              |
-|              |              |              | algorithm    |              |
-|              |              |              | before       |              |
-|              |              |              | reverting to |              |
-|              |              |              | a CG step.   |              |
-|              |              |              | See KNITRO d |              |
-|              |              |              | ocumentation |              |
-|              |              |              | .            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | contype      | OT_INTEGERVE |              |              | CasADi::Knit |
 |              | CTOR         |              |              | roInternal   |
@@ -36401,6 +36407,109 @@ n: number of decision variables (x)     m: number of constraints (A)
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
+| BarRule      | OT_INTEGER   | 0            | Barrier Rule | CasADi::Knit |
+|              |              |              |              | roInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| Debug        | OT_INTEGER   | 0            | Debug level  | CasADi::Knit |
+|              |              |              |              | roInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| Delta        | OT_REAL      | 1            | Initial      | CasADi::Knit |
+|              |              |              | region       | roInternal   |
+|              |              |              | scaling      |              |
+|              |              |              | factor       |              |
++--------------+--------------+--------------+--------------+--------------+
+| FeasModeTol  | OT_REAL      | 0.000        | Feasible     | CasADi::Knit |
+|              |              |              | mode         | roInternal   |
+|              |              |              | tolerance    |              |
++--------------+--------------+--------------+--------------+--------------+
+| FeasTol      | OT_REAL      | 0.000        | Feasible     | CasADi::Knit |
+|              |              |              | tolerance    | roInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| FeasTolAbs   | OT_REAL      | 1            | Absolute     | CasADi::Knit |
+|              |              |              | feasible     | roInternal   |
+|              |              |              | tolerance    |              |
++--------------+--------------+--------------+--------------+--------------+
+| Feasible     | OT_BOOLEAN   | 0            | Allow        | CasADi::Knit |
+|              |              |              | infeasible   | roInternal   |
+|              |              |              | iterations   |              |
++--------------+--------------+--------------+--------------+--------------+
+| GradOpt      | OT_INTEGER   | 1            | Gradient     | CasADi::Knit |
+|              |              |              | calculation  | roInternal   |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| HessOpt      | OT_INTEGER   | 1            | Hessian      | CasADi::Knit |
+|              |              |              | calculation  | roInternal   |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| HonorBnds    | OT_BOOLEAN   | 0            | Enforce      | CasADi::Knit |
+|              |              |              | bounds       | roInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| InitPt       | OT_BOOLEAN   | 0            | Use initial  | CasADi::Knit |
+|              |              |              | point        | roInternal   |
+|              |              |              | strategy     |              |
++--------------+--------------+--------------+--------------+--------------+
+| LPSolver     | OT_BOOLEAN   | 0            | Use LPSolver | CasADi::Knit |
+|              |              |              |              | roInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| LmSize       | OT_INTEGER   | 10           | Memory       | CasADi::Knit |
+|              |              |              | pairsize     | roInternal   |
+|              |              |              | limit        |              |
++--------------+--------------+--------------+--------------+--------------+
+| MaxCgIt      | OT_INTEGER   | 0            | Maximum      | CasADi::Knit |
+|              |              |              | conjugate    | roInternal   |
+|              |              |              | gradient     |              |
+|              |              |              | iterations   |              |
++--------------+--------------+--------------+--------------+--------------+
+| MaxIt        | OT_INTEGER   | 10000        | Iteration    | CasADi::Knit |
+|              |              |              | limit        | roInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| Mu           | OT_REAL      | 0.100        | Initial      | CasADi::Knit |
+|              |              |              | barrier      | roInternal   |
+|              |              |              | parameter    |              |
++--------------+--------------+--------------+--------------+--------------+
+| Multistart   | OT_BOOLEAN   | 0            | Use          | CasADi::Knit |
+|              |              |              | multistart   | roInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| NewPoint     | OT_BOOLEAN   | 0            | Select new-  | CasADi::Knit |
+|              |              |              | point        | roInternal   |
+|              |              |              | feature      |              |
++--------------+--------------+--------------+--------------+--------------+
+| ObjRange     | OT_REAL      | 0.000        | Maximum      | CasADi::Knit |
+|              |              |              | objective    | roInternal   |
+|              |              |              | value        |              |
++--------------+--------------+--------------+--------------+--------------+
+| OptTol       | OT_REAL      | 0.000        | Relative     | CasADi::Knit |
+|              |              |              | optimality   | roInternal   |
+|              |              |              | tolerance    |              |
++--------------+--------------+--------------+--------------+--------------+
+| OptTolAbs    | OT_REAL      | 0            | Absolute     | CasADi::Knit |
+|              |              |              | optimality   | roInternal   |
+|              |              |              | tolerance    |              |
++--------------+--------------+--------------+--------------+--------------+
+| OutLev       | OT_INTEGER   | 2            | Log output   | CasADi::Knit |
+|              |              |              | level        | roInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| Pivot        | OT_REAL      | 0.000        | Initial      | CasADi::Knit |
+|              |              |              | pivot        | roInternal   |
+|              |              |              | threshold    |              |
++--------------+--------------+--------------+--------------+--------------+
+| Scale        | OT_BOOLEAN   | 1            | Perform      | CasADi::Knit |
+|              |              |              | scaling      | roInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| ShiftInit    | OT_BOOLEAN   | 1            | Interior-    | CasADi::Knit |
+|              |              |              | point        | roInternal   |
+|              |              |              | shifting     |              |
+|              |              |              | initial      |              |
+|              |              |              | point        |              |
++--------------+--------------+--------------+--------------+--------------+
+| Soc          | OT_INTEGER   | 1            | Second order | CasADi::Knit |
+|              |              |              | correction   | roInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| XTol         | OT_REAL      | 0.000        | Relative     | CasADi::Knit |
+|              |              |              | solution     | roInternal   |
+|              |              |              | change       |              |
+|              |              |              | tolerance    |              |
++--------------+--------------+--------------+--------------+--------------+
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
@@ -36422,109 +36531,6 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | (forward|rev |              |
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
-+--------------+--------------+--------------+--------------+--------------+
-| algorithm    | OT_STRING    | GenericType( | Which        | CasADi::Knit |
-|              |              | )            | algorithm to | roInternal   |
-|              |              |              | use. See     |              |
-|              |              |              | KNITRO docum |              |
-|              |              |              | entation. (a |              |
-|              |              |              | uto|direct|c |              |
-|              |              |              | g|active)    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| bar_directin | OT_INTEGER   | GenericType( | When using   | CasADi::Knit |
-| terval       |              | )            | the Interior | roInternal   |
-|              |              |              | /Direct      |              |
-|              |              |              | algorithm,   |              |
-|              |              |              | this         |              |
-|              |              |              | parameter    |              |
-|              |              |              | controls the |              |
-|              |              |              | maximum      |              |
-|              |              |              | number of    |              |
-|              |              |              | consecutive  |              |
-|              |              |              | CG steps     |              |
-|              |              |              | before       |              |
-|              |              |              | trying to    |              |
-|              |              |              | force the    |              |
-|              |              |              | algorithm to |              |
-|              |              |              | take a       |              |
-|              |              |              | direct step  |              |
-|              |              |              | again. See   |              |
-|              |              |              | KNITRO docum |              |
-|              |              |              | entation.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| bar_feasible | OT_STRING    | GenericType( | Whether      | CasADi::Knit |
-|              |              | )            | feasibility  | roInternal   |
-|              |              |              | is given     |              |
-|              |              |              | special      |              |
-|              |              |              | emphasis.    |              |
-|              |              |              | See KNITRO d |              |
-|              |              |              | ocumentation |              |
-|              |              |              | . (no|stay|g |              |
-|              |              |              | et|get_stay) |              |
-+--------------+--------------+--------------+--------------+--------------+
-| bar_feasmode | OT_REAL      | GenericType( | Specifies    | CasADi::Knit |
-| tol          |              | )            | the          | roInternal   |
-|              |              |              | tolerance    |              |
-|              |              |              | for entering |              |
-|              |              |              | the stay     |              |
-|              |              |              | feasible     |              |
-|              |              |              | mode See     |              |
-|              |              |              | KNITRO docum |              |
-|              |              |              | entation.    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| bar_initmu   | OT_INTEGER   | GenericType( | Initial      | CasADi::Knit |
-|              |              | )            | value for    | roInternal   |
-|              |              |              | the barrier  |              |
-|              |              |              | parameter.   |              |
-|              |              |              | See KNITRO d |              |
-|              |              |              | ocumentation |              |
-|              |              |              | .            |              |
-+--------------+--------------+--------------+--------------+--------------+
-| bar_initpt   | OT_STRING    | GenericType( | Whether to   | CasADi::Knit |
-|              |              | )            | use the      | roInternal   |
-|              |              |              | initial      |              |
-|              |              |              | point        |              |
-|              |              |              | strategy     |              |
-|              |              |              | with barrier |              |
-|              |              |              | algorithms.  |              |
-|              |              |              | See KNITRO d |              |
-|              |              |              | ocumentation |              |
-|              |              |              | . (auto|yes| |              |
-|              |              |              | no)          |              |
-+--------------+--------------+--------------+--------------+--------------+
-| bar_maxbackt | OT_INTEGER   | GenericType( | Maximum      | CasADi::Knit |
-| rack         |              | )            | allowable    | roInternal   |
-|              |              |              | number of    |              |
-|              |              |              | backtracks   |              |
-|              |              |              | during the   |              |
-|              |              |              | linesearch   |              |
-|              |              |              | of the       |              |
-|              |              |              | Interior     |              |
-|              |              |              | Direct       |              |
-|              |              |              | algorithm    |              |
-|              |              |              | before       |              |
-|              |              |              | reverting to |              |
-|              |              |              | a CG step.   |              |
-|              |              |              | See KNITRO d |              |
-|              |              |              | ocumentation |              |
-|              |              |              | .            |              |
-+--------------+--------------+--------------+--------------+--------------+
-| bar_maxrefac | OT_INTEGER   | GenericType( | Maximum      | CasADi::Knit |
-| tor          |              | )            | number of re | roInternal   |
-|              |              |              | factorizatio |              |
-|              |              |              | ns of the    |              |
-|              |              |              | KKT system   |              |
-|              |              |              | per          |              |
-|              |              |              | iteration of |              |
-|              |              |              | the Interior |              |
-|              |              |              | Direct       |              |
-|              |              |              | algorithm    |              |
-|              |              |              | before       |              |
-|              |              |              | reverting to |              |
-|              |              |              | a CG step.   |              |
-|              |              |              | See KNITRO d |              |
-|              |              |              | ocumentation |              |
-|              |              |              | .            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | contype      | OT_INTEGERVE |              |              | CasADi::Knit |
 |              | CTOR         |              |              | roInternal   |
@@ -50884,6 +50890,20 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::NLPSolverInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+
+// File: structCasADi_1_1NonZero.xml
+%feature("docstring") CasADi::NonZero "C++ includes: matrix.hpp ";
+
+
+// File: classCasADi_1_1NonZeroIterator.xml
+%feature("docstring") CasADi::NonZeroIterator "C++ includes: matrix.hpp ";
+
+%feature("docstring")  CasADi::NonZeroIterator::NonZeroIterator "";
+
+%feature("docstring")  CasADi::NonZeroIterator::begin "";
+
+%feature("docstring")  CasADi::NonZeroIterator::end "";
 
 
 // File: classCasADi_1_1NonZeros.xml
@@ -74766,6 +74786,13 @@ The supplied vector may contain duplicates and may be non-monotonous The
 supplied vector will be checked for bounds The result vector is guaranteed
 to be monotonously increasing ";
 
+%feature("docstring")  CasADi::Interfaces::lookupvector "
+
+Returns a vector for quickly looking up entries of supplied list.
+
+lookupvector[i]!=-1 <=> v contains i v[lookupvector[i]] == i <=> v contains
+i ";
+
 %feature("docstring")  CasADi::Interfaces::get_bvec_t "
 
 Get an pointer of sets of booleans from a double vector. ";
@@ -74869,7 +74896,9 @@ values:  the vector that needs sorting
 
 sorted_values:  the sorted vector
 
-indices:  The indices into 'values' that cast it into 'sorted_values' ";
+indices:  The indices such that 'sorted_values= values[indices]'
+
+invert_indices:  Output indices such that 'sorted_values[indices=values' ";
 
 %feature("docstring")  CasADi::Interfaces::makeVector "
 

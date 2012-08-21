@@ -42,7 +42,7 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv, const std:
   
   setOption("name", "unnamed_mx_function");
   setOption("numeric_jacobian", true);
-
+  
   // Check for duplicate entries among the input expressions
   bool has_duplicates = false;
   for(vector<MX>::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
@@ -65,18 +65,11 @@ MXFunctionInternal::~MXFunctionInternal(){
 }
 
 
-double* getptr(Matrix<double>& x){
-	if(x.size()>0)
-		return &x.front();
-	else
-		return 0;
-}
-
 void MXFunctionInternal::init(){  
   log("MXFunctionInternal::init begin");
-  
+      
   // Call the init function of the base class
-  XFunctionInternal<MXFunctionInternal,MX,MXNode>::init();
+  XFunctionInternal<MXFunctionInternal,MX,MXNode>::init();    
 
   // Stack for nodes to be added to the list of nodes
   stack<MXNode*> s;

@@ -163,7 +163,15 @@ std::vector<Matrix<SX> > substitute(const std::vector<Matrix<SX> > &ex, const Ma
 Matrix<SX> substitute(const Matrix<SX> &ex, const Matrix<SX> &v, const Matrix<SX> &vdef){
   if(v.empty()) return ex; // quick return if empty
   casadi_assert_message(isSymbolic(v),"the variable is not symbolic");
-  casadi_assert_message(v.size1() == vdef.size1() && v.size2() == vdef.size2(),"the dimensions do not match");
+  // Treat scalar vdef as special case
+  if (vdef.scalar() && !v.scalar()){
+    if (vdef.empty()) {
+      return substitute(ex,v,Matrix<SX>(v.sparsity(),0));
+    } else {
+      return substitute(ex,v,Matrix<SX>(v.sparsity(),vdef.at(0)));
+    }
+  }
+  casadi_assert_message(v.size1() == vdef.size1() && v.size2() == vdef.size2(),"substitute: the dimensions " << v.dimString() << " and " << vdef.dimString() << " do not match.");
 
   // evaluate with var == expr
   SXFunction fcn(v,ex);

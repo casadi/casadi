@@ -2230,15 +2230,34 @@
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>BarRule</td><td>OT_INTEGER</td><td>0</td><td>Barrier Rule</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>Debug</td><td>OT_INTEGER</td><td>0</td><td>Debug level</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>Delta</td><td>OT_REAL</td><td>1.0</td><td>Initial region scaling factor</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>FeasModeTol</td><td>OT_REAL</td><td>0.0001</td><td>Feasible mode tolerance</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>FeasTol</td><td>OT_REAL</td><td>1e-6</td><td>Feasible tolerance</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>FeasTolAbs</td><td>OT_REAL</td><td>1</td><td>Absolute feasible tolerance</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>Feasible</td><td>OT_BOOLEAN</td><td>0</td><td>Allow infeasible iterations</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>GradOpt</td><td>OT_INTEGER</td><td>1</td><td>Gradient calculation method</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>HessOpt</td><td>OT_INTEGER</td><td>1</td><td>Hessian calculation method</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>HonorBnds</td><td>OT_BOOLEAN</td><td>0</td><td>Enforce bounds</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>InitPt</td><td>OT_BOOLEAN</td><td>0</td><td>Use initial point strategy</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>LPSolver</td><td>OT_BOOLEAN</td><td>0</td><td>Use LPSolver</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>LmSize</td><td>OT_INTEGER</td><td>10</td><td>Memory pairsize limit</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>MaxCgIt</td><td>OT_INTEGER</td><td>0</td><td>Maximum conjugate gradient iterations</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>MaxIt</td><td>OT_INTEGER</td><td>10000</td><td>Iteration limit</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>Mu</td><td>OT_REAL</td><td>0.1</td><td>Initial barrier parameter</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>Multistart</td><td>OT_BOOLEAN</td><td>0</td><td>Use multistart</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>NewPoint</td><td>OT_BOOLEAN</td><td>0</td><td>Select new-point feature</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>ObjRange</td><td>OT_REAL</td><td>1e-8</td><td>Maximum objective value</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>OptTol</td><td>OT_REAL</td><td>1e-6</td><td>Relative optimality tolerance</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>OptTolAbs</td><td>OT_REAL</td><td>0</td><td>Absolute optimality tolerance</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>OutLev</td><td>OT_INTEGER</td><td>2</td><td>Log output level</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>Pivot</td><td>OT_REAL</td><td>1e-8</td><td>Initial pivot threshold</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>Scale</td><td>OT_BOOLEAN</td><td>1</td><td>Perform scaling</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>ShiftInit</td><td>OT_BOOLEAN</td><td>1</td><td>Interior-point shifting initial point</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>Soc</td><td>OT_INTEGER</td><td>1</td><td>Second order correction</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>XTol</td><td>OT_REAL</td><td>1e-15</td><td>Relative solution change tolerance</td><td>CasADi::KnitroInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>algorithm</td><td>OT_STRING</td><td>GenericType()</td><td>Which algorithm to use. See KNITRO documentation. (auto|direct|cg|active)</td><td>CasADi::KnitroInternal</td></tr>
-<tr><td>bar_directinterval</td><td>OT_INTEGER</td><td>GenericType()</td><td>When using the Interior/Direct algorithm, this parameter controls the maximum number of consecutive CG steps before trying to force the algorithm to take a direct step again. See KNITRO documentation.</td><td>CasADi::KnitroInternal</td></tr>
-<tr><td>bar_feasible</td><td>OT_STRING</td><td>GenericType()</td><td>Whether feasibility is given special emphasis. See KNITRO documentation. (no|stay|get|get_stay)</td><td>CasADi::KnitroInternal</td></tr>
-<tr><td>bar_feasmodetol</td><td>OT_REAL</td><td>GenericType()</td><td>Specifies the tolerance for entering the stay feasible mode See KNITRO documentation.</td><td>CasADi::KnitroInternal</td></tr>
-<tr><td>bar_initmu</td><td>OT_INTEGER</td><td>GenericType()</td><td>Initial value for the barrier parameter. See KNITRO documentation.</td><td>CasADi::KnitroInternal</td></tr>
-<tr><td>bar_initpt</td><td>OT_STRING</td><td>GenericType()</td><td>Whether to use the initial point strategy with barrier algorithms.  See KNITRO documentation. (auto|yes|no)</td><td>CasADi::KnitroInternal</td></tr>
-<tr><td>bar_maxbacktrack</td><td>OT_INTEGER</td><td>GenericType()</td><td>Maximum allowable number of backtracks during the linesearch of the Interior Direct algorithm before reverting to a CG step. See KNITRO documentation.</td><td>CasADi::KnitroInternal</td></tr>
-<tr><td>bar_maxrefactor</td><td>OT_INTEGER</td><td>GenericType()</td><td>Maximum number of refactorizations of the KKT system per iteration of the Interior Direct algorithm before reverting to a CG step. See KNITRO documentation.</td><td>CasADi::KnitroInternal</td></tr>
 <tr><td>contype</td><td>OT_INTEGERVECTOR</td><td></td><td></td><td>CasADi::KnitroInternal</td></tr>
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the objective function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
@@ -2272,15 +2291,34 @@
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>BarRule</td><td>OT_INTEGER</td><td>0</td><td>Barrier Rule</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>Debug</td><td>OT_INTEGER</td><td>0</td><td>Debug level</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>Delta</td><td>OT_REAL</td><td>1.0</td><td>Initial region scaling factor</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>FeasModeTol</td><td>OT_REAL</td><td>0.0001</td><td>Feasible mode tolerance</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>FeasTol</td><td>OT_REAL</td><td>1e-6</td><td>Feasible tolerance</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>FeasTolAbs</td><td>OT_REAL</td><td>1</td><td>Absolute feasible tolerance</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>Feasible</td><td>OT_BOOLEAN</td><td>0</td><td>Allow infeasible iterations</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>GradOpt</td><td>OT_INTEGER</td><td>1</td><td>Gradient calculation method</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>HessOpt</td><td>OT_INTEGER</td><td>1</td><td>Hessian calculation method</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>HonorBnds</td><td>OT_BOOLEAN</td><td>0</td><td>Enforce bounds</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>InitPt</td><td>OT_BOOLEAN</td><td>0</td><td>Use initial point strategy</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>LPSolver</td><td>OT_BOOLEAN</td><td>0</td><td>Use LPSolver</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>LmSize</td><td>OT_INTEGER</td><td>10</td><td>Memory pairsize limit</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>MaxCgIt</td><td>OT_INTEGER</td><td>0</td><td>Maximum conjugate gradient iterations</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>MaxIt</td><td>OT_INTEGER</td><td>10000</td><td>Iteration limit</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>Mu</td><td>OT_REAL</td><td>0.1</td><td>Initial barrier parameter</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>Multistart</td><td>OT_BOOLEAN</td><td>0</td><td>Use multistart</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>NewPoint</td><td>OT_BOOLEAN</td><td>0</td><td>Select new-point feature</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>ObjRange</td><td>OT_REAL</td><td>1e-8</td><td>Maximum objective value</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>OptTol</td><td>OT_REAL</td><td>1e-6</td><td>Relative optimality tolerance</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>OptTolAbs</td><td>OT_REAL</td><td>0</td><td>Absolute optimality tolerance</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>OutLev</td><td>OT_INTEGER</td><td>2</td><td>Log output level</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>Pivot</td><td>OT_REAL</td><td>1e-8</td><td>Initial pivot threshold</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>Scale</td><td>OT_BOOLEAN</td><td>1</td><td>Perform scaling</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>ShiftInit</td><td>OT_BOOLEAN</td><td>1</td><td>Interior-point shifting initial point</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>Soc</td><td>OT_INTEGER</td><td>1</td><td>Second order correction</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>XTol</td><td>OT_REAL</td><td>1e-15</td><td>Relative solution change tolerance</td><td>CasADi::KnitroInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>algorithm</td><td>OT_STRING</td><td>GenericType()</td><td>Which algorithm to use. See KNITRO documentation. (auto|direct|cg|active)</td><td>CasADi::KnitroInternal</td></tr>
-<tr><td>bar_directinterval</td><td>OT_INTEGER</td><td>GenericType()</td><td>When using the Interior/Direct algorithm, this parameter controls the maximum number of consecutive CG steps before trying to force the algorithm to take a direct step again. See KNITRO documentation.</td><td>CasADi::KnitroInternal</td></tr>
-<tr><td>bar_feasible</td><td>OT_STRING</td><td>GenericType()</td><td>Whether feasibility is given special emphasis. See KNITRO documentation. (no|stay|get|get_stay)</td><td>CasADi::KnitroInternal</td></tr>
-<tr><td>bar_feasmodetol</td><td>OT_REAL</td><td>GenericType()</td><td>Specifies the tolerance for entering the stay feasible mode See KNITRO documentation.</td><td>CasADi::KnitroInternal</td></tr>
-<tr><td>bar_initmu</td><td>OT_INTEGER</td><td>GenericType()</td><td>Initial value for the barrier parameter. See KNITRO documentation.</td><td>CasADi::KnitroInternal</td></tr>
-<tr><td>bar_initpt</td><td>OT_STRING</td><td>GenericType()</td><td>Whether to use the initial point strategy with barrier algorithms.  See KNITRO documentation. (auto|yes|no)</td><td>CasADi::KnitroInternal</td></tr>
-<tr><td>bar_maxbacktrack</td><td>OT_INTEGER</td><td>GenericType()</td><td>Maximum allowable number of backtracks during the linesearch of the Interior Direct algorithm before reverting to a CG step. See KNITRO documentation.</td><td>CasADi::KnitroInternal</td></tr>
-<tr><td>bar_maxrefactor</td><td>OT_INTEGER</td><td>GenericType()</td><td>Maximum number of refactorizations of the KKT system per iteration of the Interior Direct algorithm before reverting to a CG step. See KNITRO documentation.</td><td>CasADi::KnitroInternal</td></tr>
 <tr><td>contype</td><td>OT_INTEGERVECTOR</td><td></td><td></td><td>CasADi::KnitroInternal</td></tr>
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the objective function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>expand_g</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the constraint function in terms of scalar operations, i.e. MX->SX</td><td>CasADi::NLPSolverInternal</td></tr>

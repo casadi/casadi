@@ -102,6 +102,14 @@ namespace CasADi{
   */
   std::vector<int> complement(const std::vector<int> &v, int size);
   
+  /** \brief Returns a vector for quickly looking up entries of supplied list
+  *
+  *  lookupvector[i]!=-1     <=>  v contains i
+  *  v[lookupvector[i]] == i <=>  v contains i
+  *
+  */
+  std::vector<int> lookupvector(const std::vector<int> &v, int size);
+  
   /// Check if the vector is strictly increasing
   template<typename T>
   bool isIncreasing(const std::vector<T> &v);
@@ -187,10 +195,11 @@ namespace CasADi{
   * 
   * \param[in]  values the vector that needs sorting
   * \param[out] sorted_values the sorted vector
-  * \param[out] indices The indices into 'values' that cast it into 'sorted_values'
+  * \param[out] indices The indices such that 'sorted_values= values[indices]'
+  * \param[in] invert_indices Output indices such that 'sorted_values[indices=values'
   **/
   template<typename T>
-  void sort(const std::vector<T> &values,std::vector<T> &sorted_values,std::vector<int> &indices);
+  void sort(const std::vector<T> &values,std::vector<T> &sorted_values,std::vector<int> &indices,bool invert_indices =false);
   #endif //SWIG
   
   /** \brief Make a vector of a certain length with its entries specified
@@ -464,7 +473,7 @@ namespace CasADi{
   }
   
   template<typename T>
-  void sort(const std::vector<T> &values, std::vector<T> &sorted_values, std::vector<int> &indices) {
+  void sort(const std::vector<T> &values, std::vector<T> &sorted_values, std::vector<int> &indices,  bool invert_indices=false) {
   
     // Create a list of (value,index) pairs
     std::vector< std::pair<T,int> > pvalues(values.size());
@@ -480,10 +489,19 @@ namespace CasADi{
     // Read out the results
     sorted_values.resize(values.size());
     indices.resize(values.size());
-    for (int i=0;i<values.size();++i) {
-      sorted_values[i] = pvalues[i].first;
-      indices[i]       =  pvalues[i].second;
+    if (invert_indices) {
+      for (int i=0;i<values.size();++i) {
+        sorted_values[i] = pvalues[i].first;
+        indices[pvalues[i].second]       =  i;
+      }
+    } else {
+      for (int i=0;i<values.size();++i) {
+        sorted_values[i] = pvalues[i].first;
+        indices[i]       =  pvalues[i].second;
+      }
     }
+    
+    
     
   }
 

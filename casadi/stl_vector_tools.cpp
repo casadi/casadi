@@ -58,6 +58,16 @@ namespace CasADi{
     
   }
   
+  std::vector<int> lookupvector(const std::vector<int> &v, int size) {
+    casadi_assert_message(inBounds(v,size),"lookupvector: out of bounds. Some elements in v fall out of [0,size[");
+    std::vector<int> lookup(size,-1);
+    
+    for (int i=0;i<v.size();i++) {
+      lookup[v[i]] = i;
+    }
+    return lookup;
+  }
+
   bvec_t* get_bvec_t(std::vector<double>& v){
     if(v.empty()){
       return 0;

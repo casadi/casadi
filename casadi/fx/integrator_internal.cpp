@@ -129,8 +129,8 @@ void IntegratorInternal::init(){
   nz_ = f_.input(DAE_Z).numel();
   nq_ = f_.output(DAE_QUAD).numel();
   np_  = f_.input(DAE_P).numel();
-  casadi_assert_message(f_.output(DAE_ODE).numel()==nx_,"Inconsistent dimensions");
-  casadi_assert_message(f_.output(DAE_ALG).numel()==nz_,"Inconsistent dimensions");
+  casadi_assert_message(f_.output(DAE_ODE).numel()==nx_,"Inconsistent dimensions. Expecting DAE_ODE output of size " << nx_ << ", but got " << f_.output(DAE_ODE).numel() << " instead.");
+  casadi_assert_message(f_.output(DAE_ALG).numel()==nz_,"Inconsistent dimensions. Expecting DAE_ALG output of size " << nz_ << ", but got " << f_.output(DAE_ALG).numel() << " instead.");
   
   // Initialize, get and assert dimensions of the backwards integration
   if(g_.isNull()){
@@ -143,11 +143,11 @@ void IntegratorInternal::init(){
     nrx_ = g_.input(RDAE_RX).numel();
     nrz_ = g_.input(RDAE_RZ).numel();
     nrq_ = g_.output(RDAE_QUAD).numel();
-    casadi_assert_message(g_.input(RDAE_P).numel()==np_,"Inconsistent dimensions");
-    casadi_assert_message(g_.input(RDAE_X).numel()==nx_,"Inconsistent dimensions");
-    casadi_assert_message(g_.input(RDAE_Z).numel()==nz_,"Inconsistent dimensions");
-    casadi_assert_message(g_.output(RDAE_ODE).numel()==nrx_,"Inconsistent dimensions");
-    casadi_assert_message(g_.output(RDAE_ALG).numel()==nrz_,"Inconsistent dimensions");
+    casadi_assert_message(g_.input(RDAE_P).numel()==np_,"Inconsistent dimensions. Expecting RDAE_P input of size " << np_ << ", but got " << g_.input(RDAE_P).numel() << " instead.");
+    casadi_assert_message(g_.input(RDAE_X).numel()==nx_,"Inconsistent dimensions. Expecting RDAE_X input of size " << nx_ << ", but got " << g_.input(RDAE_P).numel() << " instead.");
+    casadi_assert_message(g_.input(RDAE_Z).numel()==nz_,"Inconsistent dimensions. Expecting RDAE_Z input of size " << nz_ << ", but got " << g_.input(RDAE_P).numel() << " instead.");
+    casadi_assert_message(g_.output(RDAE_ODE).numel()==nrx_,"Inconsistent dimensions. Expecting RDAE_ODE input of size " << nrx_ << ", but got " << g_.input(RDAE_P).numel() << " instead.");
+    casadi_assert_message(g_.output(RDAE_ALG).numel()==nrz_,"Inconsistent dimensions. Expecting RDAE_ALG input of size " << nrz_ << ", but got " << g_.input(RDAE_P).numel() << " instead.");
   }
   
   // Allocate space for inputs
