@@ -27,18 +27,16 @@ nk = 20    # Control discretization
 tf = 10.0  # End time
 
 # Declare variables (use scalar graph)
-t  = ssym("t")    # time
 u  = ssym("u")    # control
 x  = ssym("x",3)  # state
-xd = ssym("xd",3) # state derivative
 
 # ODE right hand side
-rhs = vertcat( [(1 - x[1]*x[1])*x[0] - x[1] + u, \
+xdot = vertcat( [(1 - x[1]*x[1])*x[0] - x[1] + u, \
                 x[0], \
                 x[0]*x[0] + x[1]*x[1] + u*u] )
 
 # DAE residual function
-f = SXFunction(daeIn(x,[],u,t,xd),daeOut(rhs-xd))
+f = SXFunction(daeIn(x,[],u),daeOut(xdot))
 
 # Create an integrator
 f_d = CVodesIntegrator(f)
@@ -62,8 +60,7 @@ for k in range(nk):
 F = MXFunction([U],[X[2]])
 
 # Terminal constraints: x_0(T)=x_1(T)=0
-X_01 = X[0:2] # first two components of X
-G = MXFunction([U],[X_01])
+G = MXFunction([U],[X[:2]]) # first two components of X
 
 # Allocate an NLP solver
 solver = IpoptSolver(F,G)
