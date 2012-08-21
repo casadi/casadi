@@ -36,11 +36,11 @@ using namespace std;
 namespace CasADi{
 
 MX vertcat(const vector<MX>& comp){
-  // Remove nulls
+  // Remove nulls and empty matrices
   vector<MX> c;
   c.reserve(comp.size());
   for(vector<MX>::const_iterator it=comp.begin(); it!=comp.end(); ++it)
-    if(!it->isNull())
+    if(!it->isNull() && !it->empty())
       c.push_back(*it);
   
   if(c.empty()){
@@ -676,6 +676,12 @@ std::vector<MX> msym(const std::string& name, int n, int m, int p){
 
 std::vector<std::vector<MX> > msym(const std::string& name, int n, int m, int p, int r){
   return msym(name,sp_dense(n,m),p,r);
+}
+
+std::vector<MX> substitute(const std::vector<MX> &ex, const std::vector<MX> &v, const std::vector<MX> &vdef){
+  MXFunction F(v,ex);
+  F.init();
+  return F.evalMX(vdef);
 }
 
 } // namespace CasADi
