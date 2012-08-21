@@ -334,7 +334,19 @@ bool isSymbolic(const MX& ex){
 }
 
 bool isSymbolicSparse(const MX& ex){
-  return isSymbolic(ex);
+  if(ex.isNull()){
+    return false;
+  } else if(ex.isMapping()){
+    // Check if the expression is a mapping where all dependencies are symbolic primitives
+    for(int d=0; d<ex->ndep(); ++d){
+      if(!ex->dep(d).isSymbolic()){
+        return false;
+      }
+    }
+    return true;
+  } else {
+    return isSymbolic(ex);
+  }
 }
 
 MX trace(const MX& A){
