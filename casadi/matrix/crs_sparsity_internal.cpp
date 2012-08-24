@@ -1976,6 +1976,10 @@ CRSSparsity CRSSparsityInternal::patternProduct(const CRSSparsity& y_trans, vect
   return ret;
 }
 
+bool CRSSparsityInternal::scalar() const{
+  return nrow_==1 && ncol_==1 && size()==1;
+}
+
 bool CRSSparsityInternal::dense() const{
   return size() == numel();
 }

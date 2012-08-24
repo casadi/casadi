@@ -27,6 +27,7 @@
 #include "submatrix.hpp"
 #include "nonzeros.hpp"
 #include "crs_sparsity.hpp"
+#include "sparsity_tools.hpp"
 #include "../casadi_math.hpp"
 
 namespace CasADi{
@@ -128,6 +129,17 @@ class GenericMatrix{
     SubMatrix<MatType,I,J> operator()(const I& i, const J& j){ return SubMatrix<MatType,I,J>(static_cast<MatType&>(*this),i,j); }
     #endif // SWIG
 
+    /** \brief Create an n-by-m matrix with symbolic variables */
+    static MatType sym(const std::string& name, int n=1, int m=1);
+
+    /** \brief Create a vector of length p with with matrices with symbolic variables of given sparsity */
+    static std::vector<MatType > sym(const std::string& name, const CRSSparsity& sp, int p);
+
+    /** \brief Create a vector of length p with n-by-m matrices with symbolic variables */
+    static std::vector<MatType > sym(const std::string& name, int n, int m, int p);
+
+    /** \brief Create an matrix with symbolic variables, given a sparsity pattern */
+    static MatType sym(const std::string& name, const CRSSparsity& sp);
 };
 
 #ifndef SWIG
@@ -211,6 +223,26 @@ int GenericMatrix<MatType>::size(Sparsity sp) const{
 
 #endif // SWIG
 
+template<typename MatType>
+MatType GenericMatrix<MatType>::sym(const std::string& name, int n, int m){ return sym(name,sp_dense(n,m));}
+
+template<typename MatType>
+std::vector<MatType> GenericMatrix<MatType>::sym(const std::string& name, const CRSSparsity& sp, int p){
+  std::vector<MatType> ret(p);
+  std::stringstream ss;
+  for(int k=0; k<p; ++k){
+    ss.str("");
+    ss << name << k;
+    ret[k] = sym(ss.str(),sp);
+  }
+  return ret;
+}
+
+template<typename MatType>
+std::vector<MatType > GenericMatrix<MatType>::sym(const std::string& name, int n, int m, int p){ return sym(name,sp_dense(n,m),p);}
+
+template<typename MatType>
+MatType GenericMatrix<MatType>::sym(const std::string& name, const CRSSparsity& sp){ throw CasadiException("\"sym\" not defined for instantiation");}
 
 } // namespace CasADi
 

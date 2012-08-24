@@ -152,6 +152,9 @@ class CRSSparsityInternal : public CachedObjectNode{
     /// Shape
     std::pair<int,int> shape() const;
     
+    /// Is scalar?
+    bool scalar() const;
+    
     /// Is dense?
     bool dense() const;
     

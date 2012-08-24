@@ -318,12 +318,8 @@ void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, std::vec
 void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& INOUT, std::vector<MX>& INOUT, bool reverse=false);
 #endif // SWIG
 
-#ifndef SWIG
-template<>
-inline void sym(MX& ret, const std::string& name, int n, int m) {
-  ret = msym(name,n,m);
-}
-#endif // SWIG
+template<> inline
+MX GenericMatrix<MX>::sym(const std::string& name, const CRSSparsity& sp){ return msym(name,sp);}
 
 } // namespace CasADi
 
