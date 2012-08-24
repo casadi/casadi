@@ -54,15 +54,6 @@ T linspace(const GenericMatrix<T> &a_, const GenericMatrix<T> &b_, int nsteps){
 }
 #endif // SWIG
 
-#ifndef SWIG
-
-/** \brief  Construct a symbolic matrix
-*/
-template<typename MatType>
-void sym(MatType& ret, const std::string& name, int n, int m);
-
-#endif // SWIG
-
 } // namespace CasADi
 
 #ifdef SWIG

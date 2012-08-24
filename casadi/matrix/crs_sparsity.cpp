@@ -215,6 +215,10 @@ vector<int> CRSSparsity::getNZ(vector<int> ii, vector<int> jj) const{
   return (*this)->getNZ(ii,jj);
 }
 
+bool CRSSparsity::scalar() const{
+  return (*this)->scalar();
+}
+
 bool CRSSparsity::dense() const{
   return (*this)->dense();
 }

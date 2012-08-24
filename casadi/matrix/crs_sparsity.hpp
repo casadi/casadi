@@ -277,6 +277,9 @@ class CRSSparsity : public CachedObject{
     /// Reserve space
     void reserve(int nnz, int nrow);
 
+    /// Is scalar?
+    bool scalar() const;
+    
     /// Is dense?
     bool dense() const;
     

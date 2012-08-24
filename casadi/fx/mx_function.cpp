@@ -88,6 +88,22 @@ const std::vector<MX>& MXFunction::outputsMX() const {
   return (*this)->outputv_;
 }
 
+const MX& MXFunction::inputExpr(int ind) const{
+  return (*this)->inputv_.at(ind);
+}
+
+const MX& MXFunction::outputExpr(int ind) const{
+  return (*this)->outputv_.at(ind);
+}
+  
+const std::vector<MX>& MXFunction::inputExpr() const{
+  return (*this)->inputv_;
+}
+  
+const std::vector<MX> & MXFunction::outputExpr() const{
+  return (*this)->outputv_;
+}
+
 const std::vector<MXAlgEl>& MXFunction::algorithm() const{
   return (*this)->algorithm_;
 }

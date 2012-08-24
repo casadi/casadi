@@ -81,6 +81,10 @@ public:
   /// Generate a augmented DAE system with nfwd forward sensitivities and nadj adjoint sensitivities
   virtual std::pair<FX,FX> getAugmented(int nfwd, int nadj);
   
+  /// Generate a augmented DAE system with nfwd forward sensitivities and nadj adjoint sensitivities (generic)
+  template<class Mat,class XFunc>
+  std::pair<FX,FX> getAugmentedGen(int nfwd, int nadj);
+  
   /// Number of states for the forward integration
   int nx_, nz_, nq_;
   

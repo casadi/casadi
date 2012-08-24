@@ -116,12 +116,27 @@ const SXMatrix& SXFunction::outputSX(int ind) const{
   return (*this)->outputv_.at(ind);
 }
 
-
 const std::vector<SXMatrix>& SXFunction::inputsSX() const {
   return (*this)->inputv_;
 }
   
 const std::vector<SXMatrix>& SXFunction::outputsSX() const {
+  return (*this)->outputv_;
+}
+
+const SXMatrix& SXFunction::inputExpr(int ind) const{
+  return (*this)->inputv_.at(ind);
+}
+
+const SXMatrix& SXFunction::outputExpr(int ind) const{
+  return (*this)->outputv_.at(ind);
+}
+  
+const std::vector<SXMatrix>& SXFunction::inputExpr() const{
+  return (*this)->inputv_;
+}
+  
+const std::vector<SXMatrix> & SXFunction::outputExpr() const{
   return (*this)->outputv_;
 }
 

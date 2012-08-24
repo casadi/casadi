@@ -606,11 +606,20 @@ void fill(Matrix<SX>& mat, const SX& val){
 //   return r;
 // }
 
-Matrix<SX> ssym(const std::string& name){
+Matrix<SX> ssym(const std::string& name, int n, int m){
+  return ssym(name,sp_dense(n,m));
+}
+
+Matrix<SX> ssym(const std::string& name, const std::pair<int,int> & nm) {
+  return ssym(name,nm.first,nm.second);
+}
+
+Matrix<SX> ssym(const std::string& name, const CRSSparsity& sp){
+  // Create a dense n-by-m matrix
+  vector<SX> retv;
+  
   // Check if individial names have been provided
   if(name[0]=='['){
-    // Create a return object (empty)
-    Matrix<SX> ret;
 
     // Make a copy of the string and modify it as to remove the special characters
     string modname = name;
@@ -630,97 +639,33 @@ Matrix<SX> ssym(const std::string& name){
       
       // Append to the return vector
       if(!iss.fail())
-        ret.append(SX(varname));
+        retv.push_back(SX(varname));
     }
-    
-    return ret;
+  } else if(sp.scalar()){
+    retv.push_back(SX(name));
   } else {
     // Scalar
-    return SX(name);
+    std::stringstream ss;
+    for(int k=0; k<sp.size(); ++k){
+      ss.str("");
+      ss << name << "_" << k;
+      retv.push_back(SX(ss.str()));
+    }
   }
-}
 
-
-Matrix<SX> ssym(const std::string& name, int n, int m){
-  // Create a dense n-by-m matrix
-  Matrix<SX> ret(n,m,0);
-
-  // Check if individial names have been provided
-  if(name[0]=='['){
-    // Make a copy of the string and modify it as to remove the special characters
-    string modname = name;
-    for(string::iterator it=modname.begin(); it!=modname.end(); ++it){
-      switch(*it){
-        case '(': case ')': case '[': case ']': case '{': case '}': case ',': case ';': *it = ' ';
-      }
-    }
-    
-    istringstream iss(modname);
-    string varname;
-    
-    // Loop over elements
-    for(int i=0; i<n; ++i){
-      for(int j=0; j<m; ++j){
-        // Read the name
-        iss >> varname;
-        
-        // Make sure that the reading was successful
-        casadi_assert_message(!iss.fail(), "Not enough variable names in string");
-        
-        // Create the variable
-        ret.data()[j+i*m] = SX(varname);
-      }
-    }
-    
-    // Try to read one more element
-    iss >> varname;
-    
-    // Make sure that the reading failed
-    casadi_assert_message(iss.fail(), "Too many variable names in string");
+  // Determine dimensions automatically if empty
+  if(sp.scalar()){
+    return Matrix<SX>(retv);
   } else {
-  
-    // Fill with expressions
-    for(int i=0; i<n; ++i){
-      for(int j=0; j<m; ++j){
-        stringstream ss;
-        ss << name;
-        if(n>1)
-          ss << "_" << i;
-        if(m>1)
-          ss << "_" << j;
-        
-        ret.data()[j+i*m] = SX(ss.str());
-      }
-    }
+    return Matrix<SX>(sp,retv);
   }
-      
-  // return
-  return ret;
 }
-
-Matrix<SX> ssym(const std::string& name, const std::pair<int,int> & nm) {
-  return ssym(name,nm.first,nm.second);
-}
-
-Matrix<SX> ssym(const std::string& name, const CRSSparsity& sp){
-  // Create a matrix
-  Matrix<SX> ret(sp);
-  
-  // Fill with expressions
-  for(int i=0; i<ret.size(); ++i){
-    stringstream ss;
-    ss << name << "_" << i;
-    ret.data()[i] = SX(ss.str());
-  }
-  
-  return ret;
-}
-
 
 std::vector<Matrix<SX> > ssym(const std::string& name, const CRSSparsity& sp, int p){
   std::vector<Matrix<SX> > ret(p);
+  stringstream ss;
   for(int k=0; k<p; ++k){
-    stringstream ss;
+    ss.str("");
     ss << name << "_" << k;
     ret[k] = ssym(ss.str(),sp);
   }

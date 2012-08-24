@@ -185,174 +185,96 @@ void IntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject
 }
 
 std::pair<FX,FX> IntegratorInternal::getAugmented(int nfwd, int nadj){
+  if(is_a<SXFunction>(f_)){
+    casadi_assert_message(g_.isNull() || is_a<SXFunction>(g_), "Currently, g_ must be of the same type as f_");
+    return getAugmentedGen<SXMatrix,SXFunction>(nfwd,nadj);
+  } else if(is_a<MXFunction>(f_)){
+    casadi_assert_message(g_.isNull() || is_a<MXFunction>(g_), "Currently, g_ must be of the same type as f_");
+    return getAugmentedGen<MX,MXFunction>(nfwd,nadj);
+  } else {
+    throw CasadiException("Currently, f_ must be either SXFunction or MXFunction");
+  }
+}
+  
+template<class Mat,class XFunc>
+std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
+  
   // Currently only handles this special case
   casadi_assert(nfwd==0);
-  casadi_assert(nadj==1);
   
-  // Augmented DAE
-  FX f_aug, g_aug;
+  // Get derivatived type
+  XFunc f = shared_cast<XFunc>(f_);
+  XFunc g = shared_cast<XFunc>(g_);
   
-  // Handle this special case separately until the general case below is efficient enough
-  SXFunction f = shared_cast<SXFunction>(f_);
-  SXFunction g = shared_cast<SXFunction>(g_);
-  if(f.isNull()==f_.isNull() && g.isNull()==g_.isNull()){
-    vector<SXMatrix> dae_in = f.inputsSX();
-    vector<SXMatrix> dae_out = f.outputsSX();
-    casadi_assert(dae_in.size()==DAE_NUM_IN);
-    casadi_assert(dae_out.size()==DAE_NUM_OUT);
-    SXMatrix x = dae_in[DAE_X];
-    SXMatrix z = dae_in[DAE_Z];
-    SXMatrix p = dae_in[DAE_P];
-    SXMatrix t = dae_in[DAE_T];
-    SXMatrix xdot = dae_in[DAE_XDOT];
+  vector<Mat> dae_in = f.inputExpr();
+  vector<Mat> dae_out = f.outputExpr();
+  casadi_assert(dae_in.size()==DAE_NUM_IN);
+  casadi_assert(dae_out.size()==DAE_NUM_OUT);
+  Mat x = dae_in[DAE_X];
+  Mat z = dae_in[DAE_Z];
+  Mat p = dae_in[DAE_P];
+  Mat t = dae_in[DAE_T];
+  Mat xdot = dae_in[DAE_XDOT];
+  
+  vector<Mat> rx = Mat::sym("rx",dae_out[DAE_ODE].sparsity(),nadj);
+  vector<Mat> rz = Mat::sym("rz",dae_out[DAE_ALG].sparsity(),nadj);
+  vector<Mat> rxdot = Mat::sym("rxdot",dae_out[DAE_ODE].sparsity(),nadj);
+  vector<Mat> rp = Mat::sym("rp",dae_out[DAE_QUAD].sparsity(),nadj);
     
-    vector<SXMatrix> rx = ssym("rx",dae_out[DAE_ODE].sparsity(),nadj);
-    vector<SXMatrix> rz = ssym("rz",dae_out[DAE_ALG].sparsity(),nadj);
-    vector<SXMatrix> rxdot = ssym("rxdot",dae_out[DAE_ODE].sparsity(),nadj);
-    vector<SXMatrix> rp = ssym("rp",dae_out[DAE_QUAD].sparsity(),nadj);
-    
-    // Is the ODE part explicit?
-    bool ode_is_explict = xdot.size()==0;
-    
-    // Number of adjoint sweeps needed
-    int n_sweep = nadj*(ode_is_explict ? 1 : 2);
-    
-    vector<vector<SXMatrix> > dummy;
-    vector<vector<SXMatrix> > aseed(n_sweep,dae_out);
-    for(int dir=0; dir<nadj; ++dir){
-      aseed[dir][DAE_ODE] = rx[dir];
-      aseed[dir][DAE_ALG] = rz[dir];
-      aseed[dir][DAE_QUAD] = rp[dir];
-      if(!ode_is_explict){
-        aseed[nadj+dir][DAE_ODE] = -rxdot[dir];
-        aseed[nadj+dir][DAE_ALG].setZero();
-        aseed[nadj+dir][DAE_QUAD].setZero();
-      }
-    }
-    vector<vector<SXMatrix> > asens(n_sweep,dae_in);
-    f.evalSX(dae_in,dae_out,dummy,dummy,aseed,asens,true);
-    
-    // Augment parameter vector
-    SXMatrix p_aug = vertcat(p,vertcat(rp));
-    dae_in[DAE_P] = p_aug;
-    
-    // Formulate the backwards integration problem
-    vector<SXMatrix> rdae_in(RDAE_NUM_IN);
-    rdae_in[RDAE_RX] = rx.back();
-    rdae_in[RDAE_RZ] = rz.back();
-    rdae_in[RDAE_X] = x;
-    rdae_in[RDAE_Z] = z;
-    rdae_in[RDAE_P] = p_aug;
-    rdae_in[RDAE_T] = t;
-    rdae_in[RDAE_XDOT] = xdot;
-    rdae_in[RDAE_RXDOT] = rxdot.back();
-    
-    vector<SXMatrix> rdae_out(RDAE_NUM_OUT);
-    rdae_out[RDAE_ODE] = asens[0][DAE_X];
-    if(ode_is_explict){
-      rdae_out[RDAE_ODE] += rxdot.back();
-    } else {
-      rdae_out[RDAE_ODE] += asens[1][DAE_XDOT];
-    }
-    rdae_out[RDAE_ALG] = asens[0][DAE_Z];
-    rdae_out[RDAE_QUAD] = asens[0][DAE_P];
-    
-    f_aug = SXFunction(dae_in,dae_out);
-    g_aug = SXFunction(rdae_in,rdae_out);
-    
-  } else { // Not SXFunction
-
-    // Formulate backwards integration problem
-    MXFunction f = shared_cast<MXFunction>(f_);
-    if(!f.isNull()){
-      vector<MX> dae_in = f.inputsMX();
-      vector<MX> dae_out = f.outputsMX();
-      casadi_assert(dae_in.size()==DAE_NUM_IN);
-      casadi_assert(dae_out.size()==DAE_NUM_OUT);
-    
-      MX x = dae_in[DAE_X];
-      MX z = dae_in[DAE_Z];
-      MX p = dae_in[DAE_P];
-      MX t = dae_in[DAE_T];
-      MX xdot = dae_in[DAE_XDOT];
-    
-      vector<MX> rx = msym("rx",dae_out[DAE_ODE].sparsity(),nadj);
-      vector<MX> rz = msym("rz",dae_out[DAE_ALG].sparsity(),nadj);
-      vector<MX> rxdot = msym("rxdot",dae_out[DAE_ODE].sparsity(),nadj);
-      vector<MX> rp = msym("rp",dae_out[DAE_QUAD].sparsity(),nadj);
-    
-      // Is the ODE part explicit?
-      bool ode_is_explict = xdot.size()==0;
-    
-      // Number of adjoint sweeps needed
-      int n_sweep = ode_is_explict ? 1 : 2;
-    
-      vector<vector<MX> > dummy;
-      vector<vector<MX> > aseed(n_sweep,dae_out);
-      aseed[0][DAE_ODE] = rx.back();
-      aseed[0][DAE_ALG] = rz.back();
-      aseed[0][DAE_QUAD] = rp.back();
-      if(!ode_is_explict){
-        aseed[1][DAE_ODE] = -rxdot.back();
-        aseed[1][DAE_ALG] = MX::zeros(rz.back().size());
-        aseed[1][DAE_QUAD] = MX::zeros(rp.back().size());
-      }
-      vector<vector<MX> > asens(n_sweep,dae_in);
-      f.evalMX(dae_in,dae_out,dummy,dummy,aseed,asens,true);
-    
-     // Augment p
-      MX p_aug("p_aug",np_+nrq_);
-      
-      // Variables to replace
-      vector<MX> v(2);
-      v[0] = p;
-      v[1] = rp.back();
-      
-      // What to replace with
-      vector<MX> vdef(2);
-      vdef[0] = p_aug[Slice(0,np_)];
-      vdef[1] = p_aug[Slice(np_,np_+nrq_)];
-       
-      // Replace in expressions
-      dae_out = substitute(dae_out,v,vdef);
-      
-      // Write forward dae in terms of p_aug
-      dae_in[DAE_P] = p_aug;
-      f_aug = MXFunction(dae_in,dae_out);
-      
-      // Formulate the backwards integration problem, input...
-      vector<MX> rdae_in(RDAE_NUM_IN);
-      rdae_in[RDAE_RX] = rx.back();
-      rdae_in[RDAE_RZ] = rz.back();
-      rdae_in[RDAE_X] = x;
-      rdae_in[RDAE_Z] = z;
-      rdae_in[RDAE_P] = p_aug;
-      rdae_in[RDAE_T] = t;
-      rdae_in[RDAE_XDOT] = xdot;
-      rdae_in[RDAE_RXDOT] = rxdot.back();
-      
-      // ... and output
-      vector<MX> rdae_out(RDAE_NUM_OUT);
-      rdae_out[RDAE_ODE] = asens[0][DAE_X];
-      if(ode_is_explict){
-        rdae_out[RDAE_ODE] += rxdot.back();
-      } else {
-        rdae_out[RDAE_ODE] += asens[1][DAE_XDOT];
-      }
-      rdae_out[RDAE_ALG] = asens[0][DAE_Z];
-      rdae_out[RDAE_QUAD] = asens[0][DAE_P];
-      
-      // Replace p and rp in expressions
-      rdae_out = substitute(rdae_out,v,vdef);
-      
-      // Create backward integration function
-      g_aug = MXFunction(rdae_in,rdae_out);
+  // Is the ODE part explicit?
+  bool ode_is_explict = xdot.size()==0;
+  
+  // Number of adjoint sweeps needed
+  int n_sweep = nadj*(ode_is_explict ? 1 : 2);
+  
+  vector<vector<Mat> > dummy;
+  vector<vector<Mat> > aseed(n_sweep,vector<Mat>(DAE_NUM_OUT));
+  for(int dir=0; dir<nadj; ++dir){
+    aseed[dir][DAE_ODE] = rx[dir];
+    aseed[dir][DAE_ALG] = rz[dir];
+    aseed[dir][DAE_QUAD] = rp[dir];
+    if(!ode_is_explict){
+      aseed[nadj+dir][DAE_ODE] = -rxdot[dir];
+      aseed[nadj+dir][DAE_ALG] = Mat(dae_out[DAE_ALG].sparsity());
+      aseed[nadj+dir][DAE_QUAD] = Mat(dae_out[DAE_QUAD].sparsity());
     }
   }
+  vector<vector<Mat> > asens(n_sweep,dae_in);
+  f.eval(dae_in,dae_out,dummy,dummy,aseed,asens,true);
   
-  return std::pair<FX,FX>(f_aug,g_aug);
-}
+  // Augment parameter vector
+  Mat p_aug = vertcat(p,vertcat(rp));
+  dae_in[DAE_P] = p_aug;
+  
+  // Formulate the backwards integration problem
+  vector<Mat> rdae_in(RDAE_NUM_IN);
+  rdae_in[RDAE_RX] = vertcat(rx);
+  rdae_in[RDAE_RZ] = vertcat(rz);
+  rdae_in[RDAE_X] = x;
+  rdae_in[RDAE_Z] = z;
+  rdae_in[RDAE_P] = p_aug;
+  rdae_in[RDAE_T] = t;
+  rdae_in[RDAE_XDOT] = xdot;
+  rdae_in[RDAE_RXDOT] = vertcat(rxdot);
+  
+  vector<Mat> rdae_out(RDAE_NUM_OUT);
+  for(int dir=0; dir<nadj; ++dir){
+    Mat ode = asens[dir][DAE_X];
+    if(ode_is_explict){
+      ode += rxdot[dir];
+    } else {
+      ode += asens[nadj+dir][DAE_XDOT];
+    }
+    rdae_out[RDAE_ODE].append(ode);
+    rdae_out[RDAE_ALG].append(asens[dir][DAE_Z]);
+    rdae_out[RDAE_QUAD].append(asens[dir][DAE_P]);
+  }
+  
+  XFunc f_aug(dae_in,dae_out);
+  XFunc g_aug(rdae_in,rdae_out);
 
+  return pair<FX,FX>(f_aug,g_aug);
+}
 
 FX IntegratorInternal::getDerivative(int nfwd, int nadj){
   // Generate augmented DAE
