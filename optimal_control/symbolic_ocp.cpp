@@ -221,16 +221,18 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
       
       // Add binding equation
       var.setBinding(bexpr);
+      y.push_back(var); // legacy
+      dep.append(bexpr); // legacy
     }
     
     // Resort the dependant parameters
     sortDependentParameters();
     
     // Legacy
-    for(vector<Variable>::const_iterator it=pd.begin(); it!=pd.end(); ++it){
-      y.push_back(*it);
-      dep.append(it->binding());
-    }
+//     for(vector<Variable>::const_iterator it=pd.begin(); it!=pd.end(); ++it){
+//       y.push_back(*it);
+//       dep.append(it->binding());
+//     }
   }
 
   // **** Add dynamic equations ****
