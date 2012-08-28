@@ -221,8 +221,15 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
       
       // Add binding equation
       var.setBinding(bexpr);
-      y.push_back(var); // legacy
-      dep.append(bexpr); // legacy
+    }
+    
+    // Resort the dependant parameters
+    sortDependentParameters();
+    
+    // Legacy
+    for(vector<Variable>::const_iterator it=pd.begin(); it!=pd.end(); ++it){
+      y.push_back(*it);
+      dep.append(it->binding());
     }
   }
 
@@ -930,6 +937,31 @@ void SymbolicOCP::sortALG(){
     z_new[i]= z[colperm[i]];
   }
   z_new.swap(z);
+}
+
+void SymbolicOCP::sortDependentParameters(){
+  // Quick return if no algebraic states
+  if(pd.empty()) return;
+  
+  // Find out which dependent parameter depends on which binding equation
+  SXMatrix v = var(pd);
+  SXFunction f(v,v-binding(pd));
+  f.init();
+  CRSSparsity sp = f.jacSparsity();
+  
+  sp.spyMatlab("dep_sp.m");
+  
+  
+  // BLT transformation
+  vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
+  int nb = sp.dulmageMendelsohn(rowperm,colperm,rowblock,colblock,coarse_rowblock,coarse_colblock);
+
+  // Permute variables
+  vector<Variable> pd_new(pd.size());
+  for(int i=0; i<pd.size(); ++i){
+    pd_new[i]= pd[colperm[i]];
+  }
+  pd_new.swap(pd);  
 }
 
 void SymbolicOCP::makeExplicit(){

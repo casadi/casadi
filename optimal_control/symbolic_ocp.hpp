@@ -259,6 +259,9 @@ class SymbolicOCP : public PrintableObject{
     /// Sort the algebraic equations and algebraic states
     void sortALG();
 
+    /// Sort the dependent parameters
+    void sortDependentParameters();
+    
     /// Transform the implicit ODE to an explicit ODE
     void makeExplicit();
     
