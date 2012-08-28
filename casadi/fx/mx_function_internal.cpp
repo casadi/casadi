@@ -962,9 +962,11 @@ FX MXFunctionInternal::hessian(int iind, int oind) {
 void MXFunctionInternal::evalSX(const std::vector<SXMatrix>& input_s, std::vector<SXMatrix>& output_s, 
                                 const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
                                 const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
-                                bool output_given){
+                                bool output_given, int offset_begin, int offset_end){
   casadi_assert_message(fwdSens.empty(),"Not implemented");
   casadi_assert_message(adjSeed.empty(),"Not implemented");
+  casadi_assert_message(offset_begin==0,"Not implemented");
+  casadi_assert_message(offset_end==0,"Not implemented");
   
   // Create a work array
   vector<SXMatrix> swork(work_.size());

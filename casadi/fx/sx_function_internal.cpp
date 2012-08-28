@@ -973,7 +973,7 @@ FX SXFunctionInternal::hessian(int iind, int oind){
 void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
                                 const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
                                 const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
-                                bool output_given){
+                                bool output_given, int offset_begin, int offset_end){
   
   if(verbose()) cout << "SXFunctionInternal::eval begin" << endl;
   
@@ -1012,7 +1012,7 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
   }
 
   // Evaluate the algorithm
-  for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it<algorithm_.end(); ++it){
+  for(vector<AlgEl>::const_iterator it=algorithm_.begin()+offset_begin; it<algorithm_.end()-offset_end; ++it){
     switch(it->op){
       case OP_INPUT:
         s_work_[it->res] = input[it->arg.i[0]].data()[it->arg.i[1]]; break;
@@ -1050,6 +1050,9 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
   // Quick return if no sensitivities
   if(!taping) return;
 
+  // Partial evaluation not supported past this point
+  casadi_assert_message(offset_begin==0 && offset_end==0, "Offsets in the algorithm not supported together with sensitivities.");
+  
   // Calculate forward sensitivities
   for(int dir=0; dir<nfdir; ++dir){
     vector<TapeEl<SX> >::const_iterator it2 = s_pdwork.begin();
