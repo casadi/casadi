@@ -10830,6 +10830,10 @@ Append another sparsity patten vertically. ";
 
 Reserve space. ";
 
+%feature("docstring")  CasADi::CRSSparsity::scalar "
+
+Is scalar? ";
+
 %feature("docstring")  CasADi::CRSSparsity::dense "
 
 Is dense? ";
@@ -11117,6 +11121,10 @@ Number of non-zeros in the lower triangular half. ";
 %feature("docstring")  CasADi::CRSSparsityInternal::shape "
 
 Shape. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::scalar "
+
+Is scalar? ";
 
 %feature("docstring")  CasADi::CRSSparsityInternal::dense "
 
@@ -17470,6 +17478,10 @@ Get the sparsity pattern. ";
 %feature("docstring")  CasADi::GenericMatrix::sparsityRef "
 
 Access the sparsity, make a copy if there are multiple references to it. ";
+
+%feature("docstring")  CasADi::GenericMatrix::sym "";
+
+%feature("docstring")  CasADi::GenericMatrix::sym "";
 
 
 // File: classCasADi_1_1GenericType.xml
@@ -69198,6 +69210,10 @@ Sort the ODE and differential states. ";
 
 Sort the algebraic equations and algebraic states. ";
 
+%feature("docstring")  CasADi::SymbolicOCP::sortDependentParameters "
+
+Sort the dependent parameters. ";
+
 %feature("docstring")  CasADi::SymbolicOCP::makeExplicit "
 
 Transform the implicit ODE to an explicit ODE. ";
@@ -73953,12 +73969,8 @@ SXMatrix object. The SX expression graph has much less overhead, but is also
 more restricted than the alternative MX expression graph.
 
 Construct symbolic arrays and variables using CasADi's more restricted, but
-more efficient SX expression graphCreate an matrix with symbolic variables,
-with the dimension given by the string ";
-
-%feature("docstring")  CasADi::Interfaces::ssym "
-
-Create an n-by-m matrix with symbolic variables. ";
+more efficient SX expression graphCreate an n-by-m matrix with symbolic
+variables ";
 
 %feature("docstring")  CasADi::Interfaces::ssym "
 
@@ -74113,10 +74125,6 @@ arguments. ";
 %feature("docstring")  CasADi::Interfaces::linspace "
 
 Matlab's linspace command. ";
-
-%feature("docstring")  CasADi::Interfaces::sym "
-
-Construct a symbolic matrix. ";
 
 %feature("docstring")  CasADi::Interfaces::trans "
 
@@ -74729,6 +74737,10 @@ Inplace substitution with piggyback expressions Substitute variables v out
 of the expressions vdef sequentially, as well as out of a number of other
 expressions piggyback. ";
 
+%feature("docstring")  CasADi::Interfaces::substitute "
+
+Substitute variable var with expression expr in multiple expressions. ";
+
 %feature("docstring")  CasADi::Interfaces::vertcat "
 
 concatenate vertically ";
@@ -74752,8 +74764,6 @@ Apply a function f to each element in a vector ";
 %feature("docstring")  CasADi::Interfaces::applymap "
 
 Apply a function f to each element in a vector ";
-
-%feature("docstring")  CasADi::Interfaces::sym "";
 
 %feature("docstring")  CasADi::Interfaces::shared_cast "
 
@@ -75176,8 +75186,6 @@ Return matrix
 loop over rows
 
 append components ";
-
-%feature("docstring")  CasADi::Interfaces::sym "";
 
 %feature("docstring")  CasADi::Interfaces::print_dat "
 
