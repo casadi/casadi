@@ -78,6 +78,9 @@ namespace CasADi{
       // Binding expression
       SX binding_;
           
+      // Binding expression for the derivative
+      SX der_binding_;
+          
       // Timed variables
       std::map<double, SX> timed_sx_;
             
