@@ -160,6 +160,22 @@ std::vector<Matrix<SX> > substitute(const std::vector<Matrix<SX> > &ex, const Ma
   return fcn.eval(vector<Matrix<SX> >(1,vdef));
 }
 
+Matrix<double> evalf(const Matrix<SX> &ex, const Matrix<SX> &v, const Matrix<double> &vdef) {
+  SXFunction fcn(v,ex);
+  fcn.init();
+  fcn.input(0).set(vdef);
+  fcn.evaluate();
+  return fcn.output();
+}
+
+Matrix<double> evalf(const Matrix<SX> &ex) {
+  SXFunction fcn(std::vector< Matrix<SX> >(0),ex);
+  fcn.init();
+  fcn.evaluate();
+  return fcn.output();
+}
+
+
 Matrix<SX> substitute(const Matrix<SX> &ex, const Matrix<SX> &v, const Matrix<SX> &vdef){
   if(v.empty()) return ex; // quick return if empty
   casadi_assert_message(isSymbolic(v),"the variable is not symbolic");
