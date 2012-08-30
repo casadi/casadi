@@ -94,6 +94,13 @@ SX& SX::operator=(const SX &scalar){
   return *this;
 }
 
+void SX::assignIfDuplicate(const SX& scalar, int depth){
+  casadi_assert(depth>=1);
+  if(!isEqual(scalar,0) && isEqual(scalar,depth)){
+    *this = scalar;
+  }
+}
+
 SXNode* SX::assignNoDelete(const SX& scalar){
   // Return value
   SXNode* ret = node;
@@ -244,7 +251,7 @@ bool SX::isSquared() const{
   return isOp(OP_MUL) && node->dep(0).isEquivalent(node->dep(1));
 }
 
-bool SX::isEquivalent(const SX&y, int depth) const{
+bool SX::isEquivalent(const SX& y, int depth) const{
   if (isEqual(y)) return true;
   if (isConstant() && y.isConstant()) return y.getValue()==getValue();
   if (depth==0) return false;
@@ -471,8 +478,13 @@ bool SX::isOp(int op) const{
   return hasDep() && op==getOp();
 }
 
-bool SX::isEqual(const SX& scalar) const{
-  return node->isEqual(scalar);
+bool SX::isEqual(const SX& ex, int depth) const{
+  if(node==ex.get())
+    return true;
+  else if(depth>0)
+    return node->isEqual(ex.get(),depth);
+  else
+    return false;
 }
 
 double SX::getValue() const{

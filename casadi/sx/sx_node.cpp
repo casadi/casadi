@@ -88,13 +88,8 @@ bool SXNode::hasDep() const{
   return false;
 }
 
-bool SXNode::isEqual(const SXNode& node) const{
-  // check if the objects are the same or if both are integers with the same values
-  return (this == &node) || (isConstant() && node.isConstant() && getValue() == node.getValue());
-}
-
-bool SXNode::isEqual(const SX& scalar) const{
-  return isEqual(*scalar.get());
+bool SXNode::isEqual(const SXNode* node, int depth) const{
+  return false;
 }
 
 const std::string& SXNode::getName() const{

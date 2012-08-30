@@ -126,6 +126,12 @@ class BinarySX : public SXNode{
     virtual bool isSmooth() const{ return operation_checker<SmoothChecker>(op_);}
     
     virtual bool hasDep() const{ return true; }
+
+    /** \brief Check if two nodes are equivalent up to a given depth */
+    virtual bool isEqual(const SXNode* node, int depth) const{
+      const BinarySX* n = dynamic_cast<const BinarySX*>(node);
+      return n && n->op_ == op_ &&  n->dep0_.isEqual(dep0_,depth-1) &&  n->dep1_.isEqual(dep1_,depth-1);
+    }
     
     /** \brief  Number of dependencies */
     virtual int ndep() const{ return 2;}

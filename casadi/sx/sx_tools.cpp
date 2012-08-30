@@ -134,7 +134,7 @@ Matrix<SX> triangle(const Matrix<SX>& a){
 
 bool contains(const Matrix<SX> &list, const SX &e) {
   for (int i=0;i<nnz(list);i++) {
-    if (list(i).toScalar()->isEqual(e)) return true;
+    if (list(i).toScalar().isEqual(e)) return true;
   }
   return false;
 }

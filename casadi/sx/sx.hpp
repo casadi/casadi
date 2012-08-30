@@ -161,7 +161,17 @@ class SX : public GenericExpression<SX>{
     const std::string& getName() const;
     int getOp() const;
     bool isOp(int op) const;
-    bool isEqual(const SX& scalar) const;
+    
+    /** \brief Check if two nodes are equivalent up to a given depth. 
+     *  Depth=0 checks if the expressions are identical, i.e. points to the same node.
+     * 
+     *  a = x*x
+     *  b = x*x
+     *
+     *  a.isEqual(b,0)  will return false, but a.isEqual(b,1) will return true
+     */
+    bool isEqual(const SX& scalar, int depth=0) const;
+    
     double getValue() const;
     int getIntValue() const;
     SX getDep(int ch=0) const;
@@ -181,8 +191,7 @@ class SX : public GenericExpression<SX>{
     *
     *  a.isEqual(b)  will return false, but a.isEquivalent(b) will return true
     */
-    bool isEquivalent(const SX&y, int depth=1) const;
-
+    bool isEquivalent(const SX& y, int depth=1) const;
 
     /** \brief Returns a number that is unique for a given SXNode. 
     * If the SX does not point to any node, 0 is returned.
@@ -252,6 +261,9 @@ class SX : public GenericExpression<SX>{
     
     // Mark by flipping the sign of the temporary and decreasing by one
     void mark();
+    
+    /** \brief Assign to another expression, if a duplicate. Check for equality up to a given depth */
+    void assignIfDuplicate(const SX& scalar, int depth=1);
     
     /** \brief Set or reset the maximum number of calls to the printing function when printing an expression */
     static void setMaxNumCallsInPrint(long num=10000);
