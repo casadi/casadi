@@ -1032,6 +1032,10 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
           switch(it->op){
             CASADI_MATH_FUN_ALL_BUILTIN(s_work_[it->arg.i[0]],s_work_[it->arg.i[1]],f)
           }
+          
+          // If this new expression is identical to the expression used to define the algorithm, then reuse
+          const int depth = 2; // NOTE: a higher depth could possibly give more savings
+          f.assignIfDuplicate(*b_it++,depth);
         }
         
         // Get the partial derivatives, if requested
