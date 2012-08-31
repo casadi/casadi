@@ -2681,11 +2681,7 @@ Print the expression (recursively with a maximum number of levels) ";
 
 %feature("docstring")  CasADi::AuxOutputSX::isEqual "
 
-comparison ";
-
-%feature("docstring")  CasADi::AuxOutputSX::isEqual "
-
-comparison ";
+Check if two nodes are equivalent up to a given depth. ";
 
 %feature("docstring")  CasADi::AuxOutputSX::init "
 
@@ -3132,6 +3128,10 @@ Check if smooth. ";
 
 %feature("docstring")  CasADi::BinarySX::hasDep "";
 
+%feature("docstring")  CasADi::BinarySX::isEqual "
+
+Check if two nodes are equivalent up to a given depth. ";
+
 %feature("docstring")  CasADi::BinarySX::ndep "
 
 Number of dependencies. ";
@@ -3153,14 +3153,6 @@ Get the operation. ";
 Print the expression (recursively with a maximum number of levels) ";
 
 %feature("docstring")  CasADi::BinarySX::getName "";
-
-%feature("docstring")  CasADi::BinarySX::isEqual "
-
-comparison ";
-
-%feature("docstring")  CasADi::BinarySX::isEqual "
-
-comparison ";
 
 %feature("docstring")  CasADi::BinarySX::init "
 
@@ -7661,15 +7653,11 @@ Properties. ";
 
 Get the operation. ";
 
+%feature("docstring")  CasADi::ConstantSX::isEqual "
+
+Check if two nodes are equivalent up to a given depth. ";
+
 %feature("docstring")  CasADi::ConstantSX::getName "";
-
-%feature("docstring")  CasADi::ConstantSX::isEqual "
-
-comparison ";
-
-%feature("docstring")  CasADi::ConstantSX::isEqual "
-
-comparison ";
 
 %feature("docstring")  CasADi::ConstantSX::ndep "
 
@@ -14802,11 +14790,7 @@ Print the expression (recursively with a maximum number of levels) ";
 
 %feature("docstring")  CasADi::EvaluationSX::isEqual "
 
-comparison ";
-
-%feature("docstring")  CasADi::EvaluationSX::isEqual "
-
-comparison ";
+Check if two nodes are equivalent up to a given depth. ";
 
 %feature("docstring")  CasADi::EvaluationSX::init "
 
@@ -21158,19 +21142,15 @@ Properties. ";
 
 Get the operation. ";
 
+%feature("docstring")  CasADi::InfSX::isEqual "
+
+Check if two nodes are equivalent up to a given depth. ";
+
 %feature("docstring")  CasADi::InfSX::print "
 
 print ";
 
 %feature("docstring")  CasADi::InfSX::getName "";
-
-%feature("docstring")  CasADi::InfSX::isEqual "
-
-comparison ";
-
-%feature("docstring")  CasADi::InfSX::isEqual "
-
-comparison ";
 
 %feature("docstring")  CasADi::InfSX::ndep "
 
@@ -21266,19 +21246,15 @@ Properties. ";
 
 Get the operation. ";
 
+%feature("docstring")  CasADi::IntegerSX::isEqual "
+
+Check if two nodes are equivalent up to a given depth. ";
+
 %feature("docstring")  CasADi::IntegerSX::print "
 
 print ";
 
 %feature("docstring")  CasADi::IntegerSX::getName "";
-
-%feature("docstring")  CasADi::IntegerSX::isEqual "
-
-comparison ";
-
-%feature("docstring")  CasADi::IntegerSX::isEqual "
-
-comparison ";
 
 %feature("docstring")  CasADi::IntegerSX::ndep "
 
@@ -44809,19 +44785,15 @@ Properties. ";
 
 Get the operation. ";
 
+%feature("docstring")  CasADi::MinusInfSX::isEqual "
+
+Check if two nodes are equivalent up to a given depth. ";
+
 %feature("docstring")  CasADi::MinusInfSX::print "
 
 print ";
 
 %feature("docstring")  CasADi::MinusInfSX::getName "";
-
-%feature("docstring")  CasADi::MinusInfSX::isEqual "
-
-comparison ";
-
-%feature("docstring")  CasADi::MinusInfSX::isEqual "
-
-comparison ";
 
 %feature("docstring")  CasADi::MinusInfSX::ndep "
 
@@ -44896,19 +44868,15 @@ Properties. ";
 
 Get the operation. ";
 
+%feature("docstring")  CasADi::MinusOneSX::isEqual "
+
+Check if two nodes are equivalent up to a given depth. ";
+
 %feature("docstring")  CasADi::MinusOneSX::print "
 
 print ";
 
 %feature("docstring")  CasADi::MinusOneSX::getName "";
-
-%feature("docstring")  CasADi::MinusOneSX::isEqual "
-
-comparison ";
-
-%feature("docstring")  CasADi::MinusOneSX::isEqual "
-
-comparison ";
 
 %feature("docstring")  CasADi::MinusOneSX::ndep "
 
@@ -49482,19 +49450,15 @@ Properties. ";
 
 Get the operation. ";
 
+%feature("docstring")  CasADi::NanSX::isEqual "
+
+Check if two nodes are equivalent up to a given depth. ";
+
 %feature("docstring")  CasADi::NanSX::print "
 
 print ";
 
 %feature("docstring")  CasADi::NanSX::getName "";
-
-%feature("docstring")  CasADi::NanSX::isEqual "
-
-comparison ";
-
-%feature("docstring")  CasADi::NanSX::isEqual "
-
-comparison ";
 
 %feature("docstring")  CasADi::NanSX::ndep "
 
@@ -53850,19 +53814,15 @@ Properties. ";
 
 Get the operation. ";
 
+%feature("docstring")  CasADi::OneSX::isEqual "
+
+Check if two nodes are equivalent up to a given depth. ";
+
 %feature("docstring")  CasADi::OneSX::print "
 
 print ";
 
 %feature("docstring")  CasADi::OneSX::getName "";
-
-%feature("docstring")  CasADi::OneSX::isEqual "
-
-comparison ";
-
-%feature("docstring")  CasADi::OneSX::isEqual "
-
-comparison ";
 
 %feature("docstring")  CasADi::OneSX::ndep "
 
@@ -59423,19 +59383,15 @@ Properties. ";
 
 Get the operation. ";
 
+%feature("docstring")  CasADi::RealtypeSX::isEqual "
+
+Check if two nodes are equivalent up to a given depth. ";
+
 %feature("docstring")  CasADi::RealtypeSX::print "
 
 print ";
 
 %feature("docstring")  CasADi::RealtypeSX::getName "";
-
-%feature("docstring")  CasADi::RealtypeSX::isEqual "
-
-comparison ";
-
-%feature("docstring")  CasADi::RealtypeSX::isEqual "
-
-comparison ";
 
 %feature("docstring")  CasADi::RealtypeSX::ndep "
 
@@ -67318,7 +67274,14 @@ Check wether a binary SX is commutative. ";
 
 %feature("docstring")  CasADi::SX::isOp "";
 
-%feature("docstring")  CasADi::SX::isEqual "";
+%feature("docstring")  CasADi::SX::isEqual "
+
+Check if two nodes are equivalent up to a given depth. Depth=0 checks if the
+expressions are identical, i.e. points to the same node.
+
+a = x*x b = x*x
+
+a.isEqual(b,0) will return false, but a.isEqual(b,1) will return true ";
 
 %feature("docstring")  CasADi::SX::getValue "";
 
@@ -67445,6 +67408,11 @@ allow unambigous access. ";
 %feature("docstring")  CasADi::SX::marked "";
 
 %feature("docstring")  CasADi::SX::mark "";
+
+%feature("docstring")  CasADi::SX::assignIfDuplicate "
+
+Assign to another expression, if a duplicate. Check for equality up to a
+given depth. ";
 
 %feature("docstring")  CasADi::SX::assignNoDelete "
 
@@ -68788,11 +68756,7 @@ get the operation only for binary nodes ";
 
 %feature("docstring")  CasADi::SXNode::isEqual "
 
-comparison ";
-
-%feature("docstring")  CasADi::SXNode::isEqual "
-
-comparison ";
+Check if two nodes are equivalent up to a given depth. ";
 
 %feature("docstring")  CasADi::SXNode::ndep "
 
@@ -69338,11 +69302,7 @@ Get the operation. ";
 
 %feature("docstring")  CasADi::SymbolicSX::isEqual "
 
-comparison ";
-
-%feature("docstring")  CasADi::SymbolicSX::isEqual "
-
-comparison ";
+Check if two nodes are equivalent up to a given depth. ";
 
 %feature("docstring")  CasADi::SymbolicSX::ndep "
 
@@ -69832,6 +69792,10 @@ Check if smooth. ";
 
 %feature("docstring")  CasADi::UnarySX::hasDep "";
 
+%feature("docstring")  CasADi::UnarySX::isEqual "
+
+Check if two nodes are equivalent up to a given depth. ";
+
 %feature("docstring")  CasADi::UnarySX::ndep "
 
 Number of dependencies. ";
@@ -69853,14 +69817,6 @@ Get the operation. ";
 Print the expression (recursively with a maximum number of levels) ";
 
 %feature("docstring")  CasADi::UnarySX::getName "";
-
-%feature("docstring")  CasADi::UnarySX::isEqual "
-
-comparison ";
-
-%feature("docstring")  CasADi::UnarySX::isEqual "
-
-comparison ";
 
 %feature("docstring")  CasADi::UnarySX::init "
 
@@ -69914,7 +69870,7 @@ Get differential expression. ";
 
 %feature("docstring")  CasADi::Variable::binding "
 
-Get the binding expression. ";
+Get the binding expression for the variable or its derivative. ";
 
 %feature("docstring")  CasADi::Variable::highest "
 
@@ -70094,7 +70050,7 @@ Set the derivative expression. ";
 
 %feature("docstring")  CasADi::Variable::setBinding "
 
-Set the binding expression. ";
+Set the binding expression for the variable or its derivative. ";
 
 %feature("docstring")  CasADi::Variable::setIndex "
 
@@ -73737,19 +73693,15 @@ Properties. ";
 
 Get the operation. ";
 
+%feature("docstring")  CasADi::ZeroSX::isEqual "
+
+Check if two nodes are equivalent up to a given depth. ";
+
 %feature("docstring")  CasADi::ZeroSX::print "
 
 print ";
 
 %feature("docstring")  CasADi::ZeroSX::getName "";
-
-%feature("docstring")  CasADi::ZeroSX::isEqual "
-
-comparison ";
-
-%feature("docstring")  CasADi::ZeroSX::isEqual "
-
-comparison ";
 
 %feature("docstring")  CasADi::ZeroSX::ndep "
 
@@ -75022,6 +74974,21 @@ Remove identical calculations. ";
 %feature("docstring")  CasADi::Interfaces::substitute "
 
 Substitute variable var with expression expr in multiple expressions. ";
+
+%feature("docstring")  CasADi::Interfaces::evalf "
+
+Substitute variable v with value vdef in an expression ex, and evaluate
+numerically.
+
+Note: this is not efficient. For critical parts (loops) of your code, always
+use SXFunction. See:   numSample1D ";
+
+%feature("docstring")  CasADi::Interfaces::evalf "
+
+Evaluate an SX graph numerically.
+
+Note: this is not efficient. For critical parts (loops) of your code, always
+use SXFunction. ";
 
 %feature("docstring")  CasADi::Interfaces::substitute "
 
