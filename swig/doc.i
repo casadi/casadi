@@ -240,9 +240,9 @@ C++ includes: acado_integrator.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -274,8 +274,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -1595,9 +1593,9 @@ C++ includes: acado_ocp.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -1629,8 +1627,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -3537,9 +3533,9 @@ C++ includes: c_function.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -3571,8 +3567,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -4735,9 +4729,9 @@ C++ includes: collocation.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -4769,8 +4763,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -5523,9 +5515,9 @@ C++ includes: collocation_integrator.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -5557,8 +5549,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -7922,9 +7912,9 @@ C++ includes: control_simulator.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -7956,8 +7946,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -10033,9 +10021,9 @@ C++ includes: cplex_solver.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -10067,8 +10055,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -11428,9 +11414,9 @@ C++ includes: csparse.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -11462,8 +11448,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -12859,9 +12843,9 @@ C++ includes: cvodes_integrator.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -12893,8 +12877,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -14951,9 +14933,9 @@ C++ includes: external_function.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -14985,8 +14967,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -16396,9 +16376,9 @@ C++ includes: fx.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -16430,8 +16410,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -18235,9 +18213,9 @@ C++ includes: idas_integrator.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -18269,8 +18247,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -20097,9 +20073,9 @@ C++ includes: implicit_function.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -20131,8 +20107,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -21497,9 +21471,9 @@ C++ includes: integrator.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -21531,8 +21505,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -23481,9 +23453,9 @@ C++ includes: ip_method.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -23515,8 +23487,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -28897,9 +28867,9 @@ C++ includes: ipopt_qp_solver.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -28931,8 +28901,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -32290,9 +32258,9 @@ C++ includes: ipopt_solver.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -32324,8 +32292,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -32998,9 +32964,9 @@ C++ includes: jacobian.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -33032,8 +32998,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -34998,9 +34962,9 @@ C++ includes: kinsol_solver.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -35032,8 +34996,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -36745,9 +36707,9 @@ C++ includes: knitro_solver.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -36779,8 +36741,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -37437,9 +37397,9 @@ C++ includes: lapack_lu_dense.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -37471,8 +37431,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -38652,9 +38610,9 @@ C++ includes: lapack_qr_dense.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -38686,8 +38644,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -40063,9 +40019,9 @@ C++ includes: lifted_sqp.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -40097,8 +40053,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -42202,9 +42156,9 @@ C++ includes: liftopt_solver.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -42236,8 +42190,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -42871,9 +42823,9 @@ C++ includes: linear_solver.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -42905,8 +42857,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -45419,9 +45369,9 @@ C++ includes: multiple_shooting.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -45457,8 +45407,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -48141,9 +48089,9 @@ C++ includes: mx_function.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -48175,8 +48123,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -49772,9 +49718,9 @@ C++ includes: nlp_solver.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -49806,8 +49752,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -52716,9 +52660,9 @@ C++ includes: ocp_solver.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -52750,8 +52694,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -54632,9 +54574,9 @@ C++ includes: ooqp_solver.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -54666,8 +54608,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -55835,9 +55775,9 @@ C++ includes: parallelizer.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -55869,8 +55809,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -57655,9 +57593,9 @@ C++ includes: qpoases_solver.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -57689,8 +57627,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -58340,9 +58276,9 @@ C++ includes: qp_solver.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -58374,8 +58310,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -59636,9 +59570,9 @@ C++ includes: rk_integrator.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -59670,8 +59604,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -61329,9 +61261,9 @@ C++ includes: simulator.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -61363,8 +61295,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -63713,9 +63643,9 @@ C++ includes: sqp_method.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -63747,8 +63677,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -64612,9 +64540,9 @@ C++ includes: sundials_integrator.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -64646,8 +64574,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -66135,9 +66061,9 @@ C++ includes: superlu.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -66169,8 +66095,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -67596,9 +67520,9 @@ C++ includes: sx_function.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -67630,8 +67554,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -72597,9 +72519,9 @@ C++ includes: worhp_solver.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -72631,8 +72553,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -74016,7 +73936,9 @@ For each column in the grid, fx is numerically evaluated and the output is
 put in a resulting matrix of size m-by-n*p
 
 If your fx is really multiple output, and you wish to use a particular
-output, use the slice operator on the fx. ";
+output, use the slice operator on the fx.
+
+See:   evalf ";
 
 %feature("docstring")  CasADi::Interfaces::numSample1DT "
 
