@@ -58,6 +58,9 @@ sparse_direct = True
 # Second order sensitivities by a symbolic-numeric approach
 second_order = False
 
+# Derivatives via source code transformation
+with_sct = True
+
 # Create an IDAS instance (fully implicit integrator)
 def create_IDAS():
   # Time 
@@ -286,6 +289,28 @@ if with_asens:
   print "adjoint sensitivities           ",
   print integrator.adjSens(INTEGRATOR_X0), " ",
   print integrator.adjSens(INTEGRATOR_P), " "
+  
+# Derivatives via source code transformation
+if with_sct:
+  # Forward seeds
+  fintegrator = integrator.derivative(1,0)
+  fintegrator.setInput(integrator.input(INTEGRATOR_X0),INTEGRATOR_X0)
+  fintegrator.setInput(integrator.input(INTEGRATOR_P),INTEGRATOR_P)
+  fintegrator.setInput(integrator.fwdSeed(INTEGRATOR_X0),INTEGRATOR_NUM_IN+INTEGRATOR_X0)
+  fintegrator.setInput(integrator.fwdSeed(INTEGRATOR_P),INTEGRATOR_NUM_IN+INTEGRATOR_P)
+  fintegrator.evaluate()
+  print "forward sensitivities via sct   ", fintegrator.output(INTEGRATOR_NUM_OUT+INTEGRATOR_XF)
+  
+  aintegrator = integrator.derivative(0,1)
+  aintegrator.setInput(integrator.input(INTEGRATOR_X0),INTEGRATOR_X0)
+  aintegrator.setInput(integrator.input(INTEGRATOR_P),INTEGRATOR_P)
+  aintegrator.setInput(integrator.adjSeed(INTEGRATOR_XF),INTEGRATOR_NUM_IN+INTEGRATOR_XF)
+  aintegrator.setInput(integrator.adjSeed(INTEGRATOR_QF),INTEGRATOR_NUM_IN+INTEGRATOR_QF)
+  aintegrator.evaluate()
+
+  print "adjoint sensitivities via sct   ",
+  print aintegrator.output(INTEGRATOR_NUM_OUT+INTEGRATOR_X0), " ",
+  print aintegrator.output(INTEGRATOR_NUM_OUT+INTEGRATOR_P), " "
   
 if second_order:
   # Generate the jacobian by creating a new integrator for the sensitivity equations by source transformation

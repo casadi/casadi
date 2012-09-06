@@ -198,14 +198,12 @@ std::pair<FX,FX> IntegratorInternal::getAugmented(int nfwd, int nadj){
   
 template<class Mat,class XFunc>
 std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
-  
-  // Currently only handles this special case
-  casadi_assert(nfwd==0);
-  
+    
   // Get derivatived type
   XFunc f = shared_cast<XFunc>(f_);
   XFunc g = shared_cast<XFunc>(g_);
   
+  // Take apart forward problem
   vector<Mat> dae_in = f.inputExpr();
   vector<Mat> dae_out = f.outputExpr();
   casadi_assert(dae_in.size()==DAE_NUM_IN);
@@ -215,64 +213,135 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
   Mat p = dae_in[DAE_P];
   Mat t = dae_in[DAE_T];
   Mat xdot = dae_in[DAE_XDOT];
+  Mat ode = dae_out[DAE_ODE];
+  Mat alg = dae_out[DAE_ALG];
+  Mat quad = dae_out[DAE_QUAD];
   
-  vector<Mat> rx = Mat::sym("rx",dae_out[DAE_ODE].sparsity(),nadj);
-  vector<Mat> rz = Mat::sym("rz",dae_out[DAE_ALG].sparsity(),nadj);
-  vector<Mat> rxdot = Mat::sym("rxdot",dae_out[DAE_ODE].sparsity(),nadj);
-  vector<Mat> rp = Mat::sym("rp",dae_out[DAE_QUAD].sparsity(),nadj);
-    
+  // Take apart the backwards problem
+  vector<Mat> rdae_in(RDAE_NUM_IN), rdae_out(RDAE_NUM_OUT);
+  if(!g.isNull()){
+    rdae_in = g.inputExpr();
+    rdae_out = g.outputExpr();
+    // TODO: Assert that rdae_in[RDAE_X]==x, rdae_in[RDAE_Z]==z, rdae_in[RDAE_P]==p, rdae_in[RDAE_XDOT]==xdot
+  }
+  Mat rx = rdae_in[RDAE_RX];
+  Mat rz = rdae_in[RDAE_RZ];
+  Mat rxdot = rdae_in[RDAE_RXDOT];
+  Mat rode = rdae_out[RDAE_ODE];
+  Mat ralg = rdae_out[RDAE_ALG];
+  Mat rquad = rdae_out[RDAE_QUAD];
+  
+  // Allocate adjoint sensitivities
+  vector<Mat> adj_ode = Mat::sym("adj_ode",ode.sparsity(),nadj);
+  vector<Mat> adj_alg = Mat::sym("adj_alg",alg.sparsity(),nadj);
+  vector<Mat> adj_odedot = Mat::sym("adj_odedot",ode.sparsity(),nadj);
+  vector<Mat> adj_quad = Mat::sym("adj_quad",quad.sparsity(),nadj);
+  
+  // Allocate forward sensitivities
+  vector<Mat> fwd_x = Mat::sym("fwd_x",x.sparsity(),nfwd);
+  vector<Mat> fwd_z = Mat::sym("fwd_z",z.sparsity(),nfwd);
+  vector<Mat> fwd_xdot = Mat::sym("fwd_zdot",xdot.sparsity(),nfwd);
+  vector<Mat> fwd_p = Mat::sym("fwd_p",p.sparsity(),nfwd);
+
   // Is the ODE part explicit?
   bool ode_is_explict = xdot.size()==0;
   
-  // Number of adjoint sweeps needed
-  int n_sweep = nadj*(ode_is_explict ? 1 : 2);
-  
-  vector<vector<Mat> > dummy;
-  vector<vector<Mat> > aseed(n_sweep,vector<Mat>(DAE_NUM_OUT));
+  // Forward seeds
+  vector<vector<Mat> > fseed(nfwd,vector<Mat>(DAE_NUM_IN));
+  for(int dir=0; dir<nfwd; ++dir){
+    fseed[dir][DAE_X] = fwd_x[dir];
+    fseed[dir][DAE_Z] = fwd_z[dir];
+    fseed[dir][DAE_P] = fwd_p[dir];
+    if(!t.isNull()) fseed[dir][DAE_T] = Mat(t.sparsity());
+    fseed[dir][DAE_XDOT] = fwd_xdot[dir];
+  }
+
+  // Adjoint seeds
+  vector<vector<Mat> > aseed(nadj*(ode_is_explict ? 1 : 2),vector<Mat>(DAE_NUM_OUT));
   for(int dir=0; dir<nadj; ++dir){
-    aseed[dir][DAE_ODE] = rx[dir];
-    aseed[dir][DAE_ALG] = rz[dir];
-    aseed[dir][DAE_QUAD] = rp[dir];
+    aseed[dir][DAE_ODE] = adj_ode[dir];
+    aseed[dir][DAE_ALG] = adj_alg[dir];
+    aseed[dir][DAE_QUAD] = adj_quad[dir];
     if(!ode_is_explict){
-      aseed[nadj+dir][DAE_ODE] = -rxdot[dir];
+      aseed[nadj+dir][DAE_ODE] = -adj_odedot[dir];
       aseed[nadj+dir][DAE_ALG] = Mat(dae_out[DAE_ALG].sparsity());
       aseed[nadj+dir][DAE_QUAD] = Mat(dae_out[DAE_QUAD].sparsity());
     }
   }
-  vector<vector<Mat> > asens(n_sweep,dae_in);
-  f.eval(dae_in,dae_out,dummy,dummy,aseed,asens,true);
+  
+  // Calculate forward and adjoint sensitivities
+  vector<vector<Mat> > fsens(fseed.size(),dae_out);
+  vector<vector<Mat> > asens(aseed.size(),dae_in);
+  f.eval(dae_in,dae_out,fseed,fsens,aseed,asens,true);
+  
+  // Augment forward state vectors
+  x.append(vertcat(fwd_x));
+  z.append(vertcat(fwd_z));
+  xdot.append(vertcat(fwd_xdot));
   
   // Augment parameter vector
-  Mat p_aug = vertcat(p,vertcat(rp));
-  dae_in[DAE_P] = p_aug;
+  p.append(vertcat(fwd_p));
+  p.append(vertcat(adj_quad));
   
-  // Formulate the backwards integration problem
-  vector<Mat> rdae_in(RDAE_NUM_IN);
-  rdae_in[RDAE_RX] = vertcat(rx);
-  rdae_in[RDAE_RZ] = vertcat(rz);
-  rdae_in[RDAE_X] = x;
-  rdae_in[RDAE_Z] = z;
-  rdae_in[RDAE_P] = p_aug;
-  rdae_in[RDAE_T] = t;
-  rdae_in[RDAE_XDOT] = xdot;
-  rdae_in[RDAE_RXDOT] = vertcat(rxdot);
+  // Augment backward state vectors
+  rx.append(vertcat(adj_ode));
+  rz.append(vertcat(adj_alg));
+  rxdot.append(vertcat(adj_odedot));
   
-  vector<Mat> rdae_out(RDAE_NUM_OUT);
-  for(int dir=0; dir<nadj; ++dir){
-    Mat ode = asens[dir][DAE_X];
-    if(ode_is_explict){
-      ode += rxdot[dir];
-    } else {
-      ode += asens[nadj+dir][DAE_XDOT];
-    }
-    rdae_out[RDAE_ODE].append(ode);
-    rdae_out[RDAE_ALG].append(asens[dir][DAE_Z]);
-    rdae_out[RDAE_QUAD].append(asens[dir][DAE_P]);
+  // Augment forward problem
+  for(int dir=0; dir<nfwd; ++dir){
+    ode.append(fsens[dir][DAE_ODE]);
+    alg.append(fsens[dir][DAE_ALG]);
+    quad.append(fsens[dir][DAE_QUAD]);
   }
   
+  // Augment backwards problem
+  for(int dir=0; dir<nadj; ++dir){
+    Mat rode_sens = asens[dir][DAE_X];
+    if(ode_is_explict){
+      rode_sens += adj_odedot[dir];
+    } else {
+      rode_sens += asens[nadj+dir][DAE_XDOT];
+    }
+    rode.append(rode_sens);
+    ralg.append(asens[dir][DAE_Z]);
+    rquad.append(asens[dir][DAE_P]);
+  }
+  
+  // Update the forward problem inputs ...
+  dae_in[DAE_X] = x;
+  dae_in[DAE_Z] = z;
+  dae_in[DAE_P] = p;
+  dae_in[DAE_T] = t;
+  dae_in[DAE_XDOT] = xdot;
+
+  // ... and outputs
+  dae_out[DAE_ODE] = ode;
+  dae_out[DAE_ALG] = alg;
+  dae_out[DAE_QUAD] = quad;
+  
+  // Update the backward problem inputs ...
+  rdae_in[RDAE_RX] = rx;
+  rdae_in[RDAE_RZ] = rz;
+  rdae_in[RDAE_X] = x;
+  rdae_in[RDAE_Z] = z;
+  rdae_in[RDAE_P] = p;
+  rdae_in[RDAE_T] = t;
+  rdae_in[RDAE_XDOT] = xdot;
+  rdae_in[RDAE_RXDOT] = rxdot;
+  
+  // ... and outputs
+  rdae_out[RDAE_ODE] = rode;
+  rdae_out[RDAE_ALG] = ralg;
+  rdae_out[RDAE_QUAD] = rquad;
+  
+  // Create functions for the augmented problems
   XFunc f_aug(dae_in,dae_out);
   XFunc g_aug(rdae_in,rdae_out);
 
+  // Workaround, delete g_aug if its empty
+  if(g.isNull() && nadj==0) g_aug = XFunc();
+  
   return pair<FX,FX>(f_aug,g_aug);
 }
 
