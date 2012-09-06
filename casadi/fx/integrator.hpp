@@ -80,134 +80,91 @@
 
 namespace CasADi{
 
-/// Input arguments of an ODE/DAE function
+/// Input arguments of an ODE/DAE function [daeIn]
 enum DAEInput{
-  /** Differential state */
+  /// Differential state [x]
   DAE_X,
-  /** Algebraic state */
+  /// Algebraic state [z]
   DAE_Z,
-  /** Parameter */
+  /// Parameter [p]
   DAE_P,
-  /** Explicit time dependence */
+  /// Explicit time dependence [t]
   DAE_T,
-  /** Time derivative of differential states */
+  /// Time derivative of differential states [xdot]
   DAE_XDOT,
-  /** Number of arguments. */
+  /// Number of arguments. */
   DAE_NUM_IN
 };
 
-/// Helper function to create ODE/DAE forward integration function input arguments
-template<class M>
-std::vector<M> daeIn(const M& x, const M& z=M(), const M& p=M(), const M& t=M(), const M& xdot=M()){
-  M ret[DAE_NUM_IN] = {x,z,p,t,xdot};
-  return std::vector<M>(ret,ret+DAE_NUM_IN);
-}
-#ifdef SWIG
-%template(daeIn) daeIn<SXMatrix>;
-%template(daeIn) daeIn<MX>;
-#endif //SWIG
-
-/// Output arguments of an DAE function
+/// Output arguments of an DAE function [daeOut]
 enum DAEOutput{
-  /** Right hand side of the implicit ODE */
+  /// Right hand side of the implicit ODE [ode]
   DAE_ODE,
-  /** Right hand side of algebraic equations */
+  /// Right hand side of algebraic equations [alg]
   DAE_ALG,
-  /** Right hand side of quadratures equations */
+  /// Right hand side of quadratures equations [quad]
   DAE_QUAD,
-  /** Number of arguments. */
+  /// Number of arguments.
   DAE_NUM_OUT
 };
 
-/// Helper function to create DAE forward integration function output arguments
-template<class M>
-std::vector<M> daeOut(const M& ode, const M& alg=M(), const M& quad=M()){
-  M ret[DAE_NUM_OUT] = {ode,alg,quad};
-  return std::vector<M>(ret,ret+DAE_NUM_OUT);
-}
-#ifdef SWIG
-%template(daeOut) daeOut<SXMatrix>;
-%template(daeOut) daeOut<MX>;
-#endif //SWIG
-
-/// Input arguments of an ODE/DAE backward integration function 
+/// Input arguments of an ODE/DAE backward integration function [rdaeIn] 
 enum RDAEInput{
-  /** Backward differential state */
+  /// Backward differential state [rx]
   RDAE_RX,
-  /** Backward algebraic state */
+  /// Backward algebraic state [rz]
   RDAE_RZ,
-  /** Backward parameter */
+  /// Backward parameter [rp]
   RDAE_RP,
-  /** Forward differential state */
+  /// Forward differential state [x]
   RDAE_X,
-  /** Forward algebraic state */
+  /// Forward algebraic state [z]
   RDAE_Z,
-  /** Parameter vector */
+  /// Parameter vector [p]
   RDAE_P,
-  /** Explicit time dependence */
+  /// Explicit time dependence [t]
   RDAE_T,
-  /** Time derivative of backward differential state */
+  /// Time derivative of backward differential state [rxdot]
   RDAE_RXDOT,
-  /** Number of arguments. */
+  /// Number of arguments.
   RDAE_NUM_IN
 };
 
-/// Helper function to create ODE/DAE backward integration function input arguments
-template<class M>
-std::vector<M> rdaeIn(const M& rx, const M& rz=M(), const M& rp=M(), const M& x=M(), const M& z=M(), const M& p=M(), const M& t=M(), const M& rxdot=M()){
-  M ret[RDAE_NUM_IN] = {rx,rz,rp,x,z,p,t,rxdot};
-  return std::vector<M>(ret,ret+RDAE_NUM_IN);
-}
-#ifdef SWIG
-%template(rdaeIn) rdaeIn<SXMatrix>;
-%template(rdaeIn) rdaeIn<MX>;
-#endif //SWIG
-
-/// Output arguments of an ODE/DAE backward integration function
+/// Output arguments of an ODE/DAE backward integration function [rdaeOut]
 enum RDAEOutput{
-  /** Right hand side of ODE.*/
+  /// Right hand side of ODE. [ode]
   RDAE_ODE,
-  /** Right hand side of algebraic equations.*/
+  /// Right hand side of algebraic equations. [alg]
   RDAE_ALG,
-  /** Right hand side of quadratures.*/
+  /// Right hand side of quadratures. [quad]
   RDAE_QUAD,
-  /** Number of arguments. */
+  /// Number of arguments.
   RDAE_NUM_OUT
 };
 
-/// Helper function to create ODE/DAE backward integration function output arguments
-template<class M>
-std::vector<M> rdaeOut(const M& ode, const M& alg=M(), const M& quad=M()){
-  M ret[RDAE_NUM_OUT] = {ode,alg,quad};
-  return std::vector<M>(ret,ret+RDAE_NUM_OUT);
-}
-#ifdef SWIG
-%template(rdaeOut) rdaeOut<SXMatrix>;
-%template(rdaeOut) rdaeOut<MX>;
-#endif //SWIG
-
-/// Input arguments of an integrator
+/// Input arguments of an integrator [integratorIn]
 enum IntegratorInput{
-  /** Differential state at the initial time */
+  /// Differential state at the initial time [x0]
   INTEGRATOR_X0, 
-  /** Parameters */
+  /// Parameters [p] */
   INTEGRATOR_P,
-  /** Backward differential state at the final time */
+  /// Backward differential state at the final time [rx0]
   INTEGRATOR_RX0, 
-  /** Number of input arguments of an integrator */
-  INTEGRATOR_NUM_IN};
+  /// Number of input arguments of an integrator
+  INTEGRATOR_NUM_IN
+};
 
-/// Output arguments of an integrator
+/// Output arguments of an integrator [integratorOut]
 enum IntegratorOutput{
-  /**  Differential state at the final time */
+  ///  Differential state at the final time [xf]
   INTEGRATOR_XF,
-  /**  Quadrature state at the final time */
+  ///  Quadrature state at the final time [qf]
   INTEGRATOR_QF,
-  /**  Backward differential state at the initial time */
+  ///  Backward differential state at the initial time [rxf]
   INTEGRATOR_RXF,
-  /**  Backward quadrature state at the initial time */
+  ///  Backward quadrature state at the initial time [rqf]
   INTEGRATOR_RQF,
-    /** Number of output arguments of an integrator */
+  /// Number of output arguments of an integrator
   INTEGRATOR_NUM_OUT
 };
 

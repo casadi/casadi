@@ -72,14 +72,7 @@ ocp.makeExplicit()
 ocp.eliminateAlgebraic()
 
 # Create an integrator
-dae_in = DAE_NUM_IN * [[]]
-dae_in[DAE_T] = ocp.t
-dae_in[DAE_X] = var(ocp.x)
-dae_in[DAE_XDOT] = der(ocp.x)
-dae_in[DAE_P] = vertcat((var(ocp.pi),var(ocp.pf)))
-dae_out = DAE_NUM_OUT * [[]]
-dae_out[DAE_ODE] = ocp.ode
-dae = SXFunction(dae_in,dae_out)
+dae = SXFunction(daeIn(t=ocp.t,x=var(ocp.x),xdot=der(ocp.x),p=vertcat((var(ocp.pi),var(ocp.pf)))),daeOut(ocp.ode))
 integrator = CVodesIntegrator(dae)
 
 # Output function
@@ -131,14 +124,7 @@ ocp.makeExplicit()
 ocp.eliminateAlgebraic()
 
 # Create an integrator
-dae_in = DAE_NUM_IN * [[]]
-dae_in[DAE_T] = ocp.t
-dae_in[DAE_X] = var(ocp.x)
-dae_in[DAE_XDOT] = der(ocp.x)
-dae_in[DAE_P] = vertcat((var(ocp.pi),var(ocp.pf)))
-dae_out = DAE_NUM_OUT * [[]]
-dae_out[DAE_ODE] = ocp.ode
-dae = SXFunction(dae_in,dae_out)
+dae = SXFunction(daeIn(t=ocp.t,x=var(ocp.x),xdot=der(ocp.x),p=vertcat((var(ocp.pi),var(ocp.pf)))),daeOut(ocp.ode))
 integrator = CVodesIntegrator(dae)
 
 # Output function
@@ -182,14 +168,7 @@ ocp.makeExplicit()
 ocp.eliminateAlgebraic()
 
 # Create an integrator
-dae_in = DAE_NUM_IN * [[]]
-dae_in[DAE_T] = ocp.t
-dae_in[DAE_X] = var(ocp.x)
-dae_in[DAE_XDOT] = der(ocp.x)
-dae_in[DAE_P] = vertcat((var(ocp.pi),var(ocp.pf)))
-dae_out = DAE_NUM_OUT * [[]]
-dae_out[DAE_ODE] = ocp.ode
-dae = SXFunction(dae_in,dae_out)
+dae = SXFunction(daeIn(t=ocp.t,x=var(ocp.x),xdot=der(ocp.x),p=vertcat((var(ocp.pi),var(ocp.pf)))),daeOut(ode=ocp.ode))
 integrator = CVodesIntegrator(dae)
 
 # Output function

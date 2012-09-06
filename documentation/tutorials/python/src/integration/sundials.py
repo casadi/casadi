@@ -35,7 +35,7 @@ f  = SXFunction([vertcat([x,y]),u], [vertcat([(1-y*y)*x-y+u,x])])
 #! Manipulate the function to adhere to the integrator's
 #! input/output signature
 #! f(time;states;parameters)
-fmod=SXFunction(daeIn(f.inputSX(0),(),f.inputSX(1)),daeOut(f.outputSX(0)))
+fmod=SXFunction(daeIn(x=f.inputSX(0),p=f.inputSX(1)),daeOut(f.outputSX(0)))
 fmod.setOption("name","ODE right hand side")
 #! Create the CVodesIntegrator
 integrator = CVodesIntegrator(fmod)
@@ -194,7 +194,7 @@ show()
 #! - a free symbolic input, held constant during integration interval
 u=MX("u")
 integrator.setFinalTime(tend)
-w,_,_,_ = integrator.call({'NUM': INTEGRATOR_NUM_IN, INTEGRATOR_X0: MX([1,0]), INTEGRATOR_P: u})
+w,_,_,_ = integrator.call(integratorIn(x0=MX([1,0]),p=u))
 
 #! We construct an MXfunction and a python help function 'out'
 f=MXFunction([u],[w])
