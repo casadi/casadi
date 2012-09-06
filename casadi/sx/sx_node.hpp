@@ -73,10 +73,9 @@ virtual const std::string& getName() const; // get the name
 only for binary nodes
 */
 virtual int getOp() const=0; // get the operation (only for binary nodes)
-/// comparison
-bool isEqual(const SXNode& node) const; // comparison
-/// comparison
-bool isEqual(const SX& scalar) const; // comparison
+
+/** \brief Check if two nodes are equivalent up to a given depth */
+virtual bool isEqual(const SXNode* node, int depth) const;
 
 /** \brief  Number of dependencies */
 virtual int ndep() const{ return 0;}

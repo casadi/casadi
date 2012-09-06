@@ -473,7 +473,7 @@ namespace CasADi{
   }
   
   template<typename T>
-  void sort(const std::vector<T> &values, std::vector<T> &sorted_values, std::vector<int> &indices,  bool invert_indices=false) {
+  void sort(const std::vector<T> &values, std::vector<T> &sorted_values, std::vector<int> &indices,  bool invert_indices) {
   
     // Create a list of (value,index) pairs
     std::vector< std::pair<T,int> > pvalues(values.size());

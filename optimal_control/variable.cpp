@@ -34,6 +34,8 @@ Variable::Variable(const string& name, bool create_expression){
   if(create_expression){
     setExpression(SX(name));
     setDerivative(SX("der_" + name));
+    setBinding(var(),false);
+    setBinding(der(),true);
   }
 }
 
@@ -57,8 +59,12 @@ SX Variable::var() const{
   return (*this)->var_;
 }
 
-SX Variable::binding() const{
-  return (*this)->binding_;
+SX Variable::binding(bool derivative) const{
+  if(derivative){
+    return (*this)->der_binding_;
+  } else {
+    return (*this)->binding_;
+  }
 }
 
 const string& Variable::getName() const{
@@ -221,8 +227,12 @@ void Variable::setDerivative(const SX& d){
   (*this)->der_ = d;
 }
 
-void Variable::setBinding(const SX& binding){
-  (*this)->binding_ = binding;
+void Variable::setBinding(const SX& binding, bool derivative){
+  if(derivative){
+    (*this)->der_binding_ = binding;
+  } else {
+    (*this)->binding_ = binding;
+  }
 }
 
 bool Variable::checkNode() const{

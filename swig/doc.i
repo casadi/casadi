@@ -240,9 +240,9 @@ C++ includes: acado_integrator.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -274,8 +274,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -1595,9 +1593,9 @@ C++ includes: acado_ocp.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -1629,8 +1627,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -2681,11 +2677,7 @@ Print the expression (recursively with a maximum number of levels) ";
 
 %feature("docstring")  CasADi::AuxOutputSX::isEqual "
 
-comparison ";
-
-%feature("docstring")  CasADi::AuxOutputSX::isEqual "
-
-comparison ";
+Check if two nodes are equivalent up to a given depth. ";
 
 %feature("docstring")  CasADi::AuxOutputSX::init "
 
@@ -3132,6 +3124,10 @@ Check if smooth. ";
 
 %feature("docstring")  CasADi::BinarySX::hasDep "";
 
+%feature("docstring")  CasADi::BinarySX::isEqual "
+
+Check if two nodes are equivalent up to a given depth. ";
+
 %feature("docstring")  CasADi::BinarySX::ndep "
 
 Number of dependencies. ";
@@ -3153,14 +3149,6 @@ Get the operation. ";
 Print the expression (recursively with a maximum number of levels) ";
 
 %feature("docstring")  CasADi::BinarySX::getName "";
-
-%feature("docstring")  CasADi::BinarySX::isEqual "
-
-comparison ";
-
-%feature("docstring")  CasADi::BinarySX::isEqual "
-
-comparison ";
 
 %feature("docstring")  CasADi::BinarySX::init "
 
@@ -3545,9 +3533,9 @@ C++ includes: c_function.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -3579,8 +3567,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -4743,9 +4729,9 @@ C++ includes: collocation.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -4777,8 +4763,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -5531,9 +5515,9 @@ C++ includes: collocation_integrator.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -5565,8 +5549,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -7661,15 +7643,11 @@ Properties. ";
 
 Get the operation. ";
 
+%feature("docstring")  CasADi::ConstantSX::isEqual "
+
+Check if two nodes are equivalent up to a given depth. ";
+
 %feature("docstring")  CasADi::ConstantSX::getName "";
-
-%feature("docstring")  CasADi::ConstantSX::isEqual "
-
-comparison ";
-
-%feature("docstring")  CasADi::ConstantSX::isEqual "
-
-comparison ";
 
 %feature("docstring")  CasADi::ConstantSX::ndep "
 
@@ -7934,9 +7912,9 @@ C++ includes: control_simulator.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -7968,8 +7946,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -10045,9 +10021,9 @@ C++ includes: cplex_solver.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -10079,8 +10055,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -10830,6 +10804,10 @@ Append another sparsity patten vertically. ";
 
 Reserve space. ";
 
+%feature("docstring")  CasADi::CRSSparsity::scalar "
+
+Is scalar? ";
+
 %feature("docstring")  CasADi::CRSSparsity::dense "
 
 Is dense? ";
@@ -11117,6 +11095,10 @@ Number of non-zeros in the lower triangular half. ";
 %feature("docstring")  CasADi::CRSSparsityInternal::shape "
 
 Shape. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::scalar "
+
+Is scalar? ";
 
 %feature("docstring")  CasADi::CRSSparsityInternal::dense "
 
@@ -11432,9 +11414,9 @@ C++ includes: csparse.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -11466,8 +11448,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -12863,9 +12843,9 @@ C++ includes: cvodes_integrator.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -12897,8 +12877,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -14794,11 +14772,7 @@ Print the expression (recursively with a maximum number of levels) ";
 
 %feature("docstring")  CasADi::EvaluationSX::isEqual "
 
-comparison ";
-
-%feature("docstring")  CasADi::EvaluationSX::isEqual "
-
-comparison ";
+Check if two nodes are equivalent up to a given depth. ";
 
 %feature("docstring")  CasADi::EvaluationSX::init "
 
@@ -14959,9 +14933,9 @@ C++ includes: external_function.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -14993,8 +14967,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -16404,9 +16376,9 @@ C++ includes: fx.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -16438,8 +16410,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -17471,6 +17441,10 @@ Get the sparsity pattern. ";
 
 Access the sparsity, make a copy if there are multiple references to it. ";
 
+%feature("docstring")  CasADi::GenericMatrix::sym "";
+
+%feature("docstring")  CasADi::GenericMatrix::sym "";
+
 
 // File: classCasADi_1_1GenericType.xml
 %feature("docstring") CasADi::GenericType "
@@ -18228,9 +18202,9 @@ C++ includes: idas_integrator.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -18262,8 +18236,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -20079,9 +20051,9 @@ C++ includes: implicit_function.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -20113,8 +20085,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -21124,19 +21094,15 @@ Properties. ";
 
 Get the operation. ";
 
+%feature("docstring")  CasADi::InfSX::isEqual "
+
+Check if two nodes are equivalent up to a given depth. ";
+
 %feature("docstring")  CasADi::InfSX::print "
 
 print ";
 
 %feature("docstring")  CasADi::InfSX::getName "";
-
-%feature("docstring")  CasADi::InfSX::isEqual "
-
-comparison ";
-
-%feature("docstring")  CasADi::InfSX::isEqual "
-
-comparison ";
 
 %feature("docstring")  CasADi::InfSX::ndep "
 
@@ -21232,19 +21198,15 @@ Properties. ";
 
 Get the operation. ";
 
+%feature("docstring")  CasADi::IntegerSX::isEqual "
+
+Check if two nodes are equivalent up to a given depth. ";
+
 %feature("docstring")  CasADi::IntegerSX::print "
 
 print ";
 
 %feature("docstring")  CasADi::IntegerSX::getName "";
-
-%feature("docstring")  CasADi::IntegerSX::isEqual "
-
-comparison ";
-
-%feature("docstring")  CasADi::IntegerSX::isEqual "
-
-comparison ";
 
 %feature("docstring")  CasADi::IntegerSX::ndep "
 
@@ -21487,9 +21449,9 @@ C++ includes: integrator.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -21521,8 +21483,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -23471,9 +23431,9 @@ C++ includes: ip_method.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -23505,8 +23465,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -28887,9 +28845,9 @@ C++ includes: ipopt_qp_solver.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -28921,8 +28879,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -32280,9 +32236,9 @@ C++ includes: ipopt_solver.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -32314,8 +32270,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -32988,9 +32942,9 @@ C++ includes: jacobian.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -33022,8 +32976,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -34988,9 +34940,9 @@ C++ includes: kinsol_solver.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -35022,8 +34974,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -36735,9 +36685,9 @@ C++ includes: knitro_solver.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -36769,8 +36719,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -37427,9 +37375,9 @@ C++ includes: lapack_lu_dense.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -37461,8 +37409,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -38642,9 +38588,9 @@ C++ includes: lapack_qr_dense.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -38676,8 +38622,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -40053,9 +39997,9 @@ C++ includes: lifted_sqp.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -40087,8 +40031,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -42192,9 +42134,9 @@ C++ includes: liftopt_solver.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -42226,8 +42168,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -42861,9 +42801,9 @@ C++ includes: linear_solver.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -42895,8 +42835,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -44775,19 +44713,15 @@ Properties. ";
 
 Get the operation. ";
 
+%feature("docstring")  CasADi::MinusInfSX::isEqual "
+
+Check if two nodes are equivalent up to a given depth. ";
+
 %feature("docstring")  CasADi::MinusInfSX::print "
 
 print ";
 
 %feature("docstring")  CasADi::MinusInfSX::getName "";
-
-%feature("docstring")  CasADi::MinusInfSX::isEqual "
-
-comparison ";
-
-%feature("docstring")  CasADi::MinusInfSX::isEqual "
-
-comparison ";
 
 %feature("docstring")  CasADi::MinusInfSX::ndep "
 
@@ -44862,19 +44796,15 @@ Properties. ";
 
 Get the operation. ";
 
+%feature("docstring")  CasADi::MinusOneSX::isEqual "
+
+Check if two nodes are equivalent up to a given depth. ";
+
 %feature("docstring")  CasADi::MinusOneSX::print "
 
 print ";
 
 %feature("docstring")  CasADi::MinusOneSX::getName "";
-
-%feature("docstring")  CasADi::MinusOneSX::isEqual "
-
-comparison ";
-
-%feature("docstring")  CasADi::MinusOneSX::isEqual "
-
-comparison ";
 
 %feature("docstring")  CasADi::MinusOneSX::ndep "
 
@@ -45417,9 +45347,9 @@ C++ includes: multiple_shooting.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -45455,8 +45385,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -48139,9 +48067,9 @@ C++ includes: mx_function.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -48173,8 +48101,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -49448,19 +49374,15 @@ Properties. ";
 
 Get the operation. ";
 
+%feature("docstring")  CasADi::NanSX::isEqual "
+
+Check if two nodes are equivalent up to a given depth. ";
+
 %feature("docstring")  CasADi::NanSX::print "
 
 print ";
 
 %feature("docstring")  CasADi::NanSX::getName "";
-
-%feature("docstring")  CasADi::NanSX::isEqual "
-
-comparison ";
-
-%feature("docstring")  CasADi::NanSX::isEqual "
-
-comparison ";
 
 %feature("docstring")  CasADi::NanSX::ndep "
 
@@ -49774,9 +49696,9 @@ C++ includes: nlp_solver.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -49808,8 +49730,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -52718,9 +52638,9 @@ C++ includes: ocp_solver.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -52752,8 +52672,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -53816,19 +53734,15 @@ Properties. ";
 
 Get the operation. ";
 
+%feature("docstring")  CasADi::OneSX::isEqual "
+
+Check if two nodes are equivalent up to a given depth. ";
+
 %feature("docstring")  CasADi::OneSX::print "
 
 print ";
 
 %feature("docstring")  CasADi::OneSX::getName "";
-
-%feature("docstring")  CasADi::OneSX::isEqual "
-
-comparison ";
-
-%feature("docstring")  CasADi::OneSX::isEqual "
-
-comparison ";
 
 %feature("docstring")  CasADi::OneSX::ndep "
 
@@ -54638,9 +54552,9 @@ C++ includes: ooqp_solver.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -54672,8 +54586,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -55841,9 +55753,9 @@ C++ includes: parallelizer.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -55875,8 +55787,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -57661,9 +57571,9 @@ C++ includes: qpoases_solver.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -57695,8 +57605,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -58346,9 +58254,9 @@ C++ includes: qp_solver.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -58380,8 +58288,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -59389,19 +59295,15 @@ Properties. ";
 
 Get the operation. ";
 
+%feature("docstring")  CasADi::RealtypeSX::isEqual "
+
+Check if two nodes are equivalent up to a given depth. ";
+
 %feature("docstring")  CasADi::RealtypeSX::print "
 
 print ";
 
 %feature("docstring")  CasADi::RealtypeSX::getName "";
-
-%feature("docstring")  CasADi::RealtypeSX::isEqual "
-
-comparison ";
-
-%feature("docstring")  CasADi::RealtypeSX::isEqual "
-
-comparison ";
 
 %feature("docstring")  CasADi::RealtypeSX::ndep "
 
@@ -59646,9 +59548,9 @@ C++ includes: rk_integrator.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -59680,8 +59582,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -61339,9 +61239,9 @@ C++ includes: simulator.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -61373,8 +61273,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -63723,9 +63621,9 @@ C++ includes: sqp_method.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -63757,8 +63655,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -64622,9 +64518,9 @@ C++ includes: sundials_integrator.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -64656,8 +64552,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -66145,9 +66039,9 @@ C++ includes: superlu.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -66179,8 +66073,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -67284,7 +67176,14 @@ Check wether a binary SX is commutative. ";
 
 %feature("docstring")  CasADi::SX::isOp "";
 
-%feature("docstring")  CasADi::SX::isEqual "";
+%feature("docstring")  CasADi::SX::isEqual "
+
+Check if two nodes are equivalent up to a given depth. Depth=0 checks if the
+expressions are identical, i.e. points to the same node.
+
+a = x*x b = x*x
+
+a.isEqual(b,0) will return false, but a.isEqual(b,1) will return true ";
 
 %feature("docstring")  CasADi::SX::getValue "";
 
@@ -67411,6 +67310,11 @@ allow unambigous access. ";
 %feature("docstring")  CasADi::SX::marked "";
 
 %feature("docstring")  CasADi::SX::mark "";
+
+%feature("docstring")  CasADi::SX::assignIfDuplicate "
+
+Assign to another expression, if a duplicate. Check for equality up to a
+given depth. ";
 
 %feature("docstring")  CasADi::SX::assignNoDelete "
 
@@ -67594,9 +67498,9 @@ C++ includes: sx_function.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -67628,8 +67532,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -68754,11 +68656,7 @@ get the operation only for binary nodes ";
 
 %feature("docstring")  CasADi::SXNode::isEqual "
 
-comparison ";
-
-%feature("docstring")  CasADi::SXNode::isEqual "
-
-comparison ";
+Check if two nodes are equivalent up to a given depth. ";
 
 %feature("docstring")  CasADi::SXNode::ndep "
 
@@ -69176,6 +69074,10 @@ Sort the ODE and differential states. ";
 
 Sort the algebraic equations and algebraic states. ";
 
+%feature("docstring")  CasADi::SymbolicOCP::sortDependentParameters "
+
+Sort the dependent parameters. ";
+
 %feature("docstring")  CasADi::SymbolicOCP::makeExplicit "
 
 Transform the implicit ODE to an explicit ODE. ";
@@ -69300,11 +69202,7 @@ Get the operation. ";
 
 %feature("docstring")  CasADi::SymbolicSX::isEqual "
 
-comparison ";
-
-%feature("docstring")  CasADi::SymbolicSX::isEqual "
-
-comparison ";
+Check if two nodes are equivalent up to a given depth. ";
 
 %feature("docstring")  CasADi::SymbolicSX::ndep "
 
@@ -69794,6 +69692,10 @@ Check if smooth. ";
 
 %feature("docstring")  CasADi::UnarySX::hasDep "";
 
+%feature("docstring")  CasADi::UnarySX::isEqual "
+
+Check if two nodes are equivalent up to a given depth. ";
+
 %feature("docstring")  CasADi::UnarySX::ndep "
 
 Number of dependencies. ";
@@ -69815,14 +69717,6 @@ Get the operation. ";
 Print the expression (recursively with a maximum number of levels) ";
 
 %feature("docstring")  CasADi::UnarySX::getName "";
-
-%feature("docstring")  CasADi::UnarySX::isEqual "
-
-comparison ";
-
-%feature("docstring")  CasADi::UnarySX::isEqual "
-
-comparison ";
 
 %feature("docstring")  CasADi::UnarySX::init "
 
@@ -69876,7 +69770,7 @@ Get differential expression. ";
 
 %feature("docstring")  CasADi::Variable::binding "
 
-Get the binding expression. ";
+Get the binding expression for the variable or its derivative. ";
 
 %feature("docstring")  CasADi::Variable::highest "
 
@@ -70056,7 +69950,7 @@ Set the derivative expression. ";
 
 %feature("docstring")  CasADi::Variable::setBinding "
 
-Set the binding expression. ";
+Set the binding expression for the variable or its derivative. ";
 
 %feature("docstring")  CasADi::Variable::setIndex "
 
@@ -72603,9 +72497,9 @@ C++ includes: worhp_solver.hpp ";
 
 /*  Setters  */
 
-/* Set an input, output, forward seed/sensitivity or adjoint
-seed/sensitivity  T can be double&, double*, std::vector<double>&,
-Matrix<double> &  Assumes a properly allocated val.
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
 
 */
 
@@ -72637,8 +72531,6 @@ Reads in the adjoint sensitivity from val. ";
 
 /* A group of accessor for numerical data that operate on preallocated data.
 get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-T can be double&, double*, std::vector<double>&, Matrix<double> &  Assumes a
-properly allocated val.
 
 */
 
@@ -73699,19 +73591,15 @@ Properties. ";
 
 Get the operation. ";
 
+%feature("docstring")  CasADi::ZeroSX::isEqual "
+
+Check if two nodes are equivalent up to a given depth. ";
+
 %feature("docstring")  CasADi::ZeroSX::print "
 
 print ";
 
 %feature("docstring")  CasADi::ZeroSX::getName "";
-
-%feature("docstring")  CasADi::ZeroSX::isEqual "
-
-comparison ";
-
-%feature("docstring")  CasADi::ZeroSX::isEqual "
-
-comparison ";
 
 %feature("docstring")  CasADi::ZeroSX::ndep "
 
@@ -73931,12 +73819,8 @@ SXMatrix object. The SX expression graph has much less overhead, but is also
 more restricted than the alternative MX expression graph.
 
 Construct symbolic arrays and variables using CasADi's more restricted, but
-more efficient SX expression graphCreate an matrix with symbolic variables,
-with the dimension given by the string ";
-
-%feature("docstring")  CasADi::Interfaces::ssym "
-
-Create an n-by-m matrix with symbolic variables. ";
+more efficient SX expression graphCreate an n-by-m matrix with symbolic
+variables ";
 
 %feature("docstring")  CasADi::Interfaces::ssym "
 
@@ -74030,7 +73914,9 @@ For each column in the grid, fx is numerically evaluated and the output is
 put in a resulting matrix of size m-by-n*p
 
 If your fx is really multiple output, and you wish to use a particular
-output, use the slice operator on the fx. ";
+output, use the slice operator on the fx.
+
+See:   evalf ";
 
 %feature("docstring")  CasADi::Interfaces::numSample1DT "
 
@@ -74091,10 +73977,6 @@ arguments. ";
 %feature("docstring")  CasADi::Interfaces::linspace "
 
 Matlab's linspace command. ";
-
-%feature("docstring")  CasADi::Interfaces::sym "
-
-Construct a symbolic matrix. ";
 
 %feature("docstring")  CasADi::Interfaces::trans "
 
@@ -74707,6 +74589,10 @@ Inplace substitution with piggyback expressions Substitute variables v out
 of the expressions vdef sequentially, as well as out of a number of other
 expressions piggyback. ";
 
+%feature("docstring")  CasADi::Interfaces::substitute "
+
+Substitute variable var with expression expr in multiple expressions. ";
+
 %feature("docstring")  CasADi::Interfaces::vertcat "
 
 concatenate vertically ";
@@ -74730,8 +74616,6 @@ Apply a function f to each element in a vector ";
 %feature("docstring")  CasADi::Interfaces::applymap "
 
 Apply a function f to each element in a vector ";
-
-%feature("docstring")  CasADi::Interfaces::sym "";
 
 %feature("docstring")  CasADi::Interfaces::shared_cast "
 
@@ -74991,6 +74875,21 @@ Remove identical calculations. ";
 
 Substitute variable var with expression expr in multiple expressions. ";
 
+%feature("docstring")  CasADi::Interfaces::evalf "
+
+Substitute variable v with value vdef in an expression ex, and evaluate
+numerically.
+
+Note: this is not efficient. For critical parts (loops) of your code, always
+use SXFunction. See:   numSample1D ";
+
+%feature("docstring")  CasADi::Interfaces::evalf "
+
+Evaluate an SX graph numerically.
+
+Note: this is not efficient. For critical parts (loops) of your code, always
+use SXFunction. ";
+
 %feature("docstring")  CasADi::Interfaces::substitute "
 
 Substitute variable v with expression vdef in an expression ex. ";
@@ -75154,8 +75053,6 @@ Return matrix
 loop over rows
 
 append components ";
-
-%feature("docstring")  CasADi::Interfaces::sym "";
 
 %feature("docstring")  CasADi::Interfaces::print_dat "
 

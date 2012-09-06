@@ -216,7 +216,7 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
 
       // Get the binding equation
       bool has_der = false;
-      SX bexpr = readExpr(beq[1][0],has_der);
+      SX bexpr = readExpr(beq[1][0],has_der,eliminate_dependent);
       casadi_assert(!has_der);
       
       // Add binding equation
@@ -224,6 +224,9 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
       y.push_back(var); // legacy
       dep.append(bexpr); // legacy
     }
+    
+    // Resort the dependant parameters
+    sortDependentParameters();
   }
 
   // **** Add dynamic equations ****
@@ -239,7 +242,7 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
 
       // Add the differential equation
       bool has_der = false;
-      SX de_new = readExpr(dnode[0],has_der);
+      SX de_new = readExpr(dnode[0],has_der,eliminate_dependent);
       if(has_der){
         ode.append(de_new);
       } else {
@@ -262,7 +265,7 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
       // Add the differential equations
       for(int i=0; i<inode.size(); ++i){
         bool has_der = false;
-	initial.append(readExpr(inode[i],has_der));
+	initial.append(readExpr(inode[i],has_der,eliminate_dependent));
       }
     }
   }
@@ -329,7 +332,7 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
             
             // Read expression
             bool has_der = false;
-	    SX v = readExpr(var,has_der);
+	    SX v = readExpr(var,has_der,eliminate_dependent);
             casadi_assert(!has_der);
 	    mterm.append(v);
 	  }
@@ -349,7 +352,7 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
             
             // Read expression
             bool has_der = false;
-            SX v = readExpr(var,has_der);
+            SX v = readExpr(var,has_der,eliminate_dependent);
 	    lterm.append(v);
 	  }
 	} catch(exception& ex){
@@ -367,20 +370,20 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
         for(int i=0; i<onode.size(); ++i){
           const XMLNode& constr_i = onode[i];
           if(constr_i.checkName("opt:ConstraintLeq")){
-            SX ex = readExpr(constr_i[0],has_der);
-            SX ub = readExpr(constr_i[1],has_der);
+            SX ex = readExpr(constr_i[0],has_der,eliminate_dependent);
+            SX ub = readExpr(constr_i[1],has_der,eliminate_dependent);
             point.append(ex-ub);
             point_min.append(-numeric_limits<double>::infinity());
             point_max.append(0.);
           } else if(constr_i.checkName("opt:ConstraintGeq")){
-            SX ex = readExpr(constr_i[0],has_der);
-            SX lb = readExpr(constr_i[1],has_der);
+            SX ex = readExpr(constr_i[0],has_der,eliminate_dependent);
+            SX lb = readExpr(constr_i[1],has_der,eliminate_dependent);
             point.append(ex-lb);
             point_min.append(0.);
             point_max.append(numeric_limits<double>::infinity());
           } else if(constr_i.checkName("opt:ConstraintEq")){
-            SX ex = readExpr(constr_i[0],has_der);
-            SX eq = readExpr(constr_i[1],has_der);
+            SX ex = readExpr(constr_i[0],has_der,eliminate_dependent);
+            SX eq = readExpr(constr_i[1],has_der,eliminate_dependent);
             point.append(ex-eq);
             point_min.append(0.);
             point_max.append(0.);
@@ -396,20 +399,20 @@ void SymbolicOCP::parseFMI(const std::string& filename, const Dictionary& option
 	for(int i=0; i<onode.size(); ++i){
 	  const XMLNode& constr_i = onode[i];
 	  if(constr_i.checkName("opt:ConstraintLeq")){
-	    SX ex = readExpr(constr_i[0],has_der);
-	    SX ub = readExpr(constr_i[1],has_der);
+	    SX ex = readExpr(constr_i[0],has_der,eliminate_dependent);
+	    SX ub = readExpr(constr_i[1],has_der,eliminate_dependent);
 	    path.append(ex-ub);
 	    path_min.append(-numeric_limits<double>::infinity());
 	    path_max.append(0.);
 	  } else if(constr_i.checkName("opt:ConstraintGeq")){
-	    SX ex = readExpr(constr_i[0],has_der);
-	    SX lb = readExpr(constr_i[1],has_der);
+	    SX ex = readExpr(constr_i[0],has_der,eliminate_dependent);
+	    SX lb = readExpr(constr_i[1],has_der,eliminate_dependent);
 	    path.append(ex-lb);
 	    path_min.append(0.);
 	    path_max.append(numeric_limits<double>::infinity());
 	  } else if(constr_i.checkName("opt:ConstraintEq")){
-	    SX ex = readExpr(constr_i[0],has_der);
-	    SX eq = readExpr(constr_i[1],has_der);
+	    SX ex = readExpr(constr_i[0],has_der,eliminate_dependent);
+	    SX eq = readExpr(constr_i[1],has_der,eliminate_dependent);
 	    path.append(ex-eq);
 	    path_min.append(0.);
 	    path_max.append(0.);
@@ -482,7 +485,7 @@ Variable& SymbolicOCP::readVariable(const XMLNode& node){
   return variable(qn);
 }
 
-SX SymbolicOCP::readExpr(const XMLNode& node, bool& has_der){
+SX SymbolicOCP::readExpr(const XMLNode& node, bool& has_der, bool elim_binding){
   const string& fullname = node.getName();
   if (fullname.find("exp:")== string::npos) {
     casadi_error("SymbolicOCP::readExpr: unknown - expression is supposed to start with 'exp:' , got " << fullname);
@@ -493,24 +496,24 @@ SX SymbolicOCP::readExpr(const XMLNode& node, bool& has_der){
 
   // The switch below is alphabetical, and can be thus made more efficient, for example by using a switch statement of the first three letters, if it would ever become a bottleneck
   if(name.compare("Add")==0){
-    return readExpr(node[0],has_der) + readExpr(node[1],has_der);
+    return readExpr(node[0],has_der,elim_binding) + readExpr(node[1],has_der,elim_binding);
   } else if(name.compare("Acos")==0){
-    return acos(readExpr(node[0],has_der));
+    return acos(readExpr(node[0],has_der,elim_binding));
   } else if(name.compare("Asin")==0){
-    return asin(readExpr(node[0],has_der));
+    return asin(readExpr(node[0],has_der,elim_binding));
   } else if(name.compare("Atan")==0){
-    return atan(readExpr(node[0],has_der));
+    return atan(readExpr(node[0],has_der,elim_binding));
   } else if(name.compare("Cos")==0){
-    return cos(readExpr(node[0],has_der));
+    return cos(readExpr(node[0],has_der,elim_binding));
   } else if(name.compare("Der")==0){
     Variable v = readVariable(node[0]);
     v.setDifferential(true);
     has_der = true;
     return v.der();
   } else if(name.compare("Div")==0){
-    return readExpr(node[0],has_der) / readExpr(node[1],has_der);
+    return readExpr(node[0],has_der,elim_binding) / readExpr(node[1],has_der,elim_binding);
   } else if(name.compare("Exp")==0){
-    return exp(readExpr(node[0],has_der));
+    return exp(readExpr(node[0],has_der,elim_binding));
   } else if(name.compare("Identifier")==0){
     return readVariable(node).var();
   } else if(name.compare("IntegerLiteral")==0){
@@ -522,42 +525,42 @@ SX SymbolicOCP::readExpr(const XMLNode& node, bool& has_der){
     node.getText(val);
     return val;
   } else if(name.compare("Log")==0){
-    return log(readExpr(node[0],has_der));
+    return log(readExpr(node[0],has_der,elim_binding));
   } else if(name.compare("LogLt")==0){ // Logical less than
-    return readExpr(node[0],has_der) < readExpr(node[1],has_der);
+    return readExpr(node[0],has_der,elim_binding) < readExpr(node[1],has_der,elim_binding);
   } else if(name.compare("LogGt")==0){ // Logical less than
-    return readExpr(node[0],has_der) > readExpr(node[1],has_der);
+    return readExpr(node[0],has_der,elim_binding) > readExpr(node[1],has_der,elim_binding);
   } else if(name.compare("Mul")==0){ // Multiplication
-    return readExpr(node[0],has_der) * readExpr(node[1],has_der);
+    return readExpr(node[0],has_der,elim_binding) * readExpr(node[1],has_der,elim_binding);
   } else if(name.compare("Neg")==0){
-    return -readExpr(node[0],has_der);
+    return -readExpr(node[0],has_der,elim_binding);
   } else if(name.compare("NoEvent")==0) {
     // NOTE: This is a workaround, we assume that whenever NoEvent occurs, what is meant is a switch
     int n = node.size();
     
     // Default-expression
-    SX ex = readExpr(node[n-1],has_der);
+    SX ex = readExpr(node[n-1],has_der,elim_binding);
     
     // Evaluate ifs
-    for(int i=n-3; i>=0; i -= 2) ex = if_else(readExpr(node[i],has_der),readExpr(node[i+1],has_der),ex);
+    for(int i=n-3; i>=0; i -= 2) ex = if_else(readExpr(node[i],has_der,elim_binding),readExpr(node[i+1],has_der,elim_binding),ex);
     
     return ex;
   } else if(name.compare("Pow")==0){
-    return pow(readExpr(node[0],has_der),readExpr(node[1],has_der));
+    return pow(readExpr(node[0],has_der,elim_binding),readExpr(node[1],has_der,elim_binding));
   } else if(name.compare("RealLiteral")==0){
     double val;
     node.getText(val);
     return val;
   } else if(name.compare("Sin")==0){
-    return sin(readExpr(node[0],has_der));
+    return sin(readExpr(node[0],has_der,elim_binding));
   } else if(name.compare("Sqrt")==0){
-    return sqrt(readExpr(node[0],has_der));
+    return sqrt(readExpr(node[0],has_der,elim_binding));
   } else if(name.compare("StringLiteral")==0){
     throw CasadiException(node.getText());
   } else if(name.compare("Sub")==0){
-    return readExpr(node[0],has_der) - readExpr(node[1],has_der);
+    return readExpr(node[0],has_der,elim_binding) - readExpr(node[1],has_der,elim_binding);
   } else if(name.compare("Tan")==0){
-    return tan(readExpr(node[0],has_der));
+    return tan(readExpr(node[0],has_der,elim_binding));
   } else if(name.compare("Time")==0){
     return t.toScalar();
   } else if(name.compare("TimedVariable")==0){
@@ -930,6 +933,28 @@ void SymbolicOCP::sortALG(){
     z_new[i]= z[colperm[i]];
   }
   z_new.swap(z);
+}
+
+void SymbolicOCP::sortDependentParameters(){
+  // Quick return if no algebraic states
+  if(pd.empty()) return;
+  
+  // Find out which dependent parameter depends on which binding equation
+  SXMatrix v = var(pd);
+  SXFunction f(v,v-binding(pd));
+  f.init();
+  CRSSparsity sp = f.jacSparsity();
+  
+  // BLT transformation
+  vector<int> rowperm, colperm, rowblock, colblock, coarse_rowblock, coarse_colblock;
+  int nb = sp.dulmageMendelsohn(rowperm,colperm,rowblock,colblock,coarse_rowblock,coarse_colblock);
+
+  // Permute variables
+  vector<Variable> pd_new(pd.size());
+  for(int i=0; i<pd.size(); ++i){
+    pd_new[i]= pd[colperm[i]];
+  }
+  pd_new.swap(pd);  
 }
 
 void SymbolicOCP::makeExplicit(){

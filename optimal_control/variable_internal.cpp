@@ -33,8 +33,9 @@ VariableInternal::VariableInternal(const string& name) : name_(name){
   // Not differentable by default
   der_ = casadi_limits<SX>::nan;
     
-  // Not binding expression by default
+  // Not binding expressions by default
   binding_ = casadi_limits<SX>::nan;
+  der_binding_ = casadi_limits<SX>::nan;
     
   variability_ = CONTINUOUS;
   causality_ = INTERNAL;

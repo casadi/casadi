@@ -64,6 +64,8 @@ namespace CasADi{
     *  For each column in the grid, fx is numerically evaluated and the output is put in a resulting matrix of size m-by-n*p
     *
     * If your fx is really multiple output, and you wish to use a particular output, use the slice operator on the fx.
+    *
+    * @see evalf
     */
     Matrix<double> numSample1D(FX &fx, const Matrix<double> &grid);
     

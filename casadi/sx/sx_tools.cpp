@@ -134,7 +134,7 @@ Matrix<SX> triangle(const Matrix<SX>& a){
 
 bool contains(const Matrix<SX> &list, const SX &e) {
   for (int i=0;i<nnz(list);i++) {
-    if (list(i).toScalar()->isEqual(e)) return true;
+    if (list(i).toScalar().isEqual(e)) return true;
   }
   return false;
 }
@@ -159,6 +159,22 @@ std::vector<Matrix<SX> > substitute(const std::vector<Matrix<SX> > &ex, const Ma
   fcn.init();
   return fcn.eval(vector<Matrix<SX> >(1,vdef));
 }
+
+Matrix<double> evalf(const Matrix<SX> &ex, const Matrix<SX> &v, const Matrix<double> &vdef) {
+  SXFunction fcn(v,ex);
+  fcn.init();
+  fcn.input(0).set(vdef);
+  fcn.evaluate();
+  return fcn.output();
+}
+
+Matrix<double> evalf(const Matrix<SX> &ex) {
+  SXFunction fcn(std::vector< Matrix<SX> >(0),ex);
+  fcn.init();
+  fcn.evaluate();
+  return fcn.output();
+}
+
 
 Matrix<SX> substitute(const Matrix<SX> &ex, const Matrix<SX> &v, const Matrix<SX> &vdef){
   if(v.empty()) return ex; // quick return if empty
@@ -187,8 +203,7 @@ void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, bool reverse){
 
 void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, std::vector<Matrix<SX> >& ex, bool reverse){
   casadi_assert_message(isSymbolic(v),"the variable is not symbolic");
-  casadi_assert_message(v.size1() == vdef.size1() && v.size2() == vdef.size2(),"the dimensions do not match");
-  casadi_assert_message(vdef.dense(),"Expression must be dense");
+  casadi_assert_message(v.sparsity() == vdef.sparsity(),"the sparsity patterns of the expression and its defining expression do not match");
   if(v.empty()) return; // quick return if nothing to replace
 
   // Function outputs
@@ -198,58 +213,65 @@ void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, std::vector<Matrix
     
   // Write the mapping function
   SXFunction f(v,f_out);
-  f.setOption("live_variables",false);
   f.init();
 
   // Get references to the internal data structures
-  std::vector<SXAlgEl>& algorithm = f->algorithm_;
+  const std::vector<SXAlgEl>& algorithm = f.algorithm();
   
-  // Find out which places in the work vector corresponds to the inputs and outputs
-  vector<pair<int,int> > mapping(f.input(0).size());
-  casadi_assert(mapping.size()==f.output(0).size());
-  for(vector<SXAlgEl>::iterator it=algorithm.begin(); it!=algorithm.end(); ++it){
-    if(it->op==OP_INPUT){
-      int loc = it->res;
-      int ind = it->arg.i[0];
-      int nz = it->arg.i[1];
-      if(ind==0){
-        mapping.at(nz).first = loc;
-      }
-    } else if(it->op==OP_OUTPUT){
-      int loc = it->arg.i[0];
+  // Current place in the algorithm
+  int el = 0;
+
+  // Find out which places in the algorithm corresponds to the outputs
+  vector<int> output_indices;
+  output_indices.reserve(vdef.size());
+  int next_nz = 0;
+  for(vector<SXAlgEl>::const_iterator it=algorithm.begin(); it!=algorithm.end(); ++it, ++el){
+    if(it->op==OP_OUTPUT){
+      //int loc = it->arg.i[0];
       int ind = it->res;
       int nz = it->arg.i[1];
       if(ind==0){
-        mapping.at(nz).second = loc;
+        casadi_assert(nz==next_nz);
+        output_indices.push_back(el);
+        next_nz++;
       }
     }
   }
+  casadi_assert(next_nz==vdef.size());
 
-  // Create a filter which contains a new storage location in the algorithm for each old storage location
-  vector<int> filter = range(f->work_.size());
-  for(vector<pair<int,int> >::const_iterator it=mapping.begin(); it!=mapping.end(); ++it){
-    filter[it->first] = it->second;
-  }
-  
-  // Now filter out the variables from the algorithm
-  for(vector<SXAlgEl>::iterator it=algorithm.begin(); it!=algorithm.end(); ++it){
-    int ndeps = casadi_math<double>::ndeps(it->op);
-    for(int c=0; c<ndeps; ++c){
-      it->arg.i[c] = filter[it->arg.i[c]];
-    }
-  }
-    
   // No sensitivities
   vector<vector<SXMatrix> > dummy;
 
-  // Replace expression
+  // Input expressions
+  std::vector<Matrix<SX> > inputv = f->inputv_;
+
+  // (New) output expressions
   std::vector<Matrix<SX> > outputv = f->outputv_;
-  f->eval(f->inputv_, outputv, dummy, dummy, dummy, dummy, false);
   
-  // Replace the result
+  // Go to the beginning of the algorithm
+  el = 0;
+  
+  // Evaluate the expressions with known definitions
+  for(int nz=0; nz<output_indices.size(); ++nz){
+    
+    // The end of the portion of the algorithm to be evaluated
+    int next_el = output_indices[nz];
+    
+    // Evaluate the corresponding part of the algorithm
+    f->evalSX(inputv, outputv, dummy, dummy, dummy, dummy, false, el, algorithm.size()-next_el-1);
+    
+    // Assign the corresponding variable
+    inputv[0].at(nz) = outputv[0].at(nz);
+    
+    // Go to the next location
+    el = next_el;
+  }
+  
+  // Evaluate the rest of the algorithm
+  f->evalSX(inputv, outputv, dummy, dummy, dummy, dummy, false, el, 0);
+  
+  // Get the result
   vdef = outputv.front();
-  
-  // Get the replaced expressions
   for(int k=0; k<ex.size(); ++k){
     ex[k] = outputv[k+1];
   }

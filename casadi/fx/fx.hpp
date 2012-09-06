@@ -353,21 +353,28 @@ class FX : public OptionsFunctionality{
   
   
 #ifdef DOXYGENPROC
-/// \name Setters
-/// Set an input, output, forward seed/sensitivity or adjoint seed/sensitivity\n
-/// T can be double&, double*, std::vector<double>&, Matrix<double> &\n
+//// \defgroup setter_getter_T
+//// T can be double&, double*, std::vector<double>&, Matrix<double> &\n
 /// Assumes a properly allocated val.\n
+
+/// \name Setters
+/// Set/get an input, output, forward seed/sensitivity or adjoint seed/sensitivity\n
+/// \copydoc setter_getter_T
+/// 
 /// @{
 /** 
     \brief Reads in the input argument from val.
+    \copydoc setter_getter_T
 */
 void setInput(T val, int ind=0) const;
 /** 
     \brief Reads in the output argument from val.
+    \copydoc setter_getter_T
 */
 void setOutput(T val, int ind=0) const;
 /** 
     \brief Reads in the forward seed from val.
+    \copydoc setter_getter_T
 */
 void setFwdSeed(T val,  int ind=0, int dir=0) const;
 /** 
@@ -376,10 +383,12 @@ void setFwdSeed(T val,  int ind=0, int dir=0) const;
 void setFwdSens(T val, int ind=0, int dir=0) const ;
 /** 
     \brief Reads in the adjoint seed from val.
+    \copydoc setter_getter_T
 */
 void setAdjSeed(T val,  int ind=0, int dir=0) const;
 /** 
     \brief Reads in the adjoint sensitivity from val.
+    \copydoc setter_getter_T
 */
 void setAdjSens(T val, int ind=0, int dir=0) const ;
 /// @}
@@ -427,35 +436,40 @@ GETTERS(Matrix<double>&);
 /// \name Getters
 /// A group of accessor for numerical data that operate on preallocated data.\n
 /// get an input, output, forward seed/sensitivity or adjoint seed/sensitivity\n
-/// T can be double&, double*, std::vector<double>&, Matrix<double> &\n
-/// Assumes a properly allocated val.\n
+/// \copydoc setter_getter_T
 /// @{
 
 /** \brief Writes out the input argument into val.
+    \copydoc setter_getter_T
 */
 void getInput(T val, int ind=0) const;
  
 /** 
     \brief Writes out the output argument into val.
+    \copydoc setter_getter_T
 */
 void getOutput(T val, int ind=0) const;
 
 /** 
     \brief Writes out the forward seed into val.
+    \copydoc setter_getter_T
 */
 void getFwdSeed(T val,  int ind=0, int dir=0) const;
 
 /**  
     \brief Writes out the forward sensitivity into val.
+    \copydoc setter_getter_T
 */
 void getFwdSens(T val, int ind=0, int dir=0) const;
 /** 
     \brief Writes out the adjoint seed into val.
+    \copydoc setter_getter_T
 */
 void getAdjSeed(T val,  int ind=0, int dir=0) const ;
 
 /** 
     \brief Writes out the adjoint sensitivity into val.
+    \copydoc setter_getter_T
 */
 void getAdjSens(T val, int ind=0, int dir=0) const;
 /// @}

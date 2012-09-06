@@ -176,6 +176,19 @@ void compress(Matrix<SX> &ex, int level=5);
 /// Substitute variable v with expression vdef in an expression ex
 Matrix<SX> substitute(const Matrix<SX> &ex, const Matrix<SX> &v, const Matrix<SX> &vdef);
 
+/// Evaluate an SX graph numerically
+/**
+* Note: this is not efficient. For critical parts (loops) of your code, always use SXFunction.
+*/
+Matrix<double> evalf(const Matrix<SX> &ex);
+
+/// Substitute variable v with value vdef in an expression ex, and evaluate numerically
+/**
+* Note: this is not efficient. For critical parts (loops) of your code, always use SXFunction.
+* @see numSample1D
+*/
+Matrix<double> evalf(const Matrix<SX> &ex, const Matrix<SX> &v, const Matrix<double> &vdef);
+
 /// Substitute variable var with expression expr in multiple expressions
 std::vector<Matrix<SX> > substitute(const std::vector<Matrix<SX> > &ex, const Matrix<SX> &var, const Matrix<SX> &expr);
 

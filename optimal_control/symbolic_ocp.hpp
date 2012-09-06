@@ -259,6 +259,9 @@ class SymbolicOCP : public PrintableObject{
     /// Sort the algebraic equations and algebraic states
     void sortALG();
 
+    /// Sort the dependent parameters
+    void sortDependentParameters();
+    
     /// Transform the implicit ODE to an explicit ODE
     void makeExplicit();
     
@@ -280,7 +283,7 @@ class SymbolicOCP : public PrintableObject{
     std::map<std::string,Variable> varmap_;
 
     /// Read an equation
-    SX readExpr(const XMLNode& odenode, bool& has_der);
+    SX readExpr(const XMLNode& odenode, bool& has_der, bool elim_binding);
 
     /// Read a variable
     Variable& readVariable(const XMLNode& node);

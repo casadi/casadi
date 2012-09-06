@@ -942,7 +942,21 @@ class SXtests(casadiTestCase):
       f.evaluate()
       self.checkarray(f.output(),array(op(-0.3)),"simplifications")
       self.assertEqual(str(y),"(-x)")
-      
+
+  def test_evalf(self):
+    x = SX(3)
+    y = SX(5)
+    z = evalf(x+y)
+    self.assertEqual(type(z),DMatrix)
+    self.assertEqual(z,8)
+
+  def test_evalfs(self):
+    x = SX("x")
+    y = SX(5)
+    z = evalf(x+y,x,3)
+    self.assertEqual(type(z),DMatrix)
+    self.assertEqual(z,8)
+    
 if __name__ == '__main__':
     unittest.main()
 

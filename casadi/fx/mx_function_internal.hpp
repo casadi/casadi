@@ -115,7 +115,7 @@ class MXFunctionInternal : public XFunctionInternal<MXFunctionInternal,MX,MXNode
     virtual void evalSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
                         const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
                         const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
-                        bool output_given);
+                        bool output_given, int offset_begin=0, int offset_end=0);
                         
     /** \brief Evaluate symbolically, MX type */
     virtual void evalMX(const std::vector<MX>& input, std::vector<MX>& output, 
