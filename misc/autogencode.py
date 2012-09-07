@@ -166,9 +166,11 @@ for h in locate("*.hpp",os.path.join(os.curdir,"..")):
       p.checkconsistency()
       print p.name
       autogencpp.write(p.cppcode())
+      autogenpy.write("#ifdef SWIGPYTHON\n")
       autogenpy.write("%pythoncode %{\n")
       autogenpy.write(p.pycode())
       autogenpy.write("%}\n")
+      autogenpy.write("#endif //SWIGPYTHON\n")
       autogenpy.write("#ifndef SWIGPYTHON\n")
       autogenpy.write(p.swigcode())
       autogenpy.write("#endif //SWIGPYTHON\n")
