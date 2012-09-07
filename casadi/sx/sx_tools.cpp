@@ -255,14 +255,15 @@ void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, std::vector<Matrix
   for(int nz=0; nz<output_indices.size(); ++nz){
     
     // The end of the portion of the algorithm to be evaluated
-    int next_el = output_indices[nz];
+    int next_el = output_indices[nz]+1;
     
     // Evaluate the corresponding part of the algorithm
-    f->evalSX(inputv, outputv, dummy, dummy, dummy, dummy, false, el, algorithm.size()-next_el-1);
+    cout << "[" << el << "," << next_el << ")" << endl;
+    f->evalSX(inputv, outputv, dummy, dummy, dummy, dummy, false, el, next_el);
     
     // Assign the corresponding variable
     inputv[0].at(nz) = outputv[0].at(nz);
-    
+        
     // Go to the next location
     el = next_el;
   }

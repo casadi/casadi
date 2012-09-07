@@ -1011,15 +1011,33 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
     it1 = s_pdwork.begin();
   }
 
-  // Evaluate the algorithm
-  for(vector<AlgEl>::const_iterator it=algorithm_.begin()+offset_begin; it<algorithm_.end()-offset_end; ++it){
+  // Section of the algorithm to be evaluated
+  vector<AlgEl>::const_iterator alg_begin = algorithm_.begin()+offset_begin;
+  vector<AlgEl>::const_iterator alg_end = offset_end > 0 ? algorithm_.begin() + offset_end : algorithm_.end() + offset_end;
+  
+  // Proceed to beginning
+  vector<AlgEl>::const_iterator it = algorithm_.begin();
+  for(; it!=alg_begin; ++it){
+    switch(it->op){
+      case OP_INPUT:     break;
+      case OP_OUTPUT:    break;
+      case OP_CONST:     c_it++; break;
+      case OP_PARAMETER: p_it++; break;
+      default:           b_it++; break;
+    }
+  }
+  
+  // Evaluate selection
+  for(; it!=alg_end; ++it){
     switch(it->op){
       case OP_INPUT:
         s_work_[it->res] = input[it->arg.i[0]].data()[it->arg.i[1]]; break;
       case OP_OUTPUT:
-        output[it->res].data()[it->arg.i[1]] = s_work_[it->arg.i[0]]; break;
+        output[it->res].data()[it->arg.i[1]] = s_work_[it->arg.i[0]]; 
+        break;
       case OP_CONST:
-        s_work_[it->res] = *c_it++; break;
+        s_work_[it->res] = *c_it++; 
+        break;
       case OP_PARAMETER:
         s_work_[it->res] = *p_it++; break;
       default:
