@@ -1,0 +1,6 @@
+This is a modified version of SUNDIALS 2.5. It contains a modified, stripped down version of Sundials 2.5.
+It includes bugfixes announced to the SUNDIALS mailing list and a new different build system.
+No new functionality has been added in this version.
+
+Joel Andersson
+K.U. Leuven 2012

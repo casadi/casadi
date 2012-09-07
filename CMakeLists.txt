@@ -18,6 +18,7 @@ option(WITH_SWIG_SPLIT "Split SWIG wrapper generation into multiple modules" OFF
 option(WITH_WORHP "Compile the WORHP interface" OFF) 
 option(WITH_ACADO "Compile the interfaces to ACADO and qpOASES, if it can be found" OFF) 
 option(WITH_EIGEN3 "Use Eigen3 backend for matrix operations" OFF) 
+option(WITH_MODIFIED_SUNDIALS "Use the modified version of SUNDIALS shipped with CasADi" ON)
 
 if(WITH_FORTRAN)
   # Enable Fortran linking (needed e.g. for LAPACK/BLAS), if Fortran is available
