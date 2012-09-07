@@ -60,7 +60,6 @@ IdasInternal::IdasInternal(const FX& f, const FX& g) : SundialsInternal(f,g){
   addOption("init_z",                      OT_REALVECTOR, GenericType(), "Initial values for the algebraic states");
   
   mem_ = 0;
-  id_ = 0;
   
   xz_  = 0; 
   xzdot_ = 0, 
@@ -82,7 +81,6 @@ IdasInternal::~IdasInternal(){
 
 void IdasInternal::freeIDAS(){
   if(mem_) IDAFree(&mem_);
-  if(id_) N_VDestroy_Serial(id_);
 
   // Forward integration
   if(xz_) N_VDestroy_Serial(xz_);
@@ -168,7 +166,6 @@ void IdasInternal::init(){
   // Allocate n-vectors for ivp
   xz_ = N_VNew_Serial(nx_+nz_);
   xzdot_ = N_VNew_Serial(nx_+nz_);
-  id_ = N_VNew_Serial(nx_+nz_);
 
   // Initialize Idas
   double t0 = 0;
@@ -218,13 +215,17 @@ void IdasInternal::init(){
   if(flag != IDA_SUCCESS) idas_error("IDASetMaxNumSteps",flag);
 
   // Set algebraic components
-  fill_n(NV_DATA_S(id_),nx_,1);
-  fill_n(NV_DATA_S(id_)+nx_,nz_,0);
+  N_Vector id = N_VNew_Serial(nx_+nz_);
+  fill_n(NV_DATA_S(id),nx_,1);
+  fill_n(NV_DATA_S(id)+nx_,nz_,0);
   
   // Pass this information to IDAS
-  flag = IDASetId(mem_, id_);
+  flag = IDASetId(mem_, id);
   if(flag != IDA_SUCCESS) idas_error("IDASetId",flag);
-    
+
+  // Delete the allocated memory
+  N_VDestroy_Serial(id);
+  
   // attach a linear solver
   switch(linsol_f_){
     case SD_DENSE:
@@ -376,8 +377,10 @@ void IdasInternal::init(){
   if(!g_.isNull()){
     
     // Allocate n-vectors
-    rxz_ = N_VNew_Serial(nx_+nz_);
-    rxzdot_ = N_VNew_Serial(nx_+nz_);
+    rxz_ = N_VNew_Serial(nrx_+nrz_);
+    rxzdot_ = N_VNew_Serial(nrx_+nrz_);
+    N_VConst(0.0, rxz_);
+    N_VConst(0.0, rxzdot_);
 
     // Allocate n-vectors for quadratures
     rq_ = N_VMake_Serial(nrq_,output(INTEGRATOR_RQF).ptr());
@@ -437,9 +440,17 @@ void IdasInternal::initAdj(){
   IDASetMaxNumStepsB(mem_, whichB_, getOption("max_num_steps").toInt());
   if(flag != IDA_SUCCESS) idas_error("IDASetMaxNumStepsB",flag);
 
+  // Set algebraic components
+  N_Vector id = N_VNew_Serial(nrx_+nrz_);
+  fill_n(NV_DATA_S(id),nrx_,1);
+  fill_n(NV_DATA_S(id)+nrx_,nrz_,0);
+  
   // Pass this information to IDAS
-  flag = IDASetIdB(mem_, whichB_, id_);
+  flag = IDASetIdB(mem_, whichB_, id);
   if(flag != IDA_SUCCESS) idas_error("IDASetIdB",flag);
+
+  // Delete the allocated memory
+  N_VDestroy_Serial(id);
     
   // attach linear solver
   switch(linsol_g_){
