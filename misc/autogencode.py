@@ -90,8 +90,8 @@ class Enum:
     
   def swigcode(self):
     s="namespace CasADi {\n"
-    s+="%template(" + self.name + ") " + self.name + "<SXMatrix>;\n"
-    s+="%template(" + self.name + ") " + self.name + "<MX>;\n"
+    s+="%template(" + self.name + "_SX) " + self.name + "<SXMatrix>;\n"
+    s+="%template(" + self.name + "_MX) " + self.name + "<MX>;\n"
     s+="}\n"
     return s
     

@@ -41,8 +41,8 @@ def mayerIn(x=[],p=[]):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(mayerIn) mayerIn<SXMatrix>;
-%template(mayerIn) mayerIn<MX>;
+%template(mayerIn_SX) mayerIn<SXMatrix>;
+%template(mayerIn_MX) mayerIn<MX>;
 }
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
@@ -83,8 +83,8 @@ def ocpIn(t=[],lbx=[],ubx=[],x_init=[],lbxp=[],ubxp=[],xp_init=[],lbu=[],ubu=[],
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(ocpIn) ocpIn<SXMatrix>;
-%template(ocpIn) ocpIn<MX>;
+%template(ocpIn_SX) ocpIn<SXMatrix>;
+%template(ocpIn_MX) ocpIn<MX>;
 }
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
@@ -106,8 +106,8 @@ def ocpOut(x_opt=[],u_opt=[],xp_opt=[],p_opt=[]):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(ocpOut) ocpOut<SXMatrix>;
-%template(ocpOut) ocpOut<MX>;
+%template(ocpOut_SX) ocpOut<SXMatrix>;
+%template(ocpOut_MX) ocpOut<MX>;
 }
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
@@ -134,8 +134,8 @@ def qpIn(h=[],g=[],a=[],lba=[],uba=[],lbx=[],ubx=[],x_init=[],lambda_init=[]):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(qpIn) qpIn<SXMatrix>;
-%template(qpIn) qpIn<MX>;
+%template(qpIn_SX) qpIn<SXMatrix>;
+%template(qpIn_MX) qpIn<MX>;
 }
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
@@ -157,8 +157,8 @@ def qpOut(primal=[],cost=[],lambda_a=[],lambda_x=[]):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(qpOut) qpOut<SXMatrix>;
-%template(qpOut) qpOut<MX>;
+%template(qpOut_SX) qpOut<SXMatrix>;
+%template(qpOut_MX) qpOut<MX>;
 }
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
@@ -186,8 +186,8 @@ def controldaeIn(t=[],x=[],z=[],p=[],u=[],u_interp=[],xdot=[],x_major=[],t0=[],t
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(controldaeIn) controldaeIn<SXMatrix>;
-%template(controldaeIn) controldaeIn<MX>;
+%template(controldaeIn_SX) controldaeIn<SXMatrix>;
+%template(controldaeIn_MX) controldaeIn<MX>;
 }
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
@@ -208,8 +208,8 @@ def controlsimulatorIn(x0=[],p=[],u=[]):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(controlsimulatorIn) controlsimulatorIn<SXMatrix>;
-%template(controlsimulatorIn) controlsimulatorIn<MX>;
+%template(controlsimulatorIn_SX) controlsimulatorIn<SXMatrix>;
+%template(controlsimulatorIn_MX) controlsimulatorIn<MX>;
 }
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
@@ -234,8 +234,8 @@ def nlpsolverIn(x_init=[],lbx=[],ubx=[],lbg=[],ubg=[],lambda_init=[],p=[]):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(nlpsolverIn) nlpsolverIn<SXMatrix>;
-%template(nlpsolverIn) nlpsolverIn<MX>;
+%template(nlpsolverIn_SX) nlpsolverIn<SXMatrix>;
+%template(nlpsolverIn_MX) nlpsolverIn<MX>;
 }
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
@@ -258,8 +258,8 @@ def nlpsolverOut(x_opt=[],cost=[],lambda_g=[],lambda_x=[],g=[]):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(nlpsolverOut) nlpsolverOut<SXMatrix>;
-%template(nlpsolverOut) nlpsolverOut<MX>;
+%template(nlpsolverOut_SX) nlpsolverOut<SXMatrix>;
+%template(nlpsolverOut_MX) nlpsolverOut<MX>;
 }
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
@@ -282,8 +282,8 @@ def daeIn(x=[],z=[],p=[],t=[],xdot=[]):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(daeIn) daeIn<SXMatrix>;
-%template(daeIn) daeIn<MX>;
+%template(daeIn_SX) daeIn<SXMatrix>;
+%template(daeIn_MX) daeIn<MX>;
 }
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
@@ -304,8 +304,8 @@ def daeOut(ode=[],alg=[],quad=[]):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(daeOut) daeOut<SXMatrix>;
-%template(daeOut) daeOut<MX>;
+%template(daeOut_SX) daeOut<SXMatrix>;
+%template(daeOut_MX) daeOut<MX>;
 }
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
@@ -331,8 +331,8 @@ def rdaeIn(rx=[],rz=[],rp=[],x=[],z=[],p=[],t=[],rxdot=[]):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(rdaeIn) rdaeIn<SXMatrix>;
-%template(rdaeIn) rdaeIn<MX>;
+%template(rdaeIn_SX) rdaeIn<SXMatrix>;
+%template(rdaeIn_MX) rdaeIn<MX>;
 }
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
@@ -353,8 +353,8 @@ def rdaeOut(ode=[],alg=[],quad=[]):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(rdaeOut) rdaeOut<SXMatrix>;
-%template(rdaeOut) rdaeOut<MX>;
+%template(rdaeOut_SX) rdaeOut<SXMatrix>;
+%template(rdaeOut_MX) rdaeOut<MX>;
 }
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
@@ -375,8 +375,8 @@ def integratorIn(x0=[],p=[],rx0=[]):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(integratorIn) integratorIn<SXMatrix>;
-%template(integratorIn) integratorIn<MX>;
+%template(integratorIn_SX) integratorIn<SXMatrix>;
+%template(integratorIn_MX) integratorIn<MX>;
 }
 #endif //SWIGPYTHON
 #ifdef SWIGPYTHON
@@ -398,7 +398,7 @@ def integratorOut(xf=[],qf=[],rxf=[],rqf=[]):
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
 namespace CasADi {
-%template(integratorOut) integratorOut<SXMatrix>;
-%template(integratorOut) integratorOut<MX>;
+%template(integratorOut_SX) integratorOut<SXMatrix>;
+%template(integratorOut_MX) integratorOut<MX>;
 }
 #endif //SWIGPYTHON
