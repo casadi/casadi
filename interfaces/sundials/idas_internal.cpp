@@ -1482,12 +1482,12 @@ void IdasInternal::initUserDefinedLinearSolver(){
 }
 
 void IdasInternal::initDenseLinearSolverB(){
-  int flag = IDADenseB(mem_, whichB_, nx_+nz_);
+  int flag = IDADenseB(mem_, whichB_, nrx_+nrz_);
   if(flag != IDA_SUCCESS) idas_error("IDADenseB",flag);
 }
   
 void IdasInternal::initBandedLinearSolverB(){
-  int flag = IDABandB(mem_, whichB_, nx_+nz_, getOption("asens_upper_bandwidth").toInt(), getOption("asens_lower_bandwidth").toInt());
+  int flag = IDABandB(mem_, whichB_, nrx_+nrz_, getOption("asens_upper_bandwidth").toInt(), getOption("asens_lower_bandwidth").toInt());
   if(flag != IDA_SUCCESS) idas_error("IDABand",flag);
 }
   

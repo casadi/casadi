@@ -1271,12 +1271,12 @@ void CVodesInternal::initUserDefinedLinearSolver(){
 }
 
 void CVodesInternal::initDenseLinearSolverB(){
-  int flag = CVDenseB(mem_, whichB_, nx_);
+  int flag = CVDenseB(mem_, whichB_, nrx_);
   if(flag!=CV_SUCCESS) cvodes_error("CVDenseB",flag);
 }
   
 void CVodesInternal::initBandedLinearSolverB(){
-  int flag = CVBandB(mem_, whichB_, nx_, getOption("asens_upper_bandwidth").toInt(), getOption("asens_lower_bandwidth").toInt());
+  int flag = CVBandB(mem_, whichB_, nrx_, getOption("asens_upper_bandwidth").toInt(), getOption("asens_lower_bandwidth").toInt());
   if(flag!=CV_SUCCESS) cvodes_error("CVBandB",flag);
 }
   
