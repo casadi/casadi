@@ -54,10 +54,10 @@ IntegratorInternal::~IntegratorInternal(){
 }
 
 void IntegratorInternal::evaluate(int nfdir, int nadir){
-  if(nfdir>0 || nadir==0){
+  if(nfdir==0 && nadir==0){
   
     // Reset solver
-    reset(nfdir);
+    reset();
 
     // Integrate forward to the end of the time horizon
     integrate(tf_);
@@ -71,24 +71,29 @@ void IntegratorInternal::evaluate(int nfdir, int nadir){
       // Integrate backwards to the beginning
       integrateAdj(t0_);
     }
-  }
-  
-  // Adjoint derivatives are calculated with source code transformation
-  if(nadir>0){ 
+  } else {
     // NOTE: The following is a general functionality that should be moved to the base class
     
     // Get derivative function
-    FX dfcn = derivative(0,nadir);
+    FX dfcn = derivative(nfdir,nadir);
 
     // Pass function values
+    int input_index = 0;
     for(int i=0; i<INTEGRATOR_NUM_IN; ++i){
-      dfcn.setInput(input(i),i);
+      dfcn.setInput(input(i),input_index++);
+    }
+    
+    // Pass forward seeds
+    for(int dir=0; dir<nfdir; ++dir){
+      for(int i=0; i<INTEGRATOR_NUM_IN; ++i){
+        dfcn.setInput(fwdSeed(i,dir),input_index++);
+      }
     }
     
     // Pass adjoint seeds
     for(int dir=0; dir<nadir; ++dir){
       for(int i=0; i<INTEGRATOR_NUM_OUT; ++i){
-        dfcn.setInput(adjSeed(i,dir),INTEGRATOR_NUM_IN + dir*INTEGRATOR_NUM_OUT + i);
+        dfcn.setInput(adjSeed(i,dir),input_index++);
       }
     }
     
@@ -96,16 +101,22 @@ void IntegratorInternal::evaluate(int nfdir, int nadir){
     dfcn.evaluate();
     
     // Get nondifferentiated results
-    if(nfdir==0){
+    int output_index = 0;
+    for(int i=0; i<INTEGRATOR_NUM_OUT; ++i){
+      dfcn.getOutput(output(i),output_index++);
+    }
+    
+    // Get forward sensitivities 
+    for(int dir=0; dir<nfdir; ++dir){
       for(int i=0; i<INTEGRATOR_NUM_OUT; ++i){
-        dfcn.getOutput(output(i),i);
+        dfcn.getOutput(fwdSens(i,dir),output_index++);
       }
     }
     
     // Get adjoint sensitivities 
     for(int dir=0; dir<nadir; ++dir){
       for(int i=0; i<INTEGRATOR_NUM_IN; ++i){
-        dfcn.getOutput(adjSens(i,dir),INTEGRATOR_NUM_OUT + dir*INTEGRATOR_NUM_IN + i);
+        dfcn.getOutput(adjSens(i,dir),output_index++);
       }
     }
   }
@@ -240,7 +251,7 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
   // Allocate forward sensitivities
   vector<Mat> fwd_x = Mat::sym("fwd_x",x.sparsity(),nfwd);
   vector<Mat> fwd_z = Mat::sym("fwd_z",z.sparsity(),nfwd);
-  vector<Mat> fwd_xdot = Mat::sym("fwd_zdot",xdot.sparsity(),nfwd);
+  vector<Mat> fwd_xdot = Mat::sym("fwd_xdot",xdot.sparsity(),nfwd);
   vector<Mat> fwd_p = Mat::sym("fwd_p",p.sparsity(),nfwd);
 
   // Is the ODE part explicit?
@@ -307,6 +318,14 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
     ralg.append(asens[dir][DAE_Z]);
     rquad.append(asens[dir][DAE_P]);
   }
+  
+  // Make sure that the augmented problem is dense
+  makeDense(ode);
+  makeDense(alg);
+  makeDense(quad);
+  makeDense(rode);
+  makeDense(ralg);
+  makeDense(rquad);
   
   // Update the forward problem inputs ...
   dae_in[DAE_X] = x;

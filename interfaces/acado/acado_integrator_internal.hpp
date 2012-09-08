@@ -62,7 +62,7 @@ class AcadoIntegratorInternal : public IntegratorInternal{
   virtual void init();
 
   /** \brief  Reset the solver and bring the time back to t0 */
-  virtual void reset(int nfdir);
+  virtual void reset();
 
   /** \brief  Reset the solver of the adjoint problem and take time to tf */
   virtual void resetAdj(){}

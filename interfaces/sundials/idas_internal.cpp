@@ -666,15 +666,16 @@ int IdasInternal::resS_wrapper(int Ns, double t, N_Vector xz, N_Vector xzdot, N_
   }
 }
 
-void IdasInternal::reset(int nfdir){
+void IdasInternal::reset(){
   log("IdasInternal::reset","begin");
+  int nfdir = 0; // NOTE: need to update the function below to the new integrator formulation
   
   if(!g_.isNull() && !isInitTaping_)
     initTaping();
   
   // If we have forward sensitivities, rest one extra time without forward sensitivities to get a consistent initial guess
-  if(nfdir>0 && getOption("extra_fsens_calc_ic").toInt())
-    reset(0);
+//   if(nfdir>0 && getOption("extra_fsens_calc_ic").toInt())
+//     reset(0);
 
   // Reset timers
   t_res = t_fres = t_jac = t_lsolve = t_lsetup_jac = t_lsetup_fac = 0;

@@ -35,7 +35,7 @@ implicit_integrator = False
 collocation_integrator = False
 
 # test adjoint sensitivities
-with_asens = True
+with_asens = False
 
 # use exact jacobian
 exact_jacobian = True
@@ -129,7 +129,13 @@ def create_CVODES():
   s = ssym("s")
   v = ssym("v")
   m = ssym("m")
-  y = vertcat([s,v,m])
+  x = vertcat([s,v,m])
+  
+  # State derivatives
+  sdot = ssym("sdot")
+  vdot = ssym("vdot")
+  mdot = ssym("mdot")
+  xdot = vertcat([sdot,vdot,mdot])
   
   # Control
   u = ssym("u")
@@ -138,20 +144,13 @@ def create_CVODES():
   u_ref = 3-sin(t)
   
   # Square deviation from the state trajectory
-  u_dev = u-u_ref
-  u_dev *= u_dev
+  quad = (u-u_ref)**2
   
   # Differential equation (fully implicit form)
-  rhs = vertcat([v, (u-0.02*v*v)/m, -0.01*u*u])
-
-  # Input of the DAE residual function
-  ffcn_in = DAE_NUM_IN * [[]]
-  ffcn_in[DAE_T] = t
-  ffcn_in[DAE_X] = y
-  ffcn_in[DAE_P] = u
+  ode = vertcat([v, (u-0.02*v*v)/m, -0.01*u*u])-xdot
 
   # DAE residual function
-  ffcn = SXFunction(ffcn_in,daeOut(rhs,[],u_dev))
+  ffcn = SXFunction(daeIn(x,[],u,t,xdot),daeOut(ode,[],quad))
   
   if collocation_integrator:
     # Create a collocation integrator
@@ -271,12 +270,12 @@ integrator.setInput(u_init,INTEGRATOR_P)
 # Reset initial state
 integrator.setInput(x0,INTEGRATOR_X0)
 
-if with_asens:
-  # backward seeds
-  bseed = len(x0)*[0.]
-  bseed[0] = 1
-  integrator.setAdjSeed(bseed,INTEGRATOR_XF)
+# backward seeds
+bseed = len(x0)*[0.]
+bseed[0] = 1
+integrator.setAdjSeed(bseed,INTEGRATOR_XF)
 
+if with_asens:
   # evaluate with forward and adjoint sensitivities
   integrator.evaluate(1,1)
 else:
@@ -293,24 +292,20 @@ if with_asens:
 # Derivatives via source code transformation
 if with_sct:
   # Forward seeds
-  fintegrator = integrator.derivative(1,0)
+  fintegrator = integrator.derivative(1,1)
   fintegrator.setInput(integrator.input(INTEGRATOR_X0),INTEGRATOR_X0)
   fintegrator.setInput(integrator.input(INTEGRATOR_P),INTEGRATOR_P)
   fintegrator.setInput(integrator.fwdSeed(INTEGRATOR_X0),INTEGRATOR_NUM_IN+INTEGRATOR_X0)
   fintegrator.setInput(integrator.fwdSeed(INTEGRATOR_P),INTEGRATOR_NUM_IN+INTEGRATOR_P)
-  fintegrator.evaluate()
-  print "forward sensitivities via sct   ", fintegrator.output(INTEGRATOR_NUM_OUT+INTEGRATOR_XF)
+  fintegrator.setInput(integrator.adjSeed(INTEGRATOR_XF),2*INTEGRATOR_NUM_IN+INTEGRATOR_XF)
+  fintegrator.setInput(integrator.adjSeed(INTEGRATOR_QF),2*INTEGRATOR_NUM_IN+INTEGRATOR_QF)
   
-  aintegrator = integrator.derivative(0,1)
-  aintegrator.setInput(integrator.input(INTEGRATOR_X0),INTEGRATOR_X0)
-  aintegrator.setInput(integrator.input(INTEGRATOR_P),INTEGRATOR_P)
-  aintegrator.setInput(integrator.adjSeed(INTEGRATOR_XF),INTEGRATOR_NUM_IN+INTEGRATOR_XF)
-  aintegrator.setInput(integrator.adjSeed(INTEGRATOR_QF),INTEGRATOR_NUM_IN+INTEGRATOR_QF)
-  aintegrator.evaluate()
+  fintegrator.evaluate()
 
+  print "forward sensitivities via sct   ", fintegrator.output(INTEGRATOR_NUM_OUT+INTEGRATOR_XF)
   print "adjoint sensitivities via sct   ",
-  print aintegrator.output(INTEGRATOR_NUM_OUT+INTEGRATOR_X0), " ",
-  print aintegrator.output(INTEGRATOR_NUM_OUT+INTEGRATOR_P), " "
+  print fintegrator.output(2*INTEGRATOR_NUM_OUT+INTEGRATOR_X0), " ",
+  print fintegrator.output(2*INTEGRATOR_NUM_OUT+INTEGRATOR_P), " "
   
 if second_order:
   # Generate the jacobian by creating a new integrator for the sensitivity equations by source transformation

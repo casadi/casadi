@@ -48,8 +48,8 @@ const IntegratorInternal* Integrator::operator->() const{
    return (const IntegratorInternal*)(FX::operator->()); 
 }
   
-void Integrator::reset(int nfdir){
-  (*this)->reset(nfdir);
+void Integrator::reset(){
+  (*this)->reset();
 }
 
 void Integrator::integrate(double t_out){

@@ -106,6 +106,9 @@ void SimulatorInternal::init(){
 }
 
 void SimulatorInternal::evaluate(int nfdir, int nadir){
+  casadi_assert_message(nfdir==0, "Not implemented");
+  casadi_assert_message(nadir==0, "Not implemented");
+  
   // Pass the parameters and initial state
   integrator_.setInput(input(INTEGRATOR_X0),INTEGRATOR_X0);
   integrator_.setInput(input(INTEGRATOR_P),INTEGRATOR_P);
@@ -115,15 +118,9 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
     std::cout << " y0     = "  << input(INTEGRATOR_X0) << std::endl;
     std::cout << " p      = "   << input(INTEGRATOR_P) << std::endl;
   }
-    
-  // Pass sensitivities if fsens
-  for(int dir=0; dir<nfdir; ++dir){
-    integrator_.setFwdSeed(fwdSeed(INTEGRATOR_X0,dir),INTEGRATOR_X0,dir);
-    integrator_.setFwdSeed(fwdSeed(INTEGRATOR_P,dir),INTEGRATOR_P,dir);
-  }
   
   // Reset the integrator_
-  integrator_.reset(nfdir);
+  integrator_.reset();
   
   // Advance solution in time
   for(int k=0; k<grid_.size(); ++k){
@@ -151,16 +148,9 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
       
     // Save the states for use in backwards sensitivities
     states_[k].set(integrator_.output(INTEGRATOR_XF));
-
-    for(int dir=0; dir<nfdir; ++dir){
-      // Pass the forward seed to the output function
-      output_fcn_.setFwdSeed(0.0,DAE_T,dir);
-      output_fcn_.setFwdSeed(integrator_.fwdSens(INTEGRATOR_XF,dir),DAE_X,dir);
-      output_fcn_.setFwdSeed(fwdSeed(INTEGRATOR_P,dir),DAE_P,dir);
-    }
     
     // Evaluate output function
-    output_fcn_.evaluate(nfdir,0);
+    output_fcn_.evaluate();
 
     // Save the output of the function
     for(int i=0; i<output_.size(); ++i){
@@ -169,71 +159,8 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
       for(int j=0; j<res.numel(); ++j){
         ores(k,j) = res(j); // NOTE: inefficient implementation
       }
-      
-      // Save the forward sensitivities
-      for(int dir=0; dir<nfdir; ++dir){
-        const Matrix<double> &fres = output_fcn_.fwdSens(i,dir);
-        Matrix<double> &ofres = fwdSens(i,dir);
-        for(int j=0; j<fres.numel(); ++j){
-          ofres(k,j) = fres(j); // NOTE: inefficient implementation
-        }
-      }
     }
   }
-  
-  
-
-  // Adjoint sensitivities
-  if(nadir>0){
-
-    adjSens(INTEGRATOR_X0).setAll(0);
-    adjSens(INTEGRATOR_P).setAll(0);
-
-    for(int dir=0; dir<nadir; ++dir){
-      // Pass the adjoint seeds to the output function
-      integrator_.adjSeed(INTEGRATOR_XF,dir).setAll(0);
-    }
-      
-      
-    // Integrate backwards
-    for(int k=grid_.size()-1; k>=0; --k){
-
-      // Pass integrator output to the output function
-      if(output_fcn_.input(DAE_T).size()!=0)
-        output_fcn_.setInput(grid_[k],DAE_T);
-      if(output_fcn_.input(DAE_X).size()!=0)
-        output_fcn_.setInput(states_[k],DAE_X);
-      if(output_fcn_.input(DAE_P).size()!=0)
-        output_fcn_.setInput(input(INTEGRATOR_P),DAE_P);
-
-      for(int dir=0; dir<nadir; ++dir){
-        // Pass the adjoint seeds to the output function
-        output_fcn_.setAdjSeed(trans(adjSeed(INTEGRATOR_XF,dir)(k,ALL)),INTEGRATOR_XF,dir);
-      }
-      
-      // Evaluate output function
-      output_fcn_.evaluate(0,nadir);
-    
-      for(int dir=0; dir<nadir; ++dir){
-        // Pass the adjoint seeds to the output function
-        adjSens(INTEGRATOR_P,dir).set(adjSens(INTEGRATOR_P,dir)+output_fcn_.adjSens(DAE_P,dir));
-        integrator_.setAdjSeed(integrator_.adjSeed(INTEGRATOR_XF,dir)+output_fcn_.adjSens(DAE_X,dir),INTEGRATOR_XF,dir);
-      }
-      
-      if (k>0) {
-        integrator_.resetAdj();
-        integrator_.integrateAdj(grid_[k-1]);
-      }
-
-    }
-    
-  }
-  
- for(int dir=0; dir<nadir; ++dir){
-   adjSens(INTEGRATOR_X0,dir).set(integrator_.adjSens(INTEGRATOR_X0,dir));
-   adjSens(INTEGRATOR_P,dir).set(integrator_.adjSens(INTEGRATOR_P,dir));
- }
-
 }
 
 void SimulatorInternal::updateNumSens(bool recursive){

@@ -247,7 +247,7 @@ public:
   const IntegratorInternal* operator->() const;
   
   /// Reset the solver and bring the time back to t0 and state back to INTEGRATOR_X0
-  void reset(int nfdir=0);
+  void reset();
 
   /// Integrate until a specified time point 
   void integrate(double t_out);

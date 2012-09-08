@@ -56,7 +56,7 @@ public:
   virtual void initAdj();
 
   /// Reset the solver and bring the time back to t0
-  virtual void reset(int nfdir);
+  virtual void reset();
 
   /// Reset the solver of the adjoint problem and take time to tf
   virtual void resetAdj();

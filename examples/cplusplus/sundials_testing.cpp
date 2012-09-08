@@ -287,6 +287,8 @@ int main(){
     integrator.evaluate(1,0);
   }
     
+  return 0;
+    
   Matrix<double> fsens_xf = integrator.fwdSens(INTEGRATOR_XF);
   Matrix<double> fsens_qf = integrator.fwdSens(INTEGRATOR_QF);
   cout << "forward sensitivities           " << fsens_xf << "; " << fsens_qf << endl;

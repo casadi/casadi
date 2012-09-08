@@ -332,6 +332,7 @@ void CVodesInternal::initAdj(){
   
   // Initialize the backward problem
   double tB0 = tf_;
+  
   flag = CVodeInitB(mem_, whichB_, rhsB_wrapper, tB0, rx0_);
   if(flag != CV_SUCCESS) cvodes_error("CVodeInitB",flag);
 
@@ -426,7 +427,8 @@ try{
   }
 }
   
-void CVodesInternal::reset(int nfdir){
+void CVodesInternal::reset(){
+  int nfdir = 0; // NOTE: need to update the function below to the new integrator formulation
   if(monitored("reset")){
     cout << "initial state: " << endl;
     cout << "p = " << input(INTEGRATOR_P) << endl;

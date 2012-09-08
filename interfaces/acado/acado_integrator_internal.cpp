@@ -147,7 +147,8 @@ void AcadoIntegratorInternal::init(){
   tmp_ = new ACADO::Vector();
 }
 
-void AcadoIntegratorInternal::reset(int nfdir){
+void AcadoIntegratorInternal::reset(){
+  int nfdir = 0; // NOTE: need to update the function below to the new integrator formulation
   if(nfdir>0){
     integrator_->freezeAll();
   }
