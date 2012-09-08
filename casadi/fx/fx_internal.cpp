@@ -554,7 +554,49 @@ void FXInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res,
 }
 
 void FXInternal::spEvaluate(bool fwd){
-  casadi_error("FXInternal::spEvaluate not defined for class " << typeid(*this).name());
+  // By default, everything is assumed to depend on everything
+  
+  // Variable which depends on all everything
+  bvec_t all_depend(0);
+  if(fwd){
+    // Get dependency on all inputs
+    for(int iind=0; iind<getNumInputs(); ++iind){
+      const DMatrix& m = input<false>(iind);
+      const bvec_t* v = reinterpret_cast<const bvec_t*>(m.ptr());
+      for(int i=0; i<m.size(); ++i){
+        all_depend |= v[i];
+      }
+    }
+    
+    // Propagate to all outputs
+    for(int oind=0; oind<getNumOutputs(); ++oind){
+      DMatrix& m = output<false>(oind);
+      bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
+      for(int i=0; i<m.size(); ++i){
+        v[i] = all_depend;
+      }
+    }
+    
+  } else {
+    
+    // Get dependency on all outputs
+    for(int oind=0; oind<getNumOutputs(); ++oind){
+      const DMatrix& m = output<false>(oind);
+      const bvec_t* v = reinterpret_cast<const bvec_t*>(m.ptr());
+      for(int i=0; i<m.size(); ++i){
+        all_depend |= v[i];
+      }
+    }
+    
+    // Propagate to all inputs
+    for(int iind=0; iind<getNumInputs(); ++iind){
+      DMatrix& m = input<false>(iind);
+      bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
+      for(int i=0; i<m.size(); ++i){
+        v[i] |= all_depend;
+      }
+    }
+  }
 }
 
 FX FXInternal::jacobian_new(int iind, int oind){
