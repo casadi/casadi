@@ -2,25 +2,25 @@
 <table>
 <caption>Output scheme: CasADi::IntegratorOutput  (INTEGRATOR_NUM_OUT = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>INTEGRATOR_XF</td><td>Differential state at the final time</td></tr>
-<tr><td>INTEGRATOR_QF</td><td>Quadrature state at the final time</td></tr>
-<tr><td>INTEGRATOR_RXF</td><td>Backward differential state at the initial time</td></tr>
-<tr><td>INTEGRATOR_RQF</td><td>Backward quadrature state at the initial time</td></tr>
+<tr><td>INTEGRATOR_XF</td><td>Differential state at the final time [xf].</td></tr>
+<tr><td>INTEGRATOR_QF</td><td>Quadrature state at the final time [qf].</td></tr>
+<tr><td>INTEGRATOR_RXF</td><td>Backward differential state at the initial time [rxf].</td></tr>
+<tr><td>INTEGRATOR_RQF</td><td>Backward quadrature state at the initial time [rqf].</td></tr>
 </table>
 */
 /** \defgroup scheme_QPInput
 <table>
 <caption>Input scheme: CasADi::QPInput  (QP_NUM_IN = 9) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>QP_H</td><td>The square matrix H: sparse, (nx x nx). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.</td></tr>
-<tr><td>QP_G</td><td>The column vector G: dense, (nx x 1)</td></tr>
-<tr><td>QP_A</td><td>The matrix A: sparse, (nc x nx) - product with x must be dense.</td></tr>
-<tr><td>QP_LBA</td><td>dense, (nc x 1)</td></tr>
-<tr><td>QP_UBA</td><td>dense, (nc x 1)</td></tr>
-<tr><td>QP_LBX</td><td>dense, (nx x 1)</td></tr>
-<tr><td>QP_UBX</td><td>dense, (nx x 1)</td></tr>
-<tr><td>QP_X_INIT</td><td>dense, (nx x 1)</td></tr>
-<tr><td>QP_LAMBDA_INIT</td><td></td></tr>
+<tr><td>QP_H</td><td>The square matrix H: sparse, (nx x nx). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [h].</td></tr>
+<tr><td>QP_G</td><td>The column vector G: dense, (nx x 1) [g].</td></tr>
+<tr><td>QP_A</td><td>The matrix A: sparse, (nc x nx) - product with x must be dense. [a].</td></tr>
+<tr><td>QP_LBA</td><td>dense, (nc x 1) [lba]</td></tr>
+<tr><td>QP_UBA</td><td>dense, (nc x 1) [uba]</td></tr>
+<tr><td>QP_LBX</td><td>dense, (nx x 1) [lbx]</td></tr>
+<tr><td>QP_UBX</td><td>dense, (nx x 1) [ubx]</td></tr>
+<tr><td>QP_X_INIT</td><td>dense, (nx x 1) [x_init]</td></tr>
+<tr><td>QP_LAMBDA_INIT</td><td>dense [lambda_init]</td></tr>
 </table>
 */
 /** \defgroup scheme_ACADO_Input
@@ -62,14 +62,14 @@
 <table>
 <caption>Input scheme: CasADi::RDAEInput  (RDAE_NUM_IN = 8) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>RDAE_RX</td><td>Backward differential state</td></tr>
-<tr><td>RDAE_RZ</td><td>Backward algebraic state</td></tr>
-<tr><td>RDAE_RP</td><td>Backward parameter</td></tr>
-<tr><td>RDAE_X</td><td>Forward differential state</td></tr>
-<tr><td>RDAE_Z</td><td>Forward algebraic state</td></tr>
-<tr><td>RDAE_P</td><td>Parameter vector</td></tr>
-<tr><td>RDAE_T</td><td>Explicit time dependence</td></tr>
-<tr><td>RDAE_RXDOT</td><td>Time derivative of backward differential state</td></tr>
+<tr><td>RDAE_RX</td><td>Backward differential state [rx].</td></tr>
+<tr><td>RDAE_RZ</td><td>Backward algebraic state [rz].</td></tr>
+<tr><td>RDAE_RP</td><td>Backward parameter [rp].</td></tr>
+<tr><td>RDAE_X</td><td>Forward differential state [x].</td></tr>
+<tr><td>RDAE_Z</td><td>Forward algebraic state [z].</td></tr>
+<tr><td>RDAE_P</td><td>Parameter vector [p].</td></tr>
+<tr><td>RDAE_T</td><td>Explicit time dependence [t].</td></tr>
+<tr><td>RDAE_RXDOT</td><td>Time derivative of backward differential state [rxdot].</td></tr>
 </table>
 */
 /** \defgroup scheme_MUSCOD_FCN_Output
@@ -84,32 +84,32 @@
 <table>
 <caption>Output scheme: CasADi::QPOutput  (QP_NUM_OUT = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>QP_PRIMAL</td><td>The primal solution.</td></tr>
-<tr><td>QP_COST</td><td>The optimal cost.</td></tr>
-<tr><td>QP_LAMBDA_A</td><td>The dual solution corresponding to linear bounds.</td></tr>
-<tr><td>QP_LAMBDA_X</td><td>The dual solution corresponding to simple bounds.</td></tr>
+<tr><td>QP_PRIMAL</td><td>The primal solution [primal].</td></tr>
+<tr><td>QP_COST</td><td>The optimal cost [cost].</td></tr>
+<tr><td>QP_LAMBDA_A</td><td>The dual solution corresponding to linear bounds [lambda_a].</td></tr>
+<tr><td>QP_LAMBDA_X</td><td>The dual solution corresponding to simple bounds [lambda_x].</td></tr>
 </table>
 */
 /** \defgroup scheme_NLPOutput
 <table>
 <caption>Output scheme: CasADi::NLPOutput  (NLP_NUM_OUT = 5) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>NLP_X_OPT</td><td>Decision variables for optimal solution (n x 1)</td></tr>
-<tr><td>NLP_COST</td><td>Objective/cost function for optimal solution (1 x 1)</td></tr>
-<tr><td>NLP_LAMBDA_G</td><td>Lagrange multipliers associated with G at the solution (m x 1)</td></tr>
-<tr><td>NLP_LAMBDA_X</td><td>Lagrange multipliers associated with bounds on X at the solution (n x 1) When in warmstart mode, this output may be used as input (</td></tr>
-<tr><td>NLP_G</td><td>The constraints evaluated at the optimal solution (m x 1)</td></tr>
+<tr><td>NLP_X_OPT</td><td>Decision variables for optimal solution (n x 1) [x_opt].</td></tr>
+<tr><td>NLP_COST</td><td>Objective/cost function for optimal solution (1 x 1) [cost].</td></tr>
+<tr><td>NLP_LAMBDA_G</td><td>Lagrange multipliers associated with G at the solution (m x 1) [lambda_g].</td></tr>
+<tr><td>NLP_LAMBDA_X</td><td>Lagrange multipliers associated with bounds on X at the solution (n x 1) [lambda_x].</td></tr>
+<tr><td>NLP_G</td><td>The constraints evaluated at the optimal solution (m x 1) [g].</td></tr>
 </table>
 */
 /** \defgroup scheme_DAEInput
 <table>
 <caption>Input scheme: CasADi::DAEInput  (DAE_NUM_IN = 5) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>DAE_X</td><td>Differential state</td></tr>
-<tr><td>DAE_Z</td><td>Algebraic state</td></tr>
-<tr><td>DAE_P</td><td>Parameter</td></tr>
-<tr><td>DAE_T</td><td>Explicit time dependence</td></tr>
-<tr><td>DAE_XDOT</td><td>Time derivative of differential states</td></tr>
+<tr><td>DAE_X</td><td>Differential state [x].</td></tr>
+<tr><td>DAE_Z</td><td>Algebraic state [z].</td></tr>
+<tr><td>DAE_P</td><td>Parameter [p].</td></tr>
+<tr><td>DAE_T</td><td>Explicit time dependence [t].</td></tr>
+<tr><td>DAE_XDOT</td><td>Time derivative of differential states [xdot].</td></tr>
 </table>
 */
 /** \defgroup scheme_ACADO_Output
@@ -126,55 +126,55 @@
 <table>
 <caption>Output scheme: CasADi::DAEOutput  (DAE_NUM_OUT = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>DAE_ODE</td><td>Right hand side of the implicit ODE</td></tr>
-<tr><td>DAE_ALG</td><td>Right hand side of algebraic equations</td></tr>
-<tr><td>DAE_QUAD</td><td>Right hand side of quadratures equations</td></tr>
+<tr><td>DAE_ODE</td><td>Right hand side of the implicit ODE [ode].</td></tr>
+<tr><td>DAE_ALG</td><td>Right hand side of algebraic equations [alg].</td></tr>
+<tr><td>DAE_QUAD</td><td>Right hand side of quadratures equations [quad].</td></tr>
 </table>
 */
 /** \defgroup scheme_MayerInput
 <table>
 <caption>Input scheme: CasADi::MayerInput  (MAYER_NUM_IN = 2) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>MAYER_X</td><td>States at the end of integration (nx x 1)</td></tr>
-<tr><td>MAYER_P</td><td>Problem parameters (np x 1)</td></tr>
+<tr><td>MAYER_X</td><td>States at the end of integration (nx x 1) [x].</td></tr>
+<tr><td>MAYER_P</td><td>Problem parameters (np x 1) [p].</td></tr>
 </table>
 */
 /** \defgroup scheme_ControlledDAEInput
 <table>
 <caption>Input scheme: CasADi::ControlledDAEInput  (CONTROL_DAE_NUM_IN = 10) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>CONTROL_DAE_T</td><td>Global physical time. (1-by-1)</td></tr>
-<tr><td>CONTROL_DAE_X</td><td>State vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES</td></tr>
-<tr><td>CONTROL_DAE_Z</td><td>Algebraic state vector (dimension np-by-1).</td></tr>
-<tr><td>CONTROL_DAE_P</td><td>Parameter vector (dimension np-by-1).</td></tr>
-<tr><td>CONTROL_DAE_U</td><td>Control vector (dimension nu-by-1).</td></tr>
-<tr><td>CONTROL_DAE_U_INTERP</td><td>Control vector, linearly interpolated (dimension nu-by-1).</td></tr>
-<tr><td>CONTROL_DAE_XDOT</td><td>State derivative vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES</td></tr>
-<tr><td>CONTROL_DAE_X_MAJOR</td><td>State vector (dimension nx-by-1) at the last major time-step</td></tr>
-<tr><td>CONTROL_DAE_T0</td><td>Time at start of control interval (1-by-1)</td></tr>
-<tr><td>CONTROL_DAE_TF</td><td>Time at end of control interval (1-by-1)</td></tr>
+<tr><td>CONTROL_DAE_T</td><td>Global physical time. (1-by-1) [t].</td></tr>
+<tr><td>CONTROL_DAE_X</td><td>State vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES [x].</td></tr>
+<tr><td>CONTROL_DAE_Z</td><td>Algebraic state vector (dimension np-by-1). [z].</td></tr>
+<tr><td>CONTROL_DAE_P</td><td>Parameter vector (dimension np-by-1). [p].</td></tr>
+<tr><td>CONTROL_DAE_U</td><td>Control vector (dimension nu-by-1). [u].</td></tr>
+<tr><td>CONTROL_DAE_U_INTERP</td><td>Control vector, linearly interpolated (dimension nu-by-1). [u_interp].</td></tr>
+<tr><td>CONTROL_DAE_XDOT</td><td>State derivative vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES [xdot].</td></tr>
+<tr><td>CONTROL_DAE_X_MAJOR</td><td>State vector (dimension nx-by-1) at the last major time-step [x_major].</td></tr>
+<tr><td>CONTROL_DAE_T0</td><td>Time at start of control interval (1-by-1) [t0].</td></tr>
+<tr><td>CONTROL_DAE_TF</td><td>Time at end of control interval (1-by-1) [tf].</td></tr>
 </table>
 */
 /** \defgroup scheme_NLPInput
 <table>
 <caption>Input scheme: CasADi::NLPInput  (NLP_NUM_IN = 7) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>NLP_X_INIT</td><td>Decision variables initial guess (n x 1)</td></tr>
-<tr><td>NLP_LBX</td><td>Decision variables lower bound (n x 1), default -inf.</td></tr>
-<tr><td>NLP_UBX</td><td>Decision variables upper bound (n x 1), default +inf.</td></tr>
-<tr><td>NLP_LBG</td><td>Constraints lower bound (m x 1), default -inf.</td></tr>
-<tr><td>NLP_UBG</td><td>Constraints upper bound (m x 1), default +inf.</td></tr>
-<tr><td>NLP_LAMBDA_INIT</td><td>Lagrange multipliers associated with G, initial guess (m x 1)</td></tr>
-<tr><td>NLP_P</td><td>Only for parametric NLP - static parameters on which the objective and constraints might depend.</td></tr>
+<tr><td>NLP_X_INIT</td><td>Decision variables initial guess (n x 1) [x_init].</td></tr>
+<tr><td>NLP_LBX</td><td>Decision variables lower bound (n x 1), default -inf [lbx].</td></tr>
+<tr><td>NLP_UBX</td><td>Decision variables upper bound (n x 1), default +inf [ubx].</td></tr>
+<tr><td>NLP_LBG</td><td>Constraints lower bound (m x 1), default -inf [lbg].</td></tr>
+<tr><td>NLP_UBG</td><td>Constraints upper bound (m x 1), default +inf [ubg].</td></tr>
+<tr><td>NLP_LAMBDA_INIT</td><td>Lagrange multipliers associated with G, initial guess (m x 1) [lambda_init].</td></tr>
+<tr><td>NLP_P</td><td>Only for parametric NLP - static parameters on which the objective and constraints might depend [p].</td></tr>
 </table>
 */
 /** \defgroup scheme_IntegratorInput
 <table>
 <caption>Input scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>INTEGRATOR_X0</td><td>Differential state at the initial time</td></tr>
-<tr><td>INTEGRATOR_P</td><td>Parameters</td></tr>
-<tr><td>INTEGRATOR_RX0</td><td>Backward differential state at the final time</td></tr>
+<tr><td>INTEGRATOR_X0</td><td>Differential state at the initial time [x0].</td></tr>
+<tr><td>INTEGRATOR_P</td><td>Parameters [p] */.</td></tr>
+<tr><td>INTEGRATOR_RX0</td><td>Backward differential state at the final time [rx0].</td></tr>
 </table>
 */
 /** \defgroup scheme_MUSCOD_FCN_Input
@@ -192,51 +192,51 @@
 <table>
 <caption>Output scheme: CasADi::RDAEOutput  (RDAE_NUM_OUT = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>RDAE_ODE</td><td>Right hand side of ODE.</td></tr>
-<tr><td>RDAE_ALG</td><td>Right hand side of algebraic equations.</td></tr>
-<tr><td>RDAE_QUAD</td><td>Right hand side of quadratures.</td></tr>
+<tr><td>RDAE_ODE</td><td>Right hand side of ODE. [ode].</td></tr>
+<tr><td>RDAE_ALG</td><td>Right hand side of algebraic equations. [alg].</td></tr>
+<tr><td>RDAE_QUAD</td><td>Right hand side of quadratures. [quad].</td></tr>
 </table>
 */
 /** \defgroup scheme_OCPInput
 <table>
 <caption>Input scheme: CasADi::OCPInput  (OCP_NUM_IN = 17) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>OCP_T</td><td>Time grid: ((ns+1) x 1) - default: linspace(0,t_final,ns+1)</td></tr>
-<tr><td>OCP_LBX</td><td>States lower bounds (nx x (ns+1))</td></tr>
-<tr><td>OCP_UBX</td><td>States upper bounds (nx x (ns+1))</td></tr>
-<tr><td>OCP_X_INIT</td><td>States initial guess (nx x (ns+1))</td></tr>
-<tr><td>OCP_LBXP</td><td>States deriatives lower bounds (nx x (ns+1))</td></tr>
-<tr><td>OCP_UBXP</td><td>States deriatives upper bounds (nx x (ns+1))</td></tr>
-<tr><td>OCP_XP_INIT</td><td>States deriatives initial guess (nx x (ns+1))</td></tr>
-<tr><td>OCP_LBU</td><td>Controls lower bounds (nu x ns)</td></tr>
-<tr><td>OCP_UBU</td><td>Controls upper bounds (nu x ns)</td></tr>
-<tr><td>OCP_U_INIT</td><td>Controls initial guess (nu x ns)</td></tr>
-<tr><td>OCP_LBP</td><td>Parameters lower bounds (np x 1)</td></tr>
-<tr><td>OCP_UBP</td><td>Parameters upper bounds (np x 1)</td></tr>
-<tr><td>OCP_P_INIT</td><td>Parameters initial guess (np x 1)</td></tr>
-<tr><td>OCP_LBH</td><td>Point constraint lower bound (nh x (ns+1))</td></tr>
-<tr><td>OCP_UBH</td><td>Point constraint upper bound (nh x (ns+1))</td></tr>
-<tr><td>OCP_LBG</td><td>Lower bound for the coupling constraints.</td></tr>
-<tr><td>OCP_UBG</td><td>Upper bound for the coupling constraints.</td></tr>
+<tr><td>OCP_T</td><td>Time grid: ((ns+1) x 1) - default: linspace(0,t_final,ns+1) [t].</td></tr>
+<tr><td>OCP_LBX</td><td>States lower bounds (nx x (ns+1)) [lbx].</td></tr>
+<tr><td>OCP_UBX</td><td>States upper bounds (nx x (ns+1)) [ubx].</td></tr>
+<tr><td>OCP_X_INIT</td><td>States initial guess (nx x (ns+1)) [x_init].</td></tr>
+<tr><td>OCP_LBXP</td><td>States deriatives lower bounds (nx x (ns+1)) [lbxp].</td></tr>
+<tr><td>OCP_UBXP</td><td>States deriatives upper bounds (nx x (ns+1)) [ubxp].</td></tr>
+<tr><td>OCP_XP_INIT</td><td>States deriatives initial guess (nx x (ns+1)) [xp_init].</td></tr>
+<tr><td>OCP_LBU</td><td>Controls lower bounds (nu x ns) [lbu].</td></tr>
+<tr><td>OCP_UBU</td><td>Controls upper bounds (nu x ns) [ubu].</td></tr>
+<tr><td>OCP_U_INIT</td><td>Controls initial guess (nu x ns) [u_init].</td></tr>
+<tr><td>OCP_LBP</td><td>Parameters lower bounds (np x 1) [lbp].</td></tr>
+<tr><td>OCP_UBP</td><td>Parameters upper bounds (np x 1) [ubp].</td></tr>
+<tr><td>OCP_P_INIT</td><td>Parameters initial guess (np x 1) [p_init].</td></tr>
+<tr><td>OCP_LBH</td><td>Point constraint lower bound (nh x (ns+1)) [lbh].</td></tr>
+<tr><td>OCP_UBH</td><td>Point constraint upper bound (nh x (ns+1)) [ubh].</td></tr>
+<tr><td>OCP_LBG</td><td>Lower bound for the coupling constraints [lbg].</td></tr>
+<tr><td>OCP_UBG</td><td>Upper bound for the coupling constraints [ubg].</td></tr>
 </table>
 */
 /** \defgroup scheme_ControlSimulatorInput
 <table>
 <caption>Input scheme: CasADi::ControlSimulatorInput  (CONTROLSIMULATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>CONTROLSIMULATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1)</td></tr>
-<tr><td>CONTROLSIMULATOR_P</td><td>Parameters that are fixed over the entire horizon (dimension np-by-1)</td></tr>
-<tr><td>CONTROLSIMULATOR_U</td><td>Parameters that change over the integration intervals (dimension (ns-1)-by-nu)</td></tr>
+<tr><td>CONTROLSIMULATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1) [x0].</td></tr>
+<tr><td>CONTROLSIMULATOR_P</td><td>Parameters that are fixed over the entire horizon (dimension np-by-1) [p].</td></tr>
+<tr><td>CONTROLSIMULATOR_U</td><td>Parameters that change over the integration intervals (dimension (ns-1)-by-nu) [u].</td></tr>
 </table>
 */
 /** \defgroup scheme_OCPOutput
 <table>
 <caption>Output scheme: CasADi::OCPOutput  (OCP_NUM_OUT = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>OCP_X_OPT</td><td>Optimal state trajectory.</td></tr>
-<tr><td>OCP_U_OPT</td><td>Optimal control trajectory.</td></tr>
-<tr><td>OCP_XP_OPT</td><td>Optimal state derivative trajectory.</td></tr>
-<tr><td>OCP_P_OPT</td><td>Optimal parameters.</td></tr>
+<tr><td>OCP_X_OPT</td><td>Optimal state trajectory [x_opt].</td></tr>
+<tr><td>OCP_U_OPT</td><td>Optimal control trajectory [u_opt].</td></tr>
+<tr><td>OCP_XP_OPT</td><td>Optimal state derivative trajectory [xp_opt].</td></tr>
+<tr><td>OCP_P_OPT</td><td>Optimal parameters [p_opt].</td></tr>
 </table>
 */
 /** \class CasADi::NLPSolverInternal

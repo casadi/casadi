@@ -91,12 +91,8 @@ def create_IDAS():
   # Differential equation (fully implicit form)
   ode_res = vertcat([v - sdot,  (u-0.02*v*v)/m - vdot, -0.01*u*u - mdot])
 
-  # Input of the DAE residual function
-  ffcn_in = makeVector(SXMatrix,DAE_NUM_IN,DAE_T,t,DAE_X,y,DAE_XDOT,xdot,DAE_P,u)
-  ffcn_out = makeVector(SXMatrix,DAE_NUM_OUT,DAE_ODE,ode_res,DAE_QUAD,u_dev)
-
   # DAE residual function
-  ffcn = SXFunction(ffcn_in,ffcn_out)
+  ffcn = SXFunction(daeIn(t=t,x=y,xdot=xdot,p=u),daeOut(ode=ode_res,quad=u_dev))
   
   if collocation_integrator:
     # Create a collocation integrator
@@ -150,7 +146,7 @@ def create_CVODES():
   ode = vertcat([v, (u-0.02*v*v)/m, -0.01*u*u])-xdot
 
   # DAE residual function
-  ffcn = SXFunction(daeIn(x,[],u,t,xdot),daeOut(ode,[],quad))
+  ffcn = SXFunction(daeIn(x=x,p=u,t=t,xdot=xdot),daeOut(ode,[],quad))
   
   if collocation_integrator:
     # Create a collocation integrator

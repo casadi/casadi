@@ -199,7 +199,7 @@ class Integrationtests(casadiTestCase):
     x=SX("x")
     y=SX("y")
     z=x*exp(t)
-    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_X: [x,y]},[[z,z]])
+    f=SXFunction(daeIn(t=t, x=[x,y]),[[z,z]])
     f.init()
     # Pass inputs
     f.setInput(1.0,DAE_T)
@@ -217,7 +217,7 @@ class Integrationtests(casadiTestCase):
     t=SX("t")
     x=SX("x")
     y=SX("y")
-    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_X: [x,y]},daeOut([x,(1+1e-9)*x]))
+    f=SXFunction(daeIn(t=t, x=[x,y]),daeOut([x,(1+1e-9)*x]))
     integrator = CVodesIntegrator(f)
     integrator.setOption("fsens_err_con", True)
     integrator.setOption("t0",0)
@@ -242,7 +242,7 @@ class Integrationtests(casadiTestCase):
     q = [x,SX("problem")]
 
     dq=[x,x]
-    f=SXFunction({'NUM': DAE_NUM_IN, DAE_T: t, DAE_X: q},daeOut(dq))
+    f=SXFunction(daeIn(t=t,x=q),daeOut(dq))
     f.init()
 
     integrator = CVodesIntegrator(f)
@@ -823,7 +823,7 @@ class Integrationtests(casadiTestCase):
     #A = ssym("A",N,N)
     #x = ssym("x",N)
 
-    #ode = SXFunction({'NUM':DAE_NUM_IN, DAE_X: x, DAE_P: vec(A)},daeOut(mul(A,x)))
+    #ode = SXFunction(daeIn(x=x, p=vec(A)),daeOut(mul(A,x)))
     #I = CVodesIntegrator(ode)
     #I.setOption("fsens_err_con", True)
     #I.setOption('reltol',1e-12)

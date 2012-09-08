@@ -114,6 +114,8 @@ std::string GenericType::get_type_description(const opt_type &type) {
 	      return "OT_SPARSITYGENERATOR";
       case OT_FX:
 	      return "OT_FX";
+      case OT_VOIDPTR:
+	      return "OT_VOIDPTR";
       default:
 	      return "OT_UNKNOWN";
 	      

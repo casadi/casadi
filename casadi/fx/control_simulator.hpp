@@ -27,41 +27,41 @@
 
 namespace CasADi{
 
-/// Input arguments of an ODE/DAE function
+/// Input arguments of an ODE/DAE function [controldaeIn]
 enum ControlledDAEInput{
-  /** Global physical time. (1-by-1) */
+  /// Global physical time. (1-by-1) [t] 
   CONTROL_DAE_T,
-  /** State vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES */
+  /// State vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES [x]
   CONTROL_DAE_X,
-  /** Algebraic state vector (dimension np-by-1). */
+  /// Algebraic state vector (dimension np-by-1). [z]
   CONTROL_DAE_Z,
-  /** Parameter vector (dimension np-by-1). */
+  /// Parameter vector (dimension np-by-1). [p]
   CONTROL_DAE_P,
-  /** Control vector (dimension nu-by-1). */
+  /// Control vector (dimension nu-by-1). [u]
   CONTROL_DAE_U,
-  /** Control vector, linearly interpolated (dimension nu-by-1). */
+  /// Control vector, linearly interpolated (dimension nu-by-1). [u_interp] 
   CONTROL_DAE_U_INTERP,
-  /** State derivative vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES */
+  /// State derivative vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES [xdot] 
   CONTROL_DAE_XDOT,
-  /** State vector (dimension nx-by-1) at the last major time-step */
+  /// State vector (dimension nx-by-1) at the last major time-step [x_major]
   CONTROL_DAE_X_MAJOR,
-  /** Time at start of control interval (1-by-1) */
+  /// Time at start of control interval (1-by-1) [t0]
   CONTROL_DAE_T0,
-  /** Time at end of control interval (1-by-1) */
+  /// Time at end of control interval (1-by-1) [tf]
   CONTROL_DAE_TF,
-  /** Number of arguments. */
+  /// Number of arguments. 
   CONTROL_DAE_NUM_IN
 };
 
-/// Input arguments of an integrator
+/// Input arguments of a control simulator [controlsimulatorIn]
 enum ControlSimulatorInput{
-  /** Differential or algebraic state at t0  (dimension nx-by-1) */
+  /// Differential or algebraic state at t0  (dimension nx-by-1) [x0]
   CONTROLSIMULATOR_X0, 
-  /** Parameters that are fixed over the entire horizon  (dimension np-by-1) */
+  /// Parameters that are fixed over the entire horizon  (dimension np-by-1) [p]
   CONTROLSIMULATOR_P, 
-  /** Parameters that change over the integration intervals (dimension (ns-1)-by-nu) */
+  /// Parameters that change over the integration intervals (dimension (ns-1)-by-nu) [u]
   CONTROLSIMULATOR_U, 
-  /** Number of input arguments of a piecewise simulator */
+  /// Number of input arguments of a piecewise simulator
   CONTROLSIMULATOR_NUM_IN};
   
 // Forward declaration of internal class

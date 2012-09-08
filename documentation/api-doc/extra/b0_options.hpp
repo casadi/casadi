@@ -1123,7 +1123,7 @@
 <tr><td>tiny_step_tol</td><td>OT_REAL</td><td>2.22044604925e-15</td><td>Tolerance for detecting numerically insignificant steps. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>tiny_step_y_tol</td><td>OT_REAL</td><td>0.01</td><td>Tolerance for quitting because of numerically insignificant steps. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>tol</td><td>OT_REAL</td><td>1e-08</td><td>Desired convergence tolerance (relative). (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>user_data</td><td>OT_UNKNOWN</td><td></td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td></td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>vartheta</td><td>OT_REAL</td><td>0.5</td><td>a parameter used to check if the fast direction can be used asthe line search direction (for Chen-Goldfarb line search). (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>False</td><td>verbose evaluation -- for debugging</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>warm_start_bound_frac</td><td>OT_REAL</td><td>0.001</td><td>same as bound_frac for the regular initializer. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
@@ -1432,7 +1432,7 @@
 <tr><td>tiny_step_tol</td><td>OT_REAL</td><td>2.22044604925e-15</td><td>Tolerance for detecting numerically insignificant steps. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>tiny_step_y_tol</td><td>OT_REAL</td><td>0.01</td><td>Tolerance for quitting because of numerically insignificant steps. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>tol</td><td>OT_REAL</td><td>1e-08</td><td>Desired convergence tolerance (relative). (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>user_data</td><td>OT_UNKNOWN</td><td></td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td></td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>vartheta</td><td>OT_REAL</td><td>0.5</td><td>a parameter used to check if the fast direction can be used asthe line search direction (for Chen-Goldfarb line search). (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>False</td><td>verbose evaluation -- for debugging</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>warm_start_bound_frac</td><td>OT_REAL</td><td>0.001</td><td>same as bound_frac for the regular initializer. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
@@ -3555,7 +3555,7 @@
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>True</td><td>function is sparse</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td></td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>False</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>user_data</td><td>OT_UNKNOWN</td><td></td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td></td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>False</td><td>verbose evaluation -- for debugging</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>False</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>CasADi::WorhpInternal</td></tr>
 </table>
@@ -3719,7 +3719,7 @@
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>True</td><td>function is sparse</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td></td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>False</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>user_data</td><td>OT_UNKNOWN</td><td></td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td></td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>False</td><td>verbose evaluation -- for debugging</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>False</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>CasADi::WorhpInternal</td></tr>
 </table>

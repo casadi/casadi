@@ -45,36 +45,38 @@
       
 namespace CasADi{
   
+/// Input arguments of a QP problem [qpIn]
 enum QPInput{
-  /// The square matrix H: sparse, (nx x nx). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.
+  /// The square matrix H: sparse, (nx x nx). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [h]
   QP_H,
-  /// The column vector G: dense,  (nx x 1)
+  /// The column vector G: dense,  (nx x 1) [g]
   QP_G,
-  /// The matrix A: sparse, (nc x nx) - product with x must be dense.
+  /// The matrix A: sparse, (nc x nx) - product with x must be dense. [a]
   QP_A,
-  /// dense, (nc x 1)
+  /// dense, (nc x 1) [lba]
   QP_LBA,
-  /// dense, (nc x 1)
+  /// dense, (nc x 1) [uba]
   QP_UBA,
-  /// dense, (nx x 1)
+  /// dense, (nx x 1) [lbx]
   QP_LBX,
-  /// dense, (nx x 1)
+  /// dense, (nx x 1) [ubx]
   QP_UBX,
-  /// dense, (nx x 1)
+  /// dense, (nx x 1) [x_init]
   QP_X_INIT,
-  QP_LAMBDA_INIT,QP_NUM_IN};
+  /// dense [lambda_init]
+  QP_LAMBDA_INIT,
+  QP_NUM_IN};
 
-/// Outputs arguments of an QP Solver
+/// Output arguments of an QP Solver [qpOut]
 enum QPOutput{
-  /// The primal solution
+  /// The primal solution [primal]
   QP_PRIMAL,
-  /// The optimal cost
+  /// The optimal cost [cost]
   QP_COST,
-  /// The dual solution corresponding to linear bounds
+  /// The dual solution corresponding to linear bounds [lambda_a]
   QP_LAMBDA_A,
-  /// The dual solution corresponding to simple bounds
+  /// The dual solution corresponding to simple bounds [lambda_x]
   QP_LAMBDA_X,
-  
   QP_NUM_OUT};
 
 // Forward declaration of internal class

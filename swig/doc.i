@@ -29337,6 +29337,8 @@ Solves the following nonlinear optimization problem:min          F(x,p)  x
 subject to             LBG <= G(x,p) <= UBG LBX <= x    <= UBX
 n: number of decision variables (x)     m: number of constraints (A)
 
+When in warmstart mode, output NLP_LAMBDA_X may be used as input
+
 NOTE: Even when max_iter == 0, it is not guaranteed that input(NLP_X_INIT)
 == output(NLP_X_OPT). Indeed if bounds on X or constraints are unmet, they
 will differ.
@@ -73865,6 +73867,384 @@ Uses CasADi::SXFunction::jac ";
 
 %feature("docstring")  CasADi::Interfaces::hessian "";
 
+%feature("docstring")  CasADi::Interfaces::mayerIn "
+
+Helper function for 'MayerInput' Input arguments of a Mayer Term  nx: Number
+of states: from ffcn.input(INTEGRATOR_X0).size()  np: Number of parameters:
+from option number_of_parameters
+
+>Input scheme: CasADi::MayerInput (MAYER_NUM_IN = 2)
++---------+-------------------------------------------+
+|  Name   |                Description                |
++=========+===========================================+
+| MAYER_X | States at the end of integration (nx x 1) |
++---------+-------------------------------------------+
+| MAYER_P | Problem parameters (np x 1)               |
++---------+-------------------------------------------+
+";
+
+%feature("docstring")  CasADi::Interfaces::ocpIn "
+
+Helper function for 'OCPInput' Input arguments of an OCP Solver  ns: Number
+of shooting nodes: from option number_of_grid_points  nx: Number of states:
+from ffcn.input(INTEGRATOR_X0).size()  nc: Number of constants duting
+intergation: ffcn.input(INTEGRATOR_P).size() nu: Number of controls: from nc
+- np  np: Number of parameters: from option number_of_parameters  nh: Number
+of point constraints: from cfcn.input(0).size()
+
+>Input scheme: CasADi::OCPInput (OCP_NUM_IN = 17)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| OCP_T                              | Time grid: ((ns+1) x 1) - default: |
+|                                    | linspace(0,t_final,ns+1)           |
++------------------------------------+------------------------------------+
+| OCP_LBX                            | States lower bounds (nx x (ns+1))  |
++------------------------------------+------------------------------------+
+| OCP_UBX                            | States upper bounds (nx x (ns+1))  |
++------------------------------------+------------------------------------+
+| OCP_X_INIT                         | States initial guess (nx x (ns+1)) |
++------------------------------------+------------------------------------+
+| OCP_LBXP                           | States deriatives lower bounds (nx |
+|                                    | x (ns+1))                          |
++------------------------------------+------------------------------------+
+| OCP_UBXP                           | States deriatives upper bounds (nx |
+|                                    | x (ns+1))                          |
++------------------------------------+------------------------------------+
+| OCP_XP_INIT                        | States deriatives initial guess    |
+|                                    | (nx x (ns+1))                      |
++------------------------------------+------------------------------------+
+| OCP_LBU                            | Controls lower bounds (nu x ns)    |
++------------------------------------+------------------------------------+
+| OCP_UBU                            | Controls upper bounds (nu x ns)    |
++------------------------------------+------------------------------------+
+| OCP_U_INIT                         | Controls initial guess (nu x ns)   |
++------------------------------------+------------------------------------+
+| OCP_LBP                            | Parameters lower bounds (np x 1)   |
++------------------------------------+------------------------------------+
+| OCP_UBP                            | Parameters upper bounds (np x 1)   |
++------------------------------------+------------------------------------+
+| OCP_P_INIT                         | Parameters initial guess (np x 1)  |
++------------------------------------+------------------------------------+
+| OCP_LBH                            | Point constraint lower bound (nh x |
+|                                    | (ns+1))                            |
++------------------------------------+------------------------------------+
+| OCP_UBH                            | Point constraint upper bound (nh x |
+|                                    | (ns+1))                            |
++------------------------------------+------------------------------------+
+| OCP_LBG                            | Lower bound for the coupling       |
+|                                    | constraints.                       |
++------------------------------------+------------------------------------+
+| OCP_UBG                            | Upper bound for the coupling       |
+|                                    | constraints.                       |
++------------------------------------+------------------------------------+
+";
+
+%feature("docstring")  CasADi::Interfaces::ocpOut "
+
+Helper function for 'OCPOutput' Output arguments of an OCP Solver
+
+>Output scheme: CasADi::OCPOutput (OCP_NUM_OUT = 4)
++------------+--------------------------------------+
+|    Name    |             Description              |
++============+======================================+
+| OCP_X_OPT  | Optimal state trajectory.            |
++------------+--------------------------------------+
+| OCP_U_OPT  | Optimal control trajectory.          |
++------------+--------------------------------------+
+| OCP_XP_OPT | Optimal state derivative trajectory. |
++------------+--------------------------------------+
+| OCP_P_OPT  | Optimal parameters.                  |
++------------+--------------------------------------+
+";
+
+%feature("docstring")  CasADi::Interfaces::qpIn "
+
+Helper function for 'QPInput' Input arguments of a QP problem
+
+>Input scheme: CasADi::QPInput (QP_NUM_IN = 9)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| QP_H                               | The square matrix H: sparse, (nx x |
+|                                    | nx). Only the lower triangular     |
+|                                    | part is actually used. The matrix  |
+|                                    | is assumed to be symmetrical.      |
++------------------------------------+------------------------------------+
+| QP_G                               | The column vector G: dense, (nx x  |
+|                                    | 1)                                 |
++------------------------------------+------------------------------------+
+| QP_A                               | The matrix A: sparse, (nc x nx) -  |
+|                                    | product with x must be dense.      |
++------------------------------------+------------------------------------+
+| QP_LBA                             | dense, (nc x 1)                    |
++------------------------------------+------------------------------------+
+| QP_UBA                             | dense, (nc x 1)                    |
++------------------------------------+------------------------------------+
+| QP_LBX                             | dense, (nx x 1)                    |
++------------------------------------+------------------------------------+
+| QP_UBX                             | dense, (nx x 1)                    |
++------------------------------------+------------------------------------+
+| QP_X_INIT                          | dense, (nx x 1)                    |
++------------------------------------+------------------------------------+
+| QP_LAMBDA_INIT                     |                                    |
++------------------------------------+------------------------------------+
+";
+
+%feature("docstring")  CasADi::Interfaces::qpOut "
+
+Helper function for 'QPOutput' Output arguments of an QP Solver
+
+>Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
++-------------+---------------------------------------------------+
+|    Name     |                    Description                    |
++=============+===================================================+
+| QP_PRIMAL   | The primal solution.                              |
++-------------+---------------------------------------------------+
+| QP_COST     | The optimal cost.                                 |
++-------------+---------------------------------------------------+
+| QP_LAMBDA_A | The dual solution corresponding to linear bounds. |
++-------------+---------------------------------------------------+
+| QP_LAMBDA_X | The dual solution corresponding to simple bounds. |
++-------------+---------------------------------------------------+
+";
+
+%feature("docstring")  CasADi::Interfaces::controldaeIn "
+
+Helper function for 'ControlledDAEInput' Input arguments of an ODE/DAE
+function
+
+>Input scheme: CasADi::ControlledDAEInput (CONTROL_DAE_NUM_IN = 10)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| CONTROL_DAE_T                      | Global physical time. (1-by-1)     |
++------------------------------------+------------------------------------+
+| CONTROL_DAE_X                      | State vector (dimension nx-by-1).  |
+|                                    | Should have same amount of non-    |
+|                                    | zeros as DAEOutput:DAE_RES         |
++------------------------------------+------------------------------------+
+| CONTROL_DAE_Z                      | Algebraic state vector (dimension  |
+|                                    | np-by-1).                          |
++------------------------------------+------------------------------------+
+| CONTROL_DAE_P                      | Parameter vector (dimension np-    |
+|                                    | by-1).                             |
++------------------------------------+------------------------------------+
+| CONTROL_DAE_U                      | Control vector (dimension nu-      |
+|                                    | by-1).                             |
++------------------------------------+------------------------------------+
+| CONTROL_DAE_U_INTERP               | Control vector, linearly           |
+|                                    | interpolated (dimension nu-by-1).  |
++------------------------------------+------------------------------------+
+| CONTROL_DAE_XDOT                   | State derivative vector (dimension |
+|                                    | nx-by-1). Should have same amount  |
+|                                    | of non-zeros as DAEOutput:DAE_RES  |
++------------------------------------+------------------------------------+
+| CONTROL_DAE_X_MAJOR                | State vector (dimension nx-by-1)   |
+|                                    | at the last major time-step        |
++------------------------------------+------------------------------------+
+| CONTROL_DAE_T0                     | Time at start of control interval  |
+|                                    | (1-by-1)                           |
++------------------------------------+------------------------------------+
+| CONTROL_DAE_TF                     | Time at end of control interval    |
+|                                    | (1-by-1)                           |
++------------------------------------+------------------------------------+
+";
+
+%feature("docstring")  CasADi::Interfaces::controlsimulatorIn "
+
+Helper function for 'ControlSimulatorInput' Input arguments of a control
+simulator
+
+>Input scheme: CasADi::ControlSimulatorInput (CONTROLSIMULATOR_NUM_IN = 3)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| CONTROLSIMULATOR_X0                | Differential or algebraic state at |
+|                                    | t0 (dimension nx-by-1)             |
++------------------------------------+------------------------------------+
+| CONTROLSIMULATOR_P                 | Parameters that are fixed over the |
+|                                    | entire horizon (dimension np-by-1) |
++------------------------------------+------------------------------------+
+| CONTROLSIMULATOR_U                 | Parameters that change over the    |
+|                                    | integration intervals (dimension   |
+|                                    | (ns-1)-by-nu)                      |
++------------------------------------+------------------------------------+
+";
+
+%feature("docstring")  CasADi::Interfaces::nlpsolverIn "
+
+Helper function for 'NLPInput' Input arguments of an NLP Solver
+
+>Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| NLP_X_INIT                         | Decision variables initial guess   |
+|                                    | (n x 1)                            |
++------------------------------------+------------------------------------+
+| NLP_LBX                            | Decision variables lower bound (n  |
+|                                    | x 1), default -inf.                |
++------------------------------------+------------------------------------+
+| NLP_UBX                            | Decision variables upper bound (n  |
+|                                    | x 1), default +inf.                |
++------------------------------------+------------------------------------+
+| NLP_LBG                            | Constraints lower bound (m x 1),   |
+|                                    | default -inf.                      |
++------------------------------------+------------------------------------+
+| NLP_UBG                            | Constraints upper bound (m x 1),   |
+|                                    | default +inf.                      |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
+|                                    | with G, initial guess (m x 1)      |
++------------------------------------+------------------------------------+
+| NLP_P                              | Only for parametric NLP - static   |
+|                                    | parameters on which the objective  |
+|                                    | and constraints might depend.      |
++------------------------------------+------------------------------------+
+";
+
+%feature("docstring")  CasADi::Interfaces::nlpsolverOut "
+
+Helper function for 'NLPOutput' Output arguments of an NLP Solver
+
+>Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| NLP_X_OPT                          | Decision variables for optimal     |
+|                                    | solution (n x 1)                   |
++------------------------------------+------------------------------------+
+| NLP_COST                           | Objective/cost function for        |
+|                                    | optimal solution (1 x 1)           |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_G                       | Lagrange multipliers associated    |
+|                                    | with G at the solution (m x 1)     |
++------------------------------------+------------------------------------+
+| NLP_LAMBDA_X                       | Lagrange multipliers associated    |
+|                                    | with bounds on X at the solution   |
+|                                    | (n x 1) When in warmstart mode,    |
+|                                    | this output may be used as input ( |
++------------------------------------+------------------------------------+
+| NLP_G                              | The constraints evaluated at the   |
+|                                    | optimal solution (m x 1)           |
++------------------------------------+------------------------------------+
+";
+
+%feature("docstring")  CasADi::Interfaces::daeIn "
+
+Helper function for 'DAEInput' Input arguments of an ODE/DAE function
+
+>Input scheme: CasADi::DAEInput (DAE_NUM_IN = 5)
++----------+----------------------------------------+
+|   Name   |              Description               |
++==========+========================================+
+| DAE_X    | Differential state                     |
++----------+----------------------------------------+
+| DAE_Z    | Algebraic state                        |
++----------+----------------------------------------+
+| DAE_P    | Parameter                              |
++----------+----------------------------------------+
+| DAE_T    | Explicit time dependence               |
++----------+----------------------------------------+
+| DAE_XDOT | Time derivative of differential states |
++----------+----------------------------------------+
+";
+
+%feature("docstring")  CasADi::Interfaces::daeOut "
+
+Helper function for 'DAEOutput' Output arguments of an DAE function
+
+>Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 3)
++----------+------------------------------------------+
+|   Name   |               Description                |
++==========+==========================================+
+| DAE_ODE  | Right hand side of the implicit ODE      |
++----------+------------------------------------------+
+| DAE_ALG  | Right hand side of algebraic equations   |
++----------+------------------------------------------+
+| DAE_QUAD | Right hand side of quadratures equations |
++----------+------------------------------------------+
+";
+
+%feature("docstring")  CasADi::Interfaces::rdaeIn "
+
+Helper function for 'RDAEInput' Input arguments of an ODE/DAE backward
+integration function
+
+>Input scheme: CasADi::RDAEInput (RDAE_NUM_IN = 8)
++------------+------------------------------------------------+
+|    Name    |                  Description                   |
++============+================================================+
+| RDAE_RX    | Backward differential state                    |
++------------+------------------------------------------------+
+| RDAE_RZ    | Backward algebraic state                       |
++------------+------------------------------------------------+
+| RDAE_RP    | Backward parameter                             |
++------------+------------------------------------------------+
+| RDAE_X     | Forward differential state                     |
++------------+------------------------------------------------+
+| RDAE_Z     | Forward algebraic state                        |
++------------+------------------------------------------------+
+| RDAE_P     | Parameter vector                               |
++------------+------------------------------------------------+
+| RDAE_T     | Explicit time dependence                       |
++------------+------------------------------------------------+
+| RDAE_RXDOT | Time derivative of backward differential state |
++------------+------------------------------------------------+
+";
+
+%feature("docstring")  CasADi::Interfaces::rdaeOut "
+
+Helper function for 'RDAEOutput' Output arguments of an ODE/DAE backward
+integration function
+
+>Output scheme: CasADi::RDAEOutput (RDAE_NUM_OUT = 3)
++-----------+-----------------------------------------+
+|   Name    |               Description               |
++===========+=========================================+
+| RDAE_ODE  | Right hand side of ODE.                 |
++-----------+-----------------------------------------+
+| RDAE_ALG  | Right hand side of algebraic equations. |
++-----------+-----------------------------------------+
+| RDAE_QUAD | Right hand side of quadratures.         |
++-----------+-----------------------------------------+
+";
+
+%feature("docstring")  CasADi::Interfaces::integratorIn "
+
+Helper function for 'IntegratorInput' Input arguments of an integrator
+
+>Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
++----------------+-----------------------------------------------+
+|      Name      |                  Description                  |
++================+===============================================+
+| INTEGRATOR_X0  | Differential state at the initial time        |
++----------------+-----------------------------------------------+
+| INTEGRATOR_P   | Parameters                                    |
++----------------+-----------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time |
++----------------+-----------------------------------------------+
+";
+
+%feature("docstring")  CasADi::Interfaces::integratorOut "
+
+Helper function for 'IntegratorOutput' Output arguments of an integrator
+
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
++----------------+-------------------------------------------------+
+|      Name      |                   Description                   |
++================+=================================================+
+| INTEGRATOR_XF  | Differential state at the final time            |
++----------------+-------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time              |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time |
++----------------+-------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
++----------------+-------------------------------------------------+
+";
+
 %feature("docstring")  CasADi::Interfaces::timesTwo "";
 
 %feature("docstring")  CasADi::Interfaces::square "";
@@ -73951,26 +74331,6 @@ is put in a matrix
 
 If your fx is really multiple output, and you wish to use a particular
 output, use the slice operator on the fx. ";
-
-%feature("docstring")  CasADi::Interfaces::daeIn "
-
-Helper function to create ODE/DAE forward integration function input
-arguments. ";
-
-%feature("docstring")  CasADi::Interfaces::daeOut "
-
-Helper function to create DAE forward integration function output arguments.
-";
-
-%feature("docstring")  CasADi::Interfaces::rdaeIn "
-
-Helper function to create ODE/DAE backward integration function input
-arguments. ";
-
-%feature("docstring")  CasADi::Interfaces::rdaeOut "
-
-Helper function to create ODE/DAE backward integration function output
-arguments. ";
 
 %feature("docstring")  CasADi::Interfaces::getptr "";
 
@@ -75658,6 +76018,9 @@ h:  internal expressions which the user may wish to inspect ";
 
 
 // File: all_8hpp.xml
+
+
+// File: autogenerated_8hpp.xml
 
 
 // File: aux__output__sx_8hpp.xml

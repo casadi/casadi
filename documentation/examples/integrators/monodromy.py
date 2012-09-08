@@ -50,7 +50,7 @@ f.init()
 
 t = SX("t")
 dx  = ssym("dx",2)
-cf=SXFunction({'NUM': CONTROL_DAE_NUM_IN, CONTROL_DAE_T: t, CONTROL_DAE_X: x, CONTROL_DAE_P: [w0,a3,a5,mu1,mu3], CONTROL_DAE_XDOT: dx, CONTROL_DAE_U: [ff]},[rhs])
+cf=SXFunction(controldaeIn(t=t, x=x, p=[w0,a3,a5,mu1,mu3], xdot=dx, u=[ff]),[rhs])
 cf.init()
 
 integrator = CVodesIntegrator(f)
