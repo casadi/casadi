@@ -39,28 +39,26 @@ thus x := [xd,xa]
 Joel Andersson
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+----------------+-----------------------------------------------+
-|      Name      |                  Description                  |
-+================+===============================================+
-| INTEGRATOR_X0  | Differential state at the initial time        |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_P   | Parameters                                    |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_RX0 | Backward differential state at the final time |
-+----------------+-----------------------------------------------+
++---------------+----------------------------------------------+
+|     Name      |                 Description                  |
++===============+==============================================+
+| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
++---------------+----------------------------------------------+
+| INTEGRATOR_P  | Parameters [p]                               |
++---------------+----------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
-+----------------+-------------------------------------------------+
-|      Name      |                   Description                   |
-+================+=================================================+
-| INTEGRATOR_XF  | Differential state at the final time            |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_QF  | Quadrature state at the final time              |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RXF | Backward differential state at the initial time |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
-+----------------+-------------------------------------------------+
++----------------+--------------------------------------------------------+
+|      Name      |                      Description                       |
++================+========================================================+
+| INTEGRATOR_XF  | Differential state at the final time [xf].             |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time [qf].               |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -813,28 +811,26 @@ differential states xd and the algebraic states xa. The complete state is
 thus x := [xd,xa]
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+----------------+-----------------------------------------------+
-|      Name      |                  Description                  |
-+================+===============================================+
-| INTEGRATOR_X0  | Differential state at the initial time        |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_P   | Parameters                                    |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_RX0 | Backward differential state at the final time |
-+----------------+-----------------------------------------------+
++---------------+----------------------------------------------+
+|     Name      |                 Description                  |
++===============+==============================================+
+| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
++---------------+----------------------------------------------+
+| INTEGRATOR_P  | Parameters [p]                               |
++---------------+----------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
-+----------------+-------------------------------------------------+
-|      Name      |                   Description                   |
-+================+=================================================+
-| INTEGRATOR_XF  | Differential state at the final time            |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_QF  | Quadrature state at the final time              |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RXF | Backward differential state at the initial time |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
-+----------------+-------------------------------------------------+
++----------------+--------------------------------------------------------+
+|      Name      |                      Description                       |
++================+========================================================+
+| INTEGRATOR_XF  | Differential state at the final time [xf].             |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time [qf].               |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -4499,60 +4495,69 @@ Joel Andersson
 |                Name                |            Description             |
 +====================================+====================================+
 | OCP_T                              | Time grid: ((ns+1) x 1) - default: |
-|                                    | linspace(0,t_final,ns+1)           |
+|                                    | linspace(0,t_final,ns+1) [t].      |
 +------------------------------------+------------------------------------+
 | OCP_LBX                            | States lower bounds (nx x (ns+1))  |
+|                                    | [lbx].                             |
 +------------------------------------+------------------------------------+
 | OCP_UBX                            | States upper bounds (nx x (ns+1))  |
+|                                    | [ubx].                             |
 +------------------------------------+------------------------------------+
 | OCP_X_INIT                         | States initial guess (nx x (ns+1)) |
+|                                    | [x_init].                          |
 +------------------------------------+------------------------------------+
 | OCP_LBXP                           | States deriatives lower bounds (nx |
-|                                    | x (ns+1))                          |
+|                                    | x (ns+1)) [lbxp].                  |
 +------------------------------------+------------------------------------+
 | OCP_UBXP                           | States deriatives upper bounds (nx |
-|                                    | x (ns+1))                          |
+|                                    | x (ns+1)) [ubxp].                  |
 +------------------------------------+------------------------------------+
 | OCP_XP_INIT                        | States deriatives initial guess    |
-|                                    | (nx x (ns+1))                      |
+|                                    | (nx x (ns+1)) [xp_init].           |
 +------------------------------------+------------------------------------+
 | OCP_LBU                            | Controls lower bounds (nu x ns)    |
+|                                    | [lbu].                             |
 +------------------------------------+------------------------------------+
 | OCP_UBU                            | Controls upper bounds (nu x ns)    |
+|                                    | [ubu].                             |
 +------------------------------------+------------------------------------+
 | OCP_U_INIT                         | Controls initial guess (nu x ns)   |
+|                                    | [u_init].                          |
 +------------------------------------+------------------------------------+
 | OCP_LBP                            | Parameters lower bounds (np x 1)   |
+|                                    | [lbp].                             |
 +------------------------------------+------------------------------------+
 | OCP_UBP                            | Parameters upper bounds (np x 1)   |
+|                                    | [ubp].                             |
 +------------------------------------+------------------------------------+
 | OCP_P_INIT                         | Parameters initial guess (np x 1)  |
+|                                    | [p_init].                          |
 +------------------------------------+------------------------------------+
 | OCP_LBH                            | Point constraint lower bound (nh x |
-|                                    | (ns+1))                            |
+|                                    | (ns+1)) [lbh].                     |
 +------------------------------------+------------------------------------+
 | OCP_UBH                            | Point constraint upper bound (nh x |
-|                                    | (ns+1))                            |
+|                                    | (ns+1)) [ubh].                     |
 +------------------------------------+------------------------------------+
 | OCP_LBG                            | Lower bound for the coupling       |
-|                                    | constraints.                       |
+|                                    | constraints [lbg].                 |
 +------------------------------------+------------------------------------+
 | OCP_UBG                            | Upper bound for the coupling       |
-|                                    | constraints.                       |
+|                                    | constraints [ubg].                 |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::OCPOutput (OCP_NUM_OUT = 4)
-+------------+--------------------------------------+
-|    Name    |             Description              |
-+============+======================================+
-| OCP_X_OPT  | Optimal state trajectory.            |
-+------------+--------------------------------------+
-| OCP_U_OPT  | Optimal control trajectory.          |
-+------------+--------------------------------------+
-| OCP_XP_OPT | Optimal state derivative trajectory. |
-+------------+--------------------------------------+
-| OCP_P_OPT  | Optimal parameters.                  |
-+------------+--------------------------------------+
++------------+-----------------------------------------------+
+|    Name    |                  Description                  |
++============+===============================================+
+| OCP_X_OPT  | Optimal state trajectory [x_opt].             |
++------------+-----------------------------------------------+
+| OCP_U_OPT  | Optimal control trajectory [u_opt].           |
++------------+-----------------------------------------------+
+| OCP_XP_OPT | Optimal state derivative trajectory [xp_opt]. |
++------------+-----------------------------------------------+
+| OCP_P_OPT  | Optimal parameters [p_opt].                   |
++------------+-----------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -5269,28 +5274,26 @@ The method is still under development
 Joel Andersson
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+----------------+-----------------------------------------------+
-|      Name      |                  Description                  |
-+================+===============================================+
-| INTEGRATOR_X0  | Differential state at the initial time        |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_P   | Parameters                                    |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_RX0 | Backward differential state at the final time |
-+----------------+-----------------------------------------------+
++---------------+----------------------------------------------+
+|     Name      |                 Description                  |
++===============+==============================================+
+| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
++---------------+----------------------------------------------+
+| INTEGRATOR_P  | Parameters [p]                               |
++---------------+----------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
-+----------------+-------------------------------------------------+
-|      Name      |                   Description                   |
-+================+=================================================+
-| INTEGRATOR_XF  | Differential state at the final time            |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_QF  | Quadrature state at the final time              |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RXF | Backward differential state at the initial time |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
-+----------------+-------------------------------------------------+
++----------------+--------------------------------------------------------+
+|      Name      |                      Description                       |
++================+========================================================+
+| INTEGRATOR_XF  | Differential state at the final time [xf].             |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time [qf].               |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -5639,29 +5642,30 @@ Parameters:
 -----------
 
 f:  dynamical system >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 5)
-+----------+----------------------------------------+ |   Name   |
-Description               |
-+==========+========================================+ | DAE_X    |
-Differential state                     |
-+----------+----------------------------------------+ | DAE_Z    | Algebraic
-state                        |
-+----------+----------------------------------------+ | DAE_P    | Parameter
-| +----------+----------------------------------------+ | DAE_T    |
-Explicit time dependence               |
-+----------+----------------------------------------+ | DAE_XDOT | Time
-derivative of differential states |
-+----------+----------------------------------------+
++----------+------------------------------------------------+ |   Name   |
+Description                   |
++==========+================================================+ | DAE_X    |
+Differential state [x].                        |
++----------+------------------------------------------------+ | DAE_Z    |
+Algebraic state [z].                           |
++----------+------------------------------------------------+ | DAE_P    |
+Parameter [p].                                 |
++----------+------------------------------------------------+ | DAE_T    |
+Explicit time dependence [t].                  |
++----------+------------------------------------------------+ | DAE_XDOT |
+Time derivative of differential states [xdot]. |
++----------+------------------------------------------------+
 
 >Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 3)
-+----------+------------------------------------------+
-|   Name   |               Description                |
-+==========+==========================================+
-| DAE_ODE  | Right hand side of the implicit ODE      |
-+----------+------------------------------------------+
-| DAE_ALG  | Right hand side of algebraic equations   |
-+----------+------------------------------------------+
-| DAE_QUAD | Right hand side of quadratures equations |
-+----------+------------------------------------------+
++----------+--------------------------------------------------+
+|   Name   |                   Description                    |
++==========+==================================================+
+| DAE_ODE  | Right hand side of the implicit ODE [ode].       |
++----------+--------------------------------------------------+
+| DAE_ALG  | Right hand side of algebraic equations [alg].    |
++----------+--------------------------------------------------+
+| DAE_QUAD | Right hand side of quadratures equations [quad]. |
++----------+--------------------------------------------------+
 ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::checkNode "
@@ -6052,28 +6056,26 @@ Return a string with a destription (for SWIG) ";
 %feature("docstring") CasADi::CollocationIntegratorInternal "
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+----------------+-----------------------------------------------+
-|      Name      |                  Description                  |
-+================+===============================================+
-| INTEGRATOR_X0  | Differential state at the initial time        |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_P   | Parameters                                    |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_RX0 | Backward differential state at the final time |
-+----------------+-----------------------------------------------+
++---------------+----------------------------------------------+
+|     Name      |                 Description                  |
++===============+==============================================+
+| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
++---------------+----------------------------------------------+
+| INTEGRATOR_P  | Parameters [p]                               |
++---------------+----------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
-+----------------+-------------------------------------------------+
-|      Name      |                   Description                   |
-+================+=================================================+
-| INTEGRATOR_XF  | Differential state at the final time            |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_QF  | Quadrature state at the final time              |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RXF | Backward differential state at the initial time |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
-+----------------+-------------------------------------------------+
++----------------+--------------------------------------------------------+
+|      Name      |                      Description                       |
++================+========================================================+
+| INTEGRATOR_XF  | Differential state at the final time [xf].             |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time [qf].               |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -6705,60 +6707,69 @@ Assert that the object has been initialized. ";
 |                Name                |            Description             |
 +====================================+====================================+
 | OCP_T                              | Time grid: ((ns+1) x 1) - default: |
-|                                    | linspace(0,t_final,ns+1)           |
+|                                    | linspace(0,t_final,ns+1) [t].      |
 +------------------------------------+------------------------------------+
 | OCP_LBX                            | States lower bounds (nx x (ns+1))  |
+|                                    | [lbx].                             |
 +------------------------------------+------------------------------------+
 | OCP_UBX                            | States upper bounds (nx x (ns+1))  |
+|                                    | [ubx].                             |
 +------------------------------------+------------------------------------+
 | OCP_X_INIT                         | States initial guess (nx x (ns+1)) |
+|                                    | [x_init].                          |
 +------------------------------------+------------------------------------+
 | OCP_LBXP                           | States deriatives lower bounds (nx |
-|                                    | x (ns+1))                          |
+|                                    | x (ns+1)) [lbxp].                  |
 +------------------------------------+------------------------------------+
 | OCP_UBXP                           | States deriatives upper bounds (nx |
-|                                    | x (ns+1))                          |
+|                                    | x (ns+1)) [ubxp].                  |
 +------------------------------------+------------------------------------+
 | OCP_XP_INIT                        | States deriatives initial guess    |
-|                                    | (nx x (ns+1))                      |
+|                                    | (nx x (ns+1)) [xp_init].           |
 +------------------------------------+------------------------------------+
 | OCP_LBU                            | Controls lower bounds (nu x ns)    |
+|                                    | [lbu].                             |
 +------------------------------------+------------------------------------+
 | OCP_UBU                            | Controls upper bounds (nu x ns)    |
+|                                    | [ubu].                             |
 +------------------------------------+------------------------------------+
 | OCP_U_INIT                         | Controls initial guess (nu x ns)   |
+|                                    | [u_init].                          |
 +------------------------------------+------------------------------------+
 | OCP_LBP                            | Parameters lower bounds (np x 1)   |
+|                                    | [lbp].                             |
 +------------------------------------+------------------------------------+
 | OCP_UBP                            | Parameters upper bounds (np x 1)   |
+|                                    | [ubp].                             |
 +------------------------------------+------------------------------------+
 | OCP_P_INIT                         | Parameters initial guess (np x 1)  |
+|                                    | [p_init].                          |
 +------------------------------------+------------------------------------+
 | OCP_LBH                            | Point constraint lower bound (nh x |
-|                                    | (ns+1))                            |
+|                                    | (ns+1)) [lbh].                     |
 +------------------------------------+------------------------------------+
 | OCP_UBH                            | Point constraint upper bound (nh x |
-|                                    | (ns+1))                            |
+|                                    | (ns+1)) [ubh].                     |
 +------------------------------------+------------------------------------+
 | OCP_LBG                            | Lower bound for the coupling       |
-|                                    | constraints.                       |
+|                                    | constraints [lbg].                 |
 +------------------------------------+------------------------------------+
 | OCP_UBG                            | Upper bound for the coupling       |
-|                                    | constraints.                       |
+|                                    | constraints [ubg].                 |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::OCPOutput (OCP_NUM_OUT = 4)
-+------------+--------------------------------------+
-|    Name    |             Description              |
-+============+======================================+
-| OCP_X_OPT  | Optimal state trajectory.            |
-+------------+--------------------------------------+
-| OCP_U_OPT  | Optimal control trajectory.          |
-+------------+--------------------------------------+
-| OCP_XP_OPT | Optimal state derivative trajectory. |
-+------------+--------------------------------------+
-| OCP_P_OPT  | Optimal parameters.                  |
-+------------+--------------------------------------+
++------------+-----------------------------------------------+
+|    Name    |                  Description                  |
++============+===============================================+
+| OCP_X_OPT  | Optimal state trajectory [x_opt].             |
++------------+-----------------------------------------------+
+| OCP_U_OPT  | Optimal control trajectory [u_opt].           |
++------------+-----------------------------------------------+
+| OCP_XP_OPT | Optimal state derivative trajectory [xp_opt]. |
++------------+-----------------------------------------------+
+| OCP_P_OPT  | Optimal parameters [p_opt].                   |
++------------+-----------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -7707,14 +7718,15 @@ Joris Gillis
 |                Name                |            Description             |
 +====================================+====================================+
 | CONTROLSIMULATOR_X0                | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
+|                                    | t0 (dimension nx-by-1) [x0].       |
 +------------------------------------+------------------------------------+
 | CONTROLSIMULATOR_P                 | Parameters that are fixed over the |
 |                                    | entire horizon (dimension np-by-1) |
+|                                    | [p].                               |
 +------------------------------------+------------------------------------+
 | CONTROLSIMULATOR_U                 | Parameters that change over the    |
 |                                    | integration intervals (dimension   |
-|                                    | (ns-1)-by-nu)                      |
+|                                    | (ns-1)-by-nu) [u].                 |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -8039,97 +8051,106 @@ ffcn:  Continuous time dynamics, an CasADi::FX with the folowing mapping:
 |                Name                |            Description             |
 +====================================+====================================+
 | CONTROL_DAE_T                      | Global physical time. (1-by-1)     |
+|                                    | [t].                               |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_X                      | State vector (dimension nx-by-1).  |
 |                                    | Should have same amount of non-    |
-|                                    | zeros as DAEOutput:DAE_RES         |
+|                                    | zeros as DAEOutput:DAE_RES [x].    |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_Z                      | Algebraic state vector (dimension  |
-|                                    | np-by-1).                          |
+|                                    | np-by-1). [z].                     |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_P                      | Parameter vector (dimension np-    |
-|                                    | by-1).                             |
+|                                    | by-1). [p].                        |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_U                      | Control vector (dimension nu-      |
-|                                    | by-1).                             |
+|                                    | by-1). [u].                        |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_U_INTERP               | Control vector, linearly           |
 |                                    | interpolated (dimension nu-by-1).  |
+|                                    | [u_interp].                        |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_XDOT                   | State derivative vector (dimension |
 |                                    | nx-by-1). Should have same amount  |
 |                                    | of non-zeros as DAEOutput:DAE_RES  |
+|                                    | [xdot].                            |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_X_MAJOR                | State vector (dimension nx-by-1)   |
 |                                    | at the last major time-step        |
+|                                    | [x_major].                         |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_T0                     | Time at start of control interval  |
-|                                    | (1-by-1)                           |
+|                                    | (1-by-1) [t0].                     |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_TF                     | Time at end of control interval    |
-|                                    | (1-by-1)                           |
+|                                    | (1-by-1) [tf].                     |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 3)
-+----------+------------------------------------------+
-|   Name   |               Description                |
-+==========+==========================================+
-| DAE_ODE  | Right hand side of the implicit ODE      |
-+----------+------------------------------------------+
-| DAE_ALG  | Right hand side of algebraic equations   |
-+----------+------------------------------------------+
-| DAE_QUAD | Right hand side of quadratures equations |
-+----------+------------------------------------------+
++----------+--------------------------------------------------+
+|   Name   |                   Description                    |
++==========+==================================================+
+| DAE_ODE  | Right hand side of the implicit ODE [ode].       |
++----------+--------------------------------------------------+
+| DAE_ALG  | Right hand side of algebraic equations [alg].    |
++----------+--------------------------------------------------+
+| DAE_QUAD | Right hand side of quadratures equations [quad]. |
++----------+--------------------------------------------------+
 
 output_fcn:  output function which maps ControlledDAEInput or DAEInput to n
 outputs. >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 5)
-+----------+----------------------------------------+ |   Name   |
-Description               |
-+==========+========================================+ | DAE_X    |
-Differential state                     |
-+----------+----------------------------------------+ | DAE_Z    | Algebraic
-state                        |
-+----------+----------------------------------------+ | DAE_P    | Parameter
-| +----------+----------------------------------------+ | DAE_T    |
-Explicit time dependence               |
-+----------+----------------------------------------+ | DAE_XDOT | Time
-derivative of differential states |
-+----------+----------------------------------------+
++----------+------------------------------------------------+ |   Name   |
+Description                   |
++==========+================================================+ | DAE_X    |
+Differential state [x].                        |
++----------+------------------------------------------------+ | DAE_Z    |
+Algebraic state [z].                           |
++----------+------------------------------------------------+ | DAE_P    |
+Parameter [p].                                 |
++----------+------------------------------------------------+ | DAE_T    |
+Explicit time dependence [t].                  |
++----------+------------------------------------------------+ | DAE_XDOT |
+Time derivative of differential states [xdot]. |
++----------+------------------------------------------------+
 
 >Input scheme: CasADi::ControlledDAEInput (CONTROL_DAE_NUM_IN = 10)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
 | CONTROL_DAE_T                      | Global physical time. (1-by-1)     |
+|                                    | [t].                               |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_X                      | State vector (dimension nx-by-1).  |
 |                                    | Should have same amount of non-    |
-|                                    | zeros as DAEOutput:DAE_RES         |
+|                                    | zeros as DAEOutput:DAE_RES [x].    |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_Z                      | Algebraic state vector (dimension  |
-|                                    | np-by-1).                          |
+|                                    | np-by-1). [z].                     |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_P                      | Parameter vector (dimension np-    |
-|                                    | by-1).                             |
+|                                    | by-1). [p].                        |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_U                      | Control vector (dimension nu-      |
-|                                    | by-1).                             |
+|                                    | by-1). [u].                        |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_U_INTERP               | Control vector, linearly           |
 |                                    | interpolated (dimension nu-by-1).  |
+|                                    | [u_interp].                        |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_XDOT                   | State derivative vector (dimension |
 |                                    | nx-by-1). Should have same amount  |
 |                                    | of non-zeros as DAEOutput:DAE_RES  |
+|                                    | [xdot].                            |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_X_MAJOR                | State vector (dimension nx-by-1)   |
 |                                    | at the last major time-step        |
+|                                    | [x_major].                         |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_T0                     | Time at start of control interval  |
-|                                    | (1-by-1)                           |
+|                                    | (1-by-1) [t0].                     |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_TF                     | Time at end of control interval    |
-|                                    | (1-by-1)                           |
+|                                    | (1-by-1) [tf].                     |
 +------------------------------------+------------------------------------+
 
 grid:  the major time grid ";
@@ -8526,14 +8547,15 @@ Joel Andersson
 |                Name                |            Description             |
 +====================================+====================================+
 | CONTROLSIMULATOR_X0                | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
+|                                    | t0 (dimension nx-by-1) [x0].       |
 +------------------------------------+------------------------------------+
 | CONTROLSIMULATOR_P                 | Parameters that are fixed over the |
 |                                    | entire horizon (dimension np-by-1) |
+|                                    | [p].                               |
 +------------------------------------+------------------------------------+
 | CONTROLSIMULATOR_U                 | Parameters that change over the    |
 |                                    | integration intervals (dimension   |
-|                                    | (ns-1)-by-nu)                      |
+|                                    | (ns-1)-by-nu) [u].                 |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -9081,26 +9103,27 @@ Assert that the object has been initialized. ";
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1)                            |
+|                                    | (n x 1) [x_init].                  |
 +------------------------------------+------------------------------------+
 | NLP_LBX                            | Decision variables lower bound (n  |
-|                                    | x 1), default -inf.                |
+|                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
 | NLP_UBX                            | Decision variables upper bound (n  |
-|                                    | x 1), default +inf.                |
+|                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
 | NLP_LBG                            | Constraints lower bound (m x 1),   |
-|                                    | default -inf.                      |
+|                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
-|                                    | default +inf.                      |
+|                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
+|                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Only for parametric NLP - static   |
 |                                    | parameters on which the objective  |
-|                                    | and constraints might depend.      |
+|                                    | and constraints might depend [p].  |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
@@ -9108,21 +9131,21 @@ Assert that the object has been initialized. ";
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1)                   |
+|                                    | solution (n x 1) [x_opt].          |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution (1 x 1)           |
+|                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
 |                                    | with G at the solution (m x 1)     |
+|                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) When in warmstart mode,    |
-|                                    | this output may be used as input ( |
+|                                    | (n x 1) [lambda_x].                |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1)           |
+|                                    | optimal solution (m x 1) [g].      |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -9747,26 +9770,27 @@ be set with this interface, it is ignored! Carlo Savorgnan
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1)                            |
+|                                    | (n x 1) [x_init].                  |
 +------------------------------------+------------------------------------+
 | NLP_LBX                            | Decision variables lower bound (n  |
-|                                    | x 1), default -inf.                |
+|                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
 | NLP_UBX                            | Decision variables upper bound (n  |
-|                                    | x 1), default +inf.                |
+|                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
 | NLP_LBG                            | Constraints lower bound (m x 1),   |
-|                                    | default -inf.                      |
+|                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
-|                                    | default +inf.                      |
+|                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
+|                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Only for parametric NLP - static   |
 |                                    | parameters on which the objective  |
-|                                    | and constraints might depend.      |
+|                                    | and constraints might depend [p].  |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
@@ -9774,21 +9798,21 @@ be set with this interface, it is ignored! Carlo Savorgnan
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1)                   |
+|                                    | solution (n x 1) [x_opt].          |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution (1 x 1)           |
+|                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
 |                                    | with G at the solution (m x 1)     |
+|                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) When in warmstart mode,    |
-|                                    | this output may be used as input ( |
+|                                    | (n x 1) [lambda_x].                |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1)           |
+|                                    | optimal solution (m x 1) [g].      |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -12428,28 +12452,26 @@ call: Call reset. Then call integrate(t_i) and getOuput for a series of
 times t_i.
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+----------------+-----------------------------------------------+
-|      Name      |                  Description                  |
-+================+===============================================+
-| INTEGRATOR_X0  | Differential state at the initial time        |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_P   | Parameters                                    |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_RX0 | Backward differential state at the final time |
-+----------------+-----------------------------------------------+
++---------------+----------------------------------------------+
+|     Name      |                 Description                  |
++===============+==============================================+
+| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
++---------------+----------------------------------------------+
+| INTEGRATOR_P  | Parameters [p]                               |
++---------------+----------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
-+----------------+-------------------------------------------------+
-|      Name      |                   Description                   |
-+================+=================================================+
-| INTEGRATOR_XF  | Differential state at the final time            |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_QF  | Quadrature state at the final time              |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RXF | Backward differential state at the initial time |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
-+----------------+-------------------------------------------------+
++----------------+--------------------------------------------------------+
+|      Name      |                      Description                       |
++================+========================================================+
+| INTEGRATOR_XF  | Differential state at the final time [xf].             |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time [qf].               |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -12967,29 +12989,30 @@ Parameters:
 -----------
 
 f:  dynamical system >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 5)
-+----------+----------------------------------------+ |   Name   |
-Description               |
-+==========+========================================+ | DAE_X    |
-Differential state                     |
-+----------+----------------------------------------+ | DAE_Z    | Algebraic
-state                        |
-+----------+----------------------------------------+ | DAE_P    | Parameter
-| +----------+----------------------------------------+ | DAE_T    |
-Explicit time dependence               |
-+----------+----------------------------------------+ | DAE_XDOT | Time
-derivative of differential states |
-+----------+----------------------------------------+
++----------+------------------------------------------------+ |   Name   |
+Description                   |
++==========+================================================+ | DAE_X    |
+Differential state [x].                        |
++----------+------------------------------------------------+ | DAE_Z    |
+Algebraic state [z].                           |
++----------+------------------------------------------------+ | DAE_P    |
+Parameter [p].                                 |
++----------+------------------------------------------------+ | DAE_T    |
+Explicit time dependence [t].                  |
++----------+------------------------------------------------+ | DAE_XDOT |
+Time derivative of differential states [xdot]. |
++----------+------------------------------------------------+
 
 >Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 3)
-+----------+------------------------------------------+
-|   Name   |               Description                |
-+==========+==========================================+
-| DAE_ODE  | Right hand side of the implicit ODE      |
-+----------+------------------------------------------+
-| DAE_ALG  | Right hand side of algebraic equations   |
-+----------+------------------------------------------+
-| DAE_QUAD | Right hand side of quadratures equations |
-+----------+------------------------------------------+
++----------+--------------------------------------------------+
+|   Name   |                   Description                    |
++==========+==================================================+
+| DAE_ODE  | Right hand side of the implicit ODE [ode].       |
++----------+--------------------------------------------------+
+| DAE_ALG  | Right hand side of algebraic equations [alg].    |
++----------+--------------------------------------------------+
+| DAE_QUAD | Right hand side of quadratures equations [quad]. |
++----------+--------------------------------------------------+
 ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::checkNode "
@@ -13418,28 +13441,26 @@ Solves the following initial value problem (IVP):
 xdot == f(t,x,p) from t0 to tf  given the initial condition x(t0) == x0;
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+----------------+-----------------------------------------------+
-|      Name      |                  Description                  |
-+================+===============================================+
-| INTEGRATOR_X0  | Differential state at the initial time        |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_P   | Parameters                                    |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_RX0 | Backward differential state at the final time |
-+----------------+-----------------------------------------------+
++---------------+----------------------------------------------+
+|     Name      |                 Description                  |
++===============+==============================================+
+| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
++---------------+----------------------------------------------+
+| INTEGRATOR_P  | Parameters [p]                               |
++---------------+----------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
-+----------------+-------------------------------------------------+
-|      Name      |                   Description                   |
-+================+=================================================+
-| INTEGRATOR_XF  | Differential state at the final time            |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_QF  | Quadrature state at the final time              |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RXF | Backward differential state at the initial time |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
-+----------------+-------------------------------------------------+
++----------------+--------------------------------------------------------+
+|      Name      |                      Description                       |
++================+========================================================+
+| INTEGRATOR_XF  | Differential state at the final time [xf].             |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time [qf].               |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -17729,28 +17750,26 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 Joel Andersson
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+----------------+-----------------------------------------------+
-|      Name      |                  Description                  |
-+================+===============================================+
-| INTEGRATOR_X0  | Differential state at the initial time        |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_P   | Parameters                                    |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_RX0 | Backward differential state at the final time |
-+----------------+-----------------------------------------------+
++---------------+----------------------------------------------+
+|     Name      |                 Description                  |
++===============+==============================================+
+| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
++---------------+----------------------------------------------+
+| INTEGRATOR_P  | Parameters [p]                               |
++---------------+----------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
-+----------------+-------------------------------------------------+
-|      Name      |                   Description                   |
-+================+=================================================+
-| INTEGRATOR_XF  | Differential state at the final time            |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_QF  | Quadrature state at the final time              |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RXF | Backward differential state at the initial time |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
-+----------------+-------------------------------------------------+
++----------------+--------------------------------------------------------+
+|      Name      |                      Description                       |
++================+========================================================+
+| INTEGRATOR_XF  | Differential state at the final time [xf].             |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time [qf].               |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -18339,29 +18358,30 @@ Parameters:
 -----------
 
 f:  dynamical system >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 5)
-+----------+----------------------------------------+ |   Name   |
-Description               |
-+==========+========================================+ | DAE_X    |
-Differential state                     |
-+----------+----------------------------------------+ | DAE_Z    | Algebraic
-state                        |
-+----------+----------------------------------------+ | DAE_P    | Parameter
-| +----------+----------------------------------------+ | DAE_T    |
-Explicit time dependence               |
-+----------+----------------------------------------+ | DAE_XDOT | Time
-derivative of differential states |
-+----------+----------------------------------------+
++----------+------------------------------------------------+ |   Name   |
+Description                   |
++==========+================================================+ | DAE_X    |
+Differential state [x].                        |
++----------+------------------------------------------------+ | DAE_Z    |
+Algebraic state [z].                           |
++----------+------------------------------------------------+ | DAE_P    |
+Parameter [p].                                 |
++----------+------------------------------------------------+ | DAE_T    |
+Explicit time dependence [t].                  |
++----------+------------------------------------------------+ | DAE_XDOT |
+Time derivative of differential states [xdot]. |
++----------+------------------------------------------------+
 
 >Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 3)
-+----------+------------------------------------------+
-|   Name   |               Description                |
-+==========+==========================================+
-| DAE_ODE  | Right hand side of the implicit ODE      |
-+----------+------------------------------------------+
-| DAE_ALG  | Right hand side of algebraic equations   |
-+----------+------------------------------------------+
-| DAE_QUAD | Right hand side of quadratures equations |
-+----------+------------------------------------------+
++----------+--------------------------------------------------+
+|   Name   |                   Description                    |
++==========+==================================================+
+| DAE_ODE  | Right hand side of the implicit ODE [ode].       |
++----------+--------------------------------------------------+
+| DAE_ALG  | Right hand side of algebraic equations [alg].    |
++----------+--------------------------------------------------+
+| DAE_QUAD | Right hand side of quadratures equations [quad]. |
++----------+--------------------------------------------------+
 ";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::checkNode "
@@ -18797,28 +18817,26 @@ quadrature part (g). In the same way, the state vector is also composed of
 two parts, the differential states and the quadrature states, i.e. x = [y,q]
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+----------------+-----------------------------------------------+
-|      Name      |                  Description                  |
-+================+===============================================+
-| INTEGRATOR_X0  | Differential state at the initial time        |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_P   | Parameters                                    |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_RX0 | Backward differential state at the final time |
-+----------------+-----------------------------------------------+
++---------------+----------------------------------------------+
+|     Name      |                 Description                  |
++===============+==============================================+
+| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
++---------------+----------------------------------------------+
+| INTEGRATOR_P  | Parameters [p]                               |
++---------------+----------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
-+----------------+-------------------------------------------------+
-|      Name      |                   Description                   |
-+================+=================================================+
-| INTEGRATOR_XF  | Differential state at the final time            |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_QF  | Quadrature state at the final time              |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RXF | Backward differential state at the initial time |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
-+----------------+-------------------------------------------------+
++----------------+--------------------------------------------------------+
+|      Name      |                      Description                       |
++================+========================================================+
+| INTEGRATOR_XF  | Differential state at the final time [xf].             |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time [qf].               |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -21293,28 +21311,26 @@ ODE/DAE is defined in the derived classes.
 Joel Andersson
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+----------------+-----------------------------------------------+
-|      Name      |                  Description                  |
-+================+===============================================+
-| INTEGRATOR_X0  | Differential state at the initial time        |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_P   | Parameters                                    |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_RX0 | Backward differential state at the final time |
-+----------------+-----------------------------------------------+
++---------------+----------------------------------------------+
+|     Name      |                 Description                  |
++===============+==============================================+
+| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
++---------------+----------------------------------------------+
+| INTEGRATOR_P  | Parameters [p]                               |
++---------------+----------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
-+----------------+-------------------------------------------------+
-|      Name      |                   Description                   |
-+================+=================================================+
-| INTEGRATOR_XF  | Differential state at the final time            |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_QF  | Quadrature state at the final time              |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RXF | Backward differential state at the initial time |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
-+----------------+-------------------------------------------------+
++----------------+--------------------------------------------------------+
+|      Name      |                      Description                       |
++================+========================================================+
+| INTEGRATOR_XF  | Differential state at the final time [xf].             |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time [qf].               |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -21998,28 +22014,26 @@ respectively.
 Joel Andersson
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+----------------+-----------------------------------------------+
-|      Name      |                  Description                  |
-+================+===============================================+
-| INTEGRATOR_X0  | Differential state at the initial time        |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_P   | Parameters                                    |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_RX0 | Backward differential state at the final time |
-+----------------+-----------------------------------------------+
++---------------+----------------------------------------------+
+|     Name      |                 Description                  |
++===============+==============================================+
+| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
++---------------+----------------------------------------------+
+| INTEGRATOR_P  | Parameters [p]                               |
++---------------+----------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
-+----------------+-------------------------------------------------+
-|      Name      |                   Description                   |
-+================+=================================================+
-| INTEGRATOR_XF  | Differential state at the final time            |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_QF  | Quadrature state at the final time              |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RXF | Backward differential state at the initial time |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
-+----------------+-------------------------------------------------+
++----------------+--------------------------------------------------------+
+|      Name      |                      Description                       |
++================+========================================================+
+| INTEGRATOR_XF  | Differential state at the final time [xf].             |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time [qf].               |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -22540,26 +22554,27 @@ Assert that the object has been initialized. ";
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1)                            |
+|                                    | (n x 1) [x_init].                  |
 +------------------------------------+------------------------------------+
 | NLP_LBX                            | Decision variables lower bound (n  |
-|                                    | x 1), default -inf.                |
+|                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
 | NLP_UBX                            | Decision variables upper bound (n  |
-|                                    | x 1), default +inf.                |
+|                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
 | NLP_LBG                            | Constraints lower bound (m x 1),   |
-|                                    | default -inf.                      |
+|                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
-|                                    | default +inf.                      |
+|                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
+|                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Only for parametric NLP - static   |
 |                                    | parameters on which the objective  |
-|                                    | and constraints might depend.      |
+|                                    | and constraints might depend [p].  |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
@@ -22567,21 +22582,21 @@ Assert that the object has been initialized. ";
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1)                   |
+|                                    | solution (n x 1) [x_opt].          |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution (1 x 1)           |
+|                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
 |                                    | with G at the solution (m x 1)     |
+|                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) When in warmstart mode,    |
-|                                    | this output may be used as input ( |
+|                                    | (n x 1) [lambda_x].                |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1)           |
+|                                    | optimal solution (m x 1) [g].      |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -23173,26 +23188,27 @@ Joel Andersson
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1)                            |
+|                                    | (n x 1) [x_init].                  |
 +------------------------------------+------------------------------------+
 | NLP_LBX                            | Decision variables lower bound (n  |
-|                                    | x 1), default -inf.                |
+|                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
 | NLP_UBX                            | Decision variables upper bound (n  |
-|                                    | x 1), default +inf.                |
+|                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
 | NLP_LBG                            | Constraints lower bound (m x 1),   |
-|                                    | default -inf.                      |
+|                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
-|                                    | default +inf.                      |
+|                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
+|                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Only for parametric NLP - static   |
 |                                    | parameters on which the objective  |
-|                                    | and constraints might depend.      |
+|                                    | and constraints might depend [p].  |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
@@ -23200,21 +23216,21 @@ Joel Andersson
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1)                   |
+|                                    | solution (n x 1) [x_opt].          |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution (1 x 1)           |
+|                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
 |                                    | with G at the solution (m x 1)     |
+|                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) When in warmstart mode,    |
-|                                    | this output may be used as input ( |
+|                                    | (n x 1) [lambda_x].                |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1)           |
+|                                    | optimal solution (m x 1) [g].      |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -23963,26 +23979,27 @@ n: number of decision variables (x)     m: number of constraints (A)
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1)                            |
+|                                    | (n x 1) [x_init].                  |
 +------------------------------------+------------------------------------+
 | NLP_LBX                            | Decision variables lower bound (n  |
-|                                    | x 1), default -inf.                |
+|                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
 | NLP_UBX                            | Decision variables upper bound (n  |
-|                                    | x 1), default +inf.                |
+|                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
 | NLP_LBG                            | Constraints lower bound (m x 1),   |
-|                                    | default -inf.                      |
+|                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
-|                                    | default +inf.                      |
+|                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
+|                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Only for parametric NLP - static   |
 |                                    | parameters on which the objective  |
-|                                    | and constraints might depend.      |
+|                                    | and constraints might depend [p].  |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
@@ -23990,21 +24007,21 @@ n: number of decision variables (x)     m: number of constraints (A)
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1)                   |
+|                                    | solution (n x 1) [x_opt].          |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution (1 x 1)           |
+|                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
 |                                    | with G at the solution (m x 1)     |
+|                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) When in warmstart mode,    |
-|                                    | this output may be used as input ( |
+|                                    | (n x 1) [lambda_x].                |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1)           |
+|                                    | optimal solution (m x 1) [g].      |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -26537,7 +26554,7 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_UNKNOWN   |              | A user-      | CasADi::Ipop |
+| user_data    | OT_VOIDPTR   |              | A user-      | CasADi::Ipop |
 |              |              |              | defined      | tInternal    |
 |              |              |              | field that   |              |
 |              |              |              | can be used  |              |
@@ -27204,39 +27221,41 @@ nc: number of constraints (A)
 | QP_H                               | The square matrix H: sparse, (nx x |
 |                                    | nx). Only the lower triangular     |
 |                                    | part is actually used. The matrix  |
-|                                    | is assumed to be symmetrical.      |
+|                                    | is assumed to be symmetrical. [h]. |
 +------------------------------------+------------------------------------+
 | QP_G                               | The column vector G: dense, (nx x  |
-|                                    | 1)                                 |
+|                                    | 1) [g].                            |
 +------------------------------------+------------------------------------+
 | QP_A                               | The matrix A: sparse, (nc x nx) -  |
-|                                    | product with x must be dense.      |
+|                                    | product with x must be dense. [a]. |
 +------------------------------------+------------------------------------+
-| QP_LBA                             | dense, (nc x 1)                    |
+| QP_LBA                             | dense, (nc x 1) [lba]              |
 +------------------------------------+------------------------------------+
-| QP_UBA                             | dense, (nc x 1)                    |
+| QP_UBA                             | dense, (nc x 1) [uba]              |
 +------------------------------------+------------------------------------+
-| QP_LBX                             | dense, (nx x 1)                    |
+| QP_LBX                             | dense, (nx x 1) [lbx]              |
 +------------------------------------+------------------------------------+
-| QP_UBX                             | dense, (nx x 1)                    |
+| QP_UBX                             | dense, (nx x 1) [ubx]              |
 +------------------------------------+------------------------------------+
-| QP_X_INIT                          | dense, (nx x 1)                    |
+| QP_X_INIT                          | dense, (nx x 1) [x_init]           |
 +------------------------------------+------------------------------------+
-| QP_LAMBDA_INIT                     |                                    |
+| QP_LAMBDA_INIT                     | dense [lambda_init]                |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
-+-------------+---------------------------------------------------+
-|    Name     |                    Description                    |
-+=============+===================================================+
-| QP_PRIMAL   | The primal solution.                              |
-+-------------+---------------------------------------------------+
-| QP_COST     | The optimal cost.                                 |
-+-------------+---------------------------------------------------+
-| QP_LAMBDA_A | The dual solution corresponding to linear bounds. |
-+-------------+---------------------------------------------------+
-| QP_LAMBDA_X | The dual solution corresponding to simple bounds. |
-+-------------+---------------------------------------------------+
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| QP_PRIMAL                          | The primal solution [primal].      |
++------------------------------------+------------------------------------+
+| QP_COST                            | The optimal cost [cost].           |
++------------------------------------+------------------------------------+
+| QP_LAMBDA_A                        | The dual solution corresponding to |
+|                                    | linear bounds [lambda_a].          |
++------------------------------------+------------------------------------+
+| QP_LAMBDA_X                        | The dual solution corresponding to |
+|                                    | simple bounds [lambda_x].          |
++------------------------------------+------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -28219,39 +28238,41 @@ Joris Gillis
 | QP_H                               | The square matrix H: sparse, (nx x |
 |                                    | nx). Only the lower triangular     |
 |                                    | part is actually used. The matrix  |
-|                                    | is assumed to be symmetrical.      |
+|                                    | is assumed to be symmetrical. [h]. |
 +------------------------------------+------------------------------------+
 | QP_G                               | The column vector G: dense, (nx x  |
-|                                    | 1)                                 |
+|                                    | 1) [g].                            |
 +------------------------------------+------------------------------------+
 | QP_A                               | The matrix A: sparse, (nc x nx) -  |
-|                                    | product with x must be dense.      |
+|                                    | product with x must be dense. [a]. |
 +------------------------------------+------------------------------------+
-| QP_LBA                             | dense, (nc x 1)                    |
+| QP_LBA                             | dense, (nc x 1) [lba]              |
 +------------------------------------+------------------------------------+
-| QP_UBA                             | dense, (nc x 1)                    |
+| QP_UBA                             | dense, (nc x 1) [uba]              |
 +------------------------------------+------------------------------------+
-| QP_LBX                             | dense, (nx x 1)                    |
+| QP_LBX                             | dense, (nx x 1) [lbx]              |
 +------------------------------------+------------------------------------+
-| QP_UBX                             | dense, (nx x 1)                    |
+| QP_UBX                             | dense, (nx x 1) [ubx]              |
 +------------------------------------+------------------------------------+
-| QP_X_INIT                          | dense, (nx x 1)                    |
+| QP_X_INIT                          | dense, (nx x 1) [x_init]           |
 +------------------------------------+------------------------------------+
-| QP_LAMBDA_INIT                     |                                    |
+| QP_LAMBDA_INIT                     | dense [lambda_init]                |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
-+-------------+---------------------------------------------------+
-|    Name     |                    Description                    |
-+=============+===================================================+
-| QP_PRIMAL   | The primal solution.                              |
-+-------------+---------------------------------------------------+
-| QP_COST     | The optimal cost.                                 |
-+-------------+---------------------------------------------------+
-| QP_LAMBDA_A | The dual solution corresponding to linear bounds. |
-+-------------+---------------------------------------------------+
-| QP_LAMBDA_X | The dual solution corresponding to simple bounds. |
-+-------------+---------------------------------------------------+
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| QP_PRIMAL                          | The primal solution [primal].      |
++------------------------------------+------------------------------------+
+| QP_COST                            | The optimal cost [cost].           |
++------------------------------------+------------------------------------+
+| QP_LAMBDA_A                        | The dual solution corresponding to |
+|                                    | linear bounds [lambda_a].          |
++------------------------------------+------------------------------------+
+| QP_LAMBDA_X                        | The dual solution corresponding to |
+|                                    | simple bounds [lambda_x].          |
++------------------------------------+------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -29376,26 +29397,27 @@ Yorktown, USA
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1)                            |
+|                                    | (n x 1) [x_init].                  |
 +------------------------------------+------------------------------------+
 | NLP_LBX                            | Decision variables lower bound (n  |
-|                                    | x 1), default -inf.                |
+|                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
 | NLP_UBX                            | Decision variables upper bound (n  |
-|                                    | x 1), default +inf.                |
+|                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
 | NLP_LBG                            | Constraints lower bound (m x 1),   |
-|                                    | default -inf.                      |
+|                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
-|                                    | default +inf.                      |
+|                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
+|                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Only for parametric NLP - static   |
 |                                    | parameters on which the objective  |
-|                                    | and constraints might depend.      |
+|                                    | and constraints might depend [p].  |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
@@ -29403,21 +29425,21 @@ Yorktown, USA
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1)                   |
+|                                    | solution (n x 1) [x_opt].          |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution (1 x 1)           |
+|                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
 |                                    | with G at the solution (m x 1)     |
+|                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) When in warmstart mode,    |
-|                                    | this output may be used as input ( |
+|                                    | (n x 1) [lambda_x].                |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1)           |
+|                                    | optimal solution (m x 1) [g].      |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -31950,7 +31972,7 @@ Yorktown, USA
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_UNKNOWN   |              | A user-      | CasADi::Ipop |
+| user_data    | OT_VOIDPTR   |              | A user-      | CasADi::Ipop |
 |              |              |              | defined      | tInternal    |
 |              |              |              | field that   |              |
 |              |              |              | can be used  |              |
@@ -35602,26 +35624,27 @@ n: number of decision variables (x)     m: number of constraints (A)
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1)                            |
+|                                    | (n x 1) [x_init].                  |
 +------------------------------------+------------------------------------+
 | NLP_LBX                            | Decision variables lower bound (n  |
-|                                    | x 1), default -inf.                |
+|                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
 | NLP_UBX                            | Decision variables upper bound (n  |
-|                                    | x 1), default +inf.                |
+|                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
 | NLP_LBG                            | Constraints lower bound (m x 1),   |
-|                                    | default -inf.                      |
+|                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
-|                                    | default +inf.                      |
+|                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
+|                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Only for parametric NLP - static   |
 |                                    | parameters on which the objective  |
-|                                    | and constraints might depend.      |
+|                                    | and constraints might depend [p].  |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
@@ -35629,21 +35652,21 @@ n: number of decision variables (x)     m: number of constraints (A)
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1)                   |
+|                                    | solution (n x 1) [x_opt].          |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution (1 x 1)           |
+|                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
 |                                    | with G at the solution (m x 1)     |
+|                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) When in warmstart mode,    |
-|                                    | this output may be used as input ( |
+|                                    | (n x 1) [lambda_x].                |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1)           |
+|                                    | optimal solution (m x 1) [g].      |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -36333,26 +36356,27 @@ n: number of decision variables (x)     m: number of constraints (A)
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1)                            |
+|                                    | (n x 1) [x_init].                  |
 +------------------------------------+------------------------------------+
 | NLP_LBX                            | Decision variables lower bound (n  |
-|                                    | x 1), default -inf.                |
+|                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
 | NLP_UBX                            | Decision variables upper bound (n  |
-|                                    | x 1), default +inf.                |
+|                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
 | NLP_LBG                            | Constraints lower bound (m x 1),   |
-|                                    | default -inf.                      |
+|                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
-|                                    | default +inf.                      |
+|                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
+|                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Only for parametric NLP - static   |
 |                                    | parameters on which the objective  |
-|                                    | and constraints might depend.      |
+|                                    | and constraints might depend [p].  |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
@@ -36360,21 +36384,21 @@ n: number of decision variables (x)     m: number of constraints (A)
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1)                   |
+|                                    | solution (n x 1) [x_opt].          |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution (1 x 1)           |
+|                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
 |                                    | with G at the solution (m x 1)     |
+|                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) When in warmstart mode,    |
-|                                    | this output may be used as input ( |
+|                                    | (n x 1) [lambda_x].                |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1)           |
+|                                    | optimal solution (m x 1) [g].      |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -39658,26 +39682,27 @@ Joel Andersson
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1)                            |
+|                                    | (n x 1) [x_init].                  |
 +------------------------------------+------------------------------------+
 | NLP_LBX                            | Decision variables lower bound (n  |
-|                                    | x 1), default -inf.                |
+|                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
 | NLP_UBX                            | Decision variables upper bound (n  |
-|                                    | x 1), default +inf.                |
+|                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
 | NLP_LBG                            | Constraints lower bound (m x 1),   |
-|                                    | default -inf.                      |
+|                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
-|                                    | default +inf.                      |
+|                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
+|                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Only for parametric NLP - static   |
 |                                    | parameters on which the objective  |
-|                                    | and constraints might depend.      |
+|                                    | and constraints might depend [p].  |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
@@ -39685,21 +39710,21 @@ Joel Andersson
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1)                   |
+|                                    | solution (n x 1) [x_opt].          |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution (1 x 1)           |
+|                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
 |                                    | with G at the solution (m x 1)     |
+|                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) When in warmstart mode,    |
-|                                    | this output may be used as input ( |
+|                                    | (n x 1) [lambda_x].                |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1)           |
+|                                    | optimal solution (m x 1) [g].      |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -40527,26 +40552,27 @@ Return a string with a destription (for SWIG) ";
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1)                            |
+|                                    | (n x 1) [x_init].                  |
 +------------------------------------+------------------------------------+
 | NLP_LBX                            | Decision variables lower bound (n  |
-|                                    | x 1), default -inf.                |
+|                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
 | NLP_UBX                            | Decision variables upper bound (n  |
-|                                    | x 1), default +inf.                |
+|                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
 | NLP_LBG                            | Constraints lower bound (m x 1),   |
-|                                    | default -inf.                      |
+|                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
-|                                    | default +inf.                      |
+|                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
+|                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Only for parametric NLP - static   |
 |                                    | parameters on which the objective  |
-|                                    | and constraints might depend.      |
+|                                    | and constraints might depend [p].  |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
@@ -40554,21 +40580,21 @@ Return a string with a destription (for SWIG) ";
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1)                   |
+|                                    | solution (n x 1) [x_opt].          |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution (1 x 1)           |
+|                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
 |                                    | with G at the solution (m x 1)     |
+|                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) When in warmstart mode,    |
-|                                    | this output may be used as input ( |
+|                                    | (n x 1) [lambda_x].                |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1)           |
+|                                    | optimal solution (m x 1) [g].      |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -41239,26 +41265,27 @@ n: number of decision variables (x)     m: number of constraints (A)
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1)                            |
+|                                    | (n x 1) [x_init].                  |
 +------------------------------------+------------------------------------+
 | NLP_LBX                            | Decision variables lower bound (n  |
-|                                    | x 1), default -inf.                |
+|                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
 | NLP_UBX                            | Decision variables upper bound (n  |
-|                                    | x 1), default +inf.                |
+|                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
 | NLP_LBG                            | Constraints lower bound (m x 1),   |
-|                                    | default -inf.                      |
+|                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
-|                                    | default +inf.                      |
+|                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
+|                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Only for parametric NLP - static   |
 |                                    | parameters on which the objective  |
-|                                    | and constraints might depend.      |
+|                                    | and constraints might depend [p].  |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
@@ -41266,21 +41293,21 @@ n: number of decision variables (x)     m: number of constraints (A)
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1)                   |
+|                                    | solution (n x 1) [x_opt].          |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution (1 x 1)           |
+|                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
 |                                    | with G at the solution (m x 1)     |
+|                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) When in warmstart mode,    |
-|                                    | this output may be used as input ( |
+|                                    | (n x 1) [lambda_x].                |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1)           |
+|                                    | optimal solution (m x 1) [g].      |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -41880,26 +41907,27 @@ n: number of decision variables (x)     m: number of constraints (A)
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1)                            |
+|                                    | (n x 1) [x_init].                  |
 +------------------------------------+------------------------------------+
 | NLP_LBX                            | Decision variables lower bound (n  |
-|                                    | x 1), default -inf.                |
+|                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
 | NLP_UBX                            | Decision variables upper bound (n  |
-|                                    | x 1), default +inf.                |
+|                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
 | NLP_LBG                            | Constraints lower bound (m x 1),   |
-|                                    | default -inf.                      |
+|                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
-|                                    | default +inf.                      |
+|                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
+|                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Only for parametric NLP - static   |
 |                                    | parameters on which the objective  |
-|                                    | and constraints might depend.      |
+|                                    | and constraints might depend [p].  |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
@@ -41907,21 +41935,21 @@ n: number of decision variables (x)     m: number of constraints (A)
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1)                   |
+|                                    | solution (n x 1) [x_opt].          |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution (1 x 1)           |
+|                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
 |                                    | with G at the solution (m x 1)     |
+|                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) When in warmstart mode,    |
-|                                    | this output may be used as input ( |
+|                                    | (n x 1) [lambda_x].                |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1)           |
+|                                    | optimal solution (m x 1) [g].      |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -45141,60 +45169,69 @@ Joel Andersson
 |                Name                |            Description             |
 +====================================+====================================+
 | OCP_T                              | Time grid: ((ns+1) x 1) - default: |
-|                                    | linspace(0,t_final,ns+1)           |
+|                                    | linspace(0,t_final,ns+1) [t].      |
 +------------------------------------+------------------------------------+
 | OCP_LBX                            | States lower bounds (nx x (ns+1))  |
+|                                    | [lbx].                             |
 +------------------------------------+------------------------------------+
 | OCP_UBX                            | States upper bounds (nx x (ns+1))  |
+|                                    | [ubx].                             |
 +------------------------------------+------------------------------------+
 | OCP_X_INIT                         | States initial guess (nx x (ns+1)) |
+|                                    | [x_init].                          |
 +------------------------------------+------------------------------------+
 | OCP_LBXP                           | States deriatives lower bounds (nx |
-|                                    | x (ns+1))                          |
+|                                    | x (ns+1)) [lbxp].                  |
 +------------------------------------+------------------------------------+
 | OCP_UBXP                           | States deriatives upper bounds (nx |
-|                                    | x (ns+1))                          |
+|                                    | x (ns+1)) [ubxp].                  |
 +------------------------------------+------------------------------------+
 | OCP_XP_INIT                        | States deriatives initial guess    |
-|                                    | (nx x (ns+1))                      |
+|                                    | (nx x (ns+1)) [xp_init].           |
 +------------------------------------+------------------------------------+
 | OCP_LBU                            | Controls lower bounds (nu x ns)    |
+|                                    | [lbu].                             |
 +------------------------------------+------------------------------------+
 | OCP_UBU                            | Controls upper bounds (nu x ns)    |
+|                                    | [ubu].                             |
 +------------------------------------+------------------------------------+
 | OCP_U_INIT                         | Controls initial guess (nu x ns)   |
+|                                    | [u_init].                          |
 +------------------------------------+------------------------------------+
 | OCP_LBP                            | Parameters lower bounds (np x 1)   |
+|                                    | [lbp].                             |
 +------------------------------------+------------------------------------+
 | OCP_UBP                            | Parameters upper bounds (np x 1)   |
+|                                    | [ubp].                             |
 +------------------------------------+------------------------------------+
 | OCP_P_INIT                         | Parameters initial guess (np x 1)  |
+|                                    | [p_init].                          |
 +------------------------------------+------------------------------------+
 | OCP_LBH                            | Point constraint lower bound (nh x |
-|                                    | (ns+1))                            |
+|                                    | (ns+1)) [lbh].                     |
 +------------------------------------+------------------------------------+
 | OCP_UBH                            | Point constraint upper bound (nh x |
-|                                    | (ns+1))                            |
+|                                    | (ns+1)) [ubh].                     |
 +------------------------------------+------------------------------------+
 | OCP_LBG                            | Lower bound for the coupling       |
-|                                    | constraints.                       |
+|                                    | constraints [lbg].                 |
 +------------------------------------+------------------------------------+
 | OCP_UBG                            | Upper bound for the coupling       |
-|                                    | constraints.                       |
+|                                    | constraints [ubg].                 |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::OCPOutput (OCP_NUM_OUT = 4)
-+------------+--------------------------------------+
-|    Name    |             Description              |
-+============+======================================+
-| OCP_X_OPT  | Optimal state trajectory.            |
-+------------+--------------------------------------+
-| OCP_U_OPT  | Optimal control trajectory.          |
-+------------+--------------------------------------+
-| OCP_XP_OPT | Optimal state derivative trajectory. |
-+------------+--------------------------------------+
-| OCP_P_OPT  | Optimal parameters.                  |
-+------------+--------------------------------------+
++------------+-----------------------------------------------+
+|    Name    |                  Description                  |
++============+===============================================+
+| OCP_X_OPT  | Optimal state trajectory [x_opt].             |
++------------+-----------------------------------------------+
+| OCP_U_OPT  | Optimal control trajectory [u_opt].           |
++------------+-----------------------------------------------+
+| OCP_XP_OPT | Optimal state derivative trajectory [xp_opt]. |
++------------+-----------------------------------------------+
+| OCP_P_OPT  | Optimal parameters [p_opt].                   |
++------------+-----------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -45510,29 +45547,30 @@ Parameters:
 
 ffcn:  Continuous time dynamics, an CasADi::FX with the folowing mapping:
 >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 5)
-+----------+----------------------------------------+ |   Name   |
-Description               |
-+==========+========================================+ | DAE_X    |
-Differential state                     |
-+----------+----------------------------------------+ | DAE_Z    | Algebraic
-state                        |
-+----------+----------------------------------------+ | DAE_P    | Parameter
-| +----------+----------------------------------------+ | DAE_T    |
-Explicit time dependence               |
-+----------+----------------------------------------+ | DAE_XDOT | Time
-derivative of differential states |
-+----------+----------------------------------------+
++----------+------------------------------------------------+ |   Name   |
+Description                   |
++==========+================================================+ | DAE_X    |
+Differential state [x].                        |
++----------+------------------------------------------------+ | DAE_Z    |
+Algebraic state [z].                           |
++----------+------------------------------------------------+ | DAE_P    |
+Parameter [p].                                 |
++----------+------------------------------------------------+ | DAE_T    |
+Explicit time dependence [t].                  |
++----------+------------------------------------------------+ | DAE_XDOT |
+Time derivative of differential states [xdot]. |
++----------+------------------------------------------------+
 
 >Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 3)
-+----------+------------------------------------------+
-|   Name   |               Description                |
-+==========+==========================================+
-| DAE_ODE  | Right hand side of the implicit ODE      |
-+----------+------------------------------------------+
-| DAE_ALG  | Right hand side of algebraic equations   |
-+----------+------------------------------------------+
-| DAE_QUAD | Right hand side of quadratures equations |
-+----------+------------------------------------------+
++----------+--------------------------------------------------+
+|   Name   |                   Description                    |
++==========+==================================================+
+| DAE_ODE  | Right hand side of the implicit ODE [ode].       |
++----------+--------------------------------------------------+
+| DAE_ALG  | Right hand side of algebraic equations [alg].    |
++----------+--------------------------------------------------+
+| DAE_QUAD | Right hand side of quadratures equations [quad]. |
++----------+--------------------------------------------------+
 
 Important notes: In the above table, INTEGRATOR_P input is not really of
 shape (np x 1), but rather ( (np+nu) x 1 ).
@@ -45546,28 +45584,29 @@ will be incorrect.
 
 mfcn:  Mayer term, CasADi::FX mapping to cost (1 x 1) >Input scheme:
 CasADi::MayerInput (MAYER_NUM_IN = 2)
-+---------+-------------------------------------------+ |  Name   |
-Description                |
-+=========+===========================================+ | MAYER_X | States
-at the end of integration (nx x 1) |
-+---------+-------------------------------------------+ | MAYER_P | Problem
-parameters (np x 1)               |
-+---------+-------------------------------------------+
++---------+------------------------------------------------+ |  Name   |
+Description                   |
++=========+================================================+ | MAYER_X |
+States at the end of integration (nx x 1) [x]. |
++---------+------------------------------------------------+ | MAYER_P |
+Problem parameters (np x 1) [p].               |
++---------+------------------------------------------------+
 
 cfcn:  Path constraints, CasADi::FX mapping to (nh x 1) >Input scheme:
 CasADi::DAEInput (DAE_NUM_IN = 5)
-+----------+----------------------------------------+ |   Name   |
-Description               |
-+==========+========================================+ | DAE_X    |
-Differential state                     |
-+----------+----------------------------------------+ | DAE_Z    | Algebraic
-state                        |
-+----------+----------------------------------------+ | DAE_P    | Parameter
-| +----------+----------------------------------------+ | DAE_T    |
-Explicit time dependence               |
-+----------+----------------------------------------+ | DAE_XDOT | Time
-derivative of differential states |
-+----------+----------------------------------------+
++----------+------------------------------------------------+ |   Name   |
+Description                   |
++==========+================================================+ | DAE_X    |
+Differential state [x].                        |
++----------+------------------------------------------------+ | DAE_Z    |
+Algebraic state [z].                           |
++----------+------------------------------------------------+ | DAE_P    |
+Parameter [p].                                 |
++----------+------------------------------------------------+ | DAE_T    |
+Explicit time dependence [t].                  |
++----------+------------------------------------------------+ | DAE_XDOT |
+Time derivative of differential states [xdot]. |
++----------+------------------------------------------------+
 
 rfcn:  Initial value constraints ";
 
@@ -46001,60 +46040,69 @@ Return a string with a destription (for SWIG) ";
 |                Name                |            Description             |
 +====================================+====================================+
 | OCP_T                              | Time grid: ((ns+1) x 1) - default: |
-|                                    | linspace(0,t_final,ns+1)           |
+|                                    | linspace(0,t_final,ns+1) [t].      |
 +------------------------------------+------------------------------------+
 | OCP_LBX                            | States lower bounds (nx x (ns+1))  |
+|                                    | [lbx].                             |
 +------------------------------------+------------------------------------+
 | OCP_UBX                            | States upper bounds (nx x (ns+1))  |
+|                                    | [ubx].                             |
 +------------------------------------+------------------------------------+
 | OCP_X_INIT                         | States initial guess (nx x (ns+1)) |
+|                                    | [x_init].                          |
 +------------------------------------+------------------------------------+
 | OCP_LBXP                           | States deriatives lower bounds (nx |
-|                                    | x (ns+1))                          |
+|                                    | x (ns+1)) [lbxp].                  |
 +------------------------------------+------------------------------------+
 | OCP_UBXP                           | States deriatives upper bounds (nx |
-|                                    | x (ns+1))                          |
+|                                    | x (ns+1)) [ubxp].                  |
 +------------------------------------+------------------------------------+
 | OCP_XP_INIT                        | States deriatives initial guess    |
-|                                    | (nx x (ns+1))                      |
+|                                    | (nx x (ns+1)) [xp_init].           |
 +------------------------------------+------------------------------------+
 | OCP_LBU                            | Controls lower bounds (nu x ns)    |
+|                                    | [lbu].                             |
 +------------------------------------+------------------------------------+
 | OCP_UBU                            | Controls upper bounds (nu x ns)    |
+|                                    | [ubu].                             |
 +------------------------------------+------------------------------------+
 | OCP_U_INIT                         | Controls initial guess (nu x ns)   |
+|                                    | [u_init].                          |
 +------------------------------------+------------------------------------+
 | OCP_LBP                            | Parameters lower bounds (np x 1)   |
+|                                    | [lbp].                             |
 +------------------------------------+------------------------------------+
 | OCP_UBP                            | Parameters upper bounds (np x 1)   |
+|                                    | [ubp].                             |
 +------------------------------------+------------------------------------+
 | OCP_P_INIT                         | Parameters initial guess (np x 1)  |
+|                                    | [p_init].                          |
 +------------------------------------+------------------------------------+
 | OCP_LBH                            | Point constraint lower bound (nh x |
-|                                    | (ns+1))                            |
+|                                    | (ns+1)) [lbh].                     |
 +------------------------------------+------------------------------------+
 | OCP_UBH                            | Point constraint upper bound (nh x |
-|                                    | (ns+1))                            |
+|                                    | (ns+1)) [ubh].                     |
 +------------------------------------+------------------------------------+
 | OCP_LBG                            | Lower bound for the coupling       |
-|                                    | constraints.                       |
+|                                    | constraints [lbg].                 |
 +------------------------------------+------------------------------------+
 | OCP_UBG                            | Upper bound for the coupling       |
-|                                    | constraints.                       |
+|                                    | constraints [ubg].                 |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::OCPOutput (OCP_NUM_OUT = 4)
-+------------+--------------------------------------+
-|    Name    |             Description              |
-+============+======================================+
-| OCP_X_OPT  | Optimal state trajectory.            |
-+------------+--------------------------------------+
-| OCP_U_OPT  | Optimal control trajectory.          |
-+------------+--------------------------------------+
-| OCP_XP_OPT | Optimal state derivative trajectory. |
-+------------+--------------------------------------+
-| OCP_P_OPT  | Optimal parameters.                  |
-+------------+--------------------------------------+
++------------+-----------------------------------------------+
+|    Name    |                  Description                  |
++============+===============================================+
+| OCP_X_OPT  | Optimal state trajectory [x_opt].             |
++------------+-----------------------------------------------+
+| OCP_U_OPT  | Optimal control trajectory [u_opt].           |
++------------+-----------------------------------------------+
+| OCP_XP_OPT | Optimal state derivative trajectory [xp_opt]. |
++------------+-----------------------------------------------+
+| OCP_P_OPT  | Optimal parameters [p_opt].                   |
++------------+-----------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -49450,26 +49498,27 @@ Joel Andersson
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1)                            |
+|                                    | (n x 1) [x_init].                  |
 +------------------------------------+------------------------------------+
 | NLP_LBX                            | Decision variables lower bound (n  |
-|                                    | x 1), default -inf.                |
+|                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
 | NLP_UBX                            | Decision variables upper bound (n  |
-|                                    | x 1), default +inf.                |
+|                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
 | NLP_LBG                            | Constraints lower bound (m x 1),   |
-|                                    | default -inf.                      |
+|                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
-|                                    | default +inf.                      |
+|                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
+|                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Only for parametric NLP - static   |
 |                                    | parameters on which the objective  |
-|                                    | and constraints might depend.      |
+|                                    | and constraints might depend [p].  |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
@@ -49477,21 +49526,21 @@ Joel Andersson
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1)                   |
+|                                    | solution (n x 1) [x_opt].          |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution (1 x 1)           |
+|                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
 |                                    | with G at the solution (m x 1)     |
+|                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) When in warmstart mode,    |
-|                                    | this output may be used as input ( |
+|                                    | (n x 1) [lambda_x].                |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1)           |
+|                                    | optimal solution (m x 1) [g].      |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -50229,26 +50278,27 @@ Joel Andersson
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1)                            |
+|                                    | (n x 1) [x_init].                  |
 +------------------------------------+------------------------------------+
 | NLP_LBX                            | Decision variables lower bound (n  |
-|                                    | x 1), default -inf.                |
+|                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
 | NLP_UBX                            | Decision variables upper bound (n  |
-|                                    | x 1), default +inf.                |
+|                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
 | NLP_LBG                            | Constraints lower bound (m x 1),   |
-|                                    | default -inf.                      |
+|                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
-|                                    | default +inf.                      |
+|                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
+|                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Only for parametric NLP - static   |
 |                                    | parameters on which the objective  |
-|                                    | and constraints might depend.      |
+|                                    | and constraints might depend [p].  |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
@@ -50256,21 +50306,21 @@ Joel Andersson
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1)                   |
+|                                    | solution (n x 1) [x_opt].          |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution (1 x 1)           |
+|                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
 |                                    | with G at the solution (m x 1)     |
+|                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) When in warmstart mode,    |
-|                                    | this output may be used as input ( |
+|                                    | (n x 1) [lambda_x].                |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1)           |
+|                                    | optimal solution (m x 1) [g].      |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -52457,60 +52507,69 @@ Joel Andersson
 |                Name                |            Description             |
 +====================================+====================================+
 | OCP_T                              | Time grid: ((ns+1) x 1) - default: |
-|                                    | linspace(0,t_final,ns+1)           |
+|                                    | linspace(0,t_final,ns+1) [t].      |
 +------------------------------------+------------------------------------+
 | OCP_LBX                            | States lower bounds (nx x (ns+1))  |
+|                                    | [lbx].                             |
 +------------------------------------+------------------------------------+
 | OCP_UBX                            | States upper bounds (nx x (ns+1))  |
+|                                    | [ubx].                             |
 +------------------------------------+------------------------------------+
 | OCP_X_INIT                         | States initial guess (nx x (ns+1)) |
+|                                    | [x_init].                          |
 +------------------------------------+------------------------------------+
 | OCP_LBXP                           | States deriatives lower bounds (nx |
-|                                    | x (ns+1))                          |
+|                                    | x (ns+1)) [lbxp].                  |
 +------------------------------------+------------------------------------+
 | OCP_UBXP                           | States deriatives upper bounds (nx |
-|                                    | x (ns+1))                          |
+|                                    | x (ns+1)) [ubxp].                  |
 +------------------------------------+------------------------------------+
 | OCP_XP_INIT                        | States deriatives initial guess    |
-|                                    | (nx x (ns+1))                      |
+|                                    | (nx x (ns+1)) [xp_init].           |
 +------------------------------------+------------------------------------+
 | OCP_LBU                            | Controls lower bounds (nu x ns)    |
+|                                    | [lbu].                             |
 +------------------------------------+------------------------------------+
 | OCP_UBU                            | Controls upper bounds (nu x ns)    |
+|                                    | [ubu].                             |
 +------------------------------------+------------------------------------+
 | OCP_U_INIT                         | Controls initial guess (nu x ns)   |
+|                                    | [u_init].                          |
 +------------------------------------+------------------------------------+
 | OCP_LBP                            | Parameters lower bounds (np x 1)   |
+|                                    | [lbp].                             |
 +------------------------------------+------------------------------------+
 | OCP_UBP                            | Parameters upper bounds (np x 1)   |
+|                                    | [ubp].                             |
 +------------------------------------+------------------------------------+
 | OCP_P_INIT                         | Parameters initial guess (np x 1)  |
+|                                    | [p_init].                          |
 +------------------------------------+------------------------------------+
 | OCP_LBH                            | Point constraint lower bound (nh x |
-|                                    | (ns+1))                            |
+|                                    | (ns+1)) [lbh].                     |
 +------------------------------------+------------------------------------+
 | OCP_UBH                            | Point constraint upper bound (nh x |
-|                                    | (ns+1))                            |
+|                                    | (ns+1)) [ubh].                     |
 +------------------------------------+------------------------------------+
 | OCP_LBG                            | Lower bound for the coupling       |
-|                                    | constraints.                       |
+|                                    | constraints [lbg].                 |
 +------------------------------------+------------------------------------+
 | OCP_UBG                            | Upper bound for the coupling       |
-|                                    | constraints.                       |
+|                                    | constraints [ubg].                 |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::OCPOutput (OCP_NUM_OUT = 4)
-+------------+--------------------------------------+
-|    Name    |             Description              |
-+============+======================================+
-| OCP_X_OPT  | Optimal state trajectory.            |
-+------------+--------------------------------------+
-| OCP_U_OPT  | Optimal control trajectory.          |
-+------------+--------------------------------------+
-| OCP_XP_OPT | Optimal state derivative trajectory. |
-+------------+--------------------------------------+
-| OCP_P_OPT  | Optimal parameters.                  |
-+------------+--------------------------------------+
++------------+-----------------------------------------------+
+|    Name    |                  Description                  |
++============+===============================================+
+| OCP_X_OPT  | Optimal state trajectory [x_opt].             |
++------------+-----------------------------------------------+
+| OCP_U_OPT  | Optimal control trajectory [u_opt].           |
++------------+-----------------------------------------------+
+| OCP_XP_OPT | Optimal state derivative trajectory [xp_opt]. |
++------------+-----------------------------------------------+
+| OCP_P_OPT  | Optimal parameters [p_opt].                   |
++------------+-----------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -53155,60 +53214,69 @@ Joel Andersson
 |                Name                |            Description             |
 +====================================+====================================+
 | OCP_T                              | Time grid: ((ns+1) x 1) - default: |
-|                                    | linspace(0,t_final,ns+1)           |
+|                                    | linspace(0,t_final,ns+1) [t].      |
 +------------------------------------+------------------------------------+
 | OCP_LBX                            | States lower bounds (nx x (ns+1))  |
+|                                    | [lbx].                             |
 +------------------------------------+------------------------------------+
 | OCP_UBX                            | States upper bounds (nx x (ns+1))  |
+|                                    | [ubx].                             |
 +------------------------------------+------------------------------------+
 | OCP_X_INIT                         | States initial guess (nx x (ns+1)) |
+|                                    | [x_init].                          |
 +------------------------------------+------------------------------------+
 | OCP_LBXP                           | States deriatives lower bounds (nx |
-|                                    | x (ns+1))                          |
+|                                    | x (ns+1)) [lbxp].                  |
 +------------------------------------+------------------------------------+
 | OCP_UBXP                           | States deriatives upper bounds (nx |
-|                                    | x (ns+1))                          |
+|                                    | x (ns+1)) [ubxp].                  |
 +------------------------------------+------------------------------------+
 | OCP_XP_INIT                        | States deriatives initial guess    |
-|                                    | (nx x (ns+1))                      |
+|                                    | (nx x (ns+1)) [xp_init].           |
 +------------------------------------+------------------------------------+
 | OCP_LBU                            | Controls lower bounds (nu x ns)    |
+|                                    | [lbu].                             |
 +------------------------------------+------------------------------------+
 | OCP_UBU                            | Controls upper bounds (nu x ns)    |
+|                                    | [ubu].                             |
 +------------------------------------+------------------------------------+
 | OCP_U_INIT                         | Controls initial guess (nu x ns)   |
+|                                    | [u_init].                          |
 +------------------------------------+------------------------------------+
 | OCP_LBP                            | Parameters lower bounds (np x 1)   |
+|                                    | [lbp].                             |
 +------------------------------------+------------------------------------+
 | OCP_UBP                            | Parameters upper bounds (np x 1)   |
+|                                    | [ubp].                             |
 +------------------------------------+------------------------------------+
 | OCP_P_INIT                         | Parameters initial guess (np x 1)  |
+|                                    | [p_init].                          |
 +------------------------------------+------------------------------------+
 | OCP_LBH                            | Point constraint lower bound (nh x |
-|                                    | (ns+1))                            |
+|                                    | (ns+1)) [lbh].                     |
 +------------------------------------+------------------------------------+
 | OCP_UBH                            | Point constraint upper bound (nh x |
-|                                    | (ns+1))                            |
+|                                    | (ns+1)) [ubh].                     |
 +------------------------------------+------------------------------------+
 | OCP_LBG                            | Lower bound for the coupling       |
-|                                    | constraints.                       |
+|                                    | constraints [lbg].                 |
 +------------------------------------+------------------------------------+
 | OCP_UBG                            | Upper bound for the coupling       |
-|                                    | constraints.                       |
+|                                    | constraints [ubg].                 |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::OCPOutput (OCP_NUM_OUT = 4)
-+------------+--------------------------------------+
-|    Name    |             Description              |
-+============+======================================+
-| OCP_X_OPT  | Optimal state trajectory.            |
-+------------+--------------------------------------+
-| OCP_U_OPT  | Optimal control trajectory.          |
-+------------+--------------------------------------+
-| OCP_XP_OPT | Optimal state derivative trajectory. |
-+------------+--------------------------------------+
-| OCP_P_OPT  | Optimal parameters.                  |
-+------------+--------------------------------------+
++------------+-----------------------------------------------+
+|    Name    |                  Description                  |
++============+===============================================+
+| OCP_X_OPT  | Optimal state trajectory [x_opt].             |
++------------+-----------------------------------------------+
+| OCP_U_OPT  | Optimal control trajectory [u_opt].           |
++------------+-----------------------------------------------+
+| OCP_XP_OPT | Optimal state derivative trajectory [xp_opt]. |
++------------+-----------------------------------------------+
+| OCP_P_OPT  | Optimal parameters [p_opt].                   |
++------------+-----------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -53812,39 +53880,41 @@ nc: number of constraints (A)
 | QP_H                               | The square matrix H: sparse, (nx x |
 |                                    | nx). Only the lower triangular     |
 |                                    | part is actually used. The matrix  |
-|                                    | is assumed to be symmetrical.      |
+|                                    | is assumed to be symmetrical. [h]. |
 +------------------------------------+------------------------------------+
 | QP_G                               | The column vector G: dense, (nx x  |
-|                                    | 1)                                 |
+|                                    | 1) [g].                            |
 +------------------------------------+------------------------------------+
 | QP_A                               | The matrix A: sparse, (nc x nx) -  |
-|                                    | product with x must be dense.      |
+|                                    | product with x must be dense. [a]. |
 +------------------------------------+------------------------------------+
-| QP_LBA                             | dense, (nc x 1)                    |
+| QP_LBA                             | dense, (nc x 1) [lba]              |
 +------------------------------------+------------------------------------+
-| QP_UBA                             | dense, (nc x 1)                    |
+| QP_UBA                             | dense, (nc x 1) [uba]              |
 +------------------------------------+------------------------------------+
-| QP_LBX                             | dense, (nx x 1)                    |
+| QP_LBX                             | dense, (nx x 1) [lbx]              |
 +------------------------------------+------------------------------------+
-| QP_UBX                             | dense, (nx x 1)                    |
+| QP_UBX                             | dense, (nx x 1) [ubx]              |
 +------------------------------------+------------------------------------+
-| QP_X_INIT                          | dense, (nx x 1)                    |
+| QP_X_INIT                          | dense, (nx x 1) [x_init]           |
 +------------------------------------+------------------------------------+
-| QP_LAMBDA_INIT                     |                                    |
+| QP_LAMBDA_INIT                     | dense [lambda_init]                |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
-+-------------+---------------------------------------------------+
-|    Name     |                    Description                    |
-+=============+===================================================+
-| QP_PRIMAL   | The primal solution.                              |
-+-------------+---------------------------------------------------+
-| QP_COST     | The optimal cost.                                 |
-+-------------+---------------------------------------------------+
-| QP_LAMBDA_A | The dual solution corresponding to linear bounds. |
-+-------------+---------------------------------------------------+
-| QP_LAMBDA_X | The dual solution corresponding to simple bounds. |
-+-------------+---------------------------------------------------+
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| QP_PRIMAL                          | The primal solution [primal].      |
++------------------------------------+------------------------------------+
+| QP_COST                            | The optimal cost [cost].           |
++------------------------------------+------------------------------------+
+| QP_LAMBDA_A                        | The dual solution corresponding to |
+|                                    | linear bounds [lambda_a].          |
++------------------------------------+------------------------------------+
+| QP_LAMBDA_X                        | The dual solution corresponding to |
+|                                    | simple bounds [lambda_x].          |
++------------------------------------+------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -54377,39 +54447,41 @@ reInit();
 | QP_H                               | The square matrix H: sparse, (nx x |
 |                                    | nx). Only the lower triangular     |
 |                                    | part is actually used. The matrix  |
-|                                    | is assumed to be symmetrical.      |
+|                                    | is assumed to be symmetrical. [h]. |
 +------------------------------------+------------------------------------+
 | QP_G                               | The column vector G: dense, (nx x  |
-|                                    | 1)                                 |
+|                                    | 1) [g].                            |
 +------------------------------------+------------------------------------+
 | QP_A                               | The matrix A: sparse, (nc x nx) -  |
-|                                    | product with x must be dense.      |
+|                                    | product with x must be dense. [a]. |
 +------------------------------------+------------------------------------+
-| QP_LBA                             | dense, (nc x 1)                    |
+| QP_LBA                             | dense, (nc x 1) [lba]              |
 +------------------------------------+------------------------------------+
-| QP_UBA                             | dense, (nc x 1)                    |
+| QP_UBA                             | dense, (nc x 1) [uba]              |
 +------------------------------------+------------------------------------+
-| QP_LBX                             | dense, (nx x 1)                    |
+| QP_LBX                             | dense, (nx x 1) [lbx]              |
 +------------------------------------+------------------------------------+
-| QP_UBX                             | dense, (nx x 1)                    |
+| QP_UBX                             | dense, (nx x 1) [ubx]              |
 +------------------------------------+------------------------------------+
-| QP_X_INIT                          | dense, (nx x 1)                    |
+| QP_X_INIT                          | dense, (nx x 1) [x_init]           |
 +------------------------------------+------------------------------------+
-| QP_LAMBDA_INIT                     |                                    |
+| QP_LAMBDA_INIT                     | dense [lambda_init]                |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
-+-------------+---------------------------------------------------+
-|    Name     |                    Description                    |
-+=============+===================================================+
-| QP_PRIMAL   | The primal solution.                              |
-+-------------+---------------------------------------------------+
-| QP_COST     | The optimal cost.                                 |
-+-------------+---------------------------------------------------+
-| QP_LAMBDA_A | The dual solution corresponding to linear bounds. |
-+-------------+---------------------------------------------------+
-| QP_LAMBDA_X | The dual solution corresponding to simple bounds. |
-+-------------+---------------------------------------------------+
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| QP_PRIMAL                          | The primal solution [primal].      |
++------------------------------------+------------------------------------+
+| QP_COST                            | The optimal cost [cost].           |
++------------------------------------+------------------------------------+
+| QP_LAMBDA_A                        | The dual solution corresponding to |
+|                                    | linear bounds [lambda_a].          |
++------------------------------------+------------------------------------+
+| QP_LAMBDA_X                        | The dual solution corresponding to |
+|                                    | simple bounds [lambda_x].          |
++------------------------------------+------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -56798,39 +56870,41 @@ nc: number of constraints (A)
 | QP_H                               | The square matrix H: sparse, (nx x |
 |                                    | nx). Only the lower triangular     |
 |                                    | part is actually used. The matrix  |
-|                                    | is assumed to be symmetrical.      |
+|                                    | is assumed to be symmetrical. [h]. |
 +------------------------------------+------------------------------------+
 | QP_G                               | The column vector G: dense, (nx x  |
-|                                    | 1)                                 |
+|                                    | 1) [g].                            |
 +------------------------------------+------------------------------------+
 | QP_A                               | The matrix A: sparse, (nc x nx) -  |
-|                                    | product with x must be dense.      |
+|                                    | product with x must be dense. [a]. |
 +------------------------------------+------------------------------------+
-| QP_LBA                             | dense, (nc x 1)                    |
+| QP_LBA                             | dense, (nc x 1) [lba]              |
 +------------------------------------+------------------------------------+
-| QP_UBA                             | dense, (nc x 1)                    |
+| QP_UBA                             | dense, (nc x 1) [uba]              |
 +------------------------------------+------------------------------------+
-| QP_LBX                             | dense, (nx x 1)                    |
+| QP_LBX                             | dense, (nx x 1) [lbx]              |
 +------------------------------------+------------------------------------+
-| QP_UBX                             | dense, (nx x 1)                    |
+| QP_UBX                             | dense, (nx x 1) [ubx]              |
 +------------------------------------+------------------------------------+
-| QP_X_INIT                          | dense, (nx x 1)                    |
+| QP_X_INIT                          | dense, (nx x 1) [x_init]           |
 +------------------------------------+------------------------------------+
-| QP_LAMBDA_INIT                     |                                    |
+| QP_LAMBDA_INIT                     | dense [lambda_init]                |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
-+-------------+---------------------------------------------------+
-|    Name     |                    Description                    |
-+=============+===================================================+
-| QP_PRIMAL   | The primal solution.                              |
-+-------------+---------------------------------------------------+
-| QP_COST     | The optimal cost.                                 |
-+-------------+---------------------------------------------------+
-| QP_LAMBDA_A | The dual solution corresponding to linear bounds. |
-+-------------+---------------------------------------------------+
-| QP_LAMBDA_X | The dual solution corresponding to simple bounds. |
-+-------------+---------------------------------------------------+
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| QP_PRIMAL                          | The primal solution [primal].      |
++------------------------------------+------------------------------------+
+| QP_COST                            | The optimal cost [cost].           |
++------------------------------------+------------------------------------+
+| QP_LAMBDA_A                        | The dual solution corresponding to |
+|                                    | linear bounds [lambda_a].          |
++------------------------------------+------------------------------------+
+| QP_LAMBDA_X                        | The dual solution corresponding to |
+|                                    | simple bounds [lambda_x].          |
++------------------------------------+------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -57380,39 +57454,41 @@ Joris Gillis, Joel Andersson
 | QP_H                               | The square matrix H: sparse, (nx x |
 |                                    | nx). Only the lower triangular     |
 |                                    | part is actually used. The matrix  |
-|                                    | is assumed to be symmetrical.      |
+|                                    | is assumed to be symmetrical. [h]. |
 +------------------------------------+------------------------------------+
 | QP_G                               | The column vector G: dense, (nx x  |
-|                                    | 1)                                 |
+|                                    | 1) [g].                            |
 +------------------------------------+------------------------------------+
 | QP_A                               | The matrix A: sparse, (nc x nx) -  |
-|                                    | product with x must be dense.      |
+|                                    | product with x must be dense. [a]. |
 +------------------------------------+------------------------------------+
-| QP_LBA                             | dense, (nc x 1)                    |
+| QP_LBA                             | dense, (nc x 1) [lba]              |
 +------------------------------------+------------------------------------+
-| QP_UBA                             | dense, (nc x 1)                    |
+| QP_UBA                             | dense, (nc x 1) [uba]              |
 +------------------------------------+------------------------------------+
-| QP_LBX                             | dense, (nx x 1)                    |
+| QP_LBX                             | dense, (nx x 1) [lbx]              |
 +------------------------------------+------------------------------------+
-| QP_UBX                             | dense, (nx x 1)                    |
+| QP_UBX                             | dense, (nx x 1) [ubx]              |
 +------------------------------------+------------------------------------+
-| QP_X_INIT                          | dense, (nx x 1)                    |
+| QP_X_INIT                          | dense, (nx x 1) [x_init]           |
 +------------------------------------+------------------------------------+
-| QP_LAMBDA_INIT                     |                                    |
+| QP_LAMBDA_INIT                     | dense [lambda_init]                |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
-+-------------+---------------------------------------------------+
-|    Name     |                    Description                    |
-+=============+===================================================+
-| QP_PRIMAL   | The primal solution.                              |
-+-------------+---------------------------------------------------+
-| QP_COST     | The optimal cost.                                 |
-+-------------+---------------------------------------------------+
-| QP_LAMBDA_A | The dual solution corresponding to linear bounds. |
-+-------------+---------------------------------------------------+
-| QP_LAMBDA_X | The dual solution corresponding to simple bounds. |
-+-------------+---------------------------------------------------+
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| QP_PRIMAL                          | The primal solution [primal].      |
++------------------------------------+------------------------------------+
+| QP_COST                            | The optimal cost [cost].           |
++------------------------------------+------------------------------------+
+| QP_LAMBDA_A                        | The dual solution corresponding to |
+|                                    | linear bounds [lambda_a].          |
++------------------------------------+------------------------------------+
+| QP_LAMBDA_X                        | The dual solution corresponding to |
+|                                    | simple bounds [lambda_x].          |
++------------------------------------+------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -58098,39 +58174,41 @@ Joel Andersson
 | QP_H                               | The square matrix H: sparse, (nx x |
 |                                    | nx). Only the lower triangular     |
 |                                    | part is actually used. The matrix  |
-|                                    | is assumed to be symmetrical.      |
+|                                    | is assumed to be symmetrical. [h]. |
 +------------------------------------+------------------------------------+
 | QP_G                               | The column vector G: dense, (nx x  |
-|                                    | 1)                                 |
+|                                    | 1) [g].                            |
 +------------------------------------+------------------------------------+
 | QP_A                               | The matrix A: sparse, (nc x nx) -  |
-|                                    | product with x must be dense.      |
+|                                    | product with x must be dense. [a]. |
 +------------------------------------+------------------------------------+
-| QP_LBA                             | dense, (nc x 1)                    |
+| QP_LBA                             | dense, (nc x 1) [lba]              |
 +------------------------------------+------------------------------------+
-| QP_UBA                             | dense, (nc x 1)                    |
+| QP_UBA                             | dense, (nc x 1) [uba]              |
 +------------------------------------+------------------------------------+
-| QP_LBX                             | dense, (nx x 1)                    |
+| QP_LBX                             | dense, (nx x 1) [lbx]              |
 +------------------------------------+------------------------------------+
-| QP_UBX                             | dense, (nx x 1)                    |
+| QP_UBX                             | dense, (nx x 1) [ubx]              |
 +------------------------------------+------------------------------------+
-| QP_X_INIT                          | dense, (nx x 1)                    |
+| QP_X_INIT                          | dense, (nx x 1) [x_init]           |
 +------------------------------------+------------------------------------+
-| QP_LAMBDA_INIT                     |                                    |
+| QP_LAMBDA_INIT                     | dense [lambda_init]                |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
-+-------------+---------------------------------------------------+
-|    Name     |                    Description                    |
-+=============+===================================================+
-| QP_PRIMAL   | The primal solution.                              |
-+-------------+---------------------------------------------------+
-| QP_COST     | The optimal cost.                                 |
-+-------------+---------------------------------------------------+
-| QP_LAMBDA_A | The dual solution corresponding to linear bounds. |
-+-------------+---------------------------------------------------+
-| QP_LAMBDA_X | The dual solution corresponding to simple bounds. |
-+-------------+---------------------------------------------------+
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| QP_PRIMAL                          | The primal solution [primal].      |
++------------------------------------+------------------------------------+
+| QP_COST                            | The optimal cost [cost].           |
++------------------------------------+------------------------------------+
+| QP_LAMBDA_A                        | The dual solution corresponding to |
+|                                    | linear bounds [lambda_a].          |
++------------------------------------+------------------------------------+
+| QP_LAMBDA_X                        | The dual solution corresponding to |
+|                                    | simple bounds [lambda_x].          |
++------------------------------------+------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -58763,39 +58841,41 @@ Internal class.
 | QP_H                               | The square matrix H: sparse, (nx x |
 |                                    | nx). Only the lower triangular     |
 |                                    | part is actually used. The matrix  |
-|                                    | is assumed to be symmetrical.      |
+|                                    | is assumed to be symmetrical. [h]. |
 +------------------------------------+------------------------------------+
 | QP_G                               | The column vector G: dense, (nx x  |
-|                                    | 1)                                 |
+|                                    | 1) [g].                            |
 +------------------------------------+------------------------------------+
 | QP_A                               | The matrix A: sparse, (nc x nx) -  |
-|                                    | product with x must be dense.      |
+|                                    | product with x must be dense. [a]. |
 +------------------------------------+------------------------------------+
-| QP_LBA                             | dense, (nc x 1)                    |
+| QP_LBA                             | dense, (nc x 1) [lba]              |
 +------------------------------------+------------------------------------+
-| QP_UBA                             | dense, (nc x 1)                    |
+| QP_UBA                             | dense, (nc x 1) [uba]              |
 +------------------------------------+------------------------------------+
-| QP_LBX                             | dense, (nx x 1)                    |
+| QP_LBX                             | dense, (nx x 1) [lbx]              |
 +------------------------------------+------------------------------------+
-| QP_UBX                             | dense, (nx x 1)                    |
+| QP_UBX                             | dense, (nx x 1) [ubx]              |
 +------------------------------------+------------------------------------+
-| QP_X_INIT                          | dense, (nx x 1)                    |
+| QP_X_INIT                          | dense, (nx x 1) [x_init]           |
 +------------------------------------+------------------------------------+
-| QP_LAMBDA_INIT                     |                                    |
+| QP_LAMBDA_INIT                     | dense [lambda_init]                |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
-+-------------+---------------------------------------------------+
-|    Name     |                    Description                    |
-+=============+===================================================+
-| QP_PRIMAL   | The primal solution.                              |
-+-------------+---------------------------------------------------+
-| QP_COST     | The optimal cost.                                 |
-+-------------+---------------------------------------------------+
-| QP_LAMBDA_A | The dual solution corresponding to linear bounds. |
-+-------------+---------------------------------------------------+
-| QP_LAMBDA_X | The dual solution corresponding to simple bounds. |
-+-------------+---------------------------------------------------+
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| QP_PRIMAL                          | The primal solution [primal].      |
++------------------------------------+------------------------------------+
+| QP_COST                            | The optimal cost [cost].           |
++------------------------------------+------------------------------------+
+| QP_LAMBDA_A                        | The dual solution corresponding to |
+|                                    | linear bounds [lambda_a].          |
++------------------------------------+------------------------------------+
+| QP_LAMBDA_X                        | The dual solution corresponding to |
+|                                    | simple bounds [lambda_x].          |
++------------------------------------+------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -59374,28 +59454,26 @@ The method is still under development
 Joel Andersson
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+----------------+-----------------------------------------------+
-|      Name      |                  Description                  |
-+================+===============================================+
-| INTEGRATOR_X0  | Differential state at the initial time        |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_P   | Parameters                                    |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_RX0 | Backward differential state at the final time |
-+----------------+-----------------------------------------------+
++---------------+----------------------------------------------+
+|     Name      |                 Description                  |
++===============+==============================================+
+| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
++---------------+----------------------------------------------+
+| INTEGRATOR_P  | Parameters [p]                               |
++---------------+----------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
-+----------------+-------------------------------------------------+
-|      Name      |                   Description                   |
-+================+=================================================+
-| INTEGRATOR_XF  | Differential state at the final time            |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_QF  | Quadrature state at the final time              |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RXF | Backward differential state at the initial time |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
-+----------------+-------------------------------------------------+
++----------------+--------------------------------------------------------+
+|      Name      |                      Description                       |
++================+========================================================+
+| INTEGRATOR_XF  | Differential state at the final time [xf].             |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time [qf].               |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -59694,29 +59772,30 @@ Parameters:
 -----------
 
 f:  dynamical system >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 5)
-+----------+----------------------------------------+ |   Name   |
-Description               |
-+==========+========================================+ | DAE_X    |
-Differential state                     |
-+----------+----------------------------------------+ | DAE_Z    | Algebraic
-state                        |
-+----------+----------------------------------------+ | DAE_P    | Parameter
-| +----------+----------------------------------------+ | DAE_T    |
-Explicit time dependence               |
-+----------+----------------------------------------+ | DAE_XDOT | Time
-derivative of differential states |
-+----------+----------------------------------------+
++----------+------------------------------------------------+ |   Name   |
+Description                   |
++==========+================================================+ | DAE_X    |
+Differential state [x].                        |
++----------+------------------------------------------------+ | DAE_Z    |
+Algebraic state [z].                           |
++----------+------------------------------------------------+ | DAE_P    |
+Parameter [p].                                 |
++----------+------------------------------------------------+ | DAE_T    |
+Explicit time dependence [t].                  |
++----------+------------------------------------------------+ | DAE_XDOT |
+Time derivative of differential states [xdot]. |
++----------+------------------------------------------------+
 
 >Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 3)
-+----------+------------------------------------------+
-|   Name   |               Description                |
-+==========+==========================================+
-| DAE_ODE  | Right hand side of the implicit ODE      |
-+----------+------------------------------------------+
-| DAE_ALG  | Right hand side of algebraic equations   |
-+----------+------------------------------------------+
-| DAE_QUAD | Right hand side of quadratures equations |
-+----------+------------------------------------------+
++----------+--------------------------------------------------+
+|   Name   |                   Description                    |
++==========+==================================================+
+| DAE_ODE  | Right hand side of the implicit ODE [ode].       |
++----------+--------------------------------------------------+
+| DAE_ALG  | Right hand side of algebraic equations [alg].    |
++----------+--------------------------------------------------+
+| DAE_QUAD | Right hand side of quadratures equations [quad]. |
++----------+--------------------------------------------------+
 ";
 
 %feature("docstring")  CasADi::RKIntegrator::checkNode "
@@ -60107,28 +60186,26 @@ Return a string with a destription (for SWIG) ";
 %feature("docstring") CasADi::RKIntegratorInternal "
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+----------------+-----------------------------------------------+
-|      Name      |                  Description                  |
-+================+===============================================+
-| INTEGRATOR_X0  | Differential state at the initial time        |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_P   | Parameters                                    |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_RX0 | Backward differential state at the final time |
-+----------------+-----------------------------------------------+
++---------------+----------------------------------------------+
+|     Name      |                 Description                  |
++===============+==============================================+
+| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
++---------------+----------------------------------------------+
+| INTEGRATOR_P  | Parameters [p]                               |
++---------------+----------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
-+----------------+-------------------------------------------------+
-|      Name      |                   Description                   |
-+================+=================================================+
-| INTEGRATOR_XF  | Differential state at the final time            |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_QF  | Quadrature state at the final time              |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RXF | Backward differential state at the initial time |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
-+----------------+-------------------------------------------------+
++----------------+--------------------------------------------------------+
+|      Name      |                      Description                       |
++================+========================================================+
+| INTEGRATOR_XF  | Differential state at the final time [xf].             |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time [qf].               |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -61101,15 +61178,13 @@ for each time step.
 Joel Andersson
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+----------------+-----------------------------------------------+
-|      Name      |                  Description                  |
-+================+===============================================+
-| INTEGRATOR_X0  | Differential state at the initial time        |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_P   | Parameters                                    |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_RX0 | Backward differential state at the final time |
-+----------------+-----------------------------------------------+
++---------------+----------------------------------------------+
+|     Name      |                 Description                  |
++===============+==============================================+
+| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
++---------------+----------------------------------------------+
+| INTEGRATOR_P  | Parameters [p]                               |
++---------------+----------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -61386,18 +61461,19 @@ Parameters:
 
 output_fcn:  output function which maps to n outputs. >Input scheme:
 CasADi::DAEInput (DAE_NUM_IN = 5)
-+----------+----------------------------------------+ |   Name   |
-Description               |
-+==========+========================================+ | DAE_X    |
-Differential state                     |
-+----------+----------------------------------------+ | DAE_Z    | Algebraic
-state                        |
-+----------+----------------------------------------+ | DAE_P    | Parameter
-| +----------+----------------------------------------+ | DAE_T    |
-Explicit time dependence               |
-+----------+----------------------------------------+ | DAE_XDOT | Time
-derivative of differential states |
-+----------+----------------------------------------+ ";
++----------+------------------------------------------------+ |   Name   |
+Description                   |
++==========+================================================+ | DAE_X    |
+Differential state [x].                        |
++----------+------------------------------------------------+ | DAE_Z    |
+Algebraic state [z].                           |
++----------+------------------------------------------------+ | DAE_P    |
+Parameter [p].                                 |
++----------+------------------------------------------------+ | DAE_T    |
+Explicit time dependence [t].                  |
++----------+------------------------------------------------+ | DAE_XDOT |
+Time derivative of differential states [xdot]. |
++----------+------------------------------------------------+ ";
 
 %feature("docstring")  CasADi::Simulator::Simulator "";
 
@@ -61774,15 +61850,13 @@ Simulator data storage classs.
 Joel Andersson
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+----------------+-----------------------------------------------+
-|      Name      |                  Description                  |
-+================+===============================================+
-| INTEGRATOR_X0  | Differential state at the initial time        |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_P   | Parameters                                    |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_RX0 | Backward differential state at the final time |
-+----------------+-----------------------------------------------+
++---------------+----------------------------------------------+
+|     Name      |                 Description                  |
++===============+==============================================+
+| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
++---------------+----------------------------------------------+
+| INTEGRATOR_P  | Parameters [p]                               |
++---------------+----------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -62551,26 +62625,27 @@ Assert that the object has been initialized. ";
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1)                            |
+|                                    | (n x 1) [x_init].                  |
 +------------------------------------+------------------------------------+
 | NLP_LBX                            | Decision variables lower bound (n  |
-|                                    | x 1), default -inf.                |
+|                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
 | NLP_UBX                            | Decision variables upper bound (n  |
-|                                    | x 1), default +inf.                |
+|                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
 | NLP_LBG                            | Constraints lower bound (m x 1),   |
-|                                    | default -inf.                      |
+|                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
-|                                    | default +inf.                      |
+|                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
+|                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Only for parametric NLP - static   |
 |                                    | parameters on which the objective  |
-|                                    | and constraints might depend.      |
+|                                    | and constraints might depend [p].  |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
@@ -62578,21 +62653,21 @@ Assert that the object has been initialized. ";
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1)                   |
+|                                    | solution (n x 1) [x_opt].          |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution (1 x 1)           |
+|                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
 |                                    | with G at the solution (m x 1)     |
+|                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) When in warmstart mode,    |
-|                                    | this output may be used as input ( |
+|                                    | (n x 1) [lambda_x].                |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1)           |
+|                                    | optimal solution (m x 1) [g].      |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -63280,26 +63355,27 @@ Joel Andersson
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1)                            |
+|                                    | (n x 1) [x_init].                  |
 +------------------------------------+------------------------------------+
 | NLP_LBX                            | Decision variables lower bound (n  |
-|                                    | x 1), default -inf.                |
+|                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
 | NLP_UBX                            | Decision variables upper bound (n  |
-|                                    | x 1), default +inf.                |
+|                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
 | NLP_LBG                            | Constraints lower bound (m x 1),   |
-|                                    | default -inf.                      |
+|                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
-|                                    | default +inf.                      |
+|                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
+|                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Only for parametric NLP - static   |
 |                                    | parameters on which the objective  |
-|                                    | and constraints might depend.      |
+|                                    | and constraints might depend [p].  |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
@@ -63307,21 +63383,21 @@ Joel Andersson
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1)                   |
+|                                    | solution (n x 1) [x_opt].          |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution (1 x 1)           |
+|                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
 |                                    | with G at the solution (m x 1)     |
+|                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) When in warmstart mode,    |
-|                                    | this output may be used as input ( |
+|                                    | (n x 1) [lambda_x].                |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1)           |
+|                                    | optimal solution (m x 1) [g].      |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -64168,28 +64244,26 @@ Constructor. ";
 %feature("docstring") CasADi::Sundials::SundialsIntegrator "
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+----------------+-----------------------------------------------+
-|      Name      |                  Description                  |
-+================+===============================================+
-| INTEGRATOR_X0  | Differential state at the initial time        |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_P   | Parameters                                    |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_RX0 | Backward differential state at the final time |
-+----------------+-----------------------------------------------+
++---------------+----------------------------------------------+
+|     Name      |                 Description                  |
++===============+==============================================+
+| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
++---------------+----------------------------------------------+
+| INTEGRATOR_P  | Parameters [p]                               |
++---------------+----------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
-+----------------+-------------------------------------------------+
-|      Name      |                   Description                   |
-+================+=================================================+
-| INTEGRATOR_XF  | Differential state at the final time            |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_QF  | Quadrature state at the final time              |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RXF | Backward differential state at the initial time |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
-+----------------+-------------------------------------------------+
++----------------+--------------------------------------------------------+
+|      Name      |                      Description                       |
++================+========================================================+
+| INTEGRATOR_XF  | Differential state at the final time [xf].             |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time [qf].               |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -65086,28 +65160,26 @@ Return a string with a destription (for SWIG) ";
 %feature("docstring") CasADi::Sundials::SundialsInternal "
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+----------------+-----------------------------------------------+
-|      Name      |                  Description                  |
-+================+===============================================+
-| INTEGRATOR_X0  | Differential state at the initial time        |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_P   | Parameters                                    |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_RX0 | Backward differential state at the final time |
-+----------------+-----------------------------------------------+
++---------------+----------------------------------------------+
+|     Name      |                 Description                  |
++===============+==============================================+
+| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
++---------------+----------------------------------------------+
+| INTEGRATOR_P  | Parameters [p]                               |
++---------------+----------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
-+----------------+-------------------------------------------------+
-|      Name      |                   Description                   |
-+================+=================================================+
-| INTEGRATOR_XF  | Differential state at the final time            |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_QF  | Quadrature state at the final time              |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RXF | Backward differential state at the initial time |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
-+----------------+-------------------------------------------------+
++----------------+--------------------------------------------------------+
+|      Name      |                      Description                       |
++================+========================================================+
+| INTEGRATOR_XF  | Differential state at the final time [xf].             |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time [qf].               |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -70175,26 +70247,27 @@ n: number of decision variables (x)     m: number of constraints (A)
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1)                            |
+|                                    | (n x 1) [x_init].                  |
 +------------------------------------+------------------------------------+
 | NLP_LBX                            | Decision variables lower bound (n  |
-|                                    | x 1), default -inf.                |
+|                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
 | NLP_UBX                            | Decision variables upper bound (n  |
-|                                    | x 1), default +inf.                |
+|                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
 | NLP_LBG                            | Constraints lower bound (m x 1),   |
-|                                    | default -inf.                      |
+|                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
-|                                    | default +inf.                      |
+|                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
+|                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Only for parametric NLP - static   |
 |                                    | parameters on which the objective  |
-|                                    | and constraints might depend.      |
+|                                    | and constraints might depend [p].  |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
@@ -70202,21 +70275,21 @@ n: number of decision variables (x)     m: number of constraints (A)
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1)                   |
+|                                    | solution (n x 1) [x_opt].          |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution (1 x 1)           |
+|                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
 |                                    | with G at the solution (m x 1)     |
+|                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) When in warmstart mode,    |
-|                                    | this output may be used as input ( |
+|                                    | (n x 1) [lambda_x].                |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1)           |
+|                                    | optimal solution (m x 1) [g].      |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -71124,7 +71197,7 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_UNKNOWN   |              | A user-      | CasADi::Worh |
+| user_data    | OT_VOIDPTR   |              | A user-      | CasADi::Worh |
 |              |              |              | defined      | pInternal    |
 |              |              |              | field that   |              |
 |              |              |              | can be used  |              |
@@ -71527,26 +71600,27 @@ n: number of decision variables (x)     m: number of constraints (A)
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1)                            |
+|                                    | (n x 1) [x_init].                  |
 +------------------------------------+------------------------------------+
 | NLP_LBX                            | Decision variables lower bound (n  |
-|                                    | x 1), default -inf.                |
+|                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
 | NLP_UBX                            | Decision variables upper bound (n  |
-|                                    | x 1), default +inf.                |
+|                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
 | NLP_LBG                            | Constraints lower bound (m x 1),   |
-|                                    | default -inf.                      |
+|                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
-|                                    | default +inf.                      |
+|                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
+|                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Only for parametric NLP - static   |
 |                                    | parameters on which the objective  |
-|                                    | and constraints might depend.      |
+|                                    | and constraints might depend [p].  |
 +------------------------------------+------------------------------------+
 
 >Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
@@ -71554,21 +71628,21 @@ n: number of decision variables (x)     m: number of constraints (A)
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1)                   |
+|                                    | solution (n x 1) [x_opt].          |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution (1 x 1)           |
+|                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
 |                                    | with G at the solution (m x 1)     |
+|                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) When in warmstart mode,    |
-|                                    | this output may be used as input ( |
+|                                    | (n x 1) [lambda_x].                |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1)           |
+|                                    | optimal solution (m x 1) [g].      |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -72476,7 +72550,7 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_UNKNOWN   |              | A user-      | CasADi::Worh |
+| user_data    | OT_VOIDPTR   |              | A user-      | CasADi::Worh |
 |              |              |              | defined      | pInternal    |
 |              |              |              | field that   |              |
 |              |              |              | can be used  |              |
@@ -73896,13 +73970,13 @@ of states: from ffcn.input(INTEGRATOR_X0).size()  np: Number of parameters:
 from option number_of_parameters
 
 >Input scheme: CasADi::MayerInput (MAYER_NUM_IN = 2)
-+---------+-------------------------------------------+
-|  Name   |                Description                |
-+=========+===========================================+
-| MAYER_X | States at the end of integration (nx x 1) |
-+---------+-------------------------------------------+
-| MAYER_P | Problem parameters (np x 1)               |
-+---------+-------------------------------------------+
++---------+------------------------------------------------+
+|  Name   |                  Description                   |
++=========+================================================+
+| MAYER_X | States at the end of integration (nx x 1) [x]. |
++---------+------------------------------------------------+
+| MAYER_P | Problem parameters (np x 1) [p].               |
++---------+------------------------------------------------+
 ";
 
 %feature("docstring")  CasADi::Interfaces::ocpIn "
@@ -73919,46 +73993,55 @@ of point constraints: from cfcn.input(0).size()
 |                Name                |            Description             |
 +====================================+====================================+
 | OCP_T                              | Time grid: ((ns+1) x 1) - default: |
-|                                    | linspace(0,t_final,ns+1)           |
+|                                    | linspace(0,t_final,ns+1) [t].      |
 +------------------------------------+------------------------------------+
 | OCP_LBX                            | States lower bounds (nx x (ns+1))  |
+|                                    | [lbx].                             |
 +------------------------------------+------------------------------------+
 | OCP_UBX                            | States upper bounds (nx x (ns+1))  |
+|                                    | [ubx].                             |
 +------------------------------------+------------------------------------+
 | OCP_X_INIT                         | States initial guess (nx x (ns+1)) |
+|                                    | [x_init].                          |
 +------------------------------------+------------------------------------+
 | OCP_LBXP                           | States deriatives lower bounds (nx |
-|                                    | x (ns+1))                          |
+|                                    | x (ns+1)) [lbxp].                  |
 +------------------------------------+------------------------------------+
 | OCP_UBXP                           | States deriatives upper bounds (nx |
-|                                    | x (ns+1))                          |
+|                                    | x (ns+1)) [ubxp].                  |
 +------------------------------------+------------------------------------+
 | OCP_XP_INIT                        | States deriatives initial guess    |
-|                                    | (nx x (ns+1))                      |
+|                                    | (nx x (ns+1)) [xp_init].           |
 +------------------------------------+------------------------------------+
 | OCP_LBU                            | Controls lower bounds (nu x ns)    |
+|                                    | [lbu].                             |
 +------------------------------------+------------------------------------+
 | OCP_UBU                            | Controls upper bounds (nu x ns)    |
+|                                    | [ubu].                             |
 +------------------------------------+------------------------------------+
 | OCP_U_INIT                         | Controls initial guess (nu x ns)   |
+|                                    | [u_init].                          |
 +------------------------------------+------------------------------------+
 | OCP_LBP                            | Parameters lower bounds (np x 1)   |
+|                                    | [lbp].                             |
 +------------------------------------+------------------------------------+
 | OCP_UBP                            | Parameters upper bounds (np x 1)   |
+|                                    | [ubp].                             |
 +------------------------------------+------------------------------------+
 | OCP_P_INIT                         | Parameters initial guess (np x 1)  |
+|                                    | [p_init].                          |
 +------------------------------------+------------------------------------+
 | OCP_LBH                            | Point constraint lower bound (nh x |
-|                                    | (ns+1))                            |
+|                                    | (ns+1)) [lbh].                     |
 +------------------------------------+------------------------------------+
 | OCP_UBH                            | Point constraint upper bound (nh x |
-|                                    | (ns+1))                            |
+|                                    | (ns+1)) [ubh].                     |
 +------------------------------------+------------------------------------+
 | OCP_LBG                            | Lower bound for the coupling       |
-|                                    | constraints.                       |
+|                                    | constraints [lbg].                 |
 +------------------------------------+------------------------------------+
 | OCP_UBG                            | Upper bound for the coupling       |
-|                                    | constraints.                       |
+|                                    | constraints [ubg].                 |
 +------------------------------------+------------------------------------+
 ";
 
@@ -73967,17 +74050,17 @@ of point constraints: from cfcn.input(0).size()
 Helper function for 'OCPOutput' Output arguments of an OCP Solver
 
 >Output scheme: CasADi::OCPOutput (OCP_NUM_OUT = 4)
-+------------+--------------------------------------+
-|    Name    |             Description              |
-+============+======================================+
-| OCP_X_OPT  | Optimal state trajectory.            |
-+------------+--------------------------------------+
-| OCP_U_OPT  | Optimal control trajectory.          |
-+------------+--------------------------------------+
-| OCP_XP_OPT | Optimal state derivative trajectory. |
-+------------+--------------------------------------+
-| OCP_P_OPT  | Optimal parameters.                  |
-+------------+--------------------------------------+
++------------+-----------------------------------------------+
+|    Name    |                  Description                  |
++============+===============================================+
+| OCP_X_OPT  | Optimal state trajectory [x_opt].             |
++------------+-----------------------------------------------+
+| OCP_U_OPT  | Optimal control trajectory [u_opt].           |
++------------+-----------------------------------------------+
+| OCP_XP_OPT | Optimal state derivative trajectory [xp_opt]. |
++------------+-----------------------------------------------+
+| OCP_P_OPT  | Optimal parameters [p_opt].                   |
++------------+-----------------------------------------------+
 ";
 
 %feature("docstring")  CasADi::Interfaces::qpIn "
@@ -73991,25 +74074,25 @@ Helper function for 'QPInput' Input arguments of a QP problem
 | QP_H                               | The square matrix H: sparse, (nx x |
 |                                    | nx). Only the lower triangular     |
 |                                    | part is actually used. The matrix  |
-|                                    | is assumed to be symmetrical.      |
+|                                    | is assumed to be symmetrical. [h]. |
 +------------------------------------+------------------------------------+
 | QP_G                               | The column vector G: dense, (nx x  |
-|                                    | 1)                                 |
+|                                    | 1) [g].                            |
 +------------------------------------+------------------------------------+
 | QP_A                               | The matrix A: sparse, (nc x nx) -  |
-|                                    | product with x must be dense.      |
+|                                    | product with x must be dense. [a]. |
 +------------------------------------+------------------------------------+
-| QP_LBA                             | dense, (nc x 1)                    |
+| QP_LBA                             | dense, (nc x 1) [lba]              |
 +------------------------------------+------------------------------------+
-| QP_UBA                             | dense, (nc x 1)                    |
+| QP_UBA                             | dense, (nc x 1) [uba]              |
 +------------------------------------+------------------------------------+
-| QP_LBX                             | dense, (nx x 1)                    |
+| QP_LBX                             | dense, (nx x 1) [lbx]              |
 +------------------------------------+------------------------------------+
-| QP_UBX                             | dense, (nx x 1)                    |
+| QP_UBX                             | dense, (nx x 1) [ubx]              |
 +------------------------------------+------------------------------------+
-| QP_X_INIT                          | dense, (nx x 1)                    |
+| QP_X_INIT                          | dense, (nx x 1) [x_init]           |
 +------------------------------------+------------------------------------+
-| QP_LAMBDA_INIT                     |                                    |
+| QP_LAMBDA_INIT                     | dense [lambda_init]                |
 +------------------------------------+------------------------------------+
 ";
 
@@ -74018,17 +74101,19 @@ Helper function for 'QPInput' Input arguments of a QP problem
 Helper function for 'QPOutput' Output arguments of an QP Solver
 
 >Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
-+-------------+---------------------------------------------------+
-|    Name     |                    Description                    |
-+=============+===================================================+
-| QP_PRIMAL   | The primal solution.                              |
-+-------------+---------------------------------------------------+
-| QP_COST     | The optimal cost.                                 |
-+-------------+---------------------------------------------------+
-| QP_LAMBDA_A | The dual solution corresponding to linear bounds. |
-+-------------+---------------------------------------------------+
-| QP_LAMBDA_X | The dual solution corresponding to simple bounds. |
-+-------------+---------------------------------------------------+
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| QP_PRIMAL                          | The primal solution [primal].      |
++------------------------------------+------------------------------------+
+| QP_COST                            | The optimal cost [cost].           |
++------------------------------------+------------------------------------+
+| QP_LAMBDA_A                        | The dual solution corresponding to |
+|                                    | linear bounds [lambda_a].          |
++------------------------------------+------------------------------------+
+| QP_LAMBDA_X                        | The dual solution corresponding to |
+|                                    | simple bounds [lambda_x].          |
++------------------------------------+------------------------------------+
 ";
 
 %feature("docstring")  CasADi::Interfaces::controldaeIn "
@@ -74041,35 +74126,39 @@ function
 |                Name                |            Description             |
 +====================================+====================================+
 | CONTROL_DAE_T                      | Global physical time. (1-by-1)     |
+|                                    | [t].                               |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_X                      | State vector (dimension nx-by-1).  |
 |                                    | Should have same amount of non-    |
-|                                    | zeros as DAEOutput:DAE_RES         |
+|                                    | zeros as DAEOutput:DAE_RES [x].    |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_Z                      | Algebraic state vector (dimension  |
-|                                    | np-by-1).                          |
+|                                    | np-by-1). [z].                     |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_P                      | Parameter vector (dimension np-    |
-|                                    | by-1).                             |
+|                                    | by-1). [p].                        |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_U                      | Control vector (dimension nu-      |
-|                                    | by-1).                             |
+|                                    | by-1). [u].                        |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_U_INTERP               | Control vector, linearly           |
 |                                    | interpolated (dimension nu-by-1).  |
+|                                    | [u_interp].                        |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_XDOT                   | State derivative vector (dimension |
 |                                    | nx-by-1). Should have same amount  |
 |                                    | of non-zeros as DAEOutput:DAE_RES  |
+|                                    | [xdot].                            |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_X_MAJOR                | State vector (dimension nx-by-1)   |
 |                                    | at the last major time-step        |
+|                                    | [x_major].                         |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_T0                     | Time at start of control interval  |
-|                                    | (1-by-1)                           |
+|                                    | (1-by-1) [t0].                     |
 +------------------------------------+------------------------------------+
 | CONTROL_DAE_TF                     | Time at end of control interval    |
-|                                    | (1-by-1)                           |
+|                                    | (1-by-1) [tf].                     |
 +------------------------------------+------------------------------------+
 ";
 
@@ -74083,14 +74172,15 @@ simulator
 |                Name                |            Description             |
 +====================================+====================================+
 | CONTROLSIMULATOR_X0                | Differential or algebraic state at |
-|                                    | t0 (dimension nx-by-1)             |
+|                                    | t0 (dimension nx-by-1) [x0].       |
 +------------------------------------+------------------------------------+
 | CONTROLSIMULATOR_P                 | Parameters that are fixed over the |
 |                                    | entire horizon (dimension np-by-1) |
+|                                    | [p].                               |
 +------------------------------------+------------------------------------+
 | CONTROLSIMULATOR_U                 | Parameters that change over the    |
 |                                    | integration intervals (dimension   |
-|                                    | (ns-1)-by-nu)                      |
+|                                    | (ns-1)-by-nu) [u].                 |
 +------------------------------------+------------------------------------+
 ";
 
@@ -74103,26 +74193,27 @@ Helper function for 'NLPInput' Input arguments of an NLP Solver
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1)                            |
+|                                    | (n x 1) [x_init].                  |
 +------------------------------------+------------------------------------+
 | NLP_LBX                            | Decision variables lower bound (n  |
-|                                    | x 1), default -inf.                |
+|                                    | x 1), default -inf [lbx].          |
 +------------------------------------+------------------------------------+
 | NLP_UBX                            | Decision variables upper bound (n  |
-|                                    | x 1), default +inf.                |
+|                                    | x 1), default +inf [ubx].          |
 +------------------------------------+------------------------------------+
 | NLP_LBG                            | Constraints lower bound (m x 1),   |
-|                                    | default -inf.                      |
+|                                    | default -inf [lbg].                |
 +------------------------------------+------------------------------------+
 | NLP_UBG                            | Constraints upper bound (m x 1),   |
-|                                    | default +inf.                      |
+|                                    | default +inf [ubg].                |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
 |                                    | with G, initial guess (m x 1)      |
+|                                    | [lambda_init].                     |
 +------------------------------------+------------------------------------+
 | NLP_P                              | Only for parametric NLP - static   |
 |                                    | parameters on which the objective  |
-|                                    | and constraints might depend.      |
+|                                    | and constraints might depend [p].  |
 +------------------------------------+------------------------------------+
 ";
 
@@ -74135,21 +74226,21 @@ Helper function for 'NLPOutput' Output arguments of an NLP Solver
 |                Name                |            Description             |
 +====================================+====================================+
 | NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1)                   |
+|                                    | solution (n x 1) [x_opt].          |
 +------------------------------------+------------------------------------+
 | NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution (1 x 1)           |
+|                                    | optimal solution (1 x 1) [cost].   |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_G                       | Lagrange multipliers associated    |
 |                                    | with G at the solution (m x 1)     |
+|                                    | [lambda_g].                        |
 +------------------------------------+------------------------------------+
 | NLP_LAMBDA_X                       | Lagrange multipliers associated    |
 |                                    | with bounds on X at the solution   |
-|                                    | (n x 1) When in warmstart mode,    |
-|                                    | this output may be used as input ( |
+|                                    | (n x 1) [lambda_x].                |
 +------------------------------------+------------------------------------+
 | NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1)           |
+|                                    | optimal solution (m x 1) [g].      |
 +------------------------------------+------------------------------------+
 ";
 
@@ -74158,19 +74249,19 @@ Helper function for 'NLPOutput' Output arguments of an NLP Solver
 Helper function for 'DAEInput' Input arguments of an ODE/DAE function
 
 >Input scheme: CasADi::DAEInput (DAE_NUM_IN = 5)
-+----------+----------------------------------------+
-|   Name   |              Description               |
-+==========+========================================+
-| DAE_X    | Differential state                     |
-+----------+----------------------------------------+
-| DAE_Z    | Algebraic state                        |
-+----------+----------------------------------------+
-| DAE_P    | Parameter                              |
-+----------+----------------------------------------+
-| DAE_T    | Explicit time dependence               |
-+----------+----------------------------------------+
-| DAE_XDOT | Time derivative of differential states |
-+----------+----------------------------------------+
++----------+------------------------------------------------+
+|   Name   |                  Description                   |
++==========+================================================+
+| DAE_X    | Differential state [x].                        |
++----------+------------------------------------------------+
+| DAE_Z    | Algebraic state [z].                           |
++----------+------------------------------------------------+
+| DAE_P    | Parameter [p].                                 |
++----------+------------------------------------------------+
+| DAE_T    | Explicit time dependence [t].                  |
++----------+------------------------------------------------+
+| DAE_XDOT | Time derivative of differential states [xdot]. |
++----------+------------------------------------------------+
 ";
 
 %feature("docstring")  CasADi::Interfaces::daeOut "
@@ -74178,15 +74269,15 @@ Helper function for 'DAEInput' Input arguments of an ODE/DAE function
 Helper function for 'DAEOutput' Output arguments of an DAE function
 
 >Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 3)
-+----------+------------------------------------------+
-|   Name   |               Description                |
-+==========+==========================================+
-| DAE_ODE  | Right hand side of the implicit ODE      |
-+----------+------------------------------------------+
-| DAE_ALG  | Right hand side of algebraic equations   |
-+----------+------------------------------------------+
-| DAE_QUAD | Right hand side of quadratures equations |
-+----------+------------------------------------------+
++----------+--------------------------------------------------+
+|   Name   |                   Description                    |
++==========+==================================================+
+| DAE_ODE  | Right hand side of the implicit ODE [ode].       |
++----------+--------------------------------------------------+
+| DAE_ALG  | Right hand side of algebraic equations [alg].    |
++----------+--------------------------------------------------+
+| DAE_QUAD | Right hand side of quadratures equations [quad]. |
++----------+--------------------------------------------------+
 ";
 
 %feature("docstring")  CasADi::Interfaces::rdaeIn "
@@ -74195,25 +74286,25 @@ Helper function for 'RDAEInput' Input arguments of an ODE/DAE backward
 integration function
 
 >Input scheme: CasADi::RDAEInput (RDAE_NUM_IN = 8)
-+------------+------------------------------------------------+
-|    Name    |                  Description                   |
-+============+================================================+
-| RDAE_RX    | Backward differential state                    |
-+------------+------------------------------------------------+
-| RDAE_RZ    | Backward algebraic state                       |
-+------------+------------------------------------------------+
-| RDAE_RP    | Backward parameter                             |
-+------------+------------------------------------------------+
-| RDAE_X     | Forward differential state                     |
-+------------+------------------------------------------------+
-| RDAE_Z     | Forward algebraic state                        |
-+------------+------------------------------------------------+
-| RDAE_P     | Parameter vector                               |
-+------------+------------------------------------------------+
-| RDAE_T     | Explicit time dependence                       |
-+------------+------------------------------------------------+
-| RDAE_RXDOT | Time derivative of backward differential state |
-+------------+------------------------------------------------+
++------------+---------------------------------------------------------+
+|    Name    |                       Description                       |
++============+=========================================================+
+| RDAE_RX    | Backward differential state [rx].                       |
++------------+---------------------------------------------------------+
+| RDAE_RZ    | Backward algebraic state [rz].                          |
++------------+---------------------------------------------------------+
+| RDAE_RP    | Backward parameter [rp].                                |
++------------+---------------------------------------------------------+
+| RDAE_X     | Forward differential state [x].                         |
++------------+---------------------------------------------------------+
+| RDAE_Z     | Forward algebraic state [z].                            |
++------------+---------------------------------------------------------+
+| RDAE_P     | Parameter vector [p].                                   |
++------------+---------------------------------------------------------+
+| RDAE_T     | Explicit time dependence [t].                           |
++------------+---------------------------------------------------------+
+| RDAE_RXDOT | Time derivative of backward differential state [rxdot]. |
++------------+---------------------------------------------------------+
 ";
 
 %feature("docstring")  CasADi::Interfaces::rdaeOut "
@@ -74222,15 +74313,15 @@ Helper function for 'RDAEOutput' Output arguments of an ODE/DAE backward
 integration function
 
 >Output scheme: CasADi::RDAEOutput (RDAE_NUM_OUT = 3)
-+-----------+-----------------------------------------+
-|   Name    |               Description               |
-+===========+=========================================+
-| RDAE_ODE  | Right hand side of ODE.                 |
-+-----------+-----------------------------------------+
-| RDAE_ALG  | Right hand side of algebraic equations. |
-+-----------+-----------------------------------------+
-| RDAE_QUAD | Right hand side of quadratures.         |
-+-----------+-----------------------------------------+
++-----------+------------------------------------------------+
+|   Name    |                  Description                   |
++===========+================================================+
+| RDAE_ODE  | Right hand side of ODE. [ode].                 |
++-----------+------------------------------------------------+
+| RDAE_ALG  | Right hand side of algebraic equations. [alg]. |
++-----------+------------------------------------------------+
+| RDAE_QUAD | Right hand side of quadratures. [quad].        |
++-----------+------------------------------------------------+
 ";
 
 %feature("docstring")  CasADi::Interfaces::integratorIn "
@@ -74238,15 +74329,13 @@ integration function
 Helper function for 'IntegratorInput' Input arguments of an integrator
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+----------------+-----------------------------------------------+
-|      Name      |                  Description                  |
-+================+===============================================+
-| INTEGRATOR_X0  | Differential state at the initial time        |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_P   | Parameters                                    |
-+----------------+-----------------------------------------------+
-| INTEGRATOR_RX0 | Backward differential state at the final time |
-+----------------+-----------------------------------------------+
++---------------+----------------------------------------------+
+|     Name      |                 Description                  |
++===============+==============================================+
+| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
++---------------+----------------------------------------------+
+| INTEGRATOR_P  | Parameters [p]                               |
++---------------+----------------------------------------------+
 ";
 
 %feature("docstring")  CasADi::Interfaces::integratorOut "
@@ -74254,17 +74343,17 @@ Helper function for 'IntegratorInput' Input arguments of an integrator
 Helper function for 'IntegratorOutput' Output arguments of an integrator
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
-+----------------+-------------------------------------------------+
-|      Name      |                   Description                   |
-+================+=================================================+
-| INTEGRATOR_XF  | Differential state at the final time            |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_QF  | Quadrature state at the final time              |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RXF | Backward differential state at the initial time |
-+----------------+-------------------------------------------------+
-| INTEGRATOR_RQF | Backward quadrature state at the initial time   |
-+----------------+-------------------------------------------------+
++----------------+--------------------------------------------------------+
+|      Name      |                      Description                       |
++================+========================================================+
+| INTEGRATOR_XF  | Differential state at the final time [xf].             |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_QF  | Quadrature state at the final time [qf].               |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
 ";
 
 %feature("docstring")  CasADi::Interfaces::timesTwo "";
