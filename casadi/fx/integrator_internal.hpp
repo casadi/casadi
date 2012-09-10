@@ -91,8 +91,8 @@ public:
   /// Number of states for the backward integration
   int nrx_, nrz_, nrq_;
 
-  /// Number of parameters
-  int np_;
+  /// Number of forward and backward parameters
+  int np_, nrp_;
 
   /// Integration horizon
   double t0_, tf_;

@@ -115,8 +115,8 @@ I_adj.setInput([0,0,0],INTEGRATOR_NUM_IN+INTEGRATOR_XF)
 I_adj.setInput(1.0,INTEGRATOR_NUM_IN+INTEGRATOR_QF)
 I_adj.setAdjSeed(1.0,INTEGRATOR_NUM_OUT+INTEGRATOR_P)
 I_adj.evaluate(0,1)
-adj_adj_x0 = deepcopy(I_adj.adjSens(INTEGRATOR_P))
-adj_adj_p = deepcopy(I_adj.adjSens(INTEGRATOR_X0))
+adj_adj_x0 = deepcopy(I_adj.adjSens(INTEGRATOR_X0))
+adj_adj_p = deepcopy(I_adj.adjSens(INTEGRATOR_P))
 print "%50s" % "Adjoint over adjoint sensitivities:", "d2(qf)/d(x0)d(p) = ", adj_adj_x0, ", d2(qf)/d(p)d(p) = ", adj_adj_p
 
 

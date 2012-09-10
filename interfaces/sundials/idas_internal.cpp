@@ -1087,6 +1087,7 @@ void IdasInternal::resB(double t, const double* xz, const double* xzdot, const d
   g_.setInput(xz+nx_,RDAE_Z);
   g_.setInput(xzdot,RDAE_XDOT);
   g_.setInput(input(INTEGRATOR_P),RDAE_P);
+  g_.setInput(input(INTEGRATOR_RP),RDAE_RP);
   g_.setInput(xzA,RDAE_RX);
   g_.setInput(xzA+nx_,RDAE_RZ);
   g_.setInput(xzdotA,RDAE_RXDOT);
@@ -1119,12 +1120,13 @@ int IdasInternal::resB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector x
 void IdasInternal::rhsQB(double t, const double* xz, const double* xzdot, const double* xzA, const double* xzdotA, double *qdotA){
   log("IdasInternal::rhsQB","begin");
 
-    // Pass inputs
+  // Pass inputs
   g_.setInput(&t,RDAE_T);
   g_.setInput(xz,RDAE_X);
   g_.setInput(xz+nx_,RDAE_Z);
   g_.setInput(xzdot,RDAE_XDOT);
   g_.setInput(input(INTEGRATOR_P),RDAE_P);
+  g_.setInput(input(INTEGRATOR_RP),RDAE_RP);
   g_.setInput(xzA,RDAE_RX);
   g_.setInput(xzA+nx_,RDAE_RZ);
   g_.setInput(xzdotA,RDAE_RXDOT);

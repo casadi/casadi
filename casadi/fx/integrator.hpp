@@ -54,13 +54,13 @@
     rq(tf)  = 0
   
   Backward integration from t=tf to t=t0
-          0 = gx(rx,rz,x,z,p,t,der(rx))   Backward ODE
-          0 = gz(rx,rz,x,z,p,t)           Backward algebraic equations
-    der(rq) = gq(rx,rz,x,z,p,t)           Backward quadratures
+          0 = gx(rx,rz,rp,x,z,p,t,der(rx))   Backward ODE
+          0 = gz(rx,rz,rp,x,z,p,t)           Backward algebraic equations
+    der(rq) = gq(rx,rz,rp,x,z,p,t)           Backward quadratures
 
   where we assume that both the forward and backwards integrations are index-1
   (i.e. dfx/dxdot, dfz/dz, dgz/drz, dgx/drxdot are invertible) and furthermore that 
-  gx, gz and gq have a linear dependency on rx and rz and that f_x and g_x have a 
+  gx, gz and gq have a linear dependency on rx, rz and rp and that f_x and g_x have a 
   linear dependence on xdot and rxdot respectively.
   \endverbatim 
 */
@@ -113,6 +113,8 @@ enum RDAEInput{
   RDAE_RX,
   /// Backward algebraic state [rz]
   RDAE_RZ,
+  /// Backward  parameter vector [rp]
+  RDAE_RP,
   /// Forward differential state [x]
   RDAE_X,
   /// Forward algebraic state [z]
@@ -149,6 +151,8 @@ enum IntegratorInput{
   INTEGRATOR_P,
   /// Backward differential state at the final time [rx0]
   INTEGRATOR_RX0, 
+  /// Backward parameter vector [rp]
+  INTEGRATOR_RP, 
   /// Number of input arguments of an integrator
   INTEGRATOR_NUM_IN
 };

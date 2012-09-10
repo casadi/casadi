@@ -838,6 +838,7 @@ void CVodesInternal::rhsB(double t, const double* x, const double *rx, double* r
   g_.setInput(x,RDAE_X);
   g_.input(RDAE_XDOT).setZero();
   g_.setInput(input(INTEGRATOR_P),RDAE_P);
+  g_.setInput(input(INTEGRATOR_RP),RDAE_RP);
   g_.setInput(rx,RDAE_RX);
   g_.input(RDAE_RXDOT).setZero();
 
@@ -845,6 +846,7 @@ void CVodesInternal::rhsB(double t, const double* x, const double *rx, double* r
     cout << "t       = " << t << endl;
     cout << "x       = " << g_.input(RDAE_X) << endl;
     cout << "p       = " << g_.input(RDAE_P) << endl;
+    cout << "rp      = " << g_.input(RDAE_RP) << endl;
     cout << "rx      = " << g_.input(RDAE_RX) << endl;
   }
   
@@ -901,6 +903,7 @@ void CVodesInternal::rhsQB(double t, const double* x, const double* rx, double* 
   g_.setInput(x,RDAE_X);
   g_.input(RDAE_XDOT).setZero();
   g_.setInput(input(INTEGRATOR_P),RDAE_P);
+  g_.setInput(input(INTEGRATOR_RP),RDAE_RP);
   g_.setInput(rx,RDAE_RX);
   g_.input(RDAE_RXDOT).setZero();
 

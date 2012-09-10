@@ -146,13 +146,14 @@ void IntegratorInternal::init(){
   // Initialize, get and assert dimensions of the backwards integration
   if(g_.isNull()){
     // No backwards integration
-    nrx_ = nrz_ = nrq_ = 0;
+    nrx_ = nrz_ = nrq_ = nrp_ = 0;
   } else {
     if(!g_.isInit()) g_.init();
     casadi_assert_message(g_.getNumInputs()==RDAE_NUM_IN,"Wrong number of inputs for the backwards DAE callback function");
     casadi_assert_message(g_.getNumOutputs()==RDAE_NUM_OUT,"Wrong number of outputs for the backwards DAE callback function");
     nrx_ = g_.input(RDAE_RX).numel();
     nrz_ = g_.input(RDAE_RZ).numel();
+    nrp_ = g_.input(RDAE_RP).numel();
     nrq_ = g_.output(RDAE_QUAD).numel();
     casadi_assert_message(g_.input(RDAE_P).numel()==np_,"Inconsistent dimensions. Expecting RDAE_P input of size " << np_ << ", but got " << g_.input(RDAE_P).numel() << " instead.");
     casadi_assert_message(g_.input(RDAE_X).numel()==nx_,"Inconsistent dimensions. Expecting RDAE_X input of size " << nx_ << ", but got " << g_.input(RDAE_P).numel() << " instead.");
@@ -167,6 +168,7 @@ void IntegratorInternal::init(){
   input(INTEGRATOR_P)   = f_.input(DAE_P);
   if(!g_.isNull()){
     input(INTEGRATOR_RX0)  = g_.input(RDAE_RX);
+    input(INTEGRATOR_RP)  = g_.input(RDAE_RP);
   }
   
   // Allocate space for outputs
@@ -242,6 +244,7 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
   }
   Mat rx = rdae_in[RDAE_RX];
   Mat rz = rdae_in[RDAE_RZ];
+  Mat rp = rdae_in[RDAE_RP];
   Mat rxdot = rdae_in[RDAE_RXDOT];
   Mat rode = rdae_out[RDAE_ODE];
   Mat ralg = rdae_out[RDAE_ALG];
@@ -257,20 +260,21 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
   // Allocate forward sensitivities
   vector<Mat> fwd_x = Mat::sym("fwd_x",x.sparsity(),nfwd);
   vector<Mat> fwd_z = Mat::sym("fwd_z",z.sparsity(),nfwd);
-  vector<Mat> fwd_xdot = Mat::sym("fwd_xdot",xdot.sparsity(),nfwd);
   vector<Mat> fwd_p = Mat::sym("fwd_p",p.sparsity(),nfwd);
+  vector<Mat> fwd_xdot = Mat::sym("fwd_xdot",xdot.sparsity(),nfwd);
   vector<Mat> fwd_rx = Mat::sym("fwd_rx",rx.sparsity(),nfwd);
   vector<Mat> fwd_rz = Mat::sym("fwd_rz",rz.sparsity(),nfwd);
+  vector<Mat> fwd_rp = Mat::sym("fwd_rp",rp.sparsity(),nfwd);
   vector<Mat> fwd_rxdot = Mat::sym("fwd_rxdot",rxdot.sparsity(),nfwd);
 
   // Allocate adjoint sensitivities
   vector<Mat> adj_ode = Mat::sym("adj_ode",ode.sparsity(),nadj);
   vector<Mat> adj_alg = Mat::sym("adj_alg",alg.sparsity(),nadj);
-  vector<Mat> adj_odedot = Mat::sym("adj_odedot",ode.sparsity(),nadj);
+  vector<Mat> adj_odedot = Mat::sym("adj_odedot",xdot.sparsity(),nadj);
   vector<Mat> adj_quad = Mat::sym("adj_quad",quad.sparsity(),nadj);
   vector<Mat> adj_rode = Mat::sym("adj_rode",rode.sparsity(),nadj);
   vector<Mat> adj_ralg = Mat::sym("adj_ralg",ralg.sparsity(),nadj);
-  vector<Mat> adj_rodedot = Mat::sym("adj_rodedot",rode.sparsity(),nadj);
+  vector<Mat> adj_rodedot = Mat::sym("adj_rodedot",rxdot.sparsity(),nadj);
   vector<Mat> adj_rquad = Mat::sym("adj_rquad",rquad.sparsity(),nadj);
   
   // Are there backward states
@@ -289,6 +293,7 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
     fseed[dir][RDAE_XDOT] = fwd_xdot[dir];
     fseed[dir][RDAE_RX] = fwd_rx[dir];
     fseed[dir][RDAE_RZ] = fwd_rz[dir];
+    fseed[dir][RDAE_RP] = fwd_rp[dir];
     fseed[dir][RDAE_RXDOT] = fwd_rxdot[dir];
   }
 
@@ -343,7 +348,7 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
   
   // Augment parameter vector
   p.append(vertcat(fwd_p));
-  p.append(vertcat(adj_quad));
+  p.append(vertcat(adj_rquad));
   
   // Augment backward differential state
   rx.append(vertcat(fwd_rx));
@@ -352,6 +357,10 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
   // Augment backward algebraic state
   rz.append(vertcat(fwd_rz));
   rz.append(vertcat(adj_alg));
+  
+  // Augment backwards parameter vector
+  rp.append(vertcat(fwd_rp));
+  rp.append(vertcat(adj_quad));
   
   // Augment backward state derivative
   rxdot.append(vertcat(fwd_rxdot));
@@ -373,7 +382,7 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
     if(implicit_ode){
       rode.append(asens[dir][RDAE_X] + asens[nadj+dir][RDAE_XDOT]);
     } else {
-      rode.append(asens[dir][RDAE_X] + adj_odedot[dir]);
+      rode.append(asens[dir][RDAE_X]);
     }
     ralg.append(asens[dir][RDAE_Z]);
     rquad.append(asens[dir][RDAE_P]);
@@ -381,9 +390,10 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
     if(has_rxdot){
       ode.append(asens[dir][RDAE_RX] + asens[2*nadj+dir][RDAE_RXDOT]);
     } else {
-      ode.append(asens[dir][RDAE_RX] + adj_rodedot[dir]);
+      ode.append(asens[dir][RDAE_RX]);
     }
     alg.append(asens[dir][RDAE_RZ]);
+    quad.append(asens[dir][RDAE_RP]);
   }
   
   // Make sure that the augmented problem is dense
@@ -409,6 +419,7 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
   // Update the backward problem inputs ...
   rdae_in[RDAE_RX] = rx;
   rdae_in[RDAE_RZ] = rz;
+  rdae_in[RDAE_RP] = rp;
   rdae_in[RDAE_X] = x;
   rdae_in[RDAE_Z] = z;
   rdae_in[RDAE_P] = p;
@@ -450,7 +461,7 @@ FX IntegratorInternal::getDerivative(int nfwd, int nadj){
   ret_in.reserve(INTEGRATOR_NUM_IN*(1+nfwd) + INTEGRATOR_NUM_OUT*nadj);
   
   // Augmented state
-  MX x0_aug, p_aug, rx0_aug;
+  MX x0_aug, p_aug, rx0_aug, rp_aug;
   
   // Temp stringstream
   stringstream ss;
@@ -482,6 +493,13 @@ FX IntegratorInternal::getDerivative(int nfwd, int nadj){
     if(dir>=0) ss << "_" << dir;
     dd[INTEGRATOR_RX0] = msym(ss.str(),input(INTEGRATOR_RX0).sparsity());
     rx0_aug.append(dd[INTEGRATOR_RX0]);
+
+    // Backward parameter
+    ss.clear();
+    ss << "rp";
+    if(dir>=0) ss << "_" << dir;
+    dd[INTEGRATOR_RP] = msym(ss.str(),input(INTEGRATOR_RP).sparsity());
+    rp_aug.append(dd[INTEGRATOR_RP]);
     
     // Add to input vector
     ret_in.insert(ret_in.end(),dd.begin(),dd.end());
@@ -497,11 +515,11 @@ FX IntegratorInternal::getDerivative(int nfwd, int nadj){
     dd[INTEGRATOR_XF] = msym(ss.str(),output(INTEGRATOR_XF).sparsity());
     rx0_aug.append(dd[INTEGRATOR_XF]);
 
-    // Quadratures become parameters
+    // Quadratures become backward parameters
     ss.clear();
     ss << "qf" << "_" << dir;
     dd[INTEGRATOR_QF] = msym(ss.str(),output(INTEGRATOR_QF).sparsity());
-    p_aug.append(dd[INTEGRATOR_QF]);
+    rp_aug.append(dd[INTEGRATOR_QF]);
 
     // Backward differential states becomes forward differential states
     ss.clear();
@@ -509,7 +527,7 @@ FX IntegratorInternal::getDerivative(int nfwd, int nadj){
     dd[INTEGRATOR_RXF] = msym(ss.str(),output(INTEGRATOR_RXF).sparsity());
     x0_aug.append(dd[INTEGRATOR_RXF]);
     
-    // Backward quadratures becomes parameters
+    // Backward quadratures becomes (forward) parameters
     ss.clear();
     ss << "rqf" << "_" << dir;
     dd[INTEGRATOR_RQF] = msym(ss.str(),output(INTEGRATOR_RQF).sparsity());
@@ -524,6 +542,7 @@ FX IntegratorInternal::getDerivative(int nfwd, int nadj){
   integrator_in[INTEGRATOR_X0] = x0_aug;
   integrator_in[INTEGRATOR_P] = p_aug;
   integrator_in[INTEGRATOR_RX0] = rx0_aug;
+  integrator_in[INTEGRATOR_RP] = rp_aug;
   vector<MX> integrator_out = integrator.call(integrator_in);
   
   // Augmented results
@@ -543,10 +562,10 @@ FX IntegratorInternal::getDerivative(int nfwd, int nadj){
   dd.resize(INTEGRATOR_NUM_OUT);
   fill(dd.begin(),dd.end(),MX());
   for(int dir=-1; dir<nfwd; ++dir){
-    dd[INTEGRATOR_XF] = xf_aug[Slice(xf_offset,xf_offset+nx_)]; xf_offset += nx_;
-    if(nq_>0){ dd[INTEGRATOR_QF] = qf_aug[Slice(qf_offset,qf_offset+nq_)]; qf_offset += nq_; }
-    if(nrx_>0){ dd[INTEGRATOR_RXF] = rxf_aug[Slice(rxf_offset,rxf_offset+nrx_)]; rxf_offset += nrx_; }
-    if(nrq_>0){ dd[INTEGRATOR_RQF] = rqf_aug[Slice(rqf_offset,rqf_offset+nrq_)]; rqf_offset += nrq_; }
+    if( nx_>0){ dd[INTEGRATOR_XF]  =  xf_aug[Slice(  xf_offset, xf_offset +  nx_)];  xf_offset +=  nx_;}
+    if( nq_>0){ dd[INTEGRATOR_QF]  =  qf_aug[Slice(  qf_offset, qf_offset +  nq_)];  qf_offset +=  nq_; }
+    if(nrx_>0){ dd[INTEGRATOR_RXF] = rxf_aug[Slice( rxf_offset,rxf_offset + nrx_)]; rxf_offset += nrx_; }
+    if(nrq_>0){ dd[INTEGRATOR_RQF] = rqf_aug[Slice( rqf_offset,rqf_offset + nrq_)]; rqf_offset += nrq_; }
     ret_out.insert(ret_out.end(),dd.begin(),dd.end());
   }
   
@@ -554,9 +573,10 @@ FX IntegratorInternal::getDerivative(int nfwd, int nadj){
   dd.resize(INTEGRATOR_NUM_IN);
   fill(dd.begin(),dd.end(),MX());
   for(int dir=0; dir<nadj; ++dir){
-    dd[INTEGRATOR_X0] = rxf_aug[Slice(rxf_offset,rxf_offset+nx_)]; rxf_offset += nx_;
-    if(np_>0){ dd[INTEGRATOR_P] = rqf_aug[Slice(rqf_offset,rqf_offset+np_)]; rqf_offset += np_; }
-    if(nrx_>0){ dd[INTEGRATOR_RX0] = xf_aug[Slice(xf_offset,xf_offset+nrx_)]; xf_offset += nrx_; }
+    if(  nx_>0){ dd[INTEGRATOR_X0]  = rxf_aug[Slice(rxf_offset, rxf_offset + nx_ )]; rxf_offset += nx_;  }
+    if(  np_>0){ dd[INTEGRATOR_P]   = rqf_aug[Slice(rqf_offset, rqf_offset + np_ )]; rqf_offset += np_;  }
+    if( nrx_>0){ dd[INTEGRATOR_RX0] =  xf_aug[Slice(xf_offset,   xf_offset + nrx_)];  xf_offset += nrx_; }
+    if( nrp_>0){ dd[INTEGRATOR_RP]  =  qf_aug[Slice(qf_offset,   qf_offset + nrp_)];  qf_offset += nrp_; }
     ret_out.insert(ret_out.end(),dd.begin(),dd.end());
   }
   
