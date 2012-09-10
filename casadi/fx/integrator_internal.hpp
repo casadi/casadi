@@ -75,6 +75,9 @@ public:
   /** \brief  Initialize */
   virtual void init();
 
+  /** \brief  Propagate the sparsity pattern through a set of directional derivatives forward or backward */
+  virtual void spEvaluate(bool fwd);
+
   /// Is the class able to propate seeds through the algorithm?
   virtual bool spCanEvaluate(bool fwd){ return true;}
     
