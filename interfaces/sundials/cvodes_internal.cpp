@@ -554,6 +554,12 @@ void CVodesInternal::reset(int nfdir, int nadir){
     if(flag != CV_SUCCESS) cvodes_error("CVodeSensToggleOff",flag);
   }
   
+  // Re-initialize adjoint sensitivities
+  if(asens_order_>0){
+    flag = CVodeAdjReInit(mem_);
+    if(flag != CV_SUCCESS) cvodes_error("CVodeAdjReInit",flag);
+  }
+  
   // Set the stop time of the integration -- don't integrate past this point
   if(stop_at_end_) setStopTime(tf_);
 }

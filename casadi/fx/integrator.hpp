@@ -146,7 +146,7 @@ enum RDAEOutput{
 enum IntegratorInput{
   /// Differential state at the initial time [x0]
   INTEGRATOR_X0, 
-  /// Parameters [p] */
+  /// Parameters [p]
   INTEGRATOR_P,
   /// Backward differential state at the final time [rx0]
   INTEGRATOR_RX0, 
