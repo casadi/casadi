@@ -4,7 +4,6 @@ project(opticon C CXX)
 # Options:
 option(ENABLE_STATIC "Compile static libraries (.a on Linux)" ON)
 option(ENABLE_SHARED "Compile shared libraries (.so on Linux)" OFF)
-option(WITH_SUPERLU "Compile the SuperLU interface and source" ON)
 option(WITH_MUSCOD "Compile the MUSCOD-II interface" OFF)
 option(WITH_DL "Enable dynamic loading of functions" OFF)
 option(WITH_LLVM "Use LLVM for just-in-time compilation" OFF)

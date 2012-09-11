@@ -47,11 +47,6 @@
 %include "sundials_interface.i"
 #endif
 
-// SuperLU
-#ifdef WITH_SUPERLU
-%include "superlu.i"
-#endif
-
 #ifdef WITH_LAPACK
 %include "lapack_interface.i"
 #endif

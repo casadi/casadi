@@ -23,7 +23,6 @@
 #include <interfaces/sundials/cvodes_integrator.hpp>
 #include <interfaces/sundials/idas_integrator.hpp>
 #include <interfaces/lapack/lapack_lu_dense.hpp>
-#include <interfaces/superlu/superlu.hpp>
 #include <interfaces/csparse/csparse.hpp>
 #include <casadi/stl_vector_tools.hpp>
 #include <casadi/fx/simulator.hpp>
@@ -67,7 +66,7 @@ const bool perturb_u = true;
 // Use a user_defined linear solver
 const bool user_defined_solver = false;
 
-// Use sparse direct solver (SuperLU/CSparse)
+// Use sparse direct solver (CSparse)
 const bool sparse_direct = true;
 
 // Second order sensitivities by a symbolic-numeric approach

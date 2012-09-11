@@ -1,10 +1,3 @@
-if(WITH_SUPERLU)
-find_package (BLAS)
-if(BLAS_FOUND)
-add_subdirectory(superlu)
-endif(BLAS_FOUND)
-endif(WITH_SUPERLU)
-
 if(LAPACK_FOUND)
 add_subdirectory(lapack)
 endif(LAPACK_FOUND)

@@ -36,8 +36,8 @@ x=DMatrix([tan(i) for i in range(n)])
 #! We generate the b vector:
 b=mul(A,x)
 
-#! We demonstrate the LinearSolver API with SuperLU:
-s = SuperLU(A.sparsity())
+#! We demonstrate the LinearSolver API with CSparse:
+s = CSparse(A.sparsity())
 s.init()
 
 #! Give it the matrix A
@@ -53,12 +53,12 @@ s.solve()
 
 x_ = s.output()
 
-#! By looking at the residuals between the x we knew in advance and the computed x, we see that the SuperLU solver works
+#! By looking at the residuals between the x we knew in advance and the computed x, we see that the CSparse solver works
 print "Sum of residuals = %.2e" % sumAll(fabs(x-x_))
 
 #! Comparison of different linear solvers
 #! ======================================
-for name, solver in [("SuperLU",SuperLU),("LapackLUDense",LapackLUDense),("LapackQRDense",LapackQRDense),("CSparse",CSparse)]:
+for name, solver in [("LapackLUDense",LapackLUDense),("LapackQRDense",LapackQRDense),("CSparse",CSparse)]:
   s = solver(A.sparsity()) # We create a solver
   s.init()
 
