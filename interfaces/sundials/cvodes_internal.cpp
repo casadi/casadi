@@ -471,6 +471,12 @@ void CVodesInternal::reset(){
     if(flag != CV_SUCCESS) cvodes_error("CVodeSensToggleOff",flag);
   }
   
+  // Re-initialize adjoint sensitivities
+  if(asens_order_>0){
+    flag = CVodeAdjReInit(mem_);
+    if(flag != CV_SUCCESS) cvodes_error("CVodeAdjReInit",flag);
+  }
+  
   // Set the stop time of the integration -- don't integrate past this point
   if(stop_at_end_) setStopTime(tf_);
 }
@@ -528,6 +534,9 @@ void CVodesInternal::resetAdj(){
   int flag;
   
   if(isInitAdj_){
+    
+    
+    
     flag = CVodeReInitB(mem_, whichB_, tf_, rx0_);
     if(flag != CV_SUCCESS) cvodes_error("CVodeReInitB",flag);
 

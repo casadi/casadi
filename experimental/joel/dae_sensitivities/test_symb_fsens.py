@@ -46,7 +46,6 @@ u0 = 0.4
 # Integrator
 I = CVodesIntegrator(ffcn)
 I.setOption("tf",tf)
-I.setOption("steps_per_checkpoint",1000)
 I.init()
 
 # Integrate to get results

@@ -740,6 +740,12 @@ void IdasInternal::reset(){
     correctInitialConditions();
   }
 
+  // Re-initialize adjoint sensitivities
+  if(asens_order_>0){
+    flag = IDAAdjReInit(mem_);
+    if(flag != IDA_SUCCESS) idas_error("IDAAdjReInit",flag);
+  }
+  
   // Set the stop time of the integration -- don't integrate past this point
   if(stop_at_end_) setStopTime(tf_);
     
