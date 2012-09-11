@@ -111,68 +111,64 @@ void ParallelizerInternal::init(){
   
   // Should corrected input values be saved after evaluation?
   save_corrected_input_ = getOption("save_corrected_input");
+  
+  // Mark the subsequent call as the "first"
+  first_call_ = true;
 }
 
 void ParallelizerInternal::evaluate(int nfdir, int nadir){
-  switch(mode_){
-    case SERIAL:
-    {
-      for(int task=0; task<funcs_.size(); ++task)
-        evaluateTask(task,nfdir,nadir);
-      break;
+  // Let the first call (which may contain memory allocations) be serial when using OpenMP
+  if(mode_== SERIAL || first_call_ && mode_ == OPENMP){
+    for(int task=0; task<funcs_.size(); ++task){
+      evaluateTask(task,nfdir,nadir);
     }
-    case OPENMP:
-    {
-      #ifdef WITH_OPENMP
-      // Allocate some lists to collect statistics
-      std::vector<int> task_allocation(funcs_.size());
-      std::vector<int> task_order(funcs_.size());
-      std::vector<double> task_cputime(funcs_.size());
-      std::vector<double> task_starttime(funcs_.size());
-      std::vector<double> task_endtime(funcs_.size());
-      // A private counter
-      int cnt=0;
-      #pragma omp parallel for firstprivate(cnt)
-      for(int task=0; task<funcs_.size(); ++task) {
-        if (task==0) {
-          stats_["max_threads"] = omp_get_max_threads();
-          stats_["num_threads"] = omp_get_num_threads();
-        }
-        task_allocation[task] = omp_get_thread_num();
-        task_starttime[task] = omp_get_wtime();
-        
-        // Do the actual work
-        evaluateTask(task,nfdir,nadir);
-        
-        task_endtime[task] = omp_get_wtime();
-        task_cputime[task] =  task_endtime[task] - task_starttime[task];
-        task_order[task] = cnt++;
+  } else if(mode_== OPENMP) {
+    #ifdef WITH_OPENMP
+    // Allocate some lists to collect statistics
+    std::vector<int> task_allocation(funcs_.size());
+    std::vector<int> task_order(funcs_.size());
+    std::vector<double> task_cputime(funcs_.size());
+    std::vector<double> task_starttime(funcs_.size());
+    std::vector<double> task_endtime(funcs_.size());
+    // A private counter
+    int cnt=0;
+    #pragma omp parallel for firstprivate(cnt)
+    for(int task=0; task<funcs_.size(); ++task) {
+      if (task==0) {
+        stats_["max_threads"] = omp_get_max_threads();
+        stats_["num_threads"] = omp_get_num_threads();
       }
-      stats_["task_allocation"] = task_allocation;
-      stats_["task_order"] = task_order;
-      stats_["task_cputime"] = task_cputime;
+      task_allocation[task] = omp_get_thread_num();
+      task_starttime[task] = omp_get_wtime();
       
-      // Measure all times relative to the earliest start_time.
-      double start = *std::min_element(task_starttime.begin(),task_starttime.end());
-      for (int task=0; task<funcs_.size(); ++task) {
-       task_starttime[task] =  task_starttime[task] - start;
-       task_endtime[task] = task_endtime[task] - start;
-      }
-      stats_["task_starttime"] = task_starttime;
-      stats_["task_endtime"] = task_endtime;
+      // Do the actual work
+      evaluateTask(task,nfdir,nadir);
       
-      #endif //WITH_OPENMP
-      #ifndef WITH_OPENMP
-        throw CasadiException("ParallelizerInternal::evaluate: OPENMP support was not available during CasADi compilation");
-      #endif //WITH_OPENMP
-      break;
+      task_endtime[task] = omp_get_wtime();
+      task_cputime[task] =  task_endtime[task] - task_starttime[task];
+      task_order[task] = cnt++;
     }
-    case MPI:
-    {
-      throw CasadiException("ParallelizerInternal::evaluate: MPI not implemented");
-      break;
+    stats_["task_allocation"] = task_allocation;
+    stats_["task_order"] = task_order;
+    stats_["task_cputime"] = task_cputime;
+    
+    // Measure all times relative to the earliest start_time.
+    double start = *std::min_element(task_starttime.begin(),task_starttime.end());
+    for (int task=0; task<funcs_.size(); ++task) {
+      task_starttime[task] =  task_starttime[task] - start;
+      task_endtime[task] = task_endtime[task] - start;
     }
+    stats_["task_starttime"] = task_starttime;
+    stats_["task_endtime"] = task_endtime;
+    
+    #endif //WITH_OPENMP
+    #ifndef WITH_OPENMP
+      throw CasadiException("ParallelizerInternal::evaluate: OPENMP support was not available during CasADi compilation");
+    #endif //WITH_OPENMP
+  } else if(mode_ == MPI){
+    throw CasadiException("ParallelizerInternal::evaluate: MPI not implemented");
   }
+  first_call_ = false;
 }
 
 void ParallelizerInternal::evaluateTask(int task, int nfdir, int nadir){

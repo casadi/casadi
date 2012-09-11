@@ -91,6 +91,10 @@ class ParallelizerInternal : public FXInternal{
     
     /// Save corrected input values after evaluation
     bool save_corrected_input_;
+    
+    /// Is this the first call to the function
+    bool first_call_;
+    
 };
 
 

@@ -662,14 +662,11 @@ FX FXInternal::derivative(int nfwd, int nadj){
     derivative_fcn_[nfwd].resize(nadj+1);
   }
 
-  // Weak reference
-  WeakRef& ref = derivative_fcn_[nfwd][nadj];
-
   // Return value
-  FX ret;
+  FX& ret = derivative_fcn_[nfwd][nadj];
 
   // Check if already cached
-  if(ref.isNull()){
+  if(ret.isNull()){
     // Generate a new function
     ret = getDerivative(nfwd,nadj);
     
@@ -680,13 +677,6 @@ FX FXInternal::derivative(int nfwd, int nadj){
     
     // Initialize it
     ret.init();
-
-    // Cache function for later reference
-    ref = ret;
-    
-  } else {
-    // Retrieve cached function
-    ret = ref;
   }
 
   // Return cached or generated function
