@@ -52,7 +52,7 @@ perturb_u = True
 # Use a user_defined linear solver
 user_defined_solver = True
 
-# Use sparse direct solver (SuperLU)
+# Use sparse direct solver (CSparse)
 sparse_direct = True
 
 # Second order sensitivities by a symbolic-numeric approach

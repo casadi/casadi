@@ -10,10 +10,6 @@
 * CasADi::Interfaces::LapackLUDense;
 * CasADi::Interfaces::LapackQRDense;
 * CasADi::Interfaces::CSparse;
-* CasADi::SuperLU::SuperLU;
-* CasADi::SuperLU::SuperLU::prepare()
-* CasADi::SuperLU::SuperLU::init()
-* CasADi::SuperLU::SuperLU::solve()
 * \endcode
 *
 */

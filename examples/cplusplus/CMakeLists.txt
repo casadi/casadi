@@ -92,14 +92,6 @@ target_link_libraries(cstr
 
 ENDIF(SUNDIALS_FOUND AND IPOPT_FOUND)
 
-# SuperLU via CasADi
-if(WITH_SUPERLU)
-IF(BLAS_FOUND)
-add_executable(test_superlu_casadi test_superlu_casadi.cpp)
-target_link_libraries(test_superlu_casadi superlu_interface casadi superlu ${BLAS_LIBRARIES} ${CASADI_DEPENDENCIES} )
-ENDIF(BLAS_FOUND)
-endif(WITH_SUPERLU)
-
 include_directories(../../external_packages/CSparse/Include)
 
 # CSparse via CasADi
@@ -107,22 +99,20 @@ add_executable(test_csparse_casadi test_csparse_casadi.cpp)
 target_link_libraries(test_csparse_casadi csparse_interface casadi csparse ${CASADI_DEPENDENCIES} )
 
 # Sundials - just integrate
-IF(SUNDIALS_FOUND AND LAPACK_FOUND AND WITH_SUPERLU AND BLAS_FOUND)
+IF(SUNDIALS_FOUND AND LAPACK_FOUND AND BLAS_FOUND)
 add_executable(sundials_testing sundials_testing.cpp)
 target_link_libraries(sundials_testing
   sundials_interface
-  superlu_interface 
   lapack_interface
   csparse_interface
   casadi
   ${SUNDIALS_LIBRARIES}
   ${LAPACK_LIBRARIES}
-  superlu
   csparse
   ${BLAS_LIBRARIES}
   ${CASADI_DEPENDENCIES}
 )
-ENDIF(SUNDIALS_FOUND AND LAPACK_FOUND AND WITH_SUPERLU AND BLAS_FOUND)
+ENDIF(SUNDIALS_FOUND AND LAPACK_FOUND AND BLAS_FOUND)
 
 if(LIFTOPT_FOUND)
 include_directories(${LIFTOPT_INCLUDE_DIRS})
