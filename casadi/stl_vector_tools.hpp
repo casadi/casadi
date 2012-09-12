@@ -33,6 +33,7 @@
 #include <string>
 #include <limits>
 #include <algorithm>
+#include <map>
 #include "casadi_exception.hpp"
 #include "casadi_types.hpp"
 
@@ -51,6 +52,11 @@ namespace std{
   /// Enables flushing an STL pair to a stream (prints representation)
   template<typename T1, typename T2>
   ostream& operator<<(ostream &stream, const pair<T1,T2> &p);
+  
+  /// Enables flushing an STL map to a stream (prints representation)
+  template<typename T1, typename T2>
+  ostream& operator<<(ostream &stream, const std::map<T1,T2> &p);
+  
 #endif //SWIG
   
 } // namespace std
@@ -263,6 +269,32 @@ namespace std{
   template<typename T1, typename T2>
   ostream& operator<<(ostream &stream, const pair<T1,T2> &p){
     stream << "(" << p.first << "," << p.second << ")";
+    return stream;
+  }
+  
+  template<typename T1, typename T2>
+  ostream& operator<<(ostream &stream, const std::map<T1,T2> &p){
+    stream << "{";
+    typedef typename std::map<T1,T2>::const_iterator it_type;
+    int count = 0;
+    for (it_type it = p.begin();it!=p.end();++it) {
+      stream << it->first << ": " << it->second;
+      if (count++ < p.size()-1) stream << ", ";
+    }
+    stream << "}";
+    return stream;
+  }
+  
+  template<typename T2>
+  ostream& operator<<(ostream &stream, const std::map<std::string,T2> &p){
+    stream << "{";
+    typedef typename std::map<std::string,T2>::const_iterator it_type;
+    int count = 0;
+    for (it_type it = p.begin();it!=p.end();++it) {
+      stream << '"' << it->first << '"' << ": " << it->second;
+      if (count++ < p.size()-1) stream << ", ";
+    }
+    stream << "}";
     return stream;
   }
   
