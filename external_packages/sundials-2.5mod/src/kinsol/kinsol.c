@@ -1507,7 +1507,7 @@ static int KINStop(KINMem kin_mem, int strategy, booleantype maxStepTaken, int s
     if (setupNonNull && !jacCurrent) {
       /* If the Jacobian is out of date, update it and retry */
       sthrsh = TWO;
-      return(CONTINUE_ITERATIONS);
+      return(RETRY_ITERATION);
     } else {
       /* Give up */
       if (strategy == KIN_NONE)  return(KIN_STEP_LT_STPTOL);
@@ -1589,7 +1589,7 @@ static int KINStop(KINMem kin_mem, int strategy, booleantype maxStepTaken, int s
 	if (setupNonNull && !jacCurrent) {
           /* If the Jacobian is out of date, update it and retry */
 	  sthrsh = TWO;
-	  return(RETRY_ITERATION);
+	  return(CONTINUE_ITERATIONS);
 	} else {
           /* Otherwise, we cannot do anything, so just return. */
         }
