@@ -173,7 +173,7 @@
 <caption>Input scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>INTEGRATOR_X0</td><td>Differential state at the initial time [x0].</td></tr>
-<tr><td>INTEGRATOR_P</td><td>Parameters [p] */.</td></tr>
+<tr><td>INTEGRATOR_P</td><td>Parameters [p].</td></tr>
 <tr><td>INTEGRATOR_RX0</td><td>Backward differential state at the final time [rx0].</td></tr>
 </table>
 */
