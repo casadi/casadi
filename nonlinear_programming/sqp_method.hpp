@@ -31,32 +31,30 @@ class SQPInternal;
   
 /**
   \brief Sequential Quadratic Programming method
-  The algorithm is a Quasi-Newton method with damped BFGS updating to that
-  assures positive definitenes of the Hessian approximation. Line search is
-  carried out via backtracking until with the Armijo condition applied to
-  the T1 (in Nocedal phi1) merit function is satisfied.
+  The algorithm is a classical SQP method with either exact (has to be provided) or 
+  damped BFGS Lagrange Hessian approximation.
+  Two different line-search algorithms are available.
+  First, Armijo (Wolfe) condition with backtracking (suffers from Maratos effect).
+  Second, a line-search method that checks if the merit function is lower
+  than the last k values (no Maratos effect).
+  Both methods employ the L1 merit function.
   
-  The method solved can be written in the form:
+  The method solves the problems of form:
   \verbatim
-  min          F(x1,x2)
-  x1,x2
+  min          F(x)
+  x
   
   subject to
-            LBG1 <= G1(x1,x2) <= UBG1
-              x2 == G2(x1,x2)
-            LBX1 <=     x1    <= UBX1
-            LBX2 <=     x2    <= UBX2
+            LBG <= G(x) <= UBG
+            LBX <=   x  <= UBX
   \endverbatim
   
-  We thus assume that the variable vector x can be divided into two parts,
-  where the second part is given recursively by the equations x2 == G2(x1,x2).
-  That is x2 is given recursively means that we assume that the Jacobian of 
-  G2 with respect to x2 is lower triangular with zeros along the diagonal.
+  Nonlinear equalities can be introduced by setting LBG and UBG equal at the correct positions.
   
-  The method is still under development
+  The method is still under development and should be used with cared
   
-  \author Joel Andersson
-  \date 2011
+  \author Joel Andersson and Attila Kozma
+  \date 2012
 */
 class SQPMethod : public NLPSolver {
   public:
@@ -88,7 +86,6 @@ class SQPMethod : public NLPSolver {
 
     /// @Joris: This would be an alternative
     static NLPSolverCreator getCreator(){return creator;}
-
     
 };
 
