@@ -131,9 +131,13 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   DMatrix gk;
   // Constraint Jacobian
   DMatrix Jgk = DMatrix::zeros(0, n);
-  // Initial guess for the lagrange multipliers
+  // Lagrange multipliers of the NLP
   DMatrix mu(m, 1, 0.); 
   DMatrix mu_x(n, 1, 0.);
+  // Lagrange multiplers of the QP
+  DMatrix mu_qp(m, 1, 0.);
+  DMatrix mu_x_qp(n, 1, 0.);
+
   // Lagrange gradient in the next iterate
   DMatrix gLag(n, 1, 0.);
   // Lagrange gradient in the actual iterate
@@ -238,7 +242,8 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     // Hot-starting if possible
     if (p.size1()){
       qp_solver_.setInput(p, QP_X_INIT);
-      qp_solver_.setInput(mu, QP_LAMBDA_INIT);
+      //TODO: Fix hot-starting of dual variables!!!
+      //qp_solver_.setInput(mu_qp, QP_LAMBDA_INIT);
     }
       
     if (!G_.isNull()) {
@@ -285,14 +290,14 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     }
     
     // Get the dual solution for the inequalities
-    mu = qp_solver_.output(QP_LAMBDA_A);
-    mu_x = qp_solver_.output(QP_LAMBDA_X);
+    mu_qp = qp_solver_.output(QP_LAMBDA_A);
+    mu_x_qp = qp_solver_.output(QP_LAMBDA_X);
 
     // Calculate penalty parameter of merit function
     sigma_ = 0.;
     for(int j = 0; j < m; ++j){
-      if( fabs(mu.elem(j)) > sigma_){
-        sigma_ = fabs(mu.elem(j));
+      if( fabs(mu_qp.elem(j)) > sigma_){
+        sigma_ = fabs(mu_qp.elem(j));
       }
     }
 
@@ -390,6 +395,8 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     // Candidate accepted
     x_old = x;
     x = x_cand;
+    mu = t * mu_qp + (1 - t) * mu;
+    mu_x = t * mu_x_qp + (1 - t) * mu_x;
 
     // Calculating Lagrange gradient in the new iterate.
     gLag_old = gLag;
