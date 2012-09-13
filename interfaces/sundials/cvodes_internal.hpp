@@ -176,10 +176,8 @@ public:
   // Ids of backward problem
   int whichB_;
 
-  int fsens_order_, asens_order_; 
-
-  // Number of forward and adjoint seeds for the functions f and q
-  int nfdir_f_, nadir_f_;
+  // Number of forward directions for the function f
+  int nfdir_f_;
 
   // Initialize the dense linear solver
   void initDenseLinearSolver();

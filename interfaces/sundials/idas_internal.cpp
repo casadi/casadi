@@ -152,7 +152,6 @@ void IdasInternal::init(){
 
   // Get the number of forward and adjoint directions
   nfdir_f_ = f_.getOption("number_of_fwd_dir");
-  nadir_f_ = f_.getOption("number_of_adj_dir");
 
   cj_scaling_ = getOption("cj_scaling");
   
@@ -668,9 +667,11 @@ int IdasInternal::resS_wrapper(int Ns, double t, N_Vector xz, N_Vector xzdot, N_
 
 void IdasInternal::reset(int nsens, int nsensB, int nsensB_store){
   log("IdasInternal::reset","begin");
-  int nfdir = 0; // NOTE: need to update the function below to the new integrator formulation
   
-  if(!g_.isNull() && !isInitTaping_)
+  // Reset the base classes
+  SundialsInternal::reset(nsens,nsensB,nsensB_store);
+  
+  if(nrx_>0 && !isInitTaping_)
     initTaping();
   
   // If we have forward sensitivities, rest one extra time without forward sensitivities to get a consistent initial guess
@@ -680,12 +681,6 @@ void IdasInternal::reset(int nsens, int nsensB, int nsensB_store){
   // Reset timers
   t_res = t_fres = t_jac = t_lsolve = t_lsetup_jac = t_lsetup_fac = 0;
     
-  fsens_order_ = nfdir>0;
-  asens_order_ = !g_.isNull();
-  
-  // Get the time horizon
-  t_ = t0_;
-  
   // Return flag
   int flag;
   
@@ -709,7 +704,7 @@ void IdasInternal::reset(int nsens, int nsensB, int nsensB_store){
     log("IdasInternal::reset","re-initialized quadratures");
   }
   
-  if(fsens_order_>0){
+  if(nsens>0){
     // Get the forward seeds
     for(int i=0; i<nfdir_; ++i){
       const Matrix<double>& x0_seed = fwdSeed(INTEGRATOR_X0,i);
@@ -740,8 +735,8 @@ void IdasInternal::reset(int nsens, int nsensB, int nsensB_store){
     correctInitialConditions();
   }
 
-  // Re-initialize adjoint sensitivities
-  if(asens_order_>0){
+  // Re-initialize backward integration
+  if(nrx_>0){
     flag = IDAAdjReInit(mem_);
     if(flag != IDA_SUCCESS) idas_error("IDAAdjReInit",flag);
   }
@@ -759,7 +754,7 @@ void IdasInternal::correctInitialConditions(){
     cout << "initial guess: " << endl;
     cout << "p = " << input(INTEGRATOR_P) << endl;
     cout << "x0 = " << input(INTEGRATOR_X0) << endl;
-    if(fsens_order_>0){
+    if(nsens_>0){
       for(int dir=0; dir<nfdir_; ++dir){
         cout << "forward seed guess, direction " << dir << ": " << endl;
         cout << "p_seed = " << fwdSeed(INTEGRATOR_P,dir) << endl;
@@ -784,7 +779,7 @@ void IdasInternal::correctInitialConditions(){
   if(monitored("correctInitialConditions")){
     cout << "p = " << input(INTEGRATOR_P) << endl;
     cout << "x0 = " << input(INTEGRATOR_X0) << endl;
-    if(fsens_order_>0){
+    if(nsens_>0){
       for(int dir=0; dir<nfdir_; ++dir){
         cout << "forward seed, direction " << dir << ": " << endl;
         cout << "p_seed = " << fwdSeed(INTEGRATOR_P,dir) << endl;
@@ -807,7 +802,7 @@ void IdasInternal::integrate(double t_out){
     
   } else {
     // Integrate ...
-    if(asens_order_>0){
+    if(nrx_>0){
       // ... with taping
       log("IdasInternal::integrate","integration with taping");
       flag = IDASolveF(mem_, t_out, &t_, xz_, xzdot_, IDA_NORMAL, &ncheck_);
@@ -827,7 +822,7 @@ void IdasInternal::integrate(double t_out){
       if(flag != IDA_SUCCESS) idas_error("IDAGetQuad",flag);
     }
     
-    if(fsens_order_>0){
+    if(nsens_>0){
       // Get the sensitivities
       flag = IDAGetSens(mem_,&t_, getPtr(xzF_));
       if(flag != IDA_SUCCESS) idas_error("IDAGetSens",flag);
@@ -842,7 +837,7 @@ void IdasInternal::integrate(double t_out){
   
   // Save the final state
   copy(NV_DATA_S(xz_),NV_DATA_S(xz_)+nx_,output(INTEGRATOR_XF).begin());
-  if(fsens_order_>0){
+  if(nsens_>0){
     for(int i=0; i<nfdir_; ++i){
       copy(NV_DATA_S(xzF_[i]),NV_DATA_S(xzF_[i])+nx_,fwdSens(INTEGRATOR_XF,i).begin());
     }

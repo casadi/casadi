@@ -696,6 +696,12 @@ FX IntegratorInternal::getDerivative(int nfwd, int nadj){
   return MXFunction(ret_in,ret_out);
 }
 
+void IntegratorInternal::reset(int nsens, int nsensB, int nsensB_store){
+  nsens_ = nsens;
+  nsensB_ = nsensB;
+  nsensB_store_ = nsensB_store;
+}
+
 
 } // namespace CasADi
 

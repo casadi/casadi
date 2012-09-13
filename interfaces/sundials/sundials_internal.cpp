@@ -376,6 +376,15 @@ void SundialsInternal::setFinalTime(double tf){
   tf_ = tf;
 }
 
+void SundialsInternal::reset(int nsens, int nsensB, int nsensB_store){
+  // Reset the base classes
+  IntegratorInternal::reset(nsens,nsensB,nsensB_store);
+  
+  // Go to the start time
+  t_ = t0_;
+}
+
+
 } // namespace Sundials
 } // namespace CasADi
 

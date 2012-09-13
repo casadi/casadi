@@ -195,8 +195,6 @@ class IdasInternal : public SundialsInternal{
   // Ids of backward problem
   int whichB_;
 
-  int fsens_order_, asens_order_;
-  
   // For timings
   clock_t time1, time2;
   
@@ -212,8 +210,8 @@ class IdasInternal : public SundialsInternal{
   bool isInitAdj_;
   bool isInitTaping_;
   
-  // Number of forward and adjoint seeds for the functions f and q
-  int nfdir_f_, nadir_f_;
+  // Number of forward seeds for the function f
+  int nfdir_f_;
   
   // Scaling of cj
   bool cj_scaling_;

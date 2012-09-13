@@ -118,6 +118,18 @@ adj_adj_x0 = deepcopy(I_adj.adjSens(INTEGRATOR_X0))
 adj_adj_p = deepcopy(I_adj.adjSens(INTEGRATOR_P))
 print "%50s" % "Adjoint over adjoint sensitivities:", "d2(qf)/d(x0)d(p) = ", adj_adj_x0, ", d2(qf)/d(p)d(p) = ", adj_adj_p
 
+# Operator overloading approach
+I.setInput(x0,INTEGRATOR_X0)
+I.setInput(u0,INTEGRATOR_P)
+I.setFwdSeed([0,0,0],INTEGRATOR_X0)
+I.setFwdSeed(1.0,INTEGRATOR_P)
+I.reset(1,0,0)
+I.integrate(tf)
+oo_xf = deepcopy(I.fwdSens(INTEGRATOR_XF))
+oo_qf = deepcopy(I.fwdSens(INTEGRATOR_QF))
+print "%50s" % "Forward sensitivities via OO:", "d(xf)/d(p) = ", oo_xf, ", d(qf)/d(p) = ", oo_qf
+
+
 
 
 

@@ -129,12 +129,10 @@ void CVodesInternal::init(){
 
   // Get the number of forward and adjoint directions
   nfdir_f_ = f_.getOption("number_of_fwd_dir");
-  nadir_f_ = f_.getOption("number_of_adj_dir");
 
   // Set state derivative and its derivatives to zero (explicit integrator)
   f_.input(DAE_XDOT).setAll(0);
   for(int i=0; i<nfdir_f_; ++i) f_.fwdSeed(DAE_XDOT,i).setAll(0);
-  for(int i=0; i<nadir_f_; ++i) f_.adjSens(DAE_XDOT,i).setAll(0);
   
   // Sundials return flag
   int flag;
@@ -360,7 +358,7 @@ void CVodesInternal::initAdj(){
       break;
   }
 
-  // Quadratures for the adjoint problem
+  // Quadratures for the backward problem
   N_VConst(0.0, rq_);
   flag = CVodeQuadInitB(mem_,whichB_,rhsQB_wrapper,rq_);
   if(flag!=CV_SUCCESS) cvodes_error("CVodeQuadInitB",flag);
@@ -428,7 +426,9 @@ try{
 }
   
 void CVodesInternal::reset(int nsens, int nsensB, int nsensB_store){
-  int nfdir = 0; // NOTE: need to update the function below to the new integrator formulation
+  // Reset the base classes
+  SundialsInternal::reset(nsens,nsensB,nsensB_store);
+  
   if(monitored("reset")){
     cout << "initial state: " << endl;
     cout << "p = " << input(INTEGRATOR_P) << endl;
@@ -438,12 +438,6 @@ void CVodesInternal::reset(int nsens, int nsensB, int nsensB_store){
   // Reset timers
   t_res = t_fres = t_jac = t_lsolve = t_lsetup_jac = t_lsetup_fac = 0;
   
-  fsens_order_ = nfdir>0;
-  asens_order_ = !g_.isNull();
-  
-  // Get the time horizon
-  t_ = t0_;
-
   // Re-initialize
   int flag = CVodeReInit(mem_, t0_, x0_);
   if(flag!=CV_SUCCESS) cvodes_error("CVodeReInit",flag);
@@ -456,7 +450,7 @@ void CVodesInternal::reset(int nsens, int nsensB, int nsensB_store){
   }
   
   // Re-initialize sensitivities
-  if(fsens_order_>0){
+  if(nsens>0){
     flag = CVodeSensReInit(mem_,ism_,getPtr(xF0_));
     if(flag != CV_SUCCESS) cvodes_error("CVodeSensReInit",flag);
     
@@ -471,8 +465,8 @@ void CVodesInternal::reset(int nsens, int nsensB, int nsensB_store){
     if(flag != CV_SUCCESS) cvodes_error("CVodeSensToggleOff",flag);
   }
   
-  // Re-initialize adjoint sensitivities
-  if(asens_order_>0){
+  // Re-initialize backward integration
+  if(nrx_>0){
     flag = CVodeAdjReInit(mem_);
     if(flag != CV_SUCCESS) cvodes_error("CVodeAdjReInit",flag);
   }
@@ -482,21 +476,21 @@ void CVodesInternal::reset(int nsens, int nsensB, int nsensB_store){
 }
 
 void CVodesInternal::integrate(double t_out){
-   log("CVODES::integrate begin");
+  log("CVODES::integrate begin");
   int flag;
     
   // tolerance
   double ttol = 1e-9;
   if(fabs(t_-t_out)<ttol){
     copy(input(INTEGRATOR_X0).begin(),input(INTEGRATOR_X0).end(),output(INTEGRATOR_XF).begin());
-    if(fsens_order_>0){
+    if(nsens_>0){
       for(int i=0; i<nfdir_; ++i){
         copy(fwdSeed(INTEGRATOR_X0,i).begin(),fwdSeed(INTEGRATOR_X0,i).end(),fwdSens(INTEGRATOR_XF,i).begin());
       }
     }
     return;
   }
-  if(asens_order_>0){
+  if(nrx_>0){
     flag = CVodeF(mem_, t_out, x_, &t_, CV_NORMAL,&ncheck_);
     if(flag!=CV_SUCCESS && flag!=CV_TSTOP_RETURN) cvodes_error("CVodeF",flag);
     
@@ -511,7 +505,7 @@ void CVodesInternal::integrate(double t_out){
     if(flag!=CV_SUCCESS) cvodes_error("CVodeGetQuad",flag);
   }
   
-  if(fsens_order_>0){
+  if(nsens_>0){
     // Get the sensitivities
     flag = CVodeGetSens(mem_, &t_, getPtr(xF_));
     if(flag != CV_SUCCESS) cvodes_error("CVodeGetSens",flag);

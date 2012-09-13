@@ -57,10 +57,10 @@ public:
   /** \brief  Print solver statistics */
   virtual void printStats(std::ostream &stream) const = 0;
 
-    /** \brief  Reset the forward problem and bring the time back to t0 */
+  /** \brief  Reset the forward problem and bring the time back to t0 */
   virtual void reset(int nsens, int nsensB, int nsensB_store) = 0;
 
-    /** \brief  Reset the backward problem and take time to tf */
+  /** \brief  Reset the backward problem and take time to tf */
   virtual void resetB() = 0;
 
   /** \brief  Integrate forward until a specified time point */
@@ -111,6 +111,15 @@ public:
   
   /// Number of right hand sides
   int nrhs_;
+  
+  /// Number of sensitivities to be propagated along with the integration forward in time
+  int nsens_;
+  
+  /// Number of sensitivities to be propagated along with the integration backward in time
+  int nsensB_;
+  
+  /// Number of sensitivities to be propagated along with the integration backward in time  that depend on sensitivities propagated along with the integration forward in time
+  int nsensB_store_;
 };
   
 } // namespace CasADi
