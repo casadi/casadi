@@ -39,13 +39,15 @@ thus x := [xd,xa]
 Joel Andersson
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+---------------+----------------------------------------------+
-|     Name      |                 Description                  |
-+===============+==============================================+
-| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
-+---------------+----------------------------------------------+
-| INTEGRATOR_P  | Parameters [p]                               |
-+---------------+----------------------------------------------+
++----------------+------------------------------------------------------+
+|      Name      |                     Description                      |
++================+======================================================+
+| INTEGRATOR_X0  | Differential state at the initial time [x0].         |
++----------------+------------------------------------------------------+
+| INTEGRATOR_P   | Parameters [p].                                      |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
@@ -811,13 +813,15 @@ differential states xd and the algebraic states xa. The complete state is
 thus x := [xd,xa]
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+---------------+----------------------------------------------+
-|     Name      |                 Description                  |
-+===============+==============================================+
-| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
-+---------------+----------------------------------------------+
-| INTEGRATOR_P  | Parameters [p]                               |
-+---------------+----------------------------------------------+
++----------------+------------------------------------------------------+
+|      Name      |                     Description                      |
++================+======================================================+
+| INTEGRATOR_X0  | Differential state at the initial time [x0].         |
++----------------+------------------------------------------------------+
+| INTEGRATOR_P   | Parameters [p].                                      |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
@@ -5274,13 +5278,15 @@ The method is still under development
 Joel Andersson
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+---------------+----------------------------------------------+
-|     Name      |                 Description                  |
-+===============+==============================================+
-| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
-+---------------+----------------------------------------------+
-| INTEGRATOR_P  | Parameters [p]                               |
-+---------------+----------------------------------------------+
++----------------+------------------------------------------------------+
+|      Name      |                     Description                      |
++================+======================================================+
+| INTEGRATOR_X0  | Differential state at the initial time [x0].         |
++----------------+------------------------------------------------------+
+| INTEGRATOR_P   | Parameters [p].                                      |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
@@ -6056,13 +6062,15 @@ Return a string with a destription (for SWIG) ";
 %feature("docstring") CasADi::CollocationIntegratorInternal "
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+---------------+----------------------------------------------+
-|     Name      |                 Description                  |
-+===============+==============================================+
-| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
-+---------------+----------------------------------------------+
-| INTEGRATOR_P  | Parameters [p]                               |
-+---------------+----------------------------------------------+
++----------------+------------------------------------------------------+
+|      Name      |                     Description                      |
++================+======================================================+
+| INTEGRATOR_X0  | Differential state at the initial time [x0].         |
++----------------+------------------------------------------------------+
+| INTEGRATOR_P   | Parameters [p].                                      |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
@@ -12452,13 +12460,15 @@ call: Call reset. Then call integrate(t_i) and getOuput for a series of
 times t_i.
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+---------------+----------------------------------------------+
-|     Name      |                 Description                  |
-+===============+==============================================+
-| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
-+---------------+----------------------------------------------+
-| INTEGRATOR_P  | Parameters [p]                               |
-+---------------+----------------------------------------------+
++----------------+------------------------------------------------------+
+|      Name      |                     Description                      |
++================+======================================================+
+| INTEGRATOR_X0  | Differential state at the initial time [x0].         |
++----------------+------------------------------------------------------+
+| INTEGRATOR_P   | Parameters [p].                                      |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
@@ -13441,13 +13451,15 @@ Solves the following initial value problem (IVP):
 xdot == f(t,x,p) from t0 to tf  given the initial condition x(t0) == x0;
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+---------------+----------------------------------------------+
-|     Name      |                 Description                  |
-+===============+==============================================+
-| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
-+---------------+----------------------------------------------+
-| INTEGRATOR_P  | Parameters [p]                               |
-+---------------+----------------------------------------------+
++----------------+------------------------------------------------------+
+|      Name      |                     Description                      |
++================+======================================================+
+| INTEGRATOR_X0  | Differential state at the initial time [x0].         |
++----------------+------------------------------------------------------+
+| INTEGRATOR_P   | Parameters [p].                                      |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
@@ -17750,13 +17762,15 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 Joel Andersson
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+---------------+----------------------------------------------+
-|     Name      |                 Description                  |
-+===============+==============================================+
-| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
-+---------------+----------------------------------------------+
-| INTEGRATOR_P  | Parameters [p]                               |
-+---------------+----------------------------------------------+
++----------------+------------------------------------------------------+
+|      Name      |                     Description                      |
++================+======================================================+
+| INTEGRATOR_X0  | Differential state at the initial time [x0].         |
++----------------+------------------------------------------------------+
+| INTEGRATOR_P   | Parameters [p].                                      |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
@@ -18817,13 +18831,15 @@ quadrature part (g). In the same way, the state vector is also composed of
 two parts, the differential states and the quadrature states, i.e. x = [y,q]
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+---------------+----------------------------------------------+
-|     Name      |                 Description                  |
-+===============+==============================================+
-| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
-+---------------+----------------------------------------------+
-| INTEGRATOR_P  | Parameters [p]                               |
-+---------------+----------------------------------------------+
++----------------+------------------------------------------------------+
+|      Name      |                     Description                      |
++================+======================================================+
+| INTEGRATOR_X0  | Differential state at the initial time [x0].         |
++----------------+------------------------------------------------------+
+| INTEGRATOR_P   | Parameters [p].                                      |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
@@ -21311,13 +21327,15 @@ ODE/DAE is defined in the derived classes.
 Joel Andersson
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+---------------+----------------------------------------------+
-|     Name      |                 Description                  |
-+===============+==============================================+
-| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
-+---------------+----------------------------------------------+
-| INTEGRATOR_P  | Parameters [p]                               |
-+---------------+----------------------------------------------+
++----------------+------------------------------------------------------+
+|      Name      |                     Description                      |
++================+======================================================+
+| INTEGRATOR_X0  | Differential state at the initial time [x0].         |
++----------------+------------------------------------------------------+
+| INTEGRATOR_P   | Parameters [p].                                      |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
@@ -22014,13 +22032,15 @@ respectively.
 Joel Andersson
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+---------------+----------------------------------------------+
-|     Name      |                 Description                  |
-+===============+==============================================+
-| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
-+---------------+----------------------------------------------+
-| INTEGRATOR_P  | Parameters [p]                               |
-+---------------+----------------------------------------------+
++----------------+------------------------------------------------------+
+|      Name      |                     Description                      |
++================+======================================================+
+| INTEGRATOR_X0  | Differential state at the initial time [x0].         |
++----------------+------------------------------------------------------+
+| INTEGRATOR_P   | Parameters [p].                                      |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
@@ -59454,13 +59474,15 @@ The method is still under development
 Joel Andersson
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+---------------+----------------------------------------------+
-|     Name      |                 Description                  |
-+===============+==============================================+
-| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
-+---------------+----------------------------------------------+
-| INTEGRATOR_P  | Parameters [p]                               |
-+---------------+----------------------------------------------+
++----------------+------------------------------------------------------+
+|      Name      |                     Description                      |
++================+======================================================+
+| INTEGRATOR_X0  | Differential state at the initial time [x0].         |
++----------------+------------------------------------------------------+
+| INTEGRATOR_P   | Parameters [p].                                      |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
@@ -60186,13 +60208,15 @@ Return a string with a destription (for SWIG) ";
 %feature("docstring") CasADi::RKIntegratorInternal "
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+---------------+----------------------------------------------+
-|     Name      |                 Description                  |
-+===============+==============================================+
-| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
-+---------------+----------------------------------------------+
-| INTEGRATOR_P  | Parameters [p]                               |
-+---------------+----------------------------------------------+
++----------------+------------------------------------------------------+
+|      Name      |                     Description                      |
++================+======================================================+
+| INTEGRATOR_X0  | Differential state at the initial time [x0].         |
++----------------+------------------------------------------------------+
+| INTEGRATOR_P   | Parameters [p].                                      |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
@@ -61178,13 +61202,15 @@ for each time step.
 Joel Andersson
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+---------------+----------------------------------------------+
-|     Name      |                 Description                  |
-+===============+==============================================+
-| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
-+---------------+----------------------------------------------+
-| INTEGRATOR_P  | Parameters [p]                               |
-+---------------+----------------------------------------------+
++----------------+------------------------------------------------------+
+|      Name      |                     Description                      |
++================+======================================================+
+| INTEGRATOR_X0  | Differential state at the initial time [x0].         |
++----------------+------------------------------------------------------+
+| INTEGRATOR_P   | Parameters [p].                                      |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -61850,13 +61876,15 @@ Simulator data storage classs.
 Joel Andersson
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+---------------+----------------------------------------------+
-|     Name      |                 Description                  |
-+===============+==============================================+
-| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
-+---------------+----------------------------------------------+
-| INTEGRATOR_P  | Parameters [p]                               |
-+---------------+----------------------------------------------+
++----------------+------------------------------------------------------+
+|      Name      |                     Description                      |
++================+======================================================+
+| INTEGRATOR_X0  | Differential state at the initial time [x0].         |
++----------------+------------------------------------------------------+
+| INTEGRATOR_P   | Parameters [p].                                      |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -63331,24 +63359,23 @@ Assert that the object has been initialized. ";
 // File: classCasADi_1_1SQPMethod.xml
 %feature("docstring") CasADi::SQPMethod "
 
-Sequential Quadratic Programming method The algorithm is a Quasi- Newton
-method with damped BFGS updating to that assures positive definitenes of the
-Hessian approximation. Line search is carried out via backtracking until
-with the Armijo condition applied to the T1 (in Nocedal phi1) merit function
-is satisfied.
+Sequential Quadratic Programming method The algorithm is a classical SQP
+method with either exact (has to be provided) or damped BFGS Lagrange
+Hessian approximation. Two different line-search algorithms are available.
+First, Armijo (Wolfe) condition with backtracking (suffers from Maratos
+effect). Second, a line-search method that checks if the merit function is
+lower than the last k values (no Maratos effect). Both methods employ the L1
+merit function.
 
-The method solved can be written in the form:min          F(x1,x2) x1,x2
-subject to           LBG1 <= G1(x1,x2) <= UBG1             x2 == G2(x1,x2)
-LBX1 <=     x1    <= UBX1 LBX2 <=     x2    <= UBX2
+The method solves the problems of form:min          F(x) x  subject to
+LBG <= G(x) <= UBG LBX <=   x  <= UBX
 
-We thus assume that the variable vector x can be divided into two parts,
-where the second part is given recursively by the equations x2 == G2(x1,x2).
-That is x2 is given recursively means that we assume that the Jacobian of G2
-with respect to x2 is lower triangular with zeros along the diagonal.
+Nonlinear equalities can be introduced by setting LBG and UBG equal at the
+correct positions.
 
-The method is still under development
+The method is still under development and should be used with cared
 
-Joel Andersson
+Joel Andersson and Attila Kozma
 
 >Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
 +------------------------------------+------------------------------------+
@@ -64244,13 +64271,15 @@ Constructor. ";
 %feature("docstring") CasADi::Sundials::SundialsIntegrator "
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+---------------+----------------------------------------------+
-|     Name      |                 Description                  |
-+===============+==============================================+
-| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
-+---------------+----------------------------------------------+
-| INTEGRATOR_P  | Parameters [p]                               |
-+---------------+----------------------------------------------+
++----------------+------------------------------------------------------+
+|      Name      |                     Description                      |
++================+======================================================+
+| INTEGRATOR_X0  | Differential state at the initial time [x0].         |
++----------------+------------------------------------------------------+
+| INTEGRATOR_P   | Parameters [p].                                      |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
@@ -65160,13 +65189,15 @@ Return a string with a destription (for SWIG) ";
 %feature("docstring") CasADi::Sundials::SundialsInternal "
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+---------------+----------------------------------------------+
-|     Name      |                 Description                  |
-+===============+==============================================+
-| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
-+---------------+----------------------------------------------+
-| INTEGRATOR_P  | Parameters [p]                               |
-+---------------+----------------------------------------------+
++----------------+------------------------------------------------------+
+|      Name      |                     Description                      |
++================+======================================================+
+| INTEGRATOR_X0  | Differential state at the initial time [x0].         |
++----------------+------------------------------------------------------+
+| INTEGRATOR_P   | Parameters [p].                                      |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
@@ -65920,380 +65951,6 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::Sundials::SundialsInternal::assertInit "
 
 Assert that the object has been initialized. ";
-
-
-// File: classCasADi_1_1SuperLU.xml
-%feature("docstring") CasADi::SuperLU "
-
->List of available options
-+--------------+--------------+--------------+--------------+--------------+
-|      Id      |     Type     |   Default    | Description  |   Used in    |
-+==============+==============+==============+==============+==============+
-| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
-|              |              |              | calculate    | ternal       |
-|              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
-|              |              |              | decides      |              |
-|              |              |              | which is     |              |
-|              |              |              | more         |              |
-|              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
-+--------------+--------------+--------------+--------------+--------------+
-| colperm      | OT_STRING    | \"colamd\"     | Specifies    | CasADi::Supe |
-|              |              |              | how to       | rLUInternal  |
-|              |              |              | permute the  |              |
-|              |              |              | columns of   |              |
-|              |              |              | the matrix   |              |
-|              |              |              | for sparsity |              |
-|              |              |              | preservation |              |
-|              |              |              | .            |              |
-+--------------+--------------+--------------+--------------+--------------+
-| conditionnum | OT_BOOLEAN   | false        |              | CasADi::Supe |
-| ber          |              |              |              | rLUInternal  |
-+--------------+--------------+--------------+--------------+--------------+
-| diagpivotthr | OT_REAL      | 1            |              | CasADi::Supe |
-| esh          |              |              |              | rLUInternal  |
-+--------------+--------------+--------------+--------------+--------------+
-| equil        | OT_BOOLEAN   | true         | Specifies    | CasADi::Supe |
-|              |              |              | whether to   | rLUInternal  |
-|              |              |              | equilibrate  |              |
-|              |              |              | the system   |              |
-|              |              |              | (scale As    |              |
-|              |              |              | rows and     |              |
-|              |              |              | columns to   |              |
-|              |              |              | have unit    |              |
-|              |              |              | norm).       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| iterrefine   | OT_STRING    | \"norefine\"   |              | CasADi::Supe |
-|              |              |              |              | rLUInternal  |
-+--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
-| erator       | ENERATOR     | )            | pointer that | ternal       |
-|              |              |              | returns a    |              |
-|              |              |              | Jacobian     |              |
-|              |              |              | function     |              |
-|              |              |              | given a set  |              |
-|              |              |              | of desired   |              |
-|              |              |              | Jacobian     |              |
-|              |              |              | blocks,      |              |
-|              |              |              | overrides    |              |
-|              |              |              | internal     |              |
-|              |              |              | routines     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
-|              | TOR          | )            | be activated | ternal       |
-|              |              |              | (inputs|outp |              |
-|              |              |              | uts)         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
-| j_dir        |              |              | adjoint      | ternal       |
-|              |              |              | derivatives  |              |
-|              |              |              | to be        |              |
-|              |              |              | calculated s |              |
-|              |              |              | imultanously |              |
-+--------------+--------------+--------------+--------------+--------------+
-| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
-| d_dir        |              |              | forward      | ternal       |
-|              |              |              | derivatives  |              |
-|              |              |              | to be        |              |
-|              |              |              | calculated s |              |
-|              |              |              | imultanously |              |
-+--------------+--------------+--------------+--------------+--------------+
-| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
-| ian          |              |              | Hessians     | ternal       |
-|              |              |              | numerically  |              |
-|              |              |              | (using       |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives) |              |
-|              |              |              | rather than  |              |
-|              |              |              | with the     |              |
-|              |              |              | built-in     |              |
-|              |              |              | method       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
-| bian         |              |              | Jacobians    | ternal       |
-|              |              |              | numerically  |              |
-|              |              |              | (using       |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives) |              |
-|              |              |              | rather than  |              |
-|              |              |              | with the     |              |
-|              |              |              | built-in     |              |
-|              |              |              | method       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| pivotgrowth  | OT_BOOLEAN   | false        |              | CasADi::Supe |
-|              |              |              |              | rLUInternal  |
-+--------------+--------------+--------------+--------------+--------------+
-| printstat    | OT_BOOLEAN   | true         |              | CasADi::Supe |
-|              |              |              |              | rLUInternal  |
-+--------------+--------------+--------------+--------------+--------------+
-| rowperm      | OT_STRING    | \"largediag\"  |              | CasADi::Supe |
-|              |              |              |              | rLUInternal  |
-+--------------+--------------+--------------+--------------+--------------+
-| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
-|              |              |              | sparse       | ternal       |
-+--------------+--------------+--------------+--------------+--------------+
-| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
-| erator       | ENERATOR     | )            | that         | ternal       |
-|              |              |              | provides     |              |
-|              |              |              | sparsity for |              |
-|              |              |              | a given      |              |
-|              |              |              | input output |              |
-|              |              |              | block,       |              |
-|              |              |              | overrides    |              |
-|              |              |              | internal     |              |
-|              |              |              | routines     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
-| ans          |              |              | references   | ternal       |
-|              |              |              | to generated |              |
-|              |              |              | Jacobians in |              |
-|              |              |              | order to     |              |
-|              |              |              | avoid        |              |
-|              |              |              | generating   |              |
-|              |              |              | identical    |              |
-|              |              |              | Jacobians    |              |
-|              |              |              | multiple     |              |
-|              |              |              | times        |              |
-+--------------+--------------+--------------+--------------+--------------+
-| symmetricmod | OT_BOOLEAN   | false        |              | CasADi::Supe |
-| e            |              |              |              | rLUInternal  |
-+--------------+--------------+--------------+--------------+--------------+
-| trans        | OT_BOOLEAN   | false        |              | CasADi::Line |
-|              |              |              |              | arSolverInte |
-|              |              |              |              | rnal         |
-+--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
-|              |              | )            | defined      | ternal       |
-|              |              |              | field that   |              |
-|              |              |              | can be used  |              |
-|              |              |              | to identify  |              |
-|              |              |              | the function |              |
-|              |              |              | or pass      |              |
-|              |              |              | additional   |              |
-|              |              |              | information  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| user_work    | OT_BOOLEAN   | false        | keep work in | CasADi::Supe |
-|              |              |              | memory       | rLUInternal  |
-+--------------+--------------+--------------+--------------+--------------+
-| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
-|              |              |              | evaluation   | ternal       |
-|              |              |              | for          |              |
-|              |              |              | debugging    |              |
-+--------------+--------------+--------------+--------------+--------------+
-
-C++ includes: b0_options.hpp ";
-
-
-// File: classCasADi_1_1SuperLUInternal.xml
-%feature("docstring") CasADi::SuperLUInternal "
-
->List of available options
-+--------------+--------------+--------------+--------------+--------------+
-|      Id      |     Type     |   Default    | Description  |   Used in    |
-+==============+==============+==============+==============+==============+
-| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
-|              |              |              | calculate    | ternal       |
-|              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
-|              |              |              | decides      |              |
-|              |              |              | which is     |              |
-|              |              |              | more         |              |
-|              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
-+--------------+--------------+--------------+--------------+--------------+
-| colperm      | OT_STRING    | \"colamd\"     | Specifies    | CasADi::Supe |
-|              |              |              | how to       | rLUInternal  |
-|              |              |              | permute the  |              |
-|              |              |              | columns of   |              |
-|              |              |              | the matrix   |              |
-|              |              |              | for sparsity |              |
-|              |              |              | preservation |              |
-|              |              |              | .            |              |
-+--------------+--------------+--------------+--------------+--------------+
-| conditionnum | OT_BOOLEAN   | false        |              | CasADi::Supe |
-| ber          |              |              |              | rLUInternal  |
-+--------------+--------------+--------------+--------------+--------------+
-| diagpivotthr | OT_REAL      | 1            |              | CasADi::Supe |
-| esh          |              |              |              | rLUInternal  |
-+--------------+--------------+--------------+--------------+--------------+
-| equil        | OT_BOOLEAN   | true         | Specifies    | CasADi::Supe |
-|              |              |              | whether to   | rLUInternal  |
-|              |              |              | equilibrate  |              |
-|              |              |              | the system   |              |
-|              |              |              | (scale As    |              |
-|              |              |              | rows and     |              |
-|              |              |              | columns to   |              |
-|              |              |              | have unit    |              |
-|              |              |              | norm).       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| iterrefine   | OT_STRING    | \"norefine\"   |              | CasADi::Supe |
-|              |              |              |              | rLUInternal  |
-+--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
-| erator       | ENERATOR     | )            | pointer that | ternal       |
-|              |              |              | returns a    |              |
-|              |              |              | Jacobian     |              |
-|              |              |              | function     |              |
-|              |              |              | given a set  |              |
-|              |              |              | of desired   |              |
-|              |              |              | Jacobian     |              |
-|              |              |              | blocks,      |              |
-|              |              |              | overrides    |              |
-|              |              |              | internal     |              |
-|              |              |              | routines     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
-|              | TOR          | )            | be activated | ternal       |
-|              |              |              | (inputs|outp |              |
-|              |              |              | uts)         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
-| j_dir        |              |              | adjoint      | ternal       |
-|              |              |              | derivatives  |              |
-|              |              |              | to be        |              |
-|              |              |              | calculated s |              |
-|              |              |              | imultanously |              |
-+--------------+--------------+--------------+--------------+--------------+
-| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
-| d_dir        |              |              | forward      | ternal       |
-|              |              |              | derivatives  |              |
-|              |              |              | to be        |              |
-|              |              |              | calculated s |              |
-|              |              |              | imultanously |              |
-+--------------+--------------+--------------+--------------+--------------+
-| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
-| ian          |              |              | Hessians     | ternal       |
-|              |              |              | numerically  |              |
-|              |              |              | (using       |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives) |              |
-|              |              |              | rather than  |              |
-|              |              |              | with the     |              |
-|              |              |              | built-in     |              |
-|              |              |              | method       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
-| bian         |              |              | Jacobians    | ternal       |
-|              |              |              | numerically  |              |
-|              |              |              | (using       |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives) |              |
-|              |              |              | rather than  |              |
-|              |              |              | with the     |              |
-|              |              |              | built-in     |              |
-|              |              |              | method       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| pivotgrowth  | OT_BOOLEAN   | false        |              | CasADi::Supe |
-|              |              |              |              | rLUInternal  |
-+--------------+--------------+--------------+--------------+--------------+
-| printstat    | OT_BOOLEAN   | true         |              | CasADi::Supe |
-|              |              |              |              | rLUInternal  |
-+--------------+--------------+--------------+--------------+--------------+
-| rowperm      | OT_STRING    | \"largediag\"  |              | CasADi::Supe |
-|              |              |              |              | rLUInternal  |
-+--------------+--------------+--------------+--------------+--------------+
-| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
-|              |              |              | sparse       | ternal       |
-+--------------+--------------+--------------+--------------+--------------+
-| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
-| erator       | ENERATOR     | )            | that         | ternal       |
-|              |              |              | provides     |              |
-|              |              |              | sparsity for |              |
-|              |              |              | a given      |              |
-|              |              |              | input output |              |
-|              |              |              | block,       |              |
-|              |              |              | overrides    |              |
-|              |              |              | internal     |              |
-|              |              |              | routines     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
-| ans          |              |              | references   | ternal       |
-|              |              |              | to generated |              |
-|              |              |              | Jacobians in |              |
-|              |              |              | order to     |              |
-|              |              |              | avoid        |              |
-|              |              |              | generating   |              |
-|              |              |              | identical    |              |
-|              |              |              | Jacobians    |              |
-|              |              |              | multiple     |              |
-|              |              |              | times        |              |
-+--------------+--------------+--------------+--------------+--------------+
-| symmetricmod | OT_BOOLEAN   | false        |              | CasADi::Supe |
-| e            |              |              |              | rLUInternal  |
-+--------------+--------------+--------------+--------------+--------------+
-| trans        | OT_BOOLEAN   | false        |              | CasADi::Line |
-|              |              |              |              | arSolverInte |
-|              |              |              |              | rnal         |
-+--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
-|              |              | )            | defined      | ternal       |
-|              |              |              | field that   |              |
-|              |              |              | can be used  |              |
-|              |              |              | to identify  |              |
-|              |              |              | the function |              |
-|              |              |              | or pass      |              |
-|              |              |              | additional   |              |
-|              |              |              | information  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| user_work    | OT_BOOLEAN   | false        | keep work in | CasADi::Supe |
-|              |              |              | memory       | rLUInternal  |
-+--------------+--------------+--------------+--------------+--------------+
-| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
-|              |              |              | evaluation   | ternal       |
-|              |              |              | for          |              |
-|              |              |              | debugging    |              |
-+--------------+--------------+--------------+--------------+--------------+
-
-C++ includes: b0_options.hpp ";
 
 
 // File: classCasADi_1_1SX.xml
@@ -73462,13 +73119,15 @@ integration function
 Helper function for 'IntegratorInput' Input arguments of an integrator
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
-+---------------+----------------------------------------------+
-|     Name      |                 Description                  |
-+===============+==============================================+
-| INTEGRATOR_X0 | Differential state at the initial time [x0]. |
-+---------------+----------------------------------------------+
-| INTEGRATOR_P  | Parameters [p]                               |
-+---------------+----------------------------------------------+
++----------------+------------------------------------------------------+
+|      Name      |                     Description                      |
++================+======================================================+
+| INTEGRATOR_X0  | Differential state at the initial time [x0].         |
++----------------+------------------------------------------------------+
+| INTEGRATOR_P   | Parameters [p].                                      |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
 ";
 
 %feature("docstring")  CasADi::Interfaces::integratorOut "

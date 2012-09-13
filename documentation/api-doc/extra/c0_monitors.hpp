@@ -150,6 +150,7 @@
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
+<tr><td>dx</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>eval_f</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>eval_g</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>eval_grad_f</td><td>CasADi::SQPInternal</td></tr>
@@ -166,6 +167,7 @@
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
+<tr><td>dx</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>eval_f</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>eval_g</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>eval_grad_f</td><td>CasADi::SQPInternal</td></tr>
