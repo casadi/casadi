@@ -132,7 +132,7 @@ void RKIntegratorInternal::evaluate(int nfdir, int nadir){
   IntegratorInternal::evaluate(nfdir,nadir);
 }
 
-void RKIntegratorInternal::reset(){
+void RKIntegratorInternal::reset(int nsens, int nsensB, int nsensB_store){
   int nfdir = 0; // NOTE: need to update the function below to the new integrator formulation
   
   // Pass the inputs

@@ -206,13 +206,21 @@ public:
   /// Access functions of the node
   const IntegratorInternal* operator->() const;
   
-  /// Reset the forward problem and bring the time back to t0 and state back to INTEGRATOR_X0
-  void reset();
+  /** \brief Reset the forward problem
+   * Time will be set to t0 and state to input(INTEGRATOR_X0)
+   * \param nsens        Number of sensitivities to be propagated along with the integration forward in time
+   * \param nsensB       Number of sensitivities to be propagated along with the integration backward in time
+   * \param nsensB_store Number of sensitivities to be propagated along with the integration backward in time 
+   *                     that depend on sensitivities propagated along with the integration forward in time
+   */
+  void reset(int nsens=0, int nsensB=0, int nsensB_store=0);
 
   /// Integrate forward until a specified time point 
   void integrate(double t_out);
 
-  /// Reset the backward problem and take time to tf
+  /** \brief Reset the backward problem
+   * Time will be set to tf and backward state to input(INTEGRATOR_RX0)
+   */
   void resetB();
 
   /// Integrate backward until a specified time point

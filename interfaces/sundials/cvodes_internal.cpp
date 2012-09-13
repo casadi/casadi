@@ -427,7 +427,7 @@ try{
   }
 }
   
-void CVodesInternal::reset(){
+void CVodesInternal::reset(int nsens, int nsensB, int nsensB_store){
   int nfdir = 0; // NOTE: need to update the function below to the new integrator formulation
   if(monitored("reset")){
     cout << "initial state: " << endl;

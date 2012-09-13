@@ -48,8 +48,8 @@ const IntegratorInternal* Integrator::operator->() const{
    return (const IntegratorInternal*)(FX::operator->()); 
 }
   
-void Integrator::reset(){
-  (*this)->reset();
+void Integrator::reset(int nsens, int nsensB, int nsensB_store){
+  (*this)->reset(nsens, nsensB, nsensB_store);
 }
 
 void Integrator::integrate(double t_out){

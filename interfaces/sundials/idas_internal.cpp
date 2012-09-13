@@ -666,7 +666,7 @@ int IdasInternal::resS_wrapper(int Ns, double t, N_Vector xz, N_Vector xzdot, N_
   }
 }
 
-void IdasInternal::reset(){
+void IdasInternal::reset(int nsens, int nsensB, int nsensB_store){
   log("IdasInternal::reset","begin");
   int nfdir = 0; // NOTE: need to update the function below to the new integrator formulation
   

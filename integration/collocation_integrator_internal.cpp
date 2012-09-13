@@ -469,7 +469,7 @@ void CollocationIntegratorInternal::evaluate(int nfdir, int nadir){
 }
 
   
-void CollocationIntegratorInternal::reset(){
+void CollocationIntegratorInternal::reset(int nsens, int nsensB, int nsensB_store){
   // Pass the inputs
   const vector<double>& x0 = input(INTEGRATOR_X0).data();
   implicit_solver_.input(0).setArray(&x0.front(),ny_); // only the ny_ first elements

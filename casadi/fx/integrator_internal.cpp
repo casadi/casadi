@@ -56,14 +56,23 @@ IntegratorInternal::~IntegratorInternal(){
 void IntegratorInternal::evaluate(int nfdir, int nadir){
   if(nfdir==0 && nadir==0){
   
+    // Number of sensitivities integrating forward
+    int nsens = nfdir; // NOTE: Can be overly pessimistic e.g. if there are no seeds at all in some directions
+    
+    // Number of sensitivities integrate_backward 
+    int nsensB = nrx_>0 ? nfdir : 0; // NOTE: Can be overly pessimistic e.g. if there are no seeds at all in some directions
+    
+    // Number of sensitivities in the forward integration to be used in the backward integration
+    int nsensB_store = nsensB; // NOTE: Can be overly pessimistic e.g. if some sensitivities do not depend on the forward sensitivities
+    
     // Reset solver
-    reset();
+    reset(nsens,nsensB,nsensB_store);
 
     // Integrate forward to the end of the time horizon
     integrate(tf_);
 
     // If backwards integration is needed
-    if(!g_.isNull()){
+    if(nrx_>0){
       
       // Re-initialize backward problem
       resetB();
