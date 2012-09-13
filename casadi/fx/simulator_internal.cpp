@@ -106,7 +106,6 @@ void SimulatorInternal::init(){
 }
 
 void SimulatorInternal::evaluate(int nfdir, int nadir){
-  casadi_assert_message(nfdir==0, "Not implemented");
   casadi_assert_message(nadir==0, "Not implemented");
   
   // Pass the parameters and initial state
@@ -119,8 +118,14 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
     std::cout << " p      = "   << input(INTEGRATOR_P) << std::endl;
   }
   
+  // Pass sensitivities if fsens 
+  for(int dir=0; dir<nfdir; ++dir){ 
+    integrator_.setFwdSeed(fwdSeed(INTEGRATOR_X0,dir),INTEGRATOR_X0,dir); 
+    integrator_.setFwdSeed(fwdSeed(INTEGRATOR_P,dir),INTEGRATOR_P,dir); 
+  }
+    
   // Reset the integrator_
-  integrator_.reset();
+  integrator_.reset(nfdir);
   
   // Advance solution in time
   for(int k=0; k<grid_.size(); ++k){
@@ -149,8 +154,15 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
     // Save the states for use in backwards sensitivities
     states_[k].set(integrator_.output(INTEGRATOR_XF));
     
+    for(int dir=0; dir<nfdir; ++dir){ 
+      // Pass the forward seed to the output function 
+      output_fcn_.setFwdSeed(0.0,DAE_T,dir); 
+      output_fcn_.setFwdSeed(integrator_.fwdSens(INTEGRATOR_XF,dir),DAE_X,dir); 
+      output_fcn_.setFwdSeed(fwdSeed(INTEGRATOR_P,dir),DAE_P,dir); 
+    }
+
     // Evaluate output function
-    output_fcn_.evaluate();
+    output_fcn_.evaluate(nfdir);
 
     // Save the output of the function
     for(int i=0; i<output_.size(); ++i){
@@ -159,6 +171,15 @@ void SimulatorInternal::evaluate(int nfdir, int nadir){
       for(int j=0; j<res.numel(); ++j){
         ores(k,j) = res(j); // NOTE: inefficient implementation
       }
+    
+      // Save the forward sensitivities
+      for(int dir=0; dir<nfdir; ++dir){
+        const Matrix<double> &fres = output_fcn_.fwdSens(i,dir); 
+        Matrix<double> &ofres = fwdSens(i,dir); 
+        for(int j=0; j<fres.numel(); ++j){ 
+          ofres(k,j) = fres(j); // NOTE: inefficient implementation 
+        }
+      }     
     }
   }
 }

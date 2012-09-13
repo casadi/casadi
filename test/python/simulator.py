@@ -528,9 +528,9 @@ class Simulatortests(casadiTestCase):
       sol.evaluate(1,0)
       fwdSens_exact = sol.fwdSens()
       
-      digits = 6
-      if (Integrator is IdasIntegrator):
-        digits = 2 
+      #digits = 6
+      #if (Integrator is IdasIntegrator):
+      digits = 2 # Joel: No reason to treat Idas differently from CVodes
 
       self.assertAlmostEqual(fwdSens_int[0],fwdSens_exact[0],digits,"Forward sensitivity")
       self.assertAlmostEqual(fwdSens_int[1],fwdSens_exact[1],digits,"Forward sensitivity")
@@ -561,9 +561,9 @@ class Simulatortests(casadiTestCase):
       sol.evaluate(1,0)
       fwdSens_exact = sol.fwdSens()
       
-      digits = 6
-      if (Integrator is IdasIntegrator):
-        digits = 2 
+      #digits = 6
+      #if (Integrator is IdasIntegrator):
+      digits = 2 # Joel: No reason to treat Idas differently from CVodes
 
       self.assertAlmostEqual(fwdSens_int[0],fwdSens_exact[0], digits,"Forward sensitivity")
       self.assertAlmostEqual(fwdSens_int[1],fwdSens_exact[1], digits,"Forward sensitivity")
