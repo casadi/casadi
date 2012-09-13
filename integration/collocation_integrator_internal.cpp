@@ -572,7 +572,7 @@ void CollocationIntegratorInternal::reset(){
   integrated_once_ = true;
 }
 
-void CollocationIntegratorInternal::resetAdj(){
+void CollocationIntegratorInternal::resetB(){
 }
 
 void CollocationIntegratorInternal::integrate(double t_out){
@@ -621,7 +621,7 @@ void CollocationIntegratorInternal::integrate(double t_out){
   }
 }
 
-void CollocationIntegratorInternal::integrateAdj(double t_out){
+void CollocationIntegratorInternal::integrateB(double t_out){
 }
 
 FX CollocationIntegratorInternal::getJacobian(){

@@ -530,7 +530,7 @@ void CVodesInternal::integrate(double t_out){
   log("CVODES::integrate end");
 }
 
-void CVodesInternal::resetAdj(){
+void CVodesInternal::resetB(){
   int flag;
   
   if(isInitAdj_){
@@ -550,7 +550,7 @@ void CVodesInternal::resetAdj(){
   }
 }
 
-void CVodesInternal::integrateAdj(double t_out){
+void CVodesInternal::integrateB(double t_out){
   int flag;
   
   // Integrate backward to t_out

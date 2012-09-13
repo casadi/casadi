@@ -57,17 +57,17 @@ public:
   /** \brief  Print solver statistics */
   virtual void printStats(std::ostream &stream) const = 0;
 
-    /** \brief  Reset the solver and bring the time back to t0 */
+    /** \brief  Reset the forward problem and bring the time back to t0 */
   virtual void reset() = 0;
 
-    /** \brief  Reset the solver of the adjoint problem and take time to tf */
-  virtual void resetAdj() = 0;
+    /** \brief  Reset the backward problem and take time to tf */
+  virtual void resetB() = 0;
 
-  /** \brief  Integrate until a specified time point */
+  /** \brief  Integrate forward until a specified time point */
   virtual void integrate(double t_out) = 0;
 
-  /** \brief  Integrate backwards in time until a specified time point */
-  virtual void integrateAdj(double t_out) = 0;
+  /** \brief  Integrate backward until a specified time point */
+  virtual void integrateB(double t_out) = 0;
 
   /** \brief  evaluate */
   virtual void evaluate(int nfdir, int nadir);

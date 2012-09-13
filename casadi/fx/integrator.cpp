@@ -60,12 +60,12 @@ bool Integrator::checkNode() const{
   return dynamic_cast<const IntegratorInternal*>(get())!=0;
 }
 
-void Integrator::resetAdj(){
-  (*this)->resetAdj();
+void Integrator::resetB(){
+  (*this)->resetB();
 }
 
-void Integrator::integrateAdj(double t_out){
-  (*this)->integrateAdj(t_out);
+void Integrator::integrateB(double t_out){
+  (*this)->integrateB(t_out);
 }
 
 FX Integrator::getDAE(){

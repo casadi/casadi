@@ -71,17 +71,17 @@ public:
   /** \brief Initialize the adjoint problem (can only be called after the first integration) */
   virtual void initAdj();
 
-  /** \brief  Reset the solver and bring the time back to t0 */
+  /** \brief  Reset the forward problem and bring the time back to t0 */
   virtual void reset();
 
-  /** \brief  Reset the solver of the adjoint problem and take time to tf */
-  virtual void resetAdj();
+  /** \brief  Reset the backward problem and take time to tf */
+  virtual void resetB();
 
-  /** \brief  Integrate until a specified time point */
+  /** \brief  Integrate forward until a specified time point */
   virtual void integrate(double t_out);
 
-  /** \brief  Integrate backwards in time until a specified time point */
-  virtual void integrateAdj(double t_out);
+  /** \brief  Integrate backward until a specified time point */
+  virtual void integrateB(double t_out);
 
   /** \brief  Set the stop time of the forward integration */
   virtual void setStopTime(double tf);

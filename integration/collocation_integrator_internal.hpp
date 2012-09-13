@@ -55,11 +55,11 @@ public:
   /// Initialize the adjoint problem (can only be called after the first integration)
   virtual void initAdj();
 
-  /// Reset the solver and bring the time back to t0
+  /// Reset the forward problem and bring the time back to t0
   virtual void reset();
 
-  /// Reset the solver of the adjoint problem and take time to tf
-  virtual void resetAdj();
+  /// Reset the backward problem and take time to tf
+  virtual void resetB();
 
   /// Overload this method, since the number of derivative directions currently aren't passed
   virtual void evaluate(int nfdir, int nadir);
@@ -68,7 +68,7 @@ public:
   virtual void integrate(double t_out);
 
   /// Integrate backwards in time until a specified time point
-  virtual void integrateAdj(double t_out);
+  virtual void integrateB(double t_out);
 
   /// Get the jacobian in the nonlinear iteration
   virtual FX getJacobian();

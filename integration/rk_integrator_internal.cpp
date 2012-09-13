@@ -168,13 +168,13 @@ void RKIntegratorInternal::reset(){
   }
 }
 
-void RKIntegratorInternal::resetAdj(){
+void RKIntegratorInternal::resetB(){
 }
 
 void RKIntegratorInternal::integrate(double t_out){
 }
 
-void RKIntegratorInternal::integrateAdj(double t_out){
+void RKIntegratorInternal::integrateB(double t_out){
 }
 
 FX RKIntegratorInternal::getJacobian(){

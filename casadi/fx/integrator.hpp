@@ -206,17 +206,17 @@ public:
   /// Access functions of the node
   const IntegratorInternal* operator->() const;
   
-  /// Reset the solver and bring the time back to t0 and state back to INTEGRATOR_X0
+  /// Reset the forward problem and bring the time back to t0 and state back to INTEGRATOR_X0
   void reset();
 
-  /// Integrate until a specified time point 
+  /// Integrate forward until a specified time point 
   void integrate(double t_out);
 
-  /// Reset the solver of the adjoint problem and take time to tf
-  void resetAdj();
+  /// Reset the backward problem and take time to tf
+  void resetB();
 
-  /// Integrate backwards in time until a specified time point
-  void integrateAdj(double t_out);
+  /// Integrate backward until a specified time point
+  void integrateB(double t_out);
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;

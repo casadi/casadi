@@ -66,10 +66,10 @@ void IntegratorInternal::evaluate(int nfdir, int nadir){
     if(!g_.isNull()){
       
       // Re-initialize backward problem
-      resetAdj();
+      resetB();
 
       // Integrate backwards to the beginning
-      integrateAdj(t0_);
+      integrateB(t0_);
     }
   } else {
     // NOTE: The following is a general functionality that should be moved to the base class

@@ -854,7 +854,7 @@ void IdasInternal::integrate(double t_out){
   log("IdasInternal::integrate","end");
 }
 
-void IdasInternal::resetAdj(){
+void IdasInternal::resetB(){
   int flag;
   
   // Reset adjoint sensitivities for the parameters
@@ -897,7 +897,7 @@ void IdasInternal::resetAdj(){
   }
 }
 
-void IdasInternal::integrateAdj(double t_out){
+void IdasInternal::integrateB(double t_out){
   int flag;
   // Integrate backwards to t_out
   flag = IDASolveB(mem_, t_out, IDA_NORMAL);
