@@ -62724,10 +62724,17 @@ Assert that the object has been initialized. ";
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| eta          | OT_REAL      | 0.000        | Linesearch   | CasADi::SQPI |
-|              |              |              | parameter:   | nternal      |
-|              |              |              | See Nocedal  |              |
-|              |              |              | 3.4          |              |
+| beta         | OT_REAL      | 0.800        | Line-search  | CasADi::SQPI |
+|              |              |              | parameter,   | nternal      |
+|              |              |              | restoration  |              |
+|              |              |              | factor of    |              |
+|              |              |              | stepsize     |              |
++--------------+--------------+--------------+--------------+--------------+
+| c1           | OT_REAL      | 0.000        | Armijo       | CasADi::SQPI |
+|              |              |              | condition,   | nternal      |
+|              |              |              | coefficient  |              |
+|              |              |              | of decrease  |              |
+|              |              |              | in merit     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
 |              |              |              | objective    | olverInterna |
@@ -62766,8 +62773,8 @@ Assert that the object has been initialized. ";
 |              |              |              | if not       |              |
 |              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| hessian_appr | OT_STRING    | \"BFGS\"       | BFGS|exact   | CasADi::SQPI |
-| oximation    |              |              |              | nternal      |
+| hessian_appr | OT_STRING    | \"limited-    | limited-     | CasADi::SQPI |
+| oximation    |              | memory\"      | memory|exact | nternal      |
 +--------------+--------------+--------------+--------------+--------------+
 | ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
 | _vec         |              |              | true, the    | olverInterna |
@@ -62823,15 +62830,30 @@ Assert that the object has been initialized. ";
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| lbfgs_memory | OT_INTEGER   | 10           | Size of      | CasADi::SQPI |
+|              |              |              | L-BFGS       | nternal      |
+|              |              |              | memory.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| line-search  | OT_STRING    | \"simple\"     | simple|armij | CasADi::SQPI |
+|              |              |              | o            | nternal      |
++--------------+--------------+--------------+--------------+--------------+
 | maxiter      | OT_INTEGER   | 100          | Maximum      | CasADi::SQPI |
 |              |              |              | number of    | nternal      |
 |              |              |              | SQP          |              |
 |              |              |              | iterations   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| maxiter_ls   | OT_INTEGER   | 100          | Maximum      | CasADi::SQPI |
+| maxiter_ls   | OT_INTEGER   | 3            | Maximum      | CasADi::SQPI |
 |              |              |              | number of    | nternal      |
 |              |              |              | linesearch   |              |
 |              |              |              | iterations   |              |
++--------------+--------------+--------------+--------------+--------------+
+| merit_memory | OT_INTEGER   | 1            | Size of      | CasADi::SQPI |
+|              |              |              | memory to    | nternal      |
+|              |              |              | store        |              |
+|              |              |              | history of   |              |
+|              |              |              | merit        |              |
+|              |              |              | function     |              |
+|              |              |              | values       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal   Cas |
@@ -62840,12 +62862,7 @@ Assert that the object has been initialized. ";
 |              |              |              | f|eval_g|eva |              |
 |              |              |              | l_jac_g|eval |              |
 |              |              |              | _grad_f|eval |              |
-|              |              |              | _h|qp)       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| mu_safety    | OT_REAL      | 1.100        | Safety       | CasADi::SQPI |
-|              |              |              | factor for   | nternal      |
-|              |              |              | linesearch   |              |
-|              |              |              | mu           |              |
+|              |              |              | _h|qp|dx)    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -62909,12 +62926,6 @@ Assert that the object has been initialized. ";
 |              |              |              | the QP       |              |
 |              |              |              | solver       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| rho          | OT_REAL      | 0.500        | Linesearch   | CasADi::SQPI |
-|              |              |              | parameter    | nternal      |
-+--------------+--------------+--------------+--------------+--------------+
-| sigma        | OT_REAL      | 1            | Linesearch   | CasADi::SQPI |
-|              |              |              | parameter    | nternal      |
-+--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -62941,19 +62952,15 @@ Assert that the object has been initialized. ";
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| tau          | OT_REAL      | 0.200        | Linesearch   | CasADi::SQPI |
-|              |              |              | parameter    | nternal      |
-+--------------+--------------+--------------+--------------+--------------+
-| toldx        | OT_REAL      | 0.000        | Stopping     | CasADi::SQPI |
+| tol_du       | OT_REAL      | 0.000        | Stopping     | CasADi::SQPI |
 |              |              |              | criterion    | nternal      |
-|              |              |              | for the      |              |
-|              |              |              | stepsize     |              |
+|              |              |              | for dual inf |              |
+|              |              |              | easability   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| tolgl        | OT_REAL      | 0.000        | Stopping     | CasADi::SQPI |
+| tol_pr       | OT_REAL      | 0.000        | Stopping     | CasADi::SQPI |
 |              |              |              | criterion    | nternal      |
-|              |              |              | for the      |              |
-|              |              |              | Lagrangian   |              |
-|              |              |              | gradient     |              |
+|              |              |              | for primal i |              |
+|              |              |              | nfeasibility |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
 |              |              | )            | defined      | ternal       |
@@ -62981,6 +62988,8 @@ Assert that the object has been initialized. ";
 +-------------+---------------------+
 |     Id      |       Used in       |
 +=============+=====================+
+| dx          | CasADi::SQPInternal |
++-------------+---------------------+
 | eval_f      | CasADi::SQPInternal |
 +-------------+---------------------+
 | eval_g      | CasADi::SQPInternal |
@@ -63002,17 +63011,7 @@ Assert that the object has been initialized. ";
 +------------+---------------------+
 |     Id     |       Used in       |
 +============+=====================+
-| eq_viol    | CasADi::SQPInternal |
-+------------+---------------------+
-| iter       | CasADi::SQPInternal |
-+------------+---------------------+
 | iter_count | CasADi::SQPInternal |
-+------------+---------------------+
-| lsiter     | CasADi::SQPInternal |
-+------------+---------------------+
-| normdx     | CasADi::SQPInternal |
-+------------+---------------------+
-| normgradL  | CasADi::SQPInternal |
 +------------+---------------------+
 
 C++ includes: sqp_internal.hpp ";
@@ -63453,10 +63452,17 @@ Joel Andersson and Attila Kozma
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| eta          | OT_REAL      | 0.000        | Linesearch   | CasADi::SQPI |
-|              |              |              | parameter:   | nternal      |
-|              |              |              | See Nocedal  |              |
-|              |              |              | 3.4          |              |
+| beta         | OT_REAL      | 0.800        | Line-search  | CasADi::SQPI |
+|              |              |              | parameter,   | nternal      |
+|              |              |              | restoration  |              |
+|              |              |              | factor of    |              |
+|              |              |              | stepsize     |              |
++--------------+--------------+--------------+--------------+--------------+
+| c1           | OT_REAL      | 0.000        | Armijo       | CasADi::SQPI |
+|              |              |              | condition,   | nternal      |
+|              |              |              | coefficient  |              |
+|              |              |              | of decrease  |              |
+|              |              |              | in merit     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
 |              |              |              | objective    | olverInterna |
@@ -63495,8 +63501,8 @@ Joel Andersson and Attila Kozma
 |              |              |              | if not       |              |
 |              |              |              | supplied     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| hessian_appr | OT_STRING    | \"BFGS\"       | BFGS|exact   | CasADi::SQPI |
-| oximation    |              |              |              | nternal      |
+| hessian_appr | OT_STRING    | \"limited-    | limited-     | CasADi::SQPI |
+| oximation    |              | memory\"      | memory|exact | nternal      |
 +--------------+--------------+--------------+--------------+--------------+
 | ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
 | _vec         |              |              | true, the    | olverInterna |
@@ -63552,15 +63558,30 @@ Joel Andersson and Attila Kozma
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| lbfgs_memory | OT_INTEGER   | 10           | Size of      | CasADi::SQPI |
+|              |              |              | L-BFGS       | nternal      |
+|              |              |              | memory.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| line-search  | OT_STRING    | \"simple\"     | simple|armij | CasADi::SQPI |
+|              |              |              | o            | nternal      |
++--------------+--------------+--------------+--------------+--------------+
 | maxiter      | OT_INTEGER   | 100          | Maximum      | CasADi::SQPI |
 |              |              |              | number of    | nternal      |
 |              |              |              | SQP          |              |
 |              |              |              | iterations   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| maxiter_ls   | OT_INTEGER   | 100          | Maximum      | CasADi::SQPI |
+| maxiter_ls   | OT_INTEGER   | 3            | Maximum      | CasADi::SQPI |
 |              |              |              | number of    | nternal      |
 |              |              |              | linesearch   |              |
 |              |              |              | iterations   |              |
++--------------+--------------+--------------+--------------+--------------+
+| merit_memory | OT_INTEGER   | 1            | Size of      | CasADi::SQPI |
+|              |              |              | memory to    | nternal      |
+|              |              |              | store        |              |
+|              |              |              | history of   |              |
+|              |              |              | merit        |              |
+|              |              |              | function     |              |
+|              |              |              | values       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal   Cas |
@@ -63569,12 +63590,7 @@ Joel Andersson and Attila Kozma
 |              |              |              | f|eval_g|eva |              |
 |              |              |              | l_jac_g|eval |              |
 |              |              |              | _grad_f|eval |              |
-|              |              |              | _h|qp)       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| mu_safety    | OT_REAL      | 1.100        | Safety       | CasADi::SQPI |
-|              |              |              | factor for   | nternal      |
-|              |              |              | linesearch   |              |
-|              |              |              | mu           |              |
+|              |              |              | _h|qp|dx)    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -63638,12 +63654,6 @@ Joel Andersson and Attila Kozma
 |              |              |              | the QP       |              |
 |              |              |              | solver       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| rho          | OT_REAL      | 0.500        | Linesearch   | CasADi::SQPI |
-|              |              |              | parameter    | nternal      |
-+--------------+--------------+--------------+--------------+--------------+
-| sigma        | OT_REAL      | 1            | Linesearch   | CasADi::SQPI |
-|              |              |              | parameter    | nternal      |
-+--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -63670,19 +63680,15 @@ Joel Andersson and Attila Kozma
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| tau          | OT_REAL      | 0.200        | Linesearch   | CasADi::SQPI |
-|              |              |              | parameter    | nternal      |
-+--------------+--------------+--------------+--------------+--------------+
-| toldx        | OT_REAL      | 0.000        | Stopping     | CasADi::SQPI |
+| tol_du       | OT_REAL      | 0.000        | Stopping     | CasADi::SQPI |
 |              |              |              | criterion    | nternal      |
-|              |              |              | for the      |              |
-|              |              |              | stepsize     |              |
+|              |              |              | for dual inf |              |
+|              |              |              | easability   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| tolgl        | OT_REAL      | 0.000        | Stopping     | CasADi::SQPI |
+| tol_pr       | OT_REAL      | 0.000        | Stopping     | CasADi::SQPI |
 |              |              |              | criterion    | nternal      |
-|              |              |              | for the      |              |
-|              |              |              | Lagrangian   |              |
-|              |              |              | gradient     |              |
+|              |              |              | for primal i |              |
+|              |              |              | nfeasibility |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
 |              |              | )            | defined      | ternal       |
@@ -63710,6 +63716,8 @@ Joel Andersson and Attila Kozma
 +-------------+---------------------+
 |     Id      |       Used in       |
 +=============+=====================+
+| dx          | CasADi::SQPInternal |
++-------------+---------------------+
 | eval_f      | CasADi::SQPInternal |
 +-------------+---------------------+
 | eval_g      | CasADi::SQPInternal |
@@ -63731,17 +63739,7 @@ Joel Andersson and Attila Kozma
 +------------+---------------------+
 |     Id     |       Used in       |
 +============+=====================+
-| eq_viol    | CasADi::SQPInternal |
-+------------+---------------------+
-| iter       | CasADi::SQPInternal |
-+------------+---------------------+
 | iter_count | CasADi::SQPInternal |
-+------------+---------------------+
-| lsiter     | CasADi::SQPInternal |
-+------------+---------------------+
-| normdx     | CasADi::SQPInternal |
-+------------+---------------------+
-| normgradL  | CasADi::SQPInternal |
 +------------+---------------------+
 
 C++ includes: sqp_method.hpp ";
