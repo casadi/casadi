@@ -27,6 +27,8 @@
 #include "../sx/sx_tools.hpp"
 #include "../mx/mx_tools.hpp"
 #include "fx_tools.hpp"
+#include <utility>
+#include <string>
 
 INPUTSCHEME(ControlSimulatorInput)
 
@@ -43,6 +45,8 @@ ControlSimulatorInternal::ControlSimulatorInternal(const FX& control_dae, const 
   addOption("simulator_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the simulator");
   addOption("control_interpolation",   OT_STRING,     "none", "none|nearest|linear");
   addOption("control_endpoint",        OT_BOOLEAN,       false, "Include a control value at the end of the simulation domain. Used for interpolation.");
+  
+  inputScheme = SCHEME_ControlSimulatorInput;
 }
   
 ControlSimulatorInternal::~ControlSimulatorInternal(){
@@ -138,7 +142,8 @@ void ControlSimulatorInternal::init(){
   std::vector<MX> control_dae_call = control_dae_.call(control_dae_in_);
   
   
-  std::vector<MX> dae_out(daeOut((dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0))*control_dae_call[0]));
+  std::vector<MX> dae_out(daeOut("ode",(dae_in_[DAE_P](iTF)-dae_in_[DAE_P](iT0))*control_dae_call[DAE_ODE]));
+
   int i=1;
   while( control_dae_call.size()>i && dae_out.size()>i) {dae_out[i] = control_dae_call[i];i++;}
    

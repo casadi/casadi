@@ -305,7 +305,7 @@ is_differential_gentype
 assert(is_differential_gentype.isDoubleVector())
 
 x=ssym("x")
-f = SXFunction(daeIn(x),daeOut(x))
+f = SXFunction(daeIn("x",x),daeOut("ode",x))
 
 integrator = CVodesIntegrator(f)
 

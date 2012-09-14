@@ -45,20 +45,21 @@ public:
   /// maximum number of sqp iterations
   int maxiter_; 
 
-  /// stopping criterion for the stepsize
-  double toldx_;
-  
-  /// stopping criterion for the lagrangian gradient
-  double tolgl_;
+  /// Memory size of L-BFGS method
+  int lbfgs_memory_;
+  /// Tolerance of primal infeasibility
+  double tol_pr_;
+  /// Tolerance of dual infeasibility
+  double tol_du_;
 
   /// Linesearch parameters
   //@{
   double sigma_;
-  double rho_;
-  double mu_safety_;
-  double eta_;
-  double tau_;
+  double c1_;
+  double beta_;
   int maxiter_ls_;
+  int merit_memsize_;
+
   //@}
 };
 

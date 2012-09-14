@@ -92,7 +92,7 @@ int main(){
   x0[2] = 1;
 
   // DAE residual function
-  SXFunction daefcn(daeIn<SXMatrix>(x,SXMatrix(),u,t,xdot),daeOut<SXMatrix>(res));
+  SXFunction daefcn(daeIn<SXMatrix>("x",x, "p",u, "t",t, "xdot",xdot),daeOut<SXMatrix>("ode",res));
   daefcn.setOption("name","DAE residual");
 
   // Integrator

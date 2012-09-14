@@ -146,7 +146,7 @@ def create_CVODES():
   ode = vertcat([v, (u-0.02*v*v)/m, -0.01*u*u])-xdot
 
   # DAE residual function
-  ffcn = SXFunction(daeIn(x=x,p=u,t=t,xdot=xdot),daeOut(ode,[],quad))
+  ffcn = SXFunction(daeIn(t=t,x=x,p=u,xdot=xdot),daeOut(ode=ode,quad=quad))
   
   if collocation_integrator:
     # Create a collocation integrator

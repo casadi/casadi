@@ -292,6 +292,17 @@ class Misctests(casadiTestCase):
       f.setOption("integrator_options",None) # This should not give a segfault
     except:
       pass
+  
+  def test_regression448(self):
+    self.message("regression test for segfaukt when printing")
+    x = ssym("x")
+
+    f = SXFunction(controldaeIn(x=x),daeOut(ode=x))
+    f.init()
+
+    sim = ControlSimulator(f,[0,1])
+    sim.setOption("integrator_options",{"abstol": 1e-4})
+    sim.printOptions()
       
 if __name__ == '__main__':
     unittest.main()

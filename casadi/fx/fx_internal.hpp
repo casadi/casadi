@@ -174,7 +174,22 @@ class FXInternal : public OptionsFunctionalityNode{
     
     /** \brief  Print */
     virtual void repr(std::ostream &stream) const;
-  
+    
+    /** \brief Find the index for a string describing a particular entry of an input scheme
+    * example:  schemeEntry("x_opt")  -> returns  NLP_X_OPT if FXInternal adheres to SCHEME_NLPINput 
+    */
+    int inputSchemeEntry(const std::string &name) const;
+
+    /** \brief Find the index for a string describing a particular entry of an output scheme
+    * example:  schemeEntry("x_opt")  -> returns  NLP_X_OPT if FXInternal adheres to SCHEME_NLPINput 
+    */
+    int outputSchemeEntry(const std::string &name) const;
+
+    /** \brief Find the index for a string describing a particular entry of a scheme
+    * example:  schemeEntry("x_opt")  -> returns  NLP_X_OPT if FXInternal adheres to SCHEME_NLPINput 
+    */
+    int schemeEntry(InputOutputScheme scheme,const std::string &name) const;
+    
     /** \brief  Inputs of the function */
     std::vector<FunctionIO> input_;
 
@@ -190,14 +205,22 @@ class FXInternal : public OptionsFunctionalityNode{
     /// Is function fcn being monitored
     bool monitored(const std::string& mod) const;
     
-      /// Access input argument
+    /// Access input argument
     template<bool check=true>
     inline Matrix<double>& input(int iind=0){ return iStruct(iind).data;}
-      
+
+    /// Access input argument
+    template<bool check=true>
+    inline Matrix<double>& input(const std::string &iname){ return input(inputSchemeEntry(iname));}
+    
     /// Const access input argument
     template<bool check=true>
     inline const Matrix<double>& input(int iind=0) const{ return iStruct(iind).data;}
 
+    /// Const access input argument
+    template<bool check=true>
+    inline const Matrix<double>& input(const std::string &iname) const{  return input(inputSchemeEntry(iname)); }
+    
     /// Access input argument
     template<bool check=true>
     inline Matrix<double>& output(int oind=0){ return oStruct<check>(oind).data;}
@@ -393,6 +416,13 @@ class FXInternal : public OptionsFunctionalityNode{
     void* user_data_;
     
     bool monitor_inputs_, monitor_outputs_;
+    
+    /// The name of the input scheme of this function
+    InputOutputScheme inputScheme;
+    
+    /// The name of the output scheme of this function
+    InputOutputScheme outputScheme;
+    
 };
 
 

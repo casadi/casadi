@@ -60,12 +60,7 @@
 <table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>eq_viol</td><td>CasADi::SQPInternal</td></tr>
-<tr><td>iter</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>iter_count</td><td>CasADi::SQPInternal</td></tr>
-<tr><td>lsiter</td><td>CasADi::SQPInternal</td></tr>
-<tr><td>normdx</td><td>CasADi::SQPInternal</td></tr>
-<tr><td>normgradL</td><td>CasADi::SQPInternal</td></tr>
 </table>
 */
 /** \class CasADi::SQPMethod
@@ -74,12 +69,7 @@
 <table>
 <caption>List of available stats</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>eq_viol</td><td>CasADi::SQPInternal</td></tr>
-<tr><td>iter</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>iter_count</td><td>CasADi::SQPInternal</td></tr>
-<tr><td>lsiter</td><td>CasADi::SQPInternal</td></tr>
-<tr><td>normdx</td><td>CasADi::SQPInternal</td></tr>
-<tr><td>normgradL</td><td>CasADi::SQPInternal</td></tr>
 </table>
 */
 /** \class CasADi::ParallelizerInternal

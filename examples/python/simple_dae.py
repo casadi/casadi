@@ -109,19 +109,14 @@ xdot = ssym("xdot")
 ldot = ssym("ldot")
 
 # The residual of the IDAS dae
-dae_in = DAE_NUM_IN * [[]]
-dae_in[DAE_T] = t     # Time
-dae_in[DAE_X] = vertcat((x,l))   # States
-dae_in[DAE_Z] = z   # States
-dae_in[DAE_XDOT] = vertcat((xdot,ldot))   # State derivatives
-dae_in[DAE_P] = u     # Control
+dae_in = daeIn(t=t, x=vertcat((x,l)), z=z, xdot=vertcat((xdot,ldot)), p=u)
 
 # The DAE residual
 ode_res = vertcat((f[0]-xdot,f[1]-ldot))
 alg_res = f[2]
 
 # The DAE residual function
-dae = SXFunction(dae_in,daeOut(ode_res,alg_res))
+dae = SXFunction(dae_in,daeOut(ode=ode_res,alg=alg_res))
 
 # Create an integrator
 integrator = IdasIntegrator(dae)

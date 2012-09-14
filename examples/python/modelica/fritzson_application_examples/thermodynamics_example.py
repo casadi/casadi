@@ -72,14 +72,14 @@ ocp.makeExplicit()
 ocp.eliminateAlgebraic()
 
 # Create an integrator
-dae = SXFunction(daeIn(t=ocp.t,x=var(ocp.x),xdot=der(ocp.x),p=vertcat((var(ocp.pi),var(ocp.pf)))),daeOut(ocp.ode))
+dae = SXFunction(daeIn(t=ocp.t,x=var(ocp.x),xdot=der(ocp.x),p=vertcat((var(ocp.pi),var(ocp.pf)))),daeOut(ode=ocp.ode))
 integrator = CVodesIntegrator(dae)
 
 # Output function
 m = ocp.variable("m").var()
 P = ocp.variable("P").var()
 output_fcn_out = ocp.substituteDependents([m,P])
-output_fcn_in = daeIn(var(ocp.x),var(ocp.z),vertcat((var(ocp.pi),var(ocp.pf),var(ocp.u))),ocp.t,der(ocp.x))
+output_fcn_in = daeIn(x=var(ocp.x),z=var(ocp.z),p=vertcat((var(ocp.pi),var(ocp.pf),var(ocp.u))),t=ocp.t,xdot=der(ocp.x))
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
 
 # Create a simulator
@@ -124,13 +124,13 @@ ocp.makeExplicit()
 ocp.eliminateAlgebraic()
 
 # Create an integrator
-dae = SXFunction(daeIn(t=ocp.t,x=var(ocp.x),xdot=der(ocp.x),p=vertcat((var(ocp.pi),var(ocp.pf)))),daeOut(ocp.ode))
+dae = SXFunction(daeIn(t=ocp.t,x=var(ocp.x),xdot=der(ocp.x),p=vertcat((var(ocp.pi),var(ocp.pf)))),daeOut(ode=ocp.ode))
 integrator = CVodesIntegrator(dae)
 
 # Output function
 T = ocp.variable("T").var()
 output_fcn_out = ocp.substituteDependents([T])
-output_fcn_in = daeIn(var(ocp.x),var(ocp.z),vertcat((var(ocp.pi),var(ocp.pf),var(ocp.u))),ocp.t,der(ocp.x))
+output_fcn_in = daeIn(x=var(ocp.x),z=var(ocp.z),p=vertcat((var(ocp.pi),var(ocp.pf),var(ocp.u))),t=ocp.t,xdot=der(ocp.x))
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
 
 # Create a simulator
@@ -176,7 +176,7 @@ T = ocp.variable("T").var()
 U = ocp.variable("U").var()
 V = ocp.variable("V").var()
 output_fcn_out = ocp.substituteDependents([T,U,V])
-output_fcn_in = daeIn(var(ocp.x),var(ocp.z),vertcat((var(ocp.pi),var(ocp.pf),var(ocp.u))),ocp.t,der(ocp.x))
+output_fcn_in = daeIn(x=var(ocp.x),z=var(ocp.z),p=vertcat((var(ocp.pi),var(ocp.pf),var(ocp.u))),t=ocp.t,xdot=der(ocp.x))
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
 
 # Create a simulator

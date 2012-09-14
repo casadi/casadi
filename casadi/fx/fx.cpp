@@ -223,9 +223,18 @@ bool FX::checkNode() const{
 Matrix<double>& FX::input(int iind){
   return (*this)->input(iind);
 }
+
+Matrix<double>& FX::input(const std::string &iname){
+  return (*this)->input(iname);
+}
+    
     
 const Matrix<double>& FX::input(int iind) const{
   return (*this)->input(iind);
+}
+
+const Matrix<double>& FX::input(const std::string & iname) const{
+  return (*this)->input(iname);
 }
 
 Matrix<double>& FX::output(int oind){

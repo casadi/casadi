@@ -306,6 +306,9 @@ class FX : public OptionsFunctionality{
   const Matrix<double>& input(int iind=0) const;
 
   /// Const access input argument
+  const Matrix<double>& input(const std::string &iname) const;
+
+  /// Const access input argument
   const Matrix<double>& output(int oind=0) const;
 
   /// Const access forward seed
@@ -332,7 +335,10 @@ class FX : public OptionsFunctionality{
 
   /// Access input argument
   Matrix<double>& input(int iind=0);
-    
+
+  /// Access input argument
+  Matrix<double>& input(const std::string &iname);
+  
   /** \brief Access output argument
   Note that copies in Python are shallow by default and fx.output() gives a reference/pointer to an internal data structure. So if you want save fx.output(), you need to make a deep copy using for example DMatrix(fx.output()).
   */

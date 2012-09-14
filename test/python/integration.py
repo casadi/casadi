@@ -42,12 +42,7 @@ class Integrationtests(casadiTestCase):
     q=ssym("q")
     p=ssym("p")
     dp=ssym("dp")
-    f = DAE_NUM_IN * [[]]
-    f[DAE_T] = t
-    f[DAE_X] = q
-    f[DAE_P] = p
-    f[DAE_XDOT] = dp
-    f=SXFunction(f,daeOut(q/p*t**2-dp))
+    f=SXFunction(daeIn(t=t, x=q, p=p, xdot=dp),daeOut(ode=q/p*t**2-dp))
     f.init()
     integrator = CVodesIntegrator(f)
     integrator.setOption("reltol",1e-15)
@@ -217,7 +212,7 @@ class Integrationtests(casadiTestCase):
     t=SX("t")
     x=SX("x")
     y=SX("y")
-    f=SXFunction(daeIn(t=t, x=[x,y]),daeOut([x,(1+1e-9)*x]))
+    f=SXFunction(daeIn(t=t, x=[x,y]),daeOut(ode=[x,(1+1e-9)*x]))
     integrator = CVodesIntegrator(f)
     integrator.setOption("fsens_err_con", True)
     integrator.setOption("t0",0)
@@ -242,7 +237,7 @@ class Integrationtests(casadiTestCase):
     q = [x,SX("problem")]
 
     dq=[x,x]
-    f=SXFunction(daeIn(t=t,x=q),daeOut(dq))
+    f=SXFunction(daeIn(t=t,x=q),daeOut(ode=dq))
     f.init()
 
     integrator = CVodesIntegrator(f)
@@ -336,7 +331,7 @@ class Integrationtests(casadiTestCase):
     p=SX("p")
 
     dh = p+q[0]**2
-    f=SXFunction(daeIn(q,[],p,t),daeOut(vertcat([dh ,q[0],dh])))
+    f=SXFunction(daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([dh ,q[0],dh])))
     f.init()
     
     integrator = CVodesIntegrator(f)
@@ -363,7 +358,7 @@ class Integrationtests(casadiTestCase):
     J.input(1).set(p0)
     J.evaluate()
     outA=J.output().toArray()
-    f=SXFunction(daeIn(q,[],p,t),daeOut(vertcat([dh ,q[0],(1+1e-9)*dh])))
+    f=SXFunction(daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([dh ,q[0],(1+1e-9)*dh])))
     f.init()
     
     integrator = CVodesIntegrator(f)
@@ -525,11 +520,8 @@ class Integrationtests(casadiTestCase):
     t=ssym("t")
     q=ssym("q",3,1)
     p=ssym("p",9,1)
-    f_in = SXMatrixVector(DAE_NUM_IN)
-    f_in[DAE_T] = t
-    f_in[DAE_X] = q
-    f_in[DAE_P] = p
-    f_out = daeOut(mul(c.reshape(p,3,3),q))
+    f_in = daeIn(t=t, x=q, p=p)
+    f_out = daeOut(ode=mul(c.reshape(p,3,3),q))
     f=SXFunction(f_in,f_out)
     f.init()
     integrator = CVodesIntegrator(f)
@@ -563,11 +555,8 @@ class Integrationtests(casadiTestCase):
     t=ssym("t")
     q=ssym("q",3,1)
     p=ssym("p",9,1)
-    f = DAE_NUM_IN * [[]]
-    f[DAE_T] = t
-    f[DAE_X] = q
-    f[DAE_P] = p
-    f=SXFunction(f,daeOut(mul(c.reshape(p,3,3),q)))
+
+    f=SXFunction(daeIn(t=t,x=q,p=p),daeOut(ode=mul(c.reshape(p,3,3),q)))
     f.init()
 
     integrator = CVodesIntegrator(f)
@@ -634,7 +623,7 @@ class Integrationtests(casadiTestCase):
     q=ssym("q",2,1)
     p=ssym("p",3,1)
 
-    f=SXFunction(daeIn(q,[],p,t),daeOut(vertcat([q[1],(p[0]-2*p[1]*cos(2*p[2]))*q[0]])))
+    f=SXFunction(daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],(p[0]-2*p[1]*cos(2*p[2]))*q[0]])))
     f.init()
     
     integrator = CVodesIntegrator(f)
@@ -684,7 +673,7 @@ class Integrationtests(casadiTestCase):
     p=ssym("p",1,1)
     # y
     # y'
-    f=SXFunction(daeIn(q,[],p,t),daeOut(vertcat([q[1],p[0]+q[1]**2 ])))
+    f=SXFunction(daeIn(x=q,p=p,t=t),daeOut(ode=vertcat([q[1],p[0]+q[1]**2 ])))
     f.init()
     
     integrator = CVodesIntegrator(f)
@@ -823,7 +812,7 @@ class Integrationtests(casadiTestCase):
     #A = ssym("A",N,N)
     #x = ssym("x",N)
 
-    #ode = SXFunction(daeIn(x=x, p=vec(A)),daeOut(mul(A,x)))
+    #ode = SXFunction(daeIn(x=x, p=vec(A)),daeOut(ode=mul(A,x)))
     #I = CVodesIntegrator(ode)
     #I.setOption("fsens_err_con", True)
     #I.setOption('reltol',1e-12)
