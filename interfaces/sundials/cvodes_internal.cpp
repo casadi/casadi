@@ -49,11 +49,8 @@ CVodesInternal::CVodesInternal(const FX& f, const FX& g) : SundialsInternal(f,g)
     
   mem_ = 0;
 
-  x0_ = x_ = 0;
-  q_ = 0;
-  
-  rx0_ = rx_ = 0;
-  rq_ = 0;
+  x0_ = x_ = q_ = 0;
+  rx0_ = rx_ = rq_ = 0;
 
   is_init = false;
   isInitAdj_ = false;
@@ -73,7 +70,7 @@ void CVodesInternal::freeCVodes(){
   if(rx_) N_VDestroy_Serial(rx_);
   if(rq_) N_VDestroy_Serial(rq_);
   
-  // Forward sensitivities
+  // Sensitivities of the forward integration
   for(vector<N_Vector>::iterator it=xF0_.begin(); it != xF0_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
   for(vector<N_Vector>::iterator it=xF_.begin(); it != xF_.end(); ++it)     if(*it) N_VDestroy_Serial(*it);
   for(vector<N_Vector>::iterator it=qF_.begin(); it != qF_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
@@ -132,7 +129,19 @@ void CVodesInternal::init(){
 
   // Set state derivative and its derivatives to zero (explicit integrator)
   f_.input(DAE_XDOT).setAll(0);
-  for(int i=0; i<nfdir_f_; ++i) f_.fwdSeed(DAE_XDOT,i).setAll(0);
+  for(int i=0; i<nfdir_f_; ++i){
+    f_.fwdSeed(DAE_XDOT,i).setAll(0);
+  }
+  if(!g_.isNull()){
+    nfdir_g_ = g_.getOption("number_of_fwd_dir");
+    g_.input(RDAE_XDOT).setAll(0);
+    g_.input(RDAE_RXDOT).setAll(0);
+    for(int i=0; i<nfdir_g_; ++i){
+      g_.fwdSeed(RDAE_XDOT,i).setAll(0);
+      g_.fwdSeed(RDAE_RXDOT,i).setAll(0);
+    }
+  }
+  
   
   // Sundials return flag
   int flag;
@@ -150,8 +159,8 @@ void CVodesInternal::init(){
   if(mem_==0) throw CasadiException("CVodeCreate: Creation failed");
 
   // Allocate n-vectors for ivp
-  x0_ = N_VMake_Serial(nx_,&input(INTEGRATOR_X0).front());
-  x_ = N_VMake_Serial(nx_,&output(INTEGRATOR_XF).front());
+  x0_ = N_VMake_Serial(nx_,input(INTEGRATOR_X0).ptr());
+  x_ = N_VMake_Serial(nx_,output(INTEGRATOR_XF).ptr());
 
   // Disable internal warning messages?
   disable_internal_warnings_ = getOption("disable_internal_warnings");
@@ -196,7 +205,7 @@ void CVodesInternal::init(){
   // Quadrature equations
   if(nq_>0){
     // Allocate n-vectors for quadratures
-    q_ = N_VMake_Serial(nq_,&output(INTEGRATOR_QF).front());
+    q_ = N_VMake_Serial(nq_,output(INTEGRATOR_QF).ptr());
 
     // Initialize quadratures in CVodes
     N_VConst(0.0, q_);
@@ -220,15 +229,15 @@ void CVodesInternal::init(){
       xF0_.resize(nfdir_,0);
       xF_.resize(nfdir_,0);
       for(int i=0; i<nfdir_; ++i){
-        xF0_[i] = N_VMake_Serial(nx_,&fwdSeed(INTEGRATOR_X0,i).data()[0]);
-        xF_[i] = N_VMake_Serial(nx_,&fwdSens(INTEGRATOR_XF,i).data()[0]);
+        xF0_[i] = N_VMake_Serial(nx_,fwdSeed(INTEGRATOR_X0,i).ptr());
+        xF_[i] = N_VMake_Serial(nx_,fwdSens(INTEGRATOR_XF,i).ptr());
       }
 
       // Allocate n-vectors for quadratures
       if(nq_>0){
         qF_.resize(nfdir_,0);
         for(int i=0; i<nfdir_; ++i){
-          qF_[i] = N_VMake_Serial(nq_,&fwdSens(INTEGRATOR_QF,i).front());
+          qF_[i] = N_VMake_Serial(nq_,fwdSens(INTEGRATOR_QF,i).ptr());
         }
       }
       
@@ -252,7 +261,7 @@ void CVodesInternal::init(){
       }
       
       // Pass pointer to parameters
-      flag = CVodeSetSensParams(mem_,&input(INTEGRATOR_P).data().front(),0,0);
+      flag = CVodeSetSensParams(mem_,input(INTEGRATOR_P).ptr(),0,0);
       if(flag != CV_SUCCESS) cvodes_error("CVodeSetSensParams",flag);
 
       //  CVodeSetSensDQMethod
@@ -294,12 +303,15 @@ void CVodesInternal::init(){
   // Adjoint sensitivity problem
   if(!g_.isNull()){
     
-    // Allocate n-vectors
-    rx0_ = N_VMake_Serial(nrx_,input(INTEGRATOR_RX0).ptr());
-    rx_ = N_VMake_Serial(nrx_,output(INTEGRATOR_RXF).ptr());
-
-    // Allocate n-vectors for quadratures
-    rq_ = N_VMake_Serial(nrq_,output(INTEGRATOR_RQF).ptr());
+    // Allocate n-vectors for backward integration
+//     if(nfdir_>0){
+//       rx_ = N_VNew_Serial((1+nfdir_)*nrx_);
+//       rq_ = N_VNew_Serial((1+nfdir_)*nrq_);
+//     } else {
+      rx0_ = N_VMake_Serial(nrx_,input(INTEGRATOR_RX0).ptr());
+      rx_ = N_VMake_Serial(nrx_,output(INTEGRATOR_RXF).ptr());
+      rq_ = N_VMake_Serial(nrq_,output(INTEGRATOR_RQF).ptr());
+//     }
     
     // Get the number of steos per checkpoint
     int Nd = getOption("steps_per_checkpoint");
@@ -329,10 +341,11 @@ void CVodesInternal::initAdj(){
   if(flag != CV_SUCCESS) cvodes_error("CVodeCreateB",flag);
   
   // Initialize the backward problem
-  double tB0 = tf_;
-  
+  double tB0 = tf_;  
   flag = CVodeInitB(mem_, whichB_, rhsB_wrapper, tB0, rx0_);
   if(flag != CV_SUCCESS) cvodes_error("CVodeInitB",flag);
+//   flag = CVodeInitBS(mem_, whichB_, rhsBS_wrapper, tB0, rx0_); // NOTE: Would be needed for forward sensitivities of the backward problem
+//   if(flag != CV_SUCCESS) cvodes_error("CVodeInitBS",flag);
 
   // Set tolerances
   flag = CVodeSStolerancesB(mem_, whichB_, asens_reltol_, asens_abstol_);
@@ -839,11 +852,9 @@ void CVodesInternal::rhsB(double t, const double* x, const double *rx, double* r
   // Pass inputs
   g_.setInput(&t,RDAE_T);
   g_.setInput(x,RDAE_X);
-  g_.input(RDAE_XDOT).setZero();
   g_.setInput(input(INTEGRATOR_P),RDAE_P);
   g_.setInput(input(INTEGRATOR_RP),RDAE_RP);
   g_.setInput(rx,RDAE_RX);
-  g_.input(RDAE_RXDOT).setZero();
 
   if(monitor_rhsB_){
     cout << "t       = " << t << endl;
@@ -872,6 +883,44 @@ void CVodesInternal::rhsB(double t, const double* x, const double *rx, double* r
   }
 }
 
+void CVodesInternal::rhsBS(double t, N_Vector x, N_Vector *xF, N_Vector rx, N_Vector rxdot){
+  
+  // Pass input
+  g_.setInput(&t,RDAE_T);
+  g_.setInput(NV_DATA_S(x),RDAE_X);
+  g_.setInput(input(INTEGRATOR_P),RDAE_P);
+  g_.setInput(input(INTEGRATOR_RP),RDAE_RP);
+  
+  // Pass backward state
+  const double *rx_data = NV_DATA_S(rx);
+  
+  // Pass backward state
+  g_.setInput(rx_data,RDAE_RX); rx_data += nrx_;
+  
+  // Pass forward seeds 
+  for(int dir=0; dir<nfdir_; ++dir){
+    g_.fwdSeed(RDAE_T,dir).setZero();
+    g_.setFwdSeed(rx_data,RDAE_RX,dir); rx_data += nrx_;
+    g_.setFwdSeed(fwdSeed(INTEGRATOR_P,dir),RDAE_P,dir);
+    g_.setFwdSeed(fwdSeed(INTEGRATOR_RP,dir),RDAE_RP,dir);
+    g_.setFwdSeed(NV_DATA_S(xF[dir]),RDAE_X,dir);
+  }
+
+  // Evaluate the AD forward algorithm
+  g_.evaluate(nfdir_,0);
+    
+  // Right hand side
+  double *rxdot_data = NV_DATA_S(rxdot);
+
+  // Get the backward right hand side
+  g_.getOutput(rxdot_data,RDAE_ODE); rxdot_data += nrx_;
+  
+  // Get forward sensitivities
+  for(int dir=0; dir<nfdir_; ++dir){
+    g_.getFwdSens(rxdot_data,RDAE_ODE,dir); rxdot_data += nrx_;
+  }
+}
+  
 int CVodesInternal::rhsB_wrapper(double t, N_Vector x, N_Vector rx, N_Vector rxdot, void *user_data){
 try{
     casadi_assert(user_data);
@@ -880,6 +929,18 @@ try{
     return 0;
   } catch(exception& e){
     cerr << "rhsB failed: " << e.what() << endl;;
+    return 1;
+  }
+}
+
+int CVodesInternal::rhsBS_wrapper(double t, N_Vector x, N_Vector *xF, N_Vector xA, N_Vector xdotA, void *user_data){
+try{
+    casadi_assert(user_data);
+    CVodesInternal *this_ = (CVodesInternal*)user_data;
+    this_->rhsBS(t,x,xF,xA,xdotA);
+    return 0;
+  } catch(exception& e){
+    cerr << "rhsBS failed: " << e.what() << endl;;
     return 1;
   }
 }
@@ -904,11 +965,9 @@ void CVodesInternal::rhsQB(double t, const double* x, const double* rx, double* 
   // Pass inputs
   g_.setInput(&t,RDAE_T);
   g_.setInput(x,RDAE_X);
-  g_.input(RDAE_XDOT).setZero();
   g_.setInput(input(INTEGRATOR_P),RDAE_P);
   g_.setInput(input(INTEGRATOR_RP),RDAE_RP);
   g_.setInput(rx,RDAE_RX);
-  g_.input(RDAE_RXDOT).setZero();
 
   if(monitor_rhsB_){
     cout << "t       = " << t << endl;
@@ -1111,8 +1170,8 @@ void CVodesInternal::psolve(double t, N_Vector x, N_Vector xdot, N_Vector r, N_V
   }
 
   // Solve the (possibly factorized) system 
-  casadi_assert(linsol_.output().size()*nrhs_ == NV_LENGTH_S(z));
-  linsol_.solve(NV_DATA_S(z),nrhs_);
+  casadi_assert(linsol_.output().size() == NV_LENGTH_S(z));
+  linsol_.solve(NV_DATA_S(z),1);
   
   // Log time duration
   time2 = clock();

@@ -255,16 +255,7 @@ SundialsIntegrator SundialsInternal::jac(bool with_x, bool with_p){
 
   // Set options
   integrator.setOption(dictionary());
-  integrator.setOption("nrhs",1+ns);
-  
-  // Pass linear solver
-  if(!linsol_.isNull()){
-    LinearSolver linsol_aug = shared_cast<LinearSolver>(linsol_.clone());
-//    linsol_aug->nrhs_ = 1+ns; // FIXME!!!
-//    integrator.setLinearSolver(linsol_aug,jac_); // FIXME!!!
-    integrator.setLinearSolver(linsol_aug);
-  }
-  
+    
   return integrator;
 }
 

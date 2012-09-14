@@ -67,6 +67,7 @@
 %include "casadi/fx/xfunction_tools.hpp"
 
 %template(IntegratorVector) std::vector<CasADi::Integrator>;
+%template(Pair_FX_FX) std::pair<CasADi::FX,CasADi::FX>;
 
 %{
 #include "integration/rk_integrator.hpp"

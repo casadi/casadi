@@ -1304,8 +1304,8 @@ void IdasInternal::psolve(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_
   }
   
   // Solve the (possibly factorized) system 
-  casadi_assert(linsol_.output().size()*nrhs_ == NV_LENGTH_S(zvec));
-  linsol_.solve(NV_DATA_S(zvec),nrhs_);
+  casadi_assert(linsol_.output().size() == NV_LENGTH_S(zvec));
+  linsol_.solve(NV_DATA_S(zvec),1);
 
   // Log time duration
   time2 = clock();

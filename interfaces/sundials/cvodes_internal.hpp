@@ -104,6 +104,7 @@ public:
   void rhsQ(double t, const double* x, double* qdot);
   void rhsQS(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot, N_Vector *qFdot, N_Vector tmp1, N_Vector tmp2);
   void rhsB(double t, const double* x, const double *rx, double* rxdot);
+  void rhsBS(double t, N_Vector x, N_Vector *xF, N_Vector xA, N_Vector xdotA);
   void rhsQB(double t, const double* x, const double* rx, double* rqdot);
   void jtimes(const double *v, double* Jv, double t, const double* x, const double* fy, double* tmp);
   void djac(SUNDIALS_INT N, double t, N_Vector x, N_Vector fy, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
@@ -121,6 +122,7 @@ public:
   static int rhsQ_wrapper(double t, N_Vector x, N_Vector qdot, void *user_data);
   static int rhsQS_wrapper(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot, N_Vector *qdotF, void *user_data, N_Vector tmp1, N_Vector tmp2);
   static int rhsB_wrapper(double t, N_Vector x, N_Vector xA, N_Vector xdotA, void *user_data);
+  static int rhsBS_wrapper(double t, N_Vector x, N_Vector *xF, N_Vector xA, N_Vector xdotA, void *user_data);
   static int rhsQB_wrapper(double t, N_Vector x, N_Vector xA, N_Vector qdotA, void *user_data);
   static int jtimes_wrapper(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector xdot, void *user_data, N_Vector tmp);
   static int djac_wrapper(SUNDIALS_INT N, double t, N_Vector x, N_Vector xdot, DlsMat Jac, void *user_data,N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
@@ -129,7 +131,6 @@ public:
   static int psetup_wrapper(double t, N_Vector x, N_Vector xdot, booleantype jok, booleantype *jcurPtr, double gamma, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
   static int lsetup_wrapper(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot, booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
   static int lsolve_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector x, N_Vector xdot);
- 
   
   virtual void printStats(std::ostream &stream) const;
   
@@ -176,8 +177,8 @@ public:
   // Ids of backward problem
   int whichB_;
 
-  // Number of forward directions for the function f
-  int nfdir_f_;
+  // Number of forward directions for the functions f and g
+  int nfdir_f_, nfdir_g_;
 
   // Initialize the dense linear solver
   void initDenseLinearSolver();

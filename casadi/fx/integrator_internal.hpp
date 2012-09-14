@@ -109,9 +109,6 @@ public:
   /// ODE/DAE backward integration function, if any
   FX g_;
   
-  /// Number of right hand sides
-  int nrhs_;
-  
   /// Number of sensitivities to be propagated along with the integration forward in time
   int nsens_;
   
@@ -120,6 +117,10 @@ public:
   
   /// Number of sensitivities to be propagated along with the integration backward in time  that depend on sensitivities propagated along with the integration forward in time
   int nsensB_store_;
+  
+  /// Generate new functions for calculating forward/adjoint directional derivatives
+  bool fwd_via_sct_, adj_via_sct_;
+  
 };
   
 } // namespace CasADi
