@@ -133,8 +133,8 @@ Integrator create_Sundials(){
   res[2] = -0.01*u*u - mdot;
 
   // Input/output of the DAE residual function
-  vector<SXMatrix> ffcn_in = daeIn<SXMatrix>(x,SXMatrix(),u,t,xdot);
-  vector<SXMatrix> ffcn_out = daeOut<SXMatrix>(res,SXMatrix(),u_dev);
+  vector<SXMatrix> ffcn_in = daeIn<SXMatrix>("x",x, "p",u, "t",t, "xdot",xdot);
+  vector<SXMatrix> ffcn_out = daeOut<SXMatrix>("ode",res, "quad",u_dev);
 
   // DAE residual function
   FX ffcn = SXFunction(ffcn_in,ffcn_out);
