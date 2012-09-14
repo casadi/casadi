@@ -36,7 +36,7 @@ xdot = vertcat( [(1 - x[1]*x[1])*x[0] - x[1] + u, \
                 x[0]*x[0] + x[1]*x[1] + u*u] )
 
 # DAE residual function
-f = SXFunction(daeIn(x,[],u),daeOut(xdot))
+f = SXFunction(daeIn(x=x,p=u),daeOut(ode=xdot))
 
 # Create an integrator
 f_d = CVodesIntegrator(f)

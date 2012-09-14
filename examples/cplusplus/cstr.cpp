@@ -45,6 +45,7 @@ using namespace CasADi::OptimalControl;
 using namespace std;
 
 int main(){
+
   bool use_kinsol = false;
 
   // Allocate an OCP object
@@ -126,7 +127,7 @@ int main(){
     ocp_solver.setOption("integrator",CVodesIntegrator::creator);
   } else {
     // DAE residual function
-    SXFunction dae(daeIn(x,SXMatrix(),u,t,xdot),daeOut(ocp.ode));
+    SXFunction dae(daeIn("x",x, "t",t, "xdot",xdot),daeOut("ode",ocp.ode));
     
     ocp_solver = MultipleShooting(dae,mterm);
     ocp_solver.setOption("integrator",IdasIntegrator::creator);

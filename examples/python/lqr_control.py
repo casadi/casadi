@@ -209,7 +209,7 @@ rhs.eAt = mul(A,eAt)
 rhs.Wt  = mul([eAt,B,B.T,eAt.T])
 rhs.freeze()
 
-dae = SXFunction(daeIn(x=states.veccat()),daeOut(rhs.veccat()))
+dae = SXFunction(daeIn(x=states.veccat()),daeOut(ode=rhs.veccat()))
 dae.init()
 
 integrator = CVodesIntegrator(dae)
@@ -289,7 +289,7 @@ P = ssym("P",ns,ns)
 
 ric = (Q + mul(A.T,P) + mul(P,A) - mul([P,B,inv(R),B.T,P]))
 
-dae = SXFunction(daeIn(x=flatten(P)),daeOut(flatten(ric)))
+dae = SXFunction(daeIn(x=flatten(P)),daeOut(ode=flatten(ric)))
 dae.init()
 
 # We solve the ricatti equation by simulating backwards in time until steady state is reached.
@@ -337,7 +337,7 @@ print "feedback matrix= ", K
 print "Open-loop eigenvalues: ", D
 
 # Check what happens if we integrate the Riccati equation forward in time
-dae = SXFunction(daeIn(x = flatten(P)),daeOut(-ric))
+dae = SXFunction(daeIn(x = flatten(P)),daeOut(ode=-ric))
 dae.init()
 
 integrator = CVodesIntegrator(dae)

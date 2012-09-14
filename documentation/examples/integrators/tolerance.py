@@ -29,7 +29,7 @@ x=ssym("x")
 dx=ssym("dx")
 states = vertcat([x,dx])
 
-f=SXFunction(daeIn(states),daeOut(vertcat([dx,-x])))
+f=SXFunction(daeIn(x=states),daeOut(ode=vertcat([dx,-x])))
 f.init()
 
 tend = 2*pi*3

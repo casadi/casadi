@@ -28,45 +28,75 @@
 
 namespace CasADi{
   
-  /// Inputs of an ACADO OCP solver
+  /// Input arguments of an ACADO OCP solver [acadoIn]
   enum ACADO_Input{
-    ACADO_X_GUESS, // Initial guess for x [default: 0]
-    ACADO_U_GUESS, // Initial guess for u [default: 0]
-    ACADO_P_GUESS, // Initial guess for p [default: 0]
-    ACADO_LBX, // Lower bound on x [default:  -infinity]
-    ACADO_UBX, // Upper bound on x [default:  infinity]
-    ACADO_LBX0, // Lower bound on x0 [default:  -infinity]
-    ACADO_UBX0, // Upper bound on x0 [default:  infinity]
-    ACADO_LBXF, // Lower bound on xf [default:  -infinity]
-    ACADO_UBXF, // Upper bound on xf [default:  infinity]
-    ACADO_LBU, // Lower bound on u [default:  -infinity]
-    ACADO_UBU, // Upper bound on u [default:  infinity]
-    ACADO_LBP, // Lower bound on p [default:  -infinity]
-    ACADO_UBP, // Upper bound on p [default:  infinity]
-    ACADO_LBC, // Lower bound on the path constraint function [default:  -infinity]
-    ACADO_UBC, // Upper bound on the path constraint function [default:  infinity]
-    ACADO_LBR, // Lower bound on the initial constraint function [default:  0]
-    ACADO_UBR, // Upper bound on the initial constraint function [default:  0]
-    ACADO_NUM_IN // Number of inputs
+    /// Initial guess for x (default: 0) [x_guess]
+    ACADO_X_GUESS,
+    /// Initial guess for u (default: 0) [u_guess]
+    ACADO_U_GUESS,
+    /// Initial guess for p (default: 0) [p_guess]
+    ACADO_P_GUESS, 
+    /// Lower bound on x (default:  -infinity) [lbx]
+    ACADO_LBX,
+    /// Upper bound on x (default:  infinity) [ubx]
+    ACADO_UBX,
+    /// Lower bound on x0 (default:  -infinity) [lbx0]
+    ACADO_LBX0,
+    /// Upper bound on x0 (default:  infinity) [ubx0]
+    ACADO_UBX0,
+    /// Lower bound on xf (default:  -infinity) [lbxf]
+    ACADO_LBXF,
+    /// Upper bound on xf (default:  infinity) [ubxf]
+    ACADO_UBXF,
+    /// Lower bound on u (default:  -infinity) [lbu]
+    ACADO_LBU,
+    /// Upper bound on u (default:  infinity) [ubu]
+    ACADO_UBU,
+    /// Lower bound on p (default:  -infinity) [lbp]
+    ACADO_LBP,
+    /// Upper bound on p (default:  infinity) [ubp]
+    ACADO_UBP,
+    /// Lower bound on the path constraint function (default:  -infinity) [lbc]
+    ACADO_LBC,
+    /// Upper bound on the path constraint function (default:  infinity) [ubc]
+    ACADO_UBC,
+    /// Lower bound on the initial constraint function (default:  0) [lbr]
+    ACADO_LBR,
+    /// Upper bound on the initial constraint function (default:  0) [ubr]
+    ACADO_UBR,
+    /// Number of inputs
+    ACADO_NUM_IN
   };
 
-  /// Outputs of an ACADO OCP solver
+  /// Output arguments of an ACADO OCP solver [acadoOut]
   enum ACADO_Output{
+    /// Optimal states [x_opt]
     ACADO_X_OPT,
+    /// Optimal control inputs [u_opt]
     ACADO_U_OPT,
+    /// Optimal parameters [p_opt]
     ACADO_P_OPT,
+    /// Optimal cost [cost]
     ACADO_COST,
+    /// Number of outputs
     ACADO_NUM_OUT
   };
 
-  /// Input arguments of an ACADO function
+  /// Input arguments of an ACADO function [acadofcnIn]
   enum ACADO_FCN_Input{
-    ACADO_FCN_T, 
+    /// Time [t]
+    ACADO_FCN_T,
+    /// Differential state [xd] 
     ACADO_FCN_XD, 
+    /// Algebraic state [xa]
     ACADO_FCN_XA,
+    /// Control input [u]
     ACADO_FCN_U,
+    /// Parameter [p]
     ACADO_FCN_P,
+    /// Differential state derivative [xdot]
     ACADO_FCN_XDOT, 
+    /// Number of inputs
     ACADO_FCN_NUM_IN
   };
   

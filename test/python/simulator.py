@@ -43,12 +43,7 @@ class Simulatortests(casadiTestCase):
     q=ssym("q")
     p=ssym("p")
     dp=ssym("dp")
-    f = DAE_NUM_IN * [[]]
-    f[DAE_T] = t
-    f[DAE_X] = q
-    f[DAE_P] = p
-    f[DAE_XDOT] = dp
-    f=SXFunction(f,daeOut(q/p*t**2-dp))
+    f=SXFunction(daeIn(t=t,x=q,p=p,xdot=dp),daeOut(ode=q/p*t**2-dp))
     f.init()
     integrator = CVodesIntegrator(f)
     integrator.setOption("reltol",1e-15)
@@ -85,7 +80,7 @@ class Simulatortests(casadiTestCase):
     out = SXFunction(daeIn(t=t, x=q, p=p, xdot=dp),[[q],[t],[p],[dp]])
     out.init()
         
-    f=SXFunction(daeIn(t=t, x=q, p=p, xdot=dp),daeOut(q/p*t**2-dp))
+    f=SXFunction(daeIn(t=t, x=q, p=p, xdot=dp),daeOut(ode=q/p*t**2-dp))
     f.init()
     integrator = CVodesIntegrator(f)
     integrator.setOption("reltol",1e-15)
@@ -106,7 +101,7 @@ class Simulatortests(casadiTestCase):
     self.checkarray(sim.output(2),DMatrix.ones(tc.shape)*num['p'],"Evaluation output mismatch")
     self.checkarray(sim.output(3),DMatrix.zeros(tc.shape),"Evaluation output mismatch")
     
-    f=SXFunction(daeIn(t=t, x=q, p=p, xdot=dp),daeOut(q/p*t**2))
+    f=SXFunction(daeIn(t=t, x=q, p=p, xdot=dp),daeOut(ode=q/p*t**2))
     f.init()
     integrator = CVodesIntegrator(f)
     integrator.setOption("reltol",1e-15)
@@ -130,7 +125,7 @@ class Simulatortests(casadiTestCase):
     out = SXFunction(daeIn(t=t, x=q, xdot=dp),[[q],[t],[dp]])
     out.init()
     
-    f=SXFunction(daeIn(t=t, x=q),daeOut(q/num['p']*t**2))
+    f=SXFunction(daeIn(t=t, x=q),daeOut(ode=q/num['p']*t**2))
     f.init()
     integrator = CVodesIntegrator(f)
     integrator.setOption("reltol",1e-15)
@@ -149,7 +144,7 @@ class Simulatortests(casadiTestCase):
     self.checkarray(sim.output(1),tc,"Evaluation output mismatch")
     self.checkarray(sim.output(2),DMatrix.zeros(tc.shape),"Evaluation output mismatch")
     
-    f=SXFunction(daeIn(x=q),daeOut(-q))
+    f=SXFunction(daeIn(x=q),daeOut(ode=-q))
     f.init()
     integrator = CVodesIntegrator(f)
     integrator.setOption("reltol",1e-15)
@@ -460,7 +455,7 @@ class Simulatortests(casadiTestCase):
     
 
     rhs = vertcat([v - dx, ( -  b*v - k*x) - dv ])
-    f=SXFunction(daeIn(t=t, xdot=[dx,dv], x=[x,v], p=[b,k]),daeOut(rhs))
+    f=SXFunction(daeIn(t=t, xdot=[dx,dv], x=[x,v], p=[b,k]),daeOut(ode=rhs))
     f.init()
     
     cf=SXFunction(controldaeIn(t=t, xdot=[dx,dv], x=[x,v], p=[b,k]),[rhs])
@@ -590,7 +585,7 @@ class Simulatortests(casadiTestCase):
     
 
     rhs = vertcat([v - dx, ( -  b*v - k*x) - dv ])
-    f=SXFunction(daeIn(t=t, xdot=[dx,dv], x=[x,v], p=[b,k]),daeOut(rhs))
+    f=SXFunction(daeIn(t=t, xdot=[dx,dv], x=[x,v], p=[b,k]),daeOut(ode=rhs))
     f.init()
     
     cf=SXFunction(controldaeIn(t=t, xdot=[dx,dv], x=[x,v], p=[b,k]),[rhs])

@@ -71,7 +71,7 @@ Z_ = [1147.0/720] # algebraic state
 #! We construct the DAE system
 ode = vertcat([dx-u,du-lambd*x,dy-v,dv-lambd*y+g])
 alg = x**2+y**2-L**2
-f = SXFunction(daeIn(x_all,z_all,p_all,t,dx_all),daeOut(ode,alg))
+f = SXFunction(daeIn(x=x_all,z=z_all,p=p_all,t=t,xdot=dx_all),daeOut(ode=ode,alg=alg))
 f.init()
 
 #! Let's check we have consistent initial conditions:
@@ -117,7 +117,7 @@ alg = vertcat([x**2+y**2-L**2, u*x+v*y,u**2-g*y+v**2+L**2*lambd])
 x_all = vertcat([x,u])
 dx_all = vertcat([dx,du])
 z_all = vertcat([y,v,lambd])
-f = SXFunction(daeIn(x_all,z_all,p_all,t,dx_all),daeOut(ode,alg))
+f = SXFunction(daeIn(x=x_all,z=z_all,p=p_all,t=t,xdot=dx_all),daeOut(ode=ode,alg=alg))
 f.init()
 
 #! the initial state of the pendulum

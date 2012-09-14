@@ -188,7 +188,7 @@ SundialsIntegrator SundialsInternal::jac(bool with_x, bool with_p){
   faug_in[DAE_P] = f.inputSX(DAE_P);
   
   // Create augmented DAE function
-  SXFunction ffcn_aug(faug_in,daeOut(ode_aug,alg_aug,quad_aug));
+  SXFunction ffcn_aug(faug_in,daeOut("ode",ode_aug, "alg",alg_aug, "quad",quad_aug));
 
   // Create integrator instance
   SundialsIntegrator integrator;

@@ -99,14 +99,14 @@ int main(){
   int ns = 50;
 
   // Input to the ODE/DAE functions
-  vector<SXMatrix> rhs_in = daeIn<SXMatrix>(x,SXMatrix(),u,t);
+  vector<SXMatrix> rhs_in = daeIn<SXMatrix>("x",x, "p",u, "t",t);
 
   // ODE right hand side
   vector<SX> ode(3);
   ode[0] = (1 - s*s)*r - s + u;
   ode[1] = r;
   ode[2] = r*r + s*s + u*u;
-  vector<SXMatrix> rhs_out = daeOut<SXMatrix>(ode);
+  vector<SXMatrix> rhs_out = daeOut<SXMatrix>("ode",ode);
   SXFunction rhs(rhs_in,rhs_out);
 
   // Mayer objective function
