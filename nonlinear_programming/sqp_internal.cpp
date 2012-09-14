@@ -28,11 +28,13 @@
 #include "casadi/sx/sx_tools.hpp"
 #include "casadi/casadi_calculus.hpp"
 /*#include "interfaces/qpoases/qpoases_solver.hpp"*/
+#include "interfaces/ipopt/ipopt_qp_solver.hpp"
 #include <ctime>
 #include <iomanip>
 #include <fstream>
 #include <cmath>
 #include <cfloat>
+
 
 using namespace std;
 namespace CasADi{
@@ -41,15 +43,14 @@ SQPInternal::SQPInternal(const FX& F, const FX& G, const FX& H, const FX& J) : N
   casadi_warning("The SQP method is under development");
   addOption("qp_solver",         OT_QPSOLVER,   GenericType(),    "The QP solver to be used by the SQP method");
   addOption("qp_solver_options", OT_DICTIONARY, GenericType(),    "Options to be passed to the QP solver");
-  addOption("maxiter",           OT_INTEGER,     100,             "Maximum number of SQP iterations");
+  addOption("hessian_approximation", OT_STRING, "limited-memory", "limited-memory|exact");
+  addOption("maxiter",           OT_INTEGER,      50,             "Maximum number of SQP iterations");
   addOption("maxiter_ls",        OT_INTEGER,       3,             "Maximum number of linesearch iterations");
   addOption("tol_pr",            OT_REAL,       1e-6,             "Stopping criterion for primal infeasibility");
   addOption("tol_du",            OT_REAL,       1e-6,             "Stopping criterion for dual infeasability");
   addOption("c1",                OT_REAL,       1E-4,             "Armijo condition, coefficient of decrease in merit");
-  addOption("line-search",       OT_STRING,     "simple",         "simple|armijo");
-  addOption("merit_memory",         OT_INTEGER,    1,             "Size of memory to store history of merit function values");
   addOption("beta",              OT_REAL,       0.8,              "Line-search parameter, restoration factor of stepsize");
-  addOption("hessian_approximation", OT_STRING, "limited-memory", "limited-memory|exact");
+  addOption("merit_memory",         OT_INTEGER,    4,             "Size of memory to store history of merit function values");
   addOption("lbfgs_memory",      OT_INTEGER,    10,               "Size of L-BFGS memory.");
   
   // Monitors
@@ -86,6 +87,12 @@ void SQPInternal::init(){
 
   QPSolverCreator qp_solver_creator = getOption("qp_solver");
   qp_solver_ = qp_solver_creator(H_sparsity,A_sparsity);
+
+  // Checking if Ipopt is used as QP solver
+  Interfaces::IpoptQPSolver* dummy = static_cast<Interfaces::IpoptQPSolver*>(&qp_solver_);
+  if(dummy){
+    qp_solver_.setOption("fixed_variable_treatment", "relax_bounds");
+  }
   
   // Set options if provided
   if(hasSetOption("qp_solver_options")){
@@ -173,6 +180,8 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   cout << header.str();
   int it_counter = 1;
 
+  sigma_ = 0.;
+
   // MAIN OPTIMIZATION LOOP
   while(true){
     // Printing header occasionally
@@ -242,7 +251,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     // Hot-starting if possible
     if (p.size1()){
       qp_solver_.setInput(p, QP_X_INIT);
-      //TODO: Fix hot-starting of dual variables!!!
+      //TODO: Fix hot-starting of dual variables
       //qp_solver_.setInput(mu_qp, QP_LAMBDA_INIT);
     }
       
@@ -282,9 +291,9 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       cout << p << endl;
     }
     // Detecting indefiniteness
-    if ((norm_2(p) / norm_2(x)).at(0) > 500.){
-      casadi_warning("Search direction has very large values, indefinite Hessian might have ouccured.");
-    }
+//    if ((norm_2(p) / norm_2(x)).at(0) > 500.){
+//      casadi_warning("Search direction has very large values, indefinite Hessian might have ouccured.");
+//    }
     if (inner_prod(p, mul(Bk, p)).at(0) < 0){
       casadi_warning("Indefinite Hessian detected...");
     }
@@ -294,12 +303,16 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     mu_x_qp = qp_solver_.output(QP_LAMBDA_X);
 
     // Calculate penalty parameter of merit function
-    sigma_ = 0.;
     for(int j = 0; j < m; ++j){
       if( fabs(mu_qp.elem(j)) > sigma_){
-        sigma_ = fabs(mu_qp.elem(j));
+        sigma_ = fabs(mu_qp.elem(j)) * 1.01;
       }
     }
+//    for(int j = 0; j < n; ++j){
+//      if( fabs(mu_x_qp.elem(j)) > sigma_){
+//        sigma_ = fabs(mu_x_qp.elem(j)) * 1.01;
+//      }
+//    }
 
     // Calculate L1-merit function in the actual iterate
     double l1_infeas = 0.;
@@ -352,37 +365,33 @@ void SQPInternal::evaluate(int nfdir, int nadir){
         // Calculating merit-function in candidate
         for(int j = 0; j < m; ++j){
           // Left-hand side violated
-          if (input(NLP_LBG).elem(j) - gk.elem(j) > 0.){
-            l1_infeas += sigma_ * (input(NLP_LBG).elem(j) - gk.elem(j));
+          if (input(NLP_LBG).elem(j) - gk_cand.elem(j) > 0.){
+            l1_infeas += sigma_ * (input(NLP_LBG).elem(j) - gk_cand.elem(j));
           }
-          else if (gk.elem(j) - input(NLP_UBG).elem(j) > 0.){
-            l1_infeas += sigma_ * (gk.elem(j) - input(NLP_UBG).elem(j));
+          else if (gk_cand.elem(j) - input(NLP_UBG).elem(j) > 0.){
+            l1_infeas += sigma_ * (gk_cand.elem(j) - input(NLP_UBG).elem(j));
           }
         }
       }
       L1merit_cand = fk_cand + l1_infeas;
-      bool accepted;
-      if (getOption("line-search") == "armijo"){
-        accepted = L1merit_cand - L1merit < t * c1_ * L1dir;
-      }
-      else{
-        // Calculating maximal merit function value so far
-        double meritmax = -1E20;
-        for(int k = 0; k < merit_mem.size(); ++k){
-          if (merit_mem[k] > meritmax){
-            meritmax = merit_mem[k];
-          }
+      // Calculating maximal merit function value so far
+      double meritmax = -1E20;
+      for(int k = 0; k < merit_mem.size(); ++k){
+        if (merit_mem[k] > meritmax){
+          meritmax = merit_mem[k];
         }
-        accepted = L1merit_cand < meritmax; 
       }
-      if (accepted){
+      if (L1merit_cand <= meritmax + t * c1_ * L1dir){ 
         // Accepting candidate
         break;
       }
       else{
-//        cout << "L1merit:      " << L1merit << endl;
-//        cout << "L1merit_cand: " << L1merit_cand << endl;
-//        cout << "merit diff: " << L1merit - L1merit_cand << endl;
+        //cout << "L1merit:      " << L1merit << endl;
+        //cout << "L1merit_cand: " << L1merit_cand << endl;
+        //cout << "merit diff: " << L1merit - L1merit_cand << endl;
+        //cout << "lhs:" << L1merit_cand - L1merit << endl;
+        //cout << "rhs:" << t * c1_ * L1dir << endl;
+        //cout << "difference: " << L1merit_cand - L1merit - t * c1_ * L1dir << endl;
         t = beta_ * t; 
       }
 
@@ -405,11 +414,16 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     F_.setAdjSeed(1.0);
     F_.evaluate(0, 1);
     gLag = F_.adjSens(); 
+    //cout << "Objective gradient:\n" << gLag << endl;
     // Adjoint derivative of constraint function
     G_.setAdjSeed(mu);
     G_.evaluate(0, 1);
+    //cout << "Constraint adjoint:\n" << G_.adjSens() << endl;
+    //cout << "mu:\n" << mu << endl;
     gLag += G_.adjSens();
     gLag += mu_x;
+    //cout << "Lagrange gradient:\n" << gLag << endl;
+    //cout << "mu_x:\n" << mu_x << endl;
 
     DMatrix gLag_old_bfgs;
     F_.setInput(x_old);
