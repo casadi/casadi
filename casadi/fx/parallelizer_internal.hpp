@@ -59,6 +59,21 @@ class ParallelizerInternal : public FXInternal{
     /// Evaluate a single task
     virtual void evaluateTask(int task, int nfdir, int nadir);
 
+    /// Reset the sparsity propagation
+    virtual void spInit(bool fwd);
+    
+    /// Propagate the sparsity pattern through a set of directional derivatives forward or backward
+    virtual void spEvaluate(bool fwd);
+    
+    /// Propagate the sparsity pattern through a set of directional derivatives forward or backward, one task only
+    void spEvaluateTask(bool fwd, int task);
+
+    /// Is the class able to propate seeds through the algorithm?
+    virtual bool spCanEvaluate(bool fwd){ return false;}
+    
+    /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
+    virtual FX getDerivative(int nfwd, int nadj);
+    
     /// Calculate the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs
     virtual FX jacobian(const std::vector<std::pair<int,int> >& jblocks);
 

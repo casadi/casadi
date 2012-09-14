@@ -287,5 +287,114 @@ void ParallelizerInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObje
   funcs_ = deepcopy(funcs_,already_copied);
 }
 
+void ParallelizerInternal::spInit(bool fwd){
+  for(vector<FX>::iterator it=funcs_.begin(); it!=funcs_.end(); ++it){
+    it->spInit(fwd);
+  }
+}
+
+void ParallelizerInternal::spEvaluate(bool fwd){
+  // This function can be parallelized. Move logic in "evaluate" to a template function.
+  for(int task=0; task<funcs_.size(); ++task){
+    spEvaluateTask(fwd,task);
+  }
+}
+
+void ParallelizerInternal::spEvaluateTask(bool fwd, int task){
+  // Get a reference to the function
+  FX& fcn = funcs_[task];
+
+  if(fwd){
+    // Set input influence
+    for(int j=inind_[task]; j<inind_[task+1]; ++j){
+      int nv = input(j).size();
+      const bvec_t* p_v = get_bvec_t(input(j).data());
+      bvec_t* f_v = get_bvec_t(fcn.input(j-inind_[task]).data());
+      copy(p_v,p_v+nv,f_v);
+    }
+    
+    // Propagate
+    fcn.spEvaluate(fwd);
+    
+    // Get output dependend
+    for(int j=outind_[task]; j<outind_[task+1]; ++j){
+      int nv = output(j).size();
+      bvec_t* p_v = get_bvec_t(output(j).data());
+      const bvec_t* f_v = get_bvec_t(fcn.output(j-outind_[task]).data());
+      copy(f_v,f_v+nv, p_v);
+    }
+  
+  } else {
+    
+    // Set output influence
+    for(int j=outind_[task]; j<outind_[task+1]; ++j){
+      int nv = output(j).size();
+      const bvec_t* p_v = get_bvec_t(output(j).data());
+      bvec_t* f_v = get_bvec_t(fcn.output(j-outind_[task]).data());
+      copy(p_v,p_v+nv,f_v);
+    }
+    
+    // Propagate
+    fcn.spEvaluate(fwd);
+    
+    // Get input dependend
+    for(int j=inind_[task]; j<inind_[task+1]; ++j){
+      int nv = input(j).size();
+      bvec_t* p_v = get_bvec_t(input(j).data());
+      const bvec_t* f_v = get_bvec_t(fcn.input(j-inind_[task]).data());
+      for(int k=0; k<nv; ++k){
+        p_v[k] |= f_v[k];
+      }
+    }
+  }
+}
+
+FX ParallelizerInternal::getDerivative(int nfwd, int nadj){
+  // Generate derivative expressions
+  vector<FX> der_funcs(funcs_.size());
+  for(int i=0; i<funcs_.size(); ++i){
+    der_funcs[i] = funcs_[i].derivative(nfwd,nadj);
+  }
+  
+  // Create a new parallelizer for the derivatives
+  Parallelizer par(der_funcs);
+  
+  // Set options and initialize
+  par.setOption(dictionary());
+  par.init();
+  
+  // Create a function call to the parallelizer
+  vector<MX> par_arg = par.symbolicInput();
+  vector<MX> par_res = par.call(par_arg);
+  
+  // Get the offsets: copy to allow being used as a counter
+  std::vector<int> par_inind = par->inind_;
+  std::vector<int> par_outind = par->outind_;
+  
+  // Arguments and results of the return function
+  vector<MX> ret_arg, ret_res;
+  ret_arg.reserve(par_arg.size());
+  ret_res.reserve(par_res.size());
+  
+  // Loop over all nondifferentiated inputs/outputs and forward seeds/sensitivities
+  for(int dir=-1; dir<nfwd; ++dir){
+    for(int i=0; i<funcs_.size(); ++i){
+      for(int j=inind_[i]; j<inind_[i+1]; ++j) ret_arg.push_back(par_arg[par_inind[i]++]);
+      for(int j=outind_[i]; j<outind_[i+1]; ++j) ret_res.push_back(par_res[par_outind[i]++]);
+    }
+  }
+  
+  // Loop over adjoint seeds/sensitivities
+  for(int dir=0; dir<nadj; ++dir){
+    for(int i=0; i<funcs_.size(); ++i){
+      for(int j=outind_[i]; j<outind_[i+1]; ++j) ret_arg.push_back(par_arg[par_inind[i]++]);
+      for(int j=inind_[i]; j<inind_[i+1]; ++j) ret_res.push_back(par_res[par_outind[i]++]);
+    }
+  }
+  
+  // Assemble the return function
+  return MXFunction(ret_arg,ret_res);
+}
+
 } // namespace CasADi
 
