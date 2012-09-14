@@ -573,6 +573,9 @@ class Simulatortests(casadiTestCase):
       self.assertAlmostEqual(fwdSens_csim[1],fwdSens_exact[1], digits,"Forward sensitivity")
 
   def test_simulator_sensitivities_adj(self):
+    # This test is currently disabled, awaiting support for the feature
+    return
+    
     self.message("Adjoint sensitivities")
     t = SX("t")
 
