@@ -41,7 +41,7 @@ nlp_solver = LiftedSQP
 qp_solver = IpoptQPSolver
 #qp_solver = OOQPSolver
 
-# Set solver specific options
+# QP solver options
 if qp_solver == QPOasesSolver:
   qp_solver_options = {"printLevel" : "none"}
 elif qp_solver == IpoptQPSolver:
@@ -52,10 +52,9 @@ else:
 # Create solver
 solv = nlp_solver(f,g)
 
-# Pass options
-if nlp_solver == IpoptSolver:
-  solv.setOption("generate_hessian",True)
-else:
+# NLP solver options
+solv.setOption("generate_hessian",True)
+if nlp_solver != IpoptSolver:
   solv.setOption("qp_solver",qp_solver)
   solv.setOption("qp_solver_options",qp_solver_options)
 
