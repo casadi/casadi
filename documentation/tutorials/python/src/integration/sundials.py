@@ -35,7 +35,7 @@ f  = SXFunction([vertcat([x,y]),u], [vertcat([(1-y*y)*x-y+u,x])])
 #! Manipulate the function to adhere to the integrator's
 #! input/output signature
 #! f(time;states;parameters)
-fmod=SXFunction(daeIn(x=f.inputSX(0),p=f.inputSX(1)),daeOut(f.outputSX(0)))
+fmod=SXFunction(daeIn(x=f.inputSX(0),p=f.inputSX(1)),daeOut(ode=f.outputSX(0)))
 fmod.setOption("name","ODE right hand side")
 #! Create the CVodesIntegrator
 integrator = CVodesIntegrator(fmod)
