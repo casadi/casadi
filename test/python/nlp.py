@@ -67,7 +67,8 @@ class NLPtests(casadiTestCase):
       solver.solve()
       self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,str(Solver))
       self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,9,str(Solver))
-
+      self.assertAlmostEqual(solver.output(NLP_G)[0],1,9,str(Solver))
+      
   def testIPOPT_par(self):
     x=SX("x")
     p=SX("p")
@@ -652,7 +653,7 @@ class NLPtests(casadiTestCase):
       solver.input(NLP_UBG).set([10,10,10])
       solver.solve()
       self.assertAlmostEqual(solver.output(NLP_COST)[0],0,9,str(Solver))
-      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,9,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,8,str(Solver))
 
   def testIPOPTdeg(self):
     self.message("degenerate optimization IPOPT")

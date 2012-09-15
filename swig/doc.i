@@ -589,6 +589,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::AcadoIntegrator::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::AcadoIntegrator::output "
@@ -1179,6 +1187,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::AcadoIntegratorInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::AcadoIntegratorInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -1194,6 +1220,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::AcadoIntegratorInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::AcadoIntegratorInternal::input "
 
@@ -1909,6 +1943,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::AcadoOCP::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::AcadoOCP::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::AcadoOCP::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::AcadoOCP::output "
@@ -2385,6 +2427,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::AcadoOCPInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::AcadoOCPInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -2400,6 +2460,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::AcadoOCPInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::AcadoOCPInternal::input "
 
@@ -3848,6 +3916,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::CFunction::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::CFunction::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::CFunction::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::CFunction::output "
@@ -4270,6 +4346,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::CFunctionInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::CFunctionInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -4285,6 +4379,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::CFunctionInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::CFunctionInternal::input "
 
@@ -5095,6 +5197,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::OptimalControl::Collocation::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::OptimalControl::Collocation::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::OptimalControl::Collocation::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::OptimalControl::Collocation::output "
@@ -5896,6 +6006,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::output "
@@ -6479,6 +6597,26 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::CollocationIntegratorInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -6494,6 +6632,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::CollocationIntegratorInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::CollocationIntegratorInternal::input "
 
@@ -7095,6 +7241,27 @@ Print. ";
 Print. ";
 
 %feature("docstring")
+CasADi::OptimalControl::CollocationInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")
+CasADi::OptimalControl::CollocationInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")
+CasADi::OptimalControl::CollocationInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")
 CasADi::OptimalControl::CollocationInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -7112,6 +7279,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::OptimalControl::CollocationInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::OptimalControl::CollocationInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::OptimalControl::CollocationInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::OptimalControl::CollocationInternal::input "
 
@@ -8377,6 +8552,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::ControlSimulator::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::ControlSimulator::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::ControlSimulator::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::ControlSimulator::output "
@@ -8883,6 +9066,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::ControlSimulatorInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::ControlSimulatorInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -8898,6 +9099,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::ControlSimulatorInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::ControlSimulatorInternal::input "
 
@@ -9510,6 +9719,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::CplexInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::CplexInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::CplexInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::CplexInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -9525,6 +9752,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::CplexInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::CplexInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::CplexInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::CplexInternal::input "
 
@@ -10390,6 +10625,14 @@ Generate the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::CplexSolver::input "
 
 Const access input argument. ";
+
+%feature("docstring")  CasADi::CplexSolver::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::CplexSolver::input "
+
+Access input argument. ";
 
 %feature("docstring")  CasADi::CplexSolver::input "
 
@@ -11773,6 +12016,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparse::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::CSparse::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::CSparse::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparse::output "
@@ -12219,6 +12470,26 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::inputSchemeEntry
+"
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")
+CasADi::Interfaces::CSparseInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -12234,6 +12505,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::CSparseInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::Interfaces::CSparseInternal::input "
 
@@ -13275,6 +13554,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesIntegrator::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesIntegrator::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::output "
@@ -14040,6 +14327,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::Sundials::CVodesInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::Sundials::CVodesInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -14055,6 +14360,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::Sundials::CVodesInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesInternal::input "
 
@@ -15279,6 +15592,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::ExternalFunction::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::ExternalFunction::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::ExternalFunction::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::ExternalFunction::output "
@@ -15699,6 +16020,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::ExternalFunctionInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::ExternalFunctionInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -15714,6 +16053,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::ExternalFunctionInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::ExternalFunctionInternal::input "
 
@@ -16718,6 +17065,10 @@ Check if the node is pointing to the right type of object. ";
 
 Const access input argument. ";
 
+%feature("docstring")  CasADi::FX::input "
+
+Const access input argument. ";
+
 %feature("docstring")  CasADi::FX::output "
 
 Const access input argument. ";
@@ -16737,6 +17088,10 @@ Const access adjoint seed. ";
 %feature("docstring")  CasADi::FX::adjSens "
 
 Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::FX::input "
+
+Access input argument. ";
 
 %feature("docstring")  CasADi::FX::input "
 
@@ -17159,6 +17514,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::FXInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::FXInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::FXInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::FXInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -17174,6 +17547,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::FXInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::FXInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::FXInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::FXInternal::input "
 
@@ -18641,6 +19022,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::Sundials::IdasIntegrator::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::Sundials::IdasIntegrator::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::output "
@@ -19488,6 +19877,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::Sundials::IdasInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::Sundials::IdasInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -19503,6 +19910,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::Sundials::IdasInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::Sundials::IdasInternal::input "
 
@@ -20388,6 +20803,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::ImplicitFunction::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::ImplicitFunction::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::ImplicitFunction::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::ImplicitFunction::output "
@@ -20815,6 +21238,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::ImplicitFunctionInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::ImplicitFunctionInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -20830,6 +21271,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::ImplicitFunctionInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::input "
 
@@ -21819,6 +22268,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::Integrator::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::Integrator::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::Integrator::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::Integrator::output "
@@ -22331,6 +22788,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::IntegratorInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::IntegratorInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -22346,6 +22821,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::IntegratorInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::IntegratorInternal::input "
 
@@ -22953,6 +23436,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::IPInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::IPInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::IPInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::IPInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -22968,6 +23469,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::IPInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::IPInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::IPInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::IPInternal::input "
 
@@ -23796,6 +24305,14 @@ Generate the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::IPMethod::input "
 
 Const access input argument. ";
+
+%feature("docstring")  CasADi::IPMethod::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::IPMethod::input "
+
+Access input argument. ";
 
 %feature("docstring")  CasADi::IPMethod::input "
 
@@ -26984,6 +27501,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::IpoptInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::IpoptInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::IpoptInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::IpoptInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -26999,6 +27534,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::IpoptInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::IpoptInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::IpoptInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::IpoptInternal::input "
 
@@ -27991,6 +28534,26 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::inputSchemeEntry
+"
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")
+CasADi::Interfaces::IpoptQPInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -28006,6 +28569,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPInternal::input "
 
@@ -29196,6 +29767,14 @@ Generate the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::input "
 
 Const access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPSolver::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::IpoptQPSolver::input "
+
+Access input argument. ";
 
 %feature("docstring")  CasADi::Interfaces::IpoptQPSolver::input "
 
@@ -32614,6 +33193,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::IpoptSolver::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::IpoptSolver::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::IpoptSolver::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::IpoptSolver::output "
@@ -33301,6 +33888,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::Jacobian::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::Jacobian::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::Jacobian::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::Jacobian::output "
@@ -33710,6 +34305,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::JacobianInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::JacobianInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::JacobianInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::JacobianInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -33725,6 +34338,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::JacobianInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::JacobianInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::JacobianInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::JacobianInternal::input "
 
@@ -34527,6 +35148,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::Sundials::KinsolInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::Sundials::KinsolInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::Sundials::KinsolInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::Sundials::KinsolInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -34542,6 +35181,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::Sundials::KinsolInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::Sundials::KinsolInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::Sundials::KinsolInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolInternal::input "
 
@@ -35317,6 +35964,14 @@ Generate the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::Sundials::KinsolSolver::input "
 
 Const access input argument. ";
+
+%feature("docstring")  CasADi::Sundials::KinsolSolver::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::Sundials::KinsolSolver::input "
+
+Access input argument. ";
 
 %feature("docstring")  CasADi::Sundials::KinsolSolver::input "
 
@@ -36125,6 +36780,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::KnitroInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::KnitroInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::KnitroInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::KnitroInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -36140,6 +36813,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::KnitroInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::KnitroInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::KnitroInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::KnitroInternal::input "
 
@@ -37075,6 +37756,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::KnitroSolver::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::KnitroSolver::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::KnitroSolver::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::KnitroSolver::output "
@@ -37752,6 +38441,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackLUDense::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackLUDense::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDense::output "
@@ -38217,6 +38914,27 @@ Print. ";
 Print. ";
 
 %feature("docstring")
+CasADi::Interfaces::LapackLUDenseInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackLUDenseInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackLUDenseInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")
 CasADi::Interfaces::LapackLUDenseInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -38233,6 +38951,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackLUDenseInternal::input "
 
@@ -38965,6 +39691,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackQRDense::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackQRDense::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDense::output "
@@ -39420,6 +40154,27 @@ Print. ";
 Print. ";
 
 %feature("docstring")
+CasADi::Interfaces::LapackQRDenseInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackQRDenseInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")
+CasADi::Interfaces::LapackQRDenseInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")
 CasADi::Interfaces::LapackQRDenseInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -39436,6 +40191,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::Interfaces::LapackQRDenseInternal::input "
 
@@ -40376,6 +41139,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::LiftedSQP::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::LiftedSQP::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::LiftedSQP::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::LiftedSQP::output "
@@ -41034,6 +41805,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::LiftedSQPInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::LiftedSQPInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -41049,6 +41838,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::LiftedSQPInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::LiftedSQPInternal::input "
 
@@ -41668,6 +42465,26 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::inputSchemeEntry
+"
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")
+CasADi::Interfaces::LiftoptInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -41683,6 +42500,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptInternal::input "
 
@@ -42531,6 +43356,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptSolver::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::LiftoptSolver::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::Interfaces::LiftoptSolver::output "
@@ -43170,6 +44003,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::LinearSolver::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::LinearSolver::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::LinearSolver::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::LinearSolver::output "
@@ -43605,6 +44446,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::LinearSolverInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::LinearSolverInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -43620,6 +44479,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::LinearSolverInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::LinearSolverInternal::input "
 
@@ -45849,6 +46716,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::OptimalControl::MultipleShooting::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::OptimalControl::MultipleShooting::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::OptimalControl::MultipleShooting::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::OptimalControl::MultipleShooting::output "
@@ -46428,6 +47303,27 @@ CasADi::OptimalControl::MultipleShootingInternal::repr "
 Print. ";
 
 %feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")
 CasADi::OptimalControl::MultipleShootingInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -46446,6 +47342,16 @@ Is function fcn being monitored. ";
 CasADi::OptimalControl::MultipleShootingInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")
+CasADi::OptimalControl::MultipleShootingInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")
 CasADi::OptimalControl::MultipleShootingInternal::input "
@@ -48504,6 +49410,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::MXFunction::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::MXFunction::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::MXFunction::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::MXFunction::output "
@@ -48958,6 +49872,24 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::MXFunctionInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::MXFunctionInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -48973,6 +49905,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::MXFunctionInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::input "
 
@@ -50094,6 +51034,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::NLPSolver::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::NLPSolver::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::NLPSolver::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::NLPSolver::output "
@@ -50663,6 +51611,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::NLPSolverInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::NLPSolverInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -50678,6 +51644,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::NLPSolverInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::NLPSolverInternal::input "
 
@@ -53034,6 +54008,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::OCPSolver::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::OCPSolver::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::OCPSolver::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::OCPSolver::output "
@@ -53556,6 +54538,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::OCPSolverInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::OCPSolverInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -53571,6 +54571,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::OCPSolverInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::OCPSolverInternal::input "
 
@@ -54201,6 +55209,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -54216,6 +55242,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPInternal::input "
 
@@ -54965,6 +55999,14 @@ Generate the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::input "
 
 Const access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPSolver::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::OOQPSolver::input "
+
+Access input argument. ";
 
 %feature("docstring")  CasADi::Interfaces::OOQPSolver::input "
 
@@ -56158,6 +57200,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::Parallelizer::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::Parallelizer::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::Parallelizer::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::Parallelizer::output "
@@ -56615,6 +57665,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::ParallelizerInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::ParallelizerInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -56630,6 +57698,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::ParallelizerInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::ParallelizerInternal::input "
 
@@ -57207,6 +58283,26 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::inputSchemeEntry
+"
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")
+CasADi::Interfaces::QPOasesInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -57222,6 +58318,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesInternal::input "
 
@@ -57982,6 +59086,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesSolver::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::Interfaces::QPOasesSolver::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::Interfaces::QPOasesSolver::output "
@@ -58661,6 +59773,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::QPSolver::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::QPSolver::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::QPSolver::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::QPSolver::output "
@@ -59131,6 +60251,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::QPSolverInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::QPSolverInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -59146,6 +60284,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::QPSolverInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::QPSolverInternal::input "
 
@@ -60020,6 +61166,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::RKIntegrator::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::RKIntegrator::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::RKIntegrator::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::RKIntegrator::output "
@@ -60548,6 +61702,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::RKIntegratorInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::RKIntegratorInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -60563,6 +61735,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::RKIntegratorInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::RKIntegratorInternal::input "
 
@@ -61680,6 +62860,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::Simulator::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::Simulator::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::Simulator::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::Simulator::output "
@@ -62127,6 +63315,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::SimulatorInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::SimulatorInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -62142,6 +63348,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::SimulatorInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::SimulatorInternal::input "
 
@@ -63116,6 +64330,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::SQPInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::SQPInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::SQPInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::SQPInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -63131,6 +64363,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::SQPInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::SQPInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::SQPInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::SQPInternal::input "
 
@@ -64053,6 +65293,14 @@ Generate the sparsity of a Jacobian block. ";
 %feature("docstring")  CasADi::SQPMethod::input "
 
 Const access input argument. ";
+
+%feature("docstring")  CasADi::SQPMethod::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::SQPMethod::input "
+
+Access input argument. ";
 
 %feature("docstring")  CasADi::SQPMethod::input "
 
@@ -64990,6 +66238,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::Sundials::SundialsIntegrator::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::Sundials::SundialsIntegrator::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::Sundials::SundialsIntegrator::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::Sundials::SundialsIntegrator::output "
@@ -65714,6 +66970,26 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::Sundials::SundialsInternal::inputSchemeEntry
+"
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::Sundials::SundialsInternal::outputSchemeEntry
+"
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::Sundials::SundialsInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::Sundials::SundialsInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -65729,6 +67005,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::Sundials::SundialsInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::Sundials::SundialsInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::Sundials::SundialsInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::Sundials::SundialsInternal::input "
 
@@ -66773,6 +68057,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::SXFunction::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::SXFunction::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::SXFunction::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::SXFunction::output "
@@ -67248,6 +68540,24 @@ Const access an output. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::SXFunctionInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::SXFunctionInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -67263,6 +68573,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::SXFunctionInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::input "
 
@@ -70135,6 +71453,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::WorhpInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::WorhpInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::WorhpInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::WorhpInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -70150,6 +71486,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::WorhpInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::WorhpInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::WorhpInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::WorhpInternal::input "
 
@@ -71693,6 +73037,14 @@ Const access input argument. ";
 
 %feature("docstring")  CasADi::WorhpSolver::input "
 
+Const access input argument. ";
+
+%feature("docstring")  CasADi::WorhpSolver::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::WorhpSolver::input "
+
 Access input argument. ";
 
 %feature("docstring")  CasADi::WorhpSolver::output "
@@ -72129,6 +73481,24 @@ Print. ";
 
 Print. ";
 
+%feature("docstring")  CasADi::XFunctionInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
 %feature("docstring")  CasADi::XFunctionInternal::getPartition "
 
 Get the unidirectional or bidirectional partition. ";
@@ -72144,6 +73514,14 @@ Is function fcn being monitored. ";
 %feature("docstring")  CasADi::XFunctionInternal::input "
 
 Access input argument. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::input "
+
+Const access input argument. ";
 
 %feature("docstring")  CasADi::XFunctionInternal::input "
 
@@ -72729,6 +74107,18 @@ Uses CasADi::SXFunction::jac ";
 
 %feature("docstring")  CasADi::Interfaces::hessian "";
 
+%feature("docstring")  CasADi::Interfaces::getSchemeName "";
+
+%feature("docstring")  CasADi::Interfaces::getSchemeEntryNames "";
+
+%feature("docstring")  CasADi::Interfaces::getSchemeEntryName "";
+
+%feature("docstring")  CasADi::Interfaces::getSchemeEntryDoc "";
+
+%feature("docstring")  CasADi::Interfaces::getSchemeEntryEnumName "";
+
+%feature("docstring")  CasADi::Interfaces::getSchemeEntryEnum "";
+
 %feature("docstring")  CasADi::Interfaces::mayerIn "
 
 Helper function for 'MayerInput' Input arguments of a Mayer Term  nx: Number
@@ -73122,6 +74512,90 @@ Helper function for 'IntegratorOutput' Output arguments of an integrator
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
 +----------------+--------------------------------------------------------+
+";
+
+%feature("docstring")  CasADi::Interfaces::acadoIn "
+
+Helper function for 'ACADO_Input' Input arguments of an ACADO OCP solver
+
+>Input scheme: CasADi::ACADO_Input (ACADO_NUM_IN = 17)
++---------------+-------------+
+|     Name      | Description |
++===============+=============+
+| ACADO_X_GUESS |             |
++---------------+-------------+
+| ACADO_U_GUESS |             |
++---------------+-------------+
+| ACADO_P_GUESS |             |
++---------------+-------------+
+| ACADO_LBX     |             |
++---------------+-------------+
+| ACADO_UBX     |             |
++---------------+-------------+
+| ACADO_LBX0    |             |
++---------------+-------------+
+| ACADO_UBX0    |             |
++---------------+-------------+
+| ACADO_LBXF    |             |
++---------------+-------------+
+| ACADO_UBXF    |             |
++---------------+-------------+
+| ACADO_LBU     |             |
++---------------+-------------+
+| ACADO_UBU     |             |
++---------------+-------------+
+| ACADO_LBP     |             |
++---------------+-------------+
+| ACADO_UBP     |             |
++---------------+-------------+
+| ACADO_LBC     |             |
++---------------+-------------+
+| ACADO_UBC     |             |
++---------------+-------------+
+| ACADO_LBR     |             |
++---------------+-------------+
+| ACADO_UBR     |             |
++---------------+-------------+
+";
+
+%feature("docstring")  CasADi::Interfaces::acadoOut "
+
+Helper function for 'ACADO_Output' Output arguments of an ACADO OCP solver
+
+>Output scheme: CasADi::ACADO_Output (ACADO_NUM_OUT = 4)
++-------------+-------------+
+|    Name     | Description |
++=============+=============+
+| ACADO_X_OPT |             |
++-------------+-------------+
+| ACADO_U_OPT |             |
++-------------+-------------+
+| ACADO_P_OPT |             |
++-------------+-------------+
+| ACADO_COST  |             |
++-------------+-------------+
+";
+
+%feature("docstring")  CasADi::Interfaces::acadofcnIn "
+
+Helper function for 'ACADO_FCN_Input' Input arguments of an ACADO function
+
+>Input scheme: CasADi::ACADO_FCN_Input (ACADO_FCN_NUM_IN = 6)
++----------------+-------------+
+|      Name      | Description |
++================+=============+
+| ACADO_FCN_T    |             |
++----------------+-------------+
+| ACADO_FCN_XD   |             |
++----------------+-------------+
+| ACADO_FCN_XA   |             |
++----------------+-------------+
+| ACADO_FCN_U    |             |
++----------------+-------------+
+| ACADO_FCN_P    |             |
++----------------+-------------+
+| ACADO_FCN_XDOT |             |
++----------------+-------------+
 ";
 
 %feature("docstring")  CasADi::Interfaces::timesTwo "";
@@ -74897,6 +76371,9 @@ h:  internal expressions which the user may wish to inspect ";
 
 
 // File: all_8hpp.xml
+
+
+// File: autogenerated_8cpp.xml
 
 
 // File: autogenerated_8hpp.xml

@@ -31,18 +31,48 @@ v = vertcat([x,y,z])
 f = SXFunction([v],[x**2 + 100*z**2])
 g = SXFunction([v],[z + (1-x)**2 - y])
 
-#solv = IpoptSolver(f,g)
+# Choose NLP solver
+#nlp_solver = IpoptSolver
+#nlp_solver = SQPMethod
+nlp_solver = LiftedSQP
 
-solv = SQPMethod(f,g)
-solv.setOption("qp_solver",IpoptQPSolver)
+# Choose a qp solver
+#qp_solver = QPOasesSolver
+qp_solver = IpoptQPSolver
+#qp_solver = OOQPSolver
 
+# QP solver options
+if qp_solver == QPOasesSolver:
+  qp_solver_options = {"printLevel" : "none"}
+elif qp_solver == IpoptQPSolver:
+  qp_solver_options = {"print_level" : 0}
+else:
+  qp_solver_options = {}
+
+# Create solver
+solv = nlp_solver(f,g)
+
+# NLP solver options
+solv.setOption("generate_hessian",True)
+if nlp_solver != IpoptSolver:
+  solv.setOption("qp_solver",qp_solver)
+  solv.setOption("qp_solver_options",qp_solver_options)
+
+# Init solver  
 solv.init()
 
+# Solve the rosenbrock problem
 solv.setInput([2.5,3.0,0.75],NLP_X_INIT)
 solv.setInput(0,NLP_UBG)
 solv.setInput(0,NLP_LBG)
-solv.solve()
+solv.evaluate()
 
-print solv.output(NLP_X_OPT)
+# Print solution
+print
+print 
+print "%50s " % "Optimal cost:", solv.output(NLP_COST)
+print "%50s " % "Primal solution:", solv.output(NLP_X_OPT)
+print "%50s " % "Dual solution (simple bounds):", solv.output(NLP_LAMBDA_X)
+print "%50s " % "Dual solution (nonlinear bounds):", solv.output(NLP_LAMBDA_G)
 
 
