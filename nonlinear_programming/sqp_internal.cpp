@@ -404,6 +404,8 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     // Candidate accepted
     x_old = x;
     x = x_cand;
+    fk = fk_cand;
+    gk = gk_cand;
     mu = t * mu_qp + (1 - t) * mu;
     mu_x = t * mu_x_qp + (1 - t) * mu_x;
 
