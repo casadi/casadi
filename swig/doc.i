@@ -64048,10 +64048,7 @@ Assert that the object has been initialized. ";
 |              |              |              | L-BFGS       | nternal      |
 |              |              |              | memory.      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| line-search  | OT_STRING    | \"simple\"     | simple|armij | CasADi::SQPI |
-|              |              |              | o            | nternal      |
-+--------------+--------------+--------------+--------------+--------------+
-| maxiter      | OT_INTEGER   | 100          | Maximum      | CasADi::SQPI |
+| maxiter      | OT_INTEGER   | 50           | Maximum      | CasADi::SQPI |
 |              |              |              | number of    | nternal      |
 |              |              |              | SQP          |              |
 |              |              |              | iterations   |              |
@@ -64061,7 +64058,7 @@ Assert that the object has been initialized. ";
 |              |              |              | linesearch   |              |
 |              |              |              | iterations   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| merit_memory | OT_INTEGER   | 1            | Size of      | CasADi::SQPI |
+| merit_memory | OT_INTEGER   | 4            | Size of      | CasADi::SQPI |
 |              |              |              | memory to    | nternal      |
 |              |              |              | store        |              |
 |              |              |              | history of   |              |
@@ -64802,10 +64799,7 @@ Joel Andersson and Attila Kozma
 |              |              |              | L-BFGS       | nternal      |
 |              |              |              | memory.      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| line-search  | OT_STRING    | \"simple\"     | simple|armij | CasADi::SQPI |
-|              |              |              | o            | nternal      |
-+--------------+--------------+--------------+--------------+--------------+
-| maxiter      | OT_INTEGER   | 100          | Maximum      | CasADi::SQPI |
+| maxiter      | OT_INTEGER   | 50           | Maximum      | CasADi::SQPI |
 |              |              |              | number of    | nternal      |
 |              |              |              | SQP          |              |
 |              |              |              | iterations   |              |
@@ -64815,7 +64809,7 @@ Joel Andersson and Attila Kozma
 |              |              |              | linesearch   |              |
 |              |              |              | iterations   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| merit_memory | OT_INTEGER   | 1            | Size of      | CasADi::SQPI |
+| merit_memory | OT_INTEGER   | 4            | Size of      | CasADi::SQPI |
 |              |              |              | memory to    | nternal      |
 |              |              |              | store        |              |
 |              |              |              | history of   |              |
@@ -74541,43 +74535,64 @@ Helper function for 'IntegratorOutput' Output arguments of an integrator
 Helper function for 'ACADO_Input' Input arguments of an ACADO OCP solver
 
 >Input scheme: CasADi::ACADO_Input (ACADO_NUM_IN = 17)
-+---------------+-------------+
-|     Name      | Description |
-+===============+=============+
-| ACADO_X_GUESS |             |
-+---------------+-------------+
-| ACADO_U_GUESS |             |
-+---------------+-------------+
-| ACADO_P_GUESS |             |
-+---------------+-------------+
-| ACADO_LBX     |             |
-+---------------+-------------+
-| ACADO_UBX     |             |
-+---------------+-------------+
-| ACADO_LBX0    |             |
-+---------------+-------------+
-| ACADO_UBX0    |             |
-+---------------+-------------+
-| ACADO_LBXF    |             |
-+---------------+-------------+
-| ACADO_UBXF    |             |
-+---------------+-------------+
-| ACADO_LBU     |             |
-+---------------+-------------+
-| ACADO_UBU     |             |
-+---------------+-------------+
-| ACADO_LBP     |             |
-+---------------+-------------+
-| ACADO_UBP     |             |
-+---------------+-------------+
-| ACADO_LBC     |             |
-+---------------+-------------+
-| ACADO_UBC     |             |
-+---------------+-------------+
-| ACADO_LBR     |             |
-+---------------+-------------+
-| ACADO_UBR     |             |
-+---------------+-------------+
++------------------------------------+------------------------------------+
+|                Name                |            Description             |
++====================================+====================================+
+| ACADO_X_GUESS                      | Initial guess for x (default: 0)   |
+|                                    | [x_guess].                         |
++------------------------------------+------------------------------------+
+| ACADO_U_GUESS                      | Initial guess for u (default: 0)   |
+|                                    | [u_guess].                         |
++------------------------------------+------------------------------------+
+| ACADO_P_GUESS                      | Initial guess for p (default: 0)   |
+|                                    | [p_guess].                         |
++------------------------------------+------------------------------------+
+| ACADO_LBX                          | Lower bound on x (default:         |
+|                                    | -infinity) [lbx].                  |
++------------------------------------+------------------------------------+
+| ACADO_UBX                          | Upper bound on x (default:         |
+|                                    | infinity) [ubx].                   |
++------------------------------------+------------------------------------+
+| ACADO_LBX0                         | Lower bound on x0 (default:        |
+|                                    | -infinity) [lbx0].                 |
++------------------------------------+------------------------------------+
+| ACADO_UBX0                         | Upper bound on x0 (default:        |
+|                                    | infinity) [ubx0].                  |
++------------------------------------+------------------------------------+
+| ACADO_LBXF                         | Lower bound on xf (default:        |
+|                                    | -infinity) [lbxf].                 |
++------------------------------------+------------------------------------+
+| ACADO_UBXF                         | Upper bound on xf (default:        |
+|                                    | infinity) [ubxf].                  |
++------------------------------------+------------------------------------+
+| ACADO_LBU                          | Lower bound on u (default:         |
+|                                    | -infinity) [lbu].                  |
++------------------------------------+------------------------------------+
+| ACADO_UBU                          | Upper bound on u (default:         |
+|                                    | infinity) [ubu].                   |
++------------------------------------+------------------------------------+
+| ACADO_LBP                          | Lower bound on p (default:         |
+|                                    | -infinity) [lbp].                  |
++------------------------------------+------------------------------------+
+| ACADO_UBP                          | Upper bound on p (default:         |
+|                                    | infinity) [ubp].                   |
++------------------------------------+------------------------------------+
+| ACADO_LBC                          | Lower bound on the path constraint |
+|                                    | function (default: -infinity)      |
+|                                    | [lbc].                             |
++------------------------------------+------------------------------------+
+| ACADO_UBC                          | Upper bound on the path constraint |
+|                                    | function (default: infinity)       |
+|                                    | [ubc].                             |
++------------------------------------+------------------------------------+
+| ACADO_LBR                          | Lower bound on the initial         |
+|                                    | constraint function (default: 0)   |
+|                                    | [lbr].                             |
++------------------------------------+------------------------------------+
+| ACADO_UBR                          | Upper bound on the initial         |
+|                                    | constraint function (default: 0)   |
+|                                    | [ubr].                             |
++------------------------------------+------------------------------------+
 ";
 
 %feature("docstring")  CasADi::Interfaces::acadoOut "
@@ -74585,17 +74600,17 @@ Helper function for 'ACADO_Input' Input arguments of an ACADO OCP solver
 Helper function for 'ACADO_Output' Output arguments of an ACADO OCP solver
 
 >Output scheme: CasADi::ACADO_Output (ACADO_NUM_OUT = 4)
-+-------------+-------------+
-|    Name     | Description |
-+=============+=============+
-| ACADO_X_OPT |             |
-+-------------+-------------+
-| ACADO_U_OPT |             |
-+-------------+-------------+
-| ACADO_P_OPT |             |
-+-------------+-------------+
-| ACADO_COST  |             |
-+-------------+-------------+
++-------------+---------------------------------+
+|    Name     |           Description           |
++=============+=================================+
+| ACADO_X_OPT | Optimal states [x_opt].         |
++-------------+---------------------------------+
+| ACADO_U_OPT | Optimal control inputs [u_opt]. |
++-------------+---------------------------------+
+| ACADO_P_OPT | Optimal parameters [p_opt].     |
++-------------+---------------------------------+
+| ACADO_COST  | Optimal cost [cost].            |
++-------------+---------------------------------+
 ";
 
 %feature("docstring")  CasADi::Interfaces::acadofcnIn "
@@ -74603,21 +74618,21 @@ Helper function for 'ACADO_Output' Output arguments of an ACADO OCP solver
 Helper function for 'ACADO_FCN_Input' Input arguments of an ACADO function
 
 >Input scheme: CasADi::ACADO_FCN_Input (ACADO_FCN_NUM_IN = 6)
-+----------------+-------------+
-|      Name      | Description |
-+================+=============+
-| ACADO_FCN_T    |             |
-+----------------+-------------+
-| ACADO_FCN_XD   |             |
-+----------------+-------------+
-| ACADO_FCN_XA   |             |
-+----------------+-------------+
-| ACADO_FCN_U    |             |
-+----------------+-------------+
-| ACADO_FCN_P    |             |
-+----------------+-------------+
-| ACADO_FCN_XDOT |             |
-+----------------+-------------+
++----------------+---------------------------------------+
+|      Name      |              Description              |
++================+=======================================+
+| ACADO_FCN_T    | Time [t].                             |
++----------------+---------------------------------------+
+| ACADO_FCN_XD   | Differential state [xd].              |
++----------------+---------------------------------------+
+| ACADO_FCN_XA   | Algebraic state [xa].                 |
++----------------+---------------------------------------+
+| ACADO_FCN_U    | Control input [u].                    |
++----------------+---------------------------------------+
+| ACADO_FCN_P    | Parameter [p].                        |
++----------------+---------------------------------------+
+| ACADO_FCN_XDOT | Differential state derivative [xdot]. |
++----------------+---------------------------------------+
 ";
 
 %feature("docstring")  CasADi::Interfaces::timesTwo "";
@@ -77418,6 +77433,9 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__DAEOutput.xml
 
 
+// File: group__scheme__InputOutputScheme.xml
+
+
 // File: group__scheme__MayerInput.xml
 
 
@@ -77430,7 +77448,7 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__IntegratorInput.xml
 
 
-// File: group__scheme__MUSCOD__FCN__Input.xml
+// File: group__scheme__OCPOutput.xml
 
 
 // File: group__scheme__RDAEOutput.xml
@@ -77442,7 +77460,7 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__ControlSimulatorInput.xml
 
 
-// File: group__scheme__OCPOutput.xml
+// File: group__scheme__MUSCOD__FCN__Input.xml
 
 
 // File: chapter1.xml
