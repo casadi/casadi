@@ -28,7 +28,6 @@
 #include "casadi/sx/sx_tools.hpp"
 #include "casadi/casadi_calculus.hpp"
 /*#include "interfaces/qpoases/qpoases_solver.hpp"*/
-#include "interfaces/ipopt/ipopt_qp_solver.hpp"
 #include <ctime>
 #include <iomanip>
 #include <fstream>
@@ -78,7 +77,14 @@ void SQPInternal::init(){
   int n = input(NLP_X_INIT).size();
   
   if (getOption("hessian_approximation")=="exact" && H_.isNull()) {
-    casadi_error("SQPInternal::evaluate: you set option 'hessian_approximation' to 'exact', but no hessian was supplied.");
+    if (!getOption("generate_hessian")){
+      casadi_error("SQPInternal::evaluate: you set option 'hessian_approximation' to 'exact', but no hessian was supplied. Try with option \"generate_hessian\".");
+    }
+  }
+  
+  // If the Hessian is generated, we use exact approximation by default
+  if (getOption("generate_hessian")){
+    setOption("hessian_approximation", "exact");
   }
   
   // Allocate a QP solver
@@ -88,9 +94,8 @@ void SQPInternal::init(){
   QPSolverCreator qp_solver_creator = getOption("qp_solver");
   qp_solver_ = qp_solver_creator(H_sparsity,A_sparsity);
 
-  // Checking if Ipopt is used as QP solver
-  Interfaces::IpoptQPSolver* dummy = static_cast<Interfaces::IpoptQPSolver*>(&qp_solver_);
-  if(dummy){
+  // If IPOPT was provided, we prevent variable elimination
+  if(qp_solver_.hasOption("fixed_variable_treatment")){
     qp_solver_.setOption("fixed_variable_treatment", "relax_bounds");
   }
   
@@ -107,13 +112,13 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   
   checkInitialBounds();
     
-  // Set the static parameter
-  if (parametric_) {
-    if (!F_.isNull()) F_.setInput(input(NLP_P),F_.getNumInputs()-1);
-    if (!G_.isNull()) G_.setInput(input(NLP_P),G_.getNumInputs()-1);
-    if (!H_.isNull()) H_.setInput(input(NLP_P),H_.getNumInputs()-1);
-    if (!J_.isNull()) J_.setInput(input(NLP_P),J_.getNumInputs()-1);
-  }
+//  // Set the static parameter
+//  if (parametric_) {
+//    if (!F_.isNull()) F_.setInput(input(NLP_P),F_.getNumInputs()-1);
+//    if (!G_.isNull()) G_.setInput(input(NLP_P),G_.getNumInputs()-1);
+//    if (!H_.isNull()) H_.setInput(input(NLP_P),H_.getNumInputs()-1);
+//    if (!J_.isNull()) J_.setInput(input(NLP_P),J_.getNumInputs()-1);
+//  }
   
   // Get dimensions
   int m = G_.isNull() ? 0 : G_.output().size(); // Number of equality constraints
@@ -133,11 +138,11 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   // Cost function value
   double fk;
   // Gradient of objective
-  DMatrix gfk = F_.adjSens();
+  DMatrix gfk;
   // Constraint function value
   DMatrix gk;
   // Constraint Jacobian
-  DMatrix Jgk = DMatrix::zeros(0, n);
+  DMatrix Jgk;
   // Lagrange multipliers of the NLP
   DMatrix mu(m, 1, 0.); 
   DMatrix mu_x(n, 1, 0.);
@@ -150,8 +155,8 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   // Lagrange gradient in the actual iterate
   DMatrix gLag_old;
 
-  // Initial Hessian approximation
-  if (! (getOption("hessian_approximation") == "exact")) {
+  // Initial Hessian approximation of BFGS
+  if ( getOption("hessian_approximation") == "limited-memory") {
     Bk = DMatrix::eye(n);
     makeDense(Bk);
   }
@@ -201,6 +206,8 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       cout << "(main loop) B = " << endl;
       Bk.printSparse();
     }
+    // Use identity Hessian
+    //Bk = DMatrix::eye(Bk.size1());
 
     if (!G_.isNull()) {
       // Evaluate the constraint function
@@ -295,7 +302,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
 //      casadi_warning("Search direction has very large values, indefinite Hessian might have ouccured.");
 //    }
     if (inner_prod(p, mul(Bk, p)).at(0) < 0){
-      casadi_warning("Indefinite Hessian detected...");
+//      casadi_warning("Indefinite Hessian detected...");
     }
     
     // Get the dual solution for the inequalities
@@ -422,6 +429,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     G_.evaluate(0, 1);
     //cout << "Constraint adjoint:\n" << G_.adjSens() << endl;
     //cout << "mu:\n" << mu << endl;
+    //cout << "mu_qp:\n" << mu_qp << endl;
     gLag += G_.adjSens();
     gLag += mu_x;
     //cout << "Lagrange gradient:\n" << gLag << endl;
