@@ -206,6 +206,7 @@ class SX : public GenericExpression<SX>{
     SX __sub__(const SX& y) const;
     SX __mul__(const SX& y) const;
     SX __div__(const SX& y) const;
+    SX __truediv__(const SX &y) const {return __div__(y);};
     SX __pow__(const SX& b) const;
     SX __constpow__(const SX& b) const;
     
@@ -245,6 +246,7 @@ class SX : public GenericExpression<SX>{
     Matrix<SX> __sub__(const Matrix<SX>& y) const;
     Matrix<SX> __mul__(const Matrix<SX>& y) const;
     Matrix<SX> __div__(const Matrix<SX>& y) const;
+    Matrix<SX> __truediv__(const Matrix<SX>& y) const {return __div__(y);};
     Matrix<SX> fmin(const Matrix<SX>& b) const;
     Matrix<SX> fmax(const Matrix<SX>& b) const;
     Matrix<SX> constpow(const Matrix<SX>& n) const;

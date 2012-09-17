@@ -445,6 +445,7 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     Matrix<T> __sub__(const Matrix<T> &y) const;
     Matrix<T> __mul__(const Matrix<T> &y) const;
     Matrix<T> __div__(const Matrix<T> &y) const;
+    Matrix<T> __truediv__(const Matrix<T> &y) const {return __div__(y);};
     Matrix<T> __pow__(const Matrix<T> &y) const;
     Matrix<T> __constpow__(const Matrix<T> &y) const;
     Matrix<T> __mpower__(const Matrix<T> &y) const;

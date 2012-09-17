@@ -256,6 +256,7 @@ memberbinopsr(Type,add) \
 memberbinopsr(Type,sub) \
 memberbinopsr(Type,mul) \
 memberbinopsr(Type,div) \
+memberbinopsr(Type,truediv) \
 memberbinopsr(Type,mldivide) \
 memberbinopsr(Type,mrdivide) \
 memberbinopsr(Type,mpower) \
@@ -289,6 +290,7 @@ memberbinops(mul,argtype,argCast,selfCast,returntype) \
 returntype mul (argtype) const{ return mul(selfCast(*$self) , argCast(b));} \
 returntype rmul (argtype) const{ return mul(argCast(b) , selfCast(*$self));} \
 memberbinops(div,argtype,argCast,selfCast,returntype) \
+memberbinops(truediv,argtype,argCast,selfCast,returntype) \
 memberbinops(mldivide,argtype,argCast,selfCast,returntype) \
 memberbinops(mrdivide,argtype,argCast,selfCast,returntype) \
 memberbinops(mpower,argtype,argCast,selfCast,returntype) 
