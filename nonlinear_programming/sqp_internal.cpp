@@ -83,7 +83,7 @@ void SQPInternal::init(){
   }
   
   // If the Hessian is generated, we use exact approximation by default
-  if (getOption("generate_hessian")){
+  if (bool(getOption("generate_hessian"))){
     setOption("hessian_approximation", "exact");
   }
   
@@ -302,7 +302,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
 //      casadi_warning("Search direction has very large values, indefinite Hessian might have ouccured.");
 //    }
     if (inner_prod(p, mul(Bk, p)).at(0) < 0){
-//      casadi_warning("Indefinite Hessian detected...");
+      casadi_warning("Indefinite Hessian detected...");
     }
     
     // Get the dual solution for the inequalities
@@ -326,10 +326,10 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     for(int j = 0; j < m; ++j){
       // Left-hand side violated
       if (input(NLP_LBG).elem(j) - gk.elem(j) > 0.){
-        l1_infeas += sigma_ * (input(NLP_LBG).elem(j) - gk.elem(j));
+        l1_infeas += input(NLP_LBG).elem(j) - gk.elem(j);
       }
       else if (gk.elem(j) - input(NLP_UBG).elem(j) > 0.){
-        l1_infeas += sigma_ * (gk.elem(j) - input(NLP_UBG).elem(j));
+        l1_infeas += gk.elem(j) - input(NLP_UBG).elem(j);
       }
     }
 
@@ -337,8 +337,8 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     F_.setFwdSeed(p);
     F_.evaluate(1, 0);
 
-    double L1dir = F_.fwdSens().elem(0) - l1_infeas;
-    double L1merit = fk + l1_infeas;
+    double L1dir = F_.fwdSens().elem(0) - sigma_ * l1_infeas;
+    double L1merit = fk + sigma_ * l1_infeas;
 
     // Storing the actual merit function value in a list
     merit_mem.push_back(L1merit);
@@ -373,14 +373,14 @@ void SQPInternal::evaluate(int nfdir, int nadir){
         for(int j = 0; j < m; ++j){
           // Left-hand side violated
           if (input(NLP_LBG).elem(j) - gk_cand.elem(j) > 0.){
-            l1_infeas += sigma_ * (input(NLP_LBG).elem(j) - gk_cand.elem(j));
+            l1_infeas += input(NLP_LBG).elem(j) - gk_cand.elem(j);
           }
           else if (gk_cand.elem(j) - input(NLP_UBG).elem(j) > 0.){
-            l1_infeas += sigma_ * (gk_cand.elem(j) - input(NLP_UBG).elem(j));
+            l1_infeas += gk_cand.elem(j) - input(NLP_UBG).elem(j);
           }
         }
       }
-      L1merit_cand = fk_cand + l1_infeas;
+      L1merit_cand = fk_cand + sigma_ * l1_infeas;
       // Calculating maximal merit function value so far
       double meritmax = -1E20;
       for(int k = 0; k < merit_mem.size(); ++k){
@@ -394,7 +394,8 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       }
       else{
         //cout << "L1merit:      " << L1merit << endl;
-        //cout << "L1merit_cand: " << L1merit_cand << endl;
+        //cout << "L1dir:        " << L1dir << endl;
+        //cout << "L1merit_cand: " << meritmax << endl;
         //cout << "merit diff: " << L1merit - L1merit_cand << endl;
         //cout << "lhs:" << L1merit_cand - L1merit << endl;
         //cout << "rhs:" << t * c1_ * L1dir << endl;
@@ -450,7 +451,6 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     if (getOption("hessian_approximation") == "limited-memory") { 
       if (it_counter % lbfgs_memory_ == 0){
         Bk = diag(diag(Bk));
-        Bk = DMatrix::eye(Bk.size1());
       }
       DMatrix sk = x - x_old;
       DMatrix yk = gLag - gLag_old_bfgs;
