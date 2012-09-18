@@ -135,6 +135,8 @@ if (!ret) {
 %my_generic_const_typemap(PRECEDENCE_DICTIONARY ,CasADi::GenericType::Dictionary)
 #endif
 
+%my_generic_const_typemap(SWIG_TYPECHECK_DOUBLE,double);
+
 %my_generic_const_typemap(PRECEDENCE_DVector,std::vector<double>);
 %my_generic_const_typemap(PRECEDENCE_IVector,std::vector<int>);
 

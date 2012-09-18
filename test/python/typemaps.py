@@ -665,6 +665,11 @@ class typemaptests(casadiTestCase):
   def test_issue314(self):
     self.message("regression test for #314: SXMatrix sparsity constructor")
     SXMatrix(sp_diag(3),[1,2,3])
-    
+  def test_setAll_365(self):
+    self.message("ticket #365: DMAtrix.setAll does not work for 1x1 Matrices as input")
+    m = DMatrix.ones(5,5)
+    m.setAll(DMatrix(4))
+    m.setAll(IMatrix(4))
+
 if __name__ == '__main__':
     unittest.main()

@@ -166,6 +166,8 @@ int meta< double >::as(PyObject * p, double &m) {
 }
    
 template <> bool meta< double >::couldbe(PyObject * p) {
+ if (PyInt_Check(p) || PyBool_Check(p) || PyFloat_Check(p)) return true;
+ 
  if (PyObject_HasAttrString(p,"dtype")) {
    PyObject *r = PyObject_GetAttrString(p,"dtype");
    if (!PyObject_HasAttrString(r,"kind")) { Py_DECREF(r); return false;}
@@ -185,7 +187,7 @@ template <> bool meta< double >::couldbe(PyObject * p) {
    if (temp->numel()==1 && temp->size()==1) return true;
  }
 
-  return PyInt_Check(p) || PyBool_Check(p) || PyFloat_Check(p);
+  return false;
 }
 
 /// std::string
