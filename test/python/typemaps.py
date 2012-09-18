@@ -237,7 +237,7 @@ class typemaptests(casadiTestCase):
         self.assertTrue(type(r) is type(SX()))
         
 
-      self.assertTrue(type(r) in ztype)
+      self.assertTrue(type(r) in ztype,"Expected %s but got %s" % (str(ztype),str(type(r))))
       
       hasNum = True
       if type(s) in [type(SX()),type(MX()),type(SXMatrix())]:
@@ -295,7 +295,9 @@ class typemaptests(casadiTestCase):
       doit(z,s,lambda z,s: max(s,z))
       doit(z,s,lambda z,s: constpow(s,z))
       doit(z,s,lambda z,s: constpow(z,s))
-      
+      doit(z,s,lambda z,s: arctan2(s,z))
+      doit(z,s,lambda z,s: arctan2(z,s))
+
     nums = [array([[1,2],[3,4]]),DMatrix([[1,2],[3,4]]), DMatrix(4), array(4),4.0,4]
         
     ## numeric & SXMatrix
