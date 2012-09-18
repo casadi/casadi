@@ -6,12 +6,39 @@ This script generates parts of CasADi source code that are highly repetitive and
 import os, fnmatch
 import re
 
+# Walk into directories in filesystem
+# Ripped from os module and slightly modified
+# for alphabetical sorting
+#
+def sortedWalk(top, topdown=True, onerror=None):
+  from os.path import join, isdir, islink
+
+  names = os.listdir(top)
+  names.sort()
+  dirs, nondirs = [], []
+  for name in names:
+    if isdir(os.path.join(top, name)):
+      dirs.append(name)
+    else:
+      nondirs.append(name)
+  if topdown:
+    yield top, dirs, nondirs
+  for name in dirs:
+    path = join(top, name)
+    if not os.path.islink(path):
+      for x in sortedWalk(path, topdown, onerror):
+        yield x
+  if not topdown:
+    yield top, dirs, nondirs
+
 def locate(pattern, root=os.curdir):
     """
     Locate all files matching supplied filename pattern in and below
     supplied root directory.
     """
-    for path, dirs, files in os.walk(os.path.abspath(root)):
+    for path, dirs, files in sortedWalk(os.path.abspath(root)):
+        dirs.sort()
+
         for filename in fnmatch.filter(files, pattern):
             yield os.path.join(path, filename)
             
