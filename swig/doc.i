@@ -45162,6 +45162,8 @@ Elementwise operations Octave/Python naming. ";
 
 %feature("docstring")  CasADi::Matrix::__div__ "";
 
+%feature("docstring")  CasADi::Matrix::__truediv__ "";
+
 %feature("docstring")  CasADi::Matrix::__pow__ "";
 
 %feature("docstring")  CasADi::Matrix::__constpow__ "";
@@ -48726,6 +48728,8 @@ Get string representation of dimensions. The representation is (nrow x ncol
 %feature("docstring")  CasADi::MX::__mul__ "";
 
 %feature("docstring")  CasADi::MX::__div__ "";
+
+%feature("docstring")  CasADi::MX::__truediv__ "";
 
 %feature("docstring")  CasADi::MX::__pow__ "";
 
@@ -67384,6 +67388,8 @@ to any node, 0 is returned. ";
 
 %feature("docstring")  CasADi::SX::__div__ "";
 
+%feature("docstring")  CasADi::SX::__truediv__ "";
+
 %feature("docstring")  CasADi::SX::__pow__ "";
 
 %feature("docstring")  CasADi::SX::__constpow__ "";
@@ -67456,6 +67462,8 @@ allow unambigous access. ";
 %feature("docstring")  CasADi::SX::__mul__ "";
 
 %feature("docstring")  CasADi::SX::__div__ "";
+
+%feature("docstring")  CasADi::SX::__truediv__ "";
 
 %feature("docstring")  CasADi::SX::fmin "";
 
