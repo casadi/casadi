@@ -241,6 +241,9 @@ class SX : public GenericExpression<SX>{
     SX sinh() const;
     SX cosh() const;
     SX tanh() const;
+    SX arcsinh() const;
+    SX arccosh() const;
+    SX arctanh() const;
     SX arctan2(const SX &y) const;
     SX log10() const;
     SX printme(const SX &y) const;

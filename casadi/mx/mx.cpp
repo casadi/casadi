@@ -771,6 +771,18 @@ MX MX::tanh() const{
   return unary(OP_TANH,*this);
 }
 
+MX MX::arcsinh() const{ 
+  return unary(OP_ASINH,*this);
+}
+
+MX MX::arccosh() const{ 
+  return unary(OP_ACOSH,*this);
+}
+
+MX MX::arctanh() const{ 
+  return unary(OP_ATANH,*this);
+}
+
 MX MX::floor() const{ 
   return unary(OP_FLOOR,*this);
 }

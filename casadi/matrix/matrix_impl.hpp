@@ -971,6 +971,21 @@ Matrix<T> Matrix<T>::tanh() const{
 }
 
 template<class T>
+Matrix<T> Matrix<T>::arcsinh() const{
+  return unary(OP_ASINH,*this);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::arccosh() const{
+  return unary(OP_ACOSH,*this);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::arctanh() const{
+  return unary(OP_ATANH,*this);
+}
+
+template<class T>
 Matrix<T> Matrix<T>::exp() const{
   return unary(OP_EXP,*this);
 }

@@ -59,6 +59,9 @@ bool operation_checker(unsigned int op){
     case OP_SINH:          return F<OP_SINH>::check;
     case OP_COSH:          return F<OP_COSH>::check;
     case OP_TANH:          return F<OP_TANH>::check;
+    case OP_ASINH:         return F<OP_ASINH>::check;
+    case OP_ACOSH:         return F<OP_ACOSH>::check;
+    case OP_ATANH:         return F<OP_ATANH>::check;
     case OP_CONST:         return F<OP_CONST>::check;
     case OP_CALL:          return F<OP_CALL>::check;
     case OP_INPUT:         return F<OP_INPUT>::check;
@@ -171,6 +174,9 @@ inline void casadi_math<T>::fun(unsigned char op, const T& x, const T& y, T& f){
     case OP_SINH+OFF:      C<OP_SINH>::fcn(X,Y,F);          break;\
     case OP_COSH+OFF:      C<OP_COSH>::fcn(X,Y,F);          break;\
     case OP_TANH+OFF:      C<OP_TANH>::fcn(X,Y,F);          break;\
+    case OP_ASINH+OFF:     C<OP_ASINH>::fcn(X,Y,F);          break;\
+    case OP_ACOSH+OFF:     C<OP_ACOSH>::fcn(X,Y,F);          break;\
+    case OP_ATANH+OFF:     C<OP_ATANH>::fcn(X,Y,F);          break;\
     case OP_ATAN2+OFF:     C<OP_ATAN2>::fcn(X,Y,F);        break; \
     case OP_ERFINV+OFF:    C<OP_ERFINV>::fcn(X,Y,F);        break;\
     case OP_PRINTME+OFF:   C<OP_PRINTME>::fcn(X,Y,F);       break;
@@ -221,7 +227,10 @@ inline void casadi_math<T>::der(unsigned char op, const T& x, const T& y, const 
     case OP_SINH:      BinaryOperation<OP_SINH>::der(X,Y,F,D);       break;\
     case OP_COSH:      BinaryOperation<OP_COSH>::der(X,Y,F,D);       break;\
     case OP_TANH:      BinaryOperation<OP_TANH>::der(X,Y,F,D);       break;\
-    case OP_ATAN2:      BinaryOperation<OP_ATAN2>::der(X,Y,F,D);       break;\
+    case OP_ASINH:     BinaryOperation<OP_ASINH>::der(X,Y,F,D);      break;\
+    case OP_ACOSH:     BinaryOperation<OP_ACOSH>::der(X,Y,F,D);      break;\
+    case OP_ATANH:     BinaryOperation<OP_ATANH>::der(X,Y,F,D);      break;\
+    case OP_ATAN2:      BinaryOperation<OP_ATAN2>::der(X,Y,F,D);     break;\
     case OP_ERFINV:    BinaryOperation<OP_ERFINV>::der(X,Y,F,D);     break;\
     case OP_PRINTME:   BinaryOperation<OP_PRINTME>::der(X,Y,F,D);    break;
   
@@ -265,6 +274,9 @@ inline void casadi_math<T>::derF(unsigned char op, const T& x, const T& y, T& f,
     case OP_SINH:      DerBinaryOpertion<OP_SINH>::derf(X,Y,F,D);        break;\
     case OP_COSH:      DerBinaryOpertion<OP_COSH>::derf(X,Y,F,D);        break;\
     case OP_TANH:      DerBinaryOpertion<OP_TANH>::derf(X,Y,F,D);        break;\
+    case OP_ASINH:     DerBinaryOpertion<OP_ASINH>::derf(X,Y,F,D);       break;\
+    case OP_ACOSH:     DerBinaryOpertion<OP_ACOSH>::derf(X,Y,F,D);       break;\
+    case OP_ATANH:     DerBinaryOpertion<OP_ATANH>::derf(X,Y,F,D);       break;\
     case OP_ATAN2:      DerBinaryOpertion<OP_ATAN2>::derf(X,Y,F,D);        break;\
     case OP_ERFINV:    DerBinaryOpertion<OP_ERFINV>::derf(X,Y,F,D);        break;\
     case OP_PRINTME:   DerBinaryOpertion<OP_PRINTME>::derf(X,Y,F,D);     break;
@@ -336,12 +348,15 @@ inline void casadi_math<T>::printPre(unsigned char op, std::ostream &stream){
     case OP_ASIN:      stream << "asin(";    break;
     case OP_ACOS:      stream << "acos(";    break;
     case OP_ATAN:      stream << "atan(";    break;
+    case OP_ASINH:     stream << "asinh(";   break;
+    case OP_ACOSH:     stream << "acosh(";   break;
+    case OP_ATANH:     stream << "atanh(";   break;
     case OP_STEP:      stream << "(";        break;
     case OP_FLOOR:     stream << "floor(";   break;
     case OP_CEIL:      stream << "ceil(";    break;
     case OP_EQUALITY:  stream << "(";        break;
     case OP_FABS:      stream << "fabs(";    break;
-    case OP_SIGN:     stream << "sign(";   break;
+    case OP_SIGN:      stream << "sign(";    break;
     case OP_ERF:       stream << "erf(";     break;
     case OP_FMIN:      stream << "fmin(";    break;
     case OP_FMAX:      stream << "fmax(";    break;
@@ -349,7 +364,7 @@ inline void casadi_math<T>::printPre(unsigned char op, std::ostream &stream){
     case OP_SINH:      stream << "sinh(";    break;
     case OP_COSH:      stream << "cosh(";    break;
     case OP_TANH:      stream << "tanh(";    break;
-    case OP_ATAN2:      stream << "atan2(";    break;
+    case OP_ATAN2:     stream << "atan2(";   break;
     case OP_ERFINV:    stream << "erfinv(";  break;
     case OP_PRINTME:   stream << "printme("; break;
   }

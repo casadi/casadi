@@ -421,6 +421,9 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Cached
   MX sinh() const;
   MX cosh() const;
   MX tanh() const;
+  MX arcsinh() const;
+  MX arccosh() const;
+  MX arctanh() const;
 
   /** \brief  Returns the IMatrix that represents the mapping of a Mapping node
   *
