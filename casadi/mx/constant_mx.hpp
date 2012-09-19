@@ -61,7 +61,10 @@ class ConstantMX : public MXNode{
 
     /** \brief  Indicate that the node is constant */
     virtual bool isConstant() const;
-    
+   
+    /// Return truth value of an MX
+    virtual bool __nonzero__() const;
+
     /// Symbolic evaluation (matrix graph)
     virtual MX eval(const std::vector<MX>& x){return MX::create(this);}
 

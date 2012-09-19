@@ -69,6 +69,9 @@ class GenericExpression{
 
 };
 
+template<class T>
+bool __nonzero__(const T &val) { return val!=0;}
+
 #ifndef SWIG
 // Implementations
 #endif // SWIG

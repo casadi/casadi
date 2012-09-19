@@ -122,7 +122,7 @@ class Toolstests(casadiTestCase):
       self.checkarray(array(p.i_a),DMatrix([[0],[1]]),"index")
       self.checkarray(array(p.i_b[0]),DMatrix([[2],[3],[4]]),"index")
       self.checkarray(array(p.i_b[1]),DMatrix([[5],[6],[7]]),"index")
-      self.checkarray(array(p.c),DMatrix(8),"index")
+      self.checkarray(array(p.i_c),DMatrix(8),"index")
 
       self.assertEqual(p.o_a,0,"Offset")
       self.assertEqual(p.o_b[0],2,"Offset")
@@ -175,7 +175,7 @@ class Toolstests(casadiTestCase):
       self.checkarray(array(p.i_a),DMatrix([[0],[1]]),"index")
       self.checkarray(array(p.i_b[0]),DMatrix([[2,5],[3,6],[4,7]]),"index")
       self.checkarray(array(p.i_b[1]),DMatrix([[8],[9],[10]]),"index")
-      self.checkarray(array(p.c),DMatrix(11),"index")
+      self.checkarray(array(p.i_c),DMatrix(11),"index")
 
       self.assertEqual(p.o_a,0,"Offset")
       self.assertEqual(p.o_b[0],2,"Offset")
@@ -230,7 +230,7 @@ class Toolstests(casadiTestCase):
       self.checkarray(array(p.i_b[1]),DMatrix([[5],[6],[7]]),"index")
       self.checkarray(array(p.i_b[2][0]),DMatrix([[8],[9],[10]]),"index")
       self.checkarray(array(p.i_b[2][1]),DMatrix([[11],[12],[13]]),"index")
-      self.checkarray(array(p.c),DMatrix(14),"index")
+      self.checkarray(array(p.i_c),DMatrix(14),"index")
 
       self.assertEqual(p.o_a,0,"Offset")
       self.assertEqual(p.o_b[0],2,"Offset")

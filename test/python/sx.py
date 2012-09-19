@@ -956,7 +956,23 @@ class SXtests(casadiTestCase):
     z = evalf(x+y,x,3)
     self.assertEqual(type(z),DMatrix)
     self.assertEqual(z,8)
-    
+  
+  def test_truth(self):
+    self.message("Truth values")
+    self.assertRaises(Exception, lambda : bool(SX("x")))
+    self.assertRaises(Exception, lambda : bool(SX("x")>0))
+    self.assertTrue(bool(SX(1)))
+    self.assertFalse(bool(SX(0)))
+    self.assertTrue(bool(SX(0.2)))
+    self.assertTrue(bool(SX(-0.2)))
+    self.assertRaises(Exception, lambda : bool(ssym("x")))
+    self.assertRaises(Exception, lambda : bool(ssym("x")>0))
+    self.assertTrue(bool(SXMatrix(SX(1))))
+    self.assertFalse(bool(SXMatrix(SX(0))))
+    self.assertTrue(bool(SXMatrix(SX(0.2))))
+    self.assertTrue(bool(SXMatrix(SX(-0.2))))
+    self.assertRaises(Exception, lambda : bool(SXMatrix([2.0,3])))
+
 if __name__ == '__main__':
     unittest.main()
 

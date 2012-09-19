@@ -140,7 +140,12 @@ class SX : public GenericExpression<SX>{
     /** \brief  Perform operations by ID */
     static SX binary(int op, const SX& x, const SX& y);
     static SX unary(int op, const SX& x);
-
+    
+    /** \brief Check the truth value of this node
+     * Introduced to catch bool(x) situations in python
+     */
+    bool __nonzero__() const;
+    
     /** \brief check if this SX is a leaf of the SX graph
     *
     * An SX qualifies as leaf when it has no dependencies.
@@ -302,6 +307,9 @@ int __int__() { return $self->getIntValue();}
 
 #ifndef SWIG
 // Template specializations
+template<>
+bool __nonzero__(const SX& val);
+
 template<>
 class casadi_limits<SX>{
   public:

@@ -98,6 +98,11 @@ const string& MXNode::getName() const{
   throw CasadiException(string("MXNode::getName() not defined for class ") + typeid(*this).name());
 }
 
+bool MXNode::__nonzero__() const {
+  casadi_error("Can only determine truth value of a numeric MX.");
+
+}
+
 bool MXNode::isSymbolic() const{
   return false;
 }

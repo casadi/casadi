@@ -87,6 +87,7 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Cached
     
     /** \brief  Destructor */
     virtual ~MX();
+    
 
 #ifndef SWIG
    /** \brief  Create from node */
@@ -99,6 +100,9 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Cached
     NonZeros<MX,int> at(int k);
     
 #endif // SWIG
+    
+    /// Returns the truth value of an MX expression
+    bool __nonzero__() const;
     
     //@{
     /// Indexing for interfaced languages

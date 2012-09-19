@@ -1790,6 +1790,18 @@ class MXtests(casadiTestCase):
     
     self.assertEqual(D.shape[0],4)
     self.assertEqual(D.shape[1],7)
+ 
+  def test_truth(self):
+    self.message("Truth values")
+    self.assertRaises(Exception, lambda : bool(msym("x")))
+    #self.assertRaises(Exception, lambda : bool(msym("x")>0))
+    self.assertTrue(bool(MX(1)))
+    self.assertFalse(bool(MX(0)))
+    self.assertTrue(bool(MX(0.2)))
+    self.assertTrue(bool(MX(-0.2)))
+    self.assertRaises(Exception, lambda : bool(MX(DMatrix([2.0,3]))))
+    self.assertRaises(Exception, lambda : bool(MX()))
+
     
 if __name__ == '__main__':
     unittest.main()

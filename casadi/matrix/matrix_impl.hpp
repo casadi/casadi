@@ -52,6 +52,13 @@ T& Matrix<T>::elem(int i, int j){
 }
 
 template<class T>
+bool Matrix<T>::__nonzero__() const {
+  if (isNull()) {casadi_error("Cannot determine truth value of null Matrix.");}
+  if (numel()!=1) {casadi_error("Only scalar Matrix could have a truth value, but you provided a shape" << dimString());}
+  return CasADi::__nonzero__(at(0));
+}
+
+template<class T>
 const Matrix<T> Matrix<T>::getSub(int i, int j) const{
   return elem(i,j);
 }

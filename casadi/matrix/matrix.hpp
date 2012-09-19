@@ -292,6 +292,9 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     /// Returns true if the matrix has a non-zero at location i,j
     bool hasNZ(int i, int j) const { return sparsity().hasNZ(i,j); }
 
+    /// Returns the truth value of a Matrix
+    bool __nonzero__() const;
+
     //@{
     /// Get a submatrix
     const Matrix<T> getSub(int i, int j) const;

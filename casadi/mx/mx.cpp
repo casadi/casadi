@@ -98,6 +98,11 @@ MX MX::create(MXNode* node){
   return ret;
 }
 
+bool MX::__nonzero__() const {
+  if (isNull()) {casadi_error("Cannot determine truth value of null MX.");}
+  return (operator->())->__nonzero__();
+}
+
 const MX MX::getSub(int i, const std::vector<int>& j) const{
   return getSub(vector<int>(1,i),j);
 }
