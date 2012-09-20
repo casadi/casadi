@@ -2857,6 +2857,10 @@ Evaluate the function symbolically ( MX) ";
 
 Clone function. ";
 
+%feature("docstring")  CasADi::BinaryMX::__nonzero__ "
+
+Check the truth value of this node. ";
+
 %feature("docstring")  CasADi::BinaryMX::deepCopyMembers "
 
 Deep copy data members. ";
@@ -7610,6 +7614,10 @@ Propagate sparsity. ";
 %feature("docstring")  CasADi::ConstantMX::isConstant "
 
 Indicate that the node is constant. ";
+
+%feature("docstring")  CasADi::ConstantMX::__nonzero__ "
+
+Return truth value of an MX. ";
 
 %feature("docstring")  CasADi::ConstantMX::eval "
 
@@ -14606,6 +14614,10 @@ Evaluate the function symbolically ( MX) ";
 
 Propagate sparsity. ";
 
+%feature("docstring")  CasADi::Densification::__nonzero__ "
+
+Check the truth value of this node. ";
+
 %feature("docstring")  CasADi::Densification::deepCopyMembers "
 
 Deep copy data members. ";
@@ -14900,6 +14912,10 @@ Get the sparsity. ";
 %feature("docstring")  CasADi::EvaluationMX::isMultipleOutput "
 
 Check if a multiple output node. ";
+
+%feature("docstring")  CasADi::EvaluationMX::__nonzero__ "
+
+Check the truth value of this node. ";
 
 %feature("docstring")  CasADi::EvaluationMX::repr "
 
@@ -16307,8 +16323,18 @@ C++ includes: casadi_calculus.hpp ";
 casadi_calculus.hpp ";
 
 
+// File: structCasADi_1_1F0XChecker_3_01OP__ASINH_01_4.xml
+%feature("docstring") CasADi::F0XChecker< OP_ASINH > " C++ includes:
+casadi_calculus.hpp ";
+
+
 // File: structCasADi_1_1F0XChecker_3_01OP__ASSIGN_01_4.xml
 %feature("docstring") CasADi::F0XChecker< OP_ASSIGN > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1F0XChecker_3_01OP__ATANH_01_4.xml
+%feature("docstring") CasADi::F0XChecker< OP_ATANH > " C++ includes:
 casadi_calculus.hpp ";
 
 
@@ -20175,6 +20201,10 @@ Evaluate the function symbolically ( MX) ";
 %feature("docstring")  CasADi::IfNode::propagateSparsity "
 
 Propagate sparsity. ";
+
+%feature("docstring")  CasADi::IfNode::__nonzero__ "
+
+Check the truth value of this node. ";
 
 %feature("docstring")  CasADi::IfNode::deepCopyMembers "
 
@@ -34623,6 +34653,10 @@ Get function output. ";
 
 Get function reference. ";
 
+%feature("docstring")  CasADi::JacobianReference::__nonzero__ "
+
+Check the truth value of this node. ";
+
 %feature("docstring")  CasADi::JacobianReference::deepCopyMembers "
 
 Deep copy data members. ";
@@ -44798,6 +44832,10 @@ Check if the mapping is in fact a transpose. ";
 
 %feature("docstring")  CasADi::Mapping::evaluateBlock "";
 
+%feature("docstring")  CasADi::Mapping::__nonzero__ "
+
+Check the truth value of this node. ";
+
 %feature("docstring")  CasADi::Mapping::deepCopyMembers "
 
 Deep copy data members. ";
@@ -45215,6 +45253,12 @@ compatibility. ";
 
 %feature("docstring")  CasADi::Matrix::tanh "";
 
+%feature("docstring")  CasADi::Matrix::arcsinh "";
+
+%feature("docstring")  CasADi::Matrix::arccosh "";
+
+%feature("docstring")  CasADi::Matrix::arctanh "";
+
 %feature("docstring")  CasADi::Matrix::arctan2 "";
 
 %feature("docstring")  CasADi::Matrix::log10 "";
@@ -45406,6 +45450,10 @@ get an element, do not allocate ";
 %feature("docstring")  CasADi::Matrix::hasNZ "
 
 Returns true if the matrix has a non-zero at location i,j. ";
+
+%feature("docstring")  CasADi::Matrix::__nonzero__ "
+
+Returns the truth value of a Matrix. ";
 
 %feature("docstring")  CasADi::Matrix::append "
 
@@ -45847,6 +45895,10 @@ Check if a multiple output node. ";
 %feature("docstring")  CasADi::MultipleOutput::clone "
 
 Clone function. ";
+
+%feature("docstring")  CasADi::MultipleOutput::__nonzero__ "
+
+Check the truth value of this node. ";
 
 %feature("docstring")  CasADi::MultipleOutput::deepCopyMembers "
 
@@ -47672,6 +47724,10 @@ Propagate sparsity. ";
 
 Check if matrix multiplication. ";
 
+%feature("docstring")  CasADi::Multiplication::__nonzero__ "
+
+Check the truth value of this node. ";
+
 %feature("docstring")  CasADi::Multiplication::deepCopyMembers "
 
 Deep copy data members. ";
@@ -48541,6 +48597,10 @@ Access a non-zero element, with bounds checking.
 
 Access a non-zero element. ";
 
+%feature("docstring")  CasADi::MX::__nonzero__ "
+
+Returns the truth value of an MX expression. ";
+
 %feature("docstring")  CasADi::MX::sparsity "
 
 Get the sparsity pattern. ";
@@ -48792,6 +48852,12 @@ Get string representation of dimensions. The representation is (nrow x ncol
 %feature("docstring")  CasADi::MX::cosh "";
 
 %feature("docstring")  CasADi::MX::tanh "";
+
+%feature("docstring")  CasADi::MX::arcsinh "";
+
+%feature("docstring")  CasADi::MX::arccosh "";
+
+%feature("docstring")  CasADi::MX::arctanh "";
 
 %feature("docstring")  CasADi::MX::mapping "
 
@@ -50152,6 +50218,10 @@ Destructor. ";
 %feature("docstring")  CasADi::MXNode::clone "
 
 Clone function. ";
+
+%feature("docstring")  CasADi::MXNode::__nonzero__ "
+
+Check the truth value of this node. ";
 
 %feature("docstring")  CasADi::MXNode::deepCopyMembers "
 
@@ -51965,6 +52035,10 @@ Evaluate the function symbolically ( MX) ";
 
 Evaluate symbolically ( MX), no derivatives. ";
 
+%feature("docstring")  CasADi::NonzerosNonzerosOp::__nonzero__ "
+
+Check the truth value of this node. ";
+
 %feature("docstring")  CasADi::NonzerosNonzerosOp::deepCopyMembers "
 
 Deep copy data members. ";
@@ -52192,6 +52266,10 @@ Evaluate the function symbolically ( MX) ";
 
 Evaluate symbolically ( MX), no derivatives. ";
 
+%feature("docstring")  CasADi::NonzerosScalarOp::__nonzero__ "
+
+Check the truth value of this node. ";
+
 %feature("docstring")  CasADi::NonzerosScalarOp::deepCopyMembers "
 
 Deep copy data members. ";
@@ -52404,6 +52482,10 @@ Propagate sparsity. ";
 %feature("docstring")  CasADi::Norm::clone "
 
 Clone function. ";
+
+%feature("docstring")  CasADi::Norm::__nonzero__ "
+
+Check the truth value of this node. ";
 
 %feature("docstring")  CasADi::Norm::deepCopyMembers "
 
@@ -52645,6 +52727,10 @@ Evaluate symbolically ( MX), no derivatives. ";
 
 Propagate sparsity. ";
 
+%feature("docstring")  CasADi::Norm1::__nonzero__ "
+
+Check the truth value of this node. ";
+
 %feature("docstring")  CasADi::Norm1::deepCopyMembers "
 
 Deep copy data members. ";
@@ -52868,6 +52954,10 @@ Evaluate symbolically ( MX), no derivatives. ";
 %feature("docstring")  CasADi::Norm2::propagateSparsity "
 
 Propagate sparsity. ";
+
+%feature("docstring")  CasADi::Norm2::__nonzero__ "
+
+Check the truth value of this node. ";
 
 %feature("docstring")  CasADi::Norm2::deepCopyMembers "
 
@@ -53093,6 +53183,10 @@ Evaluate symbolically ( MX), no derivatives. ";
 
 Propagate sparsity. ";
 
+%feature("docstring")  CasADi::NormF::__nonzero__ "
+
+Check the truth value of this node. ";
+
 %feature("docstring")  CasADi::NormF::deepCopyMembers "
 
 Deep copy data members. ";
@@ -53316,6 +53410,10 @@ Evaluate symbolically ( MX), no derivatives. ";
 %feature("docstring")  CasADi::NormInf::propagateSparsity "
 
 Propagate sparsity. ";
+
+%feature("docstring")  CasADi::NormInf::__nonzero__ "
+
+Check the truth value of this node. ";
 
 %feature("docstring")  CasADi::NormInf::deepCopyMembers "
 
@@ -56567,6 +56665,10 @@ Get function output. ";
 
 Get the jacobian of an function evaluation with respect to the iind-th
 argument. ";
+
+%feature("docstring")  CasADi::OutputNode::__nonzero__ "
+
+Check the truth value of this node. ";
 
 %feature("docstring")  CasADi::OutputNode::deepCopyMembers "
 
@@ -62015,6 +62117,10 @@ Evaluate the function symbolically ( MX) ";
 
 Evaluate symbolically ( MX), no derivatives. ";
 
+%feature("docstring")  CasADi::ScalarNonzerosOp::__nonzero__ "
+
+Check the truth value of this node. ";
+
 %feature("docstring")  CasADi::ScalarNonzerosOp::deepCopyMembers "
 
 Deep copy data members. ";
@@ -63687,6 +63793,10 @@ Evaluate the function symbolically ( MX) ";
 %feature("docstring")  CasADi::SparseSparseOp::evaluateMX "
 
 Evaluate symbolically ( MX), no derivatives. ";
+
+%feature("docstring")  CasADi::SparseSparseOp::__nonzero__ "
+
+Check the truth value of this node. ";
 
 %feature("docstring")  CasADi::SparseSparseOp::deepCopyMembers "
 
@@ -67306,6 +67416,11 @@ string representation (SWIG workaround) ";
 
 Get a pointer to the node. ";
 
+%feature("docstring")  CasADi::SX::__nonzero__ "
+
+Check the truth value of this node Introduced to catch bool(x) situations in
+python. ";
+
 %feature("docstring")  CasADi::SX::isLeaf "
 
 check if this SX is a leaf of the SX graph
@@ -67444,6 +67559,12 @@ allow unambigous access. ";
 %feature("docstring")  CasADi::SX::cosh "";
 
 %feature("docstring")  CasADi::SX::tanh "";
+
+%feature("docstring")  CasADi::SX::arcsinh "";
+
+%feature("docstring")  CasADi::SX::arccosh "";
+
+%feature("docstring")  CasADi::SX::arctanh "";
 
 %feature("docstring")  CasADi::SX::arctan2 "";
 
@@ -68953,6 +69074,10 @@ Symbolic evaluation (matrix graph) ";
 
 Partial derivatives. ";
 
+%feature("docstring")  CasADi::SymbolicMX::__nonzero__ "
+
+Check the truth value of this node. ";
+
 %feature("docstring")  CasADi::SymbolicMX::deepCopyMembers "
 
 Deep copy data members. ";
@@ -69491,6 +69616,10 @@ Propagate sparsity. ";
 
 Is it a certain operation. ";
 
+%feature("docstring")  CasADi::UnaryMX::__nonzero__ "
+
+Check the truth value of this node. ";
+
 %feature("docstring")  CasADi::UnaryMX::deepCopyMembers "
 
 Deep copy data members. ";
@@ -69683,10 +69812,26 @@ Arcus cosine.
 C++ includes: casadi_calculus.hpp ";
 
 
+// File: structCasADi_1_1UnaryOperation_3_01OP__ACOSH_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< OP_ACOSH > "
+
+Inverse hyperbolic cosine.
+
+C++ includes: casadi_calculus.hpp ";
+
+
 // File: structCasADi_1_1UnaryOperation_3_01OP__ASIN_01_4.xml
 %feature("docstring") CasADi::UnaryOperation< OP_ASIN > "
 
 Arcus sine.
+
+C++ includes: casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1UnaryOperation_3_01OP__ASINH_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< OP_ASINH > "
+
+Inverse hyperbolic sine.
 
 C++ includes: casadi_calculus.hpp ";
 
@@ -69703,6 +69848,14 @@ C++ includes: casadi_calculus.hpp ";
 %feature("docstring") CasADi::UnaryOperation< OP_ATAN > "
 
 Arcus tangent.
+
+C++ includes: casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1UnaryOperation_3_01OP__ATANH_01_4.xml
+%feature("docstring") CasADi::UnaryOperation< OP_ATANH > "
+
+Inverse hyperbolic tangent.
 
 C++ includes: casadi_calculus.hpp ";
 
@@ -73922,11 +74075,23 @@ Pre-C99 elementary functions from the math.h (cmath) header. ";
 
 %feature("docstring")  CasADi::Interfaces::tanh "";
 
+%feature("docstring")  CasADi::Interfaces::asinh "";
+
+%feature("docstring")  CasADi::Interfaces::acosh "";
+
+%feature("docstring")  CasADi::Interfaces::atanh "";
+
 %feature("docstring")  CasADi::Interfaces::exp "";
 
 %feature("docstring")  CasADi::Interfaces::log "";
 
 %feature("docstring")  CasADi::Interfaces::log10 "";
+
+%feature("docstring")  CasADi::Interfaces::atanh "throw ()";
+
+%feature("docstring")  CasADi::Interfaces::asinh "throw ()";
+
+%feature("docstring")  CasADi::Interfaces::acosh "throw ()";
 
 %feature("docstring")  CasADi::Interfaces::pow "";
 
@@ -74731,6 +74896,8 @@ If your fx is really multiple output, and you wish to use a particular
 output, use the slice operator on the fx. ";
 
 %feature("docstring")  CasADi::Interfaces::getptr "";
+
+%feature("docstring")  CasADi::Interfaces::__nonzero__ "";
 
 %feature("docstring")  CasADi::Interfaces::linspace "
 
@@ -75550,6 +75717,10 @@ ENTRY_VALUE_2, ...) Usage Python: makeVector(ClassName,(LENGTH,
 ENTRY_INDEX_1, ENTRY_VALUE_1, ENTRY_INDEX_2, ENTRY_VALUE_2 ...) ";
 
 %feature("docstring")  CasADi::Interfaces::if_else "";
+
+%feature("docstring")  CasADi::Interfaces::__nonzero__< SX > " ";
+
+%feature("docstring")  CasADi::Interfaces::__nonzero__ "";
 
 %feature("docstring")  CasADi::Interfaces::typeName< SX > " ";
 
