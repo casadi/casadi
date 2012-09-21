@@ -61,9 +61,6 @@ public:
   /// Reset the backward problem and take time to tf
   virtual void resetB();
 
-  /// Overload this method, since the number of derivative directions currently aren't passed
-  virtual void evaluate(int nfdir, int nadir);
-
   ///  Integrate until a specified time point
   virtual void integrate(double t_out);
 
@@ -97,24 +94,15 @@ public:
   // Implicit function solver
   ImplicitFunction implicit_solver_;
   
-  // Quadrature solver
-  LinearSolver quadrature_solver_;
-  
   // With hotstart
   bool hotstart_;
   
   // Has the system been integrated once
   bool integrated_once_;
   
-  // Number of sensitivity directions
-  int nfdir_, nadir_;
-  
   // Collocated times
   std::vector<double> times_;
   
-  // Differential states and quadrature states
-  int ny_;
-
 };
 
 } // namespace CasADi

@@ -269,6 +269,7 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
     rdae_in[RDAE_Z]=z;
     rdae_in[RDAE_P]=p;
     rdae_in[RDAE_XDOT]=xdot;
+    rdae_in[RDAE_T]=t;
   }
   Mat rx = rdae_in[RDAE_RX];
   Mat rz = rdae_in[RDAE_RZ];

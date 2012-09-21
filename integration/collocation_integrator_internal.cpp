@@ -58,9 +58,6 @@ void CollocationIntegratorInternal::init(){
   // Call the base class init
   IntegratorInternal::init();
   
-  // Differential states and quadrature states
-  ny_ = nx_ + nq_;
-  
   // Legendre collocation points
   double legendre_points[][6] = {
     {0},
@@ -147,76 +144,65 @@ void CollocationIntegratorInternal::init(){
     }
   }
   
-  // Free parameters
-  MX P("P",np_);
-
   // Initial state
-  MX Y0("Y0",ny_);
+  MX X0("X0",nx_);
   
-  // Initial quadrature
-  MX Q0("Q0");
+  // Parameters
+  MX P("P",np_);
+  
+  // Backward state
+  MX RX0("RX0",nrx_);
+  
+  // Backward parameters
+  MX RP("RP",nrp_);
   
   // Collocated states
-  int nY = nk*(deg+1)*ny_ + ny_;
-  
-  // Collocated quadrature states
-  int nQ = nk*(deg+1) + 1;
+  int nX = (nk*(deg+1)+1)*(nx_+nrx_);
   
   // Unknowns
-  MX V("V",nY-ny_);
+  MX V("V",nX-nx_-nrx_);
   int offset = 0;
-
-  // Quadrature unknowns
-  MX QV("QV",nQ-1);
-  int qoffset = 0;
   
   // Get collocated states
-  vector<vector<MX> > Y(nk+1);
-  vector<vector<MX> > Q(nk+1);
+  vector<vector<MX> > X(nk+1);
+  vector<vector<MX> > RX(nk+1);
   for(int k=0; k<nk; ++k){
-    Y[k].resize(deg+1);
-    Q[k].resize(deg+1);
+    X[k].resize(deg+1);
+    RX[k].resize(deg+1);
 
     // Get the expression for the state vector
     for(int j=0; j<deg+1; ++j){
       
       // If it's the first interval
       if(k==0 && j==0){
-        Y[k][j] = Y0;
-        Q[k][j] = Q0;
+        X[k][j] = X0;
       } else {
-        Y[k][j] = V[range(offset,offset+ny_)];
-        offset += ny_;
-        Q[k][j] = QV[qoffset];
-        qoffset++;
+        X[k][j] = V[range(offset,offset+nx_)];
+        offset += nx_;
       }
+      RX[k][j] = V[range(offset,offset+nrx_)];
+      offset += nrx_;
     }
   }
   
   // State at end time
-  Y[nk].resize(1);
-  Y[nk][0] = V[range(offset,offset+ny_)];
-  offset += ny_;
+  X[nk].resize(1);
+  X[nk][0] = V[range(offset,offset+nx_)];
+  offset += nx_;
   
-  // Quadrature state at end time
-  Q[nk].resize(1);
-  Q[nk][0] = QV[qoffset];
-  qoffset++;
+  RX[nk].resize(1);
+  RX[nk][0] = RX0;
   
   // Check offset for consistency
   casadi_assert(offset==V.size());
-  casadi_assert(qoffset==QV.size());
 
   // Constraints
   vector<MX> g;
   g.reserve(nk);
   
-  // Quadrature left and right hand side
-  vector<MX> q_lhs, q_rhs;
-  if(nq_>0){
-    q_lhs.resize(nQ-1,0);
-    q_rhs.resize(nQ-1,MX::sparse(nq_));
-  }
+  // Quadrature expressions
+  MX QF = MX::zeros(nq_);
+  MX RQF = MX::zeros(nrq_);
   
   // Counter
   int jk = 0;
@@ -229,43 +215,69 @@ void CollocationIntegratorInternal::init(){
       // Get the time
       times_.push_back(h*(k + tau_root[j]));
       MX tk = times_.back();
-        
+      
       // Get an expression for the state derivative at the collocation point
-      MX yp_jk = 0;
+      MX xp_jk = 0;
       for(int j2=0; j2<deg+1; ++j2){
-        yp_jk += C[j2][j]*Y[k][j2];
+        xp_jk += C[j2][j]*X[k][j2];
       }
       
       // Add collocation equations to the NLP
       vector<MX> f_in(DAE_NUM_IN);
       f_in[DAE_T] = tk;
       f_in[DAE_P] = P;
-      f_in[DAE_X] = Y[k][j];
+      f_in[DAE_X] = X[k][j];
       
       vector<MX> f_out;
       if(explicit_ode){
         // Assume equation of the form ydot = f(t,y,p)
         f_out = f_.call(f_in);
-        g.push_back(h_mx*f_out[DAE_ODE] - yp_jk);
+        g.push_back(h_mx*f_out[DAE_ODE] - xp_jk);
       } else {
         // Assume equation of the form 0 = f(t,y,ydot,p)
-        f_in[DAE_XDOT] = yp_jk/h_mx;
+        f_in[DAE_XDOT] = xp_jk/h_mx;
         f_out = f_.call(f_in);
         g.push_back(f_out[DAE_ODE]);
       }
       
+      // Add the quadrature
       if(nq_>0){
-        // Get an expression for the quadrature state derivative at the collocation point
+        QF += D[j]*h_mx*f_out[DAE_QUAD];
+      }
+      
+      // Now for the backward problem
+      if(nrx_>0){
+        
+        // Get an expression for the state derivative at the collocation point
+        MX rxp_jk = 0;
         for(int j2=0; j2<deg+1; ++j2){
-          if(k==0 && j2==0){
-            q_rhs[jk] -= C[j2][j]*Q[k][j2];
-          } else {
-            q_lhs[jk] += C[j2][j]*Q[k][j2];
-          }
+          rxp_jk += C[j2][j]*RX[k][j2];
         }
-
-        // Add quadrature collocation equations to the NLP
-        q_rhs[jk] += h_mx*f_out[DAE_QUAD];
+        
+        // Add collocation equations to the NLP
+        vector<MX> g_in(RDAE_NUM_IN);
+        g_in[RDAE_T] = tk;
+        g_in[RDAE_X] = X[k][j];
+        g_in[RDAE_P] = P;
+        g_in[RDAE_RP] = RP;
+        g_in[RDAE_RX] = X[k][j];
+        
+        vector<MX> g_out;
+        if(explicit_ode){
+          // Assume equation of the form xdot = f(t,x,p)
+          g_out = g_.call(g_in);
+          g.push_back(h_mx*g_out[RDAE_ODE] - rxp_jk);
+        } else {
+          // Assume equation of the form 0 = f(t,x,xdot,p)
+          g_in[RDAE_XDOT] = xp_jk/h_mx;
+          g_in[RDAE_RXDOT] = rxp_jk/h_mx;
+          g_out = g_.call(g_in);
+          g.push_back(g_out[RDAE_ODE]);
+        }
+        
+        if(nrq_>0){
+          RQF += D[j]*h_mx*g_out[RDAE_QUAD];
+        }
       }
     }
     
@@ -273,26 +285,23 @@ void CollocationIntegratorInternal::init(){
     times_.push_back(h*(k + 1));
 
     // Get an expression for the state at the end of the finite element
-    MX yf_k = 0;
+    MX xf_k = 0;
     for(int j=0; j<deg+1; ++j){
-      yf_k += D[j]*Y[k][j];
+      xf_k += D[j]*X[k][j];
     }
 
     // Add continuity equation to NLP
-    g.push_back(Y[k+1][0] - yf_k);
+    g.push_back(X[k+1][0] - xf_k);
     
-    if(nq_>0){
+    if(nrx_>0){
       // Get an expression for the state at the end of the finite element
+      MX rxf_k = 0;
       for(int j=0; j<deg+1; ++j){
-        if(k==0 && j==0){
-          q_rhs[jk] -= D[j]*Q[k][j];
-        } else {
-          q_lhs[jk] += D[j]*Q[k][j];
-        }
+        rxf_k += D[j]*RX[k][j];
       }
 
       // Add continuity equation to NLP
-      q_lhs[jk] -= Q[k+1][0];
+      g.push_back(RX[k+1][0] - rxf_k);
     }
   }
   
@@ -303,13 +312,20 @@ void CollocationIntegratorInternal::init(){
   casadi_assert_message(gv.size()==V.size(),"Implicit function unknowns and equations do not match");
 
   // Nonlinear constraint function input
-  vector<MX> gfcn_in(1+2);
+  vector<MX> gfcn_in(1+INTEGRATOR_NUM_IN);
   gfcn_in[0] = V;
-  gfcn_in[1+0] = Y0;
-  gfcn_in[1+1] = P;
+  gfcn_in[1+INTEGRATOR_X0] = X0;
+  gfcn_in[1+INTEGRATOR_P] = P;
+  gfcn_in[1+INTEGRATOR_RX0] = RX0;
+  gfcn_in[1+INTEGRATOR_RP] = RP;
+
+  vector<MX> gfcn_out(3);
+  gfcn_out[0] = gv;
+  gfcn_out[1] = QF;
+  gfcn_out[2] = RQF;
   
   // Nonlinear constraint function
-  MXFunction gfcn(gfcn_in,gv);
+  MXFunction gfcn(gfcn_in,gfcn_out);
   
   // Expand f?
   bool expand_f = getOption("expand_f");
@@ -334,66 +350,6 @@ void CollocationIntegratorInternal::init(){
   
   // Initialize the solver
   implicit_solver_.init();
-
-  if(nq_>0){
-    // Quadrature left hand side
-    MXFunction qfcn_lhs(QV,vertcat(q_lhs));
-    qfcn_lhs.init();
-    
-    // Expand in scalar operations
-    SXFunction qfcn_lhs_sx(qfcn_lhs);
-    qfcn_lhs_sx.init();
-    
-    // Create Jacobian function
-    FX qfcn_lhs_jac = qfcn_lhs_sx.jacobian();
-    qfcn_lhs_jac.init();
-    
-    // Evaluate (the jacobian is constant anyway)
-    qfcn_lhs_jac.evaluate();
-    
-    // Quadrature right hand side
-    MX qv_rhs = horzcat(q_rhs);
-    makeDense(qv_rhs);
-    
-    // Quadrature right hand side function
-    vector<MX> qfcn_rhs_in(4);
-    qfcn_rhs_in[0] = V;
-    qfcn_rhs_in[1] = Y0;
-    qfcn_rhs_in[2] = P;
-    qfcn_rhs_in[3] = Q0;
-    MXFunction qfcn_rhs(qfcn_rhs_in,qv_rhs);
-    
-    // Expand q?
-    bool expand_q = getOption("expand_q");
-    if(expand_q){
-      qfcn_rhs.init();
-      qfcn_ = SXFunction(qfcn_rhs);
-    } else {
-      qfcn_ = qfcn_rhs;
-    }
-    qfcn_.init();
-
-    // Create the linear solver
-    linearSolverCreator linear_solver_creator = getOption("quadrature_solver");
-    
-    // Allocate an NLP solver
-    quadrature_solver_ = linear_solver_creator(qfcn_lhs_jac.output().sparsity());
-    
-    // Pass options
-    if(hasSetOption("quadrature_solver_options")){
-      const Dictionary& quadrature_solver_options = getOption("quadrature_solver_options");
-      quadrature_solver_.setOption(quadrature_solver_options);
-    }
-    
-    // Initialize the quadrature solver
-    quadrature_solver_.init();
-      
-    // Pass the linear system
-    quadrature_solver_.setInput(qfcn_lhs_jac.output(),0);
-    
-    // Factorize
-    quadrature_solver_.prepare();
-  }
   
   if(hasSetOption("startup_integrator")){
     
@@ -417,41 +373,6 @@ void CollocationIntegratorInternal::init(){
     startup_integrator_.init();
   }
 
-  #if 0
-
-  // Create a function that maps X0 and P to X at all times
-  MX X0("X0",nx_);
-  
-  // Split the differential and quadrature states
-  if(nq_>0){
-    Y0 = X0[range(ny_)];
-    Q0 = X0[range(ny_,nx_)];
-  } else {
-    Y0 = X0;
-    Q0 = MX();
-  }
-  
-  // Solve the implicit system of equations
-  vector<MX> implicit_solver_in(2);
-  implicit_solver_in[0] = Y0;
-  implicit_solver_in[1] = P;
-  vector<MX> implicit_solver_out = implicit_solver.call(implicit_solver_in);
-  MX Y_all = implicit_solver_out[0];
- 
-  // Solve the quadrature equations
-  MX Q_all;
-  if(nq_>0){
-    // Evaluate the quadrature right hand side
-    
-    
-    vector<MX> quadrature_solver_in(2);
-    quadrature_solver_in[0] = qfcn_lhs_jac.output();
-    quadrature_solver_in[1] = 
-    quadrature_solver_.call
-  }
-
-  #endif
-
   // Mark the system not yet integrated
   integrated_once_ = false;
 }
@@ -459,43 +380,22 @@ void CollocationIntegratorInternal::init(){
 void CollocationIntegratorInternal::initAdj(){
 }
 
-void CollocationIntegratorInternal::evaluate(int nfdir, int nadir){
-  // Store the sensitivity directions
-  nfdir_ = nfdir;
-  nadir_ = nadir;
-  
-  // Call the base class method
-  IntegratorInternal::evaluate(nfdir,nadir);
-}
-
-  
 void CollocationIntegratorInternal::reset(int nsens, int nsensB, int nsensB_store){
-  // Pass the inputs
-  const vector<double>& x0 = input(INTEGRATOR_X0).data();
-  implicit_solver_.input(0).setArray(&x0.front(),ny_); // only the ny_ first elements
-  implicit_solver_.input(1).set(input(INTEGRATOR_P));
+  // Call the base class method
+  IntegratorInternal::reset(nsens,nsensB,nsensB_store);
   
-  for(int dir=0; dir<nfdir_; ++dir){
-    // Pass the forward seeds
-    const vector<double>& x0 = fwdSeed(INTEGRATOR_X0,dir).data();
-    implicit_solver_.fwdSeed(0,dir).setArray(&x0.front(),ny_); // only the ny_ first elements
-    implicit_solver_.fwdSeed(1,dir).set(fwdSeed(INTEGRATOR_P,dir));
+  // Pass the inputs
+  for(int iind=0; iind<INTEGRATOR_NUM_IN; ++iind){
+    implicit_solver_.input(iind).set(input(iind));
   }
-
-  for(int dir=0; dir<nadir_; ++dir){
-    // Pass the adjoint seeds
-    vector<double>& v = implicit_solver_.adjSeed(0,dir).data();
-    const vector<double>& xf = adjSeed(INTEGRATOR_XF,dir).data();
-
-    // Set seed to zero
-    fill(v.begin(),v.end(),0.0);
-    
-    // Pass seed for final state
-    for(int i=0; i<ny_; ++i){
-      v[v.size()-ny_+i] = xf[i];
+  
+  // Pass the forward seeds
+  for(int dir=0; dir<nsens; ++dir){
+    for(int iind=0; iind<INTEGRATOR_NUM_IN; ++iind){
+      implicit_solver_.fwdSeed(iind,dir).set(fwdSeed(iind,dir));
     }
   }
-  
+
   // Pass solution guess (if this is the first integration or if hotstart is disabled)
   if(hotstart_==false || integrated_once_==false){
     vector<double>& v = implicit_solver_.output().data();
@@ -503,23 +403,24 @@ void CollocationIntegratorInternal::reset(int nsens, int nsensB, int nsensB_stor
     // Check if an integrator for the startup trajectory has been supplied
     if(!startup_integrator_.isNull()){
       // Use supplied integrator, if any
-      startup_integrator_.input(INTEGRATOR_X0).setArray(&input(INTEGRATOR_X0).front(),ny_);
-      startup_integrator_.input(INTEGRATOR_P).set(input(INTEGRATOR_P));
+      for(int iind=0; iind<INTEGRATOR_NUM_IN; ++iind){
+        startup_integrator_.input(iind).set(input(iind));
+      }
       
       // Reset the integrator
       startup_integrator_.reset();
       
       // Integrate, stopping at all time points
-      int offs=0;
+      int offs=nrx_;
       for(vector<double>::const_iterator it=times_.begin(); it!=times_.end(); ++it){
         // Integrate to the time point
         startup_integrator_.integrate(*it);
         
         // Save the solution
-        startup_integrator_.output().getArray(&v[offs],ny_);
+        startup_integrator_.output().getArray(&v[offs],nx_);
         
         // Update the vector offset
-        offs+=ny_;
+        offs+=nx_+nrx_;
       }
       
       // Print
@@ -530,94 +431,56 @@ void CollocationIntegratorInternal::reset(int nsens, int nsensB, int nsensB_stor
     
     } else {
       // Initialize with constant trajectory
-      for(int offs=0; offs<v.size(); offs+=ny_){
-        for(int i=0; i<ny_; ++i){
-          v[i+offs] = x0[i];
+      const vector<double>& x0 = input(INTEGRATOR_X0).data();
+      const vector<double>& rx0 = input(INTEGRATOR_RX0).data();
+      for(int offs=0; offs<v.size(); offs+=nx_+nrx_){
+        for(int i=0; i<nrx_; ++i){
+          v[i+offs] = rx0[i];
+        }
+        for(int i=0; i<nx_; ++i){
+          v[i+offs+nrx_] = x0[i];
         }
       }
     }
   }
     
   // Solve the system of equations
-  implicit_solver_.evaluate(nfdir_, nadir_);
-  
-  // Solve quadrature equations
-  if(nq_>0){
-    // Pass inputs to right hand side function
-    qfcn_.input(0).set(implicit_solver_.output());
-    qfcn_.input(1).setArray(&x0.front(),ny_); // only the ny_ first elements
-    qfcn_.input(2).set(input(INTEGRATOR_P));
-    qfcn_.input(3).setArray(&x0.front()+ny_,nq_); // only the ny_ first elements
-
-    // Pass the forward seeds
-    for(int dir=0; dir<nfdir_; ++dir){
-      const vector<double>& x0 = fwdSeed(INTEGRATOR_X0,dir).data();
-      qfcn_.fwdSeed(0,dir).set(implicit_solver_.fwdSens(0,dir));
-      qfcn_.fwdSeed(1,dir).setArray(&x0.front(),ny_);
-      qfcn_.fwdSeed(2,dir).set(fwdSeed(INTEGRATOR_P,dir));
-      qfcn_.fwdSeed(3,dir).setArray(&x0.front()+ny_,nq_);
-    }
-
-    // Evaluate
-    qfcn_.evaluate(nfdir_,0);
-    
-    // Solve for qf
-    quadrature_solver_.solve(&qfcn_.output().front(),nq_);
-    for(int dir=0; dir<nfdir_; ++dir){
-      quadrature_solver_.solve(&qfcn_.fwdSens(0,dir).front(),nq_);
-    }
-  }
+  implicit_solver_.evaluate(nsens);
   
   // Mark the system integrated at least once
   integrated_once_ = true;
+  
+  output(INTEGRATOR_QF).set(gfcn_.output(1));
+  output(INTEGRATOR_RQF).set(gfcn_.output(2));
+  for(int dir=0; dir<nsens_; ++dir){
+    fwdSens(INTEGRATOR_QF,dir).set(gfcn_.fwdSens(1,dir));
+    fwdSens(INTEGRATOR_RQF,dir).set(gfcn_.fwdSens(2,dir));
+  }
 }
 
 void CollocationIntegratorInternal::resetB(){
 }
 
 void CollocationIntegratorInternal::integrate(double t_out){
-  const vector<double>& Yf = implicit_solver_.output().data();
+  const vector<double>& V = implicit_solver_.output().data();
   vector<double>& xf = output(INTEGRATOR_XF).data();
+  vector<double>& rxf = output(INTEGRATOR_RXF).data();
   
-  for(int i=0; i<ny_; ++i){
-    xf[i] = Yf[Yf.size()-ny_+i];
+  for(int i=0; i<nrx_; ++i){
+    rxf[i] = V[i];
+  }
+  for(int i=0; i<nx_; ++i){
+    xf[i] = V[V.size()-nx_+i];
   }
   
-  if(nq_>0){
-    const vector<double>& Qf = qfcn_.output().data();
-    for(int i=0; i<nq_; ++i){
-      int nQ = Qf.size()/nq_;
-      xf[ny_+i] = Qf[nQ*i + nQ-1];
-    }
-  }
-  
-  for(int dir=0; dir<nfdir_; ++dir){
+  for(int dir=0; dir<nsens_; ++dir){
     // Get the forward sensitivities
-    const vector<double>& Yf = implicit_solver_.fwdSens(0,dir).data();
+    const vector<double>& V = implicit_solver_.fwdSens(0,dir).data();
     vector<double>& xf = fwdSens(INTEGRATOR_XF,dir).data();
+    vector<double>& rxf = fwdSens(INTEGRATOR_RXF,dir).data();
     
-    for(int i=0; i<ny_; ++i){
-      xf[i] = Yf[Yf.size()-ny_+i];
-    }
-    
-    if(nq_>0){
-      const vector<double>& Qf = qfcn_.fwdSens(0,dir).data();
-      for(int i=0; i<nq_; ++i){
-        int nQ = Qf.size()/nq_;
-        xf[ny_+i] = Qf[nQ*i + nQ-1];
-      }
-    }
-  }
-
-  for(int dir=0; dir<nadir_; ++dir){
-    // Get the adjoint sensitivities
-    vector<double>& x0 = adjSens(INTEGRATOR_X0,dir).data();
-    implicit_solver_.adjSens(0,dir).getArray(&x0.front(),ny_); // only the ny_ first elements
-    implicit_solver_.adjSens(1,dir).get(adjSens(INTEGRATOR_P,dir));
-    
-    for(int i=ny_; i<nx_; ++i){
-      x0[i] = 0;
-    }
+    for(int i=0; i<nrx_; ++i) rxf[i] = V[i];
+    for(int i=0; i<nx_; ++i)  xf[i] = V[V.size()-nx_+i];
   }
 }
 

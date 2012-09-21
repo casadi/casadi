@@ -254,7 +254,9 @@ FX FXInternal::numeric_jacobian(const vector<pair<int,int> >& jblocks){
   
   // Less overhead if only jacobian is requested
   if(jblocks.size()==1 && jblocks.front().second>=0){
-    return Jacobian(fcn,jblocks.front().second,jblocks.front().first);
+    Jacobian ret(fcn,jblocks.front().second,jblocks.front().first);
+    ret.setOption("verbose",getOption("verbose"));
+    return ret;
   }
   
   // Outputs
@@ -499,6 +501,7 @@ CRSSparsity& FXInternal::jacSparsity(int iind, int oind, bool compact){
 }
 
 void FXInternal::getPartition(int iind, int oind, CRSSparsity& D1, CRSSparsity& D2, bool compact, bool symmetric){
+  log("MXFunctionInternal::getPartition begin");
   
   // Sparsity pattern with transpose
   CRSSparsity &A = jacSparsity(iind,oind,compact);

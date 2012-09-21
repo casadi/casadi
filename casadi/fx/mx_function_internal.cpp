@@ -700,6 +700,8 @@ void MXFunctionInternal::spEvaluate(bool fwd){
 // }
 
 FX MXFunctionInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks){
+  log("MXFunctionInternal::jacobian begin");
+  
   // Jacobian blocks
   vector<MX> jac_out(jblocks.size());
   jac_out.reserve(jblocks.size());
@@ -724,6 +726,7 @@ FX MXFunctionInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks)
 }
 
 MX MXFunctionInternal::jac(int iind, int oind, bool compact, bool symmetric){
+  log("MXFunctionInternal::jac begin");
   return jacGen(iind,oind,compact,symmetric);
 }
 

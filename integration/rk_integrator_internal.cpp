@@ -133,6 +133,9 @@ void RKIntegratorInternal::evaluate(int nfdir, int nadir){
 }
 
 void RKIntegratorInternal::reset(int nsens, int nsensB, int nsensB_store){
+  // Call the base class method
+  IntegratorInternal::reset(nsens,nsensB,nsensB_store);
+
   int nfdir = 0; // NOTE: need to update the function below to the new integrator formulation
   
   // Pass the inputs
