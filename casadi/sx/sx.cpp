@@ -159,6 +159,11 @@ SX SX::erfinv() const{
   return UnarySX::create(OP_ERFINV,*this);
 }
 
+bool SX::__nonzero__() const {
+  if (isConstant()) return !isZero();
+  casadi_error("Cannot compute the truth value of a CasADi SX symbolic expression.")
+}
+
 SX SX::__add__(const SX& y) const{
   // NOTE: Only simplifications that do not result in extra nodes area allowed
     
@@ -510,6 +515,9 @@ long SX::__hash__() const {
    return (long) node;
 }
 
+template<>
+bool __nonzero__<SX>(const SX& val) { return val.__nonzero__();} 
+
 const SX casadi_limits<SX>::zero(new ZeroSX(),false); // node corresponding to a constant 0
 const SX casadi_limits<SX>::one(new OneSX(),false); // node corresponding to a constant 1
 const SX casadi_limits<SX>::two(IntegerSX::create(2),false); // node corresponding to a constant 2
@@ -623,6 +631,27 @@ SX SX::tanh() const{
     return 0;
   else
     return UnarySX::create(OP_TANH,*this);
+}
+
+SX SX::arctanh() const{
+  if(node->isZero())
+    return 0;
+  else
+    return UnarySX::create(OP_ATANH,*this);
+}
+
+SX SX::arccosh() const{
+  if(node->isOne())
+    return 0;
+  else
+    return UnarySX::create(OP_ACOSH,*this);
+}
+
+SX SX::arcsinh() const{
+  if(node->isZero())
+    return 0;
+  else
+    return UnarySX::create(OP_ASINH,*this);
 }
 
 SX SX::floor() const{

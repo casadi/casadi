@@ -127,7 +127,7 @@ int main(){
     ocp_solver.setOption("integrator",CVodesIntegrator::creator);
   } else {
     // DAE residual function
-    SXFunction dae(daeIn("x",x, "t",t, "xdot",xdot),daeOut("ode",ocp.ode));
+    SXFunction dae(daeIn("x",x, "p",u, "t",t, "xdot",xdot),daeOut("ode",ocp.ode));
     
     ocp_solver = MultipleShooting(dae,mterm);
     ocp_solver.setOption("integrator",IdasIntegrator::creator);

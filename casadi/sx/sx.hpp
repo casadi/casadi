@@ -140,7 +140,12 @@ class SX : public GenericExpression<SX>{
     /** \brief  Perform operations by ID */
     static SX binary(int op, const SX& x, const SX& y);
     static SX unary(int op, const SX& x);
-
+    
+    /** \brief Check the truth value of this node
+     * Introduced to catch bool(x) situations in python
+     */
+    bool __nonzero__() const;
+    
     /** \brief check if this SX is a leaf of the SX graph
     *
     * An SX qualifies as leaf when it has no dependencies.
@@ -206,6 +211,7 @@ class SX : public GenericExpression<SX>{
     SX __sub__(const SX& y) const;
     SX __mul__(const SX& y) const;
     SX __div__(const SX& y) const;
+    SX __truediv__(const SX &y) const {return __div__(y);};
     SX __pow__(const SX& b) const;
     SX __constpow__(const SX& b) const;
     
@@ -235,6 +241,9 @@ class SX : public GenericExpression<SX>{
     SX sinh() const;
     SX cosh() const;
     SX tanh() const;
+    SX arcsinh() const;
+    SX arccosh() const;
+    SX arctanh() const;
     SX arctan2(const SX &y) const;
     SX log10() const;
     SX printme(const SX &y) const;
@@ -245,6 +254,7 @@ class SX : public GenericExpression<SX>{
     Matrix<SX> __sub__(const Matrix<SX>& y) const;
     Matrix<SX> __mul__(const Matrix<SX>& y) const;
     Matrix<SX> __div__(const Matrix<SX>& y) const;
+    Matrix<SX> __truediv__(const Matrix<SX>& y) const {return __div__(y);};
     Matrix<SX> fmin(const Matrix<SX>& b) const;
     Matrix<SX> fmax(const Matrix<SX>& b) const;
     Matrix<SX> constpow(const Matrix<SX>& n) const;
@@ -300,6 +310,9 @@ int __int__() { return $self->getIntValue();}
 
 #ifndef SWIG
 // Template specializations
+template<>
+bool __nonzero__(const SX& val);
+
 template<>
 class casadi_limits<SX>{
   public:

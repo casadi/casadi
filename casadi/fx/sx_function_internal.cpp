@@ -816,6 +816,9 @@ void SXFunctionInternal::init(){
     builtins[OP_SINH] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "sinh", jit_module_);
     builtins[OP_COSH] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "cosh", jit_module_);
     builtins[OP_TANH] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "tanh", jit_module_);
+    builtins[OP_ASINH] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "asinh", jit_module_);
+    builtins[OP_ACOSH] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "acosh", jit_module_);
+    builtins[OP_ATANH] = llvm::Function::Create(unaryFun, llvm::Function::ExternalLinkage, "atanh", jit_module_);
 
     // Void type
     llvm::Type* void_t = llvm::Type::getVoidTy(llvm::getGlobalContext());

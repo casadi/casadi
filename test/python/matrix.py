@@ -637,7 +637,14 @@ class Matrixtests(casadiTestCase):
       A = m([[0,0],[0,0]])
       self.assertFalse(all(A))
       self.assertFalse(any(A))
-    
+  def test_truth(self):
+    self.assertTrue(bool(DMatrix([1])))
+    self.assertFalse(bool(DMatrix([0])))
+    self.assertTrue(bool(DMatrix([0.2])))
+    self.assertTrue(bool(DMatrix([-0.2])))
+    self.assertRaises(Exception, lambda : bool(DMatrix([2.0,3])))
+    self.assertRaises(Exception, lambda : bool(DMatrix()))
+
 if __name__ == '__main__':
     unittest.main()
 

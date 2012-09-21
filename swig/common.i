@@ -256,13 +256,15 @@ memberbinopsr(Type,add) \
 memberbinopsr(Type,sub) \
 memberbinopsr(Type,mul) \
 memberbinopsr(Type,div) \
+memberbinopsr(Type,truediv) \
 memberbinopsr(Type,mldivide) \
 memberbinopsr(Type,mrdivide) \
 memberbinopsr(Type,mpower) \
 memberbinopsr(Type,constpow) \
 memberbinopsr_un(Type,fmin) \
 memberbinopsr_un(Type,fmax) \
-memberbinopsr_nn(Type,mul)
+memberbinopsr_nn(Type,mul) \
+memberbinopsr_un(Type,arctan2)
 
 #define memberbinops(uname,argtype,argCast,selfCast,returntype) \
 returntype __##uname##__ (argtype) const{ return selfCast(*$self).__##uname##__(argCast(b));} \
@@ -282,6 +284,7 @@ returntype __r##uname##__(argtype) const{ return argCast(b).##uname##(selfCast(*
 memberbinops_un(fmin,argtype,argCast,selfCast,returntype) \
 memberbinops_un(fmax,argtype,argCast,selfCast,returntype) \
 memberbinops(constpow,argtype,argCast,selfCast,returntype) \
+memberbinops_un(arctan2,argtype,argCast,selfCast,returntype) \
 memberbinops(pow,argtype,argCast,selfCast,returntype) \
 memberbinops(add,argtype,argCast,selfCast,returntype) \
 memberbinops(sub,argtype,argCast,selfCast,returntype) \
@@ -289,6 +292,7 @@ memberbinops(mul,argtype,argCast,selfCast,returntype) \
 returntype mul (argtype) const{ return mul(selfCast(*$self) , argCast(b));} \
 returntype rmul (argtype) const{ return mul(argCast(b) , selfCast(*$self));} \
 memberbinops(div,argtype,argCast,selfCast,returntype) \
+memberbinops(truediv,argtype,argCast,selfCast,returntype) \
 memberbinops(mldivide,argtype,argCast,selfCast,returntype) \
 memberbinops(mrdivide,argtype,argCast,selfCast,returntype) \
 memberbinops(mpower,argtype,argCast,selfCast,returntype) 

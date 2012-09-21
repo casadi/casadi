@@ -87,6 +87,7 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Cached
     
     /** \brief  Destructor */
     virtual ~MX();
+    
 
 #ifndef SWIG
    /** \brief  Create from node */
@@ -99,6 +100,9 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Cached
     NonZeros<MX,int> at(int k);
     
 #endif // SWIG
+    
+    /// Returns the truth value of an MX expression
+    bool __nonzero__() const;
     
     //@{
     /// Indexing for interfaced languages
@@ -383,6 +387,7 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Cached
   MX __sub__(const MX& y) const;
   MX __mul__(const MX& y) const;
   MX __div__(const MX& y) const;
+  MX __truediv__(const MX& y) const { return __div__(y);};
   MX __pow__(const MX& b) const;
   MX __constpow__(const MX& b) const;
   MX __mrdivide__  (const MX& b) const;
@@ -416,6 +421,9 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Cached
   MX sinh() const;
   MX cosh() const;
   MX tanh() const;
+  MX arcsinh() const;
+  MX arccosh() const;
+  MX arctanh() const;
 
   /** \brief  Returns the IMatrix that represents the mapping of a Mapping node
   *

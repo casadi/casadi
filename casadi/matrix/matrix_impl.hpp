@@ -52,6 +52,13 @@ T& Matrix<T>::elem(int i, int j){
 }
 
 template<class T>
+bool Matrix<T>::__nonzero__() const {
+  if (isNull()) {casadi_error("Cannot determine truth value of null Matrix.");}
+  if (numel()!=1) {casadi_error("Only scalar Matrix could have a truth value, but you provided a shape" << dimString());}
+  return CasADi::__nonzero__(at(0));
+}
+
+template<class T>
 const Matrix<T> Matrix<T>::getSub(int i, int j) const{
   return elem(i,j);
 }
@@ -772,11 +779,15 @@ void Matrix<T>::get(std::vector<T>& val, Sparsity sp) const{
 
 template<class T>
 void Matrix<T>::set(const Matrix<T>& val, Sparsity sp){
-	sparsity().set(getPtr(data()),getPtr(val.data()),val.sparsity());
+	if (val.size()!=size()) casadi_error("Error in Matrix::set(const Matrix&): number of nonzeros must match. But got lhs " << dimString() << " and rhs " << val.dimString());
+	if (val.numel()!=0 && numel()!=0 && val.sparsity()!=sparsity()) casadi_error("Error in Matrix::set(const Matrix&): sparsities must match. But got lhs " << dimString() << " and rhs " << val.dimString());
+  sparsity().set(getPtr(data()),getPtr(val.data()),val.sparsity());
 }
 
 template<class T>
 void Matrix<T>::get(Matrix<T>& val, Sparsity sp) const{
+	if (val.size()!=size()) casadi_error("Error in Matrix::get(const Matrix&): number of nonzeros must match. But got lhs " << dimString() << " and rhs " << val.dimString());
+  if (val.numel()!=0 && numel()!=0 && val.sparsity()!=sparsity()) casadi_error("Error in Matrix::get(const Matrix&): sparsities must match. But got lhs " << dimString() << " and rhs " << val.dimString());
 	val.set(*this,sp);
 }
 
@@ -957,6 +968,21 @@ Matrix<T> Matrix<T>::cosh() const{
 template<class T>
 Matrix<T> Matrix<T>::tanh() const{
   return unary(OP_TANH,*this);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::arcsinh() const{
+  return unary(OP_ASINH,*this);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::arccosh() const{
+  return unary(OP_ACOSH,*this);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::arctanh() const{
+  return unary(OP_ATANH,*this);
 }
 
 template<class T>

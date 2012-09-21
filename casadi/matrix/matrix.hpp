@@ -292,6 +292,9 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     /// Returns true if the matrix has a non-zero at location i,j
     bool hasNZ(int i, int j) const { return sparsity().hasNZ(i,j); }
 
+    /// Returns the truth value of a Matrix
+    bool __nonzero__() const;
+
     //@{
     /// Get a submatrix
     const Matrix<T> getSub(int i, int j) const;
@@ -445,6 +448,7 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     Matrix<T> __sub__(const Matrix<T> &y) const;
     Matrix<T> __mul__(const Matrix<T> &y) const;
     Matrix<T> __div__(const Matrix<T> &y) const;
+    Matrix<T> __truediv__(const Matrix<T> &y) const {return __div__(y);};
     Matrix<T> __pow__(const Matrix<T> &y) const;
     Matrix<T> __constpow__(const Matrix<T> &y) const;
     Matrix<T> __mpower__(const Matrix<T> &y) const;
@@ -493,6 +497,9 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     Matrix<T> sinh() const;
     Matrix<T> cosh() const;
     Matrix<T> tanh() const;
+    Matrix<T> arcsinh() const;
+    Matrix<T> arccosh() const;
+    Matrix<T> arctanh() const;
     Matrix<T> arctan2(const Matrix<T>& y) const;
     Matrix<T> log10() const;
     Matrix<T> printme(const Matrix<T>& y) const;

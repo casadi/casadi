@@ -47,6 +47,7 @@ enum Operation{
   OP_ERF,  OP_FMIN,  OP_FMAX,
   OP_INV,
   OP_SINH,  OP_COSH,  OP_TANH,
+  OP_ASINH, OP_ACOSH, OP_ATANH,
   OP_ATAN2,
   
   // Double constant
@@ -121,6 +122,10 @@ enum Operation{
   template<class T> T tanh(const T &x){return x.tanh();}
   using std::tanh;
 
+  template<class T> T asinh(const T &x){return x.arcsinh();}
+  template<class T> T acosh(const T &x){return x.arccosh();}
+  template<class T> T atanh(const T &x){return x.arctanh();}
+
   template<class T> T exp(const T &x){return x.exp();}
   using std::exp;
 
@@ -129,6 +134,20 @@ enum Operation{
 
   template<class T> T log10(const T &x){return x.log10();}
   using std::log10;
+  
+  inline double atanh(double x) throw(){
+    if (x==-1) return -std::numeric_limits<double>::infinity();
+    if (x==1) return std::numeric_limits<double>::infinity();
+    return 0.5*log((1+x)/(1-x));
+  } 
+
+  inline double asinh(double x) throw(){
+    return log(x + sqrt(1+x*x));
+  } 
+  
+  inline double acosh(double x) throw(){
+    return log(x + sqrt(1+x)*sqrt(x-1));
+  }
 
   template<class T> T pow(const T &x, const T &n){ return x.__pow__(n);}
   template<class T> T pow(const T &x,   double n){ return x.__pow__(n);}
@@ -343,6 +362,8 @@ struct DerBinaryOpertion{
   template<>      struct F0XChecker<OP_ERF>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_SINH>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_TANH>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_ASINH>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_ATANH>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_ERFINV>{ static const bool check=true;};
 //@}
 
@@ -617,6 +638,27 @@ template<>
 struct UnaryOperation<OP_TANH>{
   template<typename T> static inline void fcn(const T& x, T& f){ f = tanh(x);}
   template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0] = 1-f*f; }
+};
+
+/// Inverse hyperbolic sine
+template<>
+struct UnaryOperation<OP_ASINH>{
+  template<typename T> static inline void fcn(const T& x, T& f){ f = asinh(x);}
+  template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0] = 1/sqrt(1+x*x); }
+};
+
+/// Inverse hyperbolic cosine
+template<>
+struct UnaryOperation<OP_ACOSH>{
+  template<typename T> static inline void fcn(const T& x, T& f){ f = acosh(x);}
+  template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0] = 1/sqrt(x-1)/sqrt(x+1); }
+};
+
+/// Inverse hyperbolic tangent
+template<>
+struct UnaryOperation<OP_ATANH>{
+  template<typename T> static inline void fcn(const T& x, T& f){ f = atanh(x);}
+  template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0] = 1/(1-x*x); }
 };
 
 /// Inverse of error function

@@ -452,8 +452,9 @@ void NLPSolverInternal::checkInitialBounds() {
   
     stream << "Reporting NLP constraints" << endl;
     CasADi::reportConstraints(stream,output(NLP_X_OPT),input(NLP_LBX),input(NLP_UBX), "decision bounds");
-    
-    CasADi::reportConstraints(stream,output(NLP_G),input(NLP_LBG),input(NLP_UBG), "constraints");
+    double tol = 1e-8;
+    if (hasOption("constr_viol_tol")) tol = getOption("constr_viol_tol");
+    CasADi::reportConstraints(stream,output(NLP_G),input(NLP_LBG),input(NLP_UBG), "constraints",getOption("constr_viol_tol"));
   }
 
 

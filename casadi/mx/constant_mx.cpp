@@ -50,6 +50,12 @@ void ConstantMX::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const 
   }
 }
 
+bool ConstantMX::__nonzero__() const {
+  if (numel()!=1) casadi_error("Can only determine truth value of scalar MX.");
+  if (size()!=1) casadi_error("Can only determine truth value of dense scalar MX.");
+  return x_.at(0)!=0;
+}
+
 bool ConstantMX::isConstant() const{
   return true;
 }
