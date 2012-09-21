@@ -53,9 +53,9 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
     case SCHEME_ControlSimulatorInput: return "x0, p, u";
     case SCHEME_DAEInput: return "x, z, p, t, xdot";
     case SCHEME_DAEOutput: return "ode, alg, quad";
-    case SCHEME_RDAEInput: return "rx, rz, rp, x, z, p, t, rxdot";
+    case SCHEME_RDAEInput: return "rx, rz, rp, x, z, p, t, xdot, rxdot";
     case SCHEME_RDAEOutput: return "ode, alg, quad";
-    case SCHEME_IntegratorInput: return "x0, p, rx0";
+    case SCHEME_IntegratorInput: return "x0, p, rx0, rp";
     case SCHEME_IntegratorOutput: return "xf, qf, rxf, rqf";
     case SCHEME_NLPInput: return "x_init, lbx, ubx, lbg, ubg, lambda_init, p";
     case SCHEME_NLPOutput: return "x_opt, cost, lambda_g, lambda_x, g";
@@ -113,8 +113,9 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==4) return "z";
       if(i==5) return "p";
       if(i==6) return "t";
-      if(i==7) return "rxdot";
-      casadi_error("getSchemeEntryName: supplied number is out of range. RDAEInput has only 8 entries: ('RDAEInput', 'rx, rz, rp, x, z, p, t, rxdot')");
+      if(i==7) return "xdot";
+      if(i==8) return "rxdot";
+      casadi_error("getSchemeEntryName: supplied number is out of range. RDAEInput has only 9 entries: ('RDAEInput', 'rx, rz, rp, x, z, p, t, xdot, rxdot')");
       break;
     case SCHEME_RDAEOutput: 
       if(i==0) return "ode";
@@ -126,7 +127,8 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==0) return "x0";
       if(i==1) return "p";
       if(i==2) return "rx0";
-      casadi_error("getSchemeEntryName: supplied number is out of range. IntegratorInput has only 3 entries: ('IntegratorInput', 'x0, p, rx0')");
+      if(i==3) return "rp";
+      casadi_error("getSchemeEntryName: supplied number is out of range. IntegratorInput has only 4 entries: ('IntegratorInput', 'x0, p, rx0, rp')");
       break;
     case SCHEME_IntegratorOutput: 
       if(i==0) return "xf";
@@ -280,13 +282,14 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
     case SCHEME_RDAEInput: 
       if(i==0) return "Backward differential state";
       if(i==1) return "Backward algebraic state";
-      if(i==2) return "Backward parameter";
+      if(i==2) return "Backward  parameter vector";
       if(i==3) return "Forward differential state";
       if(i==4) return "Forward algebraic state";
       if(i==5) return "Parameter vector";
       if(i==6) return "Explicit time dependence";
-      if(i==7) return "Time derivative of backward differential state";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. RDAEInput has only 8 entries: ('RDAEInput', 'rx, rz, rp, x, z, p, t, rxdot')");
+      if(i==7) return "Time derivative of differential states";
+      if(i==8) return "Time derivative of backward differential state";
+      casadi_error("getSchemeEntryDoc: supplied number is out of range. RDAEInput has only 9 entries: ('RDAEInput', 'rx, rz, rp, x, z, p, t, xdot, rxdot')");
       break;
     case SCHEME_RDAEOutput: 
       if(i==0) return "Right hand side of ODE.";
@@ -298,7 +301,8 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==0) return "Differential state at the initial time";
       if(i==1) return "Parameters";
       if(i==2) return "Backward differential state at the final time";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. IntegratorInput has only 3 entries: ('IntegratorInput', 'x0, p, rx0')");
+      if(i==3) return "Backward parameter vector";
+      casadi_error("getSchemeEntryDoc: supplied number is out of range. IntegratorInput has only 4 entries: ('IntegratorInput', 'x0, p, rx0, rp')");
       break;
     case SCHEME_IntegratorOutput: 
       if(i==0) return "Differential state at the final time";
@@ -458,8 +462,9 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==4) return "RDAE_Z";
       if(i==5) return "RDAE_P";
       if(i==6) return "RDAE_T";
-      if(i==7) return "RDAE_RXDOT";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. RDAEInput has only 8 entries: ('RDAEInput', 'rx, rz, rp, x, z, p, t, rxdot')");
+      if(i==7) return "RDAE_XDOT";
+      if(i==8) return "RDAE_RXDOT";
+      casadi_error("getSchemeEntryEnumName: supplied number is out of range. RDAEInput has only 9 entries: ('RDAEInput', 'rx, rz, rp, x, z, p, t, xdot, rxdot')");
       break;
     case SCHEME_RDAEOutput: 
       if(i==0) return "RDAE_ODE";
@@ -471,7 +476,8 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==0) return "INTEGRATOR_X0";
       if(i==1) return "INTEGRATOR_P";
       if(i==2) return "INTEGRATOR_RX0";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. IntegratorInput has only 3 entries: ('IntegratorInput', 'x0, p, rx0')");
+      if(i==3) return "INTEGRATOR_RP";
+      casadi_error("getSchemeEntryEnumName: supplied number is out of range. IntegratorInput has only 4 entries: ('IntegratorInput', 'x0, p, rx0, rp')");
       break;
     case SCHEME_IntegratorOutput: 
       if(i==0) return "INTEGRATOR_XF";
@@ -627,7 +633,8 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if(name=="z") return 4;
       if(name=="p") return 5;
       if(name=="t") return 6;
-      if(name=="rxdot") return 7;
+      if(name=="xdot") return 7;
+      if(name=="rxdot") return 8;
       break;
     case SCHEME_RDAEOutput: 
       if(name=="ode") return 0;
@@ -638,6 +645,7 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if(name=="x0") return 0;
       if(name=="p") return 1;
       if(name=="rx0") return 2;
+      if(name=="rp") return 3;
       break;
     case SCHEME_IntegratorOutput: 
       if(name=="xf") return 0;

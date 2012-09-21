@@ -209,14 +209,15 @@ def rdaeIn(*dummy,**kwargs):
   Keyword arguments:
     rx    -- Backward differential state [RDAE_RX]
     rz    -- Backward algebraic state [RDAE_RZ]
-    rp    -- Backward parameter [RDAE_RP]
+    rp    -- Backward  parameter vector [RDAE_RP]
     x     -- Forward differential state [RDAE_X]
     z     -- Forward algebraic state [RDAE_Z]
     p     -- Parameter vector [RDAE_P]
     t     -- Explicit time dependence [RDAE_T]
+    xdot  -- Time derivative of differential states [RDAE_XDOT]
     rxdot -- Time derivative of backward differential state [RDAE_RXDOT]
   """
-  if(len(dummy)>0): raise Exception("Error in rdaeIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n rdaeIn(my_rx, my_rz, my_rp, my_x, my_z, my_p, my_t, my_rxdot)\nmust be written\n rdaeIn(rx=my_rx, rz=my_rz, rp=my_rp, x=my_x, z=my_z, p=my_p, t=my_t, rxdot=my_rxdot)\nwhere any keyword is optional.")
+  if(len(dummy)>0): raise Exception("Error in rdaeIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n rdaeIn(my_rx, my_rz, my_rp, my_x, my_z, my_p, my_t, my_xdot, my_rxdot)\nmust be written\n rdaeIn(rx=my_rx, rz=my_rz, rp=my_rp, x=my_x, z=my_z, p=my_p, t=my_t, xdot=my_xdot, rxdot=my_rxdot)\nwhere any keyword is optional.")
   rx = []
   if 'rx' in kwargs:
     rx = kwargs['rx']
@@ -238,13 +239,16 @@ def rdaeIn(*dummy,**kwargs):
   t = []
   if 't' in kwargs:
     t = kwargs['t']
+  xdot = []
+  if 'xdot' in kwargs:
+    xdot = kwargs['xdot']
   rxdot = []
   if 'rxdot' in kwargs:
     rxdot = kwargs['rxdot']
   for k in kwargs.keys():
-    if not(k in ['rx','rz','rp','x','z','p','t','rxdot']):
-      raise Exception("Keyword error in rdaeIn: '%s' is not recognized. Available keywords are: rx, rz, rp, x, z, p, t, rxdot" % k )
-  return [rx,rz,rp,x,z,p,t,rxdot]
+    if not(k in ['rx','rz','rp','x','z','p','t','xdot','rxdot']):
+      raise Exception("Keyword error in rdaeIn: '%s' is not recognized. Available keywords are: rx, rz, rp, x, z, p, t, xdot, rxdot" % k )
+  return [rx,rz,rp,x,z,p,t,xdot,rxdot]
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -300,8 +304,9 @@ def integratorIn(*dummy,**kwargs):
     x0  -- Differential state at the initial time [INTEGRATOR_X0]
     p   -- Parameters [INTEGRATOR_P]
     rx0 -- Backward differential state at the final time [INTEGRATOR_RX0]
+    rp  -- Backward parameter vector [INTEGRATOR_RP]
   """
-  if(len(dummy)>0): raise Exception("Error in integratorIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n integratorIn(my_x0, my_p, my_rx0)\nmust be written\n integratorIn(x0=my_x0, p=my_p, rx0=my_rx0)\nwhere any keyword is optional.")
+  if(len(dummy)>0): raise Exception("Error in integratorIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n integratorIn(my_x0, my_p, my_rx0, my_rp)\nmust be written\n integratorIn(x0=my_x0, p=my_p, rx0=my_rx0, rp=my_rp)\nwhere any keyword is optional.")
   x0 = []
   if 'x0' in kwargs:
     x0 = kwargs['x0']
@@ -311,10 +316,13 @@ def integratorIn(*dummy,**kwargs):
   rx0 = []
   if 'rx0' in kwargs:
     rx0 = kwargs['rx0']
+  rp = []
+  if 'rp' in kwargs:
+    rp = kwargs['rp']
   for k in kwargs.keys():
-    if not(k in ['x0','p','rx0']):
-      raise Exception("Keyword error in integratorIn: '%s' is not recognized. Available keywords are: x0, p, rx0" % k )
-  return [x0,p,rx0]
+    if not(k in ['x0','p','rx0','rp']):
+      raise Exception("Keyword error in integratorIn: '%s' is not recognized. Available keywords are: x0, p, rx0, rp" % k )
+  return [x0,p,rx0,rp]
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
