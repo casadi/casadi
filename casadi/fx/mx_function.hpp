@@ -88,17 +88,29 @@ public:
   /** \brief  Const access functions of the node */
   const MXFunctionInternal* operator->() const;
 
-  /// get function input argument 
+  /// get function input argument (to be deprecated)
   const MX inputMX(int iind=0) const;
   
-  /// get function output argument
+  /// get function output argument (to be deprecated)
   const MX outputMX(int oind=0) const;
   
-  /// get function inputs argument 
+  /// get function inputs argument (to be deprecated)
   const std::vector<MX> & inputsMX() const;
   
-  /// get function outputs argument
+  /// get function outputs argument (to be deprecated)
   const std::vector<MX> & outputsMX() const;
+  
+  /** \brief get function input */
+  const MX& inputExpr(int ind) const;
+  
+  /** \brief get function output */
+  const MX& outputExpr(int ind) const;
+  
+  /** \brief get function inputs */
+  const std::vector<MX>& inputExpr() const;
+  
+  /** \brief get function outputs */
+  const std::vector<MX> & outputExpr() const;
   
   /** \brief Access the algorithm */
   const std::vector<MXAlgEl>& algorithm() const;

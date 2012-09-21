@@ -121,7 +121,7 @@ void reportConstraints(std::ostream &stream,const Matrix<double> &v, const Matri
   stream.precision(streamsize_backup);
 }
 
-MXFunction parameterizeTime(FX dae) {
+FX parameterizeTime(FX dae) {
 
    // dimensionless time
    MX tau("tau");
@@ -154,14 +154,20 @@ MXFunction parameterizeTime(FX dae) {
    ret_out[DAE_ODE] = (tf-t0)*dae.call(dae_in)[0];
    
    MXFunction ret(ret_in,ret_out);
-   
    if (dae.isInit()) ret.init();
    
-   return ret;
-   
+   // Expand if dae was an SXFunction
+   if(is_a<SXFunction>(dae)){
+     if(!ret.isInit()) ret.init();
+     SXFunction ret_sx(ret);
+     if(ret.isInit()) ret_sx.init();
+     return ret_sx;
+   } else {
+     return ret;
+   }
  }
  
-MXFunction parameterizeTimeOutput(FX f) {
+FX parameterizeTimeOutput(FX f) {
   // dimensionless time
    MX tau("tau");
    
@@ -193,9 +199,15 @@ MXFunction parameterizeTimeOutput(FX f) {
    
    if (f.isInit()) ret.init();
    
-   return ret;
-
-
+   // Expand if f was an SXFunction
+   if(is_a<SXFunction>(f)){
+     if(!ret.isInit()) ret.init();
+     SXFunction ret_sx(ret);
+     if(ret.isInit()) ret_sx.init();
+     return ret_sx;
+   } else {
+     return ret;
+   }
 }
 
 Matrix<double> numSample1D(FX &fx, const Matrix<double> &grid) {

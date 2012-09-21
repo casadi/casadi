@@ -137,12 +137,14 @@ int main(){
   ocp_solver.setOption("final_time",ocp.tf);
   ocp_solver.setOption("parallelization","openmp");
 //  ocp_solver.setOption("parallelization","expand");
+//  ocp_solver.setOption("parallelization","serial");
 
   // NLP solver
   ocp_solver.setOption("nlp_solver",IpoptSolver::creator);
   Dictionary nlp_solver_dict;
   nlp_solver_dict["tol"] = 1e-5;
-  nlp_solver_dict["hessian_approximation"] = "limited-memory";
+  nlp_solver_dict["hessian_approximation"] = "limited-memory"; // For BFGS
+  //nlp_solver_dict["generate_hessian"] = true; // For exact Hessian
   nlp_solver_dict["max_iter"] = 100;
   nlp_solver_dict["linear_solver"] = "ma57";
   //  nlp_solver_dict["derivative_test"] = "first-order";

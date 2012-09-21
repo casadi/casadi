@@ -65,7 +65,11 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix >& inputv, const ve
   bool has_duplicates = false;
   for(vector<SXMatrix >::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
     for(vector<SX>::iterator itc = it->begin(); itc != it->end(); ++itc){
-      has_duplicates = has_duplicates || itc->getTemp()!=0;
+      bool is_duplicate = itc->getTemp()!=0;
+      if(is_duplicate){
+        cerr << "Duplicate expression: " << *itc << endl;
+      }
+      has_duplicates = has_duplicates || is_duplicate;
       itc->setTemp(1);
     }
   }
@@ -76,7 +80,14 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix >& inputv, const ve
       itc->setTemp(0);
     }
   }
-  casadi_assert_message(!has_duplicates, "The input expressions are not independent.");
+  
+  if(has_duplicates){
+    cout << "Input expressions:" << endl;
+    for(int iind=0; iind<inputv_.size(); ++iind){
+      cout << iind << ": " << inputv_[iind] << endl;
+    }
+    casadi_error("The input expressions are not independent (or were not reset properly).");
+  }
   
   casadi_assert(!outputv_.empty()); // NOTE: Remove?
 }

@@ -147,14 +147,14 @@ void AcadoIntegratorInternal::init(){
   tmp_ = new ACADO::Vector();
 }
 
-void AcadoIntegratorInternal::reset(int nfsens, int nasens){
-  if(nfsens>0 ||  nasens>0){
+void AcadoIntegratorInternal::reset(int nsens, int nsensB, int nsensB_store){
+  int nfdir = 0; // NOTE: need to update the function below to the new integrator formulation
+  if(nfdir>0){
     integrator_->freezeAll();
   }
   has_been_integrated_ = false;
-  nfsens_ = nfsens;
-  nasens_ = nasens;
-  casadi_assert_message(nasens==0, "ACADO does not support adjoint directional derivatives for c_operator. Please contact the ACADO developers to request this feature.");
+  nfsens_ = nfdir;
+  nasens_ = 0;
 }
 
 void AcadoIntegratorInternal::integrate(double t_out){

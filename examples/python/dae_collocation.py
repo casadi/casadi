@@ -48,7 +48,7 @@ legendre_points = [0,legendre_points1,legendre_points2,legendre_points3,legendre
 # Radau collocation points
 radau_points1 = [0,1.000000]
 radau_points2 = [0,0.333333,1.000000]
-radau_points3 = [0,0.155051,0.644949,1.000000]
+radau_points3 = [0,0. b155051,0.644949,1.000000]
 radau_points4 = [0,0.088588,0.409467,0.787659,1.000000]
 radau_points5 = [0,0.057104,0.276843,0.583590,0.860240,1.000000]
 radau_points = [0,radau_points1,radau_points2,radau_points3,radau_points4,radau_points5]
@@ -66,7 +66,7 @@ cp = RADAU
 h = tf/nk/nicp
 
 # Coefficients of the collocation equation
-C = np.zeros((deg+1,deg+1))
+C = np.zeros((deg+1,deg+1))b
 # Coefficients of the continuity equation
 D = np.zeros(deg+1)
 

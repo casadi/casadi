@@ -35,7 +35,7 @@ implicit_integrator = False
 collocation_integrator = False
 
 # test adjoint sensitivities
-with_asens = True
+with_asens = False
 
 # use exact jacobian
 exact_jacobian = True
@@ -57,6 +57,9 @@ sparse_direct = True
 
 # Second order sensitivities by a symbolic-numeric approach
 second_order = False
+
+# Derivatives via source code transformation
+with_sct = True
 
 # Create an IDAS instance (fully implicit integrator)
 def create_IDAS():
@@ -122,7 +125,13 @@ def create_CVODES():
   s = ssym("s")
   v = ssym("v")
   m = ssym("m")
-  y = vertcat([s,v,m])
+  x = vertcat([s,v,m])
+  
+  # State derivatives
+  sdot = ssym("sdot")
+  vdot = ssym("vdot")
+  mdot = ssym("mdot")
+  xdot = vertcat([sdot,vdot,mdot])
   
   # Control
   u = ssym("u")
@@ -131,14 +140,13 @@ def create_CVODES():
   u_ref = 3-sin(t)
   
   # Square deviation from the state trajectory
-  u_dev = u-u_ref
-  u_dev *= u_dev
+  quad = (u-u_ref)**2
   
   # Differential equation (fully implicit form)
-  rhs = vertcat([v, (u-0.02*v*v)/m, -0.01*u*u])
+  ode = vertcat([v, (u-0.02*v*v)/m, -0.01*u*u])-xdot
 
   # DAE residual function
-  ffcn = SXFunction(daeIn(t=t,x=y,p=u),daeOut(ode=rhs,quad=u_dev))
+  ffcn = SXFunction(daeIn(t=t,x=x,p=u,xdot=xdot),daeOut(ode=ode,quad=quad))
   
   if collocation_integrator:
     # Create a collocation integrator
@@ -258,12 +266,12 @@ integrator.setInput(u_init,INTEGRATOR_P)
 # Reset initial state
 integrator.setInput(x0,INTEGRATOR_X0)
 
-if with_asens:
-  # backward seeds
-  bseed = len(x0)*[0.]
-  bseed[0] = 1
-  integrator.setAdjSeed(bseed,INTEGRATOR_XF)
+# backward seeds
+bseed = len(x0)*[0.]
+bseed[0] = 1
+integrator.setAdjSeed(bseed,INTEGRATOR_XF)
 
+if with_asens:
   # evaluate with forward and adjoint sensitivities
   integrator.evaluate(1,1)
 else:
@@ -276,6 +284,24 @@ if with_asens:
   print "adjoint sensitivities           ",
   print integrator.adjSens(INTEGRATOR_X0), " ",
   print integrator.adjSens(INTEGRATOR_P), " "
+  
+# Derivatives via source code transformation
+if with_sct:
+  # Forward seeds
+  fintegrator = integrator.derivative(1,1)
+  fintegrator.setInput(integrator.input(INTEGRATOR_X0),INTEGRATOR_X0)
+  fintegrator.setInput(integrator.input(INTEGRATOR_P),INTEGRATOR_P)
+  fintegrator.setInput(integrator.fwdSeed(INTEGRATOR_X0),INTEGRATOR_NUM_IN+INTEGRATOR_X0)
+  fintegrator.setInput(integrator.fwdSeed(INTEGRATOR_P),INTEGRATOR_NUM_IN+INTEGRATOR_P)
+  fintegrator.setInput(integrator.adjSeed(INTEGRATOR_XF),2*INTEGRATOR_NUM_IN+INTEGRATOR_XF)
+  fintegrator.setInput(integrator.adjSeed(INTEGRATOR_QF),2*INTEGRATOR_NUM_IN+INTEGRATOR_QF)
+  
+  fintegrator.evaluate()
+
+  print "forward sensitivities via sct   ", fintegrator.output(INTEGRATOR_NUM_OUT+INTEGRATOR_XF)
+  print "adjoint sensitivities via sct   ",
+  print fintegrator.output(2*INTEGRATOR_NUM_OUT+INTEGRATOR_X0), " ",
+  print fintegrator.output(2*INTEGRATOR_NUM_OUT+INTEGRATOR_P), " "
   
 if second_order:
   # Generate the jacobian by creating a new integrator for the sensitivity equations by source transformation

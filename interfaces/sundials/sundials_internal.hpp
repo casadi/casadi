@@ -26,6 +26,11 @@
 #include "sundials_integrator.hpp"
 #include "casadi/fx/integrator_internal.hpp"
 
+#include <nvector/nvector_serial.h>
+#include <sundials/sundials_dense.h>
+#include <sundials/sundials_iterative.h>
+#include <sundials/sundials_types.h>
+
 #ifdef WITH_SUNDIALS_2_5
 typedef long SUNDIALS_INT;
 #else  // WITH_SUNDIALS_2_5
@@ -46,6 +51,9 @@ public:
   /** \brief  Initialize */
   virtual void init();
 
+  /** \brief  Reset the forward problem and bring the time back to t0 */
+  virtual void reset(int nsens, int nsensB, int nsensB_store) = 0;
+  
   /** \brief  Deep copy data members */
   virtual void deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied);
   
@@ -92,6 +100,31 @@ public:
   
   /// Current time (to be removed)
   double t_;
+  
+  /// number of checkpoints stored so far
+  int ncheck_; 
+  
+  /// Supported linear solvers in Sundials
+  enum LinearSolverType{SD_USER_DEFINED, SD_DENSE, SD_BANDED, SD_ITERATIVE};
+
+  /// Supported iterative solvers in Sundials
+  enum IterativeSolverType{SD_GMRES,SD_BCGSTAB,SD_TFQMR};
+
+  /// Linear solver data (dense)
+  struct LinSolDataDense{};
+  
+  /// Linear solver
+  LinearSolverType linsol_f_, linsol_g_;
+  
+  /// Iterative solver
+  IterativeSolverType itsol_f_, itsol_g_;
+  
+  /// Preconditioning
+  int pretype_f_, pretype_g_;
+  
+  /// Use preconditioning
+  bool use_preconditioner_;
+  
 };
   
 } // namespace Sundials

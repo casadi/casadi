@@ -57,17 +57,17 @@ public:
   /** \brief  Print solver statistics */
   virtual void printStats(std::ostream &stream) const = 0;
 
-    /** \brief  Reset the solver and bring the time back to t0 */
-  virtual void reset(int nfdir, int nadir) = 0;
+  /** \brief  Reset the forward problem and bring the time back to t0 */
+  virtual void reset(int nsens, int nsensB, int nsensB_store) = 0;
 
-    /** \brief  Reset the solver of the adjoint problem and take time to tf */
-  virtual void resetAdj() = 0;
+  /** \brief  Reset the backward problem and take time to tf */
+  virtual void resetB() = 0;
 
-  /** \brief  Integrate until a specified time point */
+  /** \brief  Integrate forward until a specified time point */
   virtual void integrate(double t_out) = 0;
 
-  /** \brief  Integrate backwards in time until a specified time point */
-  virtual void integrateAdj(double t_out) = 0;
+  /** \brief  Integrate backward until a specified time point */
+  virtual void integrateB(double t_out) = 0;
 
   /** \brief  evaluate */
   virtual void evaluate(int nfdir, int nadir);
@@ -75,14 +75,30 @@ public:
   /** \brief  Initialize */
   virtual void init();
 
+  /** \brief  Propagate the sparsity pattern through a set of directional derivatives forward or backward */
+  virtual void spEvaluate(bool fwd);
+
+  /// Is the class able to propate seeds through the algorithm?
+  virtual bool spCanEvaluate(bool fwd){ return true;}
+    
+  /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
+  virtual FX getDerivative(int nfwd, int nadj);
+
+  /// Generate a augmented DAE system with nfwd forward sensitivities and nadj adjoint sensitivities
+  virtual std::pair<FX,FX> getAugmented(int nfwd, int nadj);
+  
+  /// Generate a augmented DAE system with nfwd forward sensitivities and nadj adjoint sensitivities (generic)
+  template<class Mat,class XFunc>
+  std::pair<FX,FX> getAugmentedGen(int nfwd, int nadj);
+  
   /// Number of states for the forward integration
   int nx_, nz_, nq_;
   
   /// Number of states for the backward integration
   int nrx_, nrz_, nrq_;
 
-  /// Number of parameters
-  int np_;
+  /// Number of forward and backward parameters
+  int np_, nrp_;
 
   /// Integration horizon
   double t0_, tf_;
@@ -93,8 +109,18 @@ public:
   /// ODE/DAE backward integration function, if any
   FX g_;
   
-  /// Number of right hand sides
-  int nrhs_;
+  /// Number of sensitivities to be propagated along with the integration forward in time
+  int nsens_;
+  
+  /// Number of sensitivities to be propagated along with the integration backward in time
+  int nsensB_;
+  
+  /// Number of sensitivities to be propagated along with the integration backward in time  that depend on sensitivities propagated along with the integration forward in time
+  int nsensB_store_;
+  
+  /// Generate new functions for calculating forward/adjoint directional derivatives
+  bool fwd_via_sct_, adj_via_sct_;
+  
 };
   
 } // namespace CasADi

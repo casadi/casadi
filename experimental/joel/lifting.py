@@ -63,7 +63,7 @@ x = ssym("x",xdef.size())
 
 # Substitute in the lifted variables x into the expressions for xdef and F
 ex = SXMatrixVector([f])
-substituteInPlace(x, xdef, ex, True, False)
+substituteInPlace(x, xdef, ex, True)
 [f] = ex
 
 # Residual function G
@@ -76,7 +76,7 @@ d = ssym("d",xdef.size())
 # Substitute out the x from the zdef
 z = xdef-d
 ex = SXMatrixVector([f])
-substituteInPlace(x, z, ex, False, False)
+substituteInPlace(x, z, ex, False)
 [f] = ex
 
 # Modified function Z

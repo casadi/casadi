@@ -26,9 +26,6 @@
 #include "idas_integrator.hpp"
 #include "sundials_internal.hpp"
 #include "casadi/fx/linear_solver.hpp"
-#include <nvector/nvector_serial.h>   /* serial N_Vector types, fcts., and macros */
-#include <sundials/sundials_dense.h>  /* definitions DlsMat DENSE_ELEM */
-#include <sundials/sundials_types.h>  /* definition of type double */
 #include <idas/idas.h>            /* prototypes for CVODE fcts. and consts. */
 #include <idas/idas_dense.h>
 #include <idas/idas_band.h> 
@@ -82,17 +79,17 @@ class IdasInternal : public SundialsInternal{
   /** \brief Initialize the adjoint problem (can only be called after the first integration) */
   virtual void initAdj();
   
-  /** \brief  Reset the solver and bring the time back to t0 */
-  virtual void reset(int nfdir, int nadir);
+  /** \brief  Reset the forward problem and bring the time back to t0 */
+  virtual void reset(int nsens, int nsensB, int nsensB_store);
 
-  /** \brief  Reset the solver of the adjoint problem and take time to tf */
-  virtual void resetAdj();
+  /** \brief  Reset the backward problem and take time to tf */
+  virtual void resetB();
 
-  /** \brief  Integrate until a specified time point */
+  /** \brief  Integrate forward until a specified time point */
   virtual void integrate(double t_out);
 
-  /** \brief  Integrate backwards in time until a specified time point */
-  virtual void integrateAdj(double t_out);
+  /** \brief  Integrate backward until a specified time point */
+  virtual void integrateB(double t_out);
 
   /** \brief  Set the stop time of the forward integration */
   virtual void setStopTime(double tf);
@@ -148,18 +145,15 @@ class IdasInternal : public SundialsInternal{
   // Idas memory block
   void* mem_;
 
-  // N-vectors for the DAE integration
+  // N-vectors for the forward integration
   N_Vector xz_, xzdot_, q_;
+  
+  // N-vectors for the backward integration
+  N_Vector rxz_, rxzdot_, rq_;
 
   // N-vectors for the forward sensitivities
   std::vector<N_Vector> xzF_, xzdotF_, qF_;
 
-  // N-vectors for the adjoint sensitivities
-  std::vector<N_Vector> xzA_, xzdotA_, qA_;
-
-  // Which components are differential
-  N_Vector id_;
-    
   bool is_init;
   
   // sensitivity method
@@ -174,14 +168,33 @@ class IdasInternal : public SundialsInternal{
   // Throw error
   static void idas_error(const std::string& module, int flag);
   
-  // Set the user defined linear solver
+  // Initialize the dense linear solver
+  void initDenseLinearSolver();
+  
+  // Initialize the banded linear solver
+  void initBandedLinearSolver();
+  
+  // Initialize the iterative linear solver
+  void initIterativeLinearSolver();
+  
+  // Initialize the user defined linear solver
   void initUserDefinedLinearSolver();
   
-  // Ids of backward problem
-  std::vector<int> whichB_;
-
-  int fsens_order_, asens_order_;
+  // Initialize the dense linear solver (backward integration)
+  void initDenseLinearSolverB();
   
+  // Initialize the banded linear solver (backward integration)
+  void initBandedLinearSolverB();
+  
+  // Initialize the iterative linear solver (backward integration)
+  void initIterativeLinearSolverB();
+  
+  // Initialize the user defined linear solver (backward integration)
+  void initUserDefinedLinearSolverB();
+  
+  // Ids of backward problem
+  int whichB_;
+
   // For timings
   clock_t time1, time2;
   
@@ -192,16 +205,13 @@ class IdasInternal : public SundialsInternal{
   double t_lsolve; // preconditioner/linear solver solve function
   double t_lsetup_jac; // preconditioner/linear solver setup function, generate jacobian
   double t_lsetup_fac; // preconditioner setup function, factorize jacobian
-  
-  // number of checkpoints stored so far
-  int ncheck_; 
-  
+    
   // Has the adjoint problem been initialized
   bool isInitAdj_;
   bool isInitTaping_;
   
-  // Number of forward and adjoint seeds for the functions f and q
-  int nfdir_f_, nadir_f_;
+  // Number of forward seeds for the function f
+  int nfdir_f_;
   
   // Scaling of cj
   bool cj_scaling_;

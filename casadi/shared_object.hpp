@@ -234,6 +234,13 @@ const B shared_cast(const SharedObject& A){
   return shared_cast<B>(A_copy);
 }
 
+/// Check if a shared object is of a certain type
+template<class B>
+bool is_a(const SharedObject& A){
+  casadi_assert(!A.isNull());
+  return !shared_cast<B>(A).isNull();
+}
+
 //@{
 /// Make a deep copy of an object (Note: default is a shallow copy!)
 template<class A>

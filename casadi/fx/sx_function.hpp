@@ -128,17 +128,29 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
 
-  /** \brief get function input */
+  /** \brief get function input (to be deprecated) */
   const SXMatrix& inputSX(int ind=0) const;
   
-  /** \brief get function output */
+  /** \brief get function output (to be deprecated) */
   const SXMatrix& outputSX(int ind=0) const;
   
-  /** \brief get function inputs */
+  /** \brief get function inputs (to be deprecated) */
   const std::vector<SXMatrix>& inputsSX() const;
   
-  /** \brief get function outputs */
+  /** \brief get function outputs (to be deprecated) */
   const std::vector<SXMatrix> & outputsSX() const;
+  
+  /** \brief get function input */
+  const SXMatrix& inputExpr(int ind) const;
+  
+  /** \brief get function output */
+  const SXMatrix& outputExpr(int ind) const;
+  
+  /** \brief get function inputs */
+  const std::vector<SXMatrix>& inputExpr() const;
+  
+  /** \brief get function outputs */
+  const std::vector<SXMatrix> & outputExpr() const;
   
   /** \brief Export / Generate C code for the function */
   void generateCode(const std::string& filename);

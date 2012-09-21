@@ -254,7 +254,9 @@ FX FXInternal::numeric_jacobian(const vector<pair<int,int> >& jblocks){
   
   // Less overhead if only jacobian is requested
   if(jblocks.size()==1 && jblocks.front().second>=0){
-    return Jacobian(fcn,jblocks.front().second,jblocks.front().first);
+    Jacobian ret(fcn,jblocks.front().second,jblocks.front().first);
+    ret.setOption("verbose",getOption("verbose"));
+    return ret;
   }
   
   // Outputs
@@ -499,6 +501,7 @@ CRSSparsity& FXInternal::jacSparsity(int iind, int oind, bool compact){
 }
 
 void FXInternal::getPartition(int iind, int oind, CRSSparsity& D1, CRSSparsity& D2, bool compact, bool symmetric){
+  log("MXFunctionInternal::getPartition begin");
   
   // Sparsity pattern with transpose
   CRSSparsity &A = jacSparsity(iind,oind,compact);
@@ -559,7 +562,49 @@ void FXInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res,
 }
 
 void FXInternal::spEvaluate(bool fwd){
-  casadi_error("FXInternal::spEvaluate not defined for class " << typeid(*this).name());
+  // By default, everything is assumed to depend on everything
+  
+  // Variable which depends on all everything
+  bvec_t all_depend(0);
+  if(fwd){
+    // Get dependency on all inputs
+    for(int iind=0; iind<getNumInputs(); ++iind){
+      const DMatrix& m = input<false>(iind);
+      const bvec_t* v = reinterpret_cast<const bvec_t*>(m.ptr());
+      for(int i=0; i<m.size(); ++i){
+        all_depend |= v[i];
+      }
+    }
+    
+    // Propagate to all outputs
+    for(int oind=0; oind<getNumOutputs(); ++oind){
+      DMatrix& m = output<false>(oind);
+      bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
+      for(int i=0; i<m.size(); ++i){
+        v[i] = all_depend;
+      }
+    }
+    
+  } else {
+    
+    // Get dependency on all outputs
+    for(int oind=0; oind<getNumOutputs(); ++oind){
+      const DMatrix& m = output<false>(oind);
+      const bvec_t* v = reinterpret_cast<const bvec_t*>(m.ptr());
+      for(int i=0; i<m.size(); ++i){
+        all_depend |= v[i];
+      }
+    }
+    
+    // Propagate to all inputs
+    for(int iind=0; iind<getNumInputs(); ++iind){
+      DMatrix& m = input<false>(iind);
+      bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
+      for(int i=0; i<m.size(); ++i){
+        v[i] |= all_depend;
+      }
+    }
+  }
 }
 
 FX FXInternal::jacobian_new(int iind, int oind){
@@ -625,14 +670,11 @@ FX FXInternal::derivative(int nfwd, int nadj){
     derivative_fcn_[nfwd].resize(nadj+1);
   }
 
-  // Weak reference
-  WeakRef& ref = derivative_fcn_[nfwd][nadj];
-
   // Return value
-  FX ret;
+  FX& ret = derivative_fcn_[nfwd][nadj];
 
   // Check if already cached
-  if(ref.isNull()){
+  if(ret.isNull()){
     // Generate a new function
     ret = getDerivative(nfwd,nadj);
     
@@ -643,13 +685,6 @@ FX FXInternal::derivative(int nfwd, int nadj){
     
     // Initialize it
     ret.init();
-
-    // Cache function for later reference
-    ref = ret;
-    
-  } else {
-    // Retrieve cached function
-    ret = ref;
   }
 
   // Return cached or generated function

@@ -26,9 +26,6 @@
 #include "cvodes_integrator.hpp"
 #include "sundials_internal.hpp"
 #include "casadi/fx/linear_solver.hpp"
-#include <nvector/nvector_serial.h>   /* serial N_Vector types, fcts., and macros */
-#include <sundials/sundials_dense.h>  /* definitions DlsMat DENSE_ELEM */
-#include <sundials/sundials_types.h>  /* definition of type double */
 #include <cvodes/cvodes.h>            /* prototypes for CVode fcts. and consts. */
 #include <cvodes/cvodes_dense.h>
 #include <cvodes/cvodes_band.h> 
@@ -74,17 +71,17 @@ public:
   /** \brief Initialize the adjoint problem (can only be called after the first integration) */
   virtual void initAdj();
 
-  /** \brief  Reset the solver and bring the time back to t0 */
-  virtual void reset(int nfdir, int nadir);
+  /** \brief  Reset the forward problem and bring the time back to t0 */
+  virtual void reset(int nsens, int nsensB, int nsensB_store);
 
-  /** \brief  Reset the solver of the adjoint problem and take time to tf */
-  virtual void resetAdj();
+  /** \brief  Reset the backward problem and take time to tf */
+  virtual void resetB();
 
-  /** \brief  Integrate until a specified time point */
+  /** \brief  Integrate forward until a specified time point */
   virtual void integrate(double t_out);
 
-  /** \brief  Integrate backwards in time until a specified time point */
-  virtual void integrateAdj(double t_out);
+  /** \brief  Integrate backward until a specified time point */
+  virtual void integrateB(double t_out);
 
   /** \brief  Set the stop time of the forward integration */
   virtual void setStopTime(double tf);
@@ -106,8 +103,9 @@ public:
   void rhsS1(int Ns, double t, N_Vector x, N_Vector xdot, int iS, N_Vector xF, N_Vector xdotF, N_Vector tmp1, N_Vector tmp2);
   void rhsQ(double t, const double* x, double* qdot);
   void rhsQS(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot, N_Vector *qFdot, N_Vector tmp1, N_Vector tmp2);
-  void rhsB(double t, const double* x, const double *xA, double* xdotA);
-  void rhsQB(double t, const double* x, const double* xA, double* qAdot);
+  void rhsB(double t, const double* x, const double *rx, double* rxdot);
+  void rhsBS(double t, N_Vector x, N_Vector *xF, N_Vector xA, N_Vector xdotA);
+  void rhsQB(double t, const double* x, const double* rx, double* rqdot);
   void jtimes(const double *v, double* Jv, double t, const double* x, const double* fy, double* tmp);
   void djac(SUNDIALS_INT N, double t, N_Vector x, N_Vector fy, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
   void bjac(SUNDIALS_INT N, SUNDIALS_INT mupper, SUNDIALS_INT mlower, double t, N_Vector x, N_Vector fy, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
@@ -124,6 +122,7 @@ public:
   static int rhsQ_wrapper(double t, N_Vector x, N_Vector qdot, void *user_data);
   static int rhsQS_wrapper(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot, N_Vector *qdotF, void *user_data, N_Vector tmp1, N_Vector tmp2);
   static int rhsB_wrapper(double t, N_Vector x, N_Vector xA, N_Vector xdotA, void *user_data);
+  static int rhsBS_wrapper(double t, N_Vector x, N_Vector *xF, N_Vector xA, N_Vector xdotA, void *user_data);
   static int rhsQB_wrapper(double t, N_Vector x, N_Vector xA, N_Vector qdotA, void *user_data);
   static int jtimes_wrapper(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector xdot, void *user_data, N_Vector tmp);
   static int djac_wrapper(SUNDIALS_INT N, double t, N_Vector x, N_Vector xdot, DlsMat Jac, void *user_data,N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
@@ -132,7 +131,6 @@ public:
   static int psetup_wrapper(double t, N_Vector x, N_Vector xdot, booleantype jok, booleantype *jcurPtr, double gamma, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
   static int lsetup_wrapper(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot, booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
   static int lsolve_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector x, N_Vector xdot);
- 
   
   virtual void printStats(std::ostream &stream) const;
   
@@ -153,15 +151,15 @@ public:
   double t_lsetup_jac; // preconditioner/linear solver setup function, generate jacobian
   double t_lsetup_fac; // preconditioner setup function, factorize jacobian
   
-  // N-vectors for the ODE integration
+  // N-vectors for the forward integration
   N_Vector x0_, x_, q_;
+  
+  // N-vectors for the backward integration
+  N_Vector rx0_, rx_, rq_;
 
   // N-vectors for the forward sensitivities
   std::vector<N_Vector> xF0_, xF_, qF_;
 
-  // N-vectors for the adjoint sensitivities
-  std::vector<N_Vector> xA0_, xA_, qA_;  
-  
   bool is_init;
   bool isInitAdj_;
 
@@ -177,15 +175,34 @@ public:
   static void cvodes_error(const std::string& module, int flag);
 
   // Ids of backward problem
-  std::vector<int> whichB_;
+  int whichB_;
 
-  int fsens_order_, asens_order_; 
+  // Number of forward directions for the functions f and g
+  int nfdir_f_, nfdir_g_;
 
-  // Number of forward and adjoint seeds for the functions f and q
-  int nfdir_f_, nadir_f_;
-
-  // Set the user defined linear solver
+  // Initialize the dense linear solver
+  void initDenseLinearSolver();
+  
+  // Initialize the banded linear solver
+  void initBandedLinearSolver();
+  
+  // Initialize the iterative linear solver
+  void initIterativeLinearSolver();
+  
+  // Initialize the user defined linear solver
   void initUserDefinedLinearSolver();
+  
+  // Initialize the dense linear solver (backward integration)
+  void initDenseLinearSolverB();
+  
+  // Initialize the banded linear solver (backward integration)
+  void initBandedLinearSolverB();
+  
+  // Initialize the iterative linear solver (backward integration)
+  void initIterativeLinearSolverB();
+  
+  // Initialize the user defined linear solver (backward integration)
+  void initUserDefinedLinearSolverB();
 
   // Set linear solver
   virtual void setLinearSolver(const LinearSolver& linsol, const FX& jac);

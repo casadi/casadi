@@ -48,8 +48,8 @@ const IntegratorInternal* Integrator::operator->() const{
    return (const IntegratorInternal*)(FX::operator->()); 
 }
   
-void Integrator::reset(int nfdir, int nadir){
-  (*this)->reset(nfdir, nadir);
+void Integrator::reset(int nsens, int nsensB, int nsensB_store){
+  (*this)->reset(nsens, nsensB, nsensB_store);
 }
 
 void Integrator::integrate(double t_out){
@@ -60,18 +60,21 @@ bool Integrator::checkNode() const{
   return dynamic_cast<const IntegratorInternal*>(get())!=0;
 }
 
-void Integrator::resetAdj(){
-  (*this)->resetAdj();
+void Integrator::resetB(){
+  (*this)->resetB();
 }
 
-void Integrator::integrateAdj(double t_out){
-  (*this)->integrateAdj(t_out);
+void Integrator::integrateB(double t_out){
+  (*this)->integrateB(t_out);
 }
 
 FX Integrator::getDAE(){
   return (*this)->f_;
 }
-  
+
+std::pair<FX,FX> Integrator::getAugmented(int nfwd, int nadj){
+  return (*this)->getAugmented(nfwd,nadj);
+}
  
 } // namespace CasADi
 

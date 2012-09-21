@@ -151,7 +151,7 @@ for (i,x0) in enumerate([0.08]):
 
   # Substitute in the lifted variables x into the expressions for xdef, F1 and F2
   ex = SXMatrixVector([f1,f2])
-  substituteInPlace(x, xdef, ex, True, False)
+  substituteInPlace(x, xdef, ex, True)
   [f1,f2] = ex
   
   if gauss_newton: # if Gauss-Newton no multipliers needed

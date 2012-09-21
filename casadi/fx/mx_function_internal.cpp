@@ -42,7 +42,7 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv, const std:
   
   setOption("name", "unnamed_mx_function");
   setOption("numeric_jacobian", true);
-
+  
   // Check if any inputs is a mapping
   bool has_mapping_inputs = false;
   for(vector<MX>::const_iterator it = inputv_.begin(); it!=inputv_.end(); ++it){
@@ -129,18 +129,11 @@ MXFunctionInternal::~MXFunctionInternal(){
 }
 
 
-double* getptr(Matrix<double>& x){
-	if(x.size()>0)
-		return &x.front();
-	else
-		return 0;
-}
-
 void MXFunctionInternal::init(){  
   log("MXFunctionInternal::init begin");
-  
+      
   // Call the init function of the base class
-  XFunctionInternal<MXFunctionInternal,MX,MXNode>::init();
+  XFunctionInternal<MXFunctionInternal,MX,MXNode>::init();    
 
   // Stack for nodes to be added to the list of nodes
   stack<MXNode*> s;
@@ -707,6 +700,8 @@ void MXFunctionInternal::spEvaluate(bool fwd){
 // }
 
 FX MXFunctionInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks){
+  log("MXFunctionInternal::jacobian begin");
+  
   // Jacobian blocks
   vector<MX> jac_out(jblocks.size());
   jac_out.reserve(jblocks.size());
@@ -731,6 +726,7 @@ FX MXFunctionInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks)
 }
 
 MX MXFunctionInternal::jac(int iind, int oind, bool compact, bool symmetric){
+  log("MXFunctionInternal::jac begin");
   return jacGen(iind,oind,compact,symmetric);
 }
 

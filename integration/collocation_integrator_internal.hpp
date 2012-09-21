@@ -55,20 +55,17 @@ public:
   /// Initialize the adjoint problem (can only be called after the first integration)
   virtual void initAdj();
 
-  /// Reset the solver and bring the time back to t0
-  virtual void reset(int nfdir, int nadir);
+  /// Reset the forward problem and bring the time back to t0
+  virtual void reset(int nsens, int nsensB, int nsensB_store);
 
-  /// Reset the solver of the adjoint problem and take time to tf
-  virtual void resetAdj();
-
-  /// Overload this method, since the number of derivative directions currently aren't passed
-  virtual void evaluate(int nfdir, int nadir);
+  /// Reset the backward problem and take time to tf
+  virtual void resetB();
 
   ///  Integrate until a specified time point
   virtual void integrate(double t_out);
 
   /// Integrate backwards in time until a specified time point
-  virtual void integrateAdj(double t_out);
+  virtual void integrateB(double t_out);
 
   /// Get the jacobian in the nonlinear iteration
   virtual FX getJacobian();
@@ -97,24 +94,15 @@ public:
   // Implicit function solver
   ImplicitFunction implicit_solver_;
   
-  // Quadrature solver
-  LinearSolver quadrature_solver_;
-  
   // With hotstart
   bool hotstart_;
   
   // Has the system been integrated once
   bool integrated_once_;
   
-  // Number of sensitivity directions
-  int nfdir_, nadir_;
-  
   // Collocated times
   std::vector<double> times_;
   
-  // Differential states and quadrature states
-  int ny_;
-
 };
 
 } // namespace CasADi

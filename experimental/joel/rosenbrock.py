@@ -37,8 +37,8 @@ g = SXFunction([v],[z + (1-x)**2 - y])
 nlp_solver = LiftedSQP
 
 # Choose a qp solver
-#qp_solver = QPOasesSolver
-qp_solver = IpoptQPSolver
+qp_solver = QPOasesSolver
+#qp_solver = IpoptQPSolver
 #qp_solver = OOQPSolver
 
 # QP solver options
@@ -57,7 +57,11 @@ solv.setOption("generate_hessian",True)
 if nlp_solver != IpoptSolver:
   solv.setOption("qp_solver",qp_solver)
   solv.setOption("qp_solver_options",qp_solver_options)
-
+  solv.setOption("maxiter",5)
+if nlp_solver == SQPMethod:
+  #solv.setOption("monitor",['qp'])
+  solv.setOption("hessian_approximation","exact")
+  
 # Init solver  
 solv.init()
 

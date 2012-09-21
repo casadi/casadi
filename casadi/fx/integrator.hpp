@@ -25,7 +25,6 @@
 
 #include "fx.hpp"
 #include "linear_solver.hpp"
-//#define NEW_INTEGRATOR
 
 /** \defgroup DAE_doc
   Solves the following initial value problem (IVP):
@@ -55,13 +54,13 @@
     rq(tf)  = 0
   
   Backward integration from t=tf to t=t0
-          0 = gx(rx,rz,x,z,p,t,der(rx))   Backward ODE
-          0 = gz(rx,rz,x,z,p,t)           Backward algebraic equations
-    der(rq) = gq(rx,rz,x,z,p,t)           Backward quadratures
+          0 = gx(rx,rz,rp,x,z,p,t,der(rx))   Backward ODE
+          0 = gz(rx,rz,rp,x,z,p,t)           Backward algebraic equations
+    der(rq) = gq(rx,rz,rp,x,z,p,t)           Backward quadratures
 
   where we assume that both the forward and backwards integrations are index-1
   (i.e. dfx/dxdot, dfz/dz, dgz/drz, dgx/drxdot are invertible) and furthermore that 
-  gx, gz and gq have a linear dependency on rx and rz and that f_x and g_x have a 
+  gx, gz and gq have a linear dependency on rx, rz and rp and that f_x and g_x have a 
   linear dependence on xdot and rxdot respectively.
   \endverbatim 
 */
@@ -92,7 +91,7 @@ enum DAEInput{
   DAE_T,
   /// Time derivative of differential states [xdot]
   DAE_XDOT,
-  /// Number of arguments. */
+  /// Number of arguments.
   DAE_NUM_IN
 };
 
@@ -114,7 +113,7 @@ enum RDAEInput{
   RDAE_RX,
   /// Backward algebraic state [rz]
   RDAE_RZ,
-  /// Backward parameter [rp]
+  /// Backward  parameter vector [rp]
   RDAE_RP,
   /// Forward differential state [x]
   RDAE_X,
@@ -124,6 +123,8 @@ enum RDAEInput{
   RDAE_P,
   /// Explicit time dependence [t]
   RDAE_T,
+  /// Time derivative of differential states [xdot]
+  RDAE_XDOT,
   /// Time derivative of backward differential state [rxdot]
   RDAE_RXDOT,
   /// Number of arguments.
@@ -150,6 +151,8 @@ enum IntegratorInput{
   INTEGRATOR_P,
   /// Backward differential state at the final time [rx0]
   INTEGRATOR_RX0, 
+  /// Backward parameter vector [rp]
+  INTEGRATOR_RP, 
   /// Number of input arguments of an integrator
   INTEGRATOR_NUM_IN
 };
@@ -203,21 +206,33 @@ public:
   /// Access functions of the node
   const IntegratorInternal* operator->() const;
   
-  /// Reset the solver and bring the time back to t0 and state back to INTEGRATOR_X0
-  void reset(int nfdir=0, int nadir=0);
+  /** \brief Reset the forward problem
+   * Time will be set to t0 and state to input(INTEGRATOR_X0)
+   * \param nsens        Number of sensitivities to be propagated along with the integration forward in time
+   * \param nsensB       Number of sensitivities to be propagated along with the integration backward in time
+   * \param nsensB_store Number of sensitivities to be propagated along with the integration backward in time 
+   *                     that depend on sensitivities propagated along with the integration forward in time
+   */
+  void reset(int nsens=0, int nsensB=0, int nsensB_store=0);
 
-  /// Integrate until a specified time point 
+  /// Integrate forward until a specified time point 
   void integrate(double t_out);
 
-  /// Reset the solver of the adjoint problem and take time to tf
-  void resetAdj();
+  /** \brief Reset the backward problem
+   * Time will be set to tf and backward state to input(INTEGRATOR_RX0)
+   */
+  void resetB();
 
-  /// Integrate backwards in time until a specified time point
-  void integrateAdj(double t_out);
+  /// Integrate backward until a specified time point
+  void integrateB(double t_out);
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
 
+  /** \brief Generate a augmented DAE system with nfwd forward sensitivities and nadj adjoint sensitivities
+   */
+  std::pair<FX,FX> getAugmented(int nfwd, int nadj);
+  
   /// Get the DAE
   FX getDAE();
 };

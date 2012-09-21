@@ -230,6 +230,7 @@ solver = IpoptSolver(ffcn,gfcn)
 solver.setOption("expand_f",True)
 solver.setOption("expand_g",True)
 solver.setOption("generate_hessian",True)
+#solver.setOption("max_iter",4)
 
 # initialize the solver
 solver.init()
