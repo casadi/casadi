@@ -5,6 +5,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.0)
 
 PROJECT(sundials-2.5mod C)
+include_directories(include)
 
 SET(SUNDIALS_INCLUDES 
   include/nvector/nvector_serial.h
