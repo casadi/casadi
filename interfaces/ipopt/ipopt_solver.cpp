@@ -24,8 +24,6 @@
 #include "ipopt_nlp.hpp"
 
 using namespace std;
-
-#include <coin/IpIpoptApplication.hpp>
 namespace CasADi{
 
 IpoptSolver::IpoptSolver(){
