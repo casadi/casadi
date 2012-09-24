@@ -26,7 +26,11 @@
 #include <ctime>
 
 using namespace std;
+#ifdef NEW_FIND_IPOPT
+#include <IpIpoptApplication.hpp>
+#else
 #include <coin/IpIpoptApplication.hpp>
+#endif
 namespace CasADi{
 
 IpoptInternal::IpoptInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF) : NLPSolverInternal(F,G,H,J), GF_(GF){

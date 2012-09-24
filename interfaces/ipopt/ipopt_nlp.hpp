@@ -24,17 +24,31 @@
 #define IPOPT_NLP_HPP
 
 #include "ipopt_solver.hpp"
+#ifdef NEW_FIND_IPOPT
+#include <IpTNLP.hpp>
+#include <IpIpoptCalculatedQuantities.hpp>
+#include <IpIpoptData.hpp>
+#else
 #include <coin/IpTNLP.hpp>
 #include <coin/IpIpoptCalculatedQuantities.hpp>
 #include <coin/IpIpoptData.hpp>
+#endif
 
 #ifdef WITH_IPOPT_CALLBACK
 #define private public
+#ifdef NEW_FIND_IPOPT
+#include <IpIpoptData.hpp>
+#include <IpOrigIpoptNLP.hpp>
+#include <IpTNLPAdapter.hpp>
+#include <IpDenseVector.hpp>
+#include <IpExpansionMatrix.hpp>
+#else
 #include <coin/IpIpoptData.hpp>
 #include <coin/IpOrigIpoptNLP.hpp>
 #include <coin/IpTNLPAdapter.hpp>
 #include <coin/IpDenseVector.hpp>
 #include <coin/IpExpansionMatrix.hpp>
+#endif
 #undef private
 #define private private
 #endif // WITH_IPOPT_CALLBACK

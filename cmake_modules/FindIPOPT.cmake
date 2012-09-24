@@ -1,21 +1,24 @@
 # This new implementation is undergoing testing
-IF(NEW_FIND_IPOPT)
+if(NEW_FIND_IPOPT)
 
   # Get package info using pkg-config
   find_package(PkgConfig)
   pkg_search_module(IPOPT ipopt)
   
   # Callback support
-  IF(EXISTS ${IPOPT_INCLUDEDIR}/IpIpoptData.hpp AND EXISTS ${IPOPT_INCLUDEDIR}/IpOrigIpoptNLP.hpp AND EXISTS ${IPOPT_INCLUDEDIR}IpTNLPAdapter.hpp  AND EXISTS ${IPOPT_INCLUDEDIR}/IpDenseVector.hpp AND EXISTS ${IPOPT_INCLUDEDIR}/IpExpansionMatrix.hpp)
-    SET(IPOPT_FOUND_EXTRA TRUE)
-  ELSE ()
-    MESSAGE(STATUS "Detected an ipopt configuration without development headers. Build will proceed, but without callback functionality. To enable it, see https://sourceforge.net/apps/trac/casadi/wiki/enableIpoptCallback")
-  ENDIF ()
+  if(EXISTS ${IPOPT_INCLUDEDIR}/IpIpoptData.hpp AND EXISTS ${IPOPT_INCLUDEDIR}/IpOrigIpoptNLP.hpp AND EXISTS ${IPOPT_INCLUDEDIR}IpTNLPAdapter.hpp  AND EXISTS ${IPOPT_INCLUDEDIR}/IpDenseVector.hpp AND EXISTS ${IPOPT_INCLUDEDIR}/IpExpansionMatrix.hpp)
+    set(IPOPT_FOUND_EXTRA TRUE)
+  else ()
+    message(STATUS "Detected an ipopt configuration without development headers. Build will proceed, but without callback functionality. To enable it, see https://sourceforge.net/apps/trac/casadi/wiki/enableIpoptCallback")
+  endif ()
   
   # Set standard flags
   include(FindPackageHandleStandardArgs)
   find_package_handle_standard_args(IPOPT DEFAULT_MSG IPOPT_LIBRARIES IPOPT_INCLUDE_DIRS)
   mark_as_advanced(IPOPT_LIBRARIES IPOPT_INCLUDE_DIRS)
+  
+  # Add def (temporary solution)
+  add_definitions(-DNEW_FIND_IPOPT)
   
 # Legacy implementation, kept until the new implementation has been confirmed to work well
 ELSE(NEW_FIND_IPOPT)
