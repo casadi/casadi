@@ -67,7 +67,12 @@ class Toolstests(casadiTestCase):
       self.checkarray(array(p.xother.i_a),DMatrix(0),"index")
       self.checkarray(array(p.xother.i_b),DMatrix([[1,0],[0,2]]),"index")
 
-
+      self.assertEqual(p.veccat().numel(),21)
+      self.assertEqual(p.veccat().size(),19)
+      self.assertEqual(p.vecNZcat().numel(),19)
+      self.assertEqual(p.vecNZcat().size(),19)
+      self.assertEqual(p.getNumel(),21)
+      self.assertEqual(p.getSize(),19)
       
       self.assertTrue(p.lookup(('x',)) is p.x)
       self.assertTrue(p.lookup(('x',(0,))).toScalar().isEqual(p.x[0].toScalar()))
@@ -118,7 +123,14 @@ class Toolstests(casadiTestCase):
       p.c = ssym("c")
       p.freeze()
       
-            
+
+      self.assertEqual(p.veccat().numel(),9)
+      self.assertEqual(p.veccat().size(),9)
+      self.assertEqual(p.vecNZcat().numel(),9)
+      self.assertEqual(p.vecNZcat().size(),9)
+      self.assertEqual(p.getNumel(),9)
+      self.assertEqual(p.getSize(),9)
+      
       self.checkarray(array(p.i_a),DMatrix([[0],[1]]),"index")
       self.checkarray(array(p.i_b[0]),DMatrix([[2],[3],[4]]),"index")
       self.checkarray(array(p.i_b[1]),DMatrix([[5],[6],[7]]),"index")

@@ -382,7 +382,7 @@ class Variables(object):
                 i+=self.getNumel(v)
             return i
         else:
-            return 0
+            return 1
         
     def getSparsity(self, obj = None):
         if obj is None:
