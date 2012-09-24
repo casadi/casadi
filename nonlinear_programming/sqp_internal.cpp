@@ -522,6 +522,22 @@ void SQPInternal::evaluate(int nfdir, int nadir){
        
     cout << ls_counter << ls_success << "    "; 
     cout << endl;
+    
+    // Call callback function if present
+    if (!callback_.isNull()) {
+      callback_.input(NLP_X_OPT).set(fk);
+      callback_.input(NLP_COST).set(fk);
+      callback_.input(NLP_X_OPT).set(x);
+      callback_.input(NLP_LAMBDA_G).set(mu);
+      callback_.input(NLP_LAMBDA_X).set(mu_x);
+      callback_.input(NLP_G).set(gk);
+      callback_.evaluate();
+      
+      if (callback_.output(0).at(0)) {
+       cout << "SQP: aborted by callback...\n"; 
+       break;
+      }
+    }
 
     // Checking convergence criteria
     if (pr_inf < tol_pr_ && norm_1(gLag).elem(0) < tol_du_){
