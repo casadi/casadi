@@ -1,6 +1,6 @@
 if(WITH_MODIFIED_SUNDIALS)
 
-  SET(SUNDIALS_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/sundials-2.5mod/include)
+  SET(SUNDIALS_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/sundials-2.5mod)
   SET(SUNDIALS_LIBRARIES sundials-2.5mod)
   SET(SUNDIALS_FOUND TRUE)
   add_definitions(-DWITH_SUNDIALS_2_5)
