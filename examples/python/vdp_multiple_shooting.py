@@ -25,7 +25,7 @@ import matplotlib.pyplot as plt
 
 nk = 20      # Control discretization
 tf = 10.0    # End time
-coll = True # Use collocation integrator
+coll = False # Use collocation integrator
 
 # Declare variables (use scalar graph)
 t  = ssym("t")    # time
