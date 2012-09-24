@@ -2,8 +2,6 @@
 find_package(IPOPT QUIET)
 
 IF(IPOPT_FOUND)
-include_directories(${IPOPT_INCLUDE_DIR})
-
 include_directories(../cppocp)
 
 add_executable(gliderCppocp glider.cpp)

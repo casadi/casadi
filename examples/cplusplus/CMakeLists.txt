@@ -7,15 +7,6 @@ find_package(LIFTOPT QUIET)
 
 include_directories(../../)
 
-
-IF(IPOPT_FOUND)
-  include_directories(${IPOPT_INCLUDE_DIR})
-ENDIF(IPOPT_FOUND)
-
-IF(SUNDIALS_FOUND)
-  INCLUDE_DIRECTORIES(${SUNDIALS_INCLUDE_DIR})
-ENDIF(SUNDIALS_FOUND)
-
 # Error handling
 add_executable(casadi_error_handling casadi_error_handling.cpp)
 target_link_libraries(casadi_error_handling casadi ${CASADI_DEPENDENCIES})
@@ -115,9 +106,7 @@ target_link_libraries(sundials_testing
 ENDIF(SUNDIALS_FOUND AND LAPACK_FOUND AND BLAS_FOUND)
 
 if(LIFTOPT_FOUND)
-include_directories(${LIFTOPT_INCLUDE_DIRS})
 add_executable(test_liftopt test_liftopt.cpp)
 target_link_libraries(test_liftopt liftopt_interface casadi ${LIFTOPT_LIBRARIES} ${CASADI_DEPENDENCIES} )
-
 endif(LIFTOPT_FOUND)
 

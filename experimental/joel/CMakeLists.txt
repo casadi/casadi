@@ -3,21 +3,12 @@ find_package(KNITRO QUIET)
 find_package(SUNDIALS QUIET)
 find_package(BLAS QUIET)
 find_package(LAPACK QUIET)
-find_package(LIFTOPT QUIET)
 find_package(OOQP QUIET)
 if(WITH_ACADO)
 find_package(ACADO QUIET)
 else(WITH_ACADO)
 set(FOUND_ACADO FALSE)
 endif(WITH_ACADO)
-
-IF(IPOPT_FOUND)
-include_directories(${IPOPT_INCLUDE_DIR})
-ENDIF(IPOPT_FOUND)
-
-IF(SUNDIALS_FOUND)
-INCLUDE_DIRECTORIES(${SUNDIALS_INCLUDE_DIR})
-ENDIF(SUNDIALS_FOUND)
 
 IF(IPOPT_FOUND)
 
@@ -77,13 +68,6 @@ target_link_libraries(det_minor casadi ${CASADI_DEPENDENCIES})
 # Det minor example from CasADi papper
 add_executable(det_minor_paper det_minor_paper.cpp )
 target_link_libraries(det_minor_paper casadi ${CASADI_DEPENDENCIES})
-
-if(LIFTOPT_FOUND)
-include_directories(${LIFTOPT_INCLUDE_DIRS})
-add_executable(test_liftopt test_liftopt.cpp)
-target_link_libraries(test_liftopt liftopt_interface casadi ${CASADI_DEPENDENCIES} ${LIFTOPT_LIBRARIES})
-
-endif(LIFTOPT_FOUND)
 
 add_executable(mx_jacobian mx_jacobian.cpp)
 target_link_libraries(mx_jacobian casadi ${CASADI_DEPENDENCIES})
