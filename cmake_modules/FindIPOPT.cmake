@@ -1,43 +1,45 @@
-find_package(Threads)
-find_package(LAPACK)
-
-FIND_PATH(IPOPT_INCLUDE_DIR 
-coin/IpIpoptApplication.hpp
-HINTS $ENV{IPOPT}/include
-)
-
-IF(EXISTS "${IPOPT_INCLUDE_DIR}/coin/IpIpoptData.hpp" AND EXISTS "${IPOPT_INCLUDE_DIR}/coin/IpOrigIpoptNLP.hpp" AND EXISTS "${IPOPT_INCLUDE_DIR}/coin/IpTNLPAdapter.hpp"  AND EXISTS "${IPOPT_INCLUDE_DIR}/coin/IpDenseVector.hpp" AND EXISTS "${IPOPT_INCLUDE_DIR}/coin/IpExpansionMatrix.hpp" )
-   SET(IPOPT_FOUND_EXTRA TRUE)
-ELSE ()
-   MESSAGE(STATUS "Detected an ipopt configuration without development headers. Build will proceed, but without callback functionality. To enable it, see https://sourceforge.net/apps/trac/casadi/wiki/enableIpoptCallback")
-ENDIF ()
-
-IF(IPOPT_INCLUDE_DIR)
-   SET(IPOPT_FOUND_INCLUDE TRUE)
-   MESSAGE(STATUS "Found IPOPT include dir: ${IPOPT_INCLUDE_DIR}")
-ELSE (IPOPT_INCLUDE_DIR)
-   MESSAGE(STATUS "Could not find IPOPT include dir")
-ENDIF (IPOPT_INCLUDE_DIR)
-
 # This new implementation is undergoing testing
 IF(NEW_FIND_IPOPT)
 
-  # Find the file containing the list of libraries that IPOPT needs to link with
-  FIND_FILE(IPOPT_ADDLIBS_FILE share/coin/doc/Ipopt/ipopt_addlibs_cpp.txt)
-
-  # Read the file
-  IF(IPOPT_ADDLIBS_FILE)
-    MESSAGE(STATUS "Found IPOPT libs file: ${IPOPT_ADDLIBS_FILE}")
-    FILE(READ ${IPOPT_ADDLIBS_FILE} IPOPT_ADDLIBS)
-    if(IPOPT_ADDLIBS)
-      MESSAGE(STATUS "Read IPOPT libs file: ${IPOPT_ADDLIBS}")
-      SET(IPOPT_LIBRARIES ${IPOPT_ADDLIBS})
-      SET(IPOPT_FOUND_LIBS TRUE)
-    ENDIF(IPOPT_ADDLIBS)
-  ENDIF(IPOPT_ADDLIBS_FILE)
-
+  # Get package info using pkg-config
+  find_package(PkgConfig)
+  pkg_search_module(IPOPT ipopt)
+  
+  # Callback support
+  IF(EXISTS ${IPOPT_INCLUDEDIR}/IpIpoptData.hpp AND EXISTS ${IPOPT_INCLUDEDIR}/IpOrigIpoptNLP.hpp AND EXISTS ${IPOPT_INCLUDEDIR}IpTNLPAdapter.hpp  AND EXISTS ${IPOPT_INCLUDEDIR}/IpDenseVector.hpp AND EXISTS ${IPOPT_INCLUDEDIR}/IpExpansionMatrix.hpp)
+    SET(IPOPT_FOUND_EXTRA TRUE)
+  ELSE ()
+    MESSAGE(STATUS "Detected an ipopt configuration without development headers. Build will proceed, but without callback functionality. To enable it, see https://sourceforge.net/apps/trac/casadi/wiki/enableIpoptCallback")
+  ENDIF ()
+  
+  # Set standard flags
+  include(FindPackageHandleStandardArgs)
+  find_package_handle_standard_args(IPOPT DEFAULT_MSG IPOPT_LIBRARIES IPOPT_INCLUDE_DIRS)
+  mark_as_advanced(IPOPT_LIBRARIES IPOPT_INCLUDE_DIRS)
+  
 # Legacy implementation, kept until the new implementation has been confirmed to work well
 ELSE(NEW_FIND_IPOPT)
+
+  find_package(Threads)
+  find_package(LAPACK)
+
+  FIND_PATH(IPOPT_INCLUDE_DIR 
+  coin/IpIpoptApplication.hpp
+  HINTS $ENV{IPOPT}/include
+  )
+
+  IF(EXISTS "${IPOPT_INCLUDE_DIR}/coin/IpIpoptData.hpp" AND EXISTS "${IPOPT_INCLUDE_DIR}/coin/IpOrigIpoptNLP.hpp" AND EXISTS "${IPOPT_INCLUDE_DIR}/coin/IpTNLPAdapter.hpp"  AND EXISTS "${IPOPT_INCLUDE_DIR}/coin/IpDenseVector.hpp" AND EXISTS "${IPOPT_INCLUDE_DIR}/coin/IpExpansionMatrix.hpp" )
+    SET(IPOPT_FOUND_EXTRA TRUE)
+  ELSE ()
+    MESSAGE(STATUS "Detected an ipopt configuration without development headers. Build will proceed, but without callback functionality. To enable it, see https://sourceforge.net/apps/trac/casadi/wiki/enableIpoptCallback")
+  ENDIF ()
+
+  IF(IPOPT_INCLUDE_DIR)
+    SET(IPOPT_FOUND_INCLUDE TRUE)
+    MESSAGE(STATUS "Found IPOPT include dir: ${IPOPT_INCLUDE_DIR}")
+  ELSE (IPOPT_INCLUDE_DIR)
+    MESSAGE(STATUS "Could not find IPOPT include dir")
+  ENDIF (IPOPT_INCLUDE_DIR)
 
   FIND_LIBRARY(IPOPT_LIBRARY 
   ipopt HINTS $ENV{IPOPT}/coin/lib/ $ENV{IPOPT}/coin/lib/ThirdParty/ $ENV{IPOPT}/lib/ $ENV{IPOPT}/lib/coin/ $ENV{IPOPT}/lib/coin/ $ENV{IPOPT}/lib/coin/ThirdParty/ /usr/lib/coin /usr/local/lib/coin /usr/local/lib/coin/ThirdParty )
@@ -96,12 +98,12 @@ ELSE(NEW_FIND_IPOPT)
   ELSE (IPOPT_LIBRARY)
     MESSAGE(STATUS "Could not find Ipopt libs")
   ENDIF (IPOPT_LIBRARY)
+
+  IF(IPOPT_FOUND_INCLUDE AND IPOPT_FOUND_LIBS)
+    SET(IPOPT_FOUND TRUE)
+  ENDIF(IPOPT_FOUND_INCLUDE AND IPOPT_FOUND_LIBS)
+
 ENDIF(NEW_FIND_IPOPT)
-
-IF(IPOPT_FOUND_INCLUDE AND IPOPT_FOUND_LIBS)
-  SET(IPOPT_FOUND TRUE)
-ENDIF(IPOPT_FOUND_INCLUDE AND IPOPT_FOUND_LIBS)
-
 
 
 
