@@ -60,15 +60,16 @@
 */
 /** \defgroup scheme_RDAEInput
 <table>
-<caption>Input scheme: CasADi::RDAEInput  (RDAE_NUM_IN = 8) </caption>
+<caption>Input scheme: CasADi::RDAEInput  (RDAE_NUM_IN = 9) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>RDAE_RX</td><td>Backward differential state [rx].</td></tr>
 <tr><td>RDAE_RZ</td><td>Backward algebraic state [rz].</td></tr>
-<tr><td>RDAE_RP</td><td>Backward parameter [rp].</td></tr>
+<tr><td>RDAE_RP</td><td>Backward parameter vector [rp].</td></tr>
 <tr><td>RDAE_X</td><td>Forward differential state [x].</td></tr>
 <tr><td>RDAE_Z</td><td>Forward algebraic state [z].</td></tr>
 <tr><td>RDAE_P</td><td>Parameter vector [p].</td></tr>
 <tr><td>RDAE_T</td><td>Explicit time dependence [t].</td></tr>
+<tr><td>RDAE_XDOT</td><td>Time derivative of differential states [xdot].</td></tr>
 <tr><td>RDAE_RXDOT</td><td>Time derivative of backward differential state [rxdot].</td></tr>
 </table>
 */
@@ -220,11 +221,12 @@
 */
 /** \defgroup scheme_IntegratorInput
 <table>
-<caption>Input scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 3) </caption>
+<caption>Input scheme: CasADi::IntegratorInput  (INTEGRATOR_NUM_IN = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>INTEGRATOR_X0</td><td>Differential state at the initial time [x0].</td></tr>
 <tr><td>INTEGRATOR_P</td><td>Parameters [p].</td></tr>
 <tr><td>INTEGRATOR_RX0</td><td>Backward differential state at the final time [rx0].</td></tr>
+<tr><td>INTEGRATOR_RP</td><td>Backward parameter vector [rp].</td></tr>
 </table>
 */
 /** \defgroup scheme_OCPOutput

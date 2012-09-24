@@ -381,20 +381,39 @@ Print solver statistics. ";
 
 %feature("docstring")  CasADi::AcadoIntegrator::reset "
 
-Reset the solver and bring the time back to t0 and state back to
-INTEGRATOR_X0. ";
+Reset the forward problem Time will be set to t0 and state to
+input(INTEGRATOR_X0)
+
+Parameters:
+-----------
+
+nsens:  Number of sensitivities to be propagated along with the integration
+forward in time
+
+nsensB:  Number of sensitivities to be propagated along with the integration
+backward in time
+
+nsensB_store:  Number of sensitivities to be propagated along with the
+integration backward in time that depend on sensitivities propagated along
+with the integration forward in time ";
 
 %feature("docstring")  CasADi::AcadoIntegrator::integrate "
 
-Integrate until a specified time point. ";
+Integrate forward until a specified time point. ";
 
-%feature("docstring")  CasADi::AcadoIntegrator::resetAdj "
+%feature("docstring")  CasADi::AcadoIntegrator::resetB "
 
-Reset the solver of the adjoint problem and take time to tf. ";
+Reset the backward problem Time will be set to tf and backward state to
+input(INTEGRATOR_RX0) ";
 
-%feature("docstring")  CasADi::AcadoIntegrator::integrateAdj "
+%feature("docstring")  CasADi::AcadoIntegrator::integrateB "
 
-Integrate backwards in time until a specified time point. ";
+Integrate backward until a specified time point. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::getAugmented "
+
+Generate a augmented DAE system with nfwd forward sensitivities and nadj
+adjoint sensitivities. ";
 
 %feature("docstring")  CasADi::AcadoIntegrator::getDAE "
 
@@ -1052,19 +1071,19 @@ Initialize. ";
 
 %feature("docstring")  CasADi::AcadoIntegratorInternal::reset "
 
-Reset the solver and bring the time back to t0. ";
+Reset the forward problem and bring the time back to t0. ";
 
-%feature("docstring")  CasADi::AcadoIntegratorInternal::resetAdj "
+%feature("docstring")  CasADi::AcadoIntegratorInternal::resetB "
 
-Reset the solver of the adjoint problem and take time to tf. ";
+Reset the backward problem and take time to tf. ";
 
 %feature("docstring")  CasADi::AcadoIntegratorInternal::integrate "
 
-Integrate until a specified time point. ";
+Integrate forward until a specified time point. ";
 
-%feature("docstring")  CasADi::AcadoIntegratorInternal::integrateAdj "
+%feature("docstring")  CasADi::AcadoIntegratorInternal::integrateB "
 
-Integrate backwards in time until a specified time point. ";
+Integrate backward until a specified time point. ";
 
 %feature("docstring")  CasADi::AcadoIntegratorInternal::setStopTime "
 
@@ -1094,6 +1113,39 @@ Deep copy data members. ";
 
 evaluate ";
 
+%feature("docstring")  CasADi::AcadoIntegratorInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward.
+
+This is a bit better than the FXInternal implementation: XF and QF never
+depend on RX0 and RP, i.e. the worst- case structure of the Jacobian is:x0 p
+rx0 rp
+
+xf | x x | qf | x x | rxf | x x x x |rqf | x x x x |
+
+An even better structure of the Jacobian can be obtained by propagating
+sparsity through the callback functions. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getAugmented "
+
+Generate a augmented DAE system with nfwd forward sensitivities and nadj
+adjoint sensitivities. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getAugmentedGen "
+
+Generate a augmented DAE system with nfwd forward sensitivities and nadj
+adjoint sensitivities (generic) ";
+
 %feature("docstring")  CasADi::AcadoIntegratorInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -1115,15 +1167,6 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::AcadoIntegratorInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
-
-%feature("docstring")  CasADi::AcadoIntegratorInternal::spEvaluate "
-
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward. ";
-
-%feature("docstring")  CasADi::AcadoIntegratorInternal::spCanEvaluate "
-
-Is the class able to propate seeds through the algorithm? ";
 
 %feature("docstring")  CasADi::AcadoIntegratorInternal::spInit "
 
@@ -1149,11 +1192,6 @@ Evaluate symbolically, MX type (overloaded) ";
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives (cached) ";
-
-%feature("docstring")  CasADi::AcadoIntegratorInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
 
 %feature("docstring")  CasADi::AcadoIntegratorInternal::jacobian_new "
 
@@ -5802,20 +5840,39 @@ Print solver statistics. ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::reset "
 
-Reset the solver and bring the time back to t0 and state back to
-INTEGRATOR_X0. ";
+Reset the forward problem Time will be set to t0 and state to
+input(INTEGRATOR_X0)
+
+Parameters:
+-----------
+
+nsens:  Number of sensitivities to be propagated along with the integration
+forward in time
+
+nsensB:  Number of sensitivities to be propagated along with the integration
+backward in time
+
+nsensB_store:  Number of sensitivities to be propagated along with the
+integration backward in time that depend on sensitivities propagated along
+with the integration forward in time ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::integrate "
 
-Integrate until a specified time point. ";
+Integrate forward until a specified time point. ";
 
-%feature("docstring")  CasADi::CollocationIntegrator::resetAdj "
+%feature("docstring")  CasADi::CollocationIntegrator::resetB "
 
-Reset the solver of the adjoint problem and take time to tf. ";
+Reset the backward problem Time will be set to tf and backward state to
+input(INTEGRATOR_RX0) ";
 
-%feature("docstring")  CasADi::CollocationIntegrator::integrateAdj "
+%feature("docstring")  CasADi::CollocationIntegrator::integrateB "
 
-Integrate backwards in time until a specified time point. ";
+Integrate backward until a specified time point. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::getAugmented "
+
+Generate a augmented DAE system with nfwd forward sensitivities and nadj
+adjoint sensitivities. ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::getDAE "
 
@@ -6462,22 +6519,17 @@ integration) ";
 
 %feature("docstring")  CasADi::CollocationIntegratorInternal::reset "
 
-Reset the solver and bring the time back to t0. ";
+Reset the forward problem and bring the time back to t0. ";
 
-%feature("docstring")  CasADi::CollocationIntegratorInternal::resetAdj "
+%feature("docstring")  CasADi::CollocationIntegratorInternal::resetB "
 
-Reset the solver of the adjoint problem and take time to tf. ";
-
-%feature("docstring")  CasADi::CollocationIntegratorInternal::evaluate "
-
-Overload this method, since the number of derivative directions currently
-aren't passed. ";
+Reset the backward problem and take time to tf. ";
 
 %feature("docstring")  CasADi::CollocationIntegratorInternal::integrate "
 
 Integrate until a specified time point. ";
 
-%feature("docstring")  CasADi::CollocationIntegratorInternal::integrateAdj "
+%feature("docstring")  CasADi::CollocationIntegratorInternal::integrateB "
 
 Integrate backwards in time until a specified time point. ";
 
@@ -6502,6 +6554,46 @@ Print statistics. ";
 %feature("docstring")  CasADi::CollocationIntegratorInternal::setStopTime "
 
 Set the stop time of the forward integration. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::evaluate "
+
+evaluate ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward.
+
+This is a bit better than the FXInternal implementation: XF and QF never
+depend on RX0 and RP, i.e. the worst- case structure of the Jacobian is:x0 p
+rx0 rp
+
+xf | x x | qf | x x | rxf | x x x x |rqf | x x x x |
+
+An even better structure of the Jacobian can be obtained by propagating
+sparsity through the callback functions. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::spCanEvaluate
+"
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::getDerivative
+"
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::getAugmented "
+
+Generate a augmented DAE system with nfwd forward sensitivities and nadj
+adjoint sensitivities. ";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::getAugmentedGen "
+
+Generate a augmented DAE system with nfwd forward sensitivities and nadj
+adjoint sensitivities (generic) ";
 
 %feature("docstring")  CasADi::CollocationIntegratorInternal::updateNumSens
 "
@@ -6528,16 +6620,6 @@ Numeric Jacobian. ";
 
 Hessian of output oind with respect to input iind. ";
 
-%feature("docstring")  CasADi::CollocationIntegratorInternal::spEvaluate "
-
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward. ";
-
-%feature("docstring")  CasADi::CollocationIntegratorInternal::spCanEvaluate
-"
-
-Is the class able to propate seeds through the algorithm? ";
-
 %feature("docstring")  CasADi::CollocationIntegratorInternal::spInit "
 
 Reset the sparsity propagation. ";
@@ -6562,12 +6644,6 @@ Evaluate symbolically, MX type (overloaded) ";
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives (cached) ";
-
-%feature("docstring")  CasADi::CollocationIntegratorInternal::getDerivative
-"
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
 
 %feature("docstring")  CasADi::CollocationIntegratorInternal::jacobian_new "
 
@@ -13350,20 +13426,39 @@ Print solver statistics. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::reset "
 
-Reset the solver and bring the time back to t0 and state back to
-INTEGRATOR_X0. ";
+Reset the forward problem Time will be set to t0 and state to
+input(INTEGRATOR_X0)
+
+Parameters:
+-----------
+
+nsens:  Number of sensitivities to be propagated along with the integration
+forward in time
+
+nsensB:  Number of sensitivities to be propagated along with the integration
+backward in time
+
+nsensB_store:  Number of sensitivities to be propagated along with the
+integration backward in time that depend on sensitivities propagated along
+with the integration forward in time ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::integrate "
 
-Integrate until a specified time point. ";
+Integrate forward until a specified time point. ";
 
-%feature("docstring")  CasADi::Sundials::CVodesIntegrator::resetAdj "
+%feature("docstring")  CasADi::Sundials::CVodesIntegrator::resetB "
 
-Reset the solver of the adjoint problem and take time to tf. ";
+Reset the backward problem Time will be set to tf and backward state to
+input(INTEGRATOR_RX0) ";
 
-%feature("docstring")  CasADi::Sundials::CVodesIntegrator::integrateAdj "
+%feature("docstring")  CasADi::Sundials::CVodesIntegrator::integrateB "
 
-Integrate backwards in time until a specified time point. ";
+Integrate backward until a specified time point. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesIntegrator::getAugmented "
+
+Generate a augmented DAE system with nfwd forward sensitivities and nadj
+adjoint sensitivities. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesIntegrator::getDAE "
 
@@ -14199,19 +14294,19 @@ integration) ";
 
 %feature("docstring")  CasADi::Sundials::CVodesInternal::reset "
 
-Reset the solver and bring the time back to t0. ";
+Reset the forward problem and bring the time back to t0. ";
 
-%feature("docstring")  CasADi::Sundials::CVodesInternal::resetAdj "
+%feature("docstring")  CasADi::Sundials::CVodesInternal::resetB "
 
-Reset the solver of the adjoint problem and take time to tf. ";
+Reset the backward problem and take time to tf. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesInternal::integrate "
 
-Integrate until a specified time point. ";
+Integrate forward until a specified time point. ";
 
-%feature("docstring")  CasADi::Sundials::CVodesInternal::integrateAdj "
+%feature("docstring")  CasADi::Sundials::CVodesInternal::integrateB "
 
-Integrate backwards in time until a specified time point. ";
+Integrate backward until a specified time point. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesInternal::setStopTime "
 
@@ -14256,6 +14351,39 @@ Set final time (to be removed) ";
 
 evaluate ";
 
+%feature("docstring")  CasADi::Sundials::CVodesInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward.
+
+This is a bit better than the FXInternal implementation: XF and QF never
+depend on RX0 and RP, i.e. the worst- case structure of the Jacobian is:x0 p
+rx0 rp
+
+xf | x x | qf | x x | rxf | x x x x |rqf | x x x x |
+
+An even better structure of the Jacobian can be obtained by propagating
+sparsity through the callback functions. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::getAugmented "
+
+Generate a augmented DAE system with nfwd forward sensitivities and nadj
+adjoint sensitivities. ";
+
+%feature("docstring")  CasADi::Sundials::CVodesInternal::getAugmentedGen "
+
+Generate a augmented DAE system with nfwd forward sensitivities and nadj
+adjoint sensitivities (generic) ";
+
 %feature("docstring")  CasADi::Sundials::CVodesInternal::jacobian_switch "
 
 Switch between numeric and symbolic jacobian. ";
@@ -14267,15 +14395,6 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::Sundials::CVodesInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
-
-%feature("docstring")  CasADi::Sundials::CVodesInternal::spEvaluate "
-
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward. ";
-
-%feature("docstring")  CasADi::Sundials::CVodesInternal::spCanEvaluate "
-
-Is the class able to propate seeds through the algorithm? ";
 
 %feature("docstring")  CasADi::Sundials::CVodesInternal::spInit "
 
@@ -14301,11 +14420,6 @@ Evaluate symbolically, MX type (overloaded) ";
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives (cached) ";
-
-%feature("docstring")  CasADi::Sundials::CVodesInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
 
 %feature("docstring")  CasADi::Sundials::CVodesInternal::jacobian_new "
 
@@ -18848,20 +18962,39 @@ Print solver statistics. ";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::reset "
 
-Reset the solver and bring the time back to t0 and state back to
-INTEGRATOR_X0. ";
+Reset the forward problem Time will be set to t0 and state to
+input(INTEGRATOR_X0)
+
+Parameters:
+-----------
+
+nsens:  Number of sensitivities to be propagated along with the integration
+forward in time
+
+nsensB:  Number of sensitivities to be propagated along with the integration
+backward in time
+
+nsensB_store:  Number of sensitivities to be propagated along with the
+integration backward in time that depend on sensitivities propagated along
+with the integration forward in time ";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::integrate "
 
-Integrate until a specified time point. ";
+Integrate forward until a specified time point. ";
 
-%feature("docstring")  CasADi::Sundials::IdasIntegrator::resetAdj "
+%feature("docstring")  CasADi::Sundials::IdasIntegrator::resetB "
 
-Reset the solver of the adjoint problem and take time to tf. ";
+Reset the backward problem Time will be set to tf and backward state to
+input(INTEGRATOR_RX0) ";
 
-%feature("docstring")  CasADi::Sundials::IdasIntegrator::integrateAdj "
+%feature("docstring")  CasADi::Sundials::IdasIntegrator::integrateB "
 
-Integrate backwards in time until a specified time point. ";
+Integrate backward until a specified time point. ";
+
+%feature("docstring")  CasADi::Sundials::IdasIntegrator::getAugmented "
+
+Generate a augmented DAE system with nfwd forward sensitivities and nadj
+adjoint sensitivities. ";
 
 %feature("docstring")  CasADi::Sundials::IdasIntegrator::getDAE "
 
@@ -19774,19 +19907,19 @@ integration) ";
 
 %feature("docstring")  CasADi::Sundials::IdasInternal::reset "
 
-Reset the solver and bring the time back to t0. ";
+Reset the forward problem and bring the time back to t0. ";
 
-%feature("docstring")  CasADi::Sundials::IdasInternal::resetAdj "
+%feature("docstring")  CasADi::Sundials::IdasInternal::resetB "
 
-Reset the solver of the adjoint problem and take time to tf. ";
+Reset the backward problem and take time to tf. ";
 
 %feature("docstring")  CasADi::Sundials::IdasInternal::integrate "
 
-Integrate until a specified time point. ";
+Integrate forward until a specified time point. ";
 
-%feature("docstring")  CasADi::Sundials::IdasInternal::integrateAdj "
+%feature("docstring")  CasADi::Sundials::IdasInternal::integrateB "
 
-Integrate backwards in time until a specified time point. ";
+Integrate backward until a specified time point. ";
 
 %feature("docstring")  CasADi::Sundials::IdasInternal::setStopTime "
 
@@ -19809,8 +19942,29 @@ CasADi::Sundials::IdasInternal::correctInitialConditions "
 
 Correct the initial conditions, i.e. calculate. ";
 
+%feature("docstring")  CasADi::Sundials::IdasInternal::initDenseLinearSolver
+"";
+
+%feature("docstring")
+CasADi::Sundials::IdasInternal::initBandedLinearSolver "";
+
+%feature("docstring")
+CasADi::Sundials::IdasInternal::initIterativeLinearSolver "";
+
 %feature("docstring")
 CasADi::Sundials::IdasInternal::initUserDefinedLinearSolver "";
+
+%feature("docstring")
+CasADi::Sundials::IdasInternal::initDenseLinearSolverB "";
+
+%feature("docstring")
+CasADi::Sundials::IdasInternal::initBandedLinearSolverB "";
+
+%feature("docstring")
+CasADi::Sundials::IdasInternal::initIterativeLinearSolverB "";
+
+%feature("docstring")
+CasADi::Sundials::IdasInternal::initUserDefinedLinearSolverB "";
 
 %feature("docstring")  CasADi::Sundials::IdasInternal::setLinearSolver "
 
@@ -19846,6 +20000,39 @@ Set final time (to be removed) ";
 
 evaluate ";
 
+%feature("docstring")  CasADi::Sundials::IdasInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward.
+
+This is a bit better than the FXInternal implementation: XF and QF never
+depend on RX0 and RP, i.e. the worst- case structure of the Jacobian is:x0 p
+rx0 rp
+
+xf | x x | qf | x x | rxf | x x x x |rqf | x x x x |
+
+An even better structure of the Jacobian can be obtained by propagating
+sparsity through the callback functions. ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::getAugmented "
+
+Generate a augmented DAE system with nfwd forward sensitivities and nadj
+adjoint sensitivities. ";
+
+%feature("docstring")  CasADi::Sundials::IdasInternal::getAugmentedGen "
+
+Generate a augmented DAE system with nfwd forward sensitivities and nadj
+adjoint sensitivities (generic) ";
+
 %feature("docstring")  CasADi::Sundials::IdasInternal::jacobian_switch "
 
 Switch between numeric and symbolic jacobian. ";
@@ -19857,15 +20044,6 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::Sundials::IdasInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
-
-%feature("docstring")  CasADi::Sundials::IdasInternal::spEvaluate "
-
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward. ";
-
-%feature("docstring")  CasADi::Sundials::IdasInternal::spCanEvaluate "
-
-Is the class able to propate seeds through the algorithm? ";
 
 %feature("docstring")  CasADi::Sundials::IdasInternal::spInit "
 
@@ -19891,11 +20069,6 @@ Evaluate symbolically, MX type (overloaded) ";
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives (cached) ";
-
-%feature("docstring")  CasADi::Sundials::IdasInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
 
 %feature("docstring")  CasADi::Sundials::IdasInternal::jacobian_new "
 
@@ -21786,13 +21959,13 @@ integration from t=t0 to t=tf        0 = fx(x,z,p,t,der(x)) Forward ODE
 0 = fz(x,z,p,t)                  Forward algebraic equations   der(q) =
 fq(x,z,p,t)                  Forward quadratures Terminal conditions at t=tf
 rx(tf)  = rx0   rq(tf)  = 0  Backward integration from t=tf to t=t0
-0 = gx(rx,rz,x,z,p,t,der(rx)) Backward ODE         0 = gz(rx,rz,x,z,p,t)
-Backward algebraic equations   der(rq) = gq(rx,rz,x,z,p,t)
-Backward quadratures  where we assume that both the forward and backwards
-integrations are index-1 (i.e. dfx/dxdot, dfz/dz, dgz/drz, dgx/drxdot are
-invertible) and furthermore that  gx, gz and gq have a linear dependency on
-rx and rz and that f_x and g_x have a  linear dependence on xdot and rxdot
-respectively.
+0 = gx(rx,rz,rp,x,z,p,t,der(rx)) Backward ODE         0 =
+gz(rx,rz,rp,x,z,p,t)           Backward algebraic equations   der(rq) =
+gq(rx,rz,rp,x,z,p,t) Backward quadratures  where we assume that both the
+forward and backwards integrations are index-1 (i.e. dfx/dxdot, dfz/dz,
+dgz/drz, dgx/drxdot are invertible) and furthermore that  gx, gz and gq have
+a linear dependency on rx, rz and rp and that f_x and g_x have a  linear
+dependence on xdot and rxdot respectively.
 
 The Integrator class provides some additional functionality, such as getting
 the value of the state and/or sensitivities at certain time points. Controls
@@ -22108,24 +22281,43 @@ Print solver statistics. ";
 
 %feature("docstring")  CasADi::Integrator::reset "
 
-Reset the solver and bring the time back to t0 and state back to
-INTEGRATOR_X0. ";
+Reset the forward problem Time will be set to t0 and state to
+input(INTEGRATOR_X0)
+
+Parameters:
+-----------
+
+nsens:  Number of sensitivities to be propagated along with the integration
+forward in time
+
+nsensB:  Number of sensitivities to be propagated along with the integration
+backward in time
+
+nsensB_store:  Number of sensitivities to be propagated along with the
+integration backward in time that depend on sensitivities propagated along
+with the integration forward in time ";
 
 %feature("docstring")  CasADi::Integrator::integrate "
 
-Integrate until a specified time point. ";
+Integrate forward until a specified time point. ";
 
-%feature("docstring")  CasADi::Integrator::resetAdj "
+%feature("docstring")  CasADi::Integrator::resetB "
 
-Reset the solver of the adjoint problem and take time to tf. ";
+Reset the backward problem Time will be set to tf and backward state to
+input(INTEGRATOR_RX0) ";
 
-%feature("docstring")  CasADi::Integrator::integrateAdj "
+%feature("docstring")  CasADi::Integrator::integrateB "
 
-Integrate backwards in time until a specified time point. ";
+Integrate backward until a specified time point. ";
 
 %feature("docstring")  CasADi::Integrator::checkNode "
 
 Check if the node is pointing to the right type of object. ";
+
+%feature("docstring")  CasADi::Integrator::getAugmented "
+
+Generate a augmented DAE system with nfwd forward sensitivities and nadj
+adjoint sensitivities. ";
 
 %feature("docstring")  CasADi::Integrator::getDAE "
 
@@ -22508,13 +22700,13 @@ integration from t=t0 to t=tf        0 = fx(x,z,p,t,der(x)) Forward ODE
 0 = fz(x,z,p,t)                  Forward algebraic equations   der(q) =
 fq(x,z,p,t)                  Forward quadratures Terminal conditions at t=tf
 rx(tf)  = rx0   rq(tf)  = 0  Backward integration from t=tf to t=t0
-0 = gx(rx,rz,x,z,p,t,der(rx)) Backward ODE         0 = gz(rx,rz,x,z,p,t)
-Backward algebraic equations   der(rq) = gq(rx,rz,x,z,p,t)
-Backward quadratures  where we assume that both the forward and backwards
-integrations are index-1 (i.e. dfx/dxdot, dfz/dz, dgz/drz, dgx/drxdot are
-invertible) and furthermore that  gx, gz and gq have a linear dependency on
-rx and rz and that f_x and g_x have a  linear dependence on xdot and rxdot
-respectively.
+0 = gx(rx,rz,rp,x,z,p,t,der(rx)) Backward ODE         0 =
+gz(rx,rz,rp,x,z,p,t)           Backward algebraic equations   der(rq) =
+gq(rx,rz,rp,x,z,p,t) Backward quadratures  where we assume that both the
+forward and backwards integrations are index-1 (i.e. dfx/dxdot, dfz/dz,
+dgz/drz, dgx/drxdot are invertible) and furthermore that  gx, gz and gq have
+a linear dependency on rx, rz and rp and that f_x and g_x have a  linear
+dependence on xdot and rxdot respectively.
 
 Joel Andersson
 
@@ -22725,19 +22917,19 @@ Print solver statistics. ";
 
 %feature("docstring")  CasADi::IntegratorInternal::reset "
 
-Reset the solver and bring the time back to t0. ";
+Reset the forward problem and bring the time back to t0. ";
 
-%feature("docstring")  CasADi::IntegratorInternal::resetAdj "
+%feature("docstring")  CasADi::IntegratorInternal::resetB "
 
-Reset the solver of the adjoint problem and take time to tf. ";
+Reset the backward problem and take time to tf. ";
 
 %feature("docstring")  CasADi::IntegratorInternal::integrate "
 
-Integrate until a specified time point. ";
+Integrate forward until a specified time point. ";
 
-%feature("docstring")  CasADi::IntegratorInternal::integrateAdj "
+%feature("docstring")  CasADi::IntegratorInternal::integrateB "
 
-Integrate backwards in time until a specified time point. ";
+Integrate backward until a specified time point. ";
 
 %feature("docstring")  CasADi::IntegratorInternal::evaluate "
 
@@ -22746,6 +22938,39 @@ evaluate ";
 %feature("docstring")  CasADi::IntegratorInternal::init "
 
 Initialize. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward.
+
+This is a bit better than the FXInternal implementation: XF and QF never
+depend on RX0 and RP, i.e. the worst- case structure of the Jacobian is:x0 p
+rx0 rp
+
+xf | x x | qf | x x | rxf | x x x x |rqf | x x x x |
+
+An even better structure of the Jacobian can be obtained by propagating
+sparsity through the callback functions. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::IntegratorInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::getAugmented "
+
+Generate a augmented DAE system with nfwd forward sensitivities and nadj
+adjoint sensitivities. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::getAugmentedGen "
+
+Generate a augmented DAE system with nfwd forward sensitivities and nadj
+adjoint sensitivities (generic) ";
 
 %feature("docstring")  CasADi::IntegratorInternal::updateNumSens "
 
@@ -22768,15 +22993,6 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::IntegratorInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
-
-%feature("docstring")  CasADi::IntegratorInternal::spEvaluate "
-
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward. ";
-
-%feature("docstring")  CasADi::IntegratorInternal::spCanEvaluate "
-
-Is the class able to propate seeds through the algorithm? ";
 
 %feature("docstring")  CasADi::IntegratorInternal::spInit "
 
@@ -22802,11 +23018,6 @@ Evaluate symbolically, MX type (overloaded) ";
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives (cached) ";
-
-%feature("docstring")  CasADi::IntegratorInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
 
 %feature("docstring")  CasADi::IntegratorInternal::jacobian_new "
 
@@ -44749,6 +44960,14 @@ Check if the object has been initialized. ";
 Assert that the object has been initialized. ";
 
 
+// File: structCasADi_1_1Sundials_1_1SundialsInternal_1_1LinSolDataDense.xml
+%feature("docstring") CasADi::Sundials::SundialsInternal::LinSolDataDense "
+
+Linear solver data (dense)
+
+C++ includes: sundials_internal.hpp ";
+
+
 // File: classCasADi_1_1Mapping.xml
 %feature("docstring") CasADi::Mapping "
 
@@ -45524,6 +45743,14 @@ Access the non-zero elements. ";
 %feature("docstring")  CasADi::Matrix::data "
 
 Const access the non-zero elements. ";
+
+%feature("docstring")  CasADi::Matrix::ptr "
+
+Get a pointer to the data. ";
+
+%feature("docstring")  CasADi::Matrix::ptr "
+
+Get a const pointer to the data. ";
 
 %feature("docstring")  CasADi::Matrix::sparsity "
 
@@ -49267,19 +49494,35 @@ Multiple input, multiple output. ";
 
 %feature("docstring")  CasADi::MXFunction::inputMX "
 
-get function input argument ";
+get function input argument (to be deprecated) ";
 
 %feature("docstring")  CasADi::MXFunction::outputMX "
 
-get function output argument ";
+get function output argument (to be deprecated) ";
 
 %feature("docstring")  CasADi::MXFunction::inputsMX "
 
-get function inputs argument ";
+get function inputs argument (to be deprecated) ";
 
 %feature("docstring")  CasADi::MXFunction::outputsMX "
 
-get function outputs argument ";
+get function outputs argument (to be deprecated) ";
+
+%feature("docstring")  CasADi::MXFunction::inputExpr "
+
+get function input ";
+
+%feature("docstring")  CasADi::MXFunction::outputExpr "
+
+get function output ";
+
+%feature("docstring")  CasADi::MXFunction::inputExpr "
+
+get function inputs ";
+
+%feature("docstring")  CasADi::MXFunction::outputExpr "
+
+get function outputs ";
 
 %feature("docstring")  CasADi::MXFunction::algorithm "
 
@@ -57688,6 +57931,29 @@ Evaluate the all the tasks. ";
 
 Evaluate a single task. ";
 
+%feature("docstring")  CasADi::ParallelizerInternal::spInit "
+
+Reset the sparsity propagation. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::spEvaluateTask "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward, one task only. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
+
 %feature("docstring")  CasADi::ParallelizerInternal::jacobian "
 
 Calculate the jacobian of a number of function outputs with respect to a
@@ -57722,19 +57988,6 @@ Numeric Jacobian. ";
 
 Hessian of output oind with respect to input iind. ";
 
-%feature("docstring")  CasADi::ParallelizerInternal::spEvaluate "
-
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward. ";
-
-%feature("docstring")  CasADi::ParallelizerInternal::spCanEvaluate "
-
-Is the class able to propate seeds through the algorithm? ";
-
-%feature("docstring")  CasADi::ParallelizerInternal::spInit "
-
-Reset the sparsity propagation. ";
-
 %feature("docstring")  CasADi::ParallelizerInternal::evalSX "
 
 Evaluate symbolically, SX type. ";
@@ -57755,11 +58008,6 @@ Evaluate symbolically, MX type (overloaded) ";
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives (cached) ";
-
-%feature("docstring")  CasADi::ParallelizerInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
 
 %feature("docstring")  CasADi::ParallelizerInternal::jacobian_new "
 
@@ -61086,20 +61334,39 @@ Print solver statistics. ";
 
 %feature("docstring")  CasADi::RKIntegrator::reset "
 
-Reset the solver and bring the time back to t0 and state back to
-INTEGRATOR_X0. ";
+Reset the forward problem Time will be set to t0 and state to
+input(INTEGRATOR_X0)
+
+Parameters:
+-----------
+
+nsens:  Number of sensitivities to be propagated along with the integration
+forward in time
+
+nsensB:  Number of sensitivities to be propagated along with the integration
+backward in time
+
+nsensB_store:  Number of sensitivities to be propagated along with the
+integration backward in time that depend on sensitivities propagated along
+with the integration forward in time ";
 
 %feature("docstring")  CasADi::RKIntegrator::integrate "
 
-Integrate until a specified time point. ";
+Integrate forward until a specified time point. ";
 
-%feature("docstring")  CasADi::RKIntegrator::resetAdj "
+%feature("docstring")  CasADi::RKIntegrator::resetB "
 
-Reset the solver of the adjoint problem and take time to tf. ";
+Reset the backward problem Time will be set to tf and backward state to
+input(INTEGRATOR_RX0) ";
 
-%feature("docstring")  CasADi::RKIntegrator::integrateAdj "
+%feature("docstring")  CasADi::RKIntegrator::integrateB "
 
-Integrate backwards in time until a specified time point. ";
+Integrate backward until a specified time point. ";
+
+%feature("docstring")  CasADi::RKIntegrator::getAugmented "
+
+Generate a augmented DAE system with nfwd forward sensitivities and nadj
+adjoint sensitivities. ";
 
 %feature("docstring")  CasADi::RKIntegrator::getDAE "
 
@@ -61695,11 +61962,11 @@ integration) ";
 
 %feature("docstring")  CasADi::RKIntegratorInternal::reset "
 
-Reset the solver and bring the time back to t0. ";
+Reset the forward problem and bring the time back to t0. ";
 
-%feature("docstring")  CasADi::RKIntegratorInternal::resetAdj "
+%feature("docstring")  CasADi::RKIntegratorInternal::resetB "
 
-Reset the solver of the adjoint problem and take time to tf. ";
+Reset the backward problem and take time to tf. ";
 
 %feature("docstring")  CasADi::RKIntegratorInternal::evaluate "
 
@@ -61710,9 +61977,9 @@ aren't passed. ";
 
 Integrate until a specified time point. ";
 
-%feature("docstring")  CasADi::RKIntegratorInternal::integrateAdj "
+%feature("docstring")  CasADi::RKIntegratorInternal::integrateB "
 
-Integrate backwards in time until a specified time point. ";
+Integrate backward in time until a specified time point. ";
 
 %feature("docstring")  CasADi::RKIntegratorInternal::getJacobian "
 
@@ -61742,6 +62009,39 @@ Jacobian of the integrator. ";
 
 Generate the sparsity of a Jacobian block. ";
 
+%feature("docstring")  CasADi::RKIntegratorInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward.
+
+This is a bit better than the FXInternal implementation: XF and QF never
+depend on RX0 and RP, i.e. the worst- case structure of the Jacobian is:x0 p
+rx0 rp
+
+xf | x x | qf | x x | rxf | x x x x |rqf | x x x x |
+
+An even better structure of the Jacobian can be obtained by propagating
+sparsity through the callback functions. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getAugmented "
+
+Generate a augmented DAE system with nfwd forward sensitivities and nadj
+adjoint sensitivities. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getAugmentedGen "
+
+Generate a augmented DAE system with nfwd forward sensitivities and nadj
+adjoint sensitivities (generic) ";
+
 %feature("docstring")  CasADi::RKIntegratorInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -61758,15 +62058,6 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::RKIntegratorInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
-
-%feature("docstring")  CasADi::RKIntegratorInternal::spEvaluate "
-
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward. ";
-
-%feature("docstring")  CasADi::RKIntegratorInternal::spCanEvaluate "
-
-Is the class able to propate seeds through the algorithm? ";
 
 %feature("docstring")  CasADi::RKIntegratorInternal::spInit "
 
@@ -61792,11 +62083,6 @@ Evaluate symbolically, MX type (overloaded) ";
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives (cached) ";
-
-%feature("docstring")  CasADi::RKIntegratorInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
 
 %feature("docstring")  CasADi::RKIntegratorInternal::jacobian_new "
 
@@ -66155,20 +66441,39 @@ Print solver statistics. ";
 
 %feature("docstring")  CasADi::Sundials::SundialsIntegrator::reset "
 
-Reset the solver and bring the time back to t0 and state back to
-INTEGRATOR_X0. ";
+Reset the forward problem Time will be set to t0 and state to
+input(INTEGRATOR_X0)
+
+Parameters:
+-----------
+
+nsens:  Number of sensitivities to be propagated along with the integration
+forward in time
+
+nsensB:  Number of sensitivities to be propagated along with the integration
+backward in time
+
+nsensB_store:  Number of sensitivities to be propagated along with the
+integration backward in time that depend on sensitivities propagated along
+with the integration forward in time ";
 
 %feature("docstring")  CasADi::Sundials::SundialsIntegrator::integrate "
 
-Integrate until a specified time point. ";
+Integrate forward until a specified time point. ";
 
-%feature("docstring")  CasADi::Sundials::SundialsIntegrator::resetAdj "
+%feature("docstring")  CasADi::Sundials::SundialsIntegrator::resetB "
 
-Reset the solver of the adjoint problem and take time to tf. ";
+Reset the backward problem Time will be set to tf and backward state to
+input(INTEGRATOR_RX0) ";
 
-%feature("docstring")  CasADi::Sundials::SundialsIntegrator::integrateAdj "
+%feature("docstring")  CasADi::Sundials::SundialsIntegrator::integrateB "
 
-Integrate backwards in time until a specified time point. ";
+Integrate backward until a specified time point. ";
+
+%feature("docstring")  CasADi::Sundials::SundialsIntegrator::getAugmented "
+
+Generate a augmented DAE system with nfwd forward sensitivities and nadj
+adjoint sensitivities. ";
 
 %feature("docstring")  CasADi::Sundials::SundialsIntegrator::getDAE "
 
@@ -66937,6 +67242,10 @@ Destructor. ";
 
 Initialize. ";
 
+%feature("docstring")  CasADi::Sundials::SundialsInternal::reset "
+
+Reset the forward problem and bring the time back to t0. ";
+
 %feature("docstring")  CasADi::Sundials::SundialsInternal::deepCopyMembers "
 
 Deep copy data members. ";
@@ -66991,25 +67300,54 @@ Set linear solver. ";
 
 Print solver statistics. ";
 
-%feature("docstring")  CasADi::Sundials::SundialsInternal::reset "
+%feature("docstring")  CasADi::Sundials::SundialsInternal::resetB "
 
-Reset the solver and bring the time back to t0. ";
-
-%feature("docstring")  CasADi::Sundials::SundialsInternal::resetAdj "
-
-Reset the solver of the adjoint problem and take time to tf. ";
+Reset the backward problem and take time to tf. ";
 
 %feature("docstring")  CasADi::Sundials::SundialsInternal::integrate "
 
-Integrate until a specified time point. ";
+Integrate forward until a specified time point. ";
 
-%feature("docstring")  CasADi::Sundials::SundialsInternal::integrateAdj "
+%feature("docstring")  CasADi::Sundials::SundialsInternal::integrateB "
 
-Integrate backwards in time until a specified time point. ";
+Integrate backward until a specified time point. ";
 
 %feature("docstring")  CasADi::Sundials::SundialsInternal::evaluate "
 
 evaluate ";
+
+%feature("docstring")  CasADi::Sundials::SundialsInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward.
+
+This is a bit better than the FXInternal implementation: XF and QF never
+depend on RX0 and RP, i.e. the worst- case structure of the Jacobian is:x0 p
+rx0 rp
+
+xf | x x | qf | x x | rxf | x x x x |rqf | x x x x |
+
+An even better structure of the Jacobian can be obtained by propagating
+sparsity through the callback functions. ";
+
+%feature("docstring")  CasADi::Sundials::SundialsInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::Sundials::SundialsInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
+
+%feature("docstring")  CasADi::Sundials::SundialsInternal::getAugmented "
+
+Generate a augmented DAE system with nfwd forward sensitivities and nadj
+adjoint sensitivities. ";
+
+%feature("docstring")  CasADi::Sundials::SundialsInternal::getAugmentedGen "
+
+Generate a augmented DAE system with nfwd forward sensitivities and nadj
+adjoint sensitivities (generic) ";
 
 %feature("docstring")  CasADi::Sundials::SundialsInternal::updateNumSens "
 
@@ -67028,15 +67366,6 @@ Numeric Jacobian. ";
 %feature("docstring")  CasADi::Sundials::SundialsInternal::hessian "
 
 Hessian of output oind with respect to input iind. ";
-
-%feature("docstring")  CasADi::Sundials::SundialsInternal::spEvaluate "
-
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward. ";
-
-%feature("docstring")  CasADi::Sundials::SundialsInternal::spCanEvaluate "
-
-Is the class able to propate seeds through the algorithm? ";
 
 %feature("docstring")  CasADi::Sundials::SundialsInternal::spInit "
 
@@ -67062,11 +67391,6 @@ Evaluate symbolically, MX type (overloaded) ";
 
 Get a function that calculates nfwd forward derivatives and nadj adjoint
 derivatives (cached) ";
-
-%feature("docstring")  CasADi::Sundials::SundialsInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
 
 %feature("docstring")  CasADi::Sundials::SundialsInternal::jacobian_new "
 
@@ -67973,17 +68297,33 @@ Check if the node is pointing to the right type of object. ";
 
 %feature("docstring")  CasADi::SXFunction::inputSX "
 
-get function input ";
+get function input (to be deprecated) ";
 
 %feature("docstring")  CasADi::SXFunction::outputSX "
 
-get function output ";
+get function output (to be deprecated) ";
 
 %feature("docstring")  CasADi::SXFunction::inputsSX "
 
-get function inputs ";
+get function inputs (to be deprecated) ";
 
 %feature("docstring")  CasADi::SXFunction::outputsSX "
+
+get function outputs (to be deprecated) ";
+
+%feature("docstring")  CasADi::SXFunction::inputExpr "
+
+get function input ";
+
+%feature("docstring")  CasADi::SXFunction::outputExpr "
+
+get function output ";
+
+%feature("docstring")  CasADi::SXFunction::inputExpr "
+
+get function inputs ";
+
+%feature("docstring")  CasADi::SXFunction::outputExpr "
 
 get function outputs ";
 
@@ -74895,8 +75235,6 @@ is put in a matrix
 If your fx is really multiple output, and you wish to use a particular
 output, use the slice operator on the fx. ";
 
-%feature("docstring")  CasADi::Interfaces::getptr "";
-
 %feature("docstring")  CasADi::Interfaces::__nonzero__ "";
 
 %feature("docstring")  CasADi::Interfaces::linspace "
@@ -75559,6 +75897,10 @@ Null pointer if not pointing towards the right type of object ";
 
 Typecast a shared object to a base class to a shared object to a derived
 class, cf. dynamic_cast (const) ";
+
+%feature("docstring")  CasADi::Interfaces::is_a "
+
+Check if a shared object is of a certain type. ";
 
 %feature("docstring")  CasADi::Interfaces::range "
 
