@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 2.0)
 
 include_directories(../)
-find_package(OOQP REQUIRED QUIET)
 include_directories(${OOQP_INCLUDE_DIRS})
 
 set(OOQP_INTERFACE_SRCS

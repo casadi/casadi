@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 2.0)
-find_package(ACADO REQUIRED)
 include_directories(${ACADO_INCLUDE_DIRS})
 
 set(ACADO_INTERFACE_SRCS

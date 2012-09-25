@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 2.0)
-find_package(KNITRO REQUIRED QUIET)
 include_directories(${KNITRO_INCLUDE_DIR})
 
 SET(KNITRO_INTERFACE_SRCS

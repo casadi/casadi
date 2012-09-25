@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 2.0)
-find_package(IPOPT REQUIRED QUIET)
 include_directories(${IPOPT_INCLUDE_DIRS})
 link_directories(${IPOPT_LIBRARY_DIRS})
 

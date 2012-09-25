@@ -1,14 +1,3 @@
-find_package(IPOPT QUIET)
-find_package(KNITRO QUIET)
-find_package(BLAS QUIET)
-find_package(LAPACK QUIET)
-find_package(OOQP QUIET)
-if(WITH_ACADO)
-find_package(ACADO QUIET)
-else(WITH_ACADO)
-set(FOUND_ACADO FALSE)
-endif(WITH_ACADO)
-
 if(IPOPT_FOUND)
 
   # Exaple 10.1 from Biegler

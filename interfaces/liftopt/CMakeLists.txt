@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 2.0)
-find_package(LIFTOPT REQUIRED QUIET)
 include_directories(${LIFTOPT_INCLUDE_DIRS})
 
 SET(LIFTOPT_INTERFACE_SRCS

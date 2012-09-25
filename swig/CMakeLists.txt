@@ -4,11 +4,10 @@ cmake_minimum_required (VERSION 2.0)
 #cmake_policy(SET CMP0003 NEW)
 #endif(COMMAND cmake_policy)
 
-SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake_modules)
-project(casadi_swig C CXX)
+find_package (PythonLibs)
+find_package (NUMPY)
 
-find_package (SWIG REQUIRED QUIET)
-find_package(MPI QUIET)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake_modules)
 if(MPI_FOUND)
    include_directories (${MPI_INCLUDE_PATH})
    set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} ${MPI_LIBRARY} ${MPI_EXTRA_LIBRARY})
@@ -16,15 +15,14 @@ endif(MPI_FOUND)
 
 set(CASADI_SWIG_FLAGS "")
 
-# Find SWIG and include the use swig file
+# Include the use swig file
 include (../cmake_modules/UseSWIGMOD.cmake)
 
-find_package (IPOPT QUIET)
 if(IPOPT_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_IPOPT")
-  IF(IPOPT_FOUND_EXTRA)
+  if(IPOPT_FOUND_EXTRA)
     set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_IPOPT_CALLBACK")
-  ENDIF(IPOPT_FOUND_EXTRA)
+  endif(IPOPT_FOUND_EXTRA)
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} ipopt_interface ${IPOPT_LIBRARIES})
 endif(IPOPT_FOUND)
 
@@ -33,10 +31,8 @@ if(WITH_SUNDIALS)
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} sundials_interface ${SUNDIALS_LIBRARIES})
 endif()
 
-if(WITH_ACADO)
-find_package (ACADO QUIET)
 if(ACADO_FOUND)
-    set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_ACADO")
+  set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_ACADO")
   if(ACADO_SHARED_LIBRARIES)
     set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} acado_interface qpoases_interface ${ACADO_SHARED_LIBRARIES})
   else(ACADO_SHARED_LIBRARIES)
@@ -44,88 +40,56 @@ if(ACADO_FOUND)
       set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} acado_interface qpoases_interface ${ACADO_LIBRARIES})
     endif(ACADO_LIBRARIES)
   endif(ACADO_SHARED_LIBRARIES)
-endif(ACADO_FOUND)
-endif(WITH_ACADO)
+endif()
 
 if(WITH_QPOASES)
-find_package (QPOASES QUIET)
-include_directories (${QPOASES_INCLUDE_DIR})
-if(QPOASES_FOUND)
-set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_QPOASES")
-set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} qpoases_interface ${QPOASES_LIBRARIES})
-endif(QPOASES_FOUND)
-endif(WITH_QPOASES)
-
-if(WITH_SUPERLU)
-find_package (BLAS QUIET)
-if(BLAS_FOUND)
-  set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_SUPERLU")
-  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} superlu_interface superlu)
-endif(BLAS_FOUND)
-endif(WITH_SUPERLU)
+  include_directories (${QPOASES_INCLUDE_DIR})
+  set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_QPOASES")
+  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} qpoases_interface ${QPOASES_LIBRARIES})
+endif()
 
 set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_CSPARSE")
 set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} csparse_interface csparse)
 
-find_package (LAPACK QUIET)
 if(LAPACK_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_LAPACK")
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} lapack_interface ${LAPACK_LIBRARIES})
-endif(LAPACK_FOUND)
+endif()
 
-find_package (KNITRO QUIET)
 if(KNITRO_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_KNITRO")
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} knitro_interface ${KNITRO_LIBRARIES})
-endif(KNITRO_FOUND)
+endif()
 
-find_package (CPLEX QUIET)
 if(CPLEX_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_CPLEX")
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} cplex_interface ${CPLEX_LIBRARIES})
-endif(CPLEX_FOUND)
+endif()
 
-find_package (LIFTOPT QUIET)
 if(LIFTOPT_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_LIFTOPT")
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} liftopt_interface ${LIFTOPT_LIBRARIES})
-endif(LIFTOPT_FOUND)
+endif()
 
-if(WITH_GSL)
-find_package (GSL QUIET)
-find_package (BLAS QUIET)
 if(GSL_FOUND)
-if(BLAS_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_GSL")
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} gsl_interface ${GSL_LIBRARIES})
-endif(BLAS_FOUND)
-endif(GSL_FOUND)
-endif(WITH_GSL)
+endif()
 
-if(WITH_OOQP)
-find_package (OOQP QUIET)
 if(OOQP_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_OOQP")
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} ooqp_interface ${OOQP_LIBRARIES})
-endif(OOQP_FOUND)
-endif(WITH_OOQP)
+endif()
 
-if(WITH_WORHP)
-find_package (WORHP QUIET)
 if(WORHP_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_WORHP")
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} worhp_interface ${WORHP_LIBRARIES})
-endif(WORHP_FOUND)
-endif(WITH_WORHP)
-
+endif()
 
 # enabling openmp support if requesed
-if(WITH_OPENMP)
-find_package (OpenMP)
 if(OPENMP_FOUND)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_OPENMP")
-endif(OPENMP_FOUND)
-endif(WITH_OPENMP)
+endif()
 
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../doc/doc.i)
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_DOXDOC")
@@ -134,22 +98,19 @@ endif()
 set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} ${CASADI_DEPENDENCIES})
 
 # Find python library and add include path for python headers
-find_package (PythonLibs)
+if(PYTHONLIBS_FOUND)
+  include_directories (${PYTHON_INCLUDE_PATH})
+endif()
 
-IF(PYTHONLIBS_FOUND)
-include_directories (${PYTHON_INCLUDE_PATH})
-ENDIF(PYTHONLIBS_FOUND)
-
-find_package (NUMPY)
 if(NUMPY_FOUND)
-include_directories (${CMAKE_CURRENT_SOURCE_DIR})
-include_directories (${NUMPY_INCLUDED_DIRS})
-set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_NUMPY")
-endif(NUMPY_FOUND)
+  include_directories (${CMAKE_CURRENT_SOURCE_DIR})
+  include_directories (${NUMPY_INCLUDED_DIRS})
+  set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_NUMPY")
+endif()
 
 if(WITH_PYTHON_INTERRUPTS)
-set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_PYTHON_INTERRUPTS")
-endif(WITH_PYTHON_INTERRUPTS)
+  set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_PYTHON_INTERRUPTS")
+endif()
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR}/..)
 link_directories (${CMAKE_CURRENT_SOURCE_DIR}/../build/lib)
@@ -160,8 +121,8 @@ set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-I${CMAKE_CURRENT_SOURCE_DIR}/swig_l
 # set(CMAKE_SWIG_FLAGS "-outdir ${PROJECT_BINARY_DIR}")
 # SEPARATE_ARGUMENTS(CMAKE_SWIG_FLAGS)
 
-# SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
-# SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR})
+# set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
+# set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
 # SEPARATE_ARGUMENTS(CASADI_SWIG_FLAGS)
 
@@ -200,40 +161,40 @@ SWIG_ADD_MODULE (casadi python casadi.i) #the target corresponding this module i
 endif(WITH_SWIG_SPLIT)
 
 # add_dependencies(_casadi casadi) #workaround to add dependencies of casadi to _casadi (SWIG_ADD_MODULE does not add dependencies from c++ source files)
-IF(NUMPY_FOUND)
+if(NUMPY_FOUND)
 cmake_policy(SET CMP0003 NEW)
-ENDIF(NUMPY_FOUND)
+endif(NUMPY_FOUND)
 
 if(WITH_SWIG_SPLIT)
-foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
-SWIG_LINK_LIBRARIES (${my_module} ${PYTHON_LIBRARIES}  ${SWIG_LINK_LIBRARIES_LIST} optimal_control tinyxml integration nonlinear_programming casadi )
-endforeach()
-else(WITH_SWIG_SPLIT)
-SWIG_LINK_LIBRARIES (casadi ${PYTHON_LIBRARIES}  ${SWIG_LINK_LIBRARIES_LIST} optimal_control tinyxml integration nonlinear_programming casadi )
-endif(WITH_SWIG_SPLIT)
+  foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+    SWIG_LINK_LIBRARIES (${my_module} ${PYTHON_LIBRARIES}  ${SWIG_LINK_LIBRARIES_LIST} optimal_control tinyxml integration nonlinear_programming casadi )
+  endforeach()
+  else()
+    SWIG_LINK_LIBRARIES (casadi ${PYTHON_LIBRARIES}  ${SWIG_LINK_LIBRARIES_LIST} optimal_control tinyxml integration nonlinear_programming casadi )
+endif()
 
 # the name used for the shared module for the python interface is determined
 if(WITH_SWIG_SPLIT)
-get_target_property(CASADI_PYTHON_LIBRARY_SUFFIX ${SWIG_MODULE_${CASADI_SWIG_MAIN_MODULE}_REAL_NAME} SUFFIX)
-else(WITH_SWIG_SPLIT)
-get_target_property(CASADI_PYTHON_LIBRARY_SUFFIX ${SWIG_MODULE_casadi_REAL_NAME} SUFFIX)
-endif(WITH_SWIG_SPLIT)
+  get_target_property(CASADI_PYTHON_LIBRARY_SUFFIX ${SWIG_MODULE_${CASADI_SWIG_MAIN_MODULE}_REAL_NAME} SUFFIX)
+else()
+  get_target_property(CASADI_PYTHON_LIBRARY_SUFFIX ${SWIG_MODULE_casadi_REAL_NAME} SUFFIX)
+endif()
 
 if(NOT ${CASADI_PYTHON_LIBRARY_SUFFIX})
-IF( WIN32 )
-  set(CASADI_PYTHON_LIBRARY_SUFFIX ".pyd")
-ELSE( WIN32 )
-  set(CASADI_PYTHON_LIBRARY_SUFFIX ${CMAKE_SHARED_MODULE_SUFFIX})
-ENDIF( WIN32 )
-endif(NOT ${CASADI_PYTHON_LIBRARY_SUFFIX})
+  if( WIN32 )
+    set(CASADI_PYTHON_LIBRARY_SUFFIX ".pyd")
+  else()
+    set(CASADI_PYTHON_LIBRARY_SUFFIX ${CMAKE_SHARED_MODULE_SUFFIX})
+  endif()
+endif()
 
 if(WITH_SWIG_SPLIT)
-foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
-set(CASADI_PYTHON_LIBRARY_${my_module} ${SWIG_MODULE_${my_module}_REAL_NAME}${CASADI_PYTHON_LIBRARY_SUFFIX})
-endforeach()
-else(WITH_SWIG_SPLIT)
-set(CASADI_PYTHON_LIBRARY ${SWIG_MODULE_casadi_REAL_NAME}${CASADI_PYTHON_LIBRARY_SUFFIX})
-endif(WITH_SWIG_SPLIT)
+  foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
+    set(CASADI_PYTHON_LIBRARY_${my_module} ${SWIG_MODULE_${my_module}_REAL_NAME}${CASADI_PYTHON_LIBRARY_SUFFIX})
+  endforeach()
+else()
+  set(CASADI_PYTHON_LIBRARY ${SWIG_MODULE_casadi_REAL_NAME}${CASADI_PYTHON_LIBRARY_SUFFIX})
+endif()
 
 # a python library is built in the build directory inside swig/python 
 make_directory(${PROJECT_BINARY_DIR}/python/casadi)
@@ -293,18 +254,18 @@ endif(WITH_SWIG_SPLIT)
 if(MSVC)
   if(WITH_SWIG_SPLIT)
   foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
-  SET(PYTHONLIBPATH_${my_module} ${LIBRARY_OUTPUT_PATH}/Release/${CASADI_PYTHON_LIBRARY_${my_module}})
+  set(PYTHONLIBPATH_${my_module} ${LIBRARY_OUTPUT_PATH}/Release/${CASADI_PYTHON_LIBRARY_${my_module}})
   endforeach()
   else(WITH_SWIG_SPLIT)
-  SET(PYTHONLIBPATH ${LIBRARY_OUTPUT_PATH}/Release/${CASADI_PYTHON_LIBRARY})
+  set(PYTHONLIBPATH ${LIBRARY_OUTPUT_PATH}/Release/${CASADI_PYTHON_LIBRARY})
   endif(WITH_SWIG_SPLIT)
 else(MSVC)
   if(WITH_SWIG_SPLIT)
   foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
-  SET(PYTHONLIBPATH_${my_module} ${LIBRARY_OUTPUT_PATH}/${CASADI_PYTHON_LIBRARY_${my_module}})
+  set(PYTHONLIBPATH_${my_module} ${LIBRARY_OUTPUT_PATH}/${CASADI_PYTHON_LIBRARY_${my_module}})
   endforeach()
   else(WITH_SWIG_SPLIT)
-  SET(PYTHONLIBPATH ${LIBRARY_OUTPUT_PATH}/${CASADI_PYTHON_LIBRARY})
+  set(PYTHONLIBPATH ${LIBRARY_OUTPUT_PATH}/${CASADI_PYTHON_LIBRARY})
   endif(WITH_SWIG_SPLIT)
 endif(MSVC)
 
@@ -325,7 +286,7 @@ add_custom_command(
 endif(WITH_SWIG_SPLIT)
   
 find_package(PythonInterp)
-IF(PYTHONINTERP_FOUND)
+if(PYTHONINTERP_FOUND)
 
   #determining the installation path for python libraries
   EXEC_PROGRAM( "${PYTHON_EXECUTABLE}"
@@ -335,8 +296,8 @@ IF(PYTHONINTERP_FOUND)
 
   # Replace backslashes with normal slashes
   if(MSYS)
-	string(REGEX REPLACE "\\\\" "/" PYTHON_INSTALLATION_PATH ${PYTHON_INSTALLATION_PATH})
-  endif(MSYS)
+    string(REGEX REPLACE "\\\\" "/" PYTHON_INSTALLATION_PATH ${PYTHON_INSTALLATION_PATH})
+  endif()
 
   #since in the main CMakeLists.txt we used "add_subdirectory(swig EXCLUDE_FROM_ALL)" the following install command won't add anything to "make install"
   install(DIRECTORY ${PROJECT_BINARY_DIR}/python/casadi 
@@ -356,15 +317,15 @@ IF(PYTHONINTERP_FOUND)
   add_dependencies(install_python DEPENDS _${my_module})
   endforeach()
 
-  else(WITH_SWIG_SPLIT)
+  else()
   add_custom_target(install_python
     DEPENDS _casadi
     COMMAND ${CMAKE_COMMAND}
       -D COMPONENT=install_python
       -P cmake_install.cmake
   )
-  endif(WITH_SWIG_SPLIT)
-ENDIF(PYTHONINTERP_FOUND)
+  endif()
+endif()
 
 # OCTAVE interface
 if(WITH_SWIG_SPLIT)
@@ -375,17 +336,17 @@ foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})
   set_target_properties(${my_module}_octave PROPERTIES SUFFIX ".oct")
   set_target_properties(${my_module}_octave PROPERTIES OUTPUT_NAME "${my_module}")
 endforeach()
-else(WITH_SWIG_SPLIT)
-SWIG_ADD_MODULE (casadi_octave octave casadi.i octrun.swg)
-SWIG_LINK_LIBRARIES (casadi_octave ${SWIG_LINK_LIBRARIES_LIST} optimal_control tinyxml integration nonlinear_programming casadi )
-set_target_properties(casadi_octave PROPERTIES PREFIX "")
-set_target_properties(casadi_octave PROPERTIES SUFFIX ".oct")
-set_target_properties(casadi_octave PROPERTIES OUTPUT_NAME "casadi_interface")
-endif(WITH_SWIG_SPLIT)
+else()
+  SWIG_ADD_MODULE (casadi_octave octave casadi.i octrun.swg)
+  SWIG_LINK_LIBRARIES (casadi_octave ${SWIG_LINK_LIBRARIES_LIST} optimal_control tinyxml integration nonlinear_programming casadi )
+  set_target_properties(casadi_octave PROPERTIES PREFIX "")
+  set_target_properties(casadi_octave PROPERTIES SUFFIX ".oct")
+  set_target_properties(casadi_octave PROPERTIES OUTPUT_NAME "casadi_interface")
+endif()
 
 # begin Patch swig to get concat functionality
 find_package(OCTAVE)
-IF(OCTAVE_FOUND)
+if(OCTAVE_FOUND)
 EXECUTE_PROCESS(COMMAND ${SWIG_EXECUTABLE} -swiglib OUTPUT_VARIABLE ORIG_SWIGDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 ADD_CUSTOM_COMMAND(
@@ -396,13 +357,13 @@ ADD_CUSTOM_COMMAND(
    COMMAND ${OCTAVE_EXECUTABLE} -q octrun_patch.m
    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/octave/swig_lib/octrun_patch.m ${ORIG_SWIGDIR}/octave/octrun.swg
 )
-ELSE(OCTAVE_FOUND)
+else(OCTAVE_FOUND)
 #Don't do anything
 ADD_CUSTOM_COMMAND(
    OUTPUT octrun.swg
    COMMENT "No octave patch will be applied (octave executable not found)"
 )
-ENDIF(OCTAVE_FOUND)
+endif(OCTAVE_FOUND)
 # end patch
 
 if(WITH_SWIG_SPLIT)

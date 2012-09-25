@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 2.0)
 
 include_directories(../)
-find_package(WORHP REQUIRED QUIET)
 include_directories(${WORHP_INCLUDE_DIR})
 
 set(WORHP_INTERFACE_SRCS
