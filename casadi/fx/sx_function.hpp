@@ -71,6 +71,9 @@ public:
   /// Expand an MXFunction
   explicit SXFunction(const MXFunction &f);
 
+  /// Expand an FX
+  explicit SXFunction(const FX &f);
+  
   /// Multiple (matrix valued) input, multiple (matrix valued) output 
   SXFunction(const std::vector< SXMatrix>& arg, const std::vector<SXMatrix>& res);
 

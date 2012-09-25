@@ -65,8 +65,11 @@ class MXFunctionInternal;
 class MXFunction : public FX{
 public:
 
-  /** \brief  Ddefault constructor */
+  /** \brief  Default constructor */
   MXFunction();
+  
+  /** \brief  Attempt to form an MXFunction out of an FX */
+  explicit MXFunction(const FX& fx);
 
 #ifndef SWIG  
   /** \brief  Single input, single output */

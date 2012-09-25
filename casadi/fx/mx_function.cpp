@@ -40,6 +40,12 @@ bool MXFunction::checkNode() const{
 MXFunction::MXFunction(){
 }
 
+MXFunction::MXFunction(const FX& fx) {
+  const MXFunctionInternal* temp = dynamic_cast<const MXFunctionInternal*>(fx.get());
+  if (!temp) casadi_error("MXFunction(FX)::input FX cannot be cast into MXFunction");
+  assignNode(temp->clone());
+}
+  
 MXFunction::MXFunction(const MX& inputm, const MX& outputm){
   vector<MX> inputv(1);
   inputv[0] = inputm;

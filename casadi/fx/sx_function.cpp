@@ -163,6 +163,17 @@ SXFunction::SXFunction(const MXFunction& f){
   assignNode(t.get());
 }
 
+SXFunction::SXFunction(const FX& f){
+  const SXFunctionInternal* temp = dynamic_cast<const SXFunctionInternal*>(f.get());
+  if (temp) {
+    assignNode(temp->clone());
+  } else {
+    MXFunction f2(f);
+    SXFunction t = f2.expand();
+    assignNode(t.get());
+  }
+}
+
 SXFunction SXFunction::operator[](int k) const {
 
   // Delegate to FX
