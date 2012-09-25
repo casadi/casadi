@@ -66,7 +66,7 @@ cp = RADAU
 h = tf/nk/nicp
 
 # Coefficients of the collocation equation
-C = np.zeros((deg+1,deg+1))b
+C = np.zeros((deg+1,deg+1))
 # Coefficients of the continuity equation
 D = np.zeros(deg+1)
 
