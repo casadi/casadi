@@ -42,6 +42,15 @@
 %include "interfaces/qpoases/qpoases_solver.hpp"
 #endif
 
+// QPOASES
+#ifdef WITH_QPOASES
+%include "qpoases_interface.i"
+%{
+#include "interfaces/qpoases/qpoases_solver.hpp"
+%}
+%include "interfaces/qpoases/qpoases_solver.hpp"
+#endif
+
 // Sundials
 #ifdef WITH_SUNDIALS
 %include "sundials_interface.i"

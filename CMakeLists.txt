@@ -19,6 +19,7 @@ option(WITH_ACADO "Compile the interfaces to ACADO and qpOASES, if it can be fou
 option(WITH_EIGEN3 "Use Eigen3 backend for matrix operations" OFF) 
 option(WITH_MODIFIED_SUNDIALS "Use the modified version of SUNDIALS shipped with CasADi" ON)
 option(NEW_FIND_IPOPT "Use the rewritten version of the FindIPOPT.cmake script (being tested)" OFF)
+option(WITH_QPOASES "Use the latest QPOASES" ON)
 
 if(WITH_FORTRAN)
   # Enable Fortran linking (needed e.g. for LAPACK/BLAS), if Fortran is available

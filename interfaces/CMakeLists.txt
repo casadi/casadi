@@ -15,6 +15,10 @@ add_subdirectory(acado)
 add_subdirectory(qpoases)
 endif(ACADO_FOUND)
 
+if(WITH_QPOASES)
+add_subdirectory(qpoases)
+endif(WITH_QPOASES)
+
 IF (KNITRO_FOUND)
 add_subdirectory(knitro)
 ENDIF (KNITRO_FOUND)

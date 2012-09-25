@@ -1,0 +1,7 @@
+if(WITH_QPOASES)
+  SET(QPOASES_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/qpOASES/include)
+  SET(QPOASES_LIBRARIES qpoases)
+  SET(QPOASES_FOUND true)
+else()
+  message(STATUS "qpOASES not included")
+endif()

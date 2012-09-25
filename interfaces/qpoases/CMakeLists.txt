@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 2.0)
 
-include_directories(../)
-find_package(ACADO REQUIRED QUIET)
-include_directories(${ACADO_INCLUDE_DIRS} ${ACADO_QPOASES_EMBEDDED_INC_DIRS})
+find_package(QPOASES REQUIRED QUIET)
+include_directories(${QPOASES_INCLUDE_DIR})
 
 set(QPOASES_INTERFACE_SRCS
   qpoases_internal.hpp
@@ -26,5 +25,3 @@ install(DIRECTORY ./
    FILES_MATCHING PATTERN "*.hpp"
    PATTERN ".svn" EXCLUDE
 )
-
-

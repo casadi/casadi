@@ -5,3 +5,8 @@ add_subdirectory(CSparse)
 if(WITH_MODIFIED_SUNDIALS)
 add_subdirectory(sundials-2.5mod)
 endif(WITH_MODIFIED_SUNDIALS)
+
+if(WITH_QPOASES)
+add_subdirectory(qpOASES)
+endif(WITH_QPOASES)
+

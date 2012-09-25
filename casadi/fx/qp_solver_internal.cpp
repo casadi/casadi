@@ -21,6 +21,7 @@
  */
 
 #include "qp_solver_internal.hpp"
+#include "qp_solver.hpp"
 #include "casadi/matrix/matrix_tools.hpp"
 #include "casadi/matrix/sparsity_tools.hpp"
 

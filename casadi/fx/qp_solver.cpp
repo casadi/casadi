@@ -20,6 +20,7 @@
  *
  */
 
+#include "qp_solver.hpp"
 #include "qp_solver_internal.hpp"
 
 using namespace std;

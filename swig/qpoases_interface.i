@@ -20,45 +20,8 @@
  *
  */
 
-#ifndef QP_SOLVER_INTERNAL_HPP
-#define QP_SOLVER_INTERNAL_HPP
+%{
+#include "interfaces/qpoases/qpoases_solver.hpp"
+%}
 
-#include "fx_internal.hpp"
-
-namespace CasADi{
-
-/// Internal class
-class QPSolverInternal : public FXInternal{
-  public:
-    // Constructor
-    QPSolverInternal();
-        
-    // Constructor
-    QPSolverInternal(const CRSSparsity &H, const CRSSparsity &A);
-    
-    // Destructor
-    virtual ~QPSolverInternal() = 0;
-    
-    // Initialize
-    virtual void init();
-    
-    // Solve the system of equations
-    virtual void evaluate(int nfdir, int nadir);
-    
-    // Solve the system of equations
-    virtual void solve();
-    
-  protected:
-    
-    /// Number of decision variables
-    int nx_;
-    
-    /// The number of constraints (counting both equality and inequality) == A.size1()
-    int nc_; 
-};
-
-
-} // namespace CasADi
-
-#endif //QP_SOLVER_INTERNAL_HPP
-
+%include "interfaces/qpoases/qpoases_solver.hpp"
