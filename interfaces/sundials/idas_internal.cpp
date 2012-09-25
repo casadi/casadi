@@ -69,7 +69,6 @@ IdasInternal::IdasInternal(const FX& f, const FX& g) : SundialsInternal(f,g){
   rxzdot_ = 0;
   rq_ = 0;
 
-  is_init = false;
   isInitAdj_ = false;
   isInitTaping_ = false;
   disable_internal_warnings_ = false;
@@ -80,22 +79,22 @@ IdasInternal::~IdasInternal(){
 }
 
 void IdasInternal::freeIDAS(){
-  if(mem_) IDAFree(&mem_);
+  if(mem_) { IDAFree(&mem_); mem_ = 0; }
 
   // Forward integration
-  if(xz_) N_VDestroy_Serial(xz_);
-  if(xzdot_) N_VDestroy_Serial(xzdot_);
-  if(q_) N_VDestroy_Serial(q_);
+  if(xz_) { N_VDestroy_Serial(xz_); xz_ = 0; }
+  if(xzdot_) { N_VDestroy_Serial(xzdot_); xzdot_ = 0; }
+  if(q_) { N_VDestroy_Serial(q_); q_ = 0; }
   
   // Backward integration
-  if(rxz_) N_VDestroy_Serial(rxz_);
-  if(rxzdot_) N_VDestroy_Serial(rxzdot_);
-  if(rq_) N_VDestroy_Serial(rq_);
+  if(rxz_) { N_VDestroy_Serial(rxz_); rxz_ = 0; }
+  if(rxzdot_) { N_VDestroy_Serial(rxzdot_); rxzdot_ = 0; }
+  if(rq_) { N_VDestroy_Serial(rq_); rq_ = 0; }
   
     // Forward problem
-  for(vector<N_Vector>::iterator it=xzF_.begin(); it != xzF_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
-  for(vector<N_Vector>::iterator it=xzdotF_.begin(); it != xzdotF_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
-  for(vector<N_Vector>::iterator it=qF_.begin(); it != qF_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
+  for(vector<N_Vector>::iterator it=xzF_.begin(); it != xzF_.end(); ++it)   if(*it) { N_VDestroy_Serial(*it); *it = 0; }
+  for(vector<N_Vector>::iterator it=xzdotF_.begin(); it != xzdotF_.end(); ++it)   { if(*it) N_VDestroy_Serial(*it); *it = 0; }
+  for(vector<N_Vector>::iterator it=qF_.begin(); it != qF_.end(); ++it)   if(*it) { N_VDestroy_Serial(*it); *it = 0; }
 }
 
 void IdasInternal::updateNumSens(bool recursive){
@@ -106,11 +105,11 @@ void IdasInternal::updateNumSens(bool recursive){
 void IdasInternal::init(){
   log("IdasInternal::init","begin");
 
+  // Free memory if already initialized
+  if(isInit()) freeIDAS();
+  
   // Call the base class init
   SundialsInternal::init();
-
-  // Free memory if already initialized
-  if(is_init) freeIDAS();
   
   if(hasSetOption("linear_solver_creator")){
     // Make sure that a Jacobian has been provided
@@ -386,7 +385,6 @@ void IdasInternal::init(){
   }
   log("IdasInternal::init","initialized adjoint sensitivities");
  
- is_init = true;
  isInitTaping_ = false;
  isInitAdj_ = false;
  log("IdasInternal::init","end");

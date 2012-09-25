@@ -52,28 +52,27 @@ CVodesInternal::CVodesInternal(const FX& f, const FX& g) : SundialsInternal(f,g)
   x0_ = x_ = q_ = 0;
   rx0_ = rx_ = rq_ = 0;
 
-  is_init = false;
   isInitAdj_ = false;
   disable_internal_warnings_ = false;
 }
 
 void CVodesInternal::freeCVodes(){
-  if(mem_) CVodeFree(&mem_);
+  if(mem_) { CVodeFree(&mem_); mem_ = 0;}
 
   // Forward integration
-  if(x0_) N_VDestroy_Serial(x0_);
-  if(x_) N_VDestroy_Serial(x_);
-  if(q_) N_VDestroy_Serial(q_);
+  if(x0_) { N_VDestroy_Serial(x0_); x0_ = 0; }
+  if(x_) { N_VDestroy_Serial(x_); x_ = 0; }
+  if(q_) { N_VDestroy_Serial(q_); q_ = 0; }
   
   // Backward integration
-  if(rx0_) N_VDestroy_Serial(rx0_);
-  if(rx_) N_VDestroy_Serial(rx_);
-  if(rq_) N_VDestroy_Serial(rq_);
+  if(rx0_) { N_VDestroy_Serial(rx0_); rx0_ = 0; }
+  if(rx_)  { N_VDestroy_Serial(rx_);  rx_  = 0; }
+  if(rq_)  { N_VDestroy_Serial(rq_);  rq_  = 0; }
   
   // Sensitivities of the forward integration
-  for(vector<N_Vector>::iterator it=xF0_.begin(); it != xF0_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
-  for(vector<N_Vector>::iterator it=xF_.begin(); it != xF_.end(); ++it)     if(*it) N_VDestroy_Serial(*it);
-  for(vector<N_Vector>::iterator it=qF_.begin(); it != qF_.end(); ++it)   if(*it) N_VDestroy_Serial(*it);
+  for(vector<N_Vector>::iterator it=xF0_.begin(); it != xF0_.end(); ++it)   if(*it) { N_VDestroy_Serial(*it); *it=0;}
+  for(vector<N_Vector>::iterator it=xF_.begin(); it != xF_.end(); ++it)     if(*it) { N_VDestroy_Serial(*it); *it=0;}
+  for(vector<N_Vector>::iterator it=qF_.begin(); it != qF_.end(); ++it)   if(*it) { N_VDestroy_Serial(*it); *it=0;}
 }
 
 CVodesInternal::~CVodesInternal(){
@@ -86,12 +85,14 @@ void CVodesInternal::updateNumSens(bool recursive){
 }
 
 void CVodesInternal::init(){
+  log("CVodesInternal::init","begin");
+  
+  // Free memory if already initialized
+  if(isInit()) freeCVodes();
+
   // Initialize the base classes
   SundialsInternal::init();
 
-  // Free memory if already initialized
-  if(is_init) freeCVodes();
-  
   // Read options
   monitor_rhsB_  = monitored("resB");
   monitor_rhs_   = monitored("res");
@@ -328,7 +329,6 @@ void CVodesInternal::init(){
     flag = CVodeAdjInit(mem_, Nd, interpType);
     if(flag != CV_SUCCESS) cvodes_error("CVodeAdjInit",flag);
           
-    is_init = true;
     isInitAdj_ = false;
   }
 }

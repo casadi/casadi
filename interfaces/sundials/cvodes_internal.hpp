@@ -160,7 +160,6 @@ public:
   // N-vectors for the forward sensitivities
   std::vector<N_Vector> xF0_, xF_, qF_;
 
-  bool is_init;
   bool isInitAdj_;
 
   int ism_;

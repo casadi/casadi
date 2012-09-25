@@ -154,8 +154,6 @@ class IdasInternal : public SundialsInternal{
   // N-vectors for the forward sensitivities
   std::vector<N_Vector> xzF_, xzdotF_, qF_;
 
-  bool is_init;
-  
   // sensitivity method
   int ism_;
   
