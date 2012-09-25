@@ -247,7 +247,7 @@ else(WITH_SWIG_SPLIT)
 add_custom_command(
   TARGET _casadi
   COMMAND ${CMAKE_COMMAND}
-  ARGS -E copy ${PROJECT_BINARY_DIR}/casadi.py ${PROJECT_BINARY_DIR}/python/casadi/casadi.py
+  ARGS -E copy ${PROJECT_BINARY_DIR}/swig/casadi.py ${PROJECT_BINARY_DIR}/python/casadi/casadi.py
 )
 endif(WITH_SWIG_SPLIT)
 
