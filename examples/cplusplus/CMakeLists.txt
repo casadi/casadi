@@ -7,6 +7,11 @@ find_package(LIFTOPT QUIET)
 
 include_directories(../../)
 
+# Add IPOPT link directories
+if(IPOPT_FOUND AND NEW_FIND_IPOPT)
+link_directories(${IPOPT_LIBRARY_DIRS})
+endif()
+
 # Error handling
 add_executable(casadi_error_handling casadi_error_handling.cpp)
 target_link_libraries(casadi_error_handling casadi ${CASADI_DEPENDENCIES})
