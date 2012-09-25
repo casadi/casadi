@@ -38,7 +38,7 @@ thus x := [xd,xa]
 
 Joel Andersson
 
->Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
+>Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 4)
 +----------------+------------------------------------------------------+
 |      Name      |                     Description                      |
 +================+======================================================+
@@ -47,6 +47,8 @@ Joel Andersson
 | INTEGRATOR_P   | Parameters [p].                                      |
 +----------------+------------------------------------------------------+
 | INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
@@ -88,6 +90,22 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
+| fwd_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
 |              |              |              | function and |              |
@@ -117,10 +135,6 @@ Joel Andersson
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| nrhs         | OT_INTEGER   | 1            | number of    | CasADi::Inte |
-|              |              |              | right hand   | gratorIntern |
-|              |              |              | sides        | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | num_algebrai | OT_INTEGER   | 0            | Number of    | CasADi::Acad |
 | c            |              |              | algebraic    | oIntegratorI |
@@ -207,12 +221,12 @@ Joel Andersson
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| t0           | OT_REAL      | 0            | start of the | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
-|              |              |              |              | al           |
+| t0           | OT_REAL      | 0            | Beginning of | CasADi::Inte |
+|              |              |              | the time     | gratorIntern |
+|              |              |              | horizon      | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| tf           | OT_REAL      | 1            | end of the   | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
+| tf           | OT_REAL      | 1            | End of the   | CasADi::Inte |
+|              |              |              | time horizon | gratorIntern |
 |              |              |              |              | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | time_depende | OT_BOOLEAN   | true         | Explicit     | CasADi::Acad |
@@ -839,7 +853,7 @@ The DAE thus consists of an differential part (fd) and an algebraic part
 differential states xd and the algebraic states xa. The complete state is
 thus x := [xd,xa]
 
->Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
+>Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 4)
 +----------------+------------------------------------------------------+
 |      Name      |                     Description                      |
 +================+======================================================+
@@ -848,6 +862,8 @@ thus x := [xd,xa]
 | INTEGRATOR_P   | Parameters [p].                                      |
 +----------------+------------------------------------------------------+
 | INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
@@ -889,6 +905,22 @@ thus x := [xd,xa]
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
+| fwd_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
 |              |              |              | function and |              |
@@ -918,10 +950,6 @@ thus x := [xd,xa]
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| nrhs         | OT_INTEGER   | 1            | number of    | CasADi::Inte |
-|              |              |              | right hand   | gratorIntern |
-|              |              |              | sides        | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | num_algebrai | OT_INTEGER   | 0            | Number of    | CasADi::Acad |
 | c            |              |              | algebraic    | oIntegratorI |
@@ -1008,12 +1036,12 @@ thus x := [xd,xa]
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| t0           | OT_REAL      | 0            | start of the | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
-|              |              |              |              | al           |
+| t0           | OT_REAL      | 0            | Beginning of | CasADi::Inte |
+|              |              |              | the time     | gratorIntern |
+|              |              |              | horizon      | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| tf           | OT_REAL      | 1            | end of the   | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
+| tf           | OT_REAL      | 1            | End of the   | CasADi::Inte |
+|              |              |              | time horizon | gratorIntern |
 |              |              |              |              | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | time_depende | OT_BOOLEAN   | true         | Explicit     | CasADi::Acad |
@@ -5429,7 +5457,7 @@ The method is still under development
 
 Joel Andersson
 
->Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
+>Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 4)
 +----------------+------------------------------------------------------+
 |      Name      |                     Description                      |
 +================+======================================================+
@@ -5438,6 +5466,8 @@ Joel Andersson
 | INTEGRATOR_P   | Parameters [p].                                      |
 +----------------+------------------------------------------------------+
 | INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
@@ -5479,6 +5509,14 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
 | collocation_ | OT_STRING    | \"radau\"      | Collocation  | CasADi::Coll |
 | scheme       |              |              | scheme (rada | ocationInteg |
 |              |              |              | u|legendre)  | ratorInterna |
@@ -5494,6 +5532,14 @@ Joel Andersson
 |              |              |              | quadrature   | ocationInteg |
 |              |              |              | function in  | ratorInterna |
 |              |              |              | an SX graph  | l            |
++--------------+--------------+--------------+--------------+--------------+
+| fwd_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | hotstart     | OT_BOOLEAN   | true         | Initialize   | CasADi::Coll |
 |              |              |              | the          | ocationInteg |
@@ -5546,10 +5592,6 @@ Joel Andersson
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| nrhs         | OT_INTEGER   | 1            | number of    | CasADi::Inte |
-|              |              |              | right hand   | gratorIntern |
-|              |              |              | sides        | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
 | j_dir        |              |              | adjoint      | ternal       |
@@ -5648,12 +5690,12 @@ Joel Andersson
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| t0           | OT_REAL      | 0            | start of the | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
-|              |              |              |              | al           |
+| t0           | OT_REAL      | 0            | Beginning of | CasADi::Inte |
+|              |              |              | the time     | gratorIntern |
+|              |              |              | horizon      | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| tf           | OT_REAL      | 1            | end of the   | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
+| tf           | OT_REAL      | 1            | End of the   | CasADi::Inte |
+|              |              |              | time horizon | gratorIntern |
 |              |              |              |              | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
@@ -6240,7 +6282,7 @@ Return a string with a destription (for SWIG) ";
 // File: classCasADi_1_1CollocationIntegratorInternal.xml
 %feature("docstring") CasADi::CollocationIntegratorInternal "
 
->Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
+>Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 4)
 +----------------+------------------------------------------------------+
 |      Name      |                     Description                      |
 +================+======================================================+
@@ -6249,6 +6291,8 @@ Return a string with a destription (for SWIG) ";
 | INTEGRATOR_P   | Parameters [p].                                      |
 +----------------+------------------------------------------------------+
 | INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
@@ -6290,6 +6334,14 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
 | collocation_ | OT_STRING    | \"radau\"      | Collocation  | CasADi::Coll |
 | scheme       |              |              | scheme (rada | ocationInteg |
 |              |              |              | u|legendre)  | ratorInterna |
@@ -6305,6 +6357,14 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | quadrature   | ocationInteg |
 |              |              |              | function in  | ratorInterna |
 |              |              |              | an SX graph  | l            |
++--------------+--------------+--------------+--------------+--------------+
+| fwd_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | hotstart     | OT_BOOLEAN   | true         | Initialize   | CasADi::Coll |
 |              |              |              | the          | ocationInteg |
@@ -6357,10 +6417,6 @@ Return a string with a destription (for SWIG) ";
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| nrhs         | OT_INTEGER   | 1            | number of    | CasADi::Inte |
-|              |              |              | right hand   | gratorIntern |
-|              |              |              | sides        | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
 | j_dir        |              |              | adjoint      | ternal       |
@@ -6459,12 +6515,12 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| t0           | OT_REAL      | 0            | start of the | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
-|              |              |              |              | al           |
+| t0           | OT_REAL      | 0            | Beginning of | CasADi::Inte |
+|              |              |              | the time     | gratorIntern |
+|              |              |              | horizon      | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| tf           | OT_REAL      | 1            | end of the   | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
+| tf           | OT_REAL      | 1            | End of the   | CasADi::Inte |
+|              |              |              | time horizon | gratorIntern |
 |              |              |              |              | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
@@ -12822,7 +12878,7 @@ You can retrieve the entire state trajectory as follows, after the evaluate
 call: Call reset. Then call integrate(t_i) and getOuput for a series of
 times t_i.
 
->Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
+>Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 4)
 +----------------+------------------------------------------------------+
 |      Name      |                     Description                      |
 +================+======================================================+
@@ -12831,6 +12887,8 @@ times t_i.
 | INTEGRATOR_P   | Parameters [p].                                      |
 +----------------+------------------------------------------------------+
 | INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
@@ -12876,6 +12934,14 @@ times t_i.
 |              |              |              | (forward|rev |              |
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | asens_abstol | OT_REAL      |              | absolute     | CasADi::Sund |
 |              |              |              | tolerence    | ials::Sundia |
@@ -12997,6 +13063,14 @@ times t_i.
 |              |              |              | sensitivity  |              |
 |              |              |              | equations    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| fwd_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
 | interpolatio | OT_STRING    | \"hermite\"    | type of inte | CasADi::Sund |
 | n_type       |              |              | rpolation    | ials::Sundia |
 |              |              |              | for the      | lsInternal   |
@@ -13081,10 +13155,6 @@ times t_i.
 | nonlinear_so | OT_STRING    | \"newton\"     | (newton|func | CasADi::Sund |
 | lver_iterati |              |              | tional)      | ials::CVodes |
 | on           |              |              |              | Internal     |
-+--------------+--------------+--------------+--------------+--------------+
-| nrhs         | OT_INTEGER   | 1            | number of    | CasADi::Inte |
-|              |              |              | right hand   | gratorIntern |
-|              |              |              | sides        | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
 | j_dir        |              |              | adjoint      | ternal       |
@@ -13184,12 +13254,12 @@ times t_i.
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| t0           | OT_REAL      | 0            | start of the | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
-|              |              |              |              | al           |
+| t0           | OT_REAL      | 0            | Beginning of | CasADi::Inte |
+|              |              |              | the time     | gratorIntern |
+|              |              |              | horizon      | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| tf           | OT_REAL      | 1            | end of the   | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
+| tf           | OT_REAL      | 1            | End of the   | CasADi::Inte |
+|              |              |              | time horizon | gratorIntern |
 |              |              |              |              | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | upper_bandwi | OT_INTEGER   |              | upper band-  | CasADi::Sund |
@@ -13840,7 +13910,7 @@ Solves the following initial value problem (IVP):
 
 xdot == f(t,x,p) from t0 to tf  given the initial condition x(t0) == x0;
 
->Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
+>Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 4)
 +----------------+------------------------------------------------------+
 |      Name      |                     Description                      |
 +================+======================================================+
@@ -13849,6 +13919,8 @@ xdot == f(t,x,p) from t0 to tf  given the initial condition x(t0) == x0;
 | INTEGRATOR_P   | Parameters [p].                                      |
 +----------------+------------------------------------------------------+
 | INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
@@ -13894,6 +13966,14 @@ xdot == f(t,x,p) from t0 to tf  given the initial condition x(t0) == x0;
 |              |              |              | (forward|rev |              |
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | asens_abstol | OT_REAL      |              | absolute     | CasADi::Sund |
 |              |              |              | tolerence    | ials::Sundia |
@@ -14015,6 +14095,14 @@ xdot == f(t,x,p) from t0 to tf  given the initial condition x(t0) == x0;
 |              |              |              | sensitivity  |              |
 |              |              |              | equations    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| fwd_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
 | interpolatio | OT_STRING    | \"hermite\"    | type of inte | CasADi::Sund |
 | n_type       |              |              | rpolation    | ials::Sundia |
 |              |              |              | for the      | lsInternal   |
@@ -14099,10 +14187,6 @@ xdot == f(t,x,p) from t0 to tf  given the initial condition x(t0) == x0;
 | nonlinear_so | OT_STRING    | \"newton\"     | (newton|func | CasADi::Sund |
 | lver_iterati |              |              | tional)      | ials::CVodes |
 | on           |              |              |              | Internal     |
-+--------------+--------------+--------------+--------------+--------------+
-| nrhs         | OT_INTEGER   | 1            | number of    | CasADi::Inte |
-|              |              |              | right hand   | gratorIntern |
-|              |              |              | sides        | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
 | j_dir        |              |              | adjoint      | ternal       |
@@ -14202,12 +14286,12 @@ xdot == f(t,x,p) from t0 to tf  given the initial condition x(t0) == x0;
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| t0           | OT_REAL      | 0            | start of the | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
-|              |              |              |              | al           |
+| t0           | OT_REAL      | 0            | Beginning of | CasADi::Inte |
+|              |              |              | the time     | gratorIntern |
+|              |              |              | horizon      | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| tf           | OT_REAL      | 1            | end of the   | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
+| tf           | OT_REAL      | 1            | End of the   | CasADi::Inte |
+|              |              |              | time horizon | gratorIntern |
 |              |              |              |              | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | upper_bandwi | OT_INTEGER   |              | upper band-  | CasADi::Sund |
@@ -18282,7 +18366,7 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 
 Joel Andersson
 
->Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
+>Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 4)
 +----------------+------------------------------------------------------+
 |      Name      |                     Description                      |
 +================+======================================================+
@@ -18291,6 +18375,8 @@ Joel Andersson
 | INTEGRATOR_P   | Parameters [p].                                      |
 +----------------+------------------------------------------------------+
 | INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
@@ -18340,6 +18426,14 @@ Joel Andersson
 |              |              |              | (forward|rev |              |
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | asens_abstol | OT_REAL      |              | absolute     | CasADi::Sund |
 |              |              |              | tolerence    | ials::Sundia |
@@ -18514,6 +18608,14 @@ Joel Andersson
 |              |              |              | sensitivity  |              |
 |              |              |              | equations    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| fwd_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
 | init_xdot    | OT_REALVECTO | GenericType( | Initial      | CasADi::Sund |
 |              | R            | )            | values for   | ials::IdasIn |
 |              |              |              | the state    | ternal       |
@@ -18606,10 +18708,6 @@ Joel Andersson
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| nrhs         | OT_INTEGER   | 1            | number of    | CasADi::Inte |
-|              |              |              | right hand   | gratorIntern |
-|              |              |              | sides        | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
 | j_dir        |              |              | adjoint      | ternal       |
@@ -18715,12 +18813,12 @@ Joel Andersson
 |              |              |              | the error    |              |
 |              |              |              | testing      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| t0           | OT_REAL      | 0            | start of the | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
-|              |              |              |              | al           |
+| t0           | OT_REAL      | 0            | Beginning of | CasADi::Inte |
+|              |              |              | the time     | gratorIntern |
+|              |              |              | horizon      | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| tf           | OT_REAL      | 1            | end of the   | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
+| tf           | OT_REAL      | 1            | End of the   | CasADi::Inte |
+|              |              |              | time horizon | gratorIntern |
 |              |              |              |              | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | upper_bandwi | OT_INTEGER   |              | upper band-  | CasADi::Sund |
@@ -19378,7 +19476,7 @@ The DAE thus consists of a fully implicit part (f) and an explicit
 quadrature part (g). In the same way, the state vector is also composed of
 two parts, the differential states and the quadrature states, i.e. x = [y,q]
 
->Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
+>Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 4)
 +----------------+------------------------------------------------------+
 |      Name      |                     Description                      |
 +================+======================================================+
@@ -19387,6 +19485,8 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 | INTEGRATOR_P   | Parameters [p].                                      |
 +----------------+------------------------------------------------------+
 | INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
@@ -19436,6 +19536,14 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 |              |              |              | (forward|rev |              |
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | asens_abstol | OT_REAL      |              | absolute     | CasADi::Sund |
 |              |              |              | tolerence    | ials::Sundia |
@@ -19610,6 +19718,14 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 |              |              |              | sensitivity  |              |
 |              |              |              | equations    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| fwd_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
 | init_xdot    | OT_REALVECTO | GenericType( | Initial      | CasADi::Sund |
 |              | R            | )            | values for   | ials::IdasIn |
 |              |              |              | the state    | ternal       |
@@ -19702,10 +19818,6 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| nrhs         | OT_INTEGER   | 1            | number of    | CasADi::Inte |
-|              |              |              | right hand   | gratorIntern |
-|              |              |              | sides        | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
 | j_dir        |              |              | adjoint      | ternal       |
@@ -19811,12 +19923,12 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 |              |              |              | the error    |              |
 |              |              |              | testing      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| t0           | OT_REAL      | 0            | start of the | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
-|              |              |              |              | al           |
+| t0           | OT_REAL      | 0            | Beginning of | CasADi::Inte |
+|              |              |              | the time     | gratorIntern |
+|              |              |              | horizon      | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| tf           | OT_REAL      | 1            | end of the   | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
+| tf           | OT_REAL      | 1            | End of the   | CasADi::Inte |
+|              |              |              | time horizon | gratorIntern |
 |              |              |              |              | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | upper_bandwi | OT_INTEGER   |              | upper band-  | CasADi::Sund |
@@ -21978,7 +22090,7 @@ ODE/DAE is defined in the derived classes.
 
 Joel Andersson
 
->Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
+>Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 4)
 +----------------+------------------------------------------------------+
 |      Name      |                     Description                      |
 +================+======================================================+
@@ -21987,6 +22099,8 @@ Joel Andersson
 | INTEGRATOR_P   | Parameters [p].                                      |
 +----------------+------------------------------------------------------+
 | INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
@@ -22028,6 +22142,22 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
+| fwd_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
 |              |              |              | function and |              |
@@ -22057,10 +22187,6 @@ Joel Andersson
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| nrhs         | OT_INTEGER   | 1            | number of    | CasADi::Inte |
-|              |              |              | right hand   | gratorIntern |
-|              |              |              | sides        | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
 | j_dir        |              |              | adjoint      | ternal       |
@@ -22129,12 +22255,12 @@ Joel Andersson
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| t0           | OT_REAL      | 0            | start of the | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
-|              |              |              |              | al           |
+| t0           | OT_REAL      | 0            | Beginning of | CasADi::Inte |
+|              |              |              | the time     | gratorIntern |
+|              |              |              | horizon      | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| tf           | OT_REAL      | 1            | end of the   | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
+| tf           | OT_REAL      | 1            | End of the   | CasADi::Inte |
+|              |              |              | time horizon | gratorIntern |
 |              |              |              |              | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
@@ -22710,7 +22836,7 @@ dependence on xdot and rxdot respectively.
 
 Joel Andersson
 
->Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
+>Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 4)
 +----------------+------------------------------------------------------+
 |      Name      |                     Description                      |
 +================+======================================================+
@@ -22719,6 +22845,8 @@ Joel Andersson
 | INTEGRATOR_P   | Parameters [p].                                      |
 +----------------+------------------------------------------------------+
 | INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
@@ -22760,6 +22888,22 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
+| fwd_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
 |              |              |              | function and |              |
@@ -22789,10 +22933,6 @@ Joel Andersson
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| nrhs         | OT_INTEGER   | 1            | number of    | CasADi::Inte |
-|              |              |              | right hand   | gratorIntern |
-|              |              |              | sides        | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
 | j_dir        |              |              | adjoint      | ternal       |
@@ -22861,12 +23001,12 @@ Joel Andersson
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| t0           | OT_REAL      | 0            | start of the | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
-|              |              |              |              | al           |
+| t0           | OT_REAL      | 0            | Beginning of | CasADi::Inte |
+|              |              |              | the time     | gratorIntern |
+|              |              |              | horizon      | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| tf           | OT_REAL      | 1            | end of the   | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
+| tf           | OT_REAL      | 1            | End of the   | CasADi::Inte |
+|              |              |              | time horizon | gratorIntern |
 |              |              |              |              | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
@@ -60973,7 +61113,7 @@ The method is still under development
 
 Joel Andersson
 
->Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
+>Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 4)
 +----------------+------------------------------------------------------+
 |      Name      |                     Description                      |
 +================+======================================================+
@@ -60982,6 +61122,8 @@ Joel Andersson
 | INTEGRATOR_P   | Parameters [p].                                      |
 +----------------+------------------------------------------------------+
 | INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
@@ -61023,6 +61165,14 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
 | expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::RKIn |
 |              |              |              | ODE/DAE      | tegratorInte |
 |              |              |              | residual     | rnal         |
@@ -61033,6 +61183,14 @@ Joel Andersson
 |              |              |              | quadrature   | tegratorInte |
 |              |              |              | function in  | rnal         |
 |              |              |              | an SX graph  |              |
++--------------+--------------+--------------+--------------+--------------+
+| fwd_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | interpolatio | OT_INTEGER   | 4            | Order of the | CasADi::RKIn |
 | n_order      |              |              | interpolatin | tegratorInte |
@@ -61068,10 +61226,6 @@ Joel Andersson
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| nrhs         | OT_INTEGER   | 1            | number of    | CasADi::Inte |
-|              |              |              | right hand   | gratorIntern |
-|              |              |              | sides        | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
 | j_dir        |              |              | adjoint      | ternal       |
@@ -61144,12 +61298,12 @@ Joel Andersson
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| t0           | OT_REAL      | 0            | start of the | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
-|              |              |              |              | al           |
+| t0           | OT_REAL      | 0            | Beginning of | CasADi::Inte |
+|              |              |              | the time     | gratorIntern |
+|              |              |              | horizon      | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| tf           | OT_REAL      | 1            | end of the   | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
+| tf           | OT_REAL      | 1            | End of the   | CasADi::Inte |
+|              |              |              | time horizon | gratorIntern |
 |              |              |              |              | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
@@ -61734,7 +61888,7 @@ Return a string with a destription (for SWIG) ";
 // File: classCasADi_1_1RKIntegratorInternal.xml
 %feature("docstring") CasADi::RKIntegratorInternal "
 
->Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
+>Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 4)
 +----------------+------------------------------------------------------+
 |      Name      |                     Description                      |
 +================+======================================================+
@@ -61743,6 +61897,8 @@ Return a string with a destription (for SWIG) ";
 | INTEGRATOR_P   | Parameters [p].                                      |
 +----------------+------------------------------------------------------+
 | INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
@@ -61784,6 +61940,14 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
 | expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::RKIn |
 |              |              |              | ODE/DAE      | tegratorInte |
 |              |              |              | residual     | rnal         |
@@ -61794,6 +61958,14 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | quadrature   | tegratorInte |
 |              |              |              | function in  | rnal         |
 |              |              |              | an SX graph  |              |
++--------------+--------------+--------------+--------------+--------------+
+| fwd_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | interpolatio | OT_INTEGER   | 4            | Order of the | CasADi::RKIn |
 | n_order      |              |              | interpolatin | tegratorInte |
@@ -61829,10 +62001,6 @@ Return a string with a destription (for SWIG) ";
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| nrhs         | OT_INTEGER   | 1            | number of    | CasADi::Inte |
-|              |              |              | right hand   | gratorIntern |
-|              |              |              | sides        | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
 | j_dir        |              |              | adjoint      | ternal       |
@@ -61905,12 +62073,12 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| t0           | OT_REAL      | 0            | start of the | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
-|              |              |              |              | al           |
+| t0           | OT_REAL      | 0            | Beginning of | CasADi::Inte |
+|              |              |              | the time     | gratorIntern |
+|              |              |              | horizon      | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| tf           | OT_REAL      | 1            | end of the   | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
+| tf           | OT_REAL      | 1            | End of the   | CasADi::Inte |
+|              |              |              | time horizon | gratorIntern |
 |              |              |              |              | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
@@ -62777,7 +62945,7 @@ for each time step.
 
 Joel Andersson
 
->Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
+>Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 4)
 +----------------+------------------------------------------------------+
 |      Name      |                     Description                      |
 +================+======================================================+
@@ -62786,6 +62954,8 @@ Joel Andersson
 | INTEGRATOR_P   | Parameters [p].                                      |
 +----------------+------------------------------------------------------+
 | INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
 >List of available options
@@ -63459,7 +63629,7 @@ Simulator data storage classs.
 
 Joel Andersson
 
->Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
+>Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 4)
 +----------------+------------------------------------------------------+
 |      Name      |                     Description                      |
 +================+======================================================+
@@ -63468,6 +63638,8 @@ Joel Andersson
 | INTEGRATOR_P   | Parameters [p].                                      |
 +----------------+------------------------------------------------------+
 | INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
 >List of available options
@@ -65910,7 +66082,7 @@ Constructor. ";
 // File: classCasADi_1_1Sundials_1_1SundialsIntegrator.xml
 %feature("docstring") CasADi::Sundials::SundialsIntegrator "
 
->Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
+>Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 4)
 +----------------+------------------------------------------------------+
 |      Name      |                     Description                      |
 +================+======================================================+
@@ -65919,6 +66091,8 @@ Constructor. ";
 | INTEGRATOR_P   | Parameters [p].                                      |
 +----------------+------------------------------------------------------+
 | INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
@@ -65964,6 +66138,14 @@ Constructor. ";
 |              |              |              | (forward|rev |              |
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | asens_abstol | OT_REAL      |              | absolute     | CasADi::Sund |
 |              |              |              | tolerence    | ials::Sundia |
@@ -66071,6 +66253,14 @@ Constructor. ";
 |              |              |              | sensitivity  |              |
 |              |              |              | equations    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| fwd_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
 | interpolatio | OT_STRING    | \"hermite\"    | type of inte | CasADi::Sund |
 | n_type       |              |              | rpolation    | ials::Sundia |
 |              |              |              | for the      | lsInternal   |
@@ -66145,10 +66335,6 @@ Constructor. ";
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| nrhs         | OT_INTEGER   | 1            | number of    | CasADi::Inte |
-|              |              |              | right hand   | gratorIntern |
-|              |              |              | sides        | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
 | j_dir        |              |              | adjoint      | ternal       |
@@ -66248,12 +66434,12 @@ Constructor. ";
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| t0           | OT_REAL      | 0            | start of the | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
-|              |              |              |              | al           |
+| t0           | OT_REAL      | 0            | Beginning of | CasADi::Inte |
+|              |              |              | the time     | gratorIntern |
+|              |              |              | horizon      | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| tf           | OT_REAL      | 1            | end of the   | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
+| tf           | OT_REAL      | 1            | End of the   | CasADi::Inte |
+|              |              |              | time horizon | gratorIntern |
 |              |              |              |              | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | upper_bandwi | OT_INTEGER   |              | upper band-  | CasADi::Sund |
@@ -66855,7 +67041,7 @@ Return a string with a destription (for SWIG) ";
 // File: classCasADi_1_1Sundials_1_1SundialsInternal.xml
 %feature("docstring") CasADi::Sundials::SundialsInternal "
 
->Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
+>Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 4)
 +----------------+------------------------------------------------------+
 |      Name      |                     Description                      |
 +================+======================================================+
@@ -66864,6 +67050,8 @@ Return a string with a destription (for SWIG) ";
 | INTEGRATOR_P   | Parameters [p].                                      |
 +----------------+------------------------------------------------------+
 | INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
 >Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
@@ -66909,6 +67097,14 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | (forward|rev |              |
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| adj_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | asens_abstol | OT_REAL      |              | absolute     | CasADi::Sund |
 |              |              |              | tolerence    | ials::Sundia |
@@ -67016,6 +67212,14 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | sensitivity  |              |
 |              |              |              | equations    |              |
 +--------------+--------------+--------------+--------------+--------------+
+| fwd_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
+|              |              |              | functions    | gratorIntern |
+|              |              |              | for          | al           |
+|              |              |              | calculating  |              |
+|              |              |              | forward      |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
 | interpolatio | OT_STRING    | \"hermite\"    | type of inte | CasADi::Sund |
 | n_type       |              |              | rpolation    | ials::Sundia |
 |              |              |              | for the      | lsInternal   |
@@ -67090,10 +67294,6 @@ Return a string with a destription (for SWIG) ";
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| nrhs         | OT_INTEGER   | 1            | number of    | CasADi::Inte |
-|              |              |              | right hand   | gratorIntern |
-|              |              |              | sides        | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
 | j_dir        |              |              | adjoint      | ternal       |
@@ -67193,12 +67393,12 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| t0           | OT_REAL      | 0            | start of the | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
-|              |              |              |              | al           |
+| t0           | OT_REAL      | 0            | Beginning of | CasADi::Inte |
+|              |              |              | the time     | gratorIntern |
+|              |              |              | horizon      | al           |
 +--------------+--------------+--------------+--------------+--------------+
-| tf           | OT_REAL      | 1            | end of the   | CasADi::Inte |
-|              |              |              | integration  | gratorIntern |
+| tf           | OT_REAL      | 1            | End of the   | CasADi::Inte |
+|              |              |              | time horizon | gratorIntern |
 |              |              |              |              | al           |
 +--------------+--------------+--------------+--------------+--------------+
 | upper_bandwi | OT_INTEGER   |              | upper band-  | CasADi::Sund |
@@ -74757,7 +74957,7 @@ Helper function for 'DAEOutput' Output arguments of an DAE function
 Helper function for 'RDAEInput' Input arguments of an ODE/DAE backward
 integration function
 
->Input scheme: CasADi::RDAEInput (RDAE_NUM_IN = 8)
+>Input scheme: CasADi::RDAEInput (RDAE_NUM_IN = 9)
 +------------+---------------------------------------------------------+
 |    Name    |                       Description                       |
 +============+=========================================================+
@@ -74765,7 +74965,7 @@ integration function
 +------------+---------------------------------------------------------+
 | RDAE_RZ    | Backward algebraic state [rz].                          |
 +------------+---------------------------------------------------------+
-| RDAE_RP    | Backward parameter [rp].                                |
+| RDAE_RP    | Backward parameter vector [rp].                         |
 +------------+---------------------------------------------------------+
 | RDAE_X     | Forward differential state [x].                         |
 +------------+---------------------------------------------------------+
@@ -74774,6 +74974,8 @@ integration function
 | RDAE_P     | Parameter vector [p].                                   |
 +------------+---------------------------------------------------------+
 | RDAE_T     | Explicit time dependence [t].                           |
++------------+---------------------------------------------------------+
+| RDAE_XDOT  | Time derivative of differential states [xdot].          |
 +------------+---------------------------------------------------------+
 | RDAE_RXDOT | Time derivative of backward differential state [rxdot]. |
 +------------+---------------------------------------------------------+
@@ -74800,7 +75002,7 @@ integration function
 
 Helper function for 'IntegratorInput' Input arguments of an integrator
 
->Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 3)
+>Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 4)
 +----------------+------------------------------------------------------+
 |      Name      |                     Description                      |
 +================+======================================================+
@@ -74809,6 +75011,8 @@ Helper function for 'IntegratorInput' Input arguments of an integrator
 | INTEGRATOR_P   | Parameters [p].                                      |
 +----------------+------------------------------------------------------+
 | INTEGRATOR_RX0 | Backward differential state at the final time [rx0]. |
++----------------+------------------------------------------------------+
+| INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 ";
 
