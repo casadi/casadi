@@ -18,7 +18,6 @@ option(WITH_WORHP "Compile the WORHP interface" OFF)
 option(WITH_ACADO "Compile the interfaces to ACADO and qpOASES, if it can be found" OFF) 
 option(WITH_EIGEN3 "Use Eigen3 backend for matrix operations" OFF) 
 option(WITH_SUNDIALS "Compile Sundials" ON)
-option(NEW_FIND_IPOPT "Use the rewritten version of the FindIPOPT.cmake script (being tested)" OFF)
 option(WITH_QPOASES "Use the latest QPOASES" ON)
 
 if(WITH_FORTRAN)

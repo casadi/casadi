@@ -7,8 +7,8 @@ find_package(LIFTOPT QUIET)
 include_directories(../../)
 
 # Add IPOPT link directories
-if(IPOPT_FOUND AND NEW_FIND_IPOPT)
-link_directories(${IPOPT_LIBRARY_DIRS})
+if(IPOPT_FOUND)
+  link_directories(${IPOPT_LIBRARY_DIRS})
 endif()
 
 # Error handling
@@ -107,7 +107,7 @@ target_link_libraries(sundials_testing
   ${BLAS_LIBRARIES}
   ${CASADI_DEPENDENCIES}
 )
-endif(WITH_SUNDIALS AND LAPACK_FOUND AND BLAS_FOUND)
+endif()
 
 if(LIFTOPT_FOUND)
 add_executable(test_liftopt test_liftopt.cpp)

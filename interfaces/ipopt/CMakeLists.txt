@@ -1,12 +1,7 @@
 cmake_minimum_required(VERSION 2.0)
 find_package(IPOPT REQUIRED QUIET)
-if(NEW_FIND_IPOPT)
 include_directories(${IPOPT_INCLUDE_DIRS})
 link_directories(${IPOPT_LIBRARY_DIRS})
-else()
-include_directories(${IPOPT_INCLUDE_DIR})
-endif()
-
 
 SET(IPOPT_INTERFACE_SRCS
   ipopt_solver.hpp
