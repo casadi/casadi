@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.0)
 
 include_directories(../)
-find_package(SUNDIALS REQUIRED QUIET)
-include_directories(${SUNDIALS_INCLUDE_DIR})
+include_directories(${CMAKE_SOURCE_DIR}/external_packages/sundials-2.5mod)
+
 if(PRECOND_TEST)
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DPRECOND_TEST")
 endif(PRECOND_TEST)

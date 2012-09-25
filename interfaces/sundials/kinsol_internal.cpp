@@ -481,7 +481,7 @@ try{
   }
 }
 
-int KinsolInternal::djac_wrapper(SUNDIALS_INT N, N_Vector u, N_Vector fu, DlsMat J, void *user_data, N_Vector tmp1, N_Vector tmp2){
+int KinsolInternal::djac_wrapper(long N, N_Vector u, N_Vector fu, DlsMat J, void *user_data, N_Vector tmp1, N_Vector tmp2){
   try{
     casadi_assert(user_data);
     KinsolInternal *this_ = (KinsolInternal*)user_data;
@@ -493,7 +493,7 @@ int KinsolInternal::djac_wrapper(SUNDIALS_INT N, N_Vector u, N_Vector fu, DlsMat
   }
 }
 
-void KinsolInternal::djac(SUNDIALS_INT N, N_Vector u, N_Vector fu, DlsMat J, N_Vector tmp1, N_Vector tmp2){
+void KinsolInternal::djac(long N, N_Vector u, N_Vector fu, DlsMat J, N_Vector tmp1, N_Vector tmp2){
   // Get time
   time1_ = clock();
 
@@ -536,7 +536,7 @@ void KinsolInternal::djac(SUNDIALS_INT N, N_Vector u, N_Vector fu, DlsMat J, N_V
   t_jac_ += double(time2_-time1_)/CLOCKS_PER_SEC;
 }
 
-int KinsolInternal::bjac_wrapper(SUNDIALS_INT N, SUNDIALS_INT mupper, SUNDIALS_INT mlower, N_Vector u, N_Vector fu, DlsMat J, void *user_data, N_Vector tmp1, N_Vector tmp2){
+int KinsolInternal::bjac_wrapper(long N, long mupper, long mlower, N_Vector u, N_Vector fu, DlsMat J, void *user_data, N_Vector tmp1, N_Vector tmp2){
   try{
     casadi_assert(user_data);
     KinsolInternal *this_ = (KinsolInternal*)user_data;
@@ -548,7 +548,7 @@ int KinsolInternal::bjac_wrapper(SUNDIALS_INT N, SUNDIALS_INT mupper, SUNDIALS_I
   }
 }
 
-void KinsolInternal::bjac(SUNDIALS_INT N, SUNDIALS_INT mupper, SUNDIALS_INT mlower, N_Vector u, N_Vector fu, DlsMat J, N_Vector tmp1, N_Vector tmp2){
+void KinsolInternal::bjac(long N, long mupper, long mlower, N_Vector u, N_Vector fu, DlsMat J, N_Vector tmp1, N_Vector tmp2){
   // Get time
   time1_ = clock();
 

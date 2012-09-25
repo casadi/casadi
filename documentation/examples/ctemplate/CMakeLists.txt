@@ -1,17 +1,16 @@
 find_package(IPOPT QUIET)
 find_package(KNITRO QUIET)
-find_package(SUNDIALS QUIET)
 find_package(BLAS QUIET)
 find_package(LAPACK QUIET)
 find_package(LIFTOPT QUIET)
 
-IF(ENABLE_SHARED)
-SET(EXTRA_LIBS ${CMAKE_DL_LIBS})
-ELSE(ENABLE_SHARED)
-SET(EXTRA_LIBS "")
-ENDIF(ENABLE_SHARED)
+if(ENABLE_SHARED)
+  set(EXTRA_LIBS ${CMAKE_DL_LIBS})
+else()
+  set(EXTRA_LIBS "")
+endif()
 
-IF(SUNDIALS_FOUND AND LAPACK_FOUND AND WITH_SUPERLU AND BLAS_FOUND)
+if(WITH_SUNDIALS AND LAPACK_FOUND AND WITH_SUPERLU AND BLAS_FOUND)
 add_executable(ctemplate ctemplate.cpp)
 target_link_libraries(ctemplate
   sundials_interface
@@ -26,4 +25,4 @@ target_link_libraries(ctemplate
   ${BLAS_LIBRARIES}
   ${EXTRA_LIBS}
 )
-ENDIF(SUNDIALS_FOUND AND LAPACK_FOUND AND WITH_SUPERLU AND BLAS_FOUND)
+endif()

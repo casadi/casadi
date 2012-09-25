@@ -21,7 +21,6 @@
  */
 
 #include "qpoases_internal.hpp"
-#include "../../casadi/fx/qp_solver.hpp"
 
 #include "../../casadi/stl_vector_tools.hpp"
 #include "../../casadi/matrix/matrix_tools.hpp"

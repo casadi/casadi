@@ -24,11 +24,11 @@
 #define OOQP_INTERNAL_HPP
 
 #include "casadi/fx/qp_solver_internal.hpp"
-#include "QpGenData.h"
-#include "QpGenVars.h"
-#include "QpGenResiduals.h"
-#include "GondzioSolver.h"
-#include "QpGenSparseMa27.h"
+#include <QpGenData.h>
+#include <QpGenVars.h>
+#include <QpGenResiduals.h>
+#include <GondzioSolver.h>
+#include <QpGenSparseMa27.h>
 
 namespace CasADi{
 namespace Interfaces {

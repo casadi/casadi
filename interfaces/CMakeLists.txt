@@ -2,9 +2,9 @@ if(LAPACK_FOUND)
 add_subdirectory(lapack)
 endif(LAPACK_FOUND)
 
-if(SUNDIALS_FOUND)
+if(WITH_SUNDIALS)
 add_subdirectory(sundials)
-endif(SUNDIALS_FOUND)
+endif(WITH_SUNDIALS)
 
 IF (IPOPT_FOUND)
 add_subdirectory(ipopt)

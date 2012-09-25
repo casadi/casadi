@@ -17,7 +17,7 @@ option(WITH_SWIG_SPLIT "Split SWIG wrapper generation into multiple modules" OFF
 option(WITH_WORHP "Compile the WORHP interface" OFF) 
 option(WITH_ACADO "Compile the interfaces to ACADO and qpOASES, if it can be found" OFF) 
 option(WITH_EIGEN3 "Use Eigen3 backend for matrix operations" OFF) 
-option(WITH_MODIFIED_SUNDIALS "Use the modified version of SUNDIALS shipped with CasADi" ON)
+option(WITH_SUNDIALS "Compile Sundials" ON)
 option(NEW_FIND_IPOPT "Use the rewritten version of the FindIPOPT.cmake script (being tested)" OFF)
 option(WITH_QPOASES "Use the latest QPOASES" ON)
 
@@ -86,13 +86,18 @@ if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
 endif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
 
+# Use the included Sundials
+if(WITH_SUNDIALS)
+  set(SUNDIALS_LIBRARIES sundials-2.5mod)
+endif()
+
 # enabling openmp support if requesed
 if(WITH_OPENMP)
-find_package (OpenMP)
-if(OPENMP_FOUND)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DWITH_OPENMP")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS} -DWITH_OPENMP")
-endif(OPENMP_FOUND)
+  find_package (OpenMP)
+  if(OPENMP_FOUND)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DWITH_OPENMP")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS} -DWITH_OPENMP")
+  endif(OPENMP_FOUND)
 endif(WITH_OPENMP)
 
 #SET(LIBRARY_OUTPUT_PATH  ${CMAKE_CURRENT_SOURCE_DIR}/lib)
@@ -121,7 +126,6 @@ endif(WITH_LLVM)
 
 # Optional auxillary dependencies
 find_package(LAPACK)
-find_package(SUNDIALS)
 find_package(IPOPT)
 if(WITH_ACADO)
 find_package(ACADO)

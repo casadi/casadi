@@ -1036,7 +1036,7 @@ void CVodesInternal::jtimes(const double *v, double* Jv, double t, const double*
   t_jac += double(time2-time1)/CLOCKS_PER_SEC;
 }
 
-int CVodesInternal::djac_wrapper(SUNDIALS_INT N, double t, N_Vector x, N_Vector xdot, DlsMat Jac, void *user_data,N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
+int CVodesInternal::djac_wrapper(long N, double t, N_Vector x, N_Vector xdot, DlsMat Jac, void *user_data,N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
   try{
     casadi_assert(user_data);
     CVodesInternal *this_ = (CVodesInternal*)user_data;
@@ -1048,7 +1048,7 @@ int CVodesInternal::djac_wrapper(SUNDIALS_INT N, double t, N_Vector x, N_Vector 
   }
 }
 
-void CVodesInternal::djac(SUNDIALS_INT N, double t, N_Vector x, N_Vector xdot, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
+void CVodesInternal::djac(long N, double t, N_Vector x, N_Vector xdot, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
   // Get time
   time1 = clock();
 
@@ -1082,7 +1082,7 @@ void CVodesInternal::djac(SUNDIALS_INT N, double t, N_Vector x, N_Vector xdot, D
   t_jac += double(time2-time1)/CLOCKS_PER_SEC;
 }
 
-int CVodesInternal::bjac_wrapper(SUNDIALS_INT N, SUNDIALS_INT mupper, SUNDIALS_INT mlower, double t, N_Vector x, N_Vector xdot, DlsMat Jac, void *user_data,     
+int CVodesInternal::bjac_wrapper(long N, long mupper, long mlower, double t, N_Vector x, N_Vector xdot, DlsMat Jac, void *user_data,     
                         N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
   try{
     casadi_assert(user_data);
@@ -1095,7 +1095,7 @@ int CVodesInternal::bjac_wrapper(SUNDIALS_INT N, SUNDIALS_INT mupper, SUNDIALS_I
   }
 }
 
-void CVodesInternal::bjac(SUNDIALS_INT N, SUNDIALS_INT mupper, SUNDIALS_INT mlower, double t, N_Vector x, N_Vector xdot, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
+void CVodesInternal::bjac(long N, long mupper, long mlower, double t, N_Vector x, N_Vector xdot, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
   // Get time
   time1 = clock();
 

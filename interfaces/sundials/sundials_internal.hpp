@@ -31,12 +31,6 @@
 #include <sundials/sundials_iterative.h>
 #include <sundials/sundials_types.h>
 
-#ifdef WITH_SUNDIALS_2_5
-typedef long SUNDIALS_INT;
-#else  // WITH_SUNDIALS_2_5
-typedef int SUNDIALS_INT;
-#endif // WITH_SUNDIALS_2_5
-
 namespace CasADi{
 namespace Sundials{
 

@@ -1,6 +1,5 @@
 find_package(IPOPT QUIET)
 find_package(KNITRO QUIET)
-find_package(SUNDIALS QUIET)
 find_package(BLAS QUIET)
 find_package(LAPACK QUIET)
 find_package(LIFTOPT QUIET)
@@ -28,7 +27,7 @@ target_link_libraries(det_minor_mx casadi ${CASADI_DEPENDENCIES})
 add_executable(propagating_sparsity propagating_sparsity.cpp)
 target_link_libraries(propagating_sparsity casadi ${CASADI_DEPENDENCIES})
 
-IF(IPOPT_FOUND)
+if(IPOPT_FOUND)
 
 # Rocket using Ipopt
 add_executable(rocket_ipopt rocket_ipopt.cpp)
@@ -42,10 +41,10 @@ target_link_libraries(rocket_mx_and_sx ipopt_interface casadi ${IPOPT_LIBRARIES}
 add_executable(ipopt_nl ipopt_nl.cpp)
 target_link_libraries(ipopt_nl ipopt_interface nonlinear_programming casadi ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES})
 
-ENDIF(IPOPT_FOUND)
+endif(IPOPT_FOUND)
 
 
-IF(SUNDIALS_FOUND AND IPOPT_FOUND)
+if(WITH_SUNDIALS AND IPOPT_FOUND)
 
 # rocket example using sundials and ipopt
 add_executable(rocket_single_shooting rocket_single_shooting.cpp)
@@ -86,7 +85,7 @@ target_link_libraries(cstr
 )
 
 
-ENDIF(SUNDIALS_FOUND AND IPOPT_FOUND)
+endif()
 
 include_directories(../../external_packages/CSparse/Include)
 
@@ -95,7 +94,7 @@ add_executable(test_csparse_casadi test_csparse_casadi.cpp)
 target_link_libraries(test_csparse_casadi csparse_interface casadi csparse ${CASADI_DEPENDENCIES} )
 
 # Sundials - just integrate
-IF(SUNDIALS_FOUND AND LAPACK_FOUND AND BLAS_FOUND)
+if(WITH_SUNDIALS AND LAPACK_FOUND AND BLAS_FOUND)
 add_executable(sundials_testing sundials_testing.cpp)
 target_link_libraries(sundials_testing
   sundials_interface
@@ -108,10 +107,10 @@ target_link_libraries(sundials_testing
   ${BLAS_LIBRARIES}
   ${CASADI_DEPENDENCIES}
 )
-ENDIF(SUNDIALS_FOUND AND LAPACK_FOUND AND BLAS_FOUND)
+endif(WITH_SUNDIALS AND LAPACK_FOUND AND BLAS_FOUND)
 
 if(LIFTOPT_FOUND)
 add_executable(test_liftopt test_liftopt.cpp)
 target_link_libraries(test_liftopt liftopt_interface casadi ${LIFTOPT_LIBRARIES} ${CASADI_DEPENDENCIES} )
-endif(LIFTOPT_FOUND)
+endif()
 
