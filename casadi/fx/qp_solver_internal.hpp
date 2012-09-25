@@ -23,6 +23,7 @@
 #ifndef QP_SOLVER_INTERNAL_HPP
 #define QP_SOLVER_INTERNAL_HPP
 
+#include "qp_solver.hpp"
 #include "fx_internal.hpp"
 
 namespace CasADi{
