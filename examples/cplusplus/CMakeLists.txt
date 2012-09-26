@@ -109,3 +109,12 @@ if(LIFTOPT_FOUND)
     ${LIFTOPT_LIBRARIES} ${CASADI_DEPENDENCIES} )
 endif()
 
+# Parametric sensitivities with sIPOPT
+if(IPOPT_FOUND)
+  add_executable(parametric_sensitivities parametric_sensitivities.cpp)
+  target_link_libraries(parametric_sensitivities 
+    ipopt_interface casadi 
+    ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES}
+  )
+endif()
+
