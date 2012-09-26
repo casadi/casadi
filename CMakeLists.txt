@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 2.0)
 project(opticon C CXX)
 
+# find the macports python libs if they exist
+if(APPLE)
+SET(CMAKE_LIBRARY_PATH /opt/local/lib ${CMAKE_LIBRARY_PATH})
+endif(APPLE)
+
 # What is this, why is is needed and why does it not appear to work?
 if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
