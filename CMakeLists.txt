@@ -25,8 +25,9 @@ option(WITH_SWIG_SPLIT "Split SWIG wrapper generation into multiple modules" OFF
 option(WITH_WORHP "Compile the WORHP interface" OFF) 
 option(WITH_ACADO "Compile the interfaces to ACADO and qpOASES, if it can be found" OFF) 
 option(WITH_EIGEN3 "Use Eigen3 backend for matrix operations" OFF) 
-option(WITH_SUNDIALS "Compile Sundials" ON)
-option(WITH_QPOASES "Use the latest QPOASES" ON)
+option(WITH_SUNDIALS "Compile the interface to Sundials (the source code for Sundials 2.5 is included)" ON)
+option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES 3.0beta is included)" ON)
+option(WITH_CSPARSE "Compile the interface to CSparse (the source code for CSparse is included)" ON)
 
 if(WITH_FORTRAN)
   # Enable Fortran linking (needed e.g. for LAPACK/BLAS), if Fortran is available
@@ -98,7 +99,7 @@ if(WITH_SUNDIALS)
   set(SUNDIALS_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/sundials-2.5mod)
   set(SUNDIALS_LIBRARIES sundials-2.5mod)
 endif()
-add_feature_info(sundials_interface WITH_SUNDIALS "Interface to the ODE/DAE integrator suite SUNDIALS.")
+add_feature_info(sundials-interface WITH_SUNDIALS "Interface to the ODE/DAE integrator suite SUNDIALS.")
 
 # Use the included qpOASES
 if(WITH_QPOASES)
@@ -106,7 +107,14 @@ if(WITH_QPOASES)
   set(QPOASES_LIBRARIES qpoases)
   set(QPOASES_FOUND true)
 endif()
-add_feature_info(qpoases_interface WITH_QPOASES "Interface to the QP solver qpOASES.")
+add_feature_info(qpoases-interface WITH_QPOASES "Interface to the active-set QP solver qpOASES.")
+
+# Use the included qpOASES
+if(WITH_CSPARSE)
+  set(CSPARSE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/CSparse/Include)
+  set(CSPARSE_LIBRARIES csparse)
+endif()
+add_feature_info(csparse-interface WITH_CSPARSE "Interface to the sparse direct linear solver CSparse.")
 
 # enabling openmp support if requesed
 if(WITH_OPENMP)
@@ -114,8 +122,8 @@ if(WITH_OPENMP)
   if(OPENMP_FOUND)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DWITH_OPENMP")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS} -DWITH_OPENMP")
-  endif(OPENMP_FOUND)
-endif(WITH_OPENMP)
+  endif()
+endif()
 
 #SET(LIBRARY_OUTPUT_PATH  ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake_modules)

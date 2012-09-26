@@ -26,11 +26,13 @@ if(LIFTOPT_FOUND)
   add_subdirectory(liftopt)
 endif()
 
-if (CPLEX_FOUND)
-add_subdirectory(cplex)
+if(CPLEX_FOUND)
+  add_subdirectory(cplex)
 endif()
 
-add_subdirectory(csparse)
+if(WITH_CSPARSE)
+  add_subdirectory(csparse)
+endif()
 
 # if(GSL_FOUND)
 #   add_subdirectory(gsl)

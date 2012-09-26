@@ -24,7 +24,7 @@
 #define CSPARSE_INTERNAL_HPP
 
 extern "C"{
-#include "external_packages/CSparse/Include/cs.h"
+#include "cs.h"
 }
 
 #include "csparse.hpp"

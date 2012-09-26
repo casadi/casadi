@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 2.0)
+include_directories(${CSPARSE_INCLUDE_DIR})
 
 set(CSPARSE_INTERFACE_SRCS
   csparse.hpp
@@ -8,15 +9,18 @@ set(CSPARSE_INTERFACE_SRCS
 )
 
 if(ENABLE_STATIC)
-add_library(csparse_interface STATIC ${CSPARSE_INTERFACE_SRCS})
-endif(ENABLE_STATIC)
+  add_library(csparse_interface STATIC ${CSPARSE_INTERFACE_SRCS})
+endif()
+
 if(ENABLE_SHARED)
-add_library(csparse_interface SHARED ${CSPARSE_INTERFACE_SRCS})
-endif(ENABLE_SHARED)
+  add_library(csparse_interface SHARED ${CSPARSE_INTERFACE_SRCS})
+endif()
+
 install(TARGETS csparse_interface
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
+
 install(DIRECTORY ./ 
    DESTINATION include/casadi/interfaces/csparse
    FILES_MATCHING PATTERN "*.hpp"

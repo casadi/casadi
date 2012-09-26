@@ -1,50 +1,63 @@
+# Exaple 10.1 from Biegler
 if(IPOPT_FOUND)
-
-  # Exaple 10.1 from Biegler
   add_executable(biegler_10_1 biegler_10_1.cpp)
-  target_link_libraries(biegler_10_1 ipopt_interface casadi ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES})
+  target_link_libraries(biegler_10_1 
+    ipopt_interface casadi 
+    ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES}
+  )
+endif()
 
-  # Exaple 10.2 from Biegler
+# Exaple 10.2 from Biegler
+if(IPOPT_FOUND)
   add_executable(biegler_10_2 biegler_10_2.cpp)
-  target_link_libraries(biegler_10_2 ipopt_interface casadi ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES})
+  target_link_libraries(biegler_10_2 
+    ipopt_interface casadi 
+    ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES}
+  )
+endif()
 
-  # Simple OCP example
+# Simple OCP example
+if(IPOPT_FOUND)
   add_executable(simple_ocp_sequential simple_ocp_sequential.cpp)
-  target_link_libraries(simple_ocp_sequential ipopt_interface casadi ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES} ${EXTRA_LIBS})
+  target_link_libraries(simple_ocp_sequential 
+    ipopt_interface casadi 
+    ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES} ${EXTRA_LIBS}
+  )
+endif()
 
+if(IPOPT_FOUND)
   add_executable(simple_ocp_simultaneous simple_ocp_simultaneous.cpp)
-  target_link_libraries(simple_ocp_simultaneous ipopt_interface casadi ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES} ${EXTRA_LIBS})
-
-endif(IPOPT_FOUND)
-
-if(KNITRO_FOUND)
+  target_link_libraries(simple_ocp_simultaneous 
+    ipopt_interface casadi 
+    ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES} ${EXTRA_LIBS}
+  )
+endif()
 
 # Exaple 10.1 from Biegler using KNITRO
-add_executable(biegler_10_1_knitro biegler_10_1_knitro.cpp)
-target_link_libraries(biegler_10_1_knitro knitro_interface casadi ${KNITRO_LIBRARIES} ${CASADI_DEPENDENCIES})
+if(KNITRO_FOUND)
+  add_executable(biegler_10_1_knitro biegler_10_1_knitro.cpp)
+  target_link_libraries(biegler_10_1_knitro 
+    knitro_interface casadi 
+    ${KNITRO_LIBRARIES} ${CASADI_DEPENDENCIES}
+  )
+endif()
 
-endif(KNITRO_FOUND)
-
-if(WITH_SUNDIALS AND IPOPT_FOUND)
-add_executable(convection_diffusion convection_diffusion.cpp)
-target_link_libraries(convection_diffusion
-  ipopt_interface
-  sundials_interface
-  csparse_interface
-  optimal_control
-  casadi
-  ${IPOPT_LIBRARIES}
-  ${SUNDIALS_LIBRARIES}
-  tinyxml
-  csparse 
-  ${CASADI_DEPENDENCIES}
+if(WITH_SUNDIALS AND IPOPT_FOUND AND WITH_CSPARSE)
+  add_executable(convection_diffusion convection_diffusion.cpp)
+  target_link_libraries(convection_diffusion
+    ipopt_interface sundials_interface csparse_interface optimal_control casadi
+    ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES} tinyxml ${CSPARSE_LIBRARIES} ${CASADI_DEPENDENCIES}
   )
 endif()
 
 # Det minor from ADOL-C
-add_executable(symbolic_fact symbolic_fact.cpp)
-target_link_libraries(symbolic_fact csparse_interface casadi ${CASADI_DEPENDENCIES} csparse )
-
+if(WITH_CSPARSE)
+  add_executable(symbolic_fact symbolic_fact.cpp)
+  target_link_libraries(symbolic_fact 
+    csparse_interface casadi 
+    ${CASADI_DEPENDENCIES} ${CSPARSE_LIBRARIES}
+  )
+endif()
 
 # Det minor from ADOL-C
 add_executable(det_minor det_minor.cpp)
@@ -72,7 +85,7 @@ if(WITH_LLVM)
 endif(WITH_LLVM)
 
 # single shooting using a RK4 integrator and SQP
-if(IPOPT_FOUND AND ACADO_FOUND AND ACADO_SHARED_LIBRARIES)
+if(IPOPT_FOUND AND WITH_QPOASES AND ACADO_SHARED_LIBRARIES)
   add_executable(vdp_lifted_newton vdp_lifted_newton.cpp)
   target_link_libraries(vdp_lifted_newton integration nonlinear_programming qpoases_interface ipopt_interface casadi ${CASADI_DEPENDENCIES} ${IPOPT_LIBRARIES} ${ACADO_SHARED_LIBRARIES})
 

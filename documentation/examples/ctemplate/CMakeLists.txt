@@ -4,7 +4,7 @@ else()
   set(EXTRA_LIBS "")
 endif()
 
-if(LAPACK_FOUND AND BLAS_FOUND)
+if(LAPACK_FOUND AND BLAS_FOUND AND WITH_CSPARSE)
 add_executable(ctemplate ctemplate.cpp)
 target_link_libraries(ctemplate
   sundials_interface 
@@ -13,7 +13,7 @@ target_link_libraries(ctemplate
   casadi
   ${SUNDIALS_LIBRARIES}
   ${LAPACK_LIBRARIES}
-  csparse
+  ${CSPARSE_LIBRARIES}
   ${BLAS_LIBRARIES}
   ${EXTRA_LIBS}
 )

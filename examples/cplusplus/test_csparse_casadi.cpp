@@ -27,7 +27,6 @@ Joel Andersson, K.U. Leuven, 2010
 
 #include "casadi/stl_vector_tools.hpp"
 #include "interfaces/csparse/csparse.hpp"
-#include "interfaces/csparse/csparse_internal.hpp"
 
 using namespace CasADi;
 using namespace CasADi::Interfaces;
