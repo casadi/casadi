@@ -49614,7 +49614,11 @@ point to this new object. ";
 
 %feature("docstring")  CasADi::MXFunction::MXFunction "
 
-Ddefault constructor. ";
+Default constructor. ";
+
+%feature("docstring")  CasADi::MXFunction::MXFunction "
+
+Attempt to form an MXFunction out of an FX. ";
 
 %feature("docstring")  CasADi::MXFunction::MXFunction "
 
@@ -68430,6 +68434,10 @@ Default constructor. ";
 %feature("docstring")  CasADi::SXFunction::SXFunction "
 
 Expand an MXFunction. ";
+
+%feature("docstring")  CasADi::SXFunction::SXFunction "
+
+Expand an FX. ";
 
 %feature("docstring")  CasADi::SXFunction::SXFunction "
 
