@@ -65,23 +65,25 @@ endif()
 include_directories(.)
 
 # Check if the compiler supports C++11
-foreach(CXX11FLAG "" "-std=c++11" "-std=c++0x" "-std=gnu++0x")
+foreach(CXX11FLAG_TEST "" "-std=c++11" "-std=c++0x" "-std=gnu++0x")
   if(NOT USE_CXX11)
     # Try to compile test with the proposed flag
     try_compile(USE_CXX11 
       ${CMAKE_BINARY_DIR} 
       ${CMAKE_SOURCE_DIR}/cmake_modules/check_cxx11.cpp
-      CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG}
+      CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG_TEST}
       OUTPUT_VARIABLE OUTPUT)
-      
-      # If found, set flag
-      if(USE_CXX11)
-        message(STATUS "Flag for enabling C++11 features: ${CXX11FLAG}")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11FLAG}")
-        add_definitions(-DUSE_CXX11)
-      endif()
+    set(CXX11FLAG ${CXX11FLAG_TEST})
   endif()
 endforeach()
+
+# If found, set flag
+if(CXX11FLAG)
+  message(STATUS "Flag for enabling C++11 features: ${CXX11FLAG}")
+  set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${CXX11FLAG})
+  add_definitions(-DUSE_CXX11)
+endif()
+
 add_feature_info(using-c++11 USE_CXX11 "Using C++11 features (improves efficiency and is required for some examples).")
 
 # set(CMAKE_VERBOSE_MAKEFILE 0)
