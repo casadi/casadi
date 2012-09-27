@@ -2,9 +2,15 @@ cmake_minimum_required (VERSION 2.0)
 set(PACKAGE_NAME "CasADi")
 set(PACKAGE_VERSION "1.4.1")
 
-#if(COMMAND cmake_policy)
-#cmake_policy(SET CMP0003 NEW)
-#endif(COMMAND cmake_policy)
+# Enforce cmake2.4+ style behaviour for mixed filename/full path linker directives
+if(COMMAND cmake_policy)
+cmake_policy(SET CMP0003 NEW)
+endif()
+
+# cmake_policy propagation rules
+if(COMMAND cmake_policy)
+cmake_policy(SET CMP0011 OLD)
+endif()
 
 find_package (PythonLibs)
 find_package (NUMPY)
@@ -162,11 +168,6 @@ endforeach()
 else(WITH_SWIG_SPLIT)
 SWIG_ADD_MODULE (casadi python casadi.i) #the target corresponding this module is called "_casadi"
 endif(WITH_SWIG_SPLIT)
-
-# add_dependencies(_casadi casadi) #workaround to add dependencies of casadi to _casadi (SWIG_ADD_MODULE does not add dependencies from c++ source files)
-if(NUMPY_FOUND)
-cmake_policy(SET CMP0003 NEW)
-endif(NUMPY_FOUND)
 
 if(WITH_SWIG_SPLIT)
   foreach(my_module ${CASADI_SWIG_SEPARATE_MODULES})

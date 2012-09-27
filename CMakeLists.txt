@@ -6,9 +6,14 @@ if(APPLE)
   set(CMAKE_LIBRARY_PATH /opt/local/lib ${CMAKE_LIBRARY_PATH})
 endif()
 
-# What is this, why is is needed and why does it not appear to work?
+# Enforce cmake2.4+ style behaviour for mixed filename/full path linker directives
 if(COMMAND cmake_policy)
-  cmake_policy(SET CMP0003 NEW)
+cmake_policy(SET CMP0003 NEW)
+endif()
+
+# cmake_policy propagation rules
+if(COMMAND cmake_policy)
+cmake_policy(SET CMP0011 OLD)
 endif()
 
 # We use the FeatureSummary module to get a more readable CMake output

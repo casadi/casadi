@@ -39,6 +39,10 @@
 #  USE_SWIG_FLAGS_${language}
 #  USE_SWIG_FLAGS
 
+# Enforce cmake2.4+ style behaviour for mixed filename/full path linker directives
+if(COMMAND cmake_policy)
+cmake_policy(SET CMP0003 NEW)
+endif()
 
 set(USE_SWIG_FLAGS "")
 set(USE_SWIG_FLAGS_python "")
