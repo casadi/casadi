@@ -77,7 +77,7 @@ foreach(CXX11FLAG "" "-std=c++11" "-std=c++0x" "-std=gnu++0x")
       # If found, set flag
       if(USE_CXX11)
         message(STATUS "Flag for enabling C++11 features: ${CXX11FLAG}")
-        set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${CXX11FLAG})
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX11FLAG}")
         add_definitions(-DUSE_CXX11)
       endif()
   endif()
