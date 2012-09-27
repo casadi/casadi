@@ -211,6 +211,14 @@ bool IpoptUserClass::get_var_con_metadata(Index n,StringMetaDataMapType& var_str
   return solver->get_var_con_metadata(n, var_string_md, var_integer_md, var_numeric_md, m, con_string_md, con_integer_md, con_numeric_md);
 }
 
+void IpoptUserClass::finalize_metadata(Index n, const StringMetaDataMapType& var_string_md,
+                                       const IntegerMetaDataMapType& var_integer_md, const NumericMetaDataMapType& var_numeric_md,
+                                       Index m, const StringMetaDataMapType& con_string_md,
+                                       const IntegerMetaDataMapType& con_integer_md, const NumericMetaDataMapType& con_numeric_md){
+  solver->finalize_metadata(n,var_string_md,var_integer_md,var_numeric_md,m,con_string_md,con_integer_md,con_numeric_md);
+}
+
+
 
 
 } // namespace CasADi

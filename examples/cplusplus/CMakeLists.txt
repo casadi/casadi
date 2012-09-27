@@ -110,7 +110,7 @@ if(LIFTOPT_FOUND)
 endif()
 
 # Parametric sensitivities with sIPOPT
-if(IPOPT_FOUND)
+if(IPOPT_FOUND AND USE_CXX11)
   add_executable(parametric_sensitivities parametric_sensitivities.cpp)
   target_link_libraries(parametric_sensitivities 
     ipopt_interface casadi 
@@ -119,7 +119,7 @@ if(IPOPT_FOUND)
 endif()
 
 # Parametric NLP
-if(IPOPT_FOUND)
+if(IPOPT_FOUND AND USE_CXX11)
   add_executable(parametric_nlp parametric_nlp.cpp)
   target_link_libraries(parametric_nlp
     ipopt_interface casadi 

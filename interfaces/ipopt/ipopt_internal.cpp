@@ -27,6 +27,15 @@
 
 using namespace std;
 #include <IpIpoptApplication.hpp>
+
+// Headers for sIPOPT
+#ifdef WITH_SIPOPT
+#include <SensApplication.hpp>
+#include <IpPDSearchDirCalc.hpp>
+#include <IpIpoptAlg.hpp>
+#include <SensRegOp.hpp>
+#endif // WITH_SIPOPT
+
 namespace CasADi{
 
 IpoptInternal::IpoptInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF) : NLPSolverInternal(F,G,H,J), GF_(GF){
@@ -754,7 +763,15 @@ bool IpoptInternal::get_var_con_metadata(int n,
   return true;
 }
 
-
-
+void IpoptInternal::finalize_metadata(int n,
+                                      const std::map<std::string,std::vector<std::string> >& var_string_md, 
+                                      const std::map<std::string,std::vector<int> >& var_integer_md,
+                                      const std::map<std::string,std::vector<double> >& var_numeric_md,
+                                      int m,
+                                      const std::map<std::string,std::vector<std::string> >& con_string_md,
+                                      const std::map<std::string,std::vector<int> >& con_integer_md,
+                                      const std::map<std::string,std::vector<double> >& con_numeric_md){
+  
+}
 
 } // namespace CasADi

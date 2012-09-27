@@ -81,6 +81,15 @@ std::map<std::string,opt_type> ops_;
                             std::map<std::string,std::vector<int> >& con_integer_md,
                             std::map<std::string,std::vector<double> >& con_numeric_md);
   
+  void finalize_metadata(int n,
+                          const std::map<std::string,std::vector<std::string> >& var_string_md, 
+                          const std::map<std::string,std::vector<int> >& var_integer_md,
+                          const std::map<std::string,std::vector<double> >& var_numeric_md,
+                          int m,
+                          const std::map<std::string,std::vector<std::string> >& con_string_md,
+                          const std::map<std::string,std::vector<int> >& con_integer_md,
+                          const std::map<std::string,std::vector<double> >& con_numeric_md);
+  
   // Accummulated time since last reset:
   double t_eval_f_; // time spent in eval_f
   double t_eval_grad_f_; // time spent in eval_grad_f

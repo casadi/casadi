@@ -71,21 +71,39 @@ int main(){
   double inf = numeric_limits<double>::infinity();
   
   // Original parameter values
-  double p0[]  = {5.00,1.00};
+  vector<double> p_a  = {5.00,1.00};
+  
+  // Perturbed parameter values
+  vector<double> p_b  = {4.50,1.00};
 
   // Initial guess and bounds for the optimization variables
-  double x0[]  = {0.15, 0.15, 0.00, p0[0], p0[1]};
-  double lbx[] = {0.00, 0.00, 0.00,  -inf,  -inf};
-  double ubx[] = { inf,  inf,  inf,   inf,   inf};
+  vector<double> x0  = {0.15, 0.15, 0.00, p_a[0], p_a[1]};
+  vector<double> lbx = {0.00, 0.00, 0.00,   -inf,   -inf};
+  vector<double> ubx = { inf,  inf,  inf,    inf,    inf};
   
   // Nonlinear bounds
-  double lbg[] = {0.00, 0.00, p0[0], p0[1]};
-  double ubg[] = {0.00, 0.00, p0[0], p0[1]};
+  vector<double> lbg = {0.00, 0.00, p_a[0], p_a[1]};
+  vector<double> ubg = {0.00, 0.00, p_a[0], p_a[1]};
     
-  // Creaate NLP solver
+  // Create NLP solver
   SXFunction ffcn(x,f);
   SXFunction gfcn(x,g);
   IpoptSolver solver(ffcn,gfcn);
+  
+  // Mark the parameters amongst the constraints (see sIPOPT documentation)
+  Dictionary con_integer_md;
+  con_integer_md["sens_init_constr"] = vector<int>{0,0,1,2};
+  solver.setOption("con_integer_md",con_integer_md);
+  
+  // Mark the parameters amongst the variables (see sIPOPT documentation)
+  Dictionary var_integer_md;
+  var_integer_md["sens_state_1"] = vector<int>{0,0,0,1,2};
+  solver.setOption("var_integer_md",var_integer_md);
+
+  // Pass the perturbed values (see sIPOPT documentation)
+  Dictionary var_numeric_md;
+  var_numeric_md["sens_state_value_1"] = vector<double>{0,0,0,p_b[0],p_b[1]};
+  solver.setOption("var_numeric_md",var_numeric_md);
   
   // Set options and initialize solver
   solver.init();

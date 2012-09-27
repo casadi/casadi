@@ -15,10 +15,13 @@ SET(IPOPT_INTERFACE_SRCS
   ipopt_qp_solver.cpp
 )
 
-IF(IPOPT_FOUND_EXTRA)
+if(WITH_IPOPT_CALLBACK)
   add_definitions(-DWITH_IPOPT_CALLBACK)
-ENDIF(IPOPT_FOUND_EXTRA)
+endif()
 
+if(WITH_SIPOPT)
+  add_definitions(-DWITH_SIPOPT)
+endif()
 
 if(ENABLE_STATIC)
 add_library(ipopt_interface STATIC ${IPOPT_INTERFACE_SRCS})
