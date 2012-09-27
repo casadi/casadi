@@ -64,28 +64,25 @@ endif()
 
 include_directories(.)
 
-# Check if unordered map is available
-try_compile(HAVE_UNORDERED_MAP
-  ${CMAKE_BINARY_DIR} 
-  ${CMAKE_SOURCE_DIR}/cmake_modules/check_unordered_map.cpp
-  OUTPUT_VARIABLE OUTPUT)
-
-# Add -std=gnu++0x and try again
-if(NOT HAVE_UNORDERED_MAP)
-  try_compile(HAVE_UNORDERED_MAP 
-    ${CMAKE_BINARY_DIR} 
-    ${CMAKE_SOURCE_DIR}/cmake_modules/check_unordered_map.cpp
-    CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=-std=gnu++0x
-    OUTPUT_VARIABLE OUTPUT)
-    
-    # Add flag
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++0x")
-endif(NOT HAVE_UNORDERED_MAP)
-
-# Add definition
-if(HAVE_UNORDERED_MAP)
-  add_definitions(-DHAVE_UNORDERED_MAP)
-endif(HAVE_UNORDERED_MAP)
+# Check if the compiler supports C++11
+foreach(CXX11FLAG "" "-std=c++11" "-std=c++0x" "-std=gnu++0x")
+  if(NOT USE_CXX11)
+    # Try to compile test with the proposed flag
+    try_compile(USE_CXX11 
+      ${CMAKE_BINARY_DIR} 
+      ${CMAKE_SOURCE_DIR}/cmake_modules/check_cxx11.cpp
+      CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG}
+      OUTPUT_VARIABLE OUTPUT)
+      
+      # If found, set flag
+      if(USE_CXX11)
+        message(STATUS "Flag for enabling C++11 features: ${CXX11FLAG}")
+        set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} ${CXX11FLAG})
+        add_definitions(-DUSE_CXX11)
+      endif()
+  endif()
+endforeach()
+add_feature_info(using-c++11 USE_CXX11 "Using C++11 features (improves efficiency and is required for some examples).")
 
 # set(CMAKE_VERBOSE_MAKEFILE 0)
 

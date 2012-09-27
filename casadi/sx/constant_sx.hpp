@@ -27,15 +27,15 @@
 #include <cassert>
 
 // Cashing of constants requires a map (preferably a hash map)
-#ifdef HAVE_UNORDERED_MAP
+#ifdef USE_CXX11
 // Using C++11 unordered_map (hash map)
 #include <unordered_map>
 #define CACHING_MAP std::unordered_map
-#else // HAVE_UNORDERED_MAP
+#else // USE_CXX11
 // Falling back to std::map (binary search tree)
 #include <map>
 #define CACHING_MAP std::map
-#endif // HAVE_UNORDERED_MAP
+#endif // USE_CXX11
 
 namespace CasADi{
 
