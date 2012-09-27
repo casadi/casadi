@@ -1,4 +1,6 @@
 cmake_minimum_required (VERSION 2.0)
+set(PACKAGE_NAME "CasADi")
+set(PACKAGE_VERSION "1.4.1")
 
 #if(COMMAND cmake_policy)
 #cmake_policy(SET CMP0003 NEW)
@@ -9,7 +11,6 @@ find_package (NUMPY)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake_modules)
 if(MPI_FOUND)
-   include_directories (${MPI_INCLUDE_PATH})
    set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} ${MPI_LIBRARY} ${MPI_EXTRA_LIBRARY})
 endif(MPI_FOUND)
 
@@ -44,7 +45,6 @@ if(ACADO_FOUND)
 endif()
 
 if(WITH_QPOASES)
-  include_directories (${QPOASES_INCLUDE_DIR})
   set(CASADI_SWIG_FLAGS ${CASADI_SWIG_FLAGS} "-DWITH_QPOASES")
   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} qpoases_interface ${QPOASES_LIBRARIES})
 endif()
