@@ -205,6 +205,11 @@ bool IpoptUserClass::get_list_of_nonlinear_variables(Index num_nonlin_vars, Inde
   return solver->get_list_of_nonlinear_variables(num_nonlin_vars,pos_nonlin_vars);
 }
 
+bool IpoptUserClass::get_var_con_metadata(Index n,StringMetaDataMapType& var_string_md, IntegerMetaDataMapType& var_integer_md, NumericMetaDataMapType& var_numeric_md,
+                                          Index m,StringMetaDataMapType& con_string_md, IntegerMetaDataMapType& con_integer_md, NumericMetaDataMapType& con_numeric_md){
+  
+  return solver->get_var_con_metadata(n, var_string_md, var_integer_md, var_numeric_md, m, con_string_md, con_integer_md, con_numeric_md);
+}
 
 
 

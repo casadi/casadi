@@ -3,13 +3,13 @@ project(opticon C CXX)
 
 # find the macports python libs if they exist
 if(APPLE)
-SET(CMAKE_LIBRARY_PATH /opt/local/lib ${CMAKE_LIBRARY_PATH})
-endif(APPLE)
+  set(CMAKE_LIBRARY_PATH /opt/local/lib ${CMAKE_LIBRARY_PATH})
+endif()
 
 # What is this, why is is needed and why does it not appear to work?
 if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
-endif(COMMAND cmake_policy)
+endif()
 
 # We use the FeatureSummary module to get a more readable CMake output
 include(FeatureSummary)
@@ -34,19 +34,19 @@ option(WITH_SUNDIALS "Compile the interface to Sundials (the source code for Sun
 option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES 3.0beta is included)" ON)
 option(WITH_CSPARSE "Compile the interface to CSparse (the source code for CSparse is included)" ON)
 
+# Enable Fortran linking (needed e.g. for LAPACK/BLAS), if Fortran is available
 if(WITH_FORTRAN)
-  # Enable Fortran linking (needed e.g. for LAPACK/BLAS), if Fortran is available
   include(CMakeDetermineFortranCompiler)
   if(CMAKE_Fortran_COMPILER)
     enable_language(Fortran)
-  endif(CMAKE_Fortran_COMPILER)
-endif(WITH_FORTRAN)
+  endif()
+endif()
 
 # For code optimization
 if(CMAKE_BUILD_TYPE)
 else(CMAKE_BUILD_TYPE)
-SET(CMAKE_BUILD_TYPE Release)
-# SET(CMAKE_BUILD_TYPE Debug)
+  set(CMAKE_BUILD_TYPE Release)
+  # set(CMAKE_BUILD_TYPE Debug)
 endif(CMAKE_BUILD_TYPE)
 
 # Necessary for Visual C++
@@ -55,12 +55,12 @@ add_definitions(-D_SCL_SECURE_NO_WARNINGS)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
 if(WITH_DL)
-add_definitions(-DWITH_DL)
-endif(WITH_DL)
+  add_definitions(-DWITH_DL)
+endif()
 
 if(WITH_PRINTME)
-add_definitions(-DWITH_PRINTME)
-endif(WITH_PRINTME)
+  add_definitions(-DWITH_PRINTME)
+endif()
 
 include_directories(.)
 
@@ -84,7 +84,7 @@ endif(NOT HAVE_UNORDERED_MAP)
 
 # Add definition
 if(HAVE_UNORDERED_MAP)
-add_definitions(-DHAVE_UNORDERED_MAP)
+  add_definitions(-DHAVE_UNORDERED_MAP)
 endif(HAVE_UNORDERED_MAP)
 
 # set(CMAKE_VERBOSE_MAKEFILE 0)
@@ -223,12 +223,12 @@ add_subdirectory(documentation/tutorials EXCLUDE_FROM_ALL)
 add_custom_target(tutor)
 
 if(WITH_DOC)
-set(DOXYFILE_LATEX "NO")
-set(DOXYFILE_IN_DIR ${CMAKE_SOURCE_DIR}/documentation/api-doc)
-set(DOXYFILE_OUTPUT_DIR  ${CMAKE_SOURCE_DIR}/documentation/api-doc)
-set(DOXYFILE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/casadi)
-include(UseDoxygen OPTIONAL)
-endif(WITH_DOC)
+  set(DOXYFILE_LATEX "NO")
+  set(DOXYFILE_IN_DIR ${CMAKE_SOURCE_DIR}/documentation/api-doc)
+  set(DOXYFILE_OUTPUT_DIR  ${CMAKE_SOURCE_DIR}/documentation/api-doc)
+  set(DOXYFILE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/casadi)
+  include(UseDoxygen OPTIONAL)
+endif()
 
 add_subdirectory(documentation/examples/ctemplate)
 

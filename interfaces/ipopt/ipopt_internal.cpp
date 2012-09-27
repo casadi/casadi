@@ -36,6 +36,14 @@ IpoptInternal::IpoptInternal(const FX& F, const FX& G, const FX& H, const FX& J,
   // Monitors
   addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f", true);
 
+  // For passing metadata to IPOPT
+  addOption("var_string_md",    OT_DICTIONARY, GenericType(), "String metadata (a dictionary with lists of strings) about variables to be passed to IPOPT");
+  addOption("var_integer_md",   OT_DICTIONARY, GenericType(), "Integer metadata (a dictionary with lists of integers) about variables to be passed to IPOPT");
+  addOption("var_numeric_md",   OT_DICTIONARY, GenericType(), "Numeric metadata (a dictionary with lists of reals) about variables to be passed to IPOPT");
+  addOption("con_string_md",    OT_DICTIONARY, GenericType(), "String metadata (a dictionary with lists of strings) about constraints to be passed to IPOPT");
+  addOption("con_integer_md",   OT_DICTIONARY, GenericType(), "Integer metadata (a dictionary with lists of integers) about constraints to be passed to IPOPT");
+  addOption("con_numeric_md",   OT_DICTIONARY, GenericType(), "Numeric metadata (a dictionary with lists of reals) about constraints to be passed to IPOPT");
+  
   // Set pointers to zero
   app = 0;
   userclass = 0;
@@ -138,8 +146,8 @@ void IpoptInternal::init(){
   
   if(verbose_){
     cout << "There are " << n_ << " variables and " << m_ << " constraints." << endl;
-    if(exact_hessian_) std::cout << "Using exact Hessian" << std::endl;
-    else             std::cout << "Using limited memory Hessian approximation" << std::endl;
+    if(exact_hessian_) cout << "Using exact Hessian" << endl;
+    else             cout << "Using limited memory Hessian approximation" << endl;
   }
  
   bool ret = true;
@@ -591,8 +599,8 @@ bool IpoptInternal::get_starting_point(int n, bool init_x, double* x,
       // Get dual solution (simple bounds)
       vector<double>& lambda_x = output(NLP_LAMBDA_X).data();
       for(int i=0; i<lambda_x.size(); ++i){
-        z_L[i] = std::max(0.,-lambda_x[i]);
-        z_U[i] = std::max(0., lambda_x[i]);
+        z_L[i] = max(0.,-lambda_x[i]);
+        z_U[i] = max(0., lambda_x[i]);
       }
     }
     
@@ -674,5 +682,79 @@ bool IpoptInternal::get_list_of_nonlinear_variables(int num_nonlin_vars, int* po
     return false;
   }
 }
+
+bool IpoptInternal::get_var_con_metadata(int n,
+                                         map<string,vector<string> >& var_string_md, 
+                                         map<string,vector<int> >& var_integer_md,
+                                         map<string,vector<double> >& var_numeric_md,
+                                         int m,
+                                         map<string,vector<string> >& con_string_md,
+                                         map<string,vector<int> >& con_integer_md,
+                                         map<string,vector<double> >& con_numeric_md){
+  if(hasSetOption("var_string_md")){
+    Dictionary dict = getOption("var_string_md");
+    for(Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it){
+      string key = it->first; // Get the key
+      vector<string> entry = it->second; // Get the entry
+      casadi_assert_message(entry.size()==n, "Inconsistent length of IPOPT metadata."); // Check length for consistency
+      var_string_md[key] = entry; // Save to IPOPT data structure
+    }
+  }
+
+  if(hasSetOption("var_integer_md")){
+    Dictionary dict = getOption("var_integer_md");
+    for(Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it){
+      string key = it->first; // Get the key
+      vector<int> entry = it->second; // Get the entry
+      casadi_assert_message(entry.size()==n, "Inconsistent length of IPOPT metadata."); // Check length for consistency
+      var_integer_md[key] = entry; // Save to IPOPT data structure
+    }
+  }
+
+  if(hasSetOption("var_numeric_md")){
+    Dictionary dict = getOption("var_numeric_md");
+    for(Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it){
+      string key = it->first; // Get the key
+      vector<double> entry = it->second; // Get the entry
+      casadi_assert_message(entry.size()==n, "Inconsistent length of IPOPT metadata."); // Check length for consistency
+      var_numeric_md[key] = entry; // Save to IPOPT data structure
+    }
+  }
+  
+  if(hasSetOption("con_string_md")){
+    Dictionary dict = getOption("con_string_md");
+    for(Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it){
+      string key = it->first; // Get the key
+      vector<string> entry = it->second; // Get the entry
+      casadi_assert_message(entry.size()==m, "Inconsistent length of IPOPT metadata."); // Check length for consistency
+      con_string_md[key] = entry; // Save to IPOPT data structure
+    }
+  }
+
+  if(hasSetOption("con_integer_md")){
+    Dictionary dict = getOption("con_integer_md");
+    for(Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it){
+      string key = it->first; // Get the key
+      vector<int> entry = it->second; // Get the entry
+      casadi_assert_message(entry.size()==m, "Inconsistent length of IPOPT metadata."); // Check length for consistency
+      con_integer_md[key] = entry; // Save to IPOPT data structure
+    }
+  }
+
+  if(hasSetOption("con_numeric_md")){
+    Dictionary dict = getOption("con_numeric_md");
+    for(Dictionary::const_iterator it=dict.begin(); it!=dict.end(); ++it){
+      string key = it->first; // Get the key
+      vector<double> entry = it->second; // Get the entry
+      casadi_assert_message(entry.size()==m, "Inconsistent length of IPOPT metadata."); // Check length for consistency
+      con_numeric_md[key] = entry; // Save to IPOPT data structure
+    }
+  }
+  
+  return true;
+}
+
+
+
 
 } // namespace CasADi

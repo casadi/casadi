@@ -72,6 +72,14 @@ std::map<std::string,opt_type> ops_;
   int get_number_of_nonlinear_variables() const;
   bool get_list_of_nonlinear_variables(int num_nonlin_vars, int* pos_nonlin_vars) const;
   bool intermediate_callback(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value, int iter, double inf_pr, double inf_du,double mu,double d_norm,double regularization_size,double alpha_du,double alpha_pr,int ls_trials);
+  bool get_var_con_metadata(int n,
+                            std::map<std::string,std::vector<std::string> >& var_string_md, 
+                            std::map<std::string,std::vector<int> >& var_integer_md,
+                            std::map<std::string,std::vector<double> >& var_numeric_md,
+                            int m,
+                            std::map<std::string,std::vector<std::string> >& con_string_md,
+                            std::map<std::string,std::vector<int> >& con_integer_md,
+                            std::map<std::string,std::vector<double> >& con_numeric_md);
   
   // Accummulated time since last reset:
   double t_eval_f_; // time spent in eval_f

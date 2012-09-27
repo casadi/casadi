@@ -118,3 +118,12 @@ if(IPOPT_FOUND)
   )
 endif()
 
+# Parametric NLP
+if(IPOPT_FOUND)
+  add_executable(parametric_nlp parametric_nlp.cpp)
+  target_link_libraries(parametric_nlp
+    ipopt_interface casadi 
+    ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES}
+  )
+endif()
+

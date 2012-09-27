@@ -31,7 +31,11 @@
 using namespace CasADi;
 using namespace std;
 /**
- *  Example program demonstrating sensitivity analysis with IPOPT from CasADi
+ *  Example program demonstrating parametric NLPs in CasADi
+ *  Note that there is currently no support for parametric sensitivities via this feature (although it would make a lot of sense).
+ *  For parametric sensitivities, see the parametric_sensitivities.cpp example which calculates sensitivitied via the sIPOPT extension
+ *  to IPOPT.
+ * 
  *  Joel Andersson, K.U. Leuven 2012
  */
 
@@ -61,37 +65,38 @@ int main(){
     p[1]*x[0] +   x[1] -   x[2] -    1
   );
   
-  // Augment the parameters to the list of variables
-  x = vertcat(x,p);
-  
-  // Fix the parameters by additional equations
-  g = vertcat(g,p);
-  
   // Infinity
   double inf = numeric_limits<double>::infinity();
+  
+  // Initial guess and bounds for the optimization variables
+  double x0[]  = {0.15, 0.15, 0.00};
+  double lbx[] = {0.00, 0.00, 0.00};
+  double ubx[] = { inf,  inf,  inf};
+  
+  // Nonlinear bounds
+  double lbg[] = {0.00, 0.00};
+  double ubg[] = {0.00, 0.00};
   
   // Original parameter values
   double p0[]  = {5.00,1.00};
 
-  // Initial guess and bounds for the optimization variables
-  double x0[]  = {0.15, 0.15, 0.00, p0[0], p0[1]};
-  double lbx[] = {0.00, 0.00, 0.00,  -inf,  -inf};
-  double ubx[] = { inf,  inf,  inf,   inf,   inf};
+  // Input arguments for f(x,p) and g(x,p)
+  vector<SXMatrix> x_and_p(2);
+  x_and_p[0] = x;
+  x_and_p[1] = p;
   
-  // Nonlinear bounds
-  double lbg[] = {0.00, 0.00, p0[0], p0[1]};
-  double ubg[] = {0.00, 0.00, p0[0], p0[1]};
-    
   // Creaate NLP solver
-  SXFunction ffcn(x,f);
-  SXFunction gfcn(x,g);
+  SXFunction ffcn(x_and_p,f);
+  SXFunction gfcn(x_and_p,g);
   IpoptSolver solver(ffcn,gfcn);
   
   // Set options and initialize solver
+  solver.setOption("parametric",true);
   solver.init();
   
   // Solve NLP
   solver.setInput( x0, NLP_X_INIT);
+  solver.setInput( p0, NLP_P);
   solver.setInput(lbx, NLP_LBX);
   solver.setInput(ubx, NLP_UBX);
   solver.setInput(lbg, NLP_LBG);
@@ -99,8 +104,25 @@ int main(){
   solver.evaluate();
   
   // Print the solution
-  cout << "f_opt = " << solver.output(NLP_COST) << endl;
-  cout << "x_opt = " << solver.output(NLP_X_OPT) << endl;
+  cout << "-----" << endl;
+  cout << "Optimal solution for p = " << solver.input(NLP_P).getDescription() << ":" << endl;
+  cout << setw(30) << "Objective: " << solver.output(NLP_COST).getDescription() << endl;
+  cout << setw(30) << "Primal solution: " << solver.output(NLP_X_OPT).getDescription() << endl;
+  cout << setw(30) << "Dual solution (x): " << solver.output(NLP_LAMBDA_X).getDescription() << endl;
+  cout << setw(30) << "Dual solution (g): " << solver.output(NLP_LAMBDA_G).getDescription() << endl;
+  
+  // Change the parameter and resolve
+  p0[0] = 4.5;
+  solver.setInput( p0, NLP_P);
+  solver.evaluate();
+  
+  // Print the new solution
+  cout << "-----" << endl;
+  cout << "Optimal solution for p = " << solver.input(NLP_P).getDescription() << ":" << endl;
+  cout << setw(30) << "Objective: " << solver.output(NLP_COST).getDescription() << endl;
+  cout << setw(30) << "Primal solution: " << solver.output(NLP_X_OPT).getDescription() << endl;
+  cout << setw(30) << "Dual solution (x): " << solver.output(NLP_LAMBDA_X).getDescription() << endl;
+  cout << setw(30) << "Dual solution (g): " << solver.output(NLP_LAMBDA_G).getDescription() << endl;
   
   return 0;
 }
