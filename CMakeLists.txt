@@ -66,14 +66,18 @@ include_directories(.)
 
 # Check if the compiler supports C++11
 foreach(CXX11FLAG_TEST "" "-std=c++11" "-std=c++0x" "-std=gnu++0x")
-  if(NOT USE_CXX11)
+  if(NOT CXX11FLAG)
     # Try to compile test with the proposed flag
-    try_compile(USE_CXX11 
+    try_compile(CXX11_SUCCESS
       ${CMAKE_BINARY_DIR} 
       ${CMAKE_SOURCE_DIR}/cmake_modules/check_cxx11.cpp
       CMAKE_FLAGS -DCOMPILE_DEFINITIONS:STRING=${CXX11FLAG_TEST}
       OUTPUT_VARIABLE OUTPUT)
-    set(CXX11FLAG ${CXX11FLAG_TEST})
+    
+    # Save flag, if successful
+    if(CXX11_SUCCESS)
+      set(CXX11FLAG ${CXX11FLAG_TEST})
+    endif()
   endif()
 endforeach()
 
