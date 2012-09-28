@@ -31,7 +31,7 @@
 using namespace CasADi;
 using namespace std;
 /**
- *  Example program demonstrating sensitivity analysis with IPOPT from CasADi
+ *  Example program demonstrating sensitivity analysis with sIPOPT from CasADi
  *  Joel Andersson, K.U. Leuven 2012
  */
 

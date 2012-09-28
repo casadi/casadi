@@ -110,9 +110,18 @@ if(LIFTOPT_FOUND)
 endif()
 
 # Parametric sensitivities with sIPOPT
-if(IPOPT_FOUND AND USE_CXX11)
+if(IPOPT_FOUND AND USE_CXX11 AND WITH_SIPOPT)
   add_executable(parametric_sensitivities parametric_sensitivities.cpp)
   target_link_libraries(parametric_sensitivities 
+    ipopt_interface casadi 
+    ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES}
+  )
+endif()
+
+# Reduced hessian calculations with sIPOPT
+if(IPOPT_FOUND AND USE_CXX11 AND WITH_SIPOPT)
+  add_executable(reduced_hessian reduced_hessian.cpp)
+  target_link_libraries(reduced_hessian
     ipopt_interface casadi 
     ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES}
   )
