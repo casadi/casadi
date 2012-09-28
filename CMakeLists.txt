@@ -81,7 +81,7 @@ foreach(CXX11FLAG_TEST "" "-std=c++11" "-std=c++0x" "-std=gnu++0x")
     
     # Save flag, if successful
     if(USE_CXX11)
-      set(CXX11FLAG ${CXX11FLAG_TEST})
+      set(CXX11FLAG ${CXX11FLAG_TEST} CACHE INTERNAL "C++11 compile flag")
     endif()
   endif()
 endforeach()
