@@ -29,6 +29,7 @@
 /** \brief  Forward declarations */
 namespace Ipopt{
   struct IpoptApplication;
+  struct SensApplication;
 }
 
 namespace CasADi{
@@ -46,14 +47,21 @@ public:
   
   FX getGF() const { return GF_; }
   
-virtual void init();
-virtual void evaluate(int nfdir, int nadir);
+  // Free Ipopt related memory
+  void freeIpopt();
+  
+  virtual void init();
+  virtual void evaluate(int nfdir, int nadir);
 
 protected:
   
-Ipopt::IpoptApplication* app;
-void *userclass;
-std::map<std::string,opt_type> ops_;
+  void *userclass_;
+  Ipopt::IpoptApplication* app_;
+  #ifdef WITH_SIPOPT
+  Ipopt::SensApplication* app_sens_;
+  #endif
+    
+  std::map<std::string,opt_type> ops_;
 
   // The NLP functions
   /// Gradient of the objective function
@@ -99,6 +107,9 @@ std::map<std::string,opt_type> ops_;
   double t_callback_fun_;  // time spent in callback function
   double t_callback_prepare_; // time spent in callback preparation
   
+  // For parametric sensitivities with sIPOPT
+  bool run_sens_;
+  bool compute_red_hessian_;
 };
 
 } // namespace CasADi
