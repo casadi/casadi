@@ -53,21 +53,26 @@ IpoptInternal::IpoptInternal(const FX& F, const FX& G, const FX& H, const FX& J,
   addOption("con_integer_md",           OT_DICTIONARY, GenericType(), "Integer metadata (a dictionary with lists of integers) about constraints to be passed to IPOPT");
   addOption("con_numeric_md",           OT_DICTIONARY, GenericType(), "Numeric metadata (a dictionary with lists of reals) about constraints to be passed to IPOPT");
   
-  // Sensitivity calculations with sIPOPT
-  addOption("run_sens",                 OT_BOOLEAN,    false,         "Run sIPOPT sensitivity calculations");
-  addOption("compute_red_hessian",      OT_BOOLEAN,    false,         "Compute the (inverse of) the reduced Hessian");
-  
   // Set pointers to zero
   app_ = 0;
   userclass_ = 0;
   #ifdef WITH_SIPOPT
   app_sens_ = 0;
-  #endif
+  #endif // WITH_SIPOPT
 
   // Start an application (temporarily)
   Ipopt::IpoptApplication temp_app;
 
-  // Get all options available in IPOPT
+  // Start a sensitivity application (temporarily)
+  #ifdef WITH_SIPOPT
+  Ipopt::SensApplication temp_sens_app(temp_app.Jnlst(),temp_app.Options(),temp_app.RegOptions());
+  
+  // Register sIPOPT options
+  Ipopt::RegisterOptions_sIPOPT(temp_app.RegOptions());
+  temp_app.Options()->SetRegisteredOptions(temp_app.RegOptions());
+  #endif // WITH_SIPOPT
+  
+  // Get all options available in (s)IPOPT
   map<string, Ipopt::SmartPtr<Ipopt::RegisteredOption> > regops = temp_app.RegOptions()->RegisteredOptionsList();
   for(map<string, Ipopt::SmartPtr<Ipopt::RegisteredOption> >::const_iterator it=regops.begin(); it!=regops.end(); ++it){
     // Option identifier
@@ -106,26 +111,25 @@ IpoptInternal::IpoptInternal(const FX& F, const FX& G, const FX& H, const FX& J,
 }
 
 void IpoptInternal::freeIpopt(){
-  // Free Ipopt application instance
-  if(app_){
-    delete app_; 
+  // Free sensitivity application (or rather, the smart pointer holding it)
+  #ifdef WITH_SIPOPT
+  if(app_sens_ != 0){
+    delete static_cast<Ipopt::SmartPtr<Ipopt::SensApplication>*>(app_sens_);
+    app_sens_ = 0;
+  }
+  #endif // WITH_SIPOPT
+  
+  // Free Ipopt application instance (or rather, the smart pointer holding it)
+  if(app_ != 0){
+    delete static_cast<Ipopt::SmartPtr<Ipopt::IpoptApplication>*>(app_);
     app_ = 0;
   }
 
-  // Free Ipopt user class
+  // Free Ipopt user class (or rather, the smart pointer holding it)
   if(userclass_ != 0){
-    Ipopt::SmartPtr<Ipopt::TNLP> *ucptr = static_cast<Ipopt::SmartPtr<Ipopt::TNLP>*>(userclass_);
-    delete ucptr;
+    delete static_cast<Ipopt::SmartPtr<Ipopt::TNLP>*>(userclass_);
     userclass_ = 0;
   }
-  
-  // Free sensitivity application
-  #ifdef WITH_SIPOPT
-  if(app_sens_){
-    delete app_sens_;
-    app_sens_ = 0;
-  }
-  #endif  
 }
 
 IpoptInternal::~IpoptInternal(){
@@ -140,11 +144,18 @@ void IpoptInternal::init(){
   NLPSolverInternal::init();
     
   // Read user options
-  run_sens_ = getOption("run_sens");
-  compute_red_hessian_ = getOption("compute_red_hessian");
-  #ifndef WITH_SIPOPT
-  casadi_assert_message(!run_sens_ && !compute_red_hessian_,  "Sensitivity calculations with sIPOPT requires that CasADi has been compiled with sIPOPT support. See CasADi documentation.");
-  #endif
+  #ifdef WITH_SIPOPT
+  if(hasSetOption("run_sens")){
+    run_sens_ = getOption("run_sens")=="yes";
+  } else {
+    run_sens_  = false;
+  }
+  if(hasSetOption("compute_red_hessian")){
+    compute_red_hessian_ = getOption("compute_red_hessian")=="yes";
+  } else {
+    compute_red_hessian_ = false;
+  }
+  #endif // WITH_SIPOPT
   
   // Gradient of the objective function, remove?
   if(!GF_.isNull()) GF_.init();
@@ -159,14 +170,28 @@ void IpoptInternal::init(){
     casadi_assert_message((GF_.output().size1()==n_ && GF_.output().size2()==1) || (GF_.output().size1()==1 && GF_.output().size2()==n_),"Inconsistent dimensions");
   }
 
-  // Start a new IPOPT application
-  app_ = new Ipopt::IpoptApplication();
+  // Start an IPOPT application
+  Ipopt::SmartPtr<Ipopt::IpoptApplication> *app = new Ipopt::SmartPtr<Ipopt::IpoptApplication>();
+  app_ = static_cast<void*>(app);
+  *app = new Ipopt::IpoptApplication();
+  
+  #ifdef WITH_SIPOPT
+  if(run_sens_ || compute_red_hessian_){
+    // Start an sIPOPT application
+    Ipopt::SmartPtr<Ipopt::SensApplication> *app_sens = new Ipopt::SmartPtr<Ipopt::SensApplication>();
+    app_sens_ = static_cast<void*>(app_sens);
+    *app_sens = new Ipopt::SensApplication((*app)->Jnlst(),(*app)->Options(),(*app)->RegOptions());
     
+    // Register sIPOPT options
+    Ipopt::RegisterOptions_sIPOPT((*app)->RegOptions());
+    (*app)->Options()->SetRegisteredOptions((*app)->RegOptions());
+  }
+  #endif // WITH_SIPOPT
+  
   // Create an Ipopt user class -- need to use Ipopts spart pointer class
-  Ipopt::SmartPtr<Ipopt::TNLP> *ucptr = new Ipopt::SmartPtr<Ipopt::TNLP>();
-  userclass_ = static_cast<void*>(ucptr);
-  Ipopt::SmartPtr<Ipopt::TNLP> &uc = *ucptr;
-  uc = new IpoptUserClass(this);
+  Ipopt::SmartPtr<Ipopt::TNLP> *userclass = new Ipopt::SmartPtr<Ipopt::TNLP>();
+  userclass_ = static_cast<void*>(userclass);
+  *userclass = new IpoptUserClass(this);
   
   // read options
   exact_hessian_ = !H_.isNull();
@@ -197,13 +222,13 @@ void IpoptInternal::init(){
       GenericType op = getOption(it->first);
       switch(it->second){
         case OT_REAL:
-          ret &= app_->Options()->SetNumericValue(it->first,op.toDouble(),false);
+          ret &= (*app)->Options()->SetNumericValue(it->first,op.toDouble(),false);
           break;
         case OT_INTEGER:
-          ret &= app_->Options()->SetIntegerValue(it->first,op.toInt(),false);
+          ret &= (*app)->Options()->SetIntegerValue(it->first,op.toInt(),false);
           break;
         case OT_STRING:
-          ret &= app_->Options()->SetStringValue(it->first,op.toString(),false);
+          ret &= (*app)->Options()->SetStringValue(it->first,op.toString(),false);
           break;
         default:
           throw CasadiException("Illegal type");
@@ -211,11 +236,25 @@ void IpoptInternal::init(){
     }
   
   if (!ret) casadi_error("IpoptInternal::Init: Invalid options were detected by Ipopt.");
+  
+  // Extra initialization required by sIPOPT
+//   #ifdef WITH_SIPOPT
+//   if(run_sens_ || compute_red_hessian_){
+//     Ipopt::ApplicationReturnStatus status = (*app)->Initialize("");
+//     casadi_assert_message(status == Solve_Succeeded, "Error during IPOPT initialization");
+//   }
+//   #endif // WITH_SIPOPT
+  
   // Intialize the IpoptApplication and process the options
-  Ipopt::ApplicationReturnStatus status = app_->Initialize();
-  if (status != Solve_Succeeded) {
-    throw "Error during initialization!\n";
+  Ipopt::ApplicationReturnStatus status = (*app)->Initialize();
+  casadi_assert_message(status == Solve_Succeeded, "Error during IPOPT initialization");
+  
+  #ifdef WITH_SIPOPT
+  if(run_sens_ || compute_red_hessian_){
+    Ipopt::SmartPtr<Ipopt::SensApplication> *app_sens = static_cast<Ipopt::SmartPtr<Ipopt::SensApplication> *>(app_sens_);
+    (*app_sens)->Initialize();
   }
+  #endif // WITH_SIPOPT
 }
 
 void IpoptInternal::evaluate(int nfdir, int nadir){
@@ -235,12 +274,21 @@ void IpoptInternal::evaluate(int nfdir, int nadir){
   // Reset the counters
   t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ = t_callback_prepare_ = 0;
   
-  // Get back the smart pointer
-  Ipopt::SmartPtr<Ipopt::TNLP> *ucptr = (Ipopt::SmartPtr<Ipopt::TNLP>*)userclass_;
-  Ipopt::SmartPtr<Ipopt::TNLP> &uc = *ucptr;
+  // Get back the smart pointers
+  Ipopt::SmartPtr<Ipopt::TNLP> *userclass = static_cast<Ipopt::SmartPtr<Ipopt::TNLP>*>(userclass_);
+  Ipopt::SmartPtr<Ipopt::IpoptApplication> *app = static_cast<Ipopt::SmartPtr<Ipopt::IpoptApplication>*>(app_);
 
   // Ask Ipopt to solve the problem
-  Ipopt::ApplicationReturnStatus status = app_->OptimizeTNLP(uc);
+  Ipopt::ApplicationReturnStatus status = (*app)->OptimizeTNLP(*userclass);
+  
+  #ifdef WITH_SIPOPT
+  if(run_sens_ || compute_red_hessian_){
+    // Calculate parametric sensitivities
+    Ipopt::SmartPtr<Ipopt::SensApplication> *app_sens = static_cast<Ipopt::SmartPtr<Ipopt::SensApplication>*>(app_sens_);
+    (*app_sens)->SetIpoptAlgorithmObjects(*app, status);
+    (*app_sens)->Run();
+  }
+  #endif // WITH_SIPOPT
   
   if (hasOption("print_time") && bool(getOption("print_time"))) {
     // Write timings

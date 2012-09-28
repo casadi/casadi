@@ -105,7 +105,11 @@ int main(){
   var_numeric_md["sens_state_value_1"] = vector<double>{0,0,0,p_b[0],p_b[1]};
   solver.setOption("var_numeric_md",var_numeric_md);
   
-  // Set options and initialize solver
+  // Enable sensitivities
+  solver.setOption("run_sens","yes");
+  solver.setOption("n_sens_steps", 1);
+  
+  // Initialize solver
   solver.init();
   
   // Solve NLP

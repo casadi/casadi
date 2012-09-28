@@ -26,12 +26,6 @@
 #include "ipopt_solver.hpp"
 #include "casadi/fx/nlp_solver_internal.hpp"
 
-/** \brief  Forward declarations */
-namespace Ipopt{
-  struct IpoptApplication;
-  struct SensApplication;
-}
-
 namespace CasADi{
 
 /**
@@ -55,15 +49,21 @@ public:
 
 protected:
   
+  /** NOTE:
+   * To allow this header file to be free of IPOPT types (that are sometimes declared outside their scope!) and after 
+   * experiencing problems with working with IPOPT classes without IPOPT smart pointers, we work with dynamically
+   * allocated IPOPT smart pointers in this interface, that are stored as void pointers in the interface.
+   * 
+  */
   void *userclass_;
-  Ipopt::IpoptApplication* app_;
+  void* app_;
   #ifdef WITH_SIPOPT
-  Ipopt::SensApplication* app_sens_;
-  #endif
+  void* app_sens_;
+  #endif // WITH_SIPOPT
     
+  /// All IPOPT options
   std::map<std::string,opt_type> ops_;
 
-  // The NLP functions
   /// Gradient of the objective function
   FX GF_; 
 
@@ -108,8 +108,11 @@ protected:
   double t_callback_prepare_; // time spent in callback preparation
   
   // For parametric sensitivities with sIPOPT
+  #ifdef WITH_SIPOPT
   bool run_sens_;
   bool compute_red_hessian_;
+  #endif // WITH_SIPOPT
+  
 };
 
 } // namespace CasADi
