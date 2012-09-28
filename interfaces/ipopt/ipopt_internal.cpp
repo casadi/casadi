@@ -142,9 +142,9 @@ void IpoptInternal::init(){
   // Read user options
   run_sens_ = getOption("run_sens");
   compute_red_hessian_ = getOption("compute_red_hessian");
-  if(run_sens_ || compute_red_hessian_){
-    casadi_assert_message(WITH_SIPOPT,  "Sensitivity calculations with sIPOPT requires that CasADi has been compiled with sIPOPT support. See CasADi documentation.");
-  }
+  #ifndef WITH_SIPOPT
+  casadi_assert_message(!run_sens_ && !compute_red_hessian_,  "Sensitivity calculations with sIPOPT requires that CasADi has been compiled with sIPOPT support. See CasADi documentation.");
+  #endif
   
   // Gradient of the objective function, remove?
   if(!GF_.isNull()) GF_.init();
