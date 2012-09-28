@@ -888,6 +888,9 @@
 <tr><td>chi_hat</td><td>OT_REAL</td><td>2.0</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>chi_tilde</td><td>OT_REAL</td><td>5.0</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>compl_inf_tol</td><td>OT_REAL</td><td>0.0001</td><td>Desired threshold for the complementarity conditions. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>con_integer_md</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Integer metadata (a dictionary with lists of integers) about constraints to be passed to IPOPT</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>con_numeric_md</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Numeric metadata (a dictionary with lists of reals) about constraints to be passed to IPOPT</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>con_string_md</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>String metadata (a dictionary with lists of strings) about constraints to be passed to IPOPT</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>constr_mult_init_max</td><td>OT_REAL</td><td>1000.0</td><td>Maximum allowed least-square guess of constraint multipliers. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>constr_mult_reset_threshold</td><td>OT_REAL</td><td>0.0</td><td>Threshold for resetting equality and inequality multipliers after restoration phase. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>constr_viol_tol</td><td>OT_REAL</td><td>0.0001</td><td>Desired threshold for the constraint violation. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
@@ -1128,6 +1131,9 @@
 <tr><td>tiny_step_y_tol</td><td>OT_REAL</td><td>0.01</td><td>Tolerance for quitting because of numerically insignificant steps. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>tol</td><td>OT_REAL</td><td>1e-08</td><td>Desired convergence tolerance (relative). (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td></td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>var_integer_md</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Integer metadata (a dictionary with lists of integers) about variables to be passed to IPOPT</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>var_numeric_md</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Numeric metadata (a dictionary with lists of reals) about variables to be passed to IPOPT</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>var_string_md</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>String metadata (a dictionary with lists of strings) about variables to be passed to IPOPT</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>vartheta</td><td>OT_REAL</td><td>0.5</td><td>a parameter used to check if the fast direction can be used asthe line search direction (for Chen-Goldfarb line search). (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>False</td><td>verbose evaluation -- for debugging</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>warm_start_bound_frac</td><td>OT_REAL</td><td>0.001</td><td>same as bound_frac for the regular initializer. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
@@ -1197,6 +1203,9 @@
 <tr><td>chi_hat</td><td>OT_REAL</td><td>2.0</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>chi_tilde</td><td>OT_REAL</td><td>5.0</td><td>LIFENG WRITES THIS. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>compl_inf_tol</td><td>OT_REAL</td><td>0.0001</td><td>Desired threshold for the complementarity conditions. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>con_integer_md</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Integer metadata (a dictionary with lists of integers) about constraints to be passed to IPOPT</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>con_numeric_md</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Numeric metadata (a dictionary with lists of reals) about constraints to be passed to IPOPT</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>con_string_md</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>String metadata (a dictionary with lists of strings) about constraints to be passed to IPOPT</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>constr_mult_init_max</td><td>OT_REAL</td><td>1000.0</td><td>Maximum allowed least-square guess of constraint multipliers. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>constr_mult_reset_threshold</td><td>OT_REAL</td><td>0.0</td><td>Threshold for resetting equality and inequality multipliers after restoration phase. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>constr_viol_tol</td><td>OT_REAL</td><td>0.0001</td><td>Desired threshold for the constraint violation. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
@@ -1437,6 +1446,9 @@
 <tr><td>tiny_step_y_tol</td><td>OT_REAL</td><td>0.01</td><td>Tolerance for quitting because of numerically insignificant steps. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>tol</td><td>OT_REAL</td><td>1e-08</td><td>Desired convergence tolerance (relative). (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td></td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>var_integer_md</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Integer metadata (a dictionary with lists of integers) about variables to be passed to IPOPT</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>var_numeric_md</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Numeric metadata (a dictionary with lists of reals) about variables to be passed to IPOPT</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>var_string_md</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>String metadata (a dictionary with lists of strings) about variables to be passed to IPOPT</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>vartheta</td><td>OT_REAL</td><td>0.5</td><td>a parameter used to check if the fast direction can be used asthe line search direction (for Chen-Goldfarb line search). (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>False</td><td>verbose evaluation -- for debugging</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>warm_start_bound_frac</td><td>OT_REAL</td><td>0.001</td><td>same as bound_frac for the regular initializer. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>

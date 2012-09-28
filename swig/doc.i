@@ -33835,6 +33835,14 @@ This method is called at every iteration
 Code copied from TNLPAdapter::FinalizeSolution See also:http://list.coin-
 or.org/pipermail/ipopt/2010-July/002078.html ";
 
+%feature("docstring")  CasADi::IpoptUserClass::get_var_con_metadata "
+
+Allows setting information about variables and constraints ";
+
+%feature("docstring")  CasADi::IpoptUserClass::finalize_metadata "
+
+Retrieve information about variables and constraints ";
+
 
 // File: classCasADi_1_1Jacobian.xml
 %feature("docstring") CasADi::Jacobian "
