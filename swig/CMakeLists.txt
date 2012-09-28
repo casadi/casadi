@@ -16,9 +16,6 @@ find_package (PythonLibs)
 find_package (NUMPY)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake_modules)
-if(MPI_FOUND)
-   set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} ${MPI_LIBRARY} ${MPI_EXTRA_LIBRARY})
-endif(MPI_FOUND)
 
 set(CASADI_SWIG_FLAGS "")
 

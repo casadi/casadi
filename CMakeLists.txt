@@ -216,7 +216,6 @@ endif(WITH_MUSCOD)
 
 find_package(SWIG)
   if(SWIG_FOUND)
-    find_package(MPI QUIET)
     add_subdirectory(swig EXCLUDE_FROM_ALL) # the swig interfaces are not compiled when typing "make"
     if(WITH_SWIG_SPLIT)
       add_custom_target(python DEPENDS _casadi_main _casadi_primitive _casadi_primitive_tools _casadi_noncore) # the python interface is created with the command "make python"
