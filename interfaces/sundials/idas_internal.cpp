@@ -45,19 +45,19 @@ void IdasInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& alr
 }
 
 IdasInternal::IdasInternal(const FX& f, const FX& g) : SundialsInternal(f,g){
-  addOption("suppress_algebraic",          OT_BOOLEAN, false, "supress algebraic variables in the error testing");
-  addOption("calc_ic",                     OT_BOOLEAN, true,  "use IDACalcIC to get consistent initial conditions. This only works for semi-explicit index-one systems. Else, you must provide consistent initial conditions yourself.");
-  addOption("calc_icB",                    OT_BOOLEAN, false, "use IDACalcIC to get consistent initial conditions. This only works for semi-explicit index-one systems. Else, you must provide consistent initial conditions yourself.");
+  addOption("suppress_algebraic",          OT_BOOLEAN,          false,          "Supress algebraic variables in the error testing");
+  addOption("calc_ic",                     OT_BOOLEAN,          true,           "Use IDACalcIC to get consistent initial conditions. This only works for semi-explicit index-one systems. Else, you must provide consistent initial conditions yourself.");
+  addOption("calc_icB",                    OT_BOOLEAN,          false,          "Use IDACalcIC to get consistent initial conditions. This only works for semi-explicit index-one systems. Else, you must provide consistent initial conditions yourself.");
   addOption("abstolv",                     OT_REALVECTOR);
   addOption("fsens_abstolv",               OT_REALVECTOR); 
-  addOption("max_step_size",               OT_REAL, 0, "maximim step size");
-  addOption("first_time",                  OT_REAL, GenericType(), "first requested time as a fraction of the time interval");
-  addOption("cj_scaling",                  OT_BOOLEAN, false, "IDAS scaling on cj for the user-defined linear solver module");
-  addOption("extra_fsens_calc_ic",         OT_BOOLEAN, false, "Call calc ic an extra time, with fsens=0");
-  addOption("disable_internal_warnings",   OT_BOOLEAN,false, "Disable IDAS internal warning messages");
-  addOption("monitor",                     OT_STRINGVECTOR, GenericType(),  "", "correctInitialConditions|res|resS", true);
-  addOption("init_xdot",                   OT_REALVECTOR, GenericType(), "Initial values for the state derivatives");
-  addOption("init_z",                      OT_REALVECTOR, GenericType(), "Initial values for the algebraic states");
+  addOption("max_step_size",               OT_REAL,             0,              "Maximim step size");
+  addOption("first_time",                  OT_REAL,             GenericType(),  "First requested time as a fraction of the time interval");
+  addOption("cj_scaling",                  OT_BOOLEAN,          false,          "IDAS scaling on cj for the user-defined linear solver module");
+  addOption("extra_fsens_calc_ic",         OT_BOOLEAN,          false,          "Call calc ic an extra time, with fsens=0");
+  addOption("disable_internal_warnings",   OT_BOOLEAN,          false,          "Disable IDAS internal warning messages");
+  addOption("monitor",                     OT_STRINGVECTOR,     GenericType(),  "", "correctInitialConditions|res|resS", true);
+  addOption("init_xdot",                   OT_REALVECTOR,       GenericType(),  "Initial values for the state derivatives");
+  addOption("init_z",                      OT_REALVECTOR,       GenericType(),  "Initial values for the algebraic states");
   
   mem_ = 0;
   

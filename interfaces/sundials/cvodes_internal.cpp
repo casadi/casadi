@@ -41,11 +41,11 @@ CVodesInternal* CVodesInternal::clone() const{
 }
 
 CVodesInternal::CVodesInternal(const FX& f, const FX& g) : SundialsInternal(f,g){
-  addOption("linear_multistep_method",     OT_STRING,  "bdf","bdf|adams");
-  addOption("nonlinear_solver_iteration",  OT_STRING,  "newton","","newton|functional");
-  addOption("fsens_all_at_once",           OT_BOOLEAN,true); // calculate all right hand sides of the sensitivity equations at once
-  addOption("disable_internal_warnings",   OT_BOOLEAN,false, "Disable CVodes internal warning messages");
-  addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "res|resB|resQB|reset", true);
+  addOption("linear_multistep_method",          OT_STRING,              "bdf",          "Integrator scheme","bdf|adams");
+  addOption("nonlinear_solver_iteration",       OT_STRING,              "newton",       "","newton|functional");
+  addOption("fsens_all_at_once",                OT_BOOLEAN,             true,           "Calculate all right hand sides of the sensitivity equations at once");
+  addOption("disable_internal_warnings",        OT_BOOLEAN,             false,          "Disable CVodes internal warning messages");
+  addOption("monitor",                          OT_STRINGVECTOR,        GenericType(),  "", "res|resB|resQB|reset", true);
     
   mem_ = 0;
 
