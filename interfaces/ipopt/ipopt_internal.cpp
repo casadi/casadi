@@ -842,14 +842,61 @@ bool IpoptInternal::get_var_con_metadata(int n,
 }
 
 void IpoptInternal::finalize_metadata(int n,
-                                      const std::map<std::string,std::vector<std::string> >& var_string_md, 
-                                      const std::map<std::string,std::vector<int> >& var_integer_md,
-                                      const std::map<std::string,std::vector<double> >& var_numeric_md,
+                                      const map<string,vector<string> >& var_string_md, 
+                                      const map<string,vector<int> >& var_integer_md,
+                                      const map<string,vector<double> >& var_numeric_md,
                                       int m,
-                                      const std::map<std::string,std::vector<std::string> >& con_string_md,
-                                      const std::map<std::string,std::vector<int> >& con_integer_md,
-                                      const std::map<std::string,std::vector<double> >& con_numeric_md){
+                                      const map<string,vector<string> >& con_string_md,
+                                      const map<string,vector<int> >& con_integer_md,
+                                      const map<string,vector<double> >& con_numeric_md){
   
+  if(!var_string_md.empty()){
+    Dictionary dict;
+    for(map<string,vector<string> >::const_iterator it=var_string_md.begin(); it!=var_string_md.end(); ++it){
+      dict[it->first] = it->second;
+    }
+    stats_["var_string_md"] = dict;
+  }
+  
+  if(!var_integer_md.empty()){
+    Dictionary dict;
+    for(map<string,vector<int> >::const_iterator it=var_integer_md.begin(); it!=var_integer_md.end(); ++it){
+      dict[it->first] = it->second;
+    }
+    stats_["var_integer_md"] = dict;
+  }
+  
+  if(!var_numeric_md.empty()){
+    Dictionary dict;
+    for(map<string,vector<double> >::const_iterator it=var_numeric_md.begin(); it!=var_numeric_md.end(); ++it){
+      dict[it->first] = it->second;
+    }
+    stats_["var_numeric_md"] = dict;
+  }
+  
+  if(!con_string_md.empty()){
+    Dictionary dict;
+    for(map<string,vector<string> >::const_iterator it=con_string_md.begin(); it!=con_string_md.end(); ++it){
+      dict[it->first] = it->second;
+    }
+    stats_["con_string_md"] = dict;
+  }
+  
+  if(!con_integer_md.empty()){
+    Dictionary dict;
+    for(map<string,vector<int> >::const_iterator it=con_integer_md.begin(); it!=con_integer_md.end(); ++it){
+      dict[it->first] = it->second;
+    }
+    stats_["con_integer_md"] = dict;
+  }
+  
+  if(!con_numeric_md.empty()){
+    Dictionary dict;
+    for(map<string,vector<double> >::const_iterator it=con_numeric_md.begin(); it!=con_numeric_md.end(); ++it){
+      dict[it->first] = it->second;
+    }
+    stats_["con_numeric_md"] = dict;
+  }
 }
 
 } // namespace CasADi

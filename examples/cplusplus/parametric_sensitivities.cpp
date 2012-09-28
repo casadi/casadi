@@ -121,8 +121,28 @@ int main(){
   solver.evaluate();
   
   // Print the solution
-  cout << "f_opt = " << solver.output(NLP_COST) << endl;
-  cout << "x_opt = " << solver.output(NLP_X_OPT) << endl;
+  cout << "----" << endl;
+  cout << "Minimal cost " << solver.output(NLP_COST) << endl;
+  cout << "----" << endl;
+
+  cout << "Nominal solution" << endl;
+  cout << "x = " << solver.output(NLP_X_OPT).data() << endl;
+  cout << "----" << endl;
+  
+  cout << "perturbed solution" << endl;
+  var_numeric_md = solver.getStat("var_numeric_md");
+  cout << "x = " << var_numeric_md["sens_sol_state_1"] << endl;
+  cout << "----" << endl;
+  
+  cout << "Dual bound multipliers" << endl;
+  cout << "z_L = " << var_numeric_md["sens_sol_state_1_z_L"] << endl;
+  cout << "z_U = " << var_numeric_md["sens_sol_state_1_z_U"] << endl;
+  cout << "----" << endl;
+  
+  cout << "Constraint multipliers" << endl;
+  Dictionary con_numeric_md = solver.getStat("con_numeric_md");
+  cout << "lambda = " << con_numeric_md["sens_sol_state_1"] << endl;
+  cout << "----" << endl;
   
   return 0;
 }
