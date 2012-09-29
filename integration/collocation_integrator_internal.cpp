@@ -21,12 +21,12 @@
  */
 
 #include "collocation_integrator_internal.hpp"
-#include "casadi/stl_vector_tools.hpp"
-#include "casadi/matrix/sparsity_tools.hpp"
-#include "casadi/matrix/matrix_tools.hpp"
-#include "casadi/sx/sx_tools.hpp"
-#include "casadi/fx/sx_function.hpp"
-#include "casadi/mx/mx_tools.hpp"
+#include "symbolic/stl_vector_tools.hpp"
+#include "symbolic/matrix/sparsity_tools.hpp"
+#include "symbolic/matrix/matrix_tools.hpp"
+#include "symbolic/sx/sx_tools.hpp"
+#include "symbolic/fx/sx_function.hpp"
+#include "symbolic/mx/mx_tools.hpp"
 
 using namespace std;
 namespace CasADi{

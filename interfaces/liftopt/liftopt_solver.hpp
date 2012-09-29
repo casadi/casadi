@@ -23,8 +23,8 @@
 #ifndef LIFTOPT_SOLVER_HPP
 #define LIFTOPT_SOLVER_HPP
 
-#include <casadi/fx/nlp_solver.hpp>
-#include <casadi/fx/mx_function.hpp>
+#include <symbolic/fx/nlp_solver.hpp>
+#include <symbolic/fx/mx_function.hpp>
 
 namespace CasADi{
 

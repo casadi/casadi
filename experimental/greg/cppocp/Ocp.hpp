@@ -11,8 +11,8 @@
 #include "Ode.hpp"
 #include "MultipleShooting.hpp"
 
-#include <casadi/sx/sx_tools.hpp>
-#include <casadi/stl_vector_tools.hpp>
+#include <symbolic/sx/sx_tools.hpp>
+#include <symbolic/stl_vector_tools.hpp>
 
 class Ocp
 {

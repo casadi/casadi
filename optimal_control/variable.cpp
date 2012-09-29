@@ -21,7 +21,7 @@
  */
 
 #include "variable_internal.hpp"
-#include "../casadi/casadi_exception.hpp"
+#include "../symbolic/casadi_exception.hpp"
 
 using namespace std;
 namespace CasADi{

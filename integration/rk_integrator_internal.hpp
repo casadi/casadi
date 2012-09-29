@@ -24,9 +24,9 @@
 #define RK_INTEGRATOR_INTERNAL_HPP
 
 #include "rk_integrator.hpp"
-#include "casadi/fx/integrator_internal.hpp"
-#include "casadi/fx/mx_function.hpp"
-#include "casadi/fx/implicit_function.hpp"
+#include "symbolic/fx/integrator_internal.hpp"
+#include "symbolic/fx/mx_function.hpp"
+#include "symbolic/fx/implicit_function.hpp"
 
 namespace CasADi{
     

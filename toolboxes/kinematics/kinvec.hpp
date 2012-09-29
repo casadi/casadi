@@ -22,7 +22,7 @@
 
 #ifndef KINVEC_HPP
 #define KINVEC_HPP
-#include <casadi/expression_tools.hpp>
+#include <symbolic/expression_tools.hpp>
 #include <string>
 #include <iostream>
 #include "frame.hpp"

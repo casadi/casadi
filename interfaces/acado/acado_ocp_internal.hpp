@@ -25,7 +25,7 @@
 
 #include "acado_ocp.hpp"
 #include "acado_function.hpp"
-#include "casadi/fx/fx_internal.hpp"
+#include "symbolic/fx/fx_internal.hpp"
 #include "acado_forward_declarations.hpp"
 #include <stack>
 

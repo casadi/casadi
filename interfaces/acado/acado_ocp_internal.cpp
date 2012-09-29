@@ -24,7 +24,7 @@
 #include "acado_integrator_backend.hpp"
 
 #include <acado_optimal_control.hpp>
-#include <casadi/stl_vector_tools.hpp>
+#include <symbolic/stl_vector_tools.hpp>
 
 #include <cassert>
 #include <limits>

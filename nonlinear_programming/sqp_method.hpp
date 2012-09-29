@@ -23,7 +23,7 @@
 #ifndef SQP_METHOD_HPP
 #define SQP_METHOD_HPP
 
-#include "casadi/fx/nlp_solver.hpp"
+#include "symbolic/fx/nlp_solver.hpp"
 
 namespace CasADi{
   

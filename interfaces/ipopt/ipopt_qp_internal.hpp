@@ -23,7 +23,7 @@
 #ifndef IPOPT_QP_INTERNAL_HPP
 #define IPOPT_QP_INTERNAL_HPP
 
-#include "casadi/fx/qp_solver_internal.hpp"
+#include "symbolic/fx/qp_solver_internal.hpp"
 #include "interfaces/ipopt/ipopt_solver.hpp"
 
 namespace CasADi{

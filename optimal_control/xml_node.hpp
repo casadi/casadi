@@ -26,7 +26,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "casadi/casadi_exception.hpp"
+#include "symbolic/casadi_exception.hpp"
 
 /** \brief  Forward declarations */
 class TiXmlElement;

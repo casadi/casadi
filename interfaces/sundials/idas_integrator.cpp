@@ -22,7 +22,7 @@
 
 #include "idas_integrator.hpp"
 #include "idas_internal.hpp"
-#include "casadi/fx/linear_solver.hpp"
+#include "symbolic/fx/linear_solver.hpp"
 
 using namespace std;
 namespace CasADi{

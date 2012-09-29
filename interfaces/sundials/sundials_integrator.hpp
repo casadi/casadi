@@ -23,7 +23,7 @@
 #ifndef SUNDIALS_INTEGRATOR_HPP
 #define SUNDIALS_INTEGRATOR_HPP
 
-#include "casadi/fx/integrator.hpp"
+#include "symbolic/fx/integrator.hpp"
 
 namespace CasADi{
   

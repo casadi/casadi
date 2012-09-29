@@ -24,11 +24,11 @@
 #include <fstream>
 #include <ctime>
 #include <iomanip>
-#include <casadi/casadi.hpp>
+#include <symbolic/casadi.hpp>
 #include <nonlinear_programming/sqp_method.hpp>
 #include <interfaces/qpoases/qpoases_solver.hpp>
 #include <interfaces/ipopt/ipopt_solver.hpp>
-#include <casadi/stl_vector_tools.hpp>
+#include <symbolic/stl_vector_tools.hpp>
 #include <nonlinear_programming/lifted_sqp.hpp>
 
 using namespace CasADi;

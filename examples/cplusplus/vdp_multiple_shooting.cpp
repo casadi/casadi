@@ -1,8 +1,8 @@
-#include <casadi/fx/fx_tools.hpp>
-#include <casadi/mx/mx_tools.hpp>
-#include <casadi/sx/sx_tools.hpp>
-#include <casadi/matrix/matrix_tools.hpp>
-#include <casadi/stl_vector_tools.hpp>
+#include <symbolic/fx/fx_tools.hpp>
+#include <symbolic/mx/mx_tools.hpp>
+#include <symbolic/sx/sx_tools.hpp>
+#include <symbolic/matrix/matrix_tools.hpp>
+#include <symbolic/stl_vector_tools.hpp>
 
 #include <interfaces/ipopt/ipopt_solver.hpp>
 #include <interfaces/sundials/cvodes_integrator.hpp>

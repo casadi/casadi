@@ -7,7 +7,7 @@
 #include <cstdio>
 #include <iostream>
 
-#include <casadi/fx/sx_function.hpp>
+#include <symbolic/fx/sx_function.hpp>
 
 using namespace CasADi;
 using namespace std;

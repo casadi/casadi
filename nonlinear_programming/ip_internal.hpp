@@ -24,8 +24,8 @@
 #define IP_INTERNAL_HPP
 
 #include "ip_method.hpp"
-#include "casadi/fx/nlp_solver_internal.hpp"
-#include "casadi/fx/linear_solver.hpp"
+#include "symbolic/fx/nlp_solver_internal.hpp"
+#include "symbolic/fx/linear_solver.hpp"
 
 namespace CasADi{
     

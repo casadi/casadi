@@ -25,7 +25,7 @@ File superlu.c from the CSparse example collection
 Joel Andersson, K.U. Leuven, 2010
 */
 
-#include "casadi/stl_vector_tools.hpp"
+#include "symbolic/stl_vector_tools.hpp"
 #include "interfaces/csparse/csparse.hpp"
 
 using namespace CasADi;

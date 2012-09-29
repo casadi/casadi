@@ -23,7 +23,7 @@
 #ifndef WORHP_SOLVER_HPP
 #define WORHP_SOLVER_HPP
 
-#include "casadi/fx/nlp_solver.hpp"
+#include "symbolic/fx/nlp_solver.hpp"
 
 namespace CasADi{
   

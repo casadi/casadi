@@ -29,16 +29,16 @@
 #include <sstream>
 #include <ctime>
 
-#include "casadi/stl_vector_tools.hpp"
+#include "symbolic/stl_vector_tools.hpp"
 #include "external_packages/tinyxml/tinyxml.h"
 
-#include "../casadi/casadi_exception.hpp"
-#include "../casadi/stl_vector_tools.hpp"
+#include "../symbolic/casadi_exception.hpp"
+#include "../symbolic/stl_vector_tools.hpp"
 #include "variable_tools.hpp"
-#include "../casadi/matrix/matrix_tools.hpp"
-#include "../casadi/sx/sx_tools.hpp"
-#include "../casadi/fx/integrator.hpp"
-#include "../casadi/casadi_calculus.hpp"
+#include "../symbolic/matrix/matrix_tools.hpp"
+#include "../symbolic/sx/sx_tools.hpp"
+#include "../symbolic/fx/integrator.hpp"
+#include "../symbolic/casadi_calculus.hpp"
 
 using namespace std;
 namespace CasADi{

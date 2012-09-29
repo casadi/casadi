@@ -21,11 +21,11 @@
  */
 
 #include "worhp_internal.hpp"
-#include "casadi/stl_vector_tools.hpp"
-#include "casadi/matrix/matrix_tools.hpp"
-#include "casadi/mx/mx_tools.hpp"
-#include "casadi/matrix/sparsity_tools.hpp"
-#include "casadi/fx/mx_function.hpp"
+#include "symbolic/stl_vector_tools.hpp"
+#include "symbolic/matrix/matrix_tools.hpp"
+#include "symbolic/mx/mx_tools.hpp"
+#include "symbolic/matrix/sparsity_tools.hpp"
+#include "symbolic/fx/mx_function.hpp"
 #include <ctime>
 
 using namespace std;

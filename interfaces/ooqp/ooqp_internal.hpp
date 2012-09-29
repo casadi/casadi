@@ -23,7 +23,7 @@
 #ifndef OOQP_INTERNAL_HPP
 #define OOQP_INTERNAL_HPP
 
-#include "casadi/fx/qp_solver_internal.hpp"
+#include "symbolic/fx/qp_solver_internal.hpp"
 #include <QpGenData.h>
 #include <QpGenVars.h>
 #include <QpGenResiduals.h>

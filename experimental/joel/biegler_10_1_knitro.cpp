@@ -22,10 +22,10 @@
 
 #include <iostream>
 #include <ctime>
-#include "casadi/stl_vector_tools.hpp"
+#include "symbolic/stl_vector_tools.hpp"
 #include "interfaces/knitro/knitro_solver.hpp"
-#include "casadi/sx/sx_tools.hpp"
-#include "casadi/fx/sx_function.hpp"
+#include "symbolic/sx/sx_tools.hpp"
+#include "symbolic/fx/sx_function.hpp"
 
 /** Excercise 1, chapter 10 from Larry Biegler's book */
 

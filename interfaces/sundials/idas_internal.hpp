@@ -25,7 +25,7 @@
 
 #include "idas_integrator.hpp"
 #include "sundials_internal.hpp"
-#include "casadi/fx/linear_solver.hpp"
+#include "symbolic/fx/linear_solver.hpp"
 #include <idas/idas.h>            /* prototypes for CVODE fcts. and consts. */
 #include <idas/idas_dense.h>
 #include <idas/idas_band.h> 

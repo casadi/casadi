@@ -31,12 +31,12 @@
  * \date 2012
  */
 
-#include "casadi/casadi.hpp"
+#include "symbolic/casadi.hpp"
 
 // Uncomment this line to compile without error handling
 //#define CASADI_NDEBUG
 
-#include <casadi/casadi_exception.hpp>
+#include <symbolic/casadi_exception.hpp>
 
 bool bad_test(){
   return false;

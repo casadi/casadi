@@ -23,7 +23,7 @@
 #ifndef GSL_INTEGRATOR_HPP
 #define GSL_INTEGRATOR_HPP
 
-#include "casadi/fx/integrator.hpp"
+#include "symbolic/fx/integrator.hpp"
 
 
 // http://www.network-theory.co.uk/docs/gslref/OrdinaryDifferentialEquations.html

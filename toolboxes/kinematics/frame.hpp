@@ -22,7 +22,7 @@
 
 #ifndef FRAME_HPP
 #define FRAME_HPP
-#include <casadi/expression_tools.hpp>
+#include <symbolic/expression_tools.hpp>
 #include <string>
 #include <iostream>
 

@@ -22,13 +22,13 @@
 
 %{
 #include <sstream>
-#include "casadi/stl_vector_tools.hpp"
-#include "casadi/printable_object.hpp"
-#include "casadi/shared_object.hpp"
-#include "casadi/cached_object.hpp"
-#include "casadi/generic_type.hpp"
-#include "casadi/options_functionality.hpp"
-#include "casadi/casadi_calculus.hpp"
+#include "symbolic/stl_vector_tools.hpp"
+#include "symbolic/printable_object.hpp"
+#include "symbolic/shared_object.hpp"
+#include "symbolic/cached_object.hpp"
+#include "symbolic/generic_type.hpp"
+#include "symbolic/options_functionality.hpp"
+#include "symbolic/casadi_calculus.hpp"
 %}
 
 #ifdef SWIGPYTHON
@@ -42,7 +42,7 @@ def _swig_repr(self):
 %}
 #endif // SWIGPYTHON
 
-%include "casadi/stl_vector_tools.hpp"
+%include "symbolic/stl_vector_tools.hpp"
 VECTOR_TOOLS_TEMPLATES(int)
 VECTOR_TOOLS_TEMPLATES(double)
 
@@ -53,13 +53,13 @@ VECTOR_TOOLS_TEMPLATES(double)
 };
 %enddef
 
-%include "casadi/printable_object.hpp"
-%include "casadi/shared_object.hpp"
-%include "casadi/cached_object.hpp"
-%include "casadi/casadi_types.hpp"
-%include "casadi/generic_type.hpp"
-%include "casadi/options_functionality.hpp"
-%include "casadi/casadi_calculus.hpp"
+%include "symbolic/printable_object.hpp"
+%include "symbolic/shared_object.hpp"
+%include "symbolic/cached_object.hpp"
+%include "symbolic/casadi_types.hpp"
+%include "symbolic/generic_type.hpp"
+%include "symbolic/options_functionality.hpp"
+%include "symbolic/casadi_calculus.hpp"
 
 namespace CasADi {
   %extend OptionsFunctionality {

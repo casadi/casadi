@@ -26,7 +26,7 @@
 
 #include <acado_modelling/modelica/fmi_parser.hpp>
 #include <acado_modelling/ocp_tools.hpp>
-#include <casadi/stl_vector_tools.hpp>
+#include <symbolic/stl_vector_tools.hpp>
 #include <acado_interface/acado_interface.hpp>
 
 using namespace std;

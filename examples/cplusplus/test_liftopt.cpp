@@ -22,9 +22,9 @@
 
 #include <interfaces/liftopt/liftopt_solver.hpp>
 #include <interfaces/liftopt/liftopt_internal.hpp>
-#include <casadi/fx/sx_function.hpp>
-#include <casadi/mx/mx_tools.hpp>
-#include <casadi/stl_vector_tools.hpp>
+#include <symbolic/fx/sx_function.hpp>
+#include <symbolic/mx/mx_tools.hpp>
+#include <symbolic/stl_vector_tools.hpp>
 
 using namespace CasADi;
 using namespace std;

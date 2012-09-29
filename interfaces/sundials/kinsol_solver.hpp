@@ -23,8 +23,8 @@
 #ifndef KINSOL_SOLVER_HPP
 #define KINSOL_SOLVER_HPP
 
-#include "casadi/fx/implicit_function.hpp"
-#include "casadi/fx/linear_solver.hpp"
+#include "symbolic/fx/implicit_function.hpp"
+#include "symbolic/fx/linear_solver.hpp"
 
 namespace CasADi{
   

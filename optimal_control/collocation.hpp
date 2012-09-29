@@ -23,8 +23,8 @@
 #ifndef COLLOCATION_HPP
 #define COLLOCATION_HPP
 
-#include "../casadi/fx/ocp_solver.hpp"
-#include "../casadi/fx/nlp_solver.hpp"
+#include "../symbolic/fx/ocp_solver.hpp"
+#include "../symbolic/fx/nlp_solver.hpp"
 
 namespace CasADi{
   class CollocationInternal;

@@ -23,7 +23,7 @@
 #ifndef CSPARSE_HPP
 #define CSPARSE_HPP
 
-#include "casadi/fx/linear_solver.hpp"
+#include "symbolic/fx/linear_solver.hpp"
 
 namespace CasADi{
 

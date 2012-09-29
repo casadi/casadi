@@ -1,6 +1,6 @@
 #include "muscod_function.hpp"
-#include <casadi/stl_vector_tools.hpp>
-#include <casadi/expression_tools.hpp>
+#include <symbolic/stl_vector_tools.hpp>
+#include <symbolic/expression_tools.hpp>
 #include <cassert>
 #include <limits>
 

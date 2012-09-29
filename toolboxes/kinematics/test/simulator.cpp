@@ -22,7 +22,7 @@
 
 #include <toolboxes/kinematics/test/kiteode.hpp>
 
-#include <casadi/expression_tools.hpp>
+#include <symbolic/expression_tools.hpp>
 #include <toolboxes/kinematics/test/simulator.hpp>
 
 using namespace KINEMATICS;

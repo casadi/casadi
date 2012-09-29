@@ -22,8 +22,8 @@
 
 #include "qpoases_internal.hpp"
 
-#include "../../casadi/stl_vector_tools.hpp"
-#include "../../casadi/matrix/matrix_tools.hpp"
+#include "../../symbolic/stl_vector_tools.hpp"
+#include "../../symbolic/matrix/matrix_tools.hpp"
 
 const bool ALLOW_QPROBLEMB = true;
 

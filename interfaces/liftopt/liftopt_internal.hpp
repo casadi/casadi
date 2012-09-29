@@ -23,15 +23,15 @@
 #ifndef LIFTOPT_INTERNAL_HPP
 #define LIFTOPT_INTERNAL_HPP
 
-#include <casadi/fx/mx_function.hpp>
-#include <casadi/fx/nlp_solver_internal.hpp>
+#include <symbolic/fx/mx_function.hpp>
+#include <symbolic/fx/nlp_solver_internal.hpp>
 #include "liftopt_solver.hpp"
 
 #include <liftopt.hpp>
-#include <casadi/fx/mx_function.hpp>
-#include <casadi/fx/sx_function.hpp>
-#include <casadi/mx/mx_tools.hpp>
-#include <casadi/stl_vector_tools.hpp>
+#include <symbolic/fx/mx_function.hpp>
+#include <symbolic/fx/sx_function.hpp>
+#include <symbolic/mx/mx_tools.hpp>
+#include <symbolic/stl_vector_tools.hpp>
 #include "sonic++.h"
 
 namespace CasADi{

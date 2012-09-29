@@ -23,7 +23,7 @@
 #ifndef WORHP_INTERNAL_HPP
 #define WORHP_INTERNAL_HPP
 
-#include "casadi/fx/nlp_solver_internal.hpp"
+#include "symbolic/fx/nlp_solver_internal.hpp"
 
 #include "worhp.h"
 

@@ -64,8 +64,8 @@ except:
 #endif // SWIGPYTHON
 
 // Matrix tools
-%include "casadi/matrix/matrix_tools.hpp"
-%include "casadi/matrix/generic_matrix_tools.hpp"
+%include "symbolic/matrix/matrix_tools.hpp"
+%include "symbolic/matrix/generic_matrix_tools.hpp"
 
 // Instantiate the functions
 MATRIX_TOOLS_TEMPLATES(int)
@@ -79,12 +79,12 @@ GENERIC_MATRIX_TOOLS_TEMPLATES(CasADi::MX)
 
 // Sparsity tools
 %{
-#include "casadi/matrix/sparsity_tools.hpp"
+#include "symbolic/matrix/sparsity_tools.hpp"
 %}
-%include "casadi/matrix/sparsity_tools.hpp"
+%include "symbolic/matrix/sparsity_tools.hpp"
 
 // SX tools
-%include "casadi/sx/sx_tools.hpp"
+%include "symbolic/sx/sx_tools.hpp"
 
 #ifdef SWIGPYTHON
 %{
@@ -99,4 +99,4 @@ template<> swig_type_info** meta< std::pair< CasADi::MX, std::vector< CasADi::MX
 #endif //SWIGPYTHON
 
 
-%include "casadi/mx/mx_tools.hpp"
+%include "symbolic/mx/mx_tools.hpp"

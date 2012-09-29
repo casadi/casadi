@@ -10,8 +10,8 @@
 #include <map>
 #include <fstream>
 
-#include <casadi/sx/sx_tools.hpp>
-#include <casadi/fx/sx_function.hpp>
+#include <symbolic/sx/sx_tools.hpp>
+#include <symbolic/fx/sx_function.hpp>
 
 #define IDX_BACKWARD_SWEEP_INPUTS_U_K    0
 #define IDX_BACKWARD_SWEEP_INPUTS_Q_0_K  1

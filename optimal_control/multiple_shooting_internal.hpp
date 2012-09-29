@@ -24,12 +24,12 @@
 #define MULTIPLE_SHOOTING_INTERNAL_HPP
 
 #include "multiple_shooting.hpp"
-#include "../casadi/fx/ocp_solver_internal.hpp"
+#include "../symbolic/fx/ocp_solver_internal.hpp"
 
-#include "../casadi/fx/parallelizer.hpp"
-#include "../casadi/fx/c_function.hpp"
-#include "../casadi/fx/mx_function.hpp"
-#include "../casadi/fx/sx_function.hpp"
+#include "../symbolic/fx/parallelizer.hpp"
+#include "../symbolic/fx/c_function.hpp"
+#include "../symbolic/fx/mx_function.hpp"
+#include "../symbolic/fx/sx_function.hpp"
 
 namespace CasADi{
   

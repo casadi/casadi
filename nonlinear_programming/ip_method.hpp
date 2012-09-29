@@ -23,7 +23,7 @@
 #ifndef IP_METHOD_HPP
 #define IP_METHOD_HPP
 
-#include "casadi/fx/nlp_solver.hpp"
+#include "symbolic/fx/nlp_solver.hpp"
 
 namespace CasADi{
   

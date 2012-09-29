@@ -23,8 +23,8 @@
 #ifndef ACADO_OCP_HPP
 #define ACADO_OCP_HPP
 
-#include <casadi/fx/fx.hpp>
-#include <casadi/fx/integrator.hpp>
+#include <symbolic/fx/fx.hpp>
+#include <symbolic/fx/integrator.hpp>
 
 namespace CasADi{
   

@@ -24,8 +24,8 @@
 #include <acado/function/function_.hpp>
 #include "acado_integrator_backend.hpp"
 #include <cassert>
-#include "casadi/casadi_exception.hpp"
-#include "casadi/stl_vector_tools.hpp"
+#include "symbolic/casadi_exception.hpp"
+#include "symbolic/stl_vector_tools.hpp"
 
 using namespace std;
 using namespace ACADO;

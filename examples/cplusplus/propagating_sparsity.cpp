@@ -30,7 +30,7 @@
  * \date 2012
  */
 
-#include "casadi/casadi.hpp"
+#include "symbolic/casadi.hpp"
 
 using namespace CasADi;
 using namespace std;

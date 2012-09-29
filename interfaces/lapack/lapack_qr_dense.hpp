@@ -23,7 +23,7 @@
 #ifndef LAPACK_QR_DENSE_HPP
 #define LAPACK_QR_DENSE_HPP
 
-#include "casadi/fx/linear_solver_internal.hpp"
+#include "symbolic/fx/linear_solver_internal.hpp"
 
 namespace CasADi{
   

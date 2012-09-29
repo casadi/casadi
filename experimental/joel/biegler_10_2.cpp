@@ -21,11 +21,11 @@
  */
 
 #include <iostream>
-#include "casadi/stl_vector_tools.hpp"
+#include "symbolic/stl_vector_tools.hpp"
 #include "interfaces/ipopt/ipopt_solver.hpp"
 #include "interfaces/ipopt/ipopt_internal.hpp"
-#include "casadi/sx/sx_tools.hpp"
-#include "casadi/fx/sx_function.hpp"
+#include "symbolic/sx/sx_tools.hpp"
+#include "symbolic/fx/sx_function.hpp"
 
 /** Excercise 2, chapter 10 from Larry Biegler's book */
 

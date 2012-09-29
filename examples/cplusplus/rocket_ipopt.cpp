@@ -23,9 +23,9 @@
 #include <iostream>
 #include <fstream>
 #include <ctime>
-#include <casadi/casadi.hpp>
+#include <symbolic/casadi.hpp>
 #include <interfaces/ipopt/ipopt_solver.hpp>
-#include <casadi/stl_vector_tools.hpp>
+#include <symbolic/stl_vector_tools.hpp>
 
 using namespace CasADi;
 using namespace std;

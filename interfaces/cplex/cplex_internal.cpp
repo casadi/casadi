@@ -20,7 +20,7 @@
  *
  */
 #include "cplex_internal.hpp"
-#include "casadi/stl_vector_tools.hpp"
+#include "symbolic/stl_vector_tools.hpp"
 #include <ctime>
 #include <cstdio>
 #include <cstdlib>

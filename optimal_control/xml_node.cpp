@@ -22,7 +22,7 @@
 
 #include "xml_node.hpp"
 #include "external_packages/tinyxml/tinyxml.h"
-#include "../casadi/casadi_exception.hpp"
+#include "../symbolic/casadi_exception.hpp"
 
 using namespace std;
 namespace CasADi{

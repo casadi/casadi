@@ -177,9 +177,9 @@ _object = _copyableObject
 #endif
 
 %{
-#include "casadi/casadi_options.hpp" 
+#include "symbolic/casadi_options.hpp" 
 %}
-%include "casadi/casadi_options.hpp"
+%include "symbolic/casadi_options.hpp"
 
 %{
 #define START \
@@ -311,28 +311,28 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 %include "commontypemaps.i"
 
 %{
-#include "casadi/matrix/matrix.hpp" 
-#include "casadi/matrix/matrix_tools.hpp" 
-#include "casadi/matrix/sparsity_tools.hpp" 
+#include "symbolic/matrix/matrix.hpp" 
+#include "symbolic/matrix/matrix_tools.hpp" 
+#include "symbolic/matrix/sparsity_tools.hpp" 
 	 
 // Scalar expressions 
-#include "casadi/sx/sx.hpp" 
-#include "casadi/sx/sx_tools.hpp" 
-#include "casadi/fx/sx_function.hpp" 
+#include "symbolic/sx/sx.hpp" 
+#include "symbolic/sx/sx_tools.hpp" 
+#include "symbolic/fx/sx_function.hpp" 
 	 
 // Matrix expressions 
-#include "casadi/mx/mx.hpp" 
-#include "casadi/mx/mx_tools.hpp" 
+#include "symbolic/mx/mx.hpp" 
+#include "symbolic/mx/mx_tools.hpp" 
 
-#include "casadi/fx/mx_function.hpp" 
+#include "symbolic/fx/mx_function.hpp" 
  	
-#include "casadi/fx/mx_function.hpp"
-#include "casadi/fx/c_function.hpp"
-#include "casadi/fx/jacobian.hpp"
-#include "casadi/fx/ocp_solver.hpp"
-#include "casadi/fx/simulator.hpp"
-#include "casadi/fx/parallelizer.hpp"
-#include "casadi/fx/external_function.hpp"
+#include "symbolic/fx/mx_function.hpp"
+#include "symbolic/fx/c_function.hpp"
+#include "symbolic/fx/jacobian.hpp"
+#include "symbolic/fx/ocp_solver.hpp"
+#include "symbolic/fx/simulator.hpp"
+#include "symbolic/fx/parallelizer.hpp"
+#include "symbolic/fx/external_function.hpp"
 
 
 #include "optimal_control/ocp_tools.hpp"

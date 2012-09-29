@@ -10,7 +10,7 @@
 #include <map>
 #include <fstream>
 
-#include <casadi/sx/sx_tools.hpp>
+#include <symbolic/sx/sx_tools.hpp>
 
 class MultipleShooting
 {

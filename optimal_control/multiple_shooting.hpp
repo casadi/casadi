@@ -23,8 +23,8 @@
 #ifndef MULTIPLE_SHOOTING_HPP
 #define MULTIPLE_SHOOTING_HPP
 
-#include "../casadi/fx/ocp_solver.hpp"
-#include "../casadi/fx/nlp_solver.hpp"
+#include "../symbolic/fx/ocp_solver.hpp"
+#include "../symbolic/fx/nlp_solver.hpp"
 
 namespace CasADi{
   class MultipleShootingInternal;

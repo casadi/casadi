@@ -23,7 +23,7 @@
 #ifndef QPOASES_SOLVER_HPP
 #define QPOASES_SOLVER_HPP
 
-#include "casadi/fx/qp_solver.hpp"
+#include "symbolic/fx/qp_solver.hpp"
 
 
 namespace CasADi {

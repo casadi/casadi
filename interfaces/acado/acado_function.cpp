@@ -22,7 +22,7 @@
 
 #include "acado_function.hpp"
 #include <acado/function/c_function.hpp>
-#include <casadi/stl_vector_tools.hpp>
+#include <symbolic/stl_vector_tools.hpp>
 #include <cassert>
 #include <limits>
 

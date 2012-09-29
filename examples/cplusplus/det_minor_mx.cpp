@@ -20,13 +20,13 @@
  *
  */
 
-#include "casadi/mx/mx_tools.hpp"
-#include "casadi/matrix/matrix_tools.hpp"
-#include "casadi/stl_vector_tools.hpp"
-#include "casadi/fx/sx_function.hpp"
-#include "casadi/fx/mx_function.hpp"
-#include "casadi/sx/sx_tools.hpp"
-#include "casadi/fx/fx.hpp"
+#include "symbolic/mx/mx_tools.hpp"
+#include "symbolic/matrix/matrix_tools.hpp"
+#include "symbolic/stl_vector_tools.hpp"
+#include "symbolic/fx/sx_function.hpp"
+#include "symbolic/fx/mx_function.hpp"
+#include "symbolic/sx/sx_tools.hpp"
+#include "symbolic/fx/fx.hpp"
 #include <ctime>
 
 using namespace std;

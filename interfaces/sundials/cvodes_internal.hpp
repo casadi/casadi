@@ -25,7 +25,7 @@
 
 #include "cvodes_integrator.hpp"
 #include "sundials_internal.hpp"
-#include "casadi/fx/linear_solver.hpp"
+#include "symbolic/fx/linear_solver.hpp"
 #include <cvodes/cvodes.h>            /* prototypes for CVode fcts. and consts. */
 #include <cvodes/cvodes_dense.h>
 #include <cvodes/cvodes_band.h> 

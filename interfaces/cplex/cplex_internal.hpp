@@ -23,7 +23,7 @@
 #define CPLEX_INTERNAL_HPP
 
 #include "ilcplex/cplex.h"
-#include "casadi/fx/nlp_solver_internal.hpp"
+#include "symbolic/fx/nlp_solver_internal.hpp"
 
 namespace CasADi{
 

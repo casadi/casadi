@@ -23,7 +23,7 @@
 #ifndef ACADO_INTEGRATOR_HPP
 #define ACADO_INTEGRATOR_HPP
 
-#include "casadi/fx/integrator.hpp"
+#include "symbolic/fx/integrator.hpp"
 
 /**
 * \defgroup AcadoIntegrator_doc

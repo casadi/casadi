@@ -22,8 +22,8 @@
 
 #include "ipopt_qp_internal.hpp"
 
-#include "casadi/mx/mx_tools.hpp"
-#include "casadi/fx/mx_function.hpp"
+#include "symbolic/mx/mx_tools.hpp"
+#include "symbolic/fx/mx_function.hpp"
 
 using namespace std;
 namespace CasADi {

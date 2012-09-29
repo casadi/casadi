@@ -20,7 +20,7 @@
  *
  */
 
-#include "casadi/casadi.hpp"
+#include "symbolic/casadi.hpp"
 #include <ctime>
 
 using namespace std;

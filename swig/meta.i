@@ -22,20 +22,20 @@
 
 %{
 #include <sstream>
-#include "casadi/stl_vector_tools.hpp"
-#include "casadi/printable_object.hpp"
-#include "casadi/shared_object.hpp"
-#include "casadi/generic_type.hpp"
-#include "casadi/options_functionality.hpp"
-#include "casadi/matrix/crs_sparsity.hpp"
-#include "casadi/matrix/slice.hpp"
-#include "casadi/matrix/matrix.hpp"
-#include "casadi/matrix/matrix_tools.hpp"
-#include "casadi/sx/sx.hpp"
-#include "casadi/sx/sx_tools.hpp"
-#include "casadi/mx/mx.hpp"
-#include "casadi/mx/mx_tools.hpp"
-#include "casadi/fx/fx.hpp"
+#include "symbolic/stl_vector_tools.hpp"
+#include "symbolic/printable_object.hpp"
+#include "symbolic/shared_object.hpp"
+#include "symbolic/generic_type.hpp"
+#include "symbolic/options_functionality.hpp"
+#include "symbolic/matrix/crs_sparsity.hpp"
+#include "symbolic/matrix/slice.hpp"
+#include "symbolic/matrix/matrix.hpp"
+#include "symbolic/matrix/matrix_tools.hpp"
+#include "symbolic/sx/sx.hpp"
+#include "symbolic/sx/sx_tools.hpp"
+#include "symbolic/mx/mx.hpp"
+#include "symbolic/mx/mx_tools.hpp"
+#include "symbolic/fx/fx.hpp"
 %}
 
 %define %my_genericmatrix_const_typemap(Precedence,Type...) 

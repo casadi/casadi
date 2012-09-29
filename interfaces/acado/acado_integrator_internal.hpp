@@ -26,9 +26,9 @@
 #include "acado_integrator.hpp"
 #include "acado_forward_declarations.hpp"
 #include "acado_function.hpp"
-#include "casadi/fx/integrator_internal.hpp"
-#include "casadi/fx/linear_solver.hpp"
-#include "casadi/fx/fx_internal.hpp"
+#include "symbolic/fx/integrator_internal.hpp"
+#include "symbolic/fx/linear_solver.hpp"
+#include "symbolic/fx/fx_internal.hpp"
 
 namespace CasADi{
   

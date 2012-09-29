@@ -23,7 +23,7 @@
 #ifndef RK_INTEGRATOR_HPP
 #define RK_INTEGRATOR_HPP
 
-#include "casadi/fx/integrator.hpp"
+#include "symbolic/fx/integrator.hpp"
 
 namespace CasADi{
   

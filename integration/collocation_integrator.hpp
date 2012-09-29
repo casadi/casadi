@@ -23,7 +23,7 @@
 #ifndef COLLOCATION_INTEGRATOR_HPP
 #define COLLOCATION_INTEGRATOR_HPP
 
-#include "casadi/fx/integrator.hpp"
+#include "symbolic/fx/integrator.hpp"
 
 namespace CasADi{
   

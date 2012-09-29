@@ -23,7 +23,7 @@
 #include "frame.hpp"
 #include "frame_node.hpp"
 
-//#include <casadi/expression_tools.hpp>
+//#include <symbolic/expression_tools.hpp>
 using namespace std;
 using namespace CasADi;
 namespace KINEMATICS{

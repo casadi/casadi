@@ -24,8 +24,8 @@
 #define GSL_INTERNAL_HPP
 
 #include "gsl_integrator.hpp"
-#include "casadi/fx/integrator_internal.hpp"
-#include "casadi/fx/linear_solver.hpp"
+#include "symbolic/fx/integrator_internal.hpp"
+#include "symbolic/fx/linear_solver.hpp"
 #include <gsl/gsl_errno.h>
 #include <gsl/gsl_matrix.h>
 #include <gsl/gsl_odeiv.h>

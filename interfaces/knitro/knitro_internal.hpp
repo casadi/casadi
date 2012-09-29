@@ -25,7 +25,7 @@
 
 #include "knitro_solver.hpp"
 #include "knitro.h"
-#include "casadi/fx/nlp_solver_internal.hpp"
+#include "symbolic/fx/nlp_solver_internal.hpp"
 
 namespace CasADi{
 

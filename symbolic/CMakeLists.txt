@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 2.0)
-project(casadi)
 
 SET(CASADI_SRCS
   # MISC
@@ -93,7 +92,7 @@ install(TARGETS casadi
   ARCHIVE DESTINATION lib
 )
 install(DIRECTORY ./                                                                                                                                                                                          
-   DESTINATION include/casadi/casadi                                                                                                                                                                          
+   DESTINATION include/casadi/symbolic                                                                                                                                                                          
    FILES_MATCHING PATTERN "*.hpp"                                                                                                                                                                             
    PATTERN ".svn" EXCLUDE                                                                                                                                                                                     
 )                                                                                                                                                                                                             

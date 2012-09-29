@@ -1,7 +1,7 @@
 #ifndef MUSCOD_INTERFACE_HPP
 #define MUSCOD_INTERFACE_HPP
 
-#include <casadi/options_functionality.hpp>
+#include <symbolic/options_functionality.hpp>
 
 namespace CasADi{
   

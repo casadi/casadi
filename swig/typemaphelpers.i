@@ -21,16 +21,16 @@
  */
 
 %{
-#include "casadi/matrix/crs_sparsity.hpp"
-#include "casadi/matrix/matrix.hpp"
+#include "symbolic/matrix/crs_sparsity.hpp"
+#include "symbolic/matrix/matrix.hpp"
 #include <sstream>
-#include "casadi/casadi_exception.hpp"
+#include "symbolic/casadi_exception.hpp"
 
 // to allow for typechecking
-#include "casadi/sx/sx.hpp"
+#include "symbolic/sx/sx.hpp"
 
 // to typecheck for MX
-#include "casadi/mx/mx.hpp"
+#include "symbolic/mx/mx.hpp"
 %}
 
 

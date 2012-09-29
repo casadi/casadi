@@ -21,11 +21,11 @@
  */
 
 #include "idas_internal.hpp"
-#include "casadi/stl_vector_tools.hpp"
-#include "casadi/fx/linear_solver_internal.hpp"
-#include "casadi/fx/mx_function.hpp"
-#include "casadi/sx/sx_tools.hpp"
-#include "casadi/mx/mx_tools.hpp"
+#include "symbolic/stl_vector_tools.hpp"
+#include "symbolic/fx/linear_solver_internal.hpp"
+#include "symbolic/fx/mx_function.hpp"
+#include "symbolic/sx/sx_tools.hpp"
+#include "symbolic/mx/mx_tools.hpp"
 
 using namespace std;
 namespace CasADi{

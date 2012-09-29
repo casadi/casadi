@@ -28,7 +28,7 @@ extern "C"{
 }
 
 #include "csparse.hpp"
-#include "casadi/fx/linear_solver_internal.hpp"
+#include "symbolic/fx/linear_solver_internal.hpp"
 
 namespace CasADi{
 

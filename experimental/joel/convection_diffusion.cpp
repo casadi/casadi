@@ -21,14 +21,14 @@
  */
 
 #include <iostream>
-#include "casadi/stl_vector_tools.hpp"
+#include "symbolic/stl_vector_tools.hpp"
 #include "interfaces/ipopt/ipopt_solver.hpp"
 #include "interfaces/sundials/cvodes_integrator.hpp"
 #include "optimal_control/ocp_tools.hpp"
-#include "casadi/fx/simulator.hpp"
-#include "casadi/fx/simulator_internal.hpp"
-#include "casadi/sx/sx_tools.hpp"
-#include "casadi/fx/sx_function.hpp"
+#include "symbolic/fx/simulator.hpp"
+#include "symbolic/fx/simulator_internal.hpp"
+#include "symbolic/sx/sx_tools.hpp"
+#include "symbolic/fx/sx_function.hpp"
 
 using namespace CasADi;
 using namespace CasADi::OptimalControl;

@@ -22,7 +22,7 @@
 #ifndef CPLEX_SOLVER_HPP
 #define CPLEX_SOLVER_HPP
 
-#include "casadi/fx/nlp_solver.hpp"
+#include "symbolic/fx/nlp_solver.hpp"
 
 namespace CasADi{
   

@@ -23,7 +23,7 @@
 #ifndef ACADO_FUNCTION_HPP
 #define ACADO_FUNCTION_HPP
 
-#include <casadi/fx/fx.hpp>
+#include <symbolic/fx/fx.hpp>
 #include "acado_forward_declarations.hpp"
 
 namespace CasADi{

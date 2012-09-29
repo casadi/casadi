@@ -1,8 +1,8 @@
 #ifndef MUSCOD_FUNCTION_HPP
 #define MUSCOD_FUNCTION_HPP
 
-#include <casadi/fx/fx.hpp>
-#include <casadi/stl_vector_tools.hpp>
+#include <symbolic/fx/fx.hpp>
+#include <symbolic/stl_vector_tools.hpp>
 #include "muscod_interface.hpp"
 #include <stack>
 

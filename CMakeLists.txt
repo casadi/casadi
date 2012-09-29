@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.0)
-project(opticon C CXX)
+project(casadi C CXX)
 
 # find the macports python libs if they exist
 if(APPLE)
@@ -201,7 +201,7 @@ if(WITH_WORHP)
 endif()
 add_feature_info(worhp-inteface WORHP_FOUND "Interface to the NLP solver Worhp.")
 
-add_subdirectory(casadi)
+add_subdirectory(symbolic)
 add_subdirectory(optimal_control)
 add_subdirectory(nonlinear_programming)
 add_subdirectory(integration)
@@ -236,7 +236,7 @@ if(WITH_DOC)
   set(DOXYFILE_LATEX "NO")
   set(DOXYFILE_IN_DIR ${CMAKE_SOURCE_DIR}/documentation/api-doc)
   set(DOXYFILE_OUTPUT_DIR  ${CMAKE_SOURCE_DIR}/documentation/api-doc)
-  set(DOXYFILE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/casadi)
+  set(DOXYFILE_SOURCE_DIR ${CMAKE_SOURCE_DIR}/symbolic)
   include(UseDoxygen OPTIONAL)
 endif()
 
