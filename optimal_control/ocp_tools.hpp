@@ -52,27 +52,7 @@ namespace CasADi{
   static double* radau_points[] = {0,radau_points1,radau_points2,radau_points3,radau_points4,radau_points5};
 
   static double** collocation_points[] = {legendre_points,radau_points};
-  
 #endif // SWIG 
-
-
-  // Get the coefficeints for the collocation and continuity equations
-  void get_collocation_coeff(int K, std::vector<std::vector<double> >& C, std::vector<double>& D, CollocationPoints cp);
-
-  // Collocate a variable (one variable per finite element) // TODO: change to Matrix<SX>
-  void collocate(const SXMatrix& var, std::vector< SXMatrix >& VAR, int N);
-
-  // Collocate a variable (K variables per finite element) // TODO: change to Matrix<SX>
-  void collocate(const SXMatrix& var, std::vector< std::vector< SXMatrix > >& VAR, int N, int K);
-  
-  // Collocate a variable (K variables per finite element) // TODO: change to Matrix<SX>
-  void collocate_final(const SXMatrix& var, SXMatrix &VARF);
-
-  // Sort the equations in an order which is consistent with the variable sorting and save to the variable structure
-//  void sortEquations(OCP& ocp, const std::vector<SX>& dae);
-
-  /// Tarjan's algorithm
-  void tarjan(const std::vector<SX>& x, const std::vector<SX>& xdot, const std::vector<SX>& z, const std::vector<SX>& dae);
   
 } // namespace CasADi
 
