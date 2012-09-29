@@ -211,9 +211,9 @@ SX SX::__sub__(const SX& y) const{
   else if(hasDep() && getOp()==OP_ADD && getDep(0).isEquivalent(y))
     return getDep(1);
   else if(y.hasDep() && y.getOp()==OP_ADD && isEquivalent(y.getDep(1)))
-    return y.getDep(0);
+    return -y.getDep(0);
   else if(y.hasDep() && y.getOp()==OP_ADD && isEquivalent(y.getDep(0)))
-    return y.getDep(1);
+    return -y.getDep(1);
   else // create a new branch
     return BinarySX::create(OP_SUB,*this,y);
 }
