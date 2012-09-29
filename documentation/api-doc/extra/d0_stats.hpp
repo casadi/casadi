@@ -24,6 +24,9 @@
 <tr><th>Id</th><th>Used in</th></tr>
 <tr><td>alpha_du</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>alpha_pr</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>con_integer_md</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>con_numeric_md</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>con_string_md</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>d_norm</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>inf_du</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>inf_pr</td><td>CasADi::IpoptInternal</td></tr>
@@ -33,6 +36,9 @@
 <tr><td>mu</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>regularization_size</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>return_status</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>var_integer_md</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>var_numeric_md</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>var_string_md</td><td>CasADi::IpoptInternal</td></tr>
 </table>
 */
 /** \class CasADi::IpoptSolver
@@ -43,6 +49,9 @@
 <tr><th>Id</th><th>Used in</th></tr>
 <tr><td>alpha_du</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>alpha_pr</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>con_integer_md</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>con_numeric_md</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>con_string_md</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>d_norm</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>inf_du</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>inf_pr</td><td>CasADi::IpoptInternal</td></tr>
@@ -52,6 +61,9 @@
 <tr><td>mu</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>regularization_size</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>return_status</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>var_integer_md</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>var_numeric_md</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>var_string_md</td><td>CasADi::IpoptInternal</td></tr>
 </table>
 */
 /** \class CasADi::SQPInternal

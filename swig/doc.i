@@ -25247,6 +25247,36 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
+| con_integer_ | OT_DICTIONAR | GenericType( | Integer      | CasADi::Ipop |
+| md           | Y            | )            | metadata (a  | tInternal    |
+|              |              |              | dictionary   |              |
+|              |              |              | with lists   |              |
+|              |              |              | of integers) |              |
+|              |              |              | about        |              |
+|              |              |              | constraints  |              |
+|              |              |              | to be passed |              |
+|              |              |              | to IPOPT     |              |
++--------------+--------------+--------------+--------------+--------------+
+| con_numeric_ | OT_DICTIONAR | GenericType( | Numeric      | CasADi::Ipop |
+| md           | Y            | )            | metadata (a  | tInternal    |
+|              |              |              | dictionary   |              |
+|              |              |              | with lists   |              |
+|              |              |              | of reals)    |              |
+|              |              |              | about        |              |
+|              |              |              | constraints  |              |
+|              |              |              | to be passed |              |
+|              |              |              | to IPOPT     |              |
++--------------+--------------+--------------+--------------+--------------+
+| con_string_m | OT_DICTIONAR | GenericType( | String       | CasADi::Ipop |
+| d            | Y            | )            | metadata (a  | tInternal    |
+|              |              |              | dictionary   |              |
+|              |              |              | with lists   |              |
+|              |              |              | of strings)  |              |
+|              |              |              | about        |              |
+|              |              |              | constraints  |              |
+|              |              |              | to be passed |              |
+|              |              |              | to IPOPT     |              |
++--------------+--------------+--------------+--------------+--------------+
 | constr_mult_ | OT_REAL      | 1000         | Maximum      | CasADi::Ipop |
 | init_max     |              |              | allowed      | tInternal    |
 |              |              |              | least-square |              |
@@ -27482,6 +27512,36 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| var_integer_ | OT_DICTIONAR | GenericType( | Integer      | CasADi::Ipop |
+| md           | Y            | )            | metadata (a  | tInternal    |
+|              |              |              | dictionary   |              |
+|              |              |              | with lists   |              |
+|              |              |              | of integers) |              |
+|              |              |              | about        |              |
+|              |              |              | variables to |              |
+|              |              |              | be passed to |              |
+|              |              |              | IPOPT        |              |
++--------------+--------------+--------------+--------------+--------------+
+| var_numeric_ | OT_DICTIONAR | GenericType( | Numeric      | CasADi::Ipop |
+| md           | Y            | )            | metadata (a  | tInternal    |
+|              |              |              | dictionary   |              |
+|              |              |              | with lists   |              |
+|              |              |              | of reals)    |              |
+|              |              |              | about        |              |
+|              |              |              | variables to |              |
+|              |              |              | be passed to |              |
+|              |              |              | IPOPT        |              |
++--------------+--------------+--------------+--------------+--------------+
+| var_string_m | OT_DICTIONAR | GenericType( | String       | CasADi::Ipop |
+| d            | Y            | )            | metadata (a  | tInternal    |
+|              |              |              | dictionary   |              |
+|              |              |              | with lists   |              |
+|              |              |              | of strings)  |              |
+|              |              |              | about        |              |
+|              |              |              | variables to |              |
+|              |              |              | be passed to |              |
+|              |              |              | IPOPT        |              |
++--------------+--------------+--------------+--------------+--------------+
 | vartheta     | OT_REAL      | 0.500        | a parameter  | CasADi::Ipop |
 |              |              |              | used to      | tInternal    |
 |              |              |              | check if the |              |
@@ -27789,6 +27849,8 @@ C++ includes: ipopt_internal.hpp ";
 Make a deep copy of the instance. ";
 
 %feature("docstring")  CasADi::IpoptInternal::getGF "";
+
+%feature("docstring")  CasADi::IpoptInternal::freeIpopt "";
 
 %feature("docstring")  CasADi::IpoptInternal::init "
 
@@ -30727,6 +30789,36 @@ Yorktown, USA
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
+| con_integer_ | OT_DICTIONAR | GenericType( | Integer      | CasADi::Ipop |
+| md           | Y            | )            | metadata (a  | tInternal    |
+|              |              |              | dictionary   |              |
+|              |              |              | with lists   |              |
+|              |              |              | of integers) |              |
+|              |              |              | about        |              |
+|              |              |              | constraints  |              |
+|              |              |              | to be passed |              |
+|              |              |              | to IPOPT     |              |
++--------------+--------------+--------------+--------------+--------------+
+| con_numeric_ | OT_DICTIONAR | GenericType( | Numeric      | CasADi::Ipop |
+| md           | Y            | )            | metadata (a  | tInternal    |
+|              |              |              | dictionary   |              |
+|              |              |              | with lists   |              |
+|              |              |              | of reals)    |              |
+|              |              |              | about        |              |
+|              |              |              | constraints  |              |
+|              |              |              | to be passed |              |
+|              |              |              | to IPOPT     |              |
++--------------+--------------+--------------+--------------+--------------+
+| con_string_m | OT_DICTIONAR | GenericType( | String       | CasADi::Ipop |
+| d            | Y            | )            | metadata (a  | tInternal    |
+|              |              |              | dictionary   |              |
+|              |              |              | with lists   |              |
+|              |              |              | of strings)  |              |
+|              |              |              | about        |              |
+|              |              |              | constraints  |              |
+|              |              |              | to be passed |              |
+|              |              |              | to IPOPT     |              |
++--------------+--------------+--------------+--------------+--------------+
 | constr_mult_ | OT_REAL      | 1000         | Maximum      | CasADi::Ipop |
 | init_max     |              |              | allowed      | tInternal    |
 |              |              |              | least-square |              |
@@ -32961,6 +33053,36 @@ Yorktown, USA
 |              |              |              | or pass      |              |
 |              |              |              | additional   |              |
 |              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| var_integer_ | OT_DICTIONAR | GenericType( | Integer      | CasADi::Ipop |
+| md           | Y            | )            | metadata (a  | tInternal    |
+|              |              |              | dictionary   |              |
+|              |              |              | with lists   |              |
+|              |              |              | of integers) |              |
+|              |              |              | about        |              |
+|              |              |              | variables to |              |
+|              |              |              | be passed to |              |
+|              |              |              | IPOPT        |              |
++--------------+--------------+--------------+--------------+--------------+
+| var_numeric_ | OT_DICTIONAR | GenericType( | Numeric      | CasADi::Ipop |
+| md           | Y            | )            | metadata (a  | tInternal    |
+|              |              |              | dictionary   |              |
+|              |              |              | with lists   |              |
+|              |              |              | of reals)    |              |
+|              |              |              | about        |              |
+|              |              |              | variables to |              |
+|              |              |              | be passed to |              |
+|              |              |              | IPOPT        |              |
++--------------+--------------+--------------+--------------+--------------+
+| var_string_m | OT_DICTIONAR | GenericType( | String       | CasADi::Ipop |
+| d            | Y            | )            | metadata (a  | tInternal    |
+|              |              |              | dictionary   |              |
+|              |              |              | with lists   |              |
+|              |              |              | of strings)  |              |
+|              |              |              | about        |              |
+|              |              |              | variables to |              |
+|              |              |              | be passed to |              |
+|              |              |              | IPOPT        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | vartheta     | OT_REAL      | 0.500        | a parameter  | CasADi::Ipop |
 |              |              |              | used to      | tInternal    |
