@@ -32,7 +32,6 @@
 #include "../casadi/fx/sx_function.hpp"
 
 namespace CasADi{
-  namespace OptimalControl{
   
 class CollocationInternal : public OCPSolverInternal{
   friend class Collocation;
@@ -85,8 +84,6 @@ class CollocationInternal : public OCPSolverInternal{
     NLPSolver nlp_solver_;
 };
                         
-                        
-  } // namespace OptimalControl
 } // namespace CasADi
 
 

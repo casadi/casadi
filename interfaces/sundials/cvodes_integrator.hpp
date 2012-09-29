@@ -26,7 +26,6 @@
 #include "sundials_integrator.hpp"
 
 namespace CasADi{
-namespace Sundials{
   
 /// Input arguments of the Jacobian in the nonlinear iteration: M = 1 - gamma*df/dy
 enum MInput{M_T, M_Y, M_P, M_GAMMA, M_NUM_IN};
@@ -79,8 +78,6 @@ public:
   #endif
 };
 
-
-} // namespace Sundials
 } // namespace CasADi
 
 #endif //CVODES_INTEGRATOR_HPP

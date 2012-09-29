@@ -26,7 +26,6 @@
 #include "casadi/fx/integrator.hpp"
 
 namespace CasADi{
-namespace Sundials{
   
 /// Forward declaration of internal class
 class SundialsInternal;
@@ -66,7 +65,6 @@ public:
   
 };
 
-} // namespace Sundials
 } // namespace CasADi
 
 #endif //SUNDIALS_INTEGRATOR_HPP

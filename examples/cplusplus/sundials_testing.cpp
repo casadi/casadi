@@ -37,7 +37,6 @@
 
 using namespace std;
 using namespace CasADi;
-using namespace CasADi::Sundials;
 
 // Use CVodes or IDAS
 const bool implicit_integrator = false;
@@ -156,7 +155,7 @@ Integrator create_Sundials(){
   
   if(implicit_integrator){
     // Create an IDAS instance
-    Sundials::IdasIntegrator integrator(ffcn);
+    IdasIntegrator integrator(ffcn);
     
     // Set IDAS specific options
     integrator.setOption("calc_ic",calc_ic);
@@ -165,7 +164,7 @@ Integrator create_Sundials(){
     return integrator;
   } else {
     // Create an CVodes instance
-    Sundials::CVodesIntegrator integrator(ffcn);
+    CVodesIntegrator integrator(ffcn);
 
     // Return the integrator
     return integrator;

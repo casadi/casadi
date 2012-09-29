@@ -26,7 +26,6 @@
 
 using namespace std;
 namespace CasADi{
-namespace Sundials{
 
 SundialsIntegrator::SundialsIntegrator(){
 }
@@ -74,6 +73,5 @@ void SundialsIntegrator::setFinalTime(double tf){
   (*this)->setFinalTime(tf);
 }
 
-} // namespace Sundials
 } // namespace CasADi
 

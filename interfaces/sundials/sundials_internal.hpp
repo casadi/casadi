@@ -32,7 +32,6 @@
 #include <sundials/sundials_types.h>
 
 namespace CasADi{
-namespace Sundials{
 
 class SundialsInternal : public IntegratorInternal{
 public:
@@ -121,7 +120,6 @@ public:
   
 };
   
-} // namespace Sundials
 } // namespace CasADi
 
 #endif // SUNDIALS_INTERNAL_HPP

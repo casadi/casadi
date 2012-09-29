@@ -1,5 +1,5 @@
 /** 
-* This example looks at the use of CasADi::Sundials::IdasIntegrator();
+* This example looks at the use of CasADi::IdasIntegrator();
 *
 * <a href="integrators/idas.pdf">View output (PDF)</a>
 *
@@ -7,7 +7,7 @@
 *
 * \sa
 * \code
-* CasADi::Sundials::IdasIntegrator();
+* CasADi::IdasIntegrator();
 * \endcode
 *
 */

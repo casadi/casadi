@@ -44,7 +44,6 @@
 */
 
 namespace CasADi{
-namespace Sundials{
 
 // Forward declaration of internal class
 class IdasInternal;
@@ -103,8 +102,6 @@ public:
   #endif
 };
 
-
-} // namespace Sundials
 } // namespace CasADi
 
 #endif //IDAS_INTEGRATOR_HPP

@@ -30,8 +30,6 @@
 
 using namespace std;
 namespace CasADi{
-  namespace OptimalControl{
-    
     
 CollocationInternal::CollocationInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn) : OCPSolverInternal(ffcn, mfcn, cfcn, rfcn){
   addOption("parallelization", OT_STRING, GenericType(), "Passed on to CasADi::Parallelizer");
@@ -375,8 +373,4 @@ void CollocationInternal::reportConstraints(std::ostream &stream) {
  
 }
 
-
-
-  } // namespace OptimalControl
 } // namespace CasADi
-

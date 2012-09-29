@@ -12,8 +12,6 @@
 #include <optimal_control/multiple_shooting_internal.hpp>
 
 using namespace CasADi;
-using namespace CasADi::Sundials;
-using namespace CasADi::OptimalControl;
 using namespace std;
 
 

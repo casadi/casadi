@@ -39,8 +39,6 @@
 #include <optimal_control/multiple_shooting.hpp>
 
 using namespace CasADi;
-using namespace CasADi::Sundials;
-using namespace CasADi::OptimalControl;
 using namespace std;
 
 int main(){

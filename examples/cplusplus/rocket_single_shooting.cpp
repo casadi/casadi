@@ -32,7 +32,6 @@
 #include "integration/rk_integrator.hpp"
 
 using namespace CasADi;
-using namespace CasADi::Sundials;
 using namespace std;
 
 bool sundials_integrator = true;
@@ -100,13 +99,13 @@ int main(){
   if(sundials_integrator){
     if(explicit_integrator){
       // Explicit integrator (CVODES)
-      integrator = Sundials::CVodesIntegrator(daefcn);
+      integrator = CVodesIntegrator(daefcn);
       // integrator.setOption("exact_jacobian",true);
       // integrator.setOption("linear_multistep_method","bdf"); // adams or bdf
       // integrator.setOption("nonlinear_solver_iteration","newton"); // newton or functional
     } else {
       // Implicit integrator (IDAS)
-      integrator = Sundials::IdasIntegrator(daefcn);
+      integrator = IdasIntegrator(daefcn);
       integrator.setOption("calc_ic",false);
     }
     integrator.setOption("fsens_err_con",true);

@@ -25,7 +25,6 @@
 
 using namespace std;
 namespace CasADi{
-namespace Sundials{
 
 CVodesIntegrator::CVodesIntegrator(){ 
 }
@@ -47,7 +46,6 @@ bool CVodesIntegrator::checkNode() const{
   return dynamic_cast<const CVodesInternal*>(get());
 }
 
-} // namespace Sundials
 } // namespace CasADi
 
 

@@ -23,7 +23,6 @@
 #include "multiple_shooting_internal.hpp"
 
 namespace CasADi{
-  namespace OptimalControl{
     
 MultipleShooting::MultipleShooting(){
 }
@@ -62,7 +61,5 @@ void MultipleShooting::reportConstraints(std::ostream &stream) {
   (*this)->reportConstraints();
 }
 
-
-  } // namespace OptimalControl
 } // namespace CasADi
 

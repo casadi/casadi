@@ -26,7 +26,6 @@
 
 using namespace std;
 namespace CasADi{
-namespace Sundials{
 
 IdasIntegrator::IdasIntegrator(){ 
 }
@@ -51,7 +50,6 @@ void IdasIntegrator::correctInitialConditions(){
   (*this)->correctInitialConditions();
 }
 
-} // namespace Sundials
 } // namespace CasADi
 
 

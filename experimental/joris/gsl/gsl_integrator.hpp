@@ -52,7 +52,7 @@ public:
   GslIntegrator();
   
   /** \brief  Create an integrator for explicit ODEs
-  *   \param f CasADi::FX mapping from CasADi::Sundials::ODEInput to CasADi::Sundials::ODEOutput.
+  *   \param f CasADi::FX mapping from CasADi::ODEInput to CasADi::ODEOutput.
   */
   explicit GslIntegrator(const FX& f, const FX& q=FX());
   

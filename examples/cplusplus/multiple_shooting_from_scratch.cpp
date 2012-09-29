@@ -53,7 +53,6 @@
 #include <interfaces/sundials/cvodes_integrator.hpp>
 
 using namespace CasADi;
-using namespace CasADi::Sundials;
 using namespace std;
 
 // Infinity

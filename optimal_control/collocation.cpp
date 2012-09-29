@@ -23,7 +23,6 @@
 #include "collocation_internal.hpp"
 
 namespace CasADi{
-  namespace OptimalControl{
     
 Collocation::Collocation(){
 }
@@ -62,7 +61,5 @@ void Collocation::reportConstraints(std::ostream &stream) {
   (*this)->reportConstraints();
 }
 
-
-  } // namespace OptimalControl
 } // namespace CasADi
 

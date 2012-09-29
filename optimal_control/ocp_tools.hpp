@@ -30,18 +30,8 @@ namespace CasADi{
   /// Update dependent variables in an OCP
   void updateDependent(SymbolicOCP& ocp);
 
-  // Legacy stuff:
-  
-  namespace OptimalControl{
-
-  // Go through the equations of an ocp and make them explicit, if possible
-/*  void makeExplicit(AcadoOCP &ocp);*/
-  
-  // Make all equations implicit
-/*  void makeImplicit(AcadoOCP &ocp);*/
-
-// Type of collocation points
-enum CollocationPoints{LEGENDRE,RADAU};
+  // Type of collocation points
+  enum CollocationPoints{LEGENDRE,RADAU};
 
 
 #ifndef SWIG
@@ -84,62 +74,6 @@ enum CollocationPoints{LEGENDRE,RADAU};
   /// Tarjan's algorithm
   void tarjan(const std::vector<SX>& x, const std::vector<SX>& xdot, const std::vector<SX>& z, const std::vector<SX>& dae);
   
-  
-
-  
-  
-  
-  
-  
-  
-  
-  
-  
-#if 0
-/** \brief  Eliminate time derivatives from the dynamic equations and replace them by state derivatives */
-/** \brief   void eliminateTimeDerivatives(OCP_old &ocp); */
-
-/** \brief  Make smooth by eliminating switches */
-  void makeSmooth(OCP_old &ocp);
-
-/** \brief  Eliminate a lagrange objective term by adding an additional state */
-  void eliminateLagrangeTerm(OCP_old &ocp);
-
-/** \brief  Convert implicit ic's into explicit ic's (when possible) and write the remaining ic's in a compact form to allow for newton iterations */
-  void sortInitialConditions(OCP_old &ocp, bool make_explicit=false);
-
-/** \brief  Reformulate the differential equation */
-  void makeImplicit(OCP_old &ocp); // Rewrites the differential equation in fully implicit form: 0 = f(xdot,x,p,u)
-  void makeSemiExplicit(OCP_old &ocp); // Rewrites the differential equation in semi-explicit form: [xdot,0] = [f(x,y,p,u),g(x,y,p,u)]
-  void makeExplicit(OCP_old &ocp); // Rewrites the differential equation in explicit form: xdot = f(x,p,u)
-  bool isExplicit(const OCP_old &ocp); // checks if the differential equation is of explicit form
-
-  /** 
-    Parametrize the control u by introducing n_disc parameters for each control
-    The argument met specifies the discretization method 
-      (by piecewise constant discretization on a uniform grid)
-    Returns the the discretized controls (which are parameters of the ocp)
-  */
-  Matrix parametrizeControls(OCP_old &ocp, const Matrix &u, int n_disc, const Matrix& met=Matrix());
-
-/** \brief  Event iteration - see Principles of Object-Oriented Modeling and Simulation with OptimalControl 2.1, chapter 18 */
-  void eventIteration(OCP_old& ocp, bool forward=true); // should not have any argument
-
-/** \brief  Generate Lagrange discretization matrices */
-  void generateLegendreMatrices(int n, Matrix &D, Matrix &w, Matrix &tau);
-
-/** \brief  Generate Lagrange polynomials */
-  void generateLagrangePolynomials(const Matrix &t, const Matrix &tau, Matrix &L);
-
-/** \brief  Print to screen */
-  std::ostream& operator<<(std::ostream &stream, const OCP_old& ocp);
-
-/** \brief  Eliminate all dependent variables in the functions (this function should be made unecessary by means of a smarter ocp class) */
-  void eliminateDependent(OCP_old& ocp);
-
-#endif
-  
-} // namespace OptimalControl
 } // namespace CasADi
 
 #endif // OCP_TOOLS_HPP

@@ -29,7 +29,6 @@
 
 using namespace std;
 namespace CasADi{
-namespace Sundials{
 
 IdasInternal* IdasInternal::clone() const{
   // Return a deep copy
@@ -1604,6 +1603,5 @@ LinearSolver IdasInternal::getLinearSolver(){
   return linsol_;
 }
 
-} // namespace Sundials
 } // namespace CasADi
 

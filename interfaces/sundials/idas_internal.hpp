@@ -36,7 +36,6 @@
 #include <ctime>
 
 namespace CasADi{
-namespace Sundials{
   
 /**
 @copydoc IdasIntegrator_doc
@@ -225,8 +224,6 @@ class IdasInternal : public SundialsInternal{
   
 };
 
-
-} // namespace Sundials
 } // namespace CasADi
 
 #endif //IDAS_INTERNAL_HPP

@@ -28,7 +28,6 @@
 
 using namespace std;
 namespace CasADi{
-namespace Sundials{
 
 KinsolInternal::KinsolInternal(const FX& f, int nrhs) : ImplicitFunctionInternal(f,nrhs){
   addOption("linear_solver",            OT_STRING, "dense");
@@ -861,6 +860,5 @@ map<int,Message> KinsolInternal::calc_flagmap(){
   return f;
 }
 
-} // namespace Sundials
 } // namespace CasADi
 

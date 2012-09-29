@@ -30,8 +30,6 @@
 
 using namespace std;
 namespace CasADi{
-  namespace OptimalControl{
-    
     
 MultipleShootingInternal::MultipleShootingInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn) : OCPSolverInternal(ffcn, mfcn, cfcn, rfcn){
   addOption("parallelization", OT_STRING, GenericType(), "Passed on to CasADi::Parallelizer");
@@ -374,8 +372,4 @@ void MultipleShootingInternal::reportConstraints(std::ostream &stream) {
  
 }
 
-
-
-  } // namespace OptimalControl
 } // namespace CasADi
-

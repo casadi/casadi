@@ -38,7 +38,6 @@
 #include <ctime>
 
 namespace CasADi{
-namespace Sundials{
   
 typedef std::pair< std::string,std::string> Message;
     
@@ -143,8 +142,6 @@ public:
   
 };
 
-
-} // namespace Sundials
 } // namespace CasADi
 
 #endif //KINSOL_INTERNAL_HPP

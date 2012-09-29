@@ -28,7 +28,6 @@
 
 using namespace std;
 namespace CasADi{
-namespace Sundials{
 
 CVodesInternal* CVodesInternal::clone() const{
   // Return a deep copy
@@ -107,7 +106,7 @@ void CVodesInternal::init(){
       SXMatrix jac = SXMatrix::eye(nx_) - gamma * f.jac(DAE_X,DAE_ODE);
       
       // Jacobian function
-      vector<SXMatrix> jac_in(Sundials::M_NUM_IN);
+      vector<SXMatrix> jac_in(M_NUM_IN);
       jac_in[M_T] = f.inputSX(DAE_T);
       jac_in[M_Y] = f.inputSX(DAE_X);
       jac_in[M_P] = f.inputSX(DAE_P);
@@ -1389,7 +1388,5 @@ void CVodesInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& a
   jac_f_ = deepcopy(jac_f_,already_copied);
 }
 
-
-} // namespace Sundials
 } // namespace CasADi
 

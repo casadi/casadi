@@ -27,13 +27,8 @@
 #include "../casadi/fx/nlp_solver.hpp"
 
 namespace CasADi{
-  namespace OptimalControl{
-  
-    class MultipleShootingInternal;
+  class MultipleShootingInternal;
     
-    
-
-  
     
   /** \brief Multiple Shooting
    *
@@ -101,8 +96,6 @@ class MultipleShooting : public OCPSolver{
     
 };
                         
-                        
-  } // namespace OptimalControl
 } // namespace CasADi
 
 

@@ -27,7 +27,6 @@
 #include "casadi/fx/linear_solver.hpp"
 
 namespace CasADi{
-namespace Sundials{
   
 // Forward declaration of internal class 
 class KinsolInternal;
@@ -97,8 +96,6 @@ public:
 
 };
 
-
-} // namespace Sundials
 } // namespace CasADi
 
 #endif //KINSOL_SOLVER_HPP

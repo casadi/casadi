@@ -36,7 +36,6 @@
 #include <ctime>
 
 namespace CasADi{
-namespace Sundials{
   
 /**
   @copydoc ODE_doc
@@ -217,8 +216,6 @@ public:
   
 };
 
-
-} // namespace Sundials
 } // namespace CasADi
 
 #endif //CVODES_INTERNAL_HPP

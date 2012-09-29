@@ -7,7 +7,7 @@
 *
 * \sa
 * \code
-* CasADi::Sundials::kinsolSolver();
+* CasADi::kinsolSolver();
 * \endcode
 *
 */

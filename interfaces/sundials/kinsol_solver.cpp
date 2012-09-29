@@ -25,7 +25,6 @@
 
 using namespace std;
 namespace CasADi{
-namespace Sundials{
 
 KinsolSolver::KinsolSolver(){ 
 }
@@ -73,9 +72,6 @@ LinearSolver KinsolSolver::getLinearSolver(){
   return (*this)->getLinearSolver();  
 }
 
-
-
-} // namespace Sundials
 } // namespace CasADi
 
 

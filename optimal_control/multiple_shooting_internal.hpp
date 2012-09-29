@@ -32,7 +32,6 @@
 #include "../casadi/fx/sx_function.hpp"
 
 namespace CasADi{
-  namespace OptimalControl{
   
 class MultipleShootingInternal : public OCPSolverInternal{
   friend class MultipleShooting;
@@ -85,8 +84,6 @@ class MultipleShootingInternal : public OCPSolverInternal{
     NLPSolver nlp_solver_;
 };
                         
-                        
-  } // namespace OptimalControl
 } // namespace CasADi
 
 

@@ -27,9 +27,7 @@
 #include "../casadi/fx/nlp_solver.hpp"
 
 namespace CasADi{
-  namespace OptimalControl{
-  
-    class CollocationInternal;
+  class CollocationInternal;
     
   /** \brief Direct collocation
    *
@@ -72,8 +70,6 @@ class Collocation : public OCPSolver{
     std::string getReportConstraints() { std::stringstream s; reportConstraints(s); return s.str(); }
 };
                         
-  } // namespace OptimalControl
 } // namespace CasADi
-
 
 #endif // COLLOCATION_HPP
