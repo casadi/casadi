@@ -31,7 +31,6 @@
 
 using namespace std;
 namespace CasADi {
-namespace Interfaces {
 
 OOQPInternal* OOQPInternal::clone() const{
   // Return a deep copy
@@ -357,7 +356,6 @@ void OOQPInternal::ooqp_error(const string& module, int flag){
   casadi_error(ss.str());
 }
 
-} // namespace Interfaces
 } // namespace CasADi
 
 // #undef getPtr

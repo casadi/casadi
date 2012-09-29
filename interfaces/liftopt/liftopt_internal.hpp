@@ -35,7 +35,6 @@
 #include "sonic++.h"
 
 namespace CasADi{
-  namespace Interfaces{
 
 /**
 
@@ -63,7 +62,6 @@ class LiftoptInternal : public NLPSolverInternal{
     int m_nObjRes_, m_nCtrls_, m_nEq_, m_nIneq_;
 };
 
-  } // namespace Interfaces
 } // namespace CasADi
 
 #endif // LIFTOPT_INTERNAL_HPP

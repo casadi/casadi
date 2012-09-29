@@ -26,7 +26,6 @@
 #include "casadi/fx/linear_solver.hpp"
 
 namespace CasADi{
-  namespace Interfaces{
 
   
 /** \brief  Forward declaration of internal class */
@@ -78,7 +77,6 @@ public:
   
 };
 
-  } // namespace Interface
 } // namespace CasADi
 
 #endif //CSPARSE_HPP

@@ -38,7 +38,6 @@
 using namespace std;
 using namespace CasADi;
 using namespace CasADi::Sundials;
-using namespace CasADi::Interfaces;
 
 // Use CVodes or IDAS
 const bool implicit_integrator = false;

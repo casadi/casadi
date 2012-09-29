@@ -24,7 +24,6 @@
 
 using namespace std;
 namespace CasADi{
-  namespace Interfaces{
 
 CSparseInternal::CSparseInternal(const CRSSparsity& sparsity)  : LinearSolverInternal(sparsity){
   N_ = 0;
@@ -134,5 +133,4 @@ CSparseInternal* CSparseInternal::clone() const{
   return new CSparseInternal(sparsity_);
 }
 
-  } // namespace Interfaces
 } // namespace CasADi

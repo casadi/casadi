@@ -25,7 +25,6 @@
 
 using namespace std;
 namespace CasADi{
-  namespace Interfaces{
 
 LapackLUDense::LapackLUDense(){
 }
@@ -163,10 +162,4 @@ LapackLUDenseInternal* LapackLUDenseInternal::clone() const{
   return new LapackLUDenseInternal(*this);
 }
 
-
-  } // namespace Interfaces
 } // namespace CasADi
-
-  
-
-

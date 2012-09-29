@@ -364,7 +364,7 @@ int main(){
     } else {
       nlp_solver = LiftedSQP(ffcn,gfcn);
       if(gauss_newton) nlp_solver.setOption("gauss_newton",true);
-      nlp_solver.setOption("qp_solver",Interfaces::QPOasesSolver::creator);
+      nlp_solver.setOption("qp_solver",QPOasesSolver::creator);
       Dictionary qp_solver_options;
       qp_solver_options["printLevel"] = "none";
       //qp_solver_options["verbose"] = true;

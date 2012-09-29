@@ -31,7 +31,6 @@ extern "C"{
 #include "casadi/fx/linear_solver_internal.hpp"
 
 namespace CasADi{
-  namespace Interfaces{
 
 /**
  @copydoc LinearSolver_doc
@@ -77,7 +76,6 @@ class CSparseInternal : public LinearSolverInternal{
     
 };
 
-  } // namespace Interfaces
 } // namespace CasADi
 
 #endif //CSPARSE_INTERNAL_HPP

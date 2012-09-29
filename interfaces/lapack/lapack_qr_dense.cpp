@@ -25,7 +25,6 @@
 
 using namespace std;
 namespace CasADi{
-  namespace Interfaces{
 
 LapackQRDense::LapackQRDense(){
 }
@@ -120,10 +119,4 @@ LapackQRDenseInternal* LapackQRDenseInternal::clone() const{
   return new LapackQRDenseInternal(*this);
 }
 
-
-  } // namespace Interfaces
 } // namespace CasADi
-
-  
-
-

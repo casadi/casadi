@@ -26,7 +26,6 @@
 #include "liftopt_internal.hpp"
 
 namespace CasADi{
-  namespace Interfaces{
 
 class CasadiLifter: public liftopt::ILifter{
   public:
@@ -45,9 +44,6 @@ class CasadiLifter: public liftopt::ILifter{
     LiftoptInternal* interface_;
 };
 
-  } // namespace Interfaces
 } // namespace CasADi
 
-
 #endif // CASADI_LIFTER_HPP
-

@@ -24,7 +24,6 @@
 using namespace std;
 
 namespace CasADi{
-  namespace Interfaces{
 
 LiftoptSolver::LiftoptSolver(){ 
 }
@@ -92,8 +91,5 @@ const std::vector<double>& LiftoptSolver::nodeInit() const{
   return (*this)->nodeInit;
 }
 
-
-
-  } // namespace Interfaces
 } // namespace CasADi
 

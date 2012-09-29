@@ -27,7 +27,6 @@
 
 
 namespace CasADi {
-namespace Interfaces {
   
   
 // Forward declaration of internal class 
@@ -68,7 +67,6 @@ public:
 };
 
 
-} // namespace Interfaces
 } // namespace CasADi
 
 #endif //QPOASES_SOLVER_HPP

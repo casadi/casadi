@@ -24,7 +24,6 @@
 
 using namespace std;
 namespace CasADi{
-  namespace Interfaces{
 
 CSparse::CSparse(){
 }
@@ -45,10 +44,4 @@ bool CSparse::checkNode() const{
   return dynamic_cast<const CSparseInternal*>(get())!=0;
 }
   
-  
-  } // namespace Interfaces
 } // namespace CasADi
-
-  
-
-

@@ -25,7 +25,6 @@
 
 using namespace std;
 namespace CasADi{
-namespace Interfaces {
 
 IpoptQPSolver::IpoptQPSolver(){ 
 }
@@ -48,7 +47,4 @@ bool IpoptQPSolver::checkNode() const{
   return dynamic_cast<const IpoptQPInternal*>(get());
 }
 
-} 
-} // namespace Gsl
-
-
+} // namespace CasADi

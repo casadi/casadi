@@ -28,7 +28,6 @@
 #include <qpOASES.hpp>
 
 namespace CasADi{
-namespace Interfaces {
 
   /** \brief Internal class for QPOasesSolver
    * 
@@ -84,9 +83,6 @@ public:
     static std::string getErrorMessage(int flag);
 };
 
-
-} // namespace Interfaces
 } // namespace CasADi
 
 #endif //QPOASES_INTERNAL_HPP
-

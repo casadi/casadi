@@ -27,7 +27,6 @@
 using namespace std;
 
 namespace CasADi{
-  namespace Interfaces{
 
 LiftoptInternal::LiftoptInternal(const MXFunction& fcn) : fcn_(fcn){
   casadi_warning("LiftoptInternal: the LIFTOPT interface is still experimental, more tests are needed");
@@ -105,6 +104,5 @@ void LiftoptInternal::evaluate(int nfdir, int nadir){
   opt_->solveProblem( );
 }
 
-  } // namespace Interfaces
 } // namespace CasADi
 

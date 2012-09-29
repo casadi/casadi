@@ -29,7 +29,6 @@ Joel Andersson, K.U. Leuven, 2010
 #include "interfaces/csparse/csparse.hpp"
 
 using namespace CasADi;
-using namespace CasADi::Interfaces;
 using namespace std;
 
 int main(int argc, char *argv[])

@@ -37,7 +37,6 @@ extern "C"{
 
 using namespace std;
 using namespace CasADi;
-using namespace CasADi::Interfaces;
 
 int main(){
   

@@ -29,7 +29,6 @@ const bool ALLOW_QPROBLEMB = true;
 
 using namespace std;
 namespace CasADi {
-namespace Interfaces {
 
 QPOasesInternal* QPOasesInternal::clone() const{
   // Return a deep copy
@@ -342,7 +341,4 @@ std::string QPOasesInternal::getErrorMessage(int flag){
   return ss.str();
 }
 
-
-} // namespace Interfaces
 } // namespace CasADi
-

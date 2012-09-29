@@ -26,7 +26,6 @@
 #include "casadi/fx/qp_solver.hpp"
 
 namespace CasADi {
-namespace Interfaces {
   
   
 // Forward declaration of internal class 
@@ -66,7 +65,6 @@ public:
 };
 
 
-} // namespace Interfaces
 } // namespace CasADi
 
 #endif //IPOPT_QP_SOLVER_HPP

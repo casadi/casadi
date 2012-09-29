@@ -31,7 +31,6 @@
 #include <QpGenSparseMa27.h>
 
 namespace CasADi{
-namespace Interfaces {
 
 /** \brief Internal class for OOQPSolver
  * 
@@ -114,7 +113,6 @@ public:
 };
 
 
-} // namespace Interfaces
 } // namespace CasADi
 
 #endif //OOQP_INTERNAL_HPP

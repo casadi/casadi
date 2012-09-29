@@ -25,7 +25,6 @@
 
 using namespace std;
 namespace CasADi{
-namespace Interfaces {
 
 QPOasesSolver::QPOasesSolver(){ 
 }
@@ -48,7 +47,4 @@ bool QPOasesSolver::checkNode() const{
   return dynamic_cast<const QPOasesInternal*>(get());
 }
 
-} 
-} // namespace Gsl
-
-
+} // namespace CasADi

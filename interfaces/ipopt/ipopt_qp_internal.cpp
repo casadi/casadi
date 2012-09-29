@@ -27,7 +27,6 @@
 
 using namespace std;
 namespace CasADi {
-namespace Interfaces {
 
 IpoptQPInternal* IpoptQPInternal::clone() const{
   // Return a deep copy
@@ -308,6 +307,5 @@ void IpoptQPInternal::init(){
 
 }
 
-} // namespace Interfaces
 } // namespace CasADi
 

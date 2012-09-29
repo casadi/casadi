@@ -26,7 +26,6 @@
 
 using namespace std;
 using namespace CasADi;
-using namespace Interfaces;
 
 int main() {
   DMatrix H(2,2,0);

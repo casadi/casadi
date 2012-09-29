@@ -27,7 +27,6 @@
 #include <casadi/stl_vector_tools.hpp>
 
 using namespace CasADi;
-using namespace CasADi::Interfaces;
 using namespace std;
 
 int main(){

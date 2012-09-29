@@ -23,7 +23,6 @@
 #include "casadi_lifter.hpp"
 using namespace std;
 namespace CasADi{
-  namespace Interfaces{
 
 void CasadiLifter::liftfun(double *v, int n, void *user_data){
   static_cast<CasadiLifter*>(user_data)->setNode(v,n);
@@ -53,5 +52,4 @@ long CasadiLifter::evalUserFcn ( liftopt::TLifterArgs<double>& args )
   return 0;
 }
 
-  } // namespace Interfaces
 } // namespace CasADi

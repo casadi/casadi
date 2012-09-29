@@ -27,7 +27,6 @@
 #include "interfaces/ipopt/ipopt_solver.hpp"
 
 namespace CasADi{
-namespace Interfaces {
 
   /** \brief Internal class for IpoptQPSolver
    * 
@@ -64,8 +63,6 @@ public:
     MX A_;
 };
 
-
-} // namespace Interfaces
 } // namespace CasADi
 
 #endif //IPOPT_QP_INTERNAL_HPP

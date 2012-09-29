@@ -26,7 +26,6 @@
 #include "casadi/fx/linear_solver_internal.hpp"
 
 namespace CasADi{
-  namespace Interfaces{
   
 /** \brief  Forward declaration of internal class
  @copydoc LinearSolver_doc
@@ -127,8 +126,6 @@ class LapackQRDenseInternal : public LinearSolverInternal{
 
 #endif // SWIG
 
-
-  } // namespace Interfaces
 } // namespace CasADi
 
 #endif //LAPACK_QR_DENSE_HPP

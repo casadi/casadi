@@ -25,7 +25,6 @@
 
 using namespace std;
 namespace CasADi{
-namespace Interfaces {
 
 OOQPSolver::OOQPSolver(){ 
 }
@@ -52,7 +51,4 @@ void OOQPSolver::reInit() {
   dynamic_cast<OOQPInternal*>(get())->allocate();
 }
 
-} 
-} // namespace Gsl
-
-
+} // namespace CasADi

@@ -7,9 +7,9 @@
 *
 * \sa
 * \code
-* CasADi::Interfaces::LapackLUDense;
-* CasADi::Interfaces::LapackQRDense;
-* CasADi::Interfaces::CSparse;
+* CasADi::LapackLUDense;
+* CasADi::LapackQRDense;
+* CasADi::CSparse;
 * \endcode
 *
 */

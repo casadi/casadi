@@ -27,7 +27,6 @@
 #include <casadi/fx/mx_function.hpp>
 
 namespace CasADi{
-  namespace Interfaces{
 
     enum LOFunInputs{LO_U, LO_LAMBDA, LO_NUM_IN};
     enum LOFunOutputs{LO_OBJRES, LO_EQ, LO_INEQ, LO_OBJ, LO_LAGFCN, LO_NUM_OUT};
@@ -66,7 +65,6 @@ public:
   
 };
 
-  } // namespace Interfaces
 } // namespace CasADi
 
 #endif // LIFTOPT_SOLVER_HPP
