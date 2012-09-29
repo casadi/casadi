@@ -7,12 +7,12 @@ SET(NONLINEAR_PROGRAMMING_SRCS
 )
 
 if(ENABLE_STATIC)
-add_library(nonlinear_programming STATIC ${NONLINEAR_PROGRAMMING_SRCS})
+add_library(casadi_nonlinear_programming STATIC ${NONLINEAR_PROGRAMMING_SRCS})
 endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(nonlinear_programming SHARED ${NONLINEAR_PROGRAMMING_SRCS})
+add_library(casadi_nonlinear_programming SHARED ${NONLINEAR_PROGRAMMING_SRCS})
 endif(ENABLE_SHARED)
-install(TARGETS nonlinear_programming
+install(TARGETS casadi_nonlinear_programming
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )

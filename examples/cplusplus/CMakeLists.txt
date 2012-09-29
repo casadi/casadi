@@ -44,7 +44,7 @@ endif()
 if(IPOPT_FOUND)
   add_executable(ipopt_nl ipopt_nl.cpp)
   target_link_libraries(ipopt_nl 
-    ipopt_interface nonlinear_programming casadi 
+    ipopt_interface casadi_nonlinear_programming casadi 
     ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES}
   )
 endif()
