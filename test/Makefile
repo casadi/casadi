@@ -19,8 +19,9 @@ benchmarks:
 unittests: unittests_py unittests_oct
 	
 unittests_py:
-	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" $(MEMCHECK)
-
+	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py symbolic.py" $(MEMCHECK)
+	python internal/test_py.py python -skipfiles=`ls *.py | grep -v symbolic.py`
+  
 unittests_oct:
 	python internal/test_oct.py octave
 
