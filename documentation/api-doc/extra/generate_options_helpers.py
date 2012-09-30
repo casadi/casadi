@@ -68,3 +68,23 @@ def addExtra(metadata):
       pass #too bad
     #if (len(i.getOptionAllowed(name))>1):
     #  meta['description'] += "(" + "|".join(i.getOptionAllowed(name))  + ")"
+
+  try:
+    i = QPOasesSolver(sp_dense(3,3),sp_dense(1,3))
+  except:
+    return
+    
+  for name in i.getOptionNames():
+    meta = metadata["CasADi::QPOasesInternal"]["options"][name] = dict()
+    meta['name'] = name
+    meta['type'] = i.getOptionTypeName(name)
+    meta['used'] = 'CasADi::QPOasesInternal'
+    meta['inherit'] = False
+    meta['description'] = i.getOptionDescription(name)
+    try:
+      meta['default'] = i.getOptionDefault(name)
+    except:
+      meta['default'] = ''
+      pass #too bad
+    #if (len(i.getOptionAllowed(name))>1):
+    #  meta['description'] += "(" + "|".join(i.getOptionAllowed(name))  + ")"

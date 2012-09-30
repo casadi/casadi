@@ -59,6 +59,8 @@ public:
     union{
       qpOASES::QProblemB *qp_;
     };
+    
+    qpOASES::Options options;
     	
     /// Number of working set recalculations
     int max_nWSR_;

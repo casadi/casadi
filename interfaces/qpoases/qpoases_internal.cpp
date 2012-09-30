@@ -43,6 +43,72 @@ QPOasesInternal::QPOasesInternal(const CRSSparsity& H, const CRSSparsity& A) : Q
   addOption("CPUtime",    OT_REAL,        GenericType(), "The maximum allowed CPU time in seconds for the whole initialisation (and the actually required one on output). Disabled if unset.");
   addOption("printLevel", OT_STRING,      GenericType(), "Defines the amount of text output during QP solution, see Section 5.7","none|low|medium|high");
   
+  addOption("enableRamping",          OT_BOOLEAN, GenericType(), "Enables ramping.");
+  addOption("enableFarBounds",        OT_BOOLEAN, GenericType(), "Enables the use of  far bounds.");
+  addOption("enableFlippingBounds",   OT_BOOLEAN, GenericType(), "Enables the use of  flipping bounds.");
+  addOption("enableRegularisation",   OT_BOOLEAN, GenericType(), "Enables automatic  Hessian regularisation.");
+  addOption("enableFullLITests",      OT_BOOLEAN, GenericType(), "Enables condition-hardened  (but more expensive) LI test.");
+  addOption("enableNZCTests",         OT_BOOLEAN, GenericType(), "Enables nonzero curvature  tests.");
+  addOption("enableDriftCorrection",  OT_BOOLEAN, GenericType(), "Specifies the frequency of drift corrections: False: turns them off,  True: uses them at each iteration etc.");
+  addOption("enableCholeskyRefactorisation",OT_BOOLEAN, GenericType(), "Specifies the frequency of a full re-factorisation of projected Hessian matrix: False: turns them off,  True: uses them at each iteration etc.");
+  addOption("enableEqualities",       OT_BOOLEAN, GenericType(), "Specifies whether equalities should be treated  as always active (True) or not (False)");
+  addOption("terminationTolerance",   OT_REAL, GenericType(), "Relative termination tolerance to stop homotopy.");
+  addOption("boundTolerance",         OT_REAL, GenericType(), "If upper and lower bounds differ less than this tolerance, they are regarded equal, i.e. as  equality constraint.");
+  addOption("boundRelaxation",        OT_REAL, GenericType(), "Initial relaxation of bounds to start homotopy  and initial value for far bounds.");
+  addOption("epsNum",                 OT_REAL, GenericType(), "Numerator tolerance for ratio tests.");
+  addOption("epsDen",                 OT_REAL, GenericType(), "Denominator tolerance for ratio tests.");
+  addOption("maxPrimalJump",          OT_REAL, GenericType(), "Maximum allowed jump in primal variables in  nonzero curvature tests.");
+  addOption("maxDualJump",            OT_REAL, GenericType(), "Maximum allowed jump in dual variables in  linear independence tests.");
+  addOption("initialRamping",         OT_REAL, GenericType(), "Start value for ramping strategy.");
+  addOption("finalRamping",           OT_REAL, GenericType(), "Final value for ramping strategy.");
+  addOption("initialFarBounds",       OT_REAL, GenericType(), "Initial size for far bounds.");
+  addOption("growFarBounds",          OT_REAL, GenericType(), "Factor to grow far bounds.");
+  addOption("initialStatusBounds",    OT_INTEGER, GenericType(), "Initial status of bounds at first iteration: BOUND_INACTIVE: all bounds inactive, BOUND_LOWER: all bounds active at their lower bound, BOUND_UPPER: all bounds active at their upper bound.");
+  addOption("epsFlipping",            OT_REAL, GenericType(), "Tolerance of squared Cholesky diagonal factor  which triggers flipping bound.");
+  addOption("numRegularisationSteps", OT_INTEGER, GenericType(), "Maximum number of successive regularisation steps.");
+  addOption("epsRegularisation",      OT_REAL, GenericType(), "Scaling factor of identity matrix used for  Hessian regularisation.");
+  addOption("numRefinementSteps",     OT_INTEGER, GenericType(), "Maximum number of iterative refinement steps.");
+  addOption("epsIterRef",             OT_REAL, GenericType(), "Early termination tolerance for iterative  refinement.");
+  addOption("epsLITests",             OT_REAL, GenericType(), "Tolerance for linear independence tests.");
+  addOption("epsNZCTests",            OT_REAL, GenericType(), "Tolerance for nonzero curvature tests.");
+
+  // Set options
+  options.setToDefault();
+  
+  setOption("enableRamping",options.enableRamping);
+  setOption("enableFarBounds",options.enableFarBounds);
+  setOption("enableFlippingBounds",options.enableFlippingBounds);
+  setOption("enableRegularisation",options.enableRegularisation);
+  setOption("enableFullLITests",options.enableFullLITests);
+  setOption("enableNZCTests",options.enableNZCTests);
+  setOption("enableDriftCorrection",options.enableDriftCorrection);
+  setOption("enableCholeskyRefactorisation",options.enableCholeskyRefactorisation);
+  setOption("enableEqualities",options.enableEqualities);
+  setOption("terminationTolerance",options.terminationTolerance);
+  setOption("boundTolerance",options.boundTolerance);
+  setOption("boundRelaxation",options.boundRelaxation);
+  setOption("epsNum",options.epsNum);
+  setOption("epsDen",options.epsDen);
+  setOption("maxPrimalJump",options.maxPrimalJump);
+  setOption("maxDualJump",options.maxDualJump);
+  setOption("initialRamping",options.initialRamping);
+  setOption("finalRamping",options.finalRamping);
+  setOption("initialFarBounds",options.initialFarBounds);
+  setOption("growFarBounds",options.growFarBounds);
+  if (options.initialStatusBounds==qpOASES::ST_INACTIVE) 
+    setOption("initialStatusBounds",BOUND_INACTIVE);
+  if (options.initialStatusBounds==qpOASES::ST_LOWER) 
+    setOption("initialStatusBounds",BOUND_LOWER);
+  if (options.initialStatusBounds==qpOASES::ST_UPPER) 
+    setOption("initialStatusBounds",BOUND_UPPER);
+  setOption("epsFlipping",options.epsFlipping);
+  setOption("numRegularisationSteps",options.numRegularisationSteps);
+  setOption("epsRegularisation",options.epsRegularisation);
+  setOption("numRefinementSteps",options.numRefinementSteps);
+  setOption("epsIterRef",options.epsIterRef);
+  setOption("epsLITests",options.epsLITests);
+  setOption("epsNZCTests",options.epsNZCTests);
+  
   called_once_ = false;
   qp_ = 0;
 }
@@ -87,29 +153,66 @@ void QPOasesInternal::init(){
   }
   called_once_ = false;
 
-  // Set options
-  //qpOASES::Options myoptions;
-  //myoptions.setToDefault(); 
+
   
   // Get print level
   if(hasSetOption("printLevel")){
     if(getOption("printLevel")=="none"){
-      qp_->setPrintLevel(qpOASES::PL_NONE);
-      //myoptions.printLevel = qpOASES::PL_NONE;
+      //qp_->setPrintLevel(qpOASES::PL_NONE);
+      options.printLevel = qpOASES::PL_NONE;
     } else if(getOption("printLevel")=="low"){
-      qp_->setPrintLevel(qpOASES::PL_LOW);
-      //myoptions.printLevel = qpOASES::PL_LOW;
+      //qp_->setPrintLevel(qpOASES::PL_LOW);
+      options.printLevel = qpOASES::PL_LOW;
     } else if(getOption("printLevel")=="medium"){
-      qp_->setPrintLevel(qpOASES::PL_MEDIUM);
-      //myoptions.printLevel = qpOASES::PL_MEDIUM;
+      //qp_->setPrintLevel(qpOASES::PL_MEDIUM);
+      options.printLevel = qpOASES::PL_MEDIUM;
     } else if(getOption("printLevel")=="high"){
-      qp_->setPrintLevel(qpOASES::PL_HIGH);
-      //myoptions.printLevel = qpOASES::PL_HIGH;
+      //qp_->setPrintLevel(qpOASES::PL_HIGH);
+      options.printLevel = qpOASES::PL_HIGH;
     }
   }
   
+  options.enableRamping = getOption("enableRamping")?qpOASES::BT_TRUE:qpOASES::BT_FALSE;
+  options.enableFarBounds = getOption("enableFarBounds")?qpOASES::BT_TRUE:qpOASES::BT_FALSE;
+  options.enableFlippingBounds = getOption("enableFlippingBounds")?qpOASES::BT_TRUE:qpOASES::BT_FALSE;
+  options.enableRegularisation = getOption("enableRegularisation")?qpOASES::BT_TRUE:qpOASES::BT_FALSE;
+  options.enableFullLITests = getOption("enableFullLITests")?qpOASES::BT_TRUE:qpOASES::BT_FALSE;
+  options.enableNZCTests = getOption("enableNZCTests")?qpOASES::BT_TRUE:qpOASES::BT_FALSE;
+  options.enableDriftCorrection = getOption("enableDriftCorrection")?qpOASES::BT_TRUE:qpOASES::BT_FALSE;
+  options.enableCholeskyRefactorisation = getOption("enableCholeskyRefactorisation")?qpOASES::BT_TRUE:qpOASES::BT_FALSE;
+  options.enableEqualities = getOption("enableEqualities")?qpOASES::BT_TRUE:qpOASES::BT_FALSE;
+  options.terminationTolerance = getOption("terminationTolerance");
+  options.boundTolerance = getOption("boundTolerance");
+  options.boundRelaxation = getOption("boundRelaxation");
+  options.epsNum = getOption("epsNum");
+  options.epsDen = getOption("epsDen");
+  options.maxPrimalJump = getOption("maxPrimalJump");
+  options.maxDualJump = getOption("maxDualJump");
+  options.initialRamping = getOption("initialRamping");
+  options.finalRamping = getOption("finalRamping");
+  options.initialFarBounds = getOption("initialFarBounds");
+  options.growFarBounds = getOption("growFarBounds");
+  
+  if (getOption("initialStatusBounds").toInt()==BOUND_INACTIVE)
+    options.initialStatusBounds=qpOASES::ST_INACTIVE;
+
+  if (getOption("initialStatusBounds").toInt()==BOUND_LOWER)
+    options.initialStatusBounds=qpOASES::ST_LOWER;
+    
+  if (getOption("initialStatusBounds").toInt()==BOUND_UPPER)
+    options.initialStatusBounds=qpOASES::ST_UPPER;
+    
+  
+  options.epsFlipping = getOption("epsFlipping");
+  options.numRegularisationSteps = getOption("numRegularisationSteps");
+  options.epsRegularisation = getOption("epsRegularisation");
+  options.numRefinementSteps = getOption("numRefinementSteps");
+  options.epsIterRef = getOption("epsIterRef");
+  options.epsLITests = getOption("epsLITests");
+  options.epsNZCTests = getOption("epsNZCTests");
+  
   // Pass to qpOASES
-  //qp_->setOption(myoptions);
+  qp_->setOptions(options);
 }
 
 void QPOasesInternal::evaluate(int nfdir, int nadir) {
