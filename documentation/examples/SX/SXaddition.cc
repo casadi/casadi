@@ -1,5 +1,5 @@
-#include "casadi/stl_vector_tools.hpp"
-#include "casadi/sx/sx.hpp"
+#include "symbolic/stl_vector_tools.hpp"
+#include "symbolic/sx/sx.hpp"
 
 using namespace CasADi;
 using namespace std;
