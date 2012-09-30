@@ -26,15 +26,24 @@ import unittest
 from types import *
 from helpers import *
 
+qpsolvers = []
+try:
+  qpsolvers.append(IpoptQPSolver)
+except:
+  pass
+try:
+  qpsolvers.append(OOQPSolver)
+except:
+  pass
+try:
+  qpsolvers.append(QPOasesSolver)
+except:
+  pass
+
 class QPSolverTests(casadiTestCase):
 
-  def test_OOQPsmall(self):
-    try:
-      OOQPSolver()
-    except:
-      self.message("OOQP not tested")
-      return
-    self.message("OOQP")
+  def test_general_convex(self):
+  
     H = DMatrix([[1,-1],[-1,2]])
     G = DMatrix([-2,-6])
     A =  DMatrix([[1, 1],[-1, 2],[2, 1]])
@@ -44,126 +53,85 @@ class QPSolverTests(casadiTestCase):
     LBX = DMatrix([0]*2)
     UBX = DMatrix([inf]*2)
 
+    options = {"convex": True, "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+      
+    for qpsolver in qpsolvers:
+      self.message("general_convex: " + str(qpsolver))
 
-    solver = OOQPSolver(H.sparsity(),A.sparsity())
-    solver.setOption("mutol",1e-12)
-    solver.setOption("artol",1e-12)
-    solver.init()
+      solver = qpsolver(H.sparsity(),A.sparsity())
+      for key, val in options.iteritems():
+        if solver.hasOption(key):
+           solver.setOption(key,val)
+      solver.init()
 
-    solver.input(QP_H).set(H)
-    solver.input(QP_G).set(G)
-    solver.input(QP_A).set(A)
-    solver.input(QP_LBX).set(LBX)
-    solver.input(QP_UBX).set(UBX)
-    solver.input(QP_LBA).set(LBA)
-    solver.input(QP_UBA).set(UBA)
+      solver.input(QP_H).set(H)
+      solver.input(QP_G).set(G)
+      solver.input(QP_A).set(A)
+      solver.input(QP_LBX).set(LBX)
+      solver.input(QP_UBX).set(UBX)
+      solver.input(QP_LBA).set(LBA)
+      solver.input(QP_UBA).set(UBA)
 
-    solver.solve()
+      solver.solve()
 
-    self.checkarray(solver.output(),DMatrix([2.0/3,4.0/3]),"OOQP")
+      self.assertAlmostEqual(solver.output()[0],2.0/3,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output()[1],4.0/3,6,str(qpsolver))
     
-    
-    self.checkarray(solver.output(QP_COST),DMatrix(-8-2.0/9),"OOQP")
-    
-    solver.input(QP_H).set(H*4)
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[0],0,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[1],0,6,str(qpsolver))
 
-    solver.evaluate()
-    self.assertAlmostEqual(solver.output()[0],1,6)
-    self.assertAlmostEqual(solver.output()[1],1,6)
-    self.checkarray(solver.output(QP_COST),DMatrix(-6),"OOQP")
-    
-    solver.input(QP_UBA).set([-inf]*3)
-    
-    self.assertRaises(Exception,lambda : solver.evaluate())
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_A)[0],3+1.0/9,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_A)[1],4.0/9,6,str(qpsolver))
+      
+      self.assertAlmostEqual(solver.output(QP_COST)[0],-8-2.0/9,6,str(qpsolver))
+      
+      solver.input(QP_H).set(H*4)
 
-  def test_QPOasessmall(self):
-    try:
-      QPOasesSolver()
-    except:
-      self.message("QPOases not tested")
-      return
-    self.message("QPOases")
-    H = DMatrix([[1,-1],[-1,2]])
-    G = DMatrix([-2,-6])
-    A =  DMatrix([[1, 1],[-1, 2],[2, 1]])
-    UBA = DMatrix([2, 2, 3])
-    LBA = DMatrix([-inf]*3)
+      solver.evaluate()
+      self.assertAlmostEqual(solver.output()[0],1,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output()[1],1,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output(QP_COST),-6,6,str(qpsolver))
+      
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[0],0,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[1],0,6,str(qpsolver))
 
-    LBX = DMatrix([0]*2)
-    UBX = DMatrix([inf]*2)
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_A)[0],2,4,str(qpsolver))
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_A)[1],0,6,str(qpsolver))
+      
+      solver.input(QP_H).set(0)
 
+      solver.evaluate()
+      self.assertAlmostEqual(solver.output()[0],2.0/3,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output()[1],4.0/3,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output(QP_COST),-9-1.0/3,6,str(qpsolver))
+      
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[0],0,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[1],0,6,str(qpsolver))
 
-    solver = QPOasesSolver(H.sparsity(),A.sparsity())
-    solver.init()
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_A)[0],10.0/3,4,str(qpsolver))
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_A)[1],4.0/3,6,str(qpsolver))
+      
+      solver.input(QP_LBA).set([-inf]*3)
+      solver.input(QP_UBA).set([inf]*3)
 
-    solver.input(QP_H).set(H)
-    solver.input(QP_G).set(G)
-    solver.input(QP_A).set(A)
-    solver.input(QP_LBX).set(LBX)
-    solver.input(QP_UBX).set(UBX)
-    solver.input(QP_LBA).set(LBA)
-    solver.input(QP_UBA).set(UBA)
+      solver.input(QP_UBX).setAll(5)
 
-    solver.solve()
+      if not('OOQP' in str(qpsolver)): # bug?
+        solver.evaluate()
+        self.assertAlmostEqual(solver.output()[0],5,6,str(qpsolver))
+        self.assertAlmostEqual(solver.output()[1],5,6,str(qpsolver))
+        self.assertAlmostEqual(solver.output(QP_COST),-40,5,str(qpsolver))
+        
+        self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[0],2,6,str(qpsolver))
+        self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[1],6,6,str(qpsolver))
 
-    self.checkarray(solver.output(),DMatrix([2.0/3,4.0/3]),"qpOASES")
-    
-    
-    self.checkarray(solver.output(QP_COST),DMatrix(-8-2.0/9),"qpOASES")
-    
-    solver.input(QP_H).set(H*4)
-
-    solver.evaluate()
-    self.assertAlmostEqual(solver.output()[0],1,6)
-    self.assertAlmostEqual(solver.output()[1],1,6)
-    self.checkarray(solver.output(QP_COST),DMatrix(-6),"qpOASES")
-    
-    solver.input(QP_UBA).set([-inf]*3)
-    
-    self.assertRaises(Exception,lambda : solver.evaluate())
-  def test_IPOPTsmall(self):
-    try:
-      IpoptQPSolver()
-    except:
-      self.message("IPOPT QP not tested")
-      return
-    self.message("IPOPT QP")
-    H = DMatrix([[1,-1],[-1,2]])
-    G = DMatrix([-2,-6])
-    A =  DMatrix([[1, 1],[-1, 2],[2, 1]])
-    UBA = DMatrix([2, 2, 3])
-    LBA = DMatrix([-inf]*3)
-
-    LBX = DMatrix([0]*2)
-    UBX = DMatrix([inf]*2)
-
-    solver = IpoptQPSolver(H.sparsity(),A.sparsity())
-    solver.setOption("convex",True)
-    solver.init()
-
-    solver.input(QP_H).set(H)
-    solver.input(QP_G).set(G)
-    solver.input(QP_A).set(A)
-    solver.input(QP_LBX).set(LBX)
-    solver.input(QP_UBX).set(UBX)
-    solver.input(QP_LBA).set(LBA)
-    solver.input(QP_UBA).set(UBA)
-
-    solver.solve()
-
-    print solver.output()
-    self.assertAlmostEqual(solver.output()[0],2.0/3,6)
-    self.assertAlmostEqual(solver.output()[1],4.0/3,6)
-    
-    
-    self.assertAlmostEqual(solver.output(QP_COST)[0],-8-2.0/9,6)
-    
-    solver.input(QP_H).set(H*4)
-
-    solver.evaluate()
-    self.assertAlmostEqual(solver.output()[0],1,4)
-    self.assertAlmostEqual(solver.output()[1],1,4)
-    self.assertAlmostEqual(solver.output(QP_COST),-6,6)
+        self.assertAlmostEqual(solver.output(QP_LAMBDA_A)[0],0,4,str(qpsolver))
+        self.assertAlmostEqual(solver.output(QP_LAMBDA_A)[1],0,6,str(qpsolver))
+      
+      #solver.input(QP_UBA).set([-inf]*3)
+      
+      #self.assertRaises(Exception,lambda : solver.evaluate())
+      
     
 if __name__ == '__main__':
     unittest.main()
