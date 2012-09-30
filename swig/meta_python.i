@@ -210,7 +210,7 @@ meta_vector(std::string);
 // Forward declarations
 template<> int meta< CasADi::GenericType::Dictionary >::as(PyObject * p,CasADi::GenericType::Dictionary &s);
 template<> bool meta< CasADi::GenericType::Dictionary >::couldbe(PyObject * p);
-template<> bool meta< CasADi::GenericType::Dictionary >::toPython(CasADi::GenericType::Dictionary &a, PyObject *&p);
+template<> bool meta< CasADi::GenericType::Dictionary >::toPython(const CasADi::GenericType::Dictionary &a, PyObject *&p);
 
 
 /// CasADi::GenericType
@@ -295,7 +295,7 @@ bool meta< CasADi::GenericType >::couldbe(PyObject * p) {
   }
 
 template <>
-bool meta< CasADi::GenericType >::toPython(CasADi::GenericType &a, PyObject *&p) {
+bool meta< CasADi::GenericType >::toPython(const CasADi::GenericType &a, PyObject *&p) {
   if (a.isBool()) {
     p=PyBool_FromLong(a.toBool());
   } else if (a.isInt()) {
@@ -310,6 +310,8 @@ bool meta< CasADi::GenericType >::toPython(CasADi::GenericType &a, PyObject *&p)
     p = swig::from( a.toDoubleVector());
   }  else if (a.isStringVector()) {
     p = swig::from(a.toStringVector());
+  } else if (a.isDictionary()) {
+    meta< CasADi::GenericType::Dictionary >::toPython(a.toDictionary(),p);
   } else {
     return false;
   }
@@ -345,11 +347,11 @@ bool meta< CasADi::GenericType::Dictionary >::couldbe(PyObject * p) {
 }
 
 template <>
-bool meta< CasADi::GenericType::Dictionary >::toPython(CasADi::GenericType::Dictionary &a, PyObject *&p) {
+bool meta< CasADi::GenericType::Dictionary >::toPython(const CasADi::GenericType::Dictionary &a, PyObject *&p) {
   p = PyDict_New();
   //CasADi::Dictionary::const_iterator end = a.end(); 
-  CasADi::GenericType::Dictionary::iterator end = a.end();
-  for (CasADi::GenericType::Dictionary::iterator it = a.begin(); it != end; ++it)
+  CasADi::GenericType::Dictionary::const_iterator end = a.end();
+  for (CasADi::GenericType::Dictionary::const_iterator it = a.begin(); it != end; ++it)
   {
     PyObject * e;
     bool ret=meta< CasADi::GenericType >::toPython(it->second,e);

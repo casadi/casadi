@@ -196,7 +196,7 @@ class meta {
     
     #ifdef SWIGPYTHON
     // Would love to make this const T&, but looks like not allowed
-    static bool toPython(T &, PyObject *&p);
+    static bool toPython(const T &, PyObject *&p);
     #endif //SWIGPYTHON
 };
 
@@ -332,12 +332,12 @@ bool meta< std::pair< TypeA, TypeB > >::couldbe(PyObject * p) {
 }
 
 template <>
-bool meta < std::pair< TypeA, TypeB > >::toPython(std::pair< TypeA, TypeB > &m, PyObject *&p) {
+bool meta < std::pair< TypeA, TypeB > >::toPython(const std::pair< TypeA, TypeB > &m, PyObject *&p) {
   p = PyTuple_New(2);
   PyObject *first = 0;
-  first  = SWIG_NewPointerObj((new TypeA(static_cast< TypeA& >(m.first ))), *meta< TypeA >::name , SWIG_POINTER_OWN |  0 );
+  first  = SWIG_NewPointerObj((new TypeA(static_cast< const TypeA& >(m.first ))), *meta< TypeA >::name , SWIG_POINTER_OWN |  0 );
   PyObject *second = 0;
-  second = SWIG_NewPointerObj((new TypeB(static_cast< TypeB& >(m.second))), *meta< TypeB >::name , SWIG_POINTER_OWN |  0 );
+  second = SWIG_NewPointerObj((new TypeB(static_cast< const TypeB& >(m.second))), *meta< TypeB >::name , SWIG_POINTER_OWN |  0 );
   
   if (first==0 || second==0) return false;
   

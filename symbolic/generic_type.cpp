@@ -40,6 +40,7 @@ namespace CasADi{
   typedef GenericTypeInternal<std::vector<std::string> > StringVectorType;
   typedef GenericTypeInternal<SharedObject> SharedObjectType;
   typedef GenericTypeInternal<FX> FXType;
+  typedef GenericTypeInternal<Dictionary> DictionaryType;
   
 opt_type GenericType::getType() const {
   return type_;
@@ -163,6 +164,11 @@ bool GenericType::isFX() const{
   return is_a<FX>();
 }
 
+bool GenericType::isDictionary() const{
+  return is_a<Dictionary>();
+}
+
+
 GenericType::GenericType(){
 }
 
@@ -280,6 +286,11 @@ const vector<string>& GenericType::toStringVector() const{
 const SharedObject& GenericType::toSharedObject() const{
   casadi_assert_message(isSharedObject(),"type mismatch");
   return static_cast<const SharedObjectType*>(get())->d_;
+}
+
+const Dictionary& GenericType::toDictionary() const{
+  casadi_assert_message(isDictionary(),"type mismatch");
+  return static_cast<const DictionaryType*>(get())->d_;
 }
 
 const FX& GenericType::toFX() const{

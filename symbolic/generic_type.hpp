@@ -135,6 +135,9 @@ namespace CasADi{
     bool isSharedObject() const;
 
     //! \brief Is a shared object?
+    bool isDictionary() const;
+    
+    //! \brief Is a shared object?
     bool isFX() const;
     
     //! \brief Convert to boolean
@@ -160,6 +163,9 @@ namespace CasADi{
 
     //! \brief Convert to shared object
     const SharedObject& toSharedObject() const;
+
+    //! \brief Convert to Dictionary
+    const Dictionary& toDictionary() const;
 
     //! \brief Convert to shared object
     const FX& toFX() const;
