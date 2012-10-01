@@ -17,10 +17,10 @@ benchmarks:
 	cd python && python complexity.py && cd ..
 
 unittests: unittests_py unittests_oct
-	
+
 unittests_py:
 	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py symbolic.py" $(MEMCHECK)
-	python internal/test_py.py python -skipfiles=`ls *.py | grep -v symbolic.py`
+	python internal/test_py.py python -skipfiles="$(shell cd python && ls *.py | grep -v symbolic.py && cd ..)"
   
 unittests_oct:
 	python internal/test_oct.py octave
