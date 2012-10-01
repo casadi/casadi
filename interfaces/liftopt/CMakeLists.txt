@@ -11,12 +11,12 @@ SET(LIFTOPT_INTERFACE_SRCS
 )
 
 if(ENABLE_STATIC)
-add_library(liftopt_interface STATIC ${LIFTOPT_INTERFACE_SRCS})
+add_library(casadi_liftopt_interface STATIC ${LIFTOPT_INTERFACE_SRCS})
 endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(liftopt_interface SHARED ${LIFTOPT_INTERFACE_SRCS})
+add_library(casadi_liftopt_interface SHARED ${LIFTOPT_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
-install(TARGETS liftopt_interface
+install(TARGETS casadi_liftopt_interface
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )

@@ -17,12 +17,12 @@ set(ACADO_INTERFACE_SRCS
 )
 
 if(ENABLE_STATIC)
-add_library(acado_interface STATIC ${ACADO_INTERFACE_SRCS})
+add_library(casadi_acado_interface STATIC ${ACADO_INTERFACE_SRCS})
 endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(acado_interface SHARED ${ACADO_INTERFACE_SRCS})
+add_library(casadi_acado_interface SHARED ${ACADO_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
-install(TARGETS acado_interface
+install(TARGETS casadi_acado_interface
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )

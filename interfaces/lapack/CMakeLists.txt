@@ -9,12 +9,12 @@ set(LAPACK_INTERFACE_SRCS
 )
 
 if(ENABLE_STATIC)
-add_library(lapack_interface STATIC ${LAPACK_INTERFACE_SRCS})
+add_library(casadi_lapack_interface STATIC ${LAPACK_INTERFACE_SRCS})
 endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(lapack_interface SHARED ${LAPACK_INTERFACE_SRCS})
+add_library(casadi_lapack_interface SHARED ${LAPACK_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
-install(TARGETS lapack_interface
+install(TARGETS casadi_lapack_interface
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )

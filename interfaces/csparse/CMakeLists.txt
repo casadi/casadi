@@ -9,14 +9,14 @@ set(CSPARSE_INTERFACE_SRCS
 )
 
 if(ENABLE_STATIC)
-  add_library(csparse_interface STATIC ${CSPARSE_INTERFACE_SRCS})
+  add_library(casadi_csparse_interface STATIC ${CSPARSE_INTERFACE_SRCS})
 endif()
 
 if(ENABLE_SHARED)
-  add_library(csparse_interface SHARED ${CSPARSE_INTERFACE_SRCS})
+  add_library(casadi_csparse_interface SHARED ${CSPARSE_INTERFACE_SRCS})
 endif()
 
-install(TARGETS csparse_interface
+install(TARGETS casadi_csparse_interface
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )

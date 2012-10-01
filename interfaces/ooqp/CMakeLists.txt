@@ -11,12 +11,12 @@ set(OOQP_INTERFACE_SRCS
 )
 
 if(ENABLE_STATIC)
-add_library(ooqp_interface STATIC ${OOQP_INTERFACE_SRCS})
+add_library(casadi_ooqp_interface STATIC ${OOQP_INTERFACE_SRCS})
 endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(ooqp_interface SHARED ${OOQP_INTERFACE_SRCS})
+add_library(casadi_ooqp_interface SHARED ${OOQP_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
-install(TARGETS ooqp_interface
+install(TARGETS casadi_ooqp_interface
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )

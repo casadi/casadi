@@ -7,7 +7,7 @@ include_directories(../cppocp)
 add_executable(gliderCppocp glider.cpp)
 target_link_libraries(gliderCppocp
   cppocp
-  ipopt_interface 
+  casadi_ipopt_interface 
   casadi 
   ${IPOPT_LIBRARIES} 
 )
@@ -15,7 +15,7 @@ target_link_libraries(gliderCppocp
 add_executable(rocketCppocp rocket.cpp)
 target_link_libraries(rocketCppocp
   cppocp
-  ipopt_interface 
+  casadi_ipopt_interface 
   casadi 
   ${IPOPT_LIBRARIES} 
 )

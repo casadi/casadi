@@ -11,12 +11,12 @@ set(WORHP_INTERFACE_SRCS
 )
 
 if(ENABLE_STATIC)
-add_library(worhp_interface STATIC ${WORHP_INTERFACE_SRCS})
+add_library(casadi_worhp_interface STATIC ${WORHP_INTERFACE_SRCS})
 endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(worhp_interface SHARED ${WORHP_INTERFACE_SRCS})
+add_library(casadi_worhp_interface SHARED ${WORHP_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
-install(TARGETS worhp_interface
+install(TARGETS casadi_worhp_interface
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )

@@ -9,12 +9,12 @@ set(QPOASES_INTERFACE_SRCS
 )
 
 if(ENABLE_STATIC)
-add_library(qpoases_interface STATIC ${QPOASES_INTERFACE_SRCS})
+add_library(casadi_qpoases_interface STATIC ${QPOASES_INTERFACE_SRCS})
 endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(qpoases_interface SHARED ${QPOASES_INTERFACE_SRCS})
+add_library(casadi_qpoases_interface SHARED ${QPOASES_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
-install(TARGETS qpoases_interface
+install(TARGETS casadi_qpoases_interface
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )

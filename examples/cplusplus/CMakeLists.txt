@@ -25,7 +25,7 @@ target_link_libraries(propagating_sparsity casadi ${CASADI_DEPENDENCIES})
 if(IPOPT_FOUND)
   add_executable(rocket_ipopt rocket_ipopt.cpp)
   target_link_libraries(rocket_ipopt 
-    ipopt_interface casadi 
+    casadi_ipopt_interface casadi 
     ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES}
   )
 endif()
@@ -35,7 +35,7 @@ endif()
 if(IPOPT_FOUND)
   add_executable(rocket_mx_and_sx rocket_mx_and_sx.cpp)
   target_link_libraries(rocket_mx_and_sx 
-    ipopt_interface casadi 
+    casadi_ipopt_interface casadi 
     ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES}
   )
 endif()
@@ -44,7 +44,7 @@ endif()
 if(IPOPT_FOUND)
   add_executable(ipopt_nl ipopt_nl.cpp)
   target_link_libraries(ipopt_nl 
-    ipopt_interface casadi_nonlinear_programming casadi 
+    casadi_ipopt_interface casadi_nonlinear_programming casadi 
     ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES}
   )
 endif()
@@ -53,7 +53,7 @@ endif()
 if(WITH_SUNDIALS AND IPOPT_FOUND)
   add_executable(rocket_single_shooting rocket_single_shooting.cpp)
   target_link_libraries(rocket_single_shooting 
-    sundials_interface ipopt_interface integration casadi 
+    casadi_sundials_interface casadi_ipopt_interface integration casadi 
     ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES} ${CASADI_DEPENDENCIES}
   )
 endif()
@@ -62,7 +62,7 @@ endif()
 if(WITH_SUNDIALS AND IPOPT_FOUND AND WITH_CSPARSE)
   add_executable(vdp_multiple_shooting vdp_multiple_shooting.cpp)
   target_link_libraries(vdp_multiple_shooting
-    sundials_interface ipopt_interface casadi_optimal_control csparse_interface casadi
+    casadi_sundials_interface casadi_ipopt_interface casadi_optimal_control casadi_csparse_interface casadi
     ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES} tinyxml ${CSPARSE_LIBRARIES} ${CASADI_DEPENDENCIES} 
   )
 endif()
@@ -71,7 +71,7 @@ endif()
 if(WITH_SUNDIALS AND IPOPT_FOUND)
   add_executable(multiple_shooting_from_scratch multiple_shooting_from_scratch.cpp)
   target_link_libraries(multiple_shooting_from_scratch 
-    sundials_interface ipopt_interface casadi 
+    casadi_sundials_interface casadi_ipopt_interface casadi 
     ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES} ${CASADI_DEPENDENCIES} )
 endif()
 
@@ -79,7 +79,7 @@ endif()
 if(WITH_SUNDIALS AND IPOPT_FOUND AND WITH_CSPARSE)
   add_executable(cstr cstr.cpp)
   target_link_libraries(cstr 
-    sundials_interface ipopt_interface casadi_optimal_control csparse_interface casadi 
+    casadi_sundials_interface casadi_ipopt_interface casadi_optimal_control casadi_csparse_interface casadi 
     ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES} tinyxml ${CSPARSE_LIBRARIES} ${CASADI_DEPENDENCIES} 
   )
 endif()
@@ -88,7 +88,7 @@ endif()
 if(WITH_CSPARSE)
   add_executable(test_csparse_casadi test_csparse_casadi.cpp)
   target_link_libraries(test_csparse_casadi 
-    csparse_interface casadi 
+    casadi_csparse_interface casadi 
     ${CSPARSE_LIBRARIES} ${CASADI_DEPENDENCIES} 
   )
 endif()
@@ -97,7 +97,7 @@ endif()
 if(WITH_SUNDIALS AND LAPACK_FOUND AND BLAS_FOUND AND WITH_CSPARSE)
   add_executable(sundials_testing sundials_testing.cpp)
   target_link_libraries(sundials_testing
-    sundials_interface lapack_interface csparse_interface casadi
+    casadi_sundials_interface casadi_lapack_interface casadi_csparse_interface casadi
     ${SUNDIALS_LIBRARIES} ${LAPACK_LIBRARIES} ${CSPARSE_LIBRARIES} ${BLAS_LIBRARIES} ${CASADI_DEPENDENCIES}
   )
 endif()
@@ -105,7 +105,7 @@ endif()
 if(LIFTOPT_FOUND)
   add_executable(test_liftopt test_liftopt.cpp)
   target_link_libraries(test_liftopt 
-    liftopt_interface casadi 
+    casadi_liftopt_interface casadi 
     ${LIFTOPT_LIBRARIES} ${CASADI_DEPENDENCIES} )
 endif()
 
@@ -113,7 +113,7 @@ endif()
 if(IPOPT_FOUND AND USE_CXX11 AND WITH_SIPOPT)
   add_executable(parametric_sensitivities parametric_sensitivities.cpp)
   target_link_libraries(parametric_sensitivities 
-    ipopt_interface casadi 
+    casadi_ipopt_interface casadi 
     ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES}
   )
 endif()
@@ -122,7 +122,7 @@ endif()
 if(IPOPT_FOUND AND USE_CXX11 AND WITH_SIPOPT)
   add_executable(reduced_hessian reduced_hessian.cpp)
   target_link_libraries(reduced_hessian
-    ipopt_interface casadi 
+    casadi_ipopt_interface casadi 
     ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES}
   )
 endif()
@@ -131,7 +131,7 @@ endif()
 if(IPOPT_FOUND AND USE_CXX11)
   add_executable(parametric_nlp parametric_nlp.cpp)
   target_link_libraries(parametric_nlp
-    ipopt_interface casadi 
+    casadi_ipopt_interface casadi 
     ${IPOPT_LIBRARIES} ${CASADI_DEPENDENCIES}
   )
 endif()

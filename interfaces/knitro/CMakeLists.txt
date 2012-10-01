@@ -10,12 +10,12 @@ SET(KNITRO_INTERFACE_SRCS
 
 
 if(ENABLE_STATIC)
-add_library(knitro_interface STATIC ${KNITRO_INTERFACE_SRCS})
+add_library(casadi_knitro_interface STATIC ${KNITRO_INTERFACE_SRCS})
 endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(knitro_interface SHARED ${KNITRO_INTERFACE_SRCS})
+add_library(casadi_knitro_interface SHARED ${KNITRO_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
-install(TARGETS knitro_interface
+install(TARGETS casadi_knitro_interface
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )

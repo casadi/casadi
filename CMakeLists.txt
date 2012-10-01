@@ -213,10 +213,6 @@ add_subdirectory(experimental/greg EXCLUDE_FROM_ALL)
 add_subdirectory(experimental/joel EXCLUDE_FROM_ALL)
 #add_subdirectory(experimental/andrew EXCLUDE_FROM_ALL)
 
-if(WITH_MUSCOD)
-  add_subdirectory(muscod_interface)
-endif(WITH_MUSCOD)
-
 find_package(SWIG)
   if(SWIG_FOUND)
     add_subdirectory(swig EXCLUDE_FROM_ALL) # the swig interfaces are not compiled when typing "make"

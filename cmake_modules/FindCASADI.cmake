@@ -1,5 +1,5 @@
 FIND_PATH(CASADI_INCLUDE_DIR 
-  casadi/casadi/sx/sx.hpp
+  casadi/symbolic/sx/sx.hpp
 )
 
 IF (CASADI_INCLUDE_DIR)
@@ -11,17 +11,15 @@ ELSE (CASADI_INCLUDE_DIR)
 ENDIF (CASADI_INCLUDE_DIR)
 
 SET(CASADI_LIBS_LIST
-  cplex_interface
-  ipopt_interface
-  lapack_interface
-  sundials_interface
-  superlu_interface
-  csparse_interface
-  knitro_interface
-  optimal_control
+  casadi_cplex_interface
+  casadi_ipopt_interface
+  casadi_lapack_interface
+  casadi_sundials_interface
+  casadi_csparse_interface
+  casadi_knitro_interface
+  casadi_optimal_control
   integration
-  nonlinear_programming
-  superlu
+  casadi_nonlinear_programming
   csparse
   tinyxml
   casadi

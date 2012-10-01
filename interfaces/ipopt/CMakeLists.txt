@@ -24,12 +24,12 @@ if(WITH_SIPOPT)
 endif()
 
 if(ENABLE_STATIC)
-add_library(ipopt_interface STATIC ${IPOPT_INTERFACE_SRCS})
+add_library(casadi_ipopt_interface STATIC ${IPOPT_INTERFACE_SRCS})
 endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(ipopt_interface SHARED ${IPOPT_INTERFACE_SRCS})
+add_library(casadi_ipopt_interface SHARED ${IPOPT_INTERFACE_SRCS})
 endif(ENABLE_SHARED)
-install(TARGETS ipopt_interface
+install(TARGETS casadi_ipopt_interface
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
