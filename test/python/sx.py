@@ -459,7 +459,7 @@ class SXtests(casadiTestCase):
     
     group = { "x SXMatrix, y SXMatrix": (ssym("x"),ssym("y")),
                     "x SX, y SXMatrix": (SX("x"),ssym("y")),
-                    "x SXMatrix, y SX": (SX("x"),SX("y")),
+                    "x SXMatrix, y SX": (ssym("x"),SX("y")),
                     "x SX, y SX": (SX("x"),SX("y"))
                   }
     for gname, e in group.items():

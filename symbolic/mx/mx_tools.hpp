@@ -235,8 +235,6 @@ int countNodes(const MX& A);
 
 // Equality
 MX operator==(const MX& a, const MX& b);
-MX operator>=(const MX& a, const MX& b);
-MX operator<=(const MX& a, const MX& b);
 #ifndef SWIG
 MX operator!(const MX& a);
 #endif // SWIG

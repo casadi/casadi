@@ -271,12 +271,14 @@ SXMatrix SXFunctionInternal::jac(int iind, int oind, bool compact, bool symmetri
 
 bool SXFunctionInternal::isSmooth() const{
   assertInit();
-    // Go through all nodes and check if any node is non-smooth
-    for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
-      if(it->op == OP_STEP || it->op == OP_FLOOR )
-        return false;
+  
+  // Go through all nodes and check if any node is non-smooth
+  for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
+    if(!operation_checker<SmoothChecker>(it->op)){
+      return false;
     }
-    return true;
+  }
+  return true;
 }
 
 void SXFunctionInternal::print(ostream &stream) const{

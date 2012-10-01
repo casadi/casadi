@@ -468,16 +468,6 @@ MX operator==(const MX& a, const MX& b){
   return MX();
 }
 
-MX operator>=(const MX& a, const MX& b){
-  casadi_assert_message(0,"Not implemented");
-  return MX();
-}
-
-MX operator<=(const MX& a, const MX& b){
-  casadi_assert_message(0,"Not implemented");
-  return MX();
-}
-
 MX operator!(const MX& a){
   casadi_assert_message(0,"Not implemented");
   return MX();

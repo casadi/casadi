@@ -62,11 +62,29 @@ class GenericExpression{
 
     /// In-place elementwise division
     inline ExType& operator/=(const ExType &y){return static_cast<ExType&>(*this) = static_cast<ExType*>(this)->__div__(y);}
-#endif // SWIG
+
+    /// Less than
+    inline friend ExType operator<(const ExType &x, const ExType &y){ return x.__lt__(y); }
+    
+    /// Less or equal to
+    inline friend ExType operator<=(const ExType &x, const ExType &y){ return x.__le__(y); }
+    
+    /// Greater than
+    inline friend ExType operator>(const ExType &x, const ExType &y){ return x.__gt__(y); }
+    
+    /// Greater or equal to
+    inline friend ExType operator>=(const ExType &x, const ExType &y){ return x.__ge__(y); }
+    
+    #endif // SWIG
 
     /// Matrix division from left
     ExType __mldivide__(const ExType& y) const{ return y.__mrdivide__(static_cast<const ExType&>(*this));}
 
+    /// No need to have both < and >
+    ExType __gt__(const ExType& y) const{ return y.__lt__(static_cast<const ExType&>(*this));}
+    
+    /// No need to have both <= and >=
+    ExType __ge__(const ExType& y) const{ return y.__le__(static_cast<const ExType&>(*this));}
 };
 
 template<class T>

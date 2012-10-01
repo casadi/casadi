@@ -327,17 +327,6 @@ void makeSparse(Matrix<T>& A);
 template<class T>
 bool hasNonStructuralZeros(const Matrix<T>& A);
 
-template<class T>
-Matrix<T> operator<=(const Matrix<T> &a, const Matrix<T> &b);
-
-template<class T>
-Matrix<T> operator>=(const Matrix<T> &a, const Matrix<T> &b);
-
-template<class T>
-Matrix<T> operator<(const Matrix<T> &a, const Matrix<T> &b);
-
-template<class T>
-Matrix<T> operator>(const Matrix<T> &a, const Matrix<T> &b);
 #ifndef SWIG
 template<class T>
 Matrix<T> operator&&(const Matrix<T> &a, const Matrix<T> &b);
@@ -1323,10 +1312,6 @@ MTT_INST(T,addMultiple) \
 MTT_INST(T,veccat) \
 MTT_INST(T,vecNZcat) \
 MTT_INST(T,project) \
-%template(operator_leq) CasADi::operator <= < T >; \
-%template(operator_geq) CasADi::operator >= < T >; \
-%template(operator_le)  CasADi::operator <  < T >; \
-%template(operator_ge)  CasADi::operator >  < T >; \
 %template(operator_eq)  CasADi::operator == < T >; \
 %template(operator_neq) CasADi::operator != < T >; \
 

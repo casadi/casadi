@@ -327,6 +327,12 @@ Matrix<SX> SX::__mul__(const Matrix<SX>& y) const {
 Matrix<SX> SX::__div__(const Matrix<SX>& y) const { 
   return Matrix<SX>(*this)/y;
 }
+Matrix<SX> SX::__lt__(const Matrix<SX>& y) const { 
+  return Matrix<SX>(*this)<y;
+}
+Matrix<SX> SX::__le__(const Matrix<SX>& y) const { 
+  return Matrix<SX>(*this)<=y;
+}
 Matrix<SX> SX::fmin(const Matrix<SX>& b) const { 
   return Matrix<SX>(*this).fmin(b);
 }
@@ -341,25 +347,18 @@ Matrix<SX> SX::arctan2(const Matrix<SX>& b) const {
   return Matrix<SX>(*this).arctan2(b);
 }
 
-SX operator<=(const SX &a, const SX &b){
-  return b>=a;
-}
-
-SX operator>=(const SX &a, const SX &b){
-  // Move everything to one side
-  SX x = a-b;
-  if(x.isSquared() || x.isOp(OP_FABS))
+SX SX::__le__(const SX& y) const{
+  if((y-(*this)).isNonNegative())
     return 1;
   else
-    return UnarySX::create(OP_STEP,x);
+    return BinarySX::create(OP_LE,*this,y);
 }
 
-SX operator<(const SX &a, const SX &b){
-  return !(a>=b);
-}
-
-SX operator>(const SX &a, const SX &b){
-  return !(a<=b);
+SX SX::__lt__(const SX& y) const{
+  if(((*this)-y).isNonNegative())
+    return 0;
+  else
+    return BinarySX::create(OP_LT,*this,y);
 }
 
 SX operator&&(const SX &a, const SX &b){
@@ -488,6 +487,15 @@ bool SX::isEqual(const SX& ex, int depth) const{
     return true;
   else if(depth>0)
     return node->isEqual(ex.get(),depth);
+  else
+    return false;
+}
+
+bool SX::isNonNegative() const{
+  if(isConstant())
+    return getValue()>=0;
+  else if(isSquared() || isOp(OP_FABS))
+    return true;
   else
     return false;
 }

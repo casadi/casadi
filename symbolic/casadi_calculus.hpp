@@ -42,7 +42,7 @@ enum Operation{
   OP_NEG,  OP_EXP,  OP_LOG,  OP_POW, OP_CONSTPOW,
   OP_SQRT,  OP_SIN,  OP_COS,  OP_TAN,  
   OP_ASIN,  OP_ACOS,  OP_ATAN,  
-  OP_STEP,  
+  OP_LT, OP_LE,
   OP_FLOOR,  OP_CEIL,  OP_EQUALITY, OP_FABS, OP_SIGN, 
   OP_ERF,  OP_FMIN,  OP_FMAX,
   OP_INV,
@@ -337,7 +337,8 @@ struct DerBinaryOpertion{
 //@{
   /// Smoothness (by default true)
   template<int I> struct SmoothChecker{ static const bool check=true;};
-  template<>      struct SmoothChecker<OP_STEP>{ static const bool check=false;};
+  template<>      struct SmoothChecker<OP_LT>{ static const bool check=false;};
+  template<>      struct SmoothChecker<OP_LE>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_FLOOR>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_CEIL>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_EQUALITY>{ static const bool check=false;};
@@ -546,12 +547,20 @@ struct UnaryOperation<OP_ATAN>{
     template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0] = 1/(1+x*x);}
 };
 
-/// Step function
+/// Less than
 template<>
-struct UnaryOperation<OP_STEP>{
+struct BinaryOperation<OP_LT>{
   public:
-    template<typename T> static inline void fcn(const T& x, T& f){ f = x >= T(0.);}
-    template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0] = 0;}
+    template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f = x < y;}
+    template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ d[0]=d[1]=0;}
+};
+
+/// Less or equal to
+template<>
+struct BinaryOperation<OP_LE>{
+  public:
+    template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f = x <= y;}
+    template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ d[0]=d[1]=0;}
 };
 
 /// Floor function

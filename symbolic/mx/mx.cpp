@@ -869,6 +869,14 @@ MX MX::__div__(const MX& y) const{
   }
 }
 
+MX MX::__lt__(const MX& y) const{
+  return MX::binary(OP_LT,*this,y);
+}
+  
+MX MX::__le__(const MX& y) const{
+  return MX::binary(OP_LE,*this,y);
+}
+  
 MX MX::__constpow__(const MX& b) const { return (*this).constpow(b);}
 MX MX::__mrdivide__(const MX& b) const { if (b.scalar()) return *this/b; throw CasadiException("mrdivide: Not implemented");}
 MX MX::__mpower__(const MX& b) const   { return pow(*this,b); throw CasadiException("mpower: Not implemented");}

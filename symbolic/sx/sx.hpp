@@ -107,10 +107,6 @@ class SX : public GenericExpression<SX>{
     
     //@ {
     /** \brief  Conditional operators */
-    friend SX operator<=(const SX &a, const SX &b);
-    friend SX operator>=(const SX &a, const SX &b);
-    friend SX operator<(const SX &a, const SX &b);
-    friend SX operator>(const SX &a, const SX &b);
     friend SX operator&&(const SX &a, const SX &b);
     friend SX operator||(const SX &a, const SX &b);
     friend SX operator==(const SX &a, const SX &b);
@@ -177,6 +173,9 @@ class SX : public GenericExpression<SX>{
      */
     bool isEqual(const SX& scalar, int depth=0) const;
     
+    /** \brief Check if a value is always nonnegative (false negatives are allowed) */
+    bool isNonNegative() const;
+    
     double getValue() const;
     int getIntValue() const;
     SX getDep(int ch=0) const;
@@ -211,6 +210,8 @@ class SX : public GenericExpression<SX>{
     SX __sub__(const SX& y) const;
     SX __mul__(const SX& y) const;
     SX __div__(const SX& y) const;
+    SX __lt__(const SX& y) const;
+    SX __le__(const SX& y) const;
     SX __truediv__(const SX &y) const {return __div__(y);};
     SX __pow__(const SX& b) const;
     SX __constpow__(const SX& b) const;
@@ -254,6 +255,8 @@ class SX : public GenericExpression<SX>{
     Matrix<SX> __sub__(const Matrix<SX>& y) const;
     Matrix<SX> __mul__(const Matrix<SX>& y) const;
     Matrix<SX> __div__(const Matrix<SX>& y) const;
+    Matrix<SX> __lt__(const Matrix<SX>& y) const;
+    Matrix<SX> __le__(const Matrix<SX>& y) const;
     Matrix<SX> __truediv__(const Matrix<SX>& y) const {return __div__(y);};
     Matrix<SX> fmin(const Matrix<SX>& b) const;
     Matrix<SX> fmax(const Matrix<SX>& b) const;
