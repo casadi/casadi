@@ -21,6 +21,7 @@
  */
 
 #include "ooqp_internal.hpp"
+#include "../../symbolic/fx/qp_solver.hpp"
 
 #include "symbolic/matrix/sparsity_tools.hpp"
 #include "symbolic/matrix/matrix_tools.hpp"
@@ -41,7 +42,7 @@ OOQPInternal* OOQPInternal::clone() const{
 }
   
 OOQPInternal::OOQPInternal(const CRSSparsity& H, const CRSSparsity& A) : QPSolverInternal(H,A){
-  addOption("print_level",OT_INTEGER,0,"Print level. OOQP listends to print_level 0, 10 and 100");
+  addOption("print_level",OT_INTEGER,0,"Print level. OOQP listens to print_level 0, 10 and 100");
   addOption("mutol",OT_REAL,1e-8,"tolerance as provided with setMuTol to OOQP");
   addOption("artol",OT_REAL,1e-8,"tolerance as provided with setArTol to OOQP");
   
@@ -308,9 +309,12 @@ void OOQPInternal::allocate() {
                                        ineq_rowind, ineq_col,  getPtr(A_ineq_),
                                        getPtr(lbA_ineq_),  getPtr(iclow_),
                                        getPtr(ubA_ineq_),  getPtr(icupp_));
+                                       
+
 
   // Further setup of the QP problem
   vars_ = (QpGenVars *) qp_->makeVariables( prob_ );
+
   resid_ = (QpGenResiduals *) qp_->makeResiduals( prob_ );
 }
 
@@ -327,6 +331,8 @@ void OOQPInternal::init(){
 
   // Temporary vector
   temp_.resize(std::max(nx_,nc_));
+  
+  gOoqpPrintLevel = getOption("print_level");
 }
 
 map<int,string> OOQPInternal::calc_flagmap(){

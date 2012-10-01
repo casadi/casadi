@@ -30,6 +30,10 @@
 #include <GondzioSolver.h>
 #include <QpGenSparseMa27.h>
 
+// A variable that controls the printlevel of OOQP
+// This is the only possible way to access it using the C++ interface
+extern int gOoqpPrintLevel;
+
 namespace CasADi{
 
 /** \brief Internal class for OOQPSolver
