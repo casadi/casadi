@@ -18,7 +18,7 @@ SET(CASADI_LIBS_LIST
   casadi_csparse_interface
   casadi_knitro_interface
   casadi_optimal_control
-  integration
+  casadi_integration
   casadi_nonlinear_programming
   casadi_csparse
   casadi_tinyxml

@@ -53,7 +53,7 @@ endif()
 if(WITH_SUNDIALS AND IPOPT_FOUND)
   add_executable(rocket_single_shooting rocket_single_shooting.cpp)
   target_link_libraries(rocket_single_shooting 
-    casadi_sundials_interface casadi_ipopt_interface integration casadi 
+    casadi_sundials_interface casadi_ipopt_interface casadi_integration casadi 
     ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES} ${CASADI_DEPENDENCIES}
   )
 endif()

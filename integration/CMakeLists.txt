@@ -11,12 +11,12 @@ SET(INTEGRATION_SRCS
 )
 
 if(ENABLE_STATIC)
-add_library(integration STATIC ${INTEGRATION_SRCS})
+add_library(casadi_integration STATIC ${INTEGRATION_SRCS})
 endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(integration SHARED ${INTEGRATION_SRCS})
+add_library(casadi_integration SHARED ${INTEGRATION_SRCS})
 endif(ENABLE_SHARED)
-install(TARGETS integration
+install(TARGETS casadi_integration
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
