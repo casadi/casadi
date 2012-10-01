@@ -113,14 +113,14 @@ endif("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64")
 # Use the included Sundials
 if(WITH_SUNDIALS)
   set(SUNDIALS_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/sundials-2.5mod)
-  set(SUNDIALS_LIBRARIES sundials-2.5mod)
+  set(SUNDIALS_LIBRARIES casadi_sundials)
 endif()
 add_feature_info(sundials-interface WITH_SUNDIALS "Interface to the ODE/DAE integrator suite SUNDIALS.")
 
 # Use the included qpOASES
 if(WITH_QPOASES)
   set(QPOASES_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/qpOASES/include)
-  set(QPOASES_LIBRARIES qpoases)
+  set(QPOASES_LIBRARIES casadi_qpoases)
   set(QPOASES_FOUND true)
 endif()
 add_feature_info(qpoases-interface WITH_QPOASES "Interface to the active-set QP solver qpOASES.")
@@ -128,9 +128,12 @@ add_feature_info(qpoases-interface WITH_QPOASES "Interface to the active-set QP 
 # Use the included qpOASES
 if(WITH_CSPARSE)
   set(CSPARSE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/CSparse/Include)
-  set(CSPARSE_LIBRARIES csparse)
+  set(CSPARSE_LIBRARIES casadi_csparse)
 endif()
 add_feature_info(csparse-interface WITH_CSPARSE "Interface to the sparse direct linear solver CSparse.")
+
+# TinyXML
+set(TINYXML_LIBRARIES casadi_tinyxml)
 
 # enabling openmp support if requesed
 if(WITH_OPENMP)

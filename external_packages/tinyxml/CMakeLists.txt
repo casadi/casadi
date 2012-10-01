@@ -8,12 +8,12 @@ SET(TINYXML_SRC
 )
 
 if(ENABLE_STATIC)
-add_library(tinyxml STATIC ${TINYXML_SRC})
+add_library(casadi_tinyxml STATIC ${TINYXML_SRC})
 endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(tinyxml SHARED ${TINYXML_SRC})
+add_library(casadi_tinyxml SHARED ${TINYXML_SRC})
 endif(ENABLE_SHARED)
-install(TARGETS tinyxml
+install(TARGETS casadi_tinyxml
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
@@ -24,7 +24,7 @@ install(DIRECTORY ./
 )
 
 add_executable(xmltest xmltest.cpp)
-target_link_libraries(xmltest tinyxml)
+target_link_libraries(xmltest ${TINYXML_LIBRARIES})
 
 add_executable(test_dump test_dump.cpp)
-target_link_libraries(test_dump tinyxml)
+target_link_libraries(test_dump ${TINYXML_LIBRARIES})

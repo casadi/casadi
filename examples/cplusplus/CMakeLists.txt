@@ -63,7 +63,7 @@ if(WITH_SUNDIALS AND IPOPT_FOUND AND WITH_CSPARSE)
   add_executable(vdp_multiple_shooting vdp_multiple_shooting.cpp)
   target_link_libraries(vdp_multiple_shooting
     casadi_sundials_interface casadi_ipopt_interface casadi_optimal_control casadi_csparse_interface casadi
-    ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES} tinyxml ${CSPARSE_LIBRARIES} ${CASADI_DEPENDENCIES} 
+    ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES} ${TINYXML_LIBRARIES} ${CSPARSE_LIBRARIES} ${CASADI_DEPENDENCIES} 
   )
 endif()
 
@@ -80,7 +80,7 @@ if(WITH_SUNDIALS AND IPOPT_FOUND AND WITH_CSPARSE)
   add_executable(cstr cstr.cpp)
   target_link_libraries(cstr 
     casadi_sundials_interface casadi_ipopt_interface casadi_optimal_control casadi_csparse_interface casadi 
-    ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES} tinyxml ${CSPARSE_LIBRARIES} ${CASADI_DEPENDENCIES} 
+    ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES} ${TINYXML_LIBRARIES} ${CSPARSE_LIBRARIES} ${CASADI_DEPENDENCIES} 
   )
 endif()
 

@@ -16,12 +16,12 @@ set(CSPARSE_SRC
 )
 
 if(ENABLE_STATIC)
-add_library(csparse STATIC ${CSPARSE_SRC})
+add_library(casadi_csparse STATIC ${CSPARSE_SRC})
 endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(csparse SHARED ${CSPARSE_SRC})
+add_library(casadi_csparse SHARED ${CSPARSE_SRC})
 endif(ENABLE_SHARED)
-install(TARGETS csparse
+install(TARGETS casadi_csparse
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )

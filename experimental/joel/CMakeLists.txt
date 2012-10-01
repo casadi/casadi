@@ -46,7 +46,7 @@ if(WITH_SUNDIALS AND IPOPT_FOUND AND WITH_CSPARSE)
   add_executable(convection_diffusion convection_diffusion.cpp)
   target_link_libraries(convection_diffusion
     casadi_ipopt_interface casadi_sundials_interface casadi_csparse_interface casadi_optimal_control casadi
-    ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES} tinyxml ${CSPARSE_LIBRARIES} ${CASADI_DEPENDENCIES}
+    ${IPOPT_LIBRARIES} ${SUNDIALS_LIBRARIES} ${TINYXML_LIBRARIES} ${CSPARSE_LIBRARIES} ${CASADI_DEPENDENCIES}
   )
 endif()
 

@@ -13,12 +13,12 @@ FILE(GLOB SRC src/*.cpp)
 FILE(GLOB EXTRAS_SRC src/extras/*.cpp)
 
 if(ENABLE_STATIC)
-add_library(qpoases STATIC ${SRC} ${EXTRAS_SRC})
+add_library(casadi_qpoases STATIC ${SRC} ${EXTRAS_SRC})
 endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(qpoases SHARED ${SRC} ${EXTRAS_SRC})
+add_library(casadi_qpoases SHARED ${SRC} ${EXTRAS_SRC})
 endif(ENABLE_SHARED)
-install(TARGETS qpoases
+install(TARGETS casadi_qpoases
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )

@@ -20,8 +20,8 @@ SET(CASADI_LIBS_LIST
   casadi_optimal_control
   integration
   casadi_nonlinear_programming
-  csparse
-  tinyxml
+  casadi_csparse
+  casadi_tinyxml
   casadi
 )
 

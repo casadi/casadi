@@ -130,12 +130,12 @@ SET(SUNDIALS_SOURCES
 )  
   
 if(ENABLE_STATIC)
-add_library(sundials-2.5mod STATIC ${SUNDIALS_INCLUDES} ${SUNDIALS_SOURCES})
+add_library(casadi_sundials STATIC ${SUNDIALS_INCLUDES} ${SUNDIALS_SOURCES})
 endif(ENABLE_STATIC)
 if(ENABLE_SHARED)
-add_library(sundials-2.5mod SHARED ${SUNDIALS_INCLUDES} ${SUNDIALS_SOURCES})
+add_library(casadi_sundials SHARED ${SUNDIALS_INCLUDES} ${SUNDIALS_SOURCES})
 endif(ENABLE_SHARED)
-install(TARGETS sundials-2.5mod
+install(TARGETS casadi_sundials
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
