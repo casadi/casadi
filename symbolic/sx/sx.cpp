@@ -333,6 +333,12 @@ Matrix<SX> SX::__lt__(const Matrix<SX>& y) const {
 Matrix<SX> SX::__le__(const Matrix<SX>& y) const { 
   return Matrix<SX>(*this)<=y;
 }
+Matrix<SX> SX::__eq__(const Matrix<SX>& y) const { 
+  return Matrix<SX>(*this)==y;
+}
+Matrix<SX> SX::__ne__(const Matrix<SX>& y) const { 
+  return Matrix<SX>(*this)!=y;
+}
 Matrix<SX> SX::fmin(const Matrix<SX>& b) const { 
   return Matrix<SX>(*this).fmin(b);
 }
@@ -361,23 +367,26 @@ SX SX::__lt__(const SX& y) const{
     return BinarySX::create(OP_LT,*this,y);
 }
 
+SX SX::__eq__(const SX& y) const{
+  if(isEqual(y))
+    return 1;
+  else
+    return BinarySX::create(OP_EQ,*this,y);
+}
+
+SX SX::__ne__(const SX& y) const{
+  if(isEqual(y))
+    return 0;
+  else
+    return BinarySX::create(OP_NE,*this,y);
+}
+
 SX operator&&(const SX &a, const SX &b){
   return a+b>=2;
 }
 
 SX operator||(const SX &a, const SX &b){
   return !(!a && !b);
-}
-
-SX operator==(const SX &x, const SX &y){
-  if(x.isEqual(y))
-    return 1;
-  else
-    return BinarySX::create(OP_EQUALITY,x,y);
-}
-
-SX operator!=(const SX &a, const SX &b){
-  return !(a == b);
 }
 
 SX operator!(const SX &a){

@@ -727,6 +727,16 @@ Matrix<T> Matrix<T>::__le__(const Matrix<T> &y) const{
 }
 
 template<class T>
+Matrix<T> Matrix<T>::__eq__(const Matrix<T> &y) const{
+  return binary(OP_EQ,*this,y);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::__ne__(const Matrix<T> &y) const{
+  return binary(OP_NE,*this,y);
+}
+
+template<class T>
 Matrix<T> Matrix<T>::__mrdivide__(const Matrix<T>& b) const { if (b.numel()==1) return *this/b; throw CasadiException("mrdivide: Not implemented");}
 
 template<class T>

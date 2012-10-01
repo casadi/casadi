@@ -245,21 +245,6 @@ PyObject* arrayView() {
   return PyArray_SimpleNewFromData(2, dims, NPY_DOUBLE, &v[0]);
 }
 #endif // WITH_NUMPY
-
-
-    #ifdef SWIGPYTHON
-
-    %pythoncode %{
-      def __eq__(self,other):
-        return _casadi_global.__eq__(self,other)
-      def __ne__(self,other):
-        return _casadi_global.__ne__(self,other)
-      def __req__(self,other):
-        return _casadi_global.__eq__(other,self)
-      def __rne__(self,other):
-        return _casadi_global.__ne__(other,self)
-    %}
-    #endif // SWIGPYTHON
     
 %pythoncode %{
   def toArray(self,shared=False):
@@ -347,17 +332,6 @@ binopsFull(const CasADi::MX & b,,CasADi::MX,CasADi::MX)
         for j in range(r.shape[1]):
           r[i,j] = self.elem(i,j)
       return r
-  %}
-  
-  %pythoncode %{
-    def __eq__(self,other):
-      return _casadi_global.__eq__(self,other)
-    def __ne__(self,other):
-      return _casadi_global.__ne__(self,other)
-    def __req__(self,other):
-      return _casadi_global.__eq__(other,self)
-    def __rne__(self,other):
-      return _casadi_global.__ne__(other,self)
   %}
   
   %pythoncode %{

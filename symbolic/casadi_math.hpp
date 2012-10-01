@@ -48,9 +48,10 @@ bool operation_checker(unsigned int op){
     case OP_ATAN:          return F<OP_ATAN>::check;
     case OP_LT:            return F<OP_LT>::check;
     case OP_LE:            return F<OP_LE>::check;
+    case OP_EQ:            return F<OP_EQ>::check;
+    case OP_NE:            return F<OP_NE>::check;
     case OP_FLOOR:         return F<OP_FLOOR>::check;
     case OP_CEIL:          return F<OP_CEIL>::check;
-    case OP_EQUALITY:      return F<OP_EQUALITY>::check;
     case OP_FABS:          return F<OP_FABS>::check;
     case OP_SIGN:          return F<OP_SIGN>::check;
     case OP_ERF:           return F<OP_ERF>::check;
@@ -164,9 +165,10 @@ inline void casadi_math<T>::fun(unsigned char op, const T& x, const T& y, T& f){
     case OP_ATAN+OFF:      C<OP_ATAN>::fcn(X,Y,F);          break;\
     case OP_LT+OFF:        C<OP_LT>::fcn(X,Y,F);            break;\
     case OP_LE+OFF:        C<OP_LE>::fcn(X,Y,F);            break;\
+    case OP_EQ+OFF:        C<OP_EQ>::fcn(X,Y,F);            break;\
+    case OP_NE+OFF:        C<OP_NE>::fcn(X,Y,F);            break;\
     case OP_FLOOR+OFF:     C<OP_FLOOR>::fcn(X,Y,F);         break;\
     case OP_CEIL+OFF:      C<OP_CEIL>::fcn(X,Y,F);          break;\
-    case OP_EQUALITY+OFF:  C<OP_EQUALITY>::fcn(X,Y,F);      break;\
     case OP_FABS+OFF:      C<OP_FABS>::fcn(X,Y,F);          break;\
     case OP_SIGN+OFF:      C<OP_SIGN>::fcn(X,Y,F);          break;\
     case OP_ERF+OFF:       C<OP_ERF>::fcn(X,Y,F);           break;\
@@ -218,9 +220,10 @@ inline void casadi_math<T>::der(unsigned char op, const T& x, const T& y, const 
     case OP_ATAN:      BinaryOperation<OP_ATAN>::der(X,Y,F,D);       break;\
     case OP_LT:        BinaryOperation<OP_LT>::der(X,Y,F,D);         break;\
     case OP_LE:        BinaryOperation<OP_LE>::der(X,Y,F,D);         break;\
+    case OP_EQ:        BinaryOperation<OP_EQ>::der(X,Y,F,D);         break;\
+    case OP_NE:        BinaryOperation<OP_NE>::der(X,Y,F,D);         break;\
     case OP_FLOOR:     BinaryOperation<OP_FLOOR>::der(X,Y,F,D);      break;\
     case OP_CEIL:      BinaryOperation<OP_CEIL>::der(X,Y,F,D);       break;\
-    case OP_EQUALITY:  BinaryOperation<OP_EQUALITY>::der(X,Y,F,D);   break;\
     case OP_FABS:      BinaryOperation<OP_FABS>::der(X,Y,F,D);       break;\
     case OP_SIGN:      BinaryOperation<OP_SIGN>::der(X,Y,F,D);       break;\
     case OP_ERF:       BinaryOperation<OP_ERF>::der(X,Y,F,D);        break;\
@@ -266,9 +269,10 @@ inline void casadi_math<T>::derF(unsigned char op, const T& x, const T& y, T& f,
     case OP_ATAN:      DerBinaryOpertion<OP_ATAN>::derf(X,Y,F,D);       break;\
     case OP_LT:        DerBinaryOpertion<OP_LT>::derf(X,Y,F,D);         break;\
     case OP_LE:        DerBinaryOpertion<OP_LE>::derf(X,Y,F,D);         break;\
+    case OP_EQ:        DerBinaryOpertion<OP_EQ>::derf(X,Y,F,D);         break;\
+    case OP_NE:        DerBinaryOpertion<OP_NE>::derf(X,Y,F,D);         break;\
     case OP_FLOOR:     DerBinaryOpertion<OP_FLOOR>::derf(X,Y,F,D);      break;\
     case OP_CEIL:      DerBinaryOpertion<OP_CEIL>::derf(X,Y,F,D);       break;\
-    case OP_EQUALITY:  DerBinaryOpertion<OP_EQUALITY>::derf(X,Y,F,D);   break;\
     case OP_FABS:      DerBinaryOpertion<OP_FABS>::derf(X,Y,F,D);       break;\
     case OP_SIGN:      DerBinaryOpertion<OP_SIGN>::derf(X,Y,F,D);       break;\
     case OP_ERF:       DerBinaryOpertion<OP_ERF>::derf(X,Y,F,D);        break;\
@@ -301,7 +305,8 @@ inline int casadi_math<T>::ndeps(unsigned char op){
     case OP_CONSTPOW:\
     case OP_LT:\
     case OP_LE:\
-    case OP_EQUALITY:\
+    case OP_EQ:\
+    case OP_NE:\
     case OP_FMIN:\
     case OP_FMAX:\
     case OP_ATAN2:\
@@ -359,9 +364,10 @@ inline void casadi_math<T>::printPre(unsigned char op, std::ostream &stream){
     case OP_ATANH:     stream << "atanh(";   break;
     case OP_LT:        stream << "(";        break;
     case OP_LE:        stream << "(";        break;
+    case OP_EQ:        stream << "(";        break;
+    case OP_NE:        stream << "(";        break;
     case OP_FLOOR:     stream << "floor(";   break;
     case OP_CEIL:      stream << "ceil(";    break;
-    case OP_EQUALITY:  stream << "(";        break;
     case OP_FABS:      stream << "fabs(";    break;
     case OP_SIGN:      stream << "sign(";    break;
     case OP_ERF:       stream << "erf(";     break;
@@ -386,7 +392,8 @@ inline void casadi_math<T>::printSep(unsigned char op, std::ostream &stream){
     case OP_DIV:       stream << "/";        break;
     case OP_LT:        stream << "<";        break;
     case OP_LE:        stream << "<=";       break;
-    case OP_EQUALITY:  stream << "==";       break;
+    case OP_EQ:        stream << "==";       break;
+    case OP_NE:        stream << "!=";       break;
     default:           stream << ",";        break;
   }
 }

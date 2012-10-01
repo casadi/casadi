@@ -109,8 +109,6 @@ class SX : public GenericExpression<SX>{
     /** \brief  Conditional operators */
     friend SX operator&&(const SX &a, const SX &b);
     friend SX operator||(const SX &a, const SX &b);
-    friend SX operator==(const SX &a, const SX &b);
-    friend SX operator!=(const SX &a, const SX &b);
     friend SX operator!(const SX &a);
     //@}
     
@@ -212,6 +210,8 @@ class SX : public GenericExpression<SX>{
     SX __div__(const SX& y) const;
     SX __lt__(const SX& y) const;
     SX __le__(const SX& y) const;
+    SX __eq__(const SX& y) const;
+    SX __ne__(const SX& y) const;
     SX __truediv__(const SX &y) const {return __div__(y);};
     SX __pow__(const SX& b) const;
     SX __constpow__(const SX& b) const;
@@ -257,6 +257,8 @@ class SX : public GenericExpression<SX>{
     Matrix<SX> __div__(const Matrix<SX>& y) const;
     Matrix<SX> __lt__(const Matrix<SX>& y) const;
     Matrix<SX> __le__(const Matrix<SX>& y) const;
+    Matrix<SX> __eq__(const Matrix<SX>& y) const;
+    Matrix<SX> __ne__(const Matrix<SX>& y) const;
     Matrix<SX> __truediv__(const Matrix<SX>& y) const {return __div__(y);};
     Matrix<SX> fmin(const Matrix<SX>& b) const;
     Matrix<SX> fmax(const Matrix<SX>& b) const;

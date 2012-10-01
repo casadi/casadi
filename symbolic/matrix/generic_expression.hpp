@@ -75,6 +75,12 @@ class GenericExpression{
     /// Greater or equal to
     inline friend ExType operator>=(const ExType &x, const ExType &y){ return x.__ge__(y); }
     
+    /// Equal to
+    inline friend ExType operator==(const ExType &x, const ExType &y){ return x.__eq__(y); }
+    
+    /// Not equal to
+    inline friend ExType operator!=(const ExType &x, const ExType &y){ return x.__ne__(y); }
+    
     #endif // SWIG
 
     /// Matrix division from left

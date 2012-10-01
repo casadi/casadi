@@ -335,11 +335,6 @@ Matrix<T> operator||(const Matrix<T> &a, const Matrix<T> &b);
 template<class T>
 Matrix<T> operator!(const Matrix<T> &a);
 #endif
-template<class T>
-Matrix<T> operator==(const Matrix<T> &a, const Matrix<T> &b);
-template<class T>
-Matrix<T> operator!=(const Matrix<T> &a, const Matrix<T> &b);
-
 
 /// same as: res += mul(A,v)
 template<typename T>
@@ -1118,45 +1113,6 @@ bool hasNonStructuralZeros(const Matrix<T>& A){
   // No known zeros amongst the structurally nonzero entries
   return false;
 }
-
-#define bin_operator(OPERATOR) \
-template<class T> \
-Matrix<T> operator OPERATOR (const Matrix<T>& a, const Matrix<T>& b){ \
-  Matrix<T> ret = a + b; \
-  if (a.sparsity()==b.sparsity()) { \
-    for (int i=0;i<a.size();++i) ret.at(i) = a.at(i) OPERATOR b.at(i); \
-  } else if (b.scalar()) { \
-    for (int i=0;i<a.size();++i) ret.at(i) = a.at(i) OPERATOR b.at(0); \
-  } else if (a.scalar()) { \
-    for (int i=0;i<b.size();++i) ret.at(i) = a.at(0) OPERATOR b.at(i); \
-  } else { \
-    casadi_assert_message(a.size1()==b.size1() && a.size2()==b.size2(),"Matrix comparison: comparands should have identical dimensions, but got " << a.dimString() << " and " << b.dimString() << "."); \
-    casadi_assert_message(0,"not implemented"); \
-  } \
-  return ret; \
-} \
-
-
-bin_operator(<=);
-bin_operator(>=);
-bin_operator(<);
-bin_operator(>);
-
-#ifndef SWIG
-bin_operator(&&);
-bin_operator(||);
-template<class T> 
-Matrix<T> operator!(const Matrix<T>& a){ 
-  Matrix<T> ret = a;
-  for (int i=0;i<a.size();++i) ret.at(i) = ! a.at(i);
-  return ret;
-}
-#endif
-
-bin_operator(==);
-bin_operator(!=);
-
-#undef bin_operator
   
 template<class T>
 Matrix<T> polyval(const Matrix<T>& p, const Matrix<T>& x){
@@ -1312,8 +1268,6 @@ MTT_INST(T,addMultiple) \
 MTT_INST(T,veccat) \
 MTT_INST(T,vecNZcat) \
 MTT_INST(T,project) \
-%template(operator_eq)  CasADi::operator == < T >; \
-%template(operator_neq) CasADi::operator != < T >; \
 
 #endif //SWIG
 

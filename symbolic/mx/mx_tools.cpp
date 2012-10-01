@@ -463,11 +463,6 @@ std::pair<MX, std::vector<MX> > createParent(const std::vector<MX> &deps) {
   return std::pair< MX, std::vector<MX> > (P,ret);
 }
 
-MX operator==(const MX& a, const MX& b){
-  casadi_assert_message(0,"Not implemented");
-  return MX();
-}
-
 MX operator!(const MX& a){
   casadi_assert_message(0,"Not implemented");
   return MX();

@@ -42,8 +42,8 @@ enum Operation{
   OP_NEG,  OP_EXP,  OP_LOG,  OP_POW, OP_CONSTPOW,
   OP_SQRT,  OP_SIN,  OP_COS,  OP_TAN,  
   OP_ASIN,  OP_ACOS,  OP_ATAN,  
-  OP_LT, OP_LE,
-  OP_FLOOR,  OP_CEIL,  OP_EQUALITY, OP_FABS, OP_SIGN, 
+  OP_LT, OP_LE, OP_EQ, OP_NE, 
+  OP_FLOOR,  OP_CEIL,  OP_FABS, OP_SIGN, 
   OP_ERF,  OP_FMIN,  OP_FMAX,
   OP_INV,
   OP_SINH,  OP_COSH,  OP_TANH,
@@ -341,7 +341,8 @@ struct DerBinaryOpertion{
   template<>      struct SmoothChecker<OP_LE>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_FLOOR>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_CEIL>{ static const bool check=false;};
-  template<>      struct SmoothChecker<OP_EQUALITY>{ static const bool check=false;};
+  template<>      struct SmoothChecker<OP_EQ>{ static const bool check=false;};
+  template<>      struct SmoothChecker<OP_NE>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_SIGN>{ static const bool check=false;};
 //@}
 
@@ -403,7 +404,8 @@ struct DerBinaryOpertion{
   template<>      struct BinaryChecker<OP_DIV>{ static const bool check=true;};
   template<>      struct BinaryChecker<OP_POW>{ static const bool check=true;};
   template<>      struct BinaryChecker<OP_CONSTPOW>{ static const bool check=true;};
-  template<>      struct BinaryChecker<OP_EQUALITY>{ static const bool check=true;};
+  template<>      struct BinaryChecker<OP_EQ>{ static const bool check=true;};
+  template<>      struct BinaryChecker<OP_NE>{ static const bool check=true;};
   template<>      struct BinaryChecker<OP_FMIN>{ static const bool check=true;};
   template<>      struct BinaryChecker<OP_FMAX>{ static const bool check=true;};
   template<>      struct BinaryChecker<OP_PRINTME>{ static const bool check=true;};
@@ -579,10 +581,17 @@ struct UnaryOperation<OP_CEIL>{
     template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0] = 0;}
 };
 
-/// Equality
+/// Equal to
 template<>
-struct BinaryOperation<OP_EQUALITY>{
+struct BinaryOperation<OP_EQ>{
   template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f = x==y;}
+  template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ d[0]=d[1]=0;}
+};
+
+/// Not equal to
+template<>
+struct BinaryOperation<OP_NE>{
+  template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f = x!=y;}
   template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ d[0]=d[1]=0;}
 };
 

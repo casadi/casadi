@@ -170,19 +170,7 @@ namespace CasADi {
 %extend SX {
 #ifdef SWIGPYTHON
 
-    %pythoncode %{
-      def __eq__(self,other):
-        return _casadi_global.__eq__(self,other)
-      def __ne__(self,other):
-        return _casadi_global.__ne__(self,other)
-      def __req__(self,other):
-        return _casadi_global.__eq__(other,self)
-      def __rne__(self,other):
-        return _casadi_global.__ne__(other,self)
-    %}
-  
   %python_array_wrappers(1000.0)
-  
   
   %pythoncode %{
 
@@ -215,18 +203,6 @@ namespace CasADi {
 };
 
 %extend Matrix<SX>{
-    // The constructor has to be added since SX::operator Matrix<SX does not work
-    // Matrix<SX>(const SX&){ 
-   
-    #ifdef SWIGPYTHON
-    %pythoncode %{
-      def __eq__(self,other):
-        return _casadi_global.__eq__(self,other)
-      def __ne__(self,other):
-        return _casadi_global.__ne__(self,other)
-    %}
-    #endif // SWIGPYTHON
-    
     %python_matrix_convertors
     %python_matrix_helpers(CasADi::Matrix<CasADi::SX>)
        
