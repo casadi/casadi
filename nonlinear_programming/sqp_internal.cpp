@@ -27,7 +27,6 @@
 #include "symbolic/fx/sx_function.hpp"
 #include "symbolic/sx/sx_tools.hpp"
 #include "symbolic/casadi_calculus.hpp"
-/*#include "interfaces/qpoases/qpoases_solver.hpp"*/
 #include <ctime>
 #include <iomanip>
 #include <fstream>
@@ -94,11 +93,6 @@ void SQPInternal::init(){
   QPSolverCreator qp_solver_creator = getOption("qp_solver");
   qp_solver_ = qp_solver_creator(H_sparsity,A_sparsity);
 
-  // If IPOPT was provided, we prevent variable elimination
-  if(qp_solver_.hasOption("fixed_variable_treatment")){
-    qp_solver_.setOption("fixed_variable_treatment", "relax_bounds");
-  }
-  
   // Set options if provided
   if(hasSetOption("qp_solver_options")){
     Dictionary qp_solver_options = getOption("qp_solver_options");

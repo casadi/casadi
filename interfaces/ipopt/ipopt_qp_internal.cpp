@@ -298,6 +298,7 @@ void IpoptQPInternal::init(){
     }
   }
 
+  solver.setOption("fixed_variable_treatment", "relax_bounds");
   solver.setOption("jac_c_constant","yes");
   solver.setOption("jac_d_constant","yes");
   solver.setOption("hessian_constant","yes");
