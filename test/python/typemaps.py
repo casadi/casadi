@@ -345,6 +345,67 @@ class typemaptests(casadiTestCase):
         doit(z,s,lambda z,s: z/s)
         doit(z,s,lambda s,z: s/z)
         
+  def test_conversion_operators(self):
+    self.message("COnversion operations")
+    
+
+    def doit(z,s,fun):
+      function = None
+      
+      if type(z) in [type(SX()),type(SXMatrix())]:
+        ztype = [type(SX()),type(SXMatrix())]
+        function = SXFunction
+      
+      if type(z) in [type(MX())]:
+        ztype = [type(MX())]
+        function = MXFunction
+        
+      r = fun(z,s)
+            
+      if type(z) is type(SX()) and type(s) is type(SX()):
+        self.assertTrue(type(r) is type(SX()))
+        
+
+      self.assertTrue(type(r) in ztype,"Expected %s but got %s" % (str(ztype),str(type(r))))
+      
+    def tests(z,s):
+      doit(z,s,lambda z,s: s>=z)
+      doit(z,s,lambda z,s: s>z)
+      doit(z,s,lambda z,s: s<=z)
+      doit(z,s,lambda z,s: s<z)
+      doit(z,s,lambda z,s: s==z)
+      doit(z,s,lambda z,s: s!=z)
+      
+    nums = [array([[1,2],[3,4]]),DMatrix([[1,2],[3,4]]), DMatrix(4), array(4),4.0,4]
+        
+    ## numeric & SXMatrix
+    for s in nums:
+      for z in [SX("x"), ssym("x"), ssym("x",2,2)]:
+        print "z = %s, s = %s" % (str(z),str(s))
+        print "  z = %s, s = %s" % (type(z),type(s))
+        tests(z,s)
+       
+    # numeric & MX
+    for s in nums:
+      for z in [MX("x",2,2)]:
+        print "z = %s, s = %s" % (str(z),str(s))
+        print "  z = %s, s = %s" % (type(z),type(s))
+        tests(z,s)
+        
+    # SX & SX
+    for s in [SX("x"), ssym("x"), ssym("x",2,2)]:
+      for z in [SX("x"),ssym("x"), ssym("x",2,2)]:
+        print "z = %s, s = %s" % (str(z),str(s))
+        print "  z = %s, s = %s" % (type(z),type(s))
+        tests(z,s)
+         
+    # MX & MX
+    for s in [MX("x"),MX("x",2,2)]:
+      for z in [MX("x"),MX("x",2,2)]:
+        print "z = %s, s = %s" % (str(z),str(s))
+        print "  z = %s, s = %s" % (type(z),type(s))
+        tests(z,s)
+        
   def test_set(self):
     self.message("DMatrix set on dense matrices")
     

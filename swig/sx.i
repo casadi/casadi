@@ -199,7 +199,9 @@ namespace CasADi {
   binopsrFull(CasADi::SX)
   // a+b when a is SX, b is numpy.array. __array_priority works, but does not suffice to yield implicit casting
   binopsFull(const CasADi::Matrix<CasADi::SX> & b,,CasADi::Matrix<CasADi::SX>,CasADi::Matrix<CasADi::SX>)
-
+  using GenericExpression<SX>::__gt__;
+  using GenericExpression<SX>::__ge__;
+  using GenericExpression<SX>::__mldivide__;
 };
 
 %extend Matrix<SX>{

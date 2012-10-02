@@ -444,30 +444,46 @@ class SXtests(casadiTestCase):
     c.det(x)
     y=array(x)
     c.det(y)
+    
+  def test_SXbool(self):
+    return
+    self.message("bool")
+    
+    x = SX("x")
+    y = SX("y")
+    
+    f = SXFunction([[x,y]],[[bool_and(x,y),bool_or(x,y),bool_not(x)]])
+    f.init()
+    
+    
+    for t1 in [0,1]:
+      for t2 in [0,1]:
+        T1 = t1!=0
+        T2 = t2!=0
+        f.input().set([t1,t2])
+        f.evaluate()
+        self.checkarray(f.output(),DMatrix([T1 and T2,T1 or T2,not T1]),"bool(%d,%d): %s" % (t1,t2,str(f.output())))
 
   def test_SXineq(self):
-    self.message("Test (in)equality operators")
+    self.message("SX ineq")
     
-    list= {"x>y": lambda x,y: x>y,
-              "x<y": lambda x,y: x<y,
-              "x<=y": lambda x,y: x<=y,
-              "x>=y": lambda x,y: x>=y,
-              "x==y": lambda x,y: x==y,
-              "x!=y": lambda x,y: x!=y
-    }
+    x = SX("x")
+    y = SX("y")
+    
+    f = SXFunction([[x,y]],[[x<y,x<=y,x>=y,x==y,x!=y]])
+    f.init()
     
     
-    group = { "x SXMatrix, y SXMatrix": (ssym("x"),ssym("y")),
-                    "x SX, y SXMatrix": (SX("x"),ssym("y")),
-                    "x SXMatrix, y SX": (ssym("x"),SX("y")),
-                    "x SX, y SX": (SX("x"),SX("y"))
-                  }
-    for gname, e in group.items():
-      self.message(":"+ gname)
-      for name, op in list.items():
-        self.message("::" + name)
-        self.assertTrue(isinstance(op(*e),SXMatrix),gname + "/" + name)
-        
+    for t1 in [-10,0.1,0,1,10]:
+      for t2 in [-10,0.1,0,1,10]:
+        T1 = t1
+        T2 = t2
+        f.input().set([t1,t2])
+        f.evaluate()
+        self.checkarray(f.output(),DMatrix([T1 < T2,T1 <= T2, T1 >= T2, T1 == T2, T1 != T2]),"ineq(%d,%d)" % (t1,t2))
+
+    
+    
   def test_SXFunctionc2(self):
     self.message("SXmatrix typemaps constructors")
     simplify(SX("x"))                 

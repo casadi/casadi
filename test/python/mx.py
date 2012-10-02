@@ -1464,7 +1464,7 @@ class MXtests(casadiTestCase):
     def grad(y,x):
       f = MXFunction(ins,[x])
       f.init()
-      J = Jacobian(f,ins.index(y))
+      J = Jacobian(f,[i for i in range(len(ins)) if ins[i] is y][0])
       J.init()
       if x.shape[0]==1 and x.shape[1]==1:
         return (J.call(ins)[0].T).reshape(y.shape)
@@ -1801,6 +1801,47 @@ class MXtests(casadiTestCase):
     self.assertTrue(bool(MX(-0.2)))
     self.assertRaises(Exception, lambda : bool(MX(DMatrix([2.0,3]))))
     self.assertRaises(Exception, lambda : bool(MX()))
+
+
+  def test_MXbool(self):
+    return
+    self.message("bool")
+    
+    xy = MX("x",2)
+    x = xy[0]
+    y = xy[1]
+    
+    f = MXFunction([xy],[vertcat([bool_and(x,y),bool_or(x,y),bool_not(x)])])
+    f.init()
+    
+    
+    for t1 in [0,1]:
+      for t2 in [0,1]:
+        T1 = t1!=0
+        T2 = t2!=0
+        f.input().set([t1,t2])
+        f.evaluate()
+        self.checkarray(f.output(),DMatrix([T1 and T2,T1 or T2,not T1]),"bool(%d,%d): %s" % (t1,t2,str(f.output())))
+
+  def test_MXineq(self):
+    self.message("SX ineq")
+    
+    xy = MX("x",2)
+    x = xy[0]
+    y = xy[1]
+    
+    
+    f = MXFunction([xy],[vertcat([x<y,x<=y,x>=y,x==y,x!=y])])
+    f.init()
+    
+    
+    for t1 in [-10,0.1,0,1,10]:
+      for t2 in [-10,0.1,0,1,10]:
+        T1 = t1
+        T2 = t2
+        f.input().set([t1,t2])
+        f.evaluate()
+        self.checkarray(f.output(),DMatrix([T1 < T2,T1 <= T2, T1 >= T2, T1 == T2, T1 != T2]),"ineq(%d,%d)" % (t1,t2))
 
     
 if __name__ == '__main__':

@@ -244,6 +244,10 @@ import_array();
 #define memberbinopsr(Type,uname) \
 Type __r##uname##__(const Type& b) const{ return b.__##uname##__(*$self);}
 
+#define memberbinopsr_custom(Type,uname,custom) \
+Type __r##uname##__(const Type& b) const{ return b ##custom## (*$self);}
+
+
 #define memberbinopsr_un(Type,uname) \
 Type __r##uname##__(const Type& b) const{ return b.##uname##(*$self);}
 
@@ -261,6 +265,12 @@ memberbinopsr(Type,mldivide) \
 memberbinopsr(Type,mrdivide) \
 memberbinopsr(Type,mpower) \
 memberbinopsr(Type,constpow) \
+memberbinopsr_custom(Type,ge,>=) \
+memberbinopsr_custom(Type,gt,>) \
+memberbinopsr_custom(Type,le,<=) \
+memberbinopsr_custom(Type,lt,<) \
+memberbinopsr_custom(Type,eq,==) \
+memberbinopsr_custom(Type,ne,!=) \
 memberbinopsr_un(Type,fmin) \
 memberbinopsr_un(Type,fmax) \
 memberbinopsr_nn(Type,mul) \
@@ -269,6 +279,10 @@ memberbinopsr_un(Type,arctan2)
 #define memberbinops(uname,argtype,argCast,selfCast,returntype) \
 returntype __##uname##__ (argtype) const{ return selfCast(*$self).__##uname##__(argCast(b));} \
 returntype __r##uname##__(argtype) const{ return argCast(b).__##uname##__(selfCast(*$self));} \
+
+#define memberbinops_custom(uname,custom,argtype,argCast,selfCast,returntype) \
+returntype __##uname##__ (argtype) const{ return selfCast(*$self) ##custom## argCast(b);} \
+returntype __r##uname##__(argtype) const{ return argCast(b) ##custom## selfCast(*$self);} \
 
 #define memberbinops_un(uname,argtype,argCast,selfCast,returntype) \
 returntype __r##uname##__(argtype) const{ return argCast(b).##uname##(selfCast(*$self));}
@@ -289,6 +303,12 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
 memberbinops(add,argtype,argCast,selfCast,returntype) \
 memberbinops(sub,argtype,argCast,selfCast,returntype) \
 memberbinops(mul,argtype,argCast,selfCast,returntype) \
+memberbinops_custom(ge,>=,argtype,argCast,selfCast,returntype) \
+memberbinops_custom(le,<=,argtype,argCast,selfCast,returntype) \
+memberbinops_custom(gt,>,argtype,argCast,selfCast,returntype) \
+memberbinops_custom(lt,<,argtype,argCast,selfCast,returntype) \
+memberbinops_custom(eq,==,argtype,argCast,selfCast,returntype) \
+memberbinops_custom(ne,!=,argtype,argCast,selfCast,returntype) \
 returntype mul (argtype) const{ return mul(selfCast(*$self) , argCast(b));} \
 returntype rmul (argtype) const{ return mul(argCast(b) , selfCast(*$self));} \
 memberbinops(div,argtype,argCast,selfCast,returntype) \
