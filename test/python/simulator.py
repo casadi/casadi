@@ -77,7 +77,7 @@ class Simulatortests(casadiTestCase):
     p=ssym("p")
     dp=ssym("dp")
     
-    out = SXFunction(daeIn(t=t, x=q, p=p, xdot=dp),[[q],[t],[p],[dp]])
+    out = SXFunction(daeIn(t=t, x=q, p=p, xdot=dp),[q,t,p,dp])
     out.init()
         
     f=SXFunction(daeIn(t=t, x=q, p=p, xdot=dp),daeOut(ode=q/p*t**2-dp))
@@ -122,7 +122,7 @@ class Simulatortests(casadiTestCase):
     self.checkarray(sim.output(2),DMatrix.ones(tc.shape)*num['p'],"Evaluation output mismatch")
     self.checkarray(sim.output(3),DMatrix.zeros(tc.shape),"Evaluation output mismatch")
     
-    out = SXFunction(daeIn(t=t, x=q, xdot=dp),[[q],[t],[dp]])
+    out = SXFunction(daeIn(t=t, x=q, xdot=dp),[q,t,dp])
     out.init()
     
     f=SXFunction(daeIn(t=t, x=q),daeOut(ode=q/num['p']*t**2))
@@ -231,7 +231,7 @@ class Simulatortests(casadiTestCase):
     
     qm = ssym("qm")
     
-    out = SXFunction(controldaeIn(t=t, x=q, p=p, xdot=dp, t0=t0, tf=tf_, x_major=qm),[[q],[t],[p],[dp],[t0],[tf_],[qm]])
+    out = SXFunction(controldaeIn(t=t, x=q, p=p, xdot=dp, t0=t0, tf=tf_, x_major=qm),[q,t,p,dp,t0,tf_,qm])
     out.init()
     
     f=SXFunction(controldaeIn(t=t, x=q, p=p, xdot=dp, x_major=qm),[q/p*t**2-dp])
@@ -280,7 +280,7 @@ class Simulatortests(casadiTestCase):
     self.checkarray(sim.output(5),DMatrix([0.08,0.08,0.08,0.08,0.16,0.16,0.16,0.16,0.24,0.24,0.24,0.24,0.32,0.32,0.32,0.32,0.32]),"Evaluation output mismatch")
     self.checkarray(sim.output(6),num['q0']*exp(sim.output(4)**3/(3*num['p'])),"Evaluation output mismatch",digits=9)
     
-    out = SXFunction(controldaeIn(t=t, x=q, xdot=dp, t0=t0, tf=tf_, x_major=qm),[[q],[t],[dp],[t0],[tf_],[qm]])
+    out = SXFunction(controldaeIn(t=t, x=q, xdot=dp, t0=t0, tf=tf_, x_major=qm),[q,t,dp,t0,tf_,qm])
     out.init()
     
     f=SXFunction(controldaeIn(t=t, x=q, x_major=qm),[q/num['p']*t**2])
@@ -332,7 +332,7 @@ class Simulatortests(casadiTestCase):
     
     q0=2.3
 
-    out = SXFunction(controldaeIn(x=q, xdot=dq, u=u, u_interp=ui),[[q],[u],[ui]])
+    out = SXFunction(controldaeIn(x=q, xdot=dq, u=u, u_interp=ui),[q,u,ui])
     out.init()
     
     f=SXFunction(controldaeIn(x=q, u=u),[-q])
@@ -343,7 +343,7 @@ class Simulatortests(casadiTestCase):
     sim.setOption('integrator_options', {"reltol":1e-15,"abstol":1e-15,"fsens_err_con": True})
     self.assertRaises(Exception,lambda : sim.init())
     
-    out = SXFunction(controldaeIn(x=q, xdot=dq, u=u),[[q],[u]])
+    out = SXFunction(controldaeIn(x=q, xdot=dq, u=u),[q,u])
     out.init()
     
     f=SXFunction(controldaeIn(x=q),[-q])
@@ -355,7 +355,7 @@ class Simulatortests(casadiTestCase):
     self.assertRaises(Exception,lambda : sim.init())
 
 
-    out = SXFunction(controldaeIn(x=q, xdot=dq, u=u, u_interp=ui),[[q],[u],[ui]])
+    out = SXFunction(controldaeIn(x=q, xdot=dq, u=u, u_interp=ui),[q,u,ui])
     out.init()
     
     f=SXFunction(controldaeIn(x=q, u=u, u_interp=ui),[-q])
@@ -375,7 +375,7 @@ class Simulatortests(casadiTestCase):
     self.checkarray(sim.output(1),DMatrix([0,0,0,0,0.1,0.1,0.1,0.1,0,0,0,0,0.2,0.2,0.2,0.2,0.2]),"Evaluation output mismatch")
     self.checkarray(sim.output(2),DMatrix([0,0.025,0.05,0.075,0.1,0.075,0.05,0.025,0,0.05,0.1,0.15,0.2,0.2,0.2,0.2,0.2]),"Evaluation output mismatch")
 
-    out = SXFunction(controldaeIn(x=q, xdot=dq, u=u, u_interp=ui),[[q],[u],[ui]])
+    out = SXFunction(controldaeIn(x=q, xdot=dq, u=u, u_interp=ui),[q,u,ui])
     out.init()
     
     f=SXFunction(controldaeIn(x=q,u=u, u_interp=ui),[-q])
@@ -455,10 +455,10 @@ class Simulatortests(casadiTestCase):
     
 
     rhs = vertcat([v - dx, ( -  b*v - k*x) - dv ])
-    f=SXFunction(daeIn(t=t, xdot=[dx,dv], x=[x,v], p=[b,k]),daeOut(ode=rhs))
+    f=SXFunction(daeIn(t=t, xdot=vertcat([dx,dv]), x=vertcat([x,v]), p=vertcat([b,k])),daeOut(ode=rhs))
     f.init()
     
-    cf=SXFunction(controldaeIn(t=t, xdot=[dx,dv], x=[x,v], p=[b,k]),[rhs])
+    cf=SXFunction(controldaeIn(t=t, xdot=vertcat([dx,dv]), x=vertcat([x,v]), p=vertcat([b,k])),[rhs])
     cf.init()
 
     x0 = SX("x0")
@@ -470,7 +470,7 @@ class Simulatortests(casadiTestCase):
 
     # algebraic solution
     sole = exp(-(b*t)/2)*((sin((sqrt(4*k-b**2)*t)/2)*(2*(dx0+x0*b)-x0*b))/sqrt(4*k-b**2)+x0*cos((sqrt(4*k-b**2)*t)/2))
-    sol = SXFunction([[t],[x0,dx0],[b,k]],[vertcat([sole,jacobian(sole,t)])])
+    sol = SXFunction([t,vertcat([x0,dx0]),vertcat([b,k])],[vertcat([sole,jacobian(sole,t)])])
     sol.init()
     sol.input(0).set(50)
     sol.input(1).set(X0)

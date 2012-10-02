@@ -33,8 +33,8 @@ obj = (1-x)**2+100*(y-x**2)**2
 #! We choose to add a single constraint
 constr = x**2+y**2
 
-f=SXFunction([[x,y]],[obj])
-g=SXFunction([[x,y]],[constr])
+f=SXFunction([vertcat([x,y])],[obj])
+g=SXFunction([vertcat([x,y])],[constr])
 solver = IpoptSolver(f,g)
     
 #! We need the hessian of the lagrangian.
@@ -43,8 +43,9 @@ solver = IpoptSolver(f,g)
 sigma=SX("sigma")  # A scalar factor
 lambd=SX("lambd")  # Multipier of the problem, shape m x 1.
 
+xy = vertcat([x,y])
 
-h=SXFunction([[x,y],[lambd],[sigma]],[sigma*hessian(obj,[x,y])+lambd*hessian(constr,[x,y])])
+h=SXFunction([xy,lambd,sigma],[sigma*hessian(obj,xy)+lambd*hessian(constr,xy)])
    
 #! We solve the problem with an exact hessian
 solver = IpoptSolver(f,g,h)

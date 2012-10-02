@@ -31,8 +31,8 @@ from numpy import *
 x=SX("x")
 y=SX("y")
 
-f=SXFunction([[x,y]],[(1-x)**2+100*(y-x**2)**2])
-g=SXFunction([[x,y]],[x+y])
+f=SXFunction([vertcat([x,y])],[(1-x)**2+100*(y-x**2)**2])
+g=SXFunction([vertcat([x,y])],[x+y])
     
 #! Simple callback
 #! ===============

@@ -28,7 +28,7 @@ y = ssym("y",2,1) # A matrix symbolic
 
 
 ins = [x,y] # function inputs
-outs = [x,y,[[x,x],[x,x]],y*x,0]
+outs = [x,y,SXMatrix([[x,x],[x,x]]),y*x,0]
 
 print outs
 

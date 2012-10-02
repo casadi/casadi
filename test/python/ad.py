@@ -51,7 +51,7 @@ class ADtests(casadiTestCase):
     
     self.sxinputs = {
        "column" : {
-            "dense": [[x,y,z,w]],
+            "dense": [vertcat([x,y,z,w])],
             "sparse": [inp] }
         , "row": {
             "dense":  [SXMatrix([x,y,z,w]).T],
@@ -113,7 +113,7 @@ class ADtests(casadiTestCase):
 
     self.sxoutputs = {
        "column": {
-        "dense": [[x,x+2*y**2,x+2*y**3+3*z**4,w]],
+        "dense": [vertcat([x,x+2*y**2,x+2*y**3+3*z**4,w])],
         "sparse": [out]
         }, "row": {
           "dense":  [SXMatrix([x,x+2*y**2,x+2*y**3+3*z**4,w]).T],
@@ -389,7 +389,7 @@ class ADtests(casadiTestCase):
     y=SX("y")
     z=SX("z")
     n=array([1.2,2.3,7])
-    f=SXFunction([[x,y,z]],[[x+2*y**3+3*z**4]])
+    f=SXFunction([vertcat([x,y,z])],[x+2*y**3+3*z**4])
     f.init()
     J=Jacobian(f,0,0)
     J.setOption("ad_mode","forward")
@@ -418,7 +418,7 @@ class ADtests(casadiTestCase):
     inp[0,0]=x
     inp[3,0]=y
 
-    f=SXFunction([inp],[[x+y,x,y]])
+    f=SXFunction([inp],[vertcat([x+y,x,y])])
     f.init()
     J=Jacobian(f,0,0)
     J.setOption("ad_mode","forward")
@@ -439,7 +439,7 @@ class ADtests(casadiTestCase):
     inp[0,0]=x
     inp[3,0]=y
 
-    f=SXFunction([inp],[[x+y,x,y]])
+    f=SXFunction([inp],[vertcat([x+y,x,y])])
     f.init()
     J=Jacobian(f,0,0)
     J.setOption("ad_mode","forward")
@@ -447,7 +447,7 @@ class ADtests(casadiTestCase):
     J.input().set([2,7])
     J.evaluate()
 
-    f=SXFunction([inp],[[x+y,x,y]])
+    f=SXFunction([inp],[vertcat([x+y,x,y])])
     f.init()
     print f.input().shape
     J=Jacobian(f,0,0)

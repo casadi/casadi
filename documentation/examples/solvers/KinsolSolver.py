@@ -58,7 +58,7 @@ k_     = 0.2
 params_ = [0.1,0.1,alpha_,k_,sigma_]
 
 #! We create a KinsolSolver instance
-f=SXFunction([[a,gamma],params],[[res0,res1]])
+f=SXFunction([vertcat([a,gamma]),vertcat(params)],[vertcat([res0,res1])])
 s=KinsolSolver(f)
 s.setOption("strategy","linesearch")
 s.setOption("abstol",1e-14)

@@ -406,7 +406,7 @@ class MXtests(casadiTestCase):
   def test_identitySX(self):
     self.message("identity SXFunction")
     x = SX("x")
-    f = SXFunction([[x]],[[x]])
+    f = SXFunction([x],[x])
     f.init()
     f.setInput([3],0)
     f.evaluate()

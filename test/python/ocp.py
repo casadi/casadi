@@ -246,7 +246,7 @@ class OCPtests(casadiTestCase):
     print ocp.initial
     print c,T,cost
     #print c.atTime(0)
-    f=SXFunction([[c,T,cost]],[ocp.initial])
+    f=SXFunction([vertcat([c,T,cost])],[ocp.initial])
     f.init()
     return 
     f.evaluate()
@@ -365,7 +365,7 @@ class OCPtests(casadiTestCase):
     y=ssym("y",3,1)
     yd=ssym("yd",3,1)
     p=SX("p")
-    f=SXFunction(daeIn(t=t, x=y, p=p, xdot=yd),daeOut(ode=[y[1,0],-y[0,0],p*y[0,0]]))
+    f=SXFunction(daeIn(t=t, x=y, p=p, xdot=yd),daeOut(ode=vertcat([y[1,0],-y[0,0],p*y[0,0]])))
     f.init()
     
     # Options to be passed to the integrator

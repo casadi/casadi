@@ -51,7 +51,15 @@ u = SX("u")
 
 #! Create the dae
 rhs = vertcat([v - dx, (u -  c*v - k*x)/m - dv ])
-f=SXFunction(controldaeIn(t=t, xdot=[dx,dv], x=[x,v], p=[k,c,m], u=[u] , x_major=[x0,v0]),[rhs])
+fin = controldaeIn(
+    t = t,
+    xdot = vertcat([dx,dv]),
+    x = vertcat([x,v]),
+    p = vertcat([k,c,m]),
+    u = u,
+    x_major = vertcat([x0,v0])
+  )
+f=SXFunction(fin,daeOut(ode=rhs))
 f.init()
 
 #! Choose a time grid, we will have 10-1 = 9 control intervals
@@ -89,7 +97,15 @@ show()
 #! Custom output function
 #! =======================
 
-h=SXFunction(controldaeIn(t=t, xdot=[dx,dv], x=[x,v], p=[k,c,m], u=[u] , x_major=[x0,v0]),[x0,u])
+fin = controldaeIn(
+    t = t,
+    xdot = vertcat([dx,dv]),
+    x = vertcat([x,v]),
+    p = vertcat([k,c,m]),
+    u = u,
+    x_major = vertcat([x0,v0])
+  )
+h=SXFunction(fin,[x0,u])
 h.init()
 
 sim=ControlSimulator(f,h,ts)
@@ -114,12 +130,30 @@ show()
 #! Working with interpolation
 #! ===========================
 
-f=SXFunction(controldaeIn(t=t, xdot=[dx,dv], x=[x,v], p=[k,c,m], u_interp=[u] , x_major=[x0,v0]),[rhs])
+fin = controldaeIn(
+    t = t,
+    xdot = vertcat([dx,dv]),
+    x = vertcat([x,v]),
+    p = vertcat([k,c,m]),
+    u = u,
+    x_major = vertcat([x0,v0])
+  )
+  
+f=SXFunction(fin,[rhs])
 f.init()
 
 ui = ssym("ui")
 
-h=SXFunction(controldaeIn(t=t, xdot=[dx,dv], x=[x,v], p=[k,c,m], u_interp=[ui], x_major=[x0,v0]),[x,ui])
+fin = controldaeIn(
+    t = t,
+    xdot = vertcat([dx,dv]),
+    x = vertcat([x,v]),
+    p = vertcat([k,c,m]),
+    u = ui,
+    x_major = vertcat([x0,v0])
+  )
+  
+h=SXFunction(fin,[x,ui])
 h.init()
 
 sim=ControlSimulator(f,h,ts)

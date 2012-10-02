@@ -47,7 +47,7 @@ class Misctests(casadiTestCase):
     self.message('Regression test #179 (B)')
     def calc_sparsity():
       x = casadi.SX("x")
-      f = casadi.SXFunction([[x]], [[x ** 2]])
+      f = casadi.SXFunction([x], [x ** 2])
       f.init()
       return f.jacSparsity()
     

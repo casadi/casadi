@@ -510,7 +510,7 @@ class typemaptests(casadiTestCase):
     x=SX("x") 
     dx=SX("dx")
 
-    f=SXFunction(daeIn(t=t, x=[x,dx]),[[dx,-x]])
+    f=SXFunction(daeIn(t=t, x=vertcat([x,dx])),[vertcat([dx,-x])])
     f.init()
 
     integrator = CVodesIntegrator(f)
@@ -550,13 +550,13 @@ class typemaptests(casadiTestCase):
     self.assertTrue(isinstance(N+C,SXMatrix))
     self.assertTrue(isinstance(C+N,SXMatrix))
     
-    f=SXFunction([[x,y]],[C+N])
+    f=SXFunction([vertcat([x,y])],[C+N])
     f.init()
     f.input().set([7,13])
     f.evaluate()
     self.checkarray(f.output(),matrix([14,26]).T,"addition")
     
-    f=SXFunction([[x,y]],[N+C])
+    f=SXFunction([vertcat([x,y])],[N+C])
     f.init()
     f.input().set([7,13])
     f.evaluate()
@@ -576,13 +576,13 @@ class typemaptests(casadiTestCase):
     self.assertTrue(isinstance(D+C,SXMatrix))
   
       
-    f=SXFunction([[x,y]],[C+D])
+    f=SXFunction([vertcat([x,y])],[C+D])
     f.init()
     f.input().set([1,4])
     f.evaluate()
     self.checkarray(f.output(),matrix([8,17]).T,"addition")
     
-    f=SXFunction([[x,y]],[D+C])
+    f=SXFunction([vertcat([x,y])],[D+C])
     f.init()
     f.input().set([1,4])
     f.evaluate()

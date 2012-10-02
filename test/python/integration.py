@@ -194,7 +194,7 @@ class Integrationtests(casadiTestCase):
     x=SX("x")
     y=SX("y")
     z=x*exp(t)
-    f=SXFunction(daeIn(t=t, x=[x,y]),[[z,z]])
+    f=SXFunction(daeIn(t=t, x=vertcat([x,y])),[vertcat([z,z])])
     f.init()
     # Pass inputs
     f.setInput(1.0,DAE_T)
@@ -212,7 +212,7 @@ class Integrationtests(casadiTestCase):
     t=SX("t")
     x=SX("x")
     y=SX("y")
-    f=SXFunction(daeIn(t=t, x=[x,y]),daeOut(ode=[x,(1+1e-9)*x]))
+    f=SXFunction(daeIn(t=t, x=vertcat([x,y])),daeOut(ode=vertcat([x,(1+1e-9)*x])))
     integrator = CVodesIntegrator(f)
     integrator.setOption("fsens_err_con", True)
     integrator.setOption("t0",0)
@@ -234,9 +234,9 @@ class Integrationtests(casadiTestCase):
     x=SX("x")
     var = MX("var",2,1)
 
-    q = [x,SX("problem")]
+    q = vertcat([x,SX("problem")])
 
-    dq=[x,x]
+    dq=vertcat([x,x])
     f=SXFunction(daeIn(t=t,x=q),daeOut(ode=dq))
     f.init()
 

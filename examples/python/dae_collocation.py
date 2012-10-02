@@ -114,9 +114,9 @@ xddot  = ssym("xdot",3) # differential state time derivative
 p = ssym("xa",0,1)      # parameters
 
 # ODE right hand side function
-rhs = [(1 - xd[1]*xd[1])*xd[0] - xd[1] + u, \
+rhs = vertcat([(1 - xd[1]*xd[1])*xd[0] - xd[1] + u, \
        xd[0], \
-       xd[0]*xd[0] + xd[1]*xd[1] + u*u]
+       xd[0]*xd[0] + xd[1]*xd[1] + u*u])
 # System dynamics (implicit formulation)
 ffcn = SXFunction([t,xddot,xd,xa,u,p],[xddot - rhs])
 
