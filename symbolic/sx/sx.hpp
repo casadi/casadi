@@ -212,6 +212,9 @@ class SX : public GenericExpression<SX>{
     SX __le__(const SX& y) const;
     SX __eq__(const SX& y) const;
     SX __ne__(const SX& y) const;
+    using GenericExpression<SX>::__gt__;
+    using GenericExpression<SX>::__ge__;
+    using GenericExpression<SX>::__mldivide__;
     SX __truediv__(const SX &y) const {return __div__(y);};
     SX __pow__(const SX& b) const;
     SX __constpow__(const SX& b) const;
@@ -250,6 +253,7 @@ class SX : public GenericExpression<SX>{
     SX printme(const SX &y) const;
     SX sign() const;
     SX constpow(const SX& y) const;
+
     
     Matrix<SX> __add__(const Matrix<SX>& y) const;
     Matrix<SX> __sub__(const Matrix<SX>& y) const;
