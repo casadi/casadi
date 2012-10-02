@@ -315,30 +315,6 @@ SX SX::inv() const{
   }
 }
 
-Matrix<SX> SX::__add__(const Matrix<SX>& y) const {
- return Matrix<SX>(*this)+y;
-}
-Matrix<SX> SX::__sub__(const Matrix<SX>& y) const {
- return Matrix<SX>(*this)-y;
-}
-Matrix<SX> SX::__mul__(const Matrix<SX>& y) const {
- return Matrix<SX>(*this)*y;
-}
-Matrix<SX> SX::__div__(const Matrix<SX>& y) const { 
-  return Matrix<SX>(*this)/y;
-}
-Matrix<SX> SX::__lt__(const Matrix<SX>& y) const { 
-  return Matrix<SX>(*this)<y;
-}
-Matrix<SX> SX::__le__(const Matrix<SX>& y) const { 
-  return Matrix<SX>(*this)<=y;
-}
-Matrix<SX> SX::__eq__(const Matrix<SX>& y) const { 
-  return Matrix<SX>(*this)==y;
-}
-Matrix<SX> SX::__ne__(const Matrix<SX>& y) const { 
-  return Matrix<SX>(*this)!=y;
-}
 Matrix<SX> SX::fmin(const Matrix<SX>& b) const { 
   return Matrix<SX>(*this).fmin(b);
 }

@@ -254,16 +254,6 @@ class SX : public GenericExpression<SX>{
     SX sign() const;
     SX constpow(const SX& y) const;
 
-    
-    Matrix<SX> __add__(const Matrix<SX>& y) const;
-    Matrix<SX> __sub__(const Matrix<SX>& y) const;
-    Matrix<SX> __mul__(const Matrix<SX>& y) const;
-    Matrix<SX> __div__(const Matrix<SX>& y) const;
-    Matrix<SX> __lt__(const Matrix<SX>& y) const;
-    Matrix<SX> __le__(const Matrix<SX>& y) const;
-    Matrix<SX> __eq__(const Matrix<SX>& y) const;
-    Matrix<SX> __ne__(const Matrix<SX>& y) const;
-    Matrix<SX> __truediv__(const Matrix<SX>& y) const {return __div__(y);};
     Matrix<SX> fmin(const Matrix<SX>& b) const;
     Matrix<SX> fmax(const Matrix<SX>& b) const;
     Matrix<SX> constpow(const Matrix<SX>& n) const;
