@@ -15,6 +15,10 @@ full: unittests examples tutorials benchmarks
 
 benchmarks:
 	cd python && python complexity.py && cd ..
+	
+python: unittests_py examples_indoc_py examples_code_py user_guide_snippets_py tutorials
+
+cpp: examples_indoc_cpp  examples_code_cpp
 
 unittests: unittests_py unittests_oct
 
