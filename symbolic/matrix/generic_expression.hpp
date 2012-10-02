@@ -84,13 +84,34 @@ class GenericExpression{
     #endif // SWIG
 
     /// Matrix division from left
-    ExType __mldivide__(const ExType& y) const{ return y.__mrdivide__(static_cast<const ExType&>(*this));}
+    inline ExType __mldivide__(const ExType& y) const{ return y.__mrdivide__(static_cast<const ExType&>(*this));}
 
     /// No need to have both < and >
-    ExType __gt__(const ExType& y) const{ return y.__lt__(static_cast<const ExType&>(*this));}
+    inline ExType __gt__(const ExType& y) const{ return y.__lt__(static_cast<const ExType&>(*this));}
     
     /// No need to have both <= and >=
-    ExType __ge__(const ExType& y) const{ return y.__le__(static_cast<const ExType&>(*this));}
+    inline ExType __ge__(const ExType& y) const{ return y.__le__(static_cast<const ExType&>(*this));}
+
+    /// Division (with __future__.division in effect)
+    inline ExType __truediv__(const ExType& y) const {return static_cast<const ExType&>(*this)/y;};
+
+    /** @name Operations from the right
+     *  For Python
+     */
+    //@{
+    inline ExType __radd__(const ExType& y) const{ return y.__add__(static_cast<const ExType&>(*this));}
+    inline ExType __rsub__(const ExType& y) const{ return y.__sub__(static_cast<const ExType&>(*this));}
+    inline ExType __rmul__(const ExType& y) const{ return y.__mul__(static_cast<const ExType&>(*this));}
+    inline ExType __rdiv__(const ExType& y) const{ return y.__div__(static_cast<const ExType&>(*this));}
+    inline ExType __rlt__(const ExType& y) const{ return y.__lt__(static_cast<const ExType&>(*this));}
+    inline ExType __rle__(const ExType& y) const{ return y.__le__(static_cast<const ExType&>(*this));}
+    inline ExType __rgt__(const ExType& y) const{ return y.__gt__(static_cast<const ExType&>(*this));}
+    inline ExType __rge__(const ExType& y) const{ return y.__ge__(static_cast<const ExType&>(*this));}
+    inline ExType __req__(const ExType& y) const{ return y.__eq__(static_cast<const ExType&>(*this));}
+    inline ExType __rne__(const ExType& y) const{ return y.__ne__(static_cast<const ExType&>(*this));}
+    inline ExType __rtruediv__(const ExType& y) const {return y.__truediv__(static_cast<const ExType&>(*this));}
+    //@}
+    
 };
 
 template<class T>
