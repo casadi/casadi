@@ -58,18 +58,18 @@ void IfNode::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMat
   int nadj = adjSeed.size();
   bool c = fabs(input[0]->data()[0])<tol;
   vector<double> &outputd = output[0]->data();
-  if(c){
+  if(!c){
     for(int i=0; i<size(); ++i){
       // Function
-      outputd[i] = input[0]->data()[i];
+      outputd[i] = input[1]->data()[i];
       
       // Forward seeds
       for(int d=0; d<nfwd; ++d)
-        fwdSens[d][0]->data()[i] = fwdSeed[d][0]->data()[i];
+        fwdSens[d][0]->data()[i] = fwdSeed[d][1]->data()[i];
       
       // Adjoint seeds
       for(int d=0; d<nadj; ++d)
-        adjSens[d][0]->data()[i] += adjSeed[d][0]->data()[i];
+        adjSens[d][1]->data()[i] += adjSeed[d][0]->data()[i];
     }
   } else {
     // Zero if false

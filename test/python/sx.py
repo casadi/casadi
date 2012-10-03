@@ -948,6 +948,44 @@ class SXtests(casadiTestCase):
     self.assertTrue(bool(SXMatrix(SX(0.2))))
     self.assertTrue(bool(SXMatrix(SX(-0.2))))
     self.assertRaises(Exception, lambda : bool(SXMatrix([2.0,3])))
+    
+  def test_if_else(self):
+    x = SX("x")
+    y = if_else(x,1,2)
+    f = SXFunction([x],[y])
+    f.init()
+    f.input().set(1)
+    f.evaluate()
+    self.assertTrue(f.output()==1,"if_else")
+    f.input().set(0)
+    f.evaluate()
+    self.assertTrue(f.output()==2,"if_else")
+    
+    # Check sensitivities
+    
+    x0 = 2.1
+    dx = 0.3
+    y = if_else(x>1,x**2,x**3)
+    f = SXFunction([x],[y])
+    f.init()
+    f.input().set(x0)
+    f.fwdSeed().set(dx)
+    f.adjSeed().set(dx)
+    f.evaluate(1,1)
+    self.checkarray(f.output(),x0**2,"if_else sens")
+    self.checkarray(f.fwdSens(),2*x0*dx,"if_else sens")
+    self.checkarray(f.adjSens(),2*x0*dx,"if_else sens")
+    
+    x0 = -2.1
+    dx = 0.3
+    
+    f.input().set(x0)
+    f.fwdSeed().set(dx)
+    f.adjSeed().set(dx)
+    f.evaluate(1,1)
+    self.checkarray(f.output(),x0**3,"if_else sens")
+    self.checkarray(f.fwdSens(),3*(-x0)**2*dx,"if_else sens")
+    self.checkarray(f.adjSens(),3*(-x0)**2*dx,"if_else sens")
 
 if __name__ == '__main__':
     unittest.main()

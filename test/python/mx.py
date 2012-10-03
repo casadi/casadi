@@ -1832,6 +1832,56 @@ class MXtests(casadiTestCase):
         f.evaluate()
         self.checkarray(f.output(),DMatrix([T1 < T2,T1 <= T2, T1 >= T2, T1 == T2, T1 != T2]),"ineq(%d,%d)" % (t1,t2))
 
+  def test_if_else_zero(self):
+    x = MX("x")
+    y = if_else_zero(x,5)
+    f = MXFunction([x],[y])
+    f.init()
+    f.input().set(1)
+    f.evaluate()
+    self.assertTrue(f.output()==5,"if_else_zero %s " % str(f.output()))
+    f.input().set(0)
+    f.evaluate()
+    self.assertTrue(f.output()==0,"if_else_zero")
+    
+    
+  def test_if_else(self):
+    x = MX("x")
+    y = if_else(x,1,2)
+    f = MXFunction([x],[y])
+    f.init()
+    f.input().set(1)
+    f.evaluate()
+    self.assertTrue(f.output()==1,"if_else")
+    f.input().set(0)
+    f.evaluate()
+    self.assertTrue(f.output()==2,"if_else")
+    
+    # Check sensitivities
+    
+    x0 = 2.1
+    dx = 0.3
+    y = if_else(x>1,x**2,x**3)
+    f = MXFunction([x],[y])
+    f.init()
+    f.input().set(x0)
+    f.fwdSeed().set(dx)
+    f.adjSeed().set(dx)
+    f.evaluate(1,1)
+    self.checkarray(f.output(),x0**2,"if_else sens")
+    self.checkarray(f.fwdSens(),2*x0*dx,"if_else sens")
+    self.checkarray(f.adjSens(),2*x0*dx,"if_else sens")
+    
+    x0 = -2.1
+    dx = 0.3
+    
+    f.input().set(x0)
+    f.fwdSeed().set(dx)
+    f.adjSeed().set(dx)
+    f.evaluate(1,1)
+    self.checkarray(f.output(),x0**3,"if_else sens")
+    self.checkarray(f.fwdSens(),3*(-x0)**2*dx,"if_else sens")
+    self.checkarray(f.adjSens(),3*(-x0)**2*dx,"if_else sens")
     
 if __name__ == '__main__':
     unittest.main()
