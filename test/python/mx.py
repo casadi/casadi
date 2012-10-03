@@ -631,17 +631,6 @@ class MXtests(casadiTestCase):
     g.evaluate()
     checkarray(self,6*f.output().toArray(),g.output().toArray(),"slicing(trans)")
     
-  def test_dict(self):
-    self.message("Dictionary constructor for MXFunction")
-    x=MX("x",2,2)
-    y=MX("y",2,2)
-    f = MXFunction({0: x,1:y},{'NUM':1,0: x+y})
-    self.assertEqual(f.getNumInputs(),2)
-    self.checkarray(f.inputMX(0).shape,(2,2),"dict")
-    self.checkarray(f.inputMX(1).shape,(2,2),"dict")
-    self.assertEqual(f.getNumOutputs(),1)
-    self.checkarray(f.outputMX(0).shape,(2,2),"dict")
-    
   def test_scalarMX(self):
       x=MX("x")
       x0=0.738

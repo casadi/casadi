@@ -517,20 +517,6 @@ class SXtests(casadiTestCase):
     f  = SXFunction([x,y], [x*y])
     f.init()
     f.eval([x,y])
-
-  def test_dict(self):
-    self.message("Dictionary constructor for SXFunction")
-    x=ssym("x",2,2)
-    y=ssym("y",2,2)
-    f  = SXFunction({'NUM': 3,0: x,1:y},{4: x+y})
-    self.assertEqual(f.getNumInputs(),3)
-    self.checkarray(f.inputSX(0).shape,(2,2),"dict")
-    self.checkarray(f.inputSX(1).shape,(2,2),"dict")
-    self.checkarray(f.inputSX(2).shape,(0,0),"dict")
-    self.assertEqual(f.getNumOutputs(),5)
-    for i in range(4):
-      self.checkarray(f.outputSX(i).shape,(0,0),"dict")
-    self.checkarray(f.outputSX(4).shape,(2,2),"dict")
     
   def test_symbolcheck(self):
     self.message("Check if non-symbolic inputs are caught")
