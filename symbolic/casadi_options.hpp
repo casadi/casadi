@@ -56,6 +56,34 @@ namespace CasADi {
       static void setCatchErrorsPython(bool flag) { catch_errors_python = flag; }
       static bool getCatchErrorsPython() { return catch_errors_python; }
 
+      /** \brief  Implement the (in)equality operator.
+      *  If set to true,  operator==  will check if two casadi objects point to the same node.
+      *  If set to false, operator==  will invariably throw an error.
+      *
+      *  Why this option?
+      *  
+      *  The mathematician/engineer who wants to use casadi and does not care much about python goodies:
+      *  he/she needs to be guided by helpful error messages to avoid doing the incorrect thing.
+      *    For example, doing an if-test on a symbolic expression is a common mistake.
+      *         'if x==y' with x and y both SX expressions
+      *    It's good if an error is thrown in that case.
+      *   
+      *  ==> Having the option false, is engineer-friendly
+      *
+      *  However, the ==operator has special meaning in python. It is used by the index method
+      *  of lists, used in set maniplations, used in dictionaries.
+      *  Having operator== throw an error is very unpythonic
+      * 
+      *  ==> Having the option true, is python-friendly
+      *
+      *  Default: false
+      */
+      static bool equality_operator;
+      
+      // Setter and getter for equality_operator
+      static void setEqualityOperator(bool flag) { equality_operator = flag; }
+      static bool getEqualityOperator() { return equality_operator; }
+      
   };
 
 }
