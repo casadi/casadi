@@ -31,12 +31,17 @@ except:
 def hashcompare(self,other):
   return cmp(hash(self),hash(other))
   
+  
+def equality(self,other):
+  return hash(self)==hash(other)
+  
 def getDeps(s):
   deps = []
   if not(hasattr(s,'getNdeps')): return deps
   for k in range(s.getNdeps()):
     d = s.getDep(k)
     d.__class__.__cmp__ = hashcompare
+    d.__class__.__eq__  = equality
     deps.append(d)
   return deps
  
@@ -49,7 +54,7 @@ def addDependency(master,slave,dep={},invdep={}):
   if slave in invdep:
     invdep[slave].add(master)
   else:
-    invdep[slave]= set([master])
+    invdep[slave] = set([master])
     
 def addDependencies(master,slaves,dep={},invdep={}):
   for slave in slaves:
