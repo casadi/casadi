@@ -455,7 +455,7 @@ SX SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<SX>& v)
 	    case 14:  return ceil(x);
 	    case 15:  return abs(x);
 	    case 16:  return -x;
-	    case 34:  return !x;
+	    case 34:  return logic_not(x);
 	    case 37:  return tanh(x);
 	    case 38:  return tan(x);
 	    case 39:  return sqrt(x);
@@ -496,8 +496,8 @@ SX SymbolicNLP::readExpressionNL(std::istream &stream, const std::vector<SX>& v)
 	    // case 4:   return rem(x,y); FIXME
 	    case 5:   return pow(x,y);
 	    // case 6:   return x < y; TODO: Verify this, what is the difference to 'le' == 23 below?
-	    case 20:  return x || y;
-	    case 21:  return x && y;
+	    case 20:  return logic_or(x, y);
+	    case 21:  return logic_and(x, y);
 	    case 22:  return x < y;
 	    case 23:  return x <= y;
 	    case 24:  return x == y;

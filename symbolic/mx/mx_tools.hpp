@@ -26,6 +26,7 @@
 #include "mx.hpp"
 
 #include "../matrix/generic_matrix_tools.hpp"
+#include "../matrix/generic_expression_tools.hpp"
 
 namespace CasADi{
 

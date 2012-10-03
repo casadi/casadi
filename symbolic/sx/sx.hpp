@@ -105,12 +105,8 @@ class SX : public GenericExpression<SX>{
     // Convert to a 1-by-1 Matrix
     operator Matrix<SX>() const;
     
-    //@ {
-    /** \brief  Conditional operators */
-    friend SX operator&&(const SX &a, const SX &b);
-    friend SX operator||(const SX &a, const SX &b);
+    /// Not operator
     friend SX operator!(const SX &a);
-    //@}
     
     /** \brief  print to stream */
     friend std::ostream& operator<<(std::ostream &stream, const SX &scalar);

@@ -26,6 +26,10 @@
 // Scalar expressions (why do i need to put it up here?)
 #include "sx/sx.hpp"
 
+// Generic tools
+#include "matrix/generic_matrix_tools.hpp"
+#include "matrix/generic_expression_tools.hpp"
+
 // Matrices
 #include "matrix/matrix.hpp"
 #include "matrix/matrix_tools.hpp"
@@ -39,5 +43,7 @@
 #include "mx/mx.hpp"
 #include "mx/mx_tools.hpp"
 #include "fx/mx_function.hpp"
+
+
 
 #endif //CASADI_HPP

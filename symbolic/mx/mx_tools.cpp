@@ -464,8 +464,7 @@ std::pair<MX, std::vector<MX> > createParent(const std::vector<MX> &deps) {
 }
 
 MX operator!(const MX& a){
-  casadi_assert_message(0,"Not implemented");
-  return MX();
+  return logic_not(a);
 }
 
 MX diag(const MX& x){

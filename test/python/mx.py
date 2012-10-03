@@ -1793,14 +1793,13 @@ class MXtests(casadiTestCase):
 
 
   def test_MXbool(self):
-    return
     self.message("bool")
     
     xy = MX("x",2)
     x = xy[0]
     y = xy[1]
     
-    f = MXFunction([xy],[vertcat([bool_and(x,y),bool_or(x,y),bool_not(x)])])
+    f = MXFunction([xy],[vertcat([logic_and(x,y),logic_or(x,y),logic_not(x)])])
     f.init()
     
     

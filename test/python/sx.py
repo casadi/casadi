@@ -425,13 +425,12 @@ class SXtests(casadiTestCase):
     c.det(y)
     
   def test_SXbool(self):
-    return
     self.message("bool")
     
     x = SX("x")
     y = SX("y")
     
-    f = SXFunction([[x,y]],[[bool_and(x,y),bool_or(x,y),bool_not(x)]])
+    f = SXFunction([vertcat([x,y])],[vertcat([logic_and(x,y),logic_or(x,y),logic_not(x)])])
     f.init()
     
     

@@ -67,6 +67,9 @@ except:
 %include "symbolic/matrix/matrix_tools.hpp"
 %include "symbolic/matrix/generic_matrix_tools.hpp"
 
+// General tools
+%include "symbolic/matrix/generic_expression_tools.hpp"
+
 // Instantiate the functions
 MATRIX_TOOLS_TEMPLATES(int)
 MATRIX_TOOLS_TEMPLATES(double)
@@ -76,6 +79,14 @@ GENERIC_MATRIX_TOOLS_TEMPLATES(CasADi::Matrix<int>)
 GENERIC_MATRIX_TOOLS_TEMPLATES(CasADi::Matrix<double>)
 GENERIC_MATRIX_TOOLS_TEMPLATES(CasADi::Matrix<CasADi::SX>)
 GENERIC_MATRIX_TOOLS_TEMPLATES(CasADi::MX)
+
+GENERIC_EXPRESSION_TOOLS_TEMPLATES(int)
+GENERIC_EXPRESSION_TOOLS_TEMPLATES(double)
+GENERIC_EXPRESSION_TOOLS_TEMPLATES(CasADi::Matrix<int>)
+GENERIC_EXPRESSION_TOOLS_TEMPLATES(CasADi::Matrix<double>)
+GENERIC_EXPRESSION_TOOLS_TEMPLATES(CasADi::Matrix<CasADi::SX>)
+GENERIC_EXPRESSION_TOOLS_TEMPLATES(CasADi::MX)
+GENERIC_EXPRESSION_TOOLS_TEMPLATES(CasADi::SX)
 
 // Sparsity tools
 %{

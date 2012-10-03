@@ -327,15 +327,6 @@ void makeSparse(Matrix<T>& A);
 template<class T>
 bool hasNonStructuralZeros(const Matrix<T>& A);
 
-#ifndef SWIG
-template<class T>
-Matrix<T> operator&&(const Matrix<T> &a, const Matrix<T> &b);
-template<class T>
-Matrix<T> operator||(const Matrix<T> &a, const Matrix<T> &b);
-template<class T>
-Matrix<T> operator!(const Matrix<T> &a);
-#endif
-
 /// same as: res += mul(A,v)
 template<typename T>
 void addMultiple(const Matrix<T>& A, const std::vector<T>& v, std::vector<T>& res, bool trans_A=false);

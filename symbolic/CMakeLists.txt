@@ -18,6 +18,7 @@ SET(CASADI_SRCS
 
   # Template class Matrix<>, implements a sparse Matrix with row compressed storage, designed to work well with symbolic data types (SX)
   matrix/generic_expression.hpp                         # Base class for SX MX and Matrix<>
+  matrix/generic_expression_tools.hpp                   # Tools for SX MX and Matrix<>
   matrix/generic_matrix.hpp                             # Base class for Matrix<> and MX
   matrix/generic_matrix_tools.hpp                       # Tools for both Matrix<> and MX
   matrix/matrix.hpp           matrix/matrix_impl.hpp    # The Matrix template class

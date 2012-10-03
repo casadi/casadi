@@ -22,6 +22,7 @@
 
 #include "sx.hpp"
 #include "../matrix/matrix.hpp"
+#include "../matrix/generic_expression_tools.hpp"
 #include <stack>
 #include <cassert>
 #include "../casadi_math.hpp"
@@ -357,16 +358,8 @@ SX SX::__ne__(const SX& y) const{
     return BinarySX::create(OP_NE,*this,y);
 }
 
-SX operator&&(const SX &a, const SX &b){
-  return a+b>=2;
-}
-
-SX operator||(const SX &a, const SX &b){
-  return !(!a && !b);
-}
-
 SX operator!(const SX &a){
-  return 1-a;
+  return logic_not(a);
 }
 
 SXNode* const SX::get() const{
