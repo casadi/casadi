@@ -594,71 +594,9 @@ bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(PyObject * p) {
   return meta< CasADi::Matrix<CasADi::SX> >::isa(p) || meta< CasADi::SX >::couldbe(p) || meta< CasADi::Matrix<double> >::couldbe(p);
 }
 
-/// std::vector< CasADi::Matrix<CasADi::SX> >
-template<> char meta< std::vector< CasADi::Matrix<CasADi::SX> > >::expected_message[] = "Expecting sequence(numpy.ndarray(SX/number) , SXMatrix, SX, number, sequence(SX/number))";
-
-template <>
-int meta< std::vector< CasADi::Matrix<CasADi::SX> > >::as(PyObject * p,std::vector< CasADi::Matrix<CasADi::SX> > &m) {
-  NATIVERETURN(std::vector< CasADi::Matrix<CasADi::SX> >,m)
-  //if(isSXMatrix(p)) {
-  //  CasADi::SXMatrix *mp;
-  //  int result = getSXMatrix(p,mp);
-  //  if (!result)
-  //    return false;
-  //  m.push_back(*mp);
-  //}
-  if( PyIsSequence(p)) {
-    return meta< CasADi::Matrix<CasADi::SX> >::as_vector(p,m);
-  } else if (PyDict_Check(p)) {
-    PyObject *key, *value;
-    Py_ssize_t pos = 0;
-    int num=0;
-    while (PyDict_Next(p, &pos, &key, &value)) {
-      if (PyInt_Check(key)) {
-        if (PyInt_AsLong(key)+1>num)
-          num=PyInt_AsLong(key)+1;
-      } else if (PyString_Check(key) && strcmp(PyString_AsString(key),"NUM")==0) {
-        if (PyInt_Check(value))
-          num=PyInt_AsLong(value);
-      } else {
-        return false;
-      }
-    }
-    m.resize(num);
-    pos=0;
-    while (PyDict_Next(p, &pos, &key, &value)) {
-      if (PyInt_Check(key)) {
-        bool result=meta< CasADi::Matrix< CasADi::SX > >::as(value,m[PyInt_AsLong(key)]);
-        if (!result)
-          return false;
-      }
-    }
-    return true;
-  } else {
-    return false;
-  }
-  return true;
-}
-
-template <>
-bool meta< std::vector< CasADi::Matrix<CasADi::SX> > >::couldbe(PyObject * p) {
-  if( meta< CasADi::Matrix< CasADi::SX > >::couldbe_sequence(p)) {
-    return true;
-  } else if (PyDict_Check(p)) {
-    PyObject *key, *value;
-    Py_ssize_t pos = 0;
-    while (PyDict_Next(p, &pos, &key, &value)) {
-      if (!((PyInt_Check(key) || (PyString_Check(key) && strcmp(PyString_AsString(key),"NUM")==0)) && meta< CasADi::Matrix<CasADi::SX> >::couldbe(value)))
-        return false;
-    }
-    return true;
-  }
-  return meta< std::vector< CasADi::Matrix< CasADi::SX > > >::isa(p);
-}
-
-
 meta_vector(std::vector<CasADi::SX>);
 meta_vector(CasADi::SX);
+meta_vector(CasADi::Matrix< CasADi::SX >);
 meta_vector(std::vector< CasADi::Matrix< CasADi::SX > >);
 
 /// CasADi::MX
@@ -683,61 +621,7 @@ int meta< CasADi::MX >::as(PyObject * p,CasADi::MX &m) {
   return false;
 }
 
-/// std::vector< CasADi::MX >
-template<> char meta< std::vector< CasADi::MX > >::expected_message[] = "Expecting sequence(MX, number)";
-template <>
-int meta< std::vector< CasADi::MX > >::as(PyObject * p,std::vector< CasADi::MX > &m) {
-  NATIVERETURN(std::vector< CasADi::MX >,m)
-  if( PyIsSequence(p) ) {
-    return meta< CasADi::MX >::as_vector(p,m);
-  } else if (PyDict_Check(p)) {
-    PyObject *key, *value;
-    Py_ssize_t pos = 0;
-    int num=0;
-    while (PyDict_Next(p, &pos, &key, &value)) {
-      if (PyInt_Check(key)) {
-        if (PyInt_AsLong(key)+1>num)
-          num=PyInt_AsLong(key)+1;
-      } else if (PyString_Check(key) && strcmp(PyString_AsString(key),"NUM")==0) {
-        if (PyInt_Check(value))
-          num=PyInt_AsLong(value);
-      } else {
-        return false;
-      }
-    }
-    m.resize(num);
-    pos=0;
-    while (PyDict_Next(p, &pos, &key, &value)) {
-      if (PyInt_Check(key)) {
-        bool result=meta< CasADi::MX >::as(value,m[PyInt_AsLong(key)]);
-        if (!result)
-          return false;
-      }
-    }
-    return true;
-  } else {
-    return false;
-  }
-return true;
-}
-
-template <>
-bool meta< std::vector< CasADi::MX > >::couldbe(PyObject * p) {
-  if(meta< CasADi::MX >::couldbe_sequence(p)) {
-    return true;
-  } else if (PyDict_Check(p)) {
-    PyObject *key, *value;
-    Py_ssize_t pos = 0;
-    while (PyDict_Next(p, &pos, &key, &value)) {
-      if (!((PyInt_Check(key) || (PyString_Check(key) && strcmp(PyString_AsString(key),"NUM")==0)) && meta< CasADi::MX >::couldbe(value)))
-        return false;
-    }
-    return true;
-  }
-  return meta< std::vector<CasADi::MX> >::isa(p);
-}
-
-
+meta_vector(CasADi::MX);
 meta_vector(std::vector< CasADi::MX >);
 %}
 
