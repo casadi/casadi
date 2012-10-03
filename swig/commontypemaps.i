@@ -54,6 +54,7 @@
 #define PRECEDENCE_SXMatrixVector 103
 #define PRECEDENCE_SXMatrixVectorVector 103
 #define PRECEDENCE_SXVector 102
+#define PRECEDENCE_SXVectorVector 102
 #define PRECEDENCE_MX 104
 #define PRECEDENCE_MXVector 105
 #define PRECEDENCE_MXVectorVector 106
@@ -144,6 +145,7 @@ if (!ret) {
 
 %my_generic_const_typemap(PRECEDENCE_SX,CasADi::SX);
 %my_generic_const_typemap(PRECEDENCE_SXVector,std::vector< CasADi::SX >);
+%my_generic_const_typemap(PRECEDENCE_SXVectorVector,std::vector< std::vector< CasADi::SX > >);
 
 %my_generic_const_typemap(PRECEDENCE_SXMatrix,CasADi::Matrix<CasADi::SX>);
 %my_genericmatrix_const_typemap(PRECEDENCE_SXMatrix,CasADi::Matrix<CasADi::SX>);

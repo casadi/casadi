@@ -575,23 +575,7 @@ int meta< CasADi::Matrix<CasADi::SX> >::as(PyObject * p,CasADi::Matrix<CasADi::S
 		}
     Py_DECREF(it);
 		m = CasADi::Matrix< CasADi::SX >(v, nrows, ncols);
-	} else if(meta< CasADi::SX >::couldbe_sequence(p)) {
-    std::vector<CasADi::SX> sxv;
-    int result = meta< CasADi::SX >::as_vector(p,sxv);
-    if (result) {
-      m = CasADi::SXMatrix(sxv);
-    } else {
-      return false;
-    }
-  } else if(meta< std::vector<CasADi::SX> >::couldbe_sequence(p)) {
-    std::vector< std::vector<CasADi::SX> > sxv;
-    int result = meta< std::vector<CasADi::SX> >::as_vector(p,sxv);
-    if (result) {
-      m = CasADi::SXMatrix(sxv);
-    } else {
-      return false;
-    }
-  } else {
+	} else {
     SWIG_Error(SWIG_TypeError, "asSXMatrix: unrecognised type. Should have been caught by typemap(typecheck)");
     return false;
   }
@@ -607,7 +591,7 @@ bool meta< CasADi::Matrix<CasADi::SX> >::couldbe(PyObject * p) {
     return true;
   }
   
-  return meta< CasADi::Matrix<CasADi::SX> >::isa(p) || meta< CasADi::SX >::couldbe(p) || meta< CasADi::Matrix<double> >::couldbe(p) || meta< CasADi::SX >::couldbe_sequence(p) || meta< std::vector< CasADi::SX > >::couldbe_sequence(p);
+  return meta< CasADi::Matrix<CasADi::SX> >::isa(p) || meta< CasADi::SX >::couldbe(p) || meta< CasADi::Matrix<double> >::couldbe(p);
 }
 
 /// std::vector< CasADi::Matrix<CasADi::SX> >
