@@ -60,8 +60,16 @@ public:
       qpOASES::QProblemB *qp_;
     };
     
-    qpOASES::Options options;
-    	
+    //@{
+      /// Convert between qpOASES types and standard types
+    static bool BooleanType_to_bool(qpOASES::BooleanType b);
+    static qpOASES::BooleanType bool_to_BooleanType(bool b);
+    static std::string SubjectToStatus_to_string(qpOASES::SubjectToStatus b);
+    static qpOASES::SubjectToStatus string_to_SubjectToStatus(std::string b);
+    static std::string PrintLevel_to_string(qpOASES::PrintLevel b);
+    static qpOASES::PrintLevel string_to_PrintLevel(std::string b);
+    //@}
+    
     /// Number of working set recalculations
     int max_nWSR_;
     

@@ -44,9 +44,6 @@
 */
       
 namespace CasADi{
-
-// The state of a bound
-enum BoundStatus { BOUND_INACTIVE, BOUND_LOWER, BOUND_UPPER, BOUND_INFEASIBLE_LOWER, BOUND_INFEASIBLE_UPPER };
   
 /// Input arguments of a QP problem [qpIn]
 enum QPInput{

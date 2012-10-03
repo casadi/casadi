@@ -111,12 +111,12 @@ class QPSolverTests(casadiTestCase):
       self.assertAlmostEqual(solver.output(QP_LAMBDA_A)[0],10.0/3,4,str(qpsolver))
       self.assertAlmostEqual(solver.output(QP_LAMBDA_A)[1],4.0/3,6,str(qpsolver))
       
-      solver.input(QP_LBA).set([-inf]*3)
-      solver.input(QP_UBA).set([inf]*3)
+      solver.input(QP_LBA).set([-inf]*3) #  Upper _and_ lower 
+      solver.input(QP_UBA).set([inf]*3)  #  bounds infinite?
 
       solver.input(QP_UBX).setAll(5)
 
-      if not('OOQP' in str(qpsolver)): # bug?
+      if ('Ipopt' in str(qpsolver)): # bug? 
         solver.evaluate()
         self.assertAlmostEqual(solver.output()[0],5,6,str(qpsolver))
         self.assertAlmostEqual(solver.output()[1],5,6,str(qpsolver))
