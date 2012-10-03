@@ -313,7 +313,7 @@ class OCPtests(casadiTestCase):
     mayer = SXFunction([x0],[7*x0[0]])
     
     t = SX("t")
-    cfcn = SXFunction({DAE_T : t, DAE_X: x0, DAE_P: p, DAE_XDOT: xp0},[x0[:nh,0]])
+    cfcn = SXFunction(daeIn(t=t,x=x0, p=p, xdot=xp0),[x0[:nh,0]])
     cfcn.init()
     
     ms = MultipleShooting(daeres,mayer,cfcn)
