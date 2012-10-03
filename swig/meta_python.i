@@ -382,13 +382,6 @@ int meta< CasADi::SX >::as(PyObject * p,CasADi::SX &s) {
     if (!result)
       return false;
     s=CasADi::SX(res);
-  } else if (meta< CasADi::Matrix< CasADi::SX > >::isa(p)) {
-    CasADi::Matrix< CasADi::SX > m;
-    meta< CasADi::Matrix< CasADi::SX > >::as(p,m);
-    if (m.numel()==1 && m.size()==1) {
-      s = m.at(0);
-      return true;
-    }
   } else {
     return false;
   }
@@ -397,12 +390,6 @@ int meta< CasADi::SX >::as(PyObject * p,CasADi::SX &s) {
 
 template <>
 bool meta< CasADi::SX >::couldbe(PyObject * p) {
-  if (meta< CasADi::Matrix< CasADi::SX > >::isa(p)) {
-    CasADi::Matrix< CasADi::SX > m;
-    meta< CasADi::Matrix< CasADi::SX > >::as(p,m);
-    if (m.numel()==1 && m.size()==1)
-      return true;
-  }
   return (meta< CasADi::SX >::isa(p) || meta< double >::couldbe(p));
 }
 

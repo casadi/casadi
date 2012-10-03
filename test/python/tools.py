@@ -88,7 +88,7 @@ class Toolstests(casadiTestCase):
       self.assertTrue(p.lookup(('xother','a')) is p.xother.a)
       self.assertTrue(p.lookup(('xother','a',(0,))).isEqual(p.xother.a))
       self.assertTrue(p.lookup(('xother','b')) is p.xother.b)
-      self.assertTrue(p.lookup(('xother','b',(1,1))).toScalar().isEqual(p.xother.b[1]))
+      self.assertTrue(p.lookup(('xother','b',(1,1))).toScalar().isEqual(p.xother.b[1].toScalar()))
       
       
       for k in range(p.getSize()):
