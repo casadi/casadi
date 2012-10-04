@@ -720,19 +720,11 @@ SX SX::logic_not() const{
 }
 
 SX SX::logic_and(const SX& y) const{
-  if(hasDep() && getOp() == OP_NOT && y.hasDep() && y.getOp() == OP_NOT){
-    return getDep() || y.getDep();
-  } else {
-    return BinarySX::create(OP_AND,*this,y);
-  }
+  return BinarySX::create(OP_AND,*this,y);
 }
 
 SX SX::logic_or(const SX& y) const{
-  if(hasDep() && getOp() == OP_NOT && y.hasDep() && y.getOp() == OP_NOT){
-    return getDep() && y.getDep();
-  } else {
-    return BinarySX::create(OP_OR,*this,y);
-  }
+  return BinarySX::create(OP_OR,*this,y);
 }
 
 int SX::getTemp() const{
