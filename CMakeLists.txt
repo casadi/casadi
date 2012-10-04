@@ -18,6 +18,13 @@ endif()
 
 # We use the FeatureSummary module to get a more readable CMake output
 include(FeatureSummary)
+if (COMMAND cmake_policy)
+function(add_feature_info _name _enabled _description)
+message(STATUS "Detected: ${_name} ${_description}")
+endfunction()
+function(feature_summary)
+endfunction()
+endif()
 
 # Options:
 option(ENABLE_STATIC "Compile static libraries (.a on Linux)" ON)
