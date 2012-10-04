@@ -296,7 +296,7 @@ MX if_else_zero(const MX &cond, const MX &if_true){
 
 
 MX if_else(const MX &cond, const MX &if_true, const MX &if_false){
-  return if_else_zero(cond,if_true) + if_else_zero(1-cond,if_false);
+  return if_else_zero(cond,if_true) + if_else_zero(!cond,if_false);
 }
 
 MX unite(const MX& A, const MX& B){
