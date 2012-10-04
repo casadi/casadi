@@ -727,12 +727,12 @@ Matrix<T> Matrix<T>::__le__(const Matrix<T> &y) const{
 }
 
 template<class T>
-Matrix<T> Matrix<T>::__eq__(const Matrix<T> &y) const{
+Matrix<T> Matrix<T>::logic_equal(const Matrix<T> &y) const{
   return binary(OP_EQ,*this,y);
 }
 
 template<class T>
-Matrix<T> Matrix<T>::__ne__(const Matrix<T> &y) const{
+Matrix<T> Matrix<T>::logic_not_equal(const Matrix<T> &y) const{
   return binary(OP_NE,*this,y);
 }
 

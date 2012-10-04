@@ -27,16 +27,25 @@
 
 namespace CasADi{
 
-//@ {
-/** \brief  Conditional operators */
+/** \brief  Logical `and`, returns (an expression evaluating to) 1 if both expressions are nonzero and 0 otherwise */
 template<class T>
-T logic_and(const T &a, const T &b){ return a && b; }
+T logic_and(const T& x, const T& y){ return x && y; }
 
+/** \brief  Logical `or`, returns (an expression evaluating to) 1 if at least one expression is nonzero and 0 otherwise */
 template<class T>
-T logic_or(const T &a, const T &b){ return a || b; }
+T logic_or(const T& x, const T& y){ return x || y; }
 
+/** \brief  Logical `not`, returns (an expression evaluating to) 1 if expression is zero and 0 otherwise */
 template<class T>
-T logic_not(const T &a){ return !a; }
+T logic_not(const T &x){ return !x; }
+
+/** \brief  Logical equality, returns (an expression evaluating to) 1 if expressions are equal and 0 otherwise */
+template<class T>
+T logic_equal(const T& x, const T& y){ return x == y; }
+
+/** \brief  Logical inequality, returns (an expression evaluating to) 1 if expressions are not equal and 0 otherwise */
+template<class T>
+T logic_not_equal(const T& x, const T& y){ return x != y; }
 
 } // namespace CasADi
 
@@ -51,6 +60,8 @@ T logic_not(const T &a){ return !a; }
 GET_INST(T,logic_and) \
 GET_INST(T,logic_or) \
 GET_INST(T,logic_not) \
+GET_INST(T,logic_equal) \
+GET_INST(T,logic_not_equal) \
 
 #endif //SWIG
 

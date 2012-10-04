@@ -1819,7 +1819,7 @@ class MXtests(casadiTestCase):
     y = xy[1]
     
     
-    f = MXFunction([xy],[vertcat([x<y,x<=y,x>=y,x==y,x!=y])])
+    f = MXFunction([xy],[vertcat([x<y,x<=y,x>=y,logic_equal(x,y),logic_not_equal(x,y)])])
     f.init()
     
     
@@ -1829,7 +1829,7 @@ class MXtests(casadiTestCase):
         T2 = t2
         f.input().set([t1,t2])
         f.evaluate()
-        self.checkarray(f.output(),DMatrix([T1 < T2,T1 <= T2, T1 >= T2, T1 == T2, T1 != T2]),"ineq(%d,%d)" % (t1,t2))
+        self.checkarray(f.output(),DMatrix([T1 < T2,T1 <= T2, T1 >= T2, logic_equal(T1,T2), logic_not_equal(T1,T2)]),"ineq(%d,%d)" % (t1,t2))
 
   def test_if_else_zero(self):
     x = MX("x")

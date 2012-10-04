@@ -203,8 +203,6 @@ class SX : public GenericExpression<SX>{
     SX __div__(const SX& y) const;
     SX __lt__(const SX& y) const;
     SX __le__(const SX& y) const;
-    SX __eq__(const SX& y) const;
-    SX __ne__(const SX& y) const;
     using GenericExpression<SX>::__gt__;
     using GenericExpression<SX>::__ge__;
     using GenericExpression<SX>::__mldivide__;
@@ -249,6 +247,8 @@ class SX : public GenericExpression<SX>{
     SX logic_not() const;
     SX logic_and(const SX& y) const;
     SX logic_or(const SX& y) const;
+    SX logic_equal(const SX& y) const;
+    SX logic_not_equal(const SX& y) const;
 
     Matrix<SX> fmin(const Matrix<SX>& b) const;
     Matrix<SX> fmax(const Matrix<SX>& b) const;
