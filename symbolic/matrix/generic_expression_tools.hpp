@@ -39,14 +39,6 @@ T logic_or(const T& x, const T& y){ return x || y; }
 template<class T>
 T logic_not(const T &x){ return !x; }
 
-/** \brief  Logical equality, returns (an expression evaluating to) 1 if expressions are equal and 0 otherwise */
-template<class T>
-T logic_equal(const T& x, const T& y){ return x == y; }
-
-/** \brief  Logical inequality, returns (an expression evaluating to) 1 if expressions are not equal and 0 otherwise */
-template<class T>
-T logic_not_equal(const T& x, const T& y){ return x != y; }
-
 } // namespace CasADi
 
 #ifdef SWIG
@@ -60,8 +52,6 @@ T logic_not_equal(const T& x, const T& y){ return x != y; }
 GET_INST(T,logic_and) \
 GET_INST(T,logic_or) \
 GET_INST(T,logic_not) \
-GET_INST(T,logic_equal) \
-GET_INST(T,logic_not_equal) \
 
 #endif //SWIG
 

@@ -344,14 +344,14 @@ SX SX::__lt__(const SX& y) const{
     return BinarySX::create(OP_LT,*this,y);
 }
 
-SX SX::logic_equal(const SX& y) const{
+SX SX::__eq__(const SX& y) const{
   if(isEqual(y))
     return 1;
   else
     return BinarySX::create(OP_EQ,*this,y);
 }
 
-SX SX::logic_not_equal(const SX& y) const{
+SX SX::__ne__(const SX& y) const{
   if(isEqual(y))
     return 0;
   else

@@ -389,8 +389,8 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Cached
   MX __div__(const MX& y) const;
   MX __lt__(const MX& y) const;
   MX __le__(const MX& y) const;
-  MX logic_equal(const MX& y) const;
-  MX logic_not_equal(const MX& y) const;
+  MX __eq__(const MX& y) const;
+  MX __ne__(const MX& y) const;
   MX __truediv__(const MX& y) const { return __div__(y);};
   MX __pow__(const MX& b) const;
   MX __constpow__(const MX& b) const;

@@ -881,11 +881,11 @@ MX MX::__le__(const MX& y) const{
   return MX::binary(OP_LE,*this,y);
 }
   
-MX MX::logic_equal(const MX& y) const{
+MX MX::__eq__(const MX& y) const{
   return MX::binary(OP_EQ,*this,y);
 }
   
-MX MX::logic_not_equal(const MX& y) const{
+MX MX::__ne__(const MX& y) const{
   return MX::binary(OP_NE,*this,y);
 }
   

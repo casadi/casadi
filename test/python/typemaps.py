@@ -373,8 +373,8 @@ class typemaptests(casadiTestCase):
       doit(z,s,lambda z,s: s>z)
       doit(z,s,lambda z,s: s<=z)
       doit(z,s,lambda z,s: s<z)
-      doit(z,s,lambda z,s: logic_equal(s,z))
-      doit(z,s,lambda z,s: logic_not_equal(s,z))
+      doit(z,s,lambda z,s: s==z)
+      doit(z,s,lambda z,s: s!=z)
       
     nums = [array([[1,2],[3,4]]),DMatrix([[1,2],[3,4]]), DMatrix(4), array(4),4.0,4]
         

@@ -76,13 +76,13 @@ class GenericExpression{
     inline friend ExType operator>=(const ExType &x, const ExType &y){ return x.__ge__(y); }
     
     /// Logic equal to
-    inline friend ExType operator==(const ExType &x, const ExType &y){ return x.logic_equal(y); }
+    inline friend ExType operator==(const ExType &x, const ExType &y){ return x.__eq__(y); }
     
     /// Logic not equal to
-    inline friend ExType operator!=(const ExType &x, const ExType &y){ return x.logic_not_equal(y); }
+    inline friend ExType operator!=(const ExType &x, const ExType &y){ return x.__ne__(y); }
     
     /// Logic not
-    inline ExType operator!() const{ return static_cast<const ExType*>(this)->logic_not(); }
+    inline ExType operator!() const{ return static_cast<const ExType &>(*this).logic_not(); }
     
     /// Logic and
     inline friend ExType operator&&(const ExType &x, const ExType &y){ return x.logic_and(y); }
@@ -116,14 +116,15 @@ class GenericExpression{
     inline ExType __rle__(const ExType& y) const{ return y.__le__(static_cast<const ExType&>(*this));}
     inline ExType __rgt__(const ExType& y) const{ return y.__gt__(static_cast<const ExType&>(*this));}
     inline ExType __rge__(const ExType& y) const{ return y.__ge__(static_cast<const ExType&>(*this));}
+    inline ExType __req__(const ExType& y) const{ return y.__eq__(static_cast<const ExType&>(*this));}
+    inline ExType __rne__(const ExType& y) const{ return y.__ne__(static_cast<const ExType&>(*this));}
     inline ExType __rtruediv__(const ExType& y) const {return y.__truediv__(static_cast<const ExType&>(*this));}
     //@}
     
 };
 
-/// Joel: What is this? Does not look nice
 template<class T>
-bool __nonzero__(const T& val) { return val!=0;}
+bool __nonzero__(const T &val) { return val!=0;}
 
 #ifndef SWIG
 // Implementations

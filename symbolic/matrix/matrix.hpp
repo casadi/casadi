@@ -450,8 +450,8 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     Matrix<T> __div__(const Matrix<T> &y) const;
     Matrix<T> __lt__(const Matrix<T> &y) const;
     Matrix<T> __le__(const Matrix<T> &y) const;
-    Matrix<T> logic_equal(const Matrix<T> &y) const;
-    Matrix<T> logic_not_equal(const Matrix<T> &y) const;
+    Matrix<T> __eq__(const Matrix<T> &y) const;
+    Matrix<T> __ne__(const Matrix<T> &y) const;
     Matrix<T> __truediv__(const Matrix<T> &y) const {return __div__(y);};
     Matrix<T> __pow__(const Matrix<T> &y) const;
     Matrix<T> __constpow__(const Matrix<T> &y) const;
