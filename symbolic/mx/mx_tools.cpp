@@ -463,10 +463,6 @@ std::pair<MX, std::vector<MX> > createParent(const std::vector<MX> &deps) {
   return std::pair< MX, std::vector<MX> > (P,ret);
 }
 
-MX operator!(const MX& a){
-  return logic_not(a);
-}
-
 MX diag(const MX& x){
   // Nonzero mapping
   std::vector<int> mapping;

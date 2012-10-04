@@ -50,6 +50,9 @@ bool operation_checker(unsigned int op){
     case OP_LE:            return F<OP_LE>::check;
     case OP_EQ:            return F<OP_EQ>::check;
     case OP_NE:            return F<OP_NE>::check;
+    case OP_NOT:           return F<OP_NOT>::check;
+    case OP_AND:           return F<OP_AND>::check;
+    case OP_OR:            return F<OP_OR>::check;
     case OP_FLOOR:         return F<OP_FLOOR>::check;
     case OP_CEIL:          return F<OP_CEIL>::check;
     case OP_FABS:          return F<OP_FABS>::check;
@@ -167,6 +170,9 @@ inline void casadi_math<T>::fun(unsigned char op, const T& x, const T& y, T& f){
     case OP_LE+OFF:        C<OP_LE>::fcn(X,Y,F);            break;\
     case OP_EQ+OFF:        C<OP_EQ>::fcn(X,Y,F);            break;\
     case OP_NE+OFF:        C<OP_NE>::fcn(X,Y,F);            break;\
+    case OP_NOT+OFF:       C<OP_NOT>::fcn(X,Y,F);           break;\
+    case OP_AND+OFF:       C<OP_AND>::fcn(X,Y,F);           break;\
+    case OP_OR+OFF:        C<OP_OR>::fcn(X,Y,F);            break;\
     case OP_FLOOR+OFF:     C<OP_FLOOR>::fcn(X,Y,F);         break;\
     case OP_CEIL+OFF:      C<OP_CEIL>::fcn(X,Y,F);          break;\
     case OP_FABS+OFF:      C<OP_FABS>::fcn(X,Y,F);          break;\
@@ -222,6 +228,9 @@ inline void casadi_math<T>::der(unsigned char op, const T& x, const T& y, const 
     case OP_LE:        BinaryOperation<OP_LE>::der(X,Y,F,D);         break;\
     case OP_EQ:        BinaryOperation<OP_EQ>::der(X,Y,F,D);         break;\
     case OP_NE:        BinaryOperation<OP_NE>::der(X,Y,F,D);         break;\
+    case OP_NOT:       BinaryOperation<OP_NOT>::der(X,Y,F,D);        break;\
+    case OP_AND:       BinaryOperation<OP_AND>::der(X,Y,F,D);        break;\
+    case OP_OR:        BinaryOperation<OP_OR>::der(X,Y,F,D);         break;\
     case OP_FLOOR:     BinaryOperation<OP_FLOOR>::der(X,Y,F,D);      break;\
     case OP_CEIL:      BinaryOperation<OP_CEIL>::der(X,Y,F,D);       break;\
     case OP_FABS:      BinaryOperation<OP_FABS>::der(X,Y,F,D);       break;\
@@ -271,6 +280,9 @@ inline void casadi_math<T>::derF(unsigned char op, const T& x, const T& y, T& f,
     case OP_LE:        DerBinaryOpertion<OP_LE>::derf(X,Y,F,D);         break;\
     case OP_EQ:        DerBinaryOpertion<OP_EQ>::derf(X,Y,F,D);         break;\
     case OP_NE:        DerBinaryOpertion<OP_NE>::derf(X,Y,F,D);         break;\
+    case OP_NOT:       DerBinaryOpertion<OP_NOT>::derf(X,Y,F,D);        break;\
+    case OP_AND:       DerBinaryOpertion<OP_AND>::derf(X,Y,F,D);        break;\
+    case OP_OR:        DerBinaryOpertion<OP_OR>::derf(X,Y,F,D);         break;\
     case OP_FLOOR:     DerBinaryOpertion<OP_FLOOR>::derf(X,Y,F,D);      break;\
     case OP_CEIL:      DerBinaryOpertion<OP_CEIL>::derf(X,Y,F,D);       break;\
     case OP_FABS:      DerBinaryOpertion<OP_FABS>::derf(X,Y,F,D);       break;\
@@ -307,6 +319,8 @@ inline int casadi_math<T>::ndeps(unsigned char op){
     case OP_LE:\
     case OP_EQ:\
     case OP_NE:\
+    case OP_AND:\
+    case OP_OR:\
     case OP_FMIN:\
     case OP_FMAX:\
     case OP_ATAN2:\
@@ -366,6 +380,9 @@ inline void casadi_math<T>::printPre(unsigned char op, std::ostream &stream){
     case OP_LE:        stream << "(";        break;
     case OP_EQ:        stream << "(";        break;
     case OP_NE:        stream << "(";        break;
+    case OP_NOT:       stream << "(!";       break;
+    case OP_AND:       stream << "(";        break;
+    case OP_OR:        stream << "(";        break;
     case OP_FLOOR:     stream << "floor(";   break;
     case OP_CEIL:      stream << "ceil(";    break;
     case OP_FABS:      stream << "fabs(";    break;
@@ -394,6 +411,8 @@ inline void casadi_math<T>::printSep(unsigned char op, std::ostream &stream){
     case OP_LE:        stream << "<=";       break;
     case OP_EQ:        stream << "==";       break;
     case OP_NE:        stream << "!=";       break;
+    case OP_AND:       stream << "&&";       break;
+    case OP_OR:        stream << "||";       break;
     default:           stream << ",";        break;
   }
 }

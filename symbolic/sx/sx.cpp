@@ -358,10 +358,6 @@ SX SX::__ne__(const SX& y) const{
     return BinarySX::create(OP_NE,*this,y);
 }
 
-SX operator!(const SX &a){
-  return logic_not(a);
-}
-
 SXNode* const SX::get() const{
   return node;
 }
@@ -713,6 +709,30 @@ SX SX::__constpow__(const SX& n) const{
 
 SX SX::constpow(const SX& n) const{
   return BinarySX::create(OP_CONSTPOW,*this,n);
+}
+
+SX SX::logic_not() const{
+  if(hasDep() && getOp() == OP_NOT){
+    return getDep();
+  } else {
+    return UnarySX::create(OP_NOT, *this);
+  }
+}
+
+SX SX::logic_and(const SX& y) const{
+  if(hasDep() && getOp() == OP_NOT && y.hasDep() && y.getOp() == OP_NOT){
+    return getDep() || y.getDep();
+  } else {
+    return BinarySX::create(OP_AND,*this,y);
+  }
+}
+
+SX SX::logic_or(const SX& y) const{
+  if(hasDep() && getOp() == OP_NOT && y.hasDep() && y.getOp() == OP_NOT){
+    return getDep() && y.getDep();
+  } else {
+    return BinarySX::create(OP_OR,*this,y);
+  }
 }
 
 int SX::getTemp() const{

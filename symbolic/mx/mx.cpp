@@ -807,6 +807,10 @@ MX MX::erf() const{
   return unary(OP_ERF,*this);
 }
 
+MX MX::logic_not() const{ 
+  return unary(OP_NOT,*this);
+}
+
 MX MX::__add__(const MX& y) const{
   const MX& x = *this;
   bool samedim = x.size1()==y.size1() && x.size2()==y.size2();
@@ -883,6 +887,14 @@ MX MX::__eq__(const MX& y) const{
   
 MX MX::__ne__(const MX& y) const{
   return MX::binary(OP_NE,*this,y);
+}
+  
+MX MX::logic_and(const MX& y) const{
+  return MX::binary(OP_AND,*this,y);
+}
+  
+MX MX::logic_or(const MX& y) const{
+  return MX::binary(OP_OR,*this,y);
 }
   
 MX MX::__constpow__(const MX& b) const { return (*this).constpow(b);}

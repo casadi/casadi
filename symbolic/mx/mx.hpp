@@ -404,6 +404,8 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Cached
   MX fmax(const MX& y) const;
   MX printme(const MX& y) const;
   MX arctan2(const MX& y) const;
+  MX logic_and(const MX& y) const;
+  MX logic_or(const MX& y) const;
 
   // all unary operations
   MX exp() const;
@@ -428,6 +430,7 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Cached
   MX arcsinh() const;
   MX arccosh() const;
   MX arctanh() const;
+  MX logic_not() const;
 
   /** \brief  Returns the IMatrix that represents the mapping of a Mapping node
   *

@@ -105,9 +105,6 @@ class SX : public GenericExpression<SX>{
     // Convert to a 1-by-1 Matrix
     operator Matrix<SX>() const;
     
-    /// Not operator
-    friend SX operator!(const SX &a);
-    
     /** \brief  print to stream */
     friend std::ostream& operator<<(std::ostream &stream, const SX &scalar);
 
@@ -249,6 +246,9 @@ class SX : public GenericExpression<SX>{
     SX printme(const SX &y) const;
     SX sign() const;
     SX constpow(const SX& y) const;
+    SX logic_not() const;
+    SX logic_and(const SX& y) const;
+    SX logic_or(const SX& y) const;
 
     Matrix<SX> fmin(const Matrix<SX>& b) const;
     Matrix<SX> fmax(const Matrix<SX>& b) const;

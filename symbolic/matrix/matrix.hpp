@@ -507,6 +507,9 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     Matrix<T> arctan2(const Matrix<T>& y) const;
     Matrix<T> log10() const;
     Matrix<T> printme(const Matrix<T>& y) const;
+    Matrix<T> logic_not() const;
+    Matrix<T> logic_and(const Matrix<T>& y) const;
+    Matrix<T> logic_or(const Matrix<T>& y) const;
     //@}
     
     //@{

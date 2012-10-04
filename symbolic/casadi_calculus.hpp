@@ -42,7 +42,7 @@ enum Operation{
   OP_NEG,  OP_EXP,  OP_LOG,  OP_POW, OP_CONSTPOW,
   OP_SQRT,  OP_SIN,  OP_COS,  OP_TAN,  
   OP_ASIN,  OP_ACOS,  OP_ATAN,  
-  OP_LT, OP_LE, OP_EQ, OP_NE, 
+  OP_LT, OP_LE, OP_EQ, OP_NE, OP_NOT, OP_AND, OP_OR,
   OP_FLOOR,  OP_CEIL,  OP_FABS, OP_SIGN, 
   OP_ERF,  OP_FMIN,  OP_FMAX,
   OP_INV,
@@ -344,6 +344,9 @@ struct DerBinaryOpertion{
   template<>      struct SmoothChecker<OP_EQ>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_NE>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_SIGN>{ static const bool check=false;};
+  template<>      struct SmoothChecker<OP_NOT>{ static const bool check=false;};
+  template<>      struct SmoothChecker<OP_AND>{ static const bool check=false;};
+  template<>      struct SmoothChecker<OP_OR>{ static const bool check=false;};
 //@}
 
 //@{
@@ -367,12 +370,14 @@ struct DerBinaryOpertion{
   template<>      struct F0XChecker<OP_ASINH>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_ATANH>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_ERFINV>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_AND>{ static const bool check=true;};
 //@}
 
 //@{
   /// If evaluated with the second argument zero, is the result zero?
   template<int I> struct FX0Checker{ static const bool check=false;};
   template<>      struct FX0Checker<OP_MUL>{ static const bool check=true;};
+  template<>      struct FX0Checker<OP_AND>{ static const bool check=true;};
 //@}
 
 //@{
@@ -382,6 +387,8 @@ struct DerBinaryOpertion{
   template<>      struct F00Checker<OP_SUB>{ static const bool check=true;};
   template<>      struct F00Checker<OP_FMIN>{ static const bool check=true;};
   template<>      struct F00Checker<OP_FMAX>{ static const bool check=true;};
+  template<>      struct F00Checker<OP_AND>{ static const bool check=true;};
+  template<>      struct F00Checker<OP_OR>{ static const bool check=true;};
 //@}
 
 //@{
@@ -406,6 +413,8 @@ struct DerBinaryOpertion{
   template<>      struct BinaryChecker<OP_CONSTPOW>{ static const bool check=true;};
   template<>      struct BinaryChecker<OP_EQ>{ static const bool check=true;};
   template<>      struct BinaryChecker<OP_NE>{ static const bool check=true;};
+  template<>      struct BinaryChecker<OP_AND>{ static const bool check=true;};
+  template<>      struct BinaryChecker<OP_OR>{ static const bool check=true;};
   template<>      struct BinaryChecker<OP_FMIN>{ static const bool check=true;};
   template<>      struct BinaryChecker<OP_FMAX>{ static const bool check=true;};
   template<>      struct BinaryChecker<OP_PRINTME>{ static const bool check=true;};
@@ -592,6 +601,28 @@ struct BinaryOperation<OP_EQ>{
 template<>
 struct BinaryOperation<OP_NE>{
   template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f = x!=y;}
+  template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ d[0]=d[1]=0;}
+};
+
+/// Logical not
+template<>
+struct UnaryOperation<OP_NOT>{
+  public:
+    template<typename T> static inline void fcn(const T& x, T& f){ f = !x;}
+    template<typename T> static inline void der(const T& x, const T& f, T* d){ d[0] = 0;}
+};
+
+/// Logical and
+template<>
+struct BinaryOperation<OP_AND>{
+  template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f = x && y;}
+  template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ d[0]=d[1]=0;}
+};
+
+/// Logical or
+template<>
+struct BinaryOperation<OP_OR>{
+  template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f = x || y;}
   template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ d[0]=d[1]=0;}
 };
 

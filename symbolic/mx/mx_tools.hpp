@@ -234,11 +234,6 @@ std::pair<MX, std::vector<MX> > createParent(const std::vector<CRSSparsity> &dep
 /** Count number of nodes */
 int countNodes(const MX& A);
 
-// Equality
-#ifndef SWIG
-MX operator!(const MX& a);
-#endif // SWIG
-
 /** \brief  Get the diagonal of a matrix or construct a diagonal
 
 When the input is square, the diagonal elements are returned.

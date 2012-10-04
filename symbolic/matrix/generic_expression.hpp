@@ -63,23 +63,32 @@ class GenericExpression{
     /// In-place elementwise division
     inline ExType& operator/=(const ExType &y){return static_cast<ExType&>(*this) = static_cast<ExType*>(this)->__div__(y);}
 
-    /// Less than
+    /// Logic less than
     inline friend ExType operator<(const ExType &x, const ExType &y){ return x.__lt__(y); }
     
-    /// Less or equal to
+    /// Logic less or equal to
     inline friend ExType operator<=(const ExType &x, const ExType &y){ return x.__le__(y); }
     
-    /// Greater than
+    /// Logic greater than
     inline friend ExType operator>(const ExType &x, const ExType &y){ return x.__gt__(y); }
     
-    /// Greater or equal to
+    /// Logic greater or equal to
     inline friend ExType operator>=(const ExType &x, const ExType &y){ return x.__ge__(y); }
     
-    /// Equal to
+    /// Logic equal to
     inline friend ExType operator==(const ExType &x, const ExType &y){ return x.__eq__(y); }
     
-    /// Not equal to
+    /// Logic not equal to
     inline friend ExType operator!=(const ExType &x, const ExType &y){ return x.__ne__(y); }
+    
+    /// Logic not
+    inline ExType operator!() const{ return static_cast<const ExType &>(*this).logic_not(); }
+    
+    /// Logic and
+    inline friend ExType operator&&(const ExType &x, const ExType &y){ return x.logic_and(y); }
+    
+    /// Logic or
+    inline friend ExType operator||(const ExType &x, const ExType &y){ return x.logic_or(y); }
     
     #endif // SWIG
 

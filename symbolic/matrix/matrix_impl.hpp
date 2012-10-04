@@ -1071,6 +1071,21 @@ Matrix<T> Matrix<T>::printme(const Matrix<T>& y) const{
 }
 
 template<class T>
+Matrix<T> Matrix<T>::logic_not() const{
+  return unary(OP_NOT,*this);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::logic_and(const Matrix<T>& y) const{
+  return binary(OP_AND,*this,y);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::logic_or(const Matrix<T>& y) const{
+  return binary(OP_OR,*this,y);
+}
+
+template<class T>
 std::vector<T>& Matrix<T>::data(){
   return data_;  
 }

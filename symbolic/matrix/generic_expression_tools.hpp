@@ -30,27 +30,13 @@ namespace CasADi{
 //@ {
 /** \brief  Conditional operators */
 template<class T>
-T logic_and(const T &a, const T &b);
+T logic_and(const T &a, const T &b){ return a && b; }
 
 template<class T>
-T logic_or(const T &a, const T &b);
+T logic_or(const T &a, const T &b){ return a || b; }
 
 template<class T>
-T logic_not(const T &a);
-
-#ifndef SWIG
-// Implementations
-
-template<class T>
-T logic_and(const T &a, const T &b) { return a+b>=2; }
-
-template<class T>
-T logic_or(const T &a, const T &b) { return  logic_not(logic_and(logic_not(a),logic_not(b))); }
-
-template<class T>
-T logic_not(const T &a) { return  1-a; }
-
-#endif // SWIG
+T logic_not(const T &a){ return !a; }
 
 } // namespace CasADi
 
