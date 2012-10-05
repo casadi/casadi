@@ -313,19 +313,19 @@ CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
 
     // Clear the forward seeds/adjoint sensitivities
     for(int ind=0; ind<getNumInputs(); ++ind){
-      vector<double> &v = input<false>(ind).data();
+      vector<double> &v = inputNoCheck(ind).data();
       if(!v.empty()) fill_n(get_bvec_t(v),v.size(),bvec_t(0));
     }
 
     // Clear the adjoint seeds/forward sensitivities
     for(int ind=0; ind<getNumOutputs(); ++ind){
-      vector<double> &v = output<false>(ind).data();
+      vector<double> &v = outputNoCheck(ind).data();
       if(!v.empty()) fill_n(get_bvec_t(v),v.size(),bvec_t(0));
     }
     
     // Get seeds and sensitivities
-    bvec_t* input_v = get_bvec_t(input<false>(iind).data());
-    bvec_t* output_v = get_bvec_t(output<false>(oind).data());
+    bvec_t* input_v = get_bvec_t(inputNoCheck(iind).data());
+    bvec_t* output_v = get_bvec_t(outputNoCheck(oind).data());
     bvec_t* seed_v = use_fwd ? input_v : output_v;
     bvec_t* sens_v = use_fwd ? output_v : input_v;
     
@@ -569,7 +569,7 @@ void FXInternal::spEvaluate(bool fwd){
   if(fwd){
     // Get dependency on all inputs
     for(int iind=0; iind<getNumInputs(); ++iind){
-      const DMatrix& m = input<false>(iind);
+      const DMatrix& m = inputNoCheck(iind);
       const bvec_t* v = reinterpret_cast<const bvec_t*>(m.ptr());
       for(int i=0; i<m.size(); ++i){
         all_depend |= v[i];
@@ -578,7 +578,7 @@ void FXInternal::spEvaluate(bool fwd){
     
     // Propagate to all outputs
     for(int oind=0; oind<getNumOutputs(); ++oind){
-      DMatrix& m = output<false>(oind);
+      DMatrix& m = outputNoCheck(oind);
       bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
       for(int i=0; i<m.size(); ++i){
         v[i] = all_depend;
@@ -589,7 +589,7 @@ void FXInternal::spEvaluate(bool fwd){
     
     // Get dependency on all outputs
     for(int oind=0; oind<getNumOutputs(); ++oind){
-      const DMatrix& m = output<false>(oind);
+      const DMatrix& m = outputNoCheck(oind);
       const bvec_t* v = reinterpret_cast<const bvec_t*>(m.ptr());
       for(int i=0; i<m.size(); ++i){
         all_depend |= v[i];
@@ -598,7 +598,7 @@ void FXInternal::spEvaluate(bool fwd){
     
     // Propagate to all inputs
     for(int iind=0; iind<getNumInputs(); ++iind){
-      DMatrix& m = input<false>(iind);
+      DMatrix& m = inputNoCheck(iind);
       bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
       for(int i=0; i<m.size(); ++i){
         v[i] |= all_depend;

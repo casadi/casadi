@@ -160,10 +160,10 @@ void SXFunctionInternal::evaluateGen(T1 nfdir_c, T2 nadir_c){
         case OP_CONST: work_[it->res] = it->arg.d; break;
         
         // Load function input to work vector
-        case OP_INPUT: work_[it->res] = input<false>(it->arg.i[0]).data()[it->arg.i[1]]; break;
+        case OP_INPUT: work_[it->res] = inputNoCheck(it->arg.i[0]).data()[it->arg.i[1]]; break;
         
         // Get function output from work vector
-        case OP_OUTPUT: output<false>(it->res).data()[it->arg.i[1]] = work_[it->arg.i[0]]; break;
+        case OP_OUTPUT: outputNoCheck(it->res).data()[it->arg.i[1]] = work_[it->arg.i[0]]; break;
       }
     }
   } else {
@@ -177,10 +177,10 @@ void SXFunctionInternal::evaluateGen(T1 nfdir_c, T2 nadir_c){
         case OP_CONST: work_[it->res] = it->arg.d; break;
 
         // Load function input to work vector
-        case OP_INPUT: work_[it->res] = input<false>(it->arg.i[0]).data()[it->arg.i[1]]; break;
+        case OP_INPUT: work_[it->res] = inputNoCheck(it->arg.i[0]).data()[it->arg.i[1]]; break;
         
         // Get function output from work vector
-        case OP_OUTPUT: output<false>(it->res).data()[it->arg.i[1]] = work_[it->arg.i[0]]; break;
+        case OP_OUTPUT: outputNoCheck(it->res).data()[it->arg.i[1]] = work_[it->arg.i[0]]; break;
       }
     }
   }
@@ -196,9 +196,9 @@ void SXFunctionInternal::evaluateGen(T1 nfdir_c, T2 nadir_c){
         case OP_CONST:
           work_[it->res] = 0; break;
         case OP_INPUT: 
-          work_[it->res] = fwdSeed<false>(it->arg.i[0],dir).data()[it->arg.i[1]]; break;
+          work_[it->res] = fwdSeedNoCheck(it->arg.i[0],dir).data()[it->arg.i[1]]; break;
         case OP_OUTPUT: 
-          fwdSens<false>(it->res,dir).data()[it->arg.i[1]] = work_[it->arg.i[0]]; break;
+          fwdSensNoCheck(it->res,dir).data()[it->arg.i[1]] = work_[it->arg.i[0]]; break;
         default: // Unary or binary operation
           work_[it->res] = it2->d[0] * work_[it->arg.i[0]] + it2->d[1] * work_[it->arg.i[1]]; ++it2; break;
       }
@@ -216,11 +216,11 @@ void SXFunctionInternal::evaluateGen(T1 nfdir_c, T2 nadir_c){
           work_[it->res] = 0;
           break;
         case OP_INPUT:
-          adjSens<false>(it->arg.i[0],dir).data()[it->arg.i[1]] = work_[it->res];
+          adjSensNoCheck(it->arg.i[0],dir).data()[it->arg.i[1]] = work_[it->res];
           work_[it->res] = 0;
           break;
         case OP_OUTPUT:
-          work_[it->arg.i[0]] += adjSeed<false>(it->res,dir).data()[it->arg.i[1]];
+          work_[it->arg.i[0]] += adjSeedNoCheck(it->res,dir).data()[it->arg.i[1]];
           break;
         default: // Unary or binary operation
           seed = work_[it->res];
@@ -1210,9 +1210,9 @@ void SXFunctionInternal::spEvaluate(bool fwd){
         case OP_PARAMETER:
           iwork[it->res] = bvec_t(0); break;
         case OP_INPUT:
-          iwork[it->res] = reinterpret_cast<bvec_t*>(&input<false>(it->arg.i[0]).front())[it->arg.i[1]]; break;
+          iwork[it->res] = reinterpret_cast<bvec_t*>(&inputNoCheck(it->arg.i[0]).front())[it->arg.i[1]]; break;
         case OP_OUTPUT:
-          reinterpret_cast<bvec_t*>(&output<false>(it->res).front())[it->arg.i[1]] = iwork[it->arg.i[0]]; break;
+          reinterpret_cast<bvec_t*>(&outputNoCheck(it->res).front())[it->arg.i[1]] = iwork[it->arg.i[0]]; break;
         default: // Unary or binary operation
           iwork[it->res] = iwork[it->arg.i[0]] | iwork[it->arg.i[1]]; break;
       }
@@ -1232,11 +1232,11 @@ void SXFunctionInternal::spEvaluate(bool fwd){
           iwork[it->res] = 0;
           break;
         case OP_INPUT:
-          reinterpret_cast<bvec_t*>(&input<false>(it->arg.i[0]).front())[it->arg.i[1]] |= iwork[it->res];
+          reinterpret_cast<bvec_t*>(&inputNoCheck(it->arg.i[0]).front())[it->arg.i[1]] |= iwork[it->res];
           iwork[it->res] = 0;
           break;
         case OP_OUTPUT:
-          iwork[it->arg.i[0]] |= reinterpret_cast<bvec_t*>(&output<false>(it->res).front())[it->arg.i[1]];
+          iwork[it->arg.i[0]] |= reinterpret_cast<bvec_t*>(&outputNoCheck(it->res).front())[it->arg.i[1]];
           break;
         default: // Unary or binary operation
           seed = iwork[it->res];

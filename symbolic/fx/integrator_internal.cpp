@@ -493,7 +493,7 @@ void IntegratorInternal::spEvaluate(bool fwd){
     // Have dependency on anything in x0 or p
     for(int k=0; k<2; ++k){
       int iind = k==0 ? INTEGRATOR_X0 : INTEGRATOR_P;
-      const DMatrix& m = input<false>(iind);
+      const DMatrix& m = inputNoCheck(iind);
       const bvec_t* v = reinterpret_cast<const bvec_t*>(m.ptr());
       for(int i=0; i<m.size(); ++i){
         all_depend |= v[i];
@@ -503,7 +503,7 @@ void IntegratorInternal::spEvaluate(bool fwd){
     // Propagate to xf and qf (that only depend on x0 and p)
     for(int k=0; k<2; ++k){
       int oind = k==0 ? INTEGRATOR_XF : INTEGRATOR_QF;
-      DMatrix& m = output<false>(oind);
+      DMatrix& m = outputNoCheck(oind);
       bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
       for(int i=0; i<m.size(); ++i){
         v[i] = all_depend;
@@ -513,7 +513,7 @@ void IntegratorInternal::spEvaluate(bool fwd){
     // Add dependency on rx0 or rp
     for(int k=0; k<2; ++k){
       int iind = k==0 ? INTEGRATOR_RX0 : INTEGRATOR_RP;
-      const DMatrix& m = input<false>(iind);
+      const DMatrix& m = inputNoCheck(iind);
       const bvec_t* v = reinterpret_cast<const bvec_t*>(m.ptr());
       for(int i=0; i<m.size(); ++i){
         all_depend |= v[i];
@@ -523,7 +523,7 @@ void IntegratorInternal::spEvaluate(bool fwd){
     // Propagate to rxf and rqf
     for(int k=0; k<2; ++k){
       int oind = k==0 ? INTEGRATOR_RXF : INTEGRATOR_RQF;
-      DMatrix& m = output<false>(oind);
+      DMatrix& m = outputNoCheck(oind);
       bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
       for(int i=0; i<m.size(); ++i){
         v[i] = all_depend;
@@ -535,7 +535,7 @@ void IntegratorInternal::spEvaluate(bool fwd){
     // First find out what influences only rxf and rqf
     for(int k=0; k<2; ++k){
       int oind = k==0 ? INTEGRATOR_RXF : INTEGRATOR_RQF;
-      const DMatrix& m = output<false>(oind);
+      const DMatrix& m = outputNoCheck(oind);
       const bvec_t* v = reinterpret_cast<const bvec_t*>(m.ptr());
       for(int i=0; i<m.size(); ++i){
         all_depend |= v[i];
@@ -545,7 +545,7 @@ void IntegratorInternal::spEvaluate(bool fwd){
     // Propagate to rx0 and rp
     for(int k=0; k<2; ++k){
       int iind = k==0 ? INTEGRATOR_RX0 : INTEGRATOR_RP;
-      DMatrix& m = input<false>(iind);
+      DMatrix& m = inputNoCheck(iind);
       bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
       for(int i=0; i<m.size(); ++i){
         v[i] |= all_depend;
@@ -555,7 +555,7 @@ void IntegratorInternal::spEvaluate(bool fwd){
     // Add dependencies to xf and qf
     for(int k=0; k<2; ++k){
       int oind = k==0 ? INTEGRATOR_XF : INTEGRATOR_QF;
-      const DMatrix& m = output<false>(oind);
+      const DMatrix& m = outputNoCheck(oind);
       const bvec_t* v = reinterpret_cast<const bvec_t*>(m.ptr());
       for(int i=0; i<m.size(); ++i){
         all_depend |= v[i];
@@ -565,7 +565,7 @@ void IntegratorInternal::spEvaluate(bool fwd){
     // Propagate to x0 and p
     for(int k=0; k<2; ++k){
       int iind = k==0 ? INTEGRATOR_X0 : INTEGRATOR_P;
-      DMatrix& m = input<false>(iind);
+      DMatrix& m = inputNoCheck(iind);
       bvec_t* v = reinterpret_cast<bvec_t*>(m.ptr());
       for(int i=0; i<m.size(); ++i){
         v[i] |= all_depend;
