@@ -308,6 +308,13 @@ CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
     // Use forward mode?
     bool use_fwd = spCanEvaluate(true) && nsweep_fwd <= nsweep_adj;
     
+    // Override default behavior?
+    if(getOption("ad_mode") == "forward"){
+      use_fwd = true;
+    } else if(getOption("ad_mode") == "reverse"){
+      use_fwd = false;
+    }
+    
     // Reset the virtual machine
     spInit(use_fwd);
 

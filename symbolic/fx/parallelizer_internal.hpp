@@ -69,7 +69,7 @@ class ParallelizerInternal : public FXInternal{
     void spEvaluateTask(bool fwd, int task);
 
     /// Is the class able to propate seeds through the algorithm?
-    virtual bool spCanEvaluate(bool fwd){ return false;}
+    virtual bool spCanEvaluate(bool fwd){ return true;}
     
     /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
     virtual FX getDerivative(int nfwd, int nadj);

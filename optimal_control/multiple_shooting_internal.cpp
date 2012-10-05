@@ -161,8 +161,9 @@ void MultipleShootingInternal::init(){
   MX g = vertcat(gg);
   G_ = MXFunction(V,g);
   G_.setOption("numeric_jacobian",false);
-
-
+  G_.setOption("ad_mode","forward");
+  G_.init();
+  
   vector<MX> f;
   // Objective function
   if (mfcn_.getNumInputs()==1) {
@@ -174,30 +175,6 @@ void MultipleShootingInternal::init(){
     f = mfcn_.call(mfcn_argin);
   }
   F_ = MXFunction(V,f);
-
-  // Objective scaling factor
-  MX sigma("sigma");
-  
-  // Lagrange multipliers
-  MX lambda("lambda",g.size1());
-  
-  // Lagrangian
-  MX L = sigma*f[0] + inner_prod(lambda,g);
-  
-  // Input of the function
-  vector<MX> FG_in(3);
-  FG_in[0] = V;
-  FG_in[1] = lambda;
-  FG_in[2] = sigma;
-
-  // Output of the function
-  vector<MX> FG_out(3);
-  FG_out[0] = f[0];
-  FG_out[1] = g;
-  FG_out[2] = L;
-  
-  // Function that evaluates function and constraints that can also be used to get the gradient of the constraint
-  FG_ = MXFunction(FG_in,FG_out);
   
   // Get the NLP creator function
   NLPSolverCreator nlp_solver_creator = getOption("nlp_solver");
@@ -313,7 +290,7 @@ void MultipleShootingInternal::getConstraintBounds(vector<double>& G_min, vector
   casadi_assert(min_el==G_min.size() && max_el==G_max.size());
 }
 
-void MultipleShootingInternal::setOptimalSolution( const vector<double> &V_opt ){
+void MultipleShootingInternal::setOptimalSolution(const vector<double> &V_opt){
   // OCP solution
   Matrix<double> &p_opt = output(OCP_P_OPT);
   Matrix<double> &x_opt = output(OCP_X_OPT);
