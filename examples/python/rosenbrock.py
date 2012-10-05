@@ -23,20 +23,23 @@ from casadi import *
 import numpy as NP
 import matplotlib.pyplot as plt
 
+# Declare variables
 x = ssym("x")
 y = ssym("y")
 z = ssym("z")
 v = vertcat([x,y,z])
 
+# Form NLP functions
 f = SXFunction([v],[x**2 + 100*z**2])
 g = SXFunction([v],[z + (1-x)**2 - y])
 
 # Choose NLP solver
 #nlp_solver = IpoptSolver
-#nlp_solver = SQPMethod
-nlp_solver = LiftedSQP
+#nlp_solver = WorhpSolver
+nlp_solver = SQPMethod
+#nlp_solver = LiftedSQP
 
-# Choose a qp solver
+# Choose a qp solver (for CasADi NLP methods)
 qp_solver = QPOasesSolver
 #qp_solver = IpoptQPSolver
 #qp_solver = OOQPSolver
@@ -54,7 +57,7 @@ solv = nlp_solver(f,g)
 
 # NLP solver options
 solv.setOption("generate_hessian",True)
-if nlp_solver != IpoptSolver:
+if nlp_solver in (SQPMethod, LiftedSQP):
   solv.setOption("qp_solver",qp_solver)
   solv.setOption("qp_solver_options",qp_solver_options)
   solv.setOption("maxiter",5)
@@ -78,5 +81,4 @@ print "%50s " % "Optimal cost:", solv.output(NLP_COST)
 print "%50s " % "Primal solution:", solv.output(NLP_X_OPT)
 print "%50s " % "Dual solution (simple bounds):", solv.output(NLP_LAMBDA_X)
 print "%50s " % "Dual solution (nonlinear bounds):", solv.output(NLP_LAMBDA_G)
-
 
