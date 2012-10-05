@@ -207,19 +207,19 @@ class FXInternal : public OptionsFunctionalityNode{
     
     /// Access input argument
     template<bool check=true>
-    inline Matrix<double>& input(int iind=0){ return iStruct(iind).data;}
+    inline Matrix<double>& input(int iind=0){ return iStruct<check>(iind).data;}
 
     /// Access input argument
     template<bool check=true>
-    inline Matrix<double>& input(const std::string &iname){ return input(inputSchemeEntry(iname));}
+    inline Matrix<double>& input(const std::string &iname){ return input<check>(inputSchemeEntry(iname));}
     
     /// Const access input argument
     template<bool check=true>
-    inline const Matrix<double>& input(int iind=0) const{ return iStruct(iind).data;}
+    inline const Matrix<double>& input(int iind=0) const{ return iStruct<check>(iind).data;}
 
     /// Const access input argument
     template<bool check=true>
-    inline const Matrix<double>& input(const std::string &iname) const{  return input(inputSchemeEntry(iname)); }
+    inline const Matrix<double>& input(const std::string &iname) const{  return input<check>(inputSchemeEntry(iname)); }
     
     /// Access input argument
     template<bool check=true>
