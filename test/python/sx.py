@@ -985,22 +985,6 @@ class SXtests(casadiTestCase):
     self.checkarray(f.output(),x0**3,"if_else sens")
     self.checkarray(f.fwdSens(),3*(-x0)**2*dx,"if_else sens")
     self.checkarray(f.adjSens(),3*(-x0)**2*dx,"if_else sens")
-    
-  def test_equality(self):
-    return
-    x = SX("x")
-    y = SX("y")
-    self.assertRaises(Exception, lambda: x==x)
-    self.assertRaises(Exception, lambda: x==y)
-    self.assertTrue(isEqual(x,x))
-    self.assertFalse(isEqual(x,y))
-    CasadiOptions.setEqualityOperator(True)
-    self.assertTrue(x==x)
-    self.assertFalse(x==y)
-    self.assertFalse(x+y==y+x)
-    self.assertTrue(isEqual(x,x))
-    self.assertFalse(isEqual(x,y))
-    CasadiOptions.setEqualityOperator(False)
 
 if __name__ == '__main__':
     unittest.main()
