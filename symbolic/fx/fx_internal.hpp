@@ -125,7 +125,7 @@ class FXInternal : public OptionsFunctionalityNode{
     
     /** \brief  Access an input */
     template<bool check=true>
-    FunctionIO& iStruct(int i=0){
+    FunctionIO& iStruct(int i){
       if(check){
         try{
           return input_.at(i);
@@ -142,13 +142,13 @@ class FXInternal : public OptionsFunctionalityNode{
 
     /** \brief  Const access an input */
     template<bool check=true>
-    inline const FunctionIO& iStruct(int i=0) const{
+    inline const FunctionIO& iStruct(int i) const{
       return const_cast<FXInternal*>(this)->iStruct<check>(i);
     }
     
     /** \brief  Access an output*/
     template<bool check=true>
-    FunctionIO& oStruct(int i=0){
+    FunctionIO& oStruct(int i){
       if(check){
         try{
           return output_.at(i);
@@ -165,7 +165,7 @@ class FXInternal : public OptionsFunctionalityNode{
 
     /** \brief  Const access an output*/
     template<bool check=true>
-    inline const FunctionIO& oStruct(int i=0) const{
+    inline const FunctionIO& oStruct(int i) const{
       return const_cast<FXInternal*>(this)->oStruct<check>(i);
     }
       
