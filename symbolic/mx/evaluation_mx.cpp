@@ -25,7 +25,6 @@
 #include "../stl_vector_tools.hpp"
 #include "../mx/mx_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
-#include "jacobian_reference.hpp"
 
 using namespace std;
 
@@ -239,147 +238,59 @@ void EvaluationMX::evaluateMX(const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fse
   
   // Number of sensitivity directions
   int nfwd = fsens.size();
+  casadi_assert(nfwd==0 || fcn_.spCanEvaluate(true));
   int nadj = aseed.size();
-  bool no_diff = nfwd == 0 && nadj == 0; // no differentiation
+  casadi_assert(nadj==0 || fcn_.spCanEvaluate(false));
 
-  if (no_diff || (fcn_.spCanEvaluate(true) && fcn_.spCanEvaluate(false))) { // NOTE: should handle _all_ cases
-    // Get/generate the derivative function
-    FX d = fcn_.derivative(nfwd, nadj);
+  // Get/generate the derivative function
+  FX d = fcn_.derivative(nfwd, nadj);
 
-    // Temporary
-    vector<MX> tmp;
+  // Temporary
+  vector<MX> tmp;
 
-    // Assemble inputs
-    vector<MX> d_arg;
-    d_arg.reserve(d.getNumInputs());
+  // Assemble inputs
+  vector<MX> d_arg;
+  d_arg.reserve(d.getNumInputs());
 
-    // Nondifferentiated inputs
-    tmp = getVector(arg);
+  // Nondifferentiated inputs
+  tmp = getVector(arg);
+  d_arg.insert(d_arg.end(), tmp.begin(), tmp.end());
+  for (MXPtrVV::const_iterator i = fseed.begin(); i != fseed.end(); ++i) {
+    tmp = getVector(*i);
     d_arg.insert(d_arg.end(), tmp.begin(), tmp.end());
-    for (MXPtrVV::const_iterator i = fseed.begin(); i != fseed.end(); ++i) {
-      tmp = getVector(*i);
-      d_arg.insert(d_arg.end(), tmp.begin(), tmp.end());
-    }
-    for (MXPtrVV::const_iterator i = aseed.begin(); i != aseed.end(); ++i) {
-      tmp = getVector(*i);
-      d_arg.insert(d_arg.end(), tmp.begin(), tmp.end());
-    }
-
-    // Evaluate symbolically
-    vector<MX> d_res = d.call(d_arg);
-    vector<MX>::const_iterator d_res_it = d_res.begin();
-
-    // Collect the nondifferentiated results
-    for (MXPtrV::iterator i = res.begin(); i != res.end(); ++i, ++d_res_it) {
-      if (!output_given && *i) **i = *d_res_it;
-    }
-
-    // Collect the forward sensitivities
-    for (MXPtrVV::iterator j = fsens.begin(); j != fsens.end(); ++j) {
-      for (MXPtrV::iterator i = j->begin(); i != j->end(); ++i, ++d_res_it) {
-        if (*i) **i = *d_res_it;
-      }
-    }
-
-    // Collect the adjoint sensitivities
-    for (MXPtrVV::iterator j = asens.begin(); j != asens.end(); ++j) {
-      for (MXPtrV::iterator i = j->begin(); i != j->end(); ++i, ++d_res_it) {
-        if(*i && !d_res_it->isNull()){
-	  **i += *d_res_it;
-	}
-      }
-    }
-
-    // Make sure that we've got to the end of the outputs
-    casadi_assert(d_res_it==d_res.end());
-
-    // Quick return
-    return;
+  }
+  for (MXPtrVV::const_iterator i = aseed.begin(); i != aseed.end(); ++i) {
+    tmp = getVector(*i);
+    d_arg.insert(d_arg.end(), tmp.begin(), tmp.end());
   }
 
-    
-  // Old implentation starts here, should be removed when the above works with all classes
-  
-  
-  // Evaluate function
-  if (!output_given) {
-    // Evaluate the function symbolically
-    vector<MX> argv(arg.size());
-    for (int i = 0; i < arg.size(); ++i) {
-      if (arg[i])
-        argv[i] = *arg[i];
-    }
-    vector<MX> resv = fcn_.call(argv);
-    for (int i = 0; i < res.size(); ++i) {
-      if (res[i])
-        *res[i] = resv[i];
+  // Evaluate symbolically
+  vector<MX> d_res = d.call(d_arg);
+  vector<MX>::const_iterator d_res_it = d_res.begin();
+
+  // Collect the nondifferentiated results
+  for (MXPtrV::iterator i = res.begin(); i != res.end(); ++i, ++d_res_it) {
+    if (!output_given && *i) **i = *d_res_it;
+  }
+
+  // Collect the forward sensitivities
+  for (MXPtrVV::iterator j = fsens.begin(); j != fsens.end(); ++j) {
+    for (MXPtrV::iterator i = j->begin(); i != j->end(); ++i, ++d_res_it) {
+      if (*i) **i = *d_res_it;
     }
   }
 
-  // Sensitivities
-  if (nfwd > 0 || nadj > 0) {
-    // Loop over outputs
-    for (int oind = 0; oind < res.size(); ++oind) {
-      // Skip of not used
-      if (res[oind] == 0)
-        continue;
-
-      // Output dimensions
-      int od1 = res[oind]->size1();
-      int od2 = res[oind]->size2();
-
-      // Loop over inputs
-      for (int iind = 0; iind < arg.size(); ++iind) {
-        // Skip of not used
-        if (arg[iind] == 0)
-          continue;
-
-        // Input dimensions
-        int id1 = arg[iind]->size1();
-        int id2 = arg[iind]->size2();
-
-        // Create a Jacobian node
-        MX J = MX::create(new JacobianReference(*res[oind], iind));
-        if (isZero(J))
-          continue;
-
-        // Forward sensitivities
-        for (int d = 0; d < nfwd; ++d) {
-          MX fsens_d = mul(J, flatten(*fseed[d][iind]));
-          if (!isZero(fsens_d)) {
-            // Reshape sensitivity contribution if necessary
-            if (od2 > 1)
-              fsens_d = reshape(fsens_d, od1, od2);
-
-            // Save or add to vector
-            if (fsens[d][oind]->isNull()) {
-              *fsens[d][oind] = fsens_d;
-            } else {
-              *fsens[d][oind] += fsens_d;
-            }
-          }
-
-          // If no contribution added, set to zero
-          if (fsens[d][oind]->isNull()) {
-            *fsens[d][oind] = MX::sparse(od1, od2);
-          }
-        }
-
-        // Adjoint sensitivities
-        for (int d = 0; d < nadj; ++d) {
-          MX asens_d = mul(trans(J), flatten(*aseed[d][oind]));
-          if (!isZero(asens_d)) {
-            // Reshape sensitivity contribution if necessary
-            if (id2 > 1)
-              asens_d = reshape(asens_d, id1, id2);
-
-            // Add to vector
-            *asens[d][iind] += asens_d;
-          }
-        }
+  // Collect the adjoint sensitivities
+  for (MXPtrVV::iterator j = asens.begin(); j != asens.end(); ++j) {
+    for (MXPtrV::iterator i = j->begin(); i != j->end(); ++i, ++d_res_it) {
+      if(*i && !d_res_it->isNull()){
+        **i += *d_res_it;
       }
     }
   }
+
+  // Make sure that we've got to the end of the outputs
+  casadi_assert(d_res_it==d_res.end());
 }
 
 void EvaluationMX::deepCopyMembers(

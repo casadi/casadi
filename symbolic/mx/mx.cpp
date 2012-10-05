@@ -930,7 +930,6 @@ bool 	MX::isEvaluationOutput () const { return !isNull() ? (*this)->isOutputNode
 int 	MX::getEvaluationOutput () const { return !isNull() ? (*this)->getFunctionOutput() : -1; }
 
     
-bool 	MX::isJacobian () const { return !isNull() ? (*this)->isJacobian() : false; }
 bool 	MX::isOperation (int op) const { return !isNull() ? (*this)->isOperation(op) : false; }
 bool 	MX::isMultiplication () const { return !isNull() ? (*this)->isMultiplication() : false; }
 

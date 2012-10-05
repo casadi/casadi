@@ -96,9 +96,6 @@ class OutputNode : public MXNode{
     /** \brief  Get function output */
     virtual int getFunctionOutput() const{ return oind_;}
 
-    /** \brief  Get the jacobian of an function evaluation with respect to the iind-th argument */
-    virtual MX jac(int iind);
-    
     /** \brief  Output index */
     int oind_;
 };

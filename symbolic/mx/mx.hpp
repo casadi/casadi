@@ -248,9 +248,6 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Cached
   /// Get the index of evaluation output - only valid when isEvaluationoutput() is true
   int getEvaluationOutput() const;
   
-  /// Check if jacobian reference.
-  bool isJacobian() const;
-  
   /// Is it a certain operation
   bool isOperation (int op) const;
   

@@ -152,9 +152,6 @@ class MXNode : public CachedObjectNode{
     /** \brief  Check if a multiple output node */
     virtual bool isMultipleOutput() const{return false;}
 
-    /** \brief  Check if jacobian reference */
-    virtual bool isJacobian() const{return false;}
-
     /** \brief  Check if matrix multiplication */
     virtual bool isMultiplication() const {return false;}
 

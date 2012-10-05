@@ -23,7 +23,6 @@
 #include "multiple_output.hpp"
 #include "../fx/fx_internal.hpp"
 #include "../stl_vector_tools.hpp"
-#include "jacobian_reference.hpp"
 
 using namespace std;
 
@@ -55,10 +54,6 @@ void OutputNode::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& 
 }
 
 void OutputNode::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd){ 
-}
-
-MX OutputNode::jac(int iind){
-  return MX::create(new JacobianReference(MX::create(this),iind));
 }
 
 void OutputNode::printPart(std::ostream &stream, int part) const{

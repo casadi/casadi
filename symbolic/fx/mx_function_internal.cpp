@@ -21,7 +21,6 @@
 */
 
 #include "mx_function_internal.hpp"
-#include "../mx/jacobian_reference.hpp"
 #include "../mx/evaluation_mx.hpp"
 #include "../mx/mapping.hpp"
 #include "../mx/mx_tools.hpp"
@@ -177,21 +176,6 @@ void MXFunctionInternal::init(){
   for(int i=0; i<nodes.size(); ++i)
     nodes[i]->temp = i;
 
-  // An output/input pair corresponding to a jacobian block
-  typedef pair<int,int> oipair;
-  
-  // The set of jacobian blocks for a single evaluation node
-  typedef set<oipair> jblocks;
-  
-  // The sets of jacobian blocks for each evaluation node
-  typedef map<void*,jblocks> jbmap;
-  
-  // The set of evaluation nodes for each function
-  typedef map<void*,jbmap> evmap;
-  
-  // Which functions need to be differentiated with respect to which arguments
-  evmap m;
-
   // Place in the work vector for each node
   vector<int> place_in_work;
   place_in_work.reserve(nodes.size());
@@ -231,59 +215,6 @@ void MXFunctionInternal::init(){
       // Not in algorithm
       place_in_alg.push_back(-1);
 
-    } else if(n->isJacobian()){
-      
-      // Get a reference to the function
-      FX& fcn = n->dep(0)->dep(0)->getFunction();
-
-      // Get the input and output indices
-      int iind = n->getFunctionInput();
-      int oind = n->getFunctionOutput();
-
-      // Find the set of outputs in the map
-      jblocks& jb = m[fcn.get()][n->dep(0)->dep(0).get()];
-      
-      // If empty, we need to add the undifferentiated outputs
-      if(jb.empty()){
-        int n_out = fcn.getNumOutputs();
-        for(int k=0; k<n_out; ++k){
-          jb.insert(oipair(k,-1));
-        }
-      }
-
-      // Save jacobian to map
-      pair<jblocks::iterator,bool> jb_loc = jb.insert(oipair(oind,iind));
-      casadi_assert_message(jb_loc.second==true,"Multiple identical Jacobian references currently not supported, easy to fix with a test case available"); 
-
-      // Get the place where the jacobian was inserted
-      int place = fcn.getNumOutputs();
-      for(jblocks::iterator it=jb.begin(); it!=jb.end(); ++it){
-        if(it->second>=0){
-          if(iind==it->second && oind==it->first) break;
-          place++;
-        }
-      }
-      
-      // Get the index of the parent node
-      int pind = place_in_alg[n->dep(0)->dep(0)->temp];
-      
-      // Save output to the parent node (note that we add to the end, which is not the ultimate position, therefore a sorting takes place later in the code
-      algorithm_[pind].res.insert(algorithm_[pind].res.begin()+place,work_.size());
-      
-      // Save place in work vector
-      place_in_work.push_back(work_.size());
-
-      // Not in algorithm
-      place_in_alg.push_back(-1);
-      
-/*    } else if(n->isSymbolic()){
-      
-      // Save place in work vector
-      place_in_work.push_back(work_.size());
-
-      // Not in algorithm
-      place_in_alg.push_back(-1);*/
-      
     } else {
       
       // Add an element to the algorithm
@@ -344,89 +275,6 @@ void MXFunctionInternal::init(){
   
   // Get the free variables
   collectFree();
-  
-  // Eliminate Jacobian if the computational graph contains jacobians
-  if(m.empty()) return;
-
-  // Jacobian functions for each function and set of jacobians
-  map<void*,map<jblocks,FX> > jac;
-    
-  // Loop over undifferentiated functions
-  for(evmap::iterator it=m.begin(); it!=m.end(); ++it){
-    
-    // Jacobian functions for each set of jacobians
-    map<jblocks,FX>& jb = jac[it->first];
-    
-    // Loop over function evaluations for the function
-    for(jbmap::iterator it2=it->second.begin(); it2!=it->second.end(); ++it2){
-      
-      // Get a reference to the jacobian function
-      FX& j = jb[it2->second];
-      
-      // If j is null, the Jacobian must be generated
-      if(j.isNull()){
-        
-        // Create input arguments to the jacobian function
-        vector<oipair> jblocks;
-        jblocks.insert(jblocks.end(),it2->second.begin(),it2->second.end());
-        
-        // Generate jacobian functions
-        FXInternal* f = reinterpret_cast<FXInternal*>(it->first);
-        j = f->jacobian_switch(jblocks);
-        j.init();
-      }
-    }
-  }
-
-  // Loop over the nodes again, replacing nodes
-  for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
-
-    // Get the old references to the function and evaluation node (since they will change)
-    if(it->op->isEvaluation()){
-      void *fcn_ref = it->op->getFunction().get();
-      void *eval_ref = it->op.get();
-    
-      // Check if the function should be replaced
-      evmap::const_iterator ii=m.find(fcn_ref);
-      if(ii!=m.end()){
-        
-        // Check if the function evaluation is to be replaced
-        jbmap::const_iterator jj=ii->second.find(eval_ref);
-        if(jj!=ii->second.end()){
-          
-          // Make the pointer unique so that other expressions won't be affected
-          it->op.makeUnique(false);
-          
-          // Replace the function if its an evaluation node
-          it->op->getFunction() = jac[fcn_ref][jj->second];
-          
-          // Make a copy of the result indices
-          vector<int> res = it->res;
-          
-          // Update the index of the undifferentiated outputs
-          int oind_old=0, oind_new=0;
-          for(jblocks::const_iterator kk=jj->second.begin(); kk!=jj->second.end(); ++kk){
-            if(kk->second<0){
-              res[oind_new] = it->res[oind_old++];
-            }
-            oind_new++;
-          }
-
-          // Update the index of the jacobian blocks outputs
-          oind_new=0;
-          for(jblocks::const_iterator kk=jj->second.begin(); kk!=jj->second.end(); ++kk){
-            if(kk->second>=0){
-              res[oind_new] = it->res[oind_old++];
-            }
-            oind_new++;
-          }
-          
-          // Update res
-          res.swap(it->res);
-        }
-      }
-    }
-  }
 
 log("MXFunctionInternal::init end");
 }
