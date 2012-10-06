@@ -580,7 +580,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = ../../casadi \
+INPUT                  = ../../symbolic \
                          ../../toolboxes \
                          ../../interfaces \
                          ../../optimal_control \
