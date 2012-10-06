@@ -411,8 +411,7 @@ class Integrationtests(casadiTestCase):
     num=self.num
     J=self.integrator.jacobian(INTEGRATOR_P,INTEGRATOR_XF)
     J.init()
-    H=Jacobian(J,INTEGRATOR_P)
-    H.setOption("ad_mode","adjoint")
+    H=J.jacobian(INTEGRATOR_P,INTEGRATOR_XF)
     H.init()
     H.input(INTEGRATOR_X0).set([num['q0']])
     H.input(INTEGRATOR_P).set([num['p']])
@@ -434,7 +433,7 @@ class Integrationtests(casadiTestCase):
     Ji = MXFunction([q0,p],J.call([q0,p]))
     Ji.init()
     H=Jacobian(Ji,1)
-    H.setOption("ad_mode","adjoint")
+    H.setOption("ad_mode","reverse")
     H.init()
     H.input(0).set([num['q0']])
     H.input(1).set([num['p']])
@@ -535,7 +534,7 @@ class Integrationtests(casadiTestCase):
     qend,_,_,_ = integrator.call([q0,par])
     qe=integrator.jacobian(INTEGRATOR_P,INTEGRATOR_XF)
     qe.init()
-    [qe] = qe.call([q0,par])
+    qe = qe.call([q0,par])[0]
 
     qef=MXFunction([q0,par],[qe])
     qef.init()
@@ -577,14 +576,14 @@ class Integrationtests(casadiTestCase):
     qe.init()
     qendJ=integrator.jacobian(INTEGRATOR_X0,INTEGRATOR_XF)
     qendJ.init()
-    [qendJ] = qendJ.call([q0,par])
+    qendJ = qendJ.call([q0,par])[0]
 
     qeJ=MXFunction([q0,par],[qendJ])
     qeJ.init()
 
     qendJ2=integrator.jacobian(INTEGRATOR_X0,INTEGRATOR_XF)
     qendJ2.init()
-    [qendJ2] = qendJ2.call([q0,par])
+    qendJ2 = qendJ2.call([q0,par])[0]
 
     qeJ2=MXFunction([q0,par],[qendJ2])
     qeJ2.init()
@@ -605,7 +604,7 @@ class Integrationtests(casadiTestCase):
     
     return # this should return identical zero
     H=Jacobian(qeJ,0,0)
-    H.setOption("ad_mode","adjoint")
+    H.setOption("ad_mode","reverse")
     H.init()
     H.input(0).set(A)
     H.input(1).set(B.ravel())
@@ -644,7 +643,7 @@ class Integrationtests(casadiTestCase):
     qe.init()
     qendJ=integrator.jacobian(INTEGRATOR_X0,INTEGRATOR_XF)
     qendJ.init()
-    [qendJ] =qendJ.call([q0,par])
+    qendJ =qendJ.call([q0,par])[0]
     qeJ=MXFunction([q0,par],[qendJ])
     qeJ.init()
 
@@ -696,7 +695,7 @@ class Integrationtests(casadiTestCase):
     qe.init()
     qendJ=integrator.jacobian(INTEGRATOR_X0,INTEGRATOR_XF)
     qendJ.init()
-    [qendJ] = qendJ.call([q0,par])
+    qendJ = qendJ.call([q0,par])[0]
     qeJ=MXFunction([q0,par],[qendJ])
     qeJ.init()
 
@@ -719,7 +718,7 @@ class Integrationtests(casadiTestCase):
     
     
     Jf=Jacobian(qe,0,0)
-    Jf.setOption("ad_mode","adjoint")
+    Jf.setOption("ad_mode","reverse")
     Jf.init()
     Jf.input(0).set(A)
     Jf.input(1).set(p0)
@@ -747,7 +746,7 @@ class Integrationtests(casadiTestCase):
     Jr = matrix([[(sqrt(p0)*(te*yc0**2-yc0+p0*te)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te)+yc0**2)/(2*p0*yc0**2+2*p0**2)],[(sqrt(p0)*((te*yc0**2-yc0+p0*te)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te)**2+te*yc0**2-yc0+p0*te)+(yc0**2+p0)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te))/(sqrt(p0)*(2*yc0**2+2*p0))]])  
     
     Jf=Jacobian(qe,1,0)
-    Jf.setOption("ad_mode","adjoint")
+    Jf.setOption("ad_mode","reverse")
     Jf.init()
     Jf.input(0).set(A)
     Jf.input(1).set(p0)
@@ -764,7 +763,7 @@ class Integrationtests(casadiTestCase):
     
     qendJ=integrator.jacobian(INTEGRATOR_P,INTEGRATOR_XF)
     qendJ.init()
-    [qendJ] = qendJ.call([q0,par])
+    qendJ = qendJ.call([q0,par])[0]
     qeJ=MXFunction([q0,par],[qendJ])
     qeJ.init()
 
@@ -781,7 +780,7 @@ class Integrationtests(casadiTestCase):
     qeJf.init()
     
     H=Jacobian(qeJf,0,0)
-    H.setOption("ad_mode","adjoint")
+    H.setOption("ad_mode","reverse")
     H.init()
     H.input(0).set(A)
     H.input(1).set(p0)

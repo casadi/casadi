@@ -716,6 +716,16 @@ FX IntegratorInternal::getDerivative(int nfwd, int nadj){
   return MXFunction(ret_in,ret_out);
 }
 
+FX IntegratorInternal::getJacobian(int iind, int oind){
+  vector<MX> arg = symbolicInput();
+  vector<MX> res = shared_from_this<FX>().call(arg);
+  MXFunction f(arg,res);
+  f.setOption("ad_mode","forward");
+  f.setOption("numeric_jacobian", false);
+  f.init();
+  return f.jacobian(iind,oind);
+}
+
 void IntegratorInternal::reset(int nsens, int nsensB, int nsensB_store){
   // Make sure that the numbers are consistent
   casadi_assert_message(nsens<=nfdir_,"Too many sensitivities going forward");

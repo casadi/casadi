@@ -144,7 +144,7 @@ class SXtests(casadiTestCase):
       
       def fmod(f,x):
         J=Jacobian(f)
-        J.setOption("ad_mode","adjoint")
+        J.setOption("ad_mode","reverse")
         J.init()
         return J
         

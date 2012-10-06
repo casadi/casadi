@@ -41,37 +41,10 @@ const SundialsInternal* SundialsIntegrator::operator->() const{
 bool SundialsIntegrator::checkNode() const{
   return dynamic_cast<const SundialsInternal*>(get())!=0;
 }
-
-void SundialsIntegrator::setLinearSolver(const LinearSolver& linsol, const FX& jac){
-  casadi_warning(
-    "Depreciated function \"Integrator::setLinearSolver\",\n"
-    "use setOption(\"linear solver_creator\",SolverName::creator) in C++ \n"
-    "or setOption(\"linear solver_creator\",SolverName) in Python/Octave instead.\n"
-    "Options to the linear solver are passed with setOption(\"linear solver_options\",...)\n"
-    "This function will be removed in the next release"
-  );
-  (*this)->setLinearSolver(linsol,jac);
-}
-
-FX SundialsIntegrator::getJacobian(){
-  return (*this)->getJacobian();  
-}
   
-LinearSolver SundialsIntegrator::getLinearSolver(){
-  return (*this)->getLinearSolver();  
-}
-
 void SundialsIntegrator::setStopTime(double tf){
   (*this)->setStopTime(tf);
 }
   
-void SundialsIntegrator::setInitialTime(double t0){
-  (*this)->setInitialTime(t0);
-}
-
-void SundialsIntegrator::setFinalTime(double tf){
-  (*this)->setFinalTime(tf);
-}
-
 } // namespace CasADi
 

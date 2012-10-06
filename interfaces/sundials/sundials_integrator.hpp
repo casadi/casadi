@@ -44,25 +44,8 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
   
-  /// Set linear solver
-  void setLinearSolver(const LinearSolver& linsol, const FX& jac=FX());
-  
-  /// Get the Jacobian
-  FX getJacobian();
-  
-  /// Get the Linear solver
-  LinearSolver getLinearSolver();
-  
-  /// Set initial time
-  void setInitialTime(double t0);
-
-  /// Set final time
-  void setFinalTime(double tf);
-
   /// Set a stop time for the forward integration
   void setStopTime(double tf);
-
-  
 };
 
 } // namespace CasADi

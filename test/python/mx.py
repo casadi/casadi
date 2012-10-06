@@ -655,7 +655,7 @@ class MXtests(casadiTestCase):
     
     def fmod(f,x):
       J=Jacobian(f)
-      J.setOption("ad_mode","adjoint")
+      J.setOption("ad_mode","reverse")
       J.init()
       return J
       
@@ -677,7 +677,7 @@ class MXtests(casadiTestCase):
       
       def fmod(f,x):
         J=Jacobian(f)
-        J.setOption("ad_mode","adjoint")
+        J.setOption("ad_mode","reverse")
         J.init()
         return J
         
@@ -1020,7 +1020,7 @@ class MXtests(casadiTestCase):
      self.checkarray(f.output(),zr,"mul(mapping.T,mapping)")
      
      J=Jacobian(f)
-     for mode in ["forward","adjoint"]:
+     for mode in ["forward","reverse"]:
        J.setOption("ad_mode",mode)
        J.init()
        J.input().set(xn)
@@ -1049,7 +1049,7 @@ class MXtests(casadiTestCase):
      
      J=Jacobian(f)
      J_ = array([[xn[0,0]*2,0,0],[xn[1,0],xn[0,0],0],[xn[2,0],0,xn[0,0]]])
-     for mode in ["forward","adjoint"]:
+     for mode in ["forward","reverse"]:
        self.message(":" + mode)
        J.setOption("ad_mode",mode)
        J.init()
@@ -1099,7 +1099,7 @@ class MXtests(casadiTestCase):
     
     J_ = dot(dot((dot(D_,x_)+e_).T,C_.T),A_) + dot(dot((dot(A_,x_)+b_).T,C_),D_)
     
-    for mode in ["forward", "adjoint"]:
+    for mode in ["forward", "reverse"]:
       J = Jacobian(f)
       J.setOption("ad_mode",mode)
       J.init()
@@ -1170,7 +1170,7 @@ class MXtests(casadiTestCase):
 
     J_ = (D_*x_+e_).T*C_.T*A_ + (A_*x_+b_).T*C_*D_
     
-    for mode in ["forward", "adjoint"]:
+    for mode in ["forward", "reverse"]:
       J = Jacobian(f)
       J.setOption("ad_mode","forward")
       J.init()
@@ -1245,7 +1245,7 @@ class MXtests(casadiTestCase):
 
     J_ = (D_*x_+e_).T*C_.T*A_ + (A_*x_+b_).T*C_*D_
     
-    for mode in ["forward", "adjoint"]:
+    for mode in ["forward", "reverse"]:
       J = Jacobian(f)
       J.setOption("ad_mode","forward")
       J.init()
@@ -1569,7 +1569,7 @@ class MXtests(casadiTestCase):
     #self.checkarray(J.output(),nums.T/linalg.norm(nums),"Norm_2")
 
     #J = Jacobian(F,0,0)
-    #J.setOption("ad_mode","adjoint")
+    #J.setOption("ad_mode","reverse")
     #J.init()
 
     #J.input().set(nums)
@@ -1604,7 +1604,7 @@ class MXtests(casadiTestCase):
     #self.checkarray(J.output(),2*nums.T,"Norm_22 fwd")
 
     #J = Jacobian(F,0,0)
-    #J.setOption("ad_mode","adjoint")
+    #J.setOption("ad_mode","reverse")
     #J.init()
 
     #J.input().set(nums)
@@ -1638,7 +1638,7 @@ class MXtests(casadiTestCase):
     #self.checkarray(J.output(),matrix([1,-1,nan]),"Norm_1")
 
     #J = Jacobian(F,0,0)
-    #J.setOption("ad_mode","adjoint")
+    #J.setOption("ad_mode","reverse")
     #J.init()
 
     #J.input().set(nums)

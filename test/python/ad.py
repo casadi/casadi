@@ -223,7 +223,7 @@ class ADtests(casadiTestCase):
       for outputshape in ["column","row","matrix"]:
         for inputtype in ["dense","sparse"]:
           for outputtype in ["dense","sparse"]:
-            for mode in ["forward","adjoint"]:
+            for mode in ["forward","reverse"]:
               self.message(" %s Jacobian on SX. Input %s %s, Output %s %s" % (mode,inputtype,inputshape,outputtype,outputshape) )
               f=SXFunction(self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
               #f.setOption("verbose",True)
@@ -313,7 +313,7 @@ class ADtests(casadiTestCase):
       for outputshape in ["column","row","matrix"]:
         for inputtype in ["dense","sparse"]:
           for outputtype in ["dense","sparse"]:
-            for mode in ["forward","adjoint"]:
+            for mode in ["forward","reverse"]:
               self.message("adj AD on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
               f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
               f.init()
@@ -331,7 +331,7 @@ class ADtests(casadiTestCase):
       for outputshape in ["column","row","matrix"]:
         for inputtype in ["dense","sparse"]:
           for outputtype in ["dense","sparse"]:
-            for mode in ["forward","adjoint"]:
+            for mode in ["forward","reverse"]:
               self.message(" %s jacobian on MX (SCT). Input %s %s, Output %s %s" % (mode,inputtype,inputshape,outputtype,outputshape) )
               f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
               #f.setOption("verbose",True)
@@ -349,7 +349,7 @@ class ADtests(casadiTestCase):
       for outputshape in ["column","row","matrix"]:
         for inputtype in ["dense","sparse"]:
           for outputtype in ["dense","sparse"]:
-            for mode in ["forward","adjoint"]:
+            for mode in ["forward","reverse"]:
               self.message(" %s jacobian on MX (SCT). Input %s %s, Output %s %s" % (mode,inputtype,inputshape,outputtype,outputshape) )
               f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
               #f.setOption("verbose",True)
@@ -368,7 +368,7 @@ class ADtests(casadiTestCase):
       for outputshape in ["column","row","matrix"]:
         for inputtype in ["dense","sparse"]:
           for outputtype in ["dense","sparse"]:
-            for mode in ["forward","adjoint"]:
+            for mode in ["forward","reverse"]:
               self.message(" %s jacobian on MX (SCT). Input %s %s, Output %s %s" % (mode,inputtype,inputshape,outputtype,outputshape) )
               f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
               #f.setOption("verbose",True)
@@ -401,7 +401,7 @@ class ADtests(casadiTestCase):
     JT.input().set(n)
     JT.evaluate()
     H = Jacobian(JT,0,0)
-    H.setOption("ad_mode","adjoint")
+    H.setOption("ad_mode","reverse")
     H.init()
     H.input().set(n)
     H.evaluate()
