@@ -111,7 +111,7 @@ public:
   *
   * \see CasADi::Jacobian for an AD approach
   */
-  SXFunction jacobian(int iind=0, int oind=0);
+  SXFunction jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
   
   /// Hessian of output oind with respect to input iind 
   SXFunction hessian(int iind=0, int oind=0);

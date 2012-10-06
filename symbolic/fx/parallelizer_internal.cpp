@@ -249,7 +249,7 @@ CRSSparsity ParallelizerInternal::getJacSparsity(int iind, int oind){
   }
 }
 
-FX ParallelizerInternal::getJacobian(int iind, int oind){
+FX ParallelizerInternal::getJacobian(int iind, int oind, bool compact, bool symmetric){
   // Number of tasks
   int ntask = inind_.size()-1;
   
@@ -265,7 +265,7 @@ FX ParallelizerInternal::getJacobian(int iind, int oind){
     int oind_f = oind-outind_[task];
     
     // Get the local jacobian
-    return funcs_.at(task).jacobian(iind_f,oind_f);
+    return funcs_.at(task).jacobian(iind_f,oind_f, compact, symmetric);
   } else {
     // All-zero jacobian
     return FX();

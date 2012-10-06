@@ -77,7 +77,7 @@ class MXFunctionInternal : public XFunctionInternal<MXFunctionInternal,MX,MXNode
     virtual FX getDerivative(int nfwd, int nadj);
 
     /** \brief Calculate the jacobian of output oind with respect to input iind */
-    virtual FX getJacobian(int iind, int oind);
+    virtual FX getJacobian(int iind, int oind, bool compact, bool symmetric);
 
     /** \brief  An elemenent of the algorithm, namely an MX node */
     typedef MXAlgEl AlgEl;

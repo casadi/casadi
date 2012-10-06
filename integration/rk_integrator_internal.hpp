@@ -86,7 +86,7 @@ public:
   virtual void setStopTime(double tf);
 
   /// Generate a function that calculates a Jacobian function
-  virtual FX getJacobian(int iind, int oind);
+  virtual FX getJacobian(int iind, int oind, bool compact, bool symmetric);
 
   /// Generate the sparsity of a Jacobian block
   virtual CRSSparsity getJacSparsity(int iind, int oind);

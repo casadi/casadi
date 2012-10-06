@@ -109,10 +109,10 @@ class FXInternal : public OptionsFunctionalityNode{
     virtual FX getDerivative(int nfwd, int nadj);
 
     /// Access a Jacobian function (cached)
-    FX jacobian_new(int iind, int oind);
+    FX jacobian(int iind, int oind, bool compact, bool symmetric);
     
     /// Generate a function that calculates a Jacobian function
-    virtual FX getJacobian(int iind, int oind);
+    virtual FX getJacobian(int iind, int oind, bool compact, bool symmetric);
     
     /** \brief  Access an input */
     FunctionIO& iStruct(int i){

@@ -197,8 +197,8 @@ void RKIntegratorInternal::printStats(std::ostream &stream) const{
 void RKIntegratorInternal::setStopTime(double tf){
 }
 
-FX RKIntegratorInternal::getJacobian(int iind, int oind){
-  return yf_fun_.jacobian(iind,oind);
+FX RKIntegratorInternal::getJacobian(int iind, int oind, bool compact, bool symmetric){
+  return yf_fun_.jacobian(iind,oind,compact,symmetric);
 }
 
 CRSSparsity RKIntegratorInternal::getJacSparsity(int iind, int oind){

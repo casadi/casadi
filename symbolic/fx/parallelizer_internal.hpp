@@ -75,7 +75,7 @@ class ParallelizerInternal : public FXInternal{
     virtual FX getDerivative(int nfwd, int nadj);
     
     /// Generate a function that calculates a Jacobian function
-    virtual FX getJacobian(int iind, int oind);
+    virtual FX getJacobian(int iind, int oind, bool compact, bool symmetric);
 
     /// Initialize
     virtual void init();

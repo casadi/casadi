@@ -548,7 +548,7 @@ void FXInternal::spEvaluate(bool fwd){
   }
 }
 
-FX FXInternal::jacobian_new(int iind, int oind){
+FX FXInternal::jacobian(int iind, int oind, bool compact, bool symmetric){
   casadi_assert(iind>=0 && iind<getNumInputs());
   casadi_assert(oind>=0 && oind<getNumOutputs());
   
@@ -574,10 +574,11 @@ FX FXInternal::jacobian_new(int iind, int oind){
       ret = jacgen_(fcn,iind,oind,user_data_);
     } else if(numeric_jacobian_){
       // Generate Jacobian instance
+      casadi_assert_message(!compact, "Not implemented");
       ret = Jacobian(shared_from_this<FX>(),iind,oind);
     } else {
       // Use internal routine to calculate Jacobian
-      ret = getJacobian(iind,oind);
+      ret = getJacobian(iind,oind,compact, symmetric);
     }
     casadi_assert(!ret.isNull());
     
@@ -601,7 +602,7 @@ FX FXInternal::jacobian_new(int iind, int oind){
   return ret;
 }
 
-FX FXInternal::getJacobian(int iind, int oind){
+FX FXInternal::getJacobian(int iind, int oind, bool compact, bool symmetric){
   Jacobian ret(shared_from_this<FX>(),iind,oind);
   ret.setOption("verbose",getOption("verbose"));
   return ret;

@@ -201,9 +201,9 @@ void FX::setNumOutputs(int num_out){
   return (*this)->setNumOutputs(num_out);  
 }
 
-FX FX::jacobian(int iind, int oind){
+FX FX::jacobian(int iind, int oind, bool compact, bool symmetric){
   assertInit();
-  return (*this)->jacobian_new(iind,oind);
+  return (*this)->jacobian(iind,oind,compact,symmetric);
 }
 
 FX FX::hessian(int iind, int oind){

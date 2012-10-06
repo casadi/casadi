@@ -149,7 +149,7 @@ class FX : public OptionsFunctionality{
   * The default behaviour for FX is to use CasADi::Jacobian, which uses (numerical) directional
   * derivatives (i.e. operator overloading) to form the Jacobian.
   */
-  FX jacobian(int iind=0, int oind=0);
+  FX jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
   
   /** \brief Hessian of output oind with respect to input iind */
   FX hessian(int iind=0, int oind=0);

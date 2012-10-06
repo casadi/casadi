@@ -85,7 +85,7 @@ public:
   virtual FX getDerivative(int nfwd, int nadj);
 
   /** \brief Calculate the jacobian of output oind with respect to input iind */
-  virtual FX getJacobian(int iind, int oind);
+  virtual FX getJacobian(int iind, int oind, bool compact, bool symmetric);
 
   /// Generate a augmented DAE system with nfwd forward sensitivities and nadj adjoint sensitivities
   virtual std::pair<FX,FX> getAugmented(int nfwd, int nadj);

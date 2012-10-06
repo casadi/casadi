@@ -536,11 +536,11 @@ void MXFunctionInternal::spEvaluate(bool fwd){
   }
 }
 
-FX MXFunctionInternal::getJacobian(int iind, int oind){
+FX MXFunctionInternal::getJacobian(int iind, int oind, bool compact, bool symmetric){
   // Return function expression
   vector<MX> ret_out;
   ret_out.reserve(1+outputv_.size());
-  ret_out.push_back(jac(iind,oind));
+  ret_out.push_back(jac(iind,oind,compact,symmetric));
   ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
   
   // Return function
@@ -774,7 +774,7 @@ FX MXFunctionInternal::hessian(int iind, int oind) {
   gfcn.init();
   
   // And return the jacobian of that gradient function
-  return gfcn.jacobian(iind,0);
+  return gfcn.jacobian(iind,0,false,true);
 }
 
 void MXFunctionInternal::evalSX(const std::vector<SXMatrix>& input_s, std::vector<SXMatrix>& output_s, 

@@ -716,14 +716,14 @@ FX IntegratorInternal::getDerivative(int nfwd, int nadj){
   return MXFunction(ret_in,ret_out);
 }
 
-FX IntegratorInternal::getJacobian(int iind, int oind){
+FX IntegratorInternal::getJacobian(int iind, int oind, bool compact, bool symmetric){
   vector<MX> arg = symbolicInput();
   vector<MX> res = shared_from_this<FX>().call(arg);
   MXFunction f(arg,res);
   f.setOption("ad_mode","forward");
   f.setOption("numeric_jacobian", false);
   f.init();
-  return f.jacobian(iind,oind);
+  return f.jacobian(iind,oind,compact,symmetric);
 }
 
 void IntegratorInternal::reset(int nsens, int nsensB, int nsensB_store){

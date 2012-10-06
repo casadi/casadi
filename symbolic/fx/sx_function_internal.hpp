@@ -107,7 +107,7 @@ class SXFunctionInternal : public XFunctionInternal<SXFunctionInternal,Matrix<SX
   virtual FX getDerivative(int nfwd, int nadj);
   
   /** \brief Calculate the jacobian of output oind with respect to input iind */
-  virtual FX getJacobian(int iind, int oind);
+  virtual FX getJacobian(int iind, int oind, bool compact, bool symmetric);
 
   /** \brief  DATA MEMBERS */
   

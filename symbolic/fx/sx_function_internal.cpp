@@ -1158,11 +1158,11 @@ void SXFunctionInternal::clearSymbolic(){
   s_work_.clear();
 }
 
-FX SXFunctionInternal::getJacobian(int iind, int oind){
+FX SXFunctionInternal::getJacobian(int iind, int oind, bool compact, bool symmetric){
   // Return function expression
   vector<SXMatrix> ret_out;
   ret_out.reserve(1+outputv_.size());
-  ret_out.push_back(jac(iind,oind));
+  ret_out.push_back(jac(iind,oind,compact,symmetric));
   ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
   
   // Return function
