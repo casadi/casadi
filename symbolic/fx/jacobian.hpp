@@ -57,9 +57,6 @@ public:
 
   /// Create a Jacobian
   explicit Jacobian(const FX& fcn, int iind=0, int oind=0);
-
-  /// Create a set of Jacobians (new formulation)
-  Jacobian(const FX& fcn, const std::vector<std::pair<int,int> >& jblocks);
   
   /// Access functions of the node
   JacobianInternal* operator->();

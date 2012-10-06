@@ -74,8 +74,8 @@ class ParallelizerInternal : public FXInternal{
     /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
     virtual FX getDerivative(int nfwd, int nadj);
     
-    /// Calculate the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs
-    virtual FX jacobian(const std::vector<std::pair<int,int> >& jblocks);
+    /// Generate a function that calculates a Jacobian function
+    virtual FX getJacobian(int iind, int oind);
 
     /// Initialize
     virtual void init();

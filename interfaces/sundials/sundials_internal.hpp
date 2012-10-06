@@ -59,8 +59,8 @@ public:
   /** \brief Create an integrator which integrates the ODE/DAE augmented with the forward sensitivity equations */
   virtual SundialsIntegrator jac(bool with_x, bool with_p);
 
-  /** \brief Calculate the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs */
-  virtual FX jacobian(const std::vector<std::pair<int,int> >& jblocks);
+  /** \brief Calculate the jacobian of output oind with respect to input iind */
+  virtual FX getJacobian(int iind, int oind);
 
   /// Generate the sparsity of a Jacobian block
   virtual CRSSparsity getJacSparsity(int iind, int oind);

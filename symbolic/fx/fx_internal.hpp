@@ -62,15 +62,6 @@ class FXInternal : public OptionsFunctionalityNode{
         if recursive==true, updateNumSens is also invoked for the baseclass. */
     virtual void updateNumSens(bool recursive);
     
-    /** \brief Calculate the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs */
-    virtual FX jacobian(const std::vector<std::pair<int,int> >& jblocks);
-
-    /** \brief Switch between numeric and symbolic jacobian */
-    FX jacobian_switch(const std::vector<std::pair<int,int> >& jblocks);
-
-    /** \brief Numeric Jacobian */
-    FX numeric_jacobian(const std::vector<std::pair<int,int> >& jblocks);
-
     /** \brief Hessian of output oind with respect to input iind */
     virtual FX hessian(int iind=0, int oind=0);
 

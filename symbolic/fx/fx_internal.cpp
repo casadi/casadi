@@ -221,72 +221,6 @@ std::vector<SXMatrix> FXInternal::symbolicInputSX() const{
   return ret;
 }
 
-FX FXInternal::jacobian_switch(const std::vector<std::pair<int,int> >& jblocks){
-  if(numeric_jacobian_){
-    return numeric_jacobian(jblocks);
-  } else {
-    if(jacgen_==0){
-      // Use internal routine to calculate Jacobian
-      return jacobian(jblocks);
-    } else {
-      // Create a temporary FX instance
-      FX tmp;
-      tmp.assignNode(this);
-
-      // Use user-provided routine to calculate Jacobian
-      return jacgen_(tmp,jblocks,user_data_);
-    }
-  }
-}
-
-FX FXInternal::jacobian(const vector<pair<int,int> >& jblocks){
-  return numeric_jacobian(jblocks);
-}
-
-FX FXInternal::numeric_jacobian(const vector<pair<int,int> >& jblocks){
-  // Symbolic input
-  vector<MX> j_in = symbolicInput();
-  
-  // Nondifferentiated function
-  FX fcn;
-  fcn.assignNode(this);
-  vector<MX> fcn_eval = fcn.call(j_in);
-  
-  // Less overhead if only jacobian is requested
-  if(jblocks.size()==1 && jblocks.front().second>=0){
-    Jacobian ret(fcn,jblocks.front().second,jblocks.front().first);
-    ret.setOption("verbose",getOption("verbose"));
-    return ret;
-  }
-  
-  // Outputs
-  vector<MX> j_out;
-  j_out.reserve(jblocks.size());
-  for(vector<pair<int,int> >::const_iterator it=jblocks.begin(); it!=jblocks.end(); ++it){
-    // If variable index is -1, we want nondifferentiated function output
-    if(it->second==-1){
-      // Nondifferentiated function
-      j_out.push_back(fcn_eval[it->first]);
-      
-    } else {
-      // Create jacobian for block
-      Jacobian J(fcn,it->second,it->first);
-      
-      if(!J.isNull()){
-        J.init();
-      
-        // Evaluate symbolically
-        j_out.push_back(J.call(j_in).at(0));
-      } else {
-        j_out.push_back(MX::sparse(output(it->first).numel(),input(it->second).numel()));
-      }
-    }
-  }
-  
-  // Create function
-  return MXFunction(j_in,j_out);
-}
-
 CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
   // Check if we are able to propagate dependencies throught he function
   if(spCanEvaluate(true) || spCanEvaluate(false)){
@@ -634,8 +568,18 @@ FX FXInternal::jacobian_new(int iind, int oind){
 
   // Check if already cached
   if(ref.isNull()){
-    // Generate a new function
-    ret = getJacobian(iind,oind);
+    if(jacgen_!=0){
+      // Use user-provided routine to calculate Jacobian
+      FX fcn = shared_from_this<FX>();
+      ret = jacgen_(fcn,iind,oind,user_data_);
+    } else if(numeric_jacobian_){
+      // Generate Jacobian instance
+      ret = Jacobian(shared_from_this<FX>(),iind,oind);
+    } else {
+      // Use internal routine to calculate Jacobian
+      ret = getJacobian(iind,oind);
+    }
+    casadi_assert(!ret.isNull());
     
     // Give it a suitable name
     stringstream ss;
@@ -658,9 +602,9 @@ FX FXInternal::jacobian_new(int iind, int oind){
 }
 
 FX FXInternal::getJacobian(int iind, int oind){
-  vector<pair<int,int> > jblocks;
-  jblocks.push_back(pair<int,int>(oind,iind));
-  return jacobian_switch(jblocks);
+  Jacobian ret(shared_from_this<FX>(),iind,oind);
+  ret.setOption("verbose",getOption("verbose"));
+  return ret;
 }
 
 FX FXInternal::derivative(int nfwd, int nadj){

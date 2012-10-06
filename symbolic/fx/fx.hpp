@@ -154,9 +154,6 @@ class FX : public OptionsFunctionality{
   /** \brief Hessian of output oind with respect to input iind */
   FX hessian(int iind=0, int oind=0);
 
-  /** \brief Calculate the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs */
-  FX jacobian(const std::vector<std::pair<int,int> >& jblocks);
-
 #ifndef SWIG
   /** \brief  Create a function call (single input) */
   std::vector<MX> call(const MX &arg);

@@ -1158,37 +1158,15 @@ void SXFunctionInternal::clearSymbolic(){
   s_work_.clear();
 }
 
-// FX SXFunctionInternal::getJacobian(int iind, int oind){
-//   // Return function expression
-//   vector<SXMatrix> ret_out;
-//   ret_out.reserve(1+outputv_.size());
-//   ret_out.push_back(jac(iind,oind));
-//   ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
-//   
-//   // Return function
-//   return SXFunction(inputv_,ret_out);
-// }
-
-FX SXFunctionInternal::jacobian(const vector<pair<int,int> >& jblocks){
-  // Jacobian blocks
-  vector<SXMatrix> jac_out(jblocks.size());
-  jac_out.reserve(jblocks.size());
-  
-  for(int el=0; el<jac_out.size(); ++el){
-    int oind = jblocks[el].first;
-    int iind = jblocks[el].second;
-    
-    if(iind==-1){
-      // Undifferentiated function
-      jac_out[el] = outputv_.at(oind);
-    } else {
-      // Jacobian (workaround)
-      jac_out[el] = jac(iind,oind);
-    }
-  }
+FX SXFunctionInternal::getJacobian(int iind, int oind){
+  // Return function expression
+  vector<SXMatrix> ret_out;
+  ret_out.reserve(1+outputv_.size());
+  ret_out.push_back(jac(iind,oind));
+  ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
   
   // Return function
-  return SXFunction(inputv_,jac_out);
+  return SXFunction(inputv_,ret_out);
 }
 
 void SXFunctionInternal::spInit(bool fwd){

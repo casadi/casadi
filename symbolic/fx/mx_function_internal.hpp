@@ -76,11 +76,8 @@ class MXFunctionInternal : public XFunctionInternal<MXFunctionInternal,MX,MXNode
     /** \brief Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives */
     virtual FX getDerivative(int nfwd, int nadj);
 
-    /** \brief Jacobian via source code transformation */
-    virtual FX jacobian(const std::vector<std::pair<int,int> >& jblocks);
-    
     /** \brief Calculate the jacobian of output oind with respect to input iind */
-//     virtual FX getJacobian(int iind, int oind);
+    virtual FX getJacobian(int iind, int oind);
 
     /** \brief  An elemenent of the algorithm, namely an MX node */
     typedef MXAlgEl AlgEl;

@@ -106,11 +106,8 @@ class SXFunctionInternal : public XFunctionInternal<SXFunctionInternal,Matrix<SX
   /** \brief Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives */
   virtual FX getDerivative(int nfwd, int nadj);
   
-  /** \brief Calculate the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs */
-  virtual FX jacobian(const std::vector<std::pair<int,int> >& jblocks);
-
   /** \brief Calculate the jacobian of output oind with respect to input iind */
-//   virtual FX getJacobian(int iind, int oind);
+  virtual FX getJacobian(int iind, int oind);
 
   /** \brief  DATA MEMBERS */
   

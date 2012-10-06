@@ -206,11 +206,6 @@ FX FX::jacobian(int iind, int oind){
   return (*this)->jacobian_new(iind,oind);
 }
 
-FX FX::jacobian(const std::vector<std::pair<int,int> >& jblocks){
-  assertInit();
-  return (*this)->jacobian_switch(jblocks);
-}
-
 FX FX::hessian(int iind, int oind){
   assertInit();
   return (*this)->hessian(iind,oind);  

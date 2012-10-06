@@ -176,6 +176,8 @@ void SundialsInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>&
 }
 
 SundialsIntegrator SundialsInternal::jac(bool with_x, bool with_p){
+  casadi_warning("Legacy code, to be removed");
+  
   // Make sure that we need sensitivities w.r.t. X0 or P (or both)
   casadi_assert(with_x || with_p);
   
@@ -263,7 +265,11 @@ CRSSparsity SundialsInternal::getJacSparsity(int iind, int oind){
     return FXInternal::getJacSparsity(iind,oind);
 }
 
-FX SundialsInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks){
+FX SundialsInternal::getJacobian(int iind, int oind){
+  casadi_warning("Legacy code, to be removed");
+  
+  std::vector<std::pair<int,int> > jblocks(1,pair<int,int>(oind,iind));
+  
   bool with_x = false, with_p = false;
   for(int i=0; i<jblocks.size(); ++i){
     if(jblocks[i].second == INTEGRATOR_P){
@@ -354,7 +360,7 @@ FX SundialsInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks){
 
     return intjac;
   } else {
-    return FXInternal::jacobian(jblocks);
+    return FXInternal::getJacobian(iind,oind);
   }
 }
 

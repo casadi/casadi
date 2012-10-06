@@ -536,41 +536,15 @@ void MXFunctionInternal::spEvaluate(bool fwd){
   }
 }
 
-// FX MXFunctionInternal::getJacobian(int iind, int oind){
-//   // Return function expression
-//   vector<MX> ret_out;
-//   ret_out.reserve(1+outputv_.size());
-//   ret_out.push_back(jac(iind,oind));
-//   ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
-//   
-//   // Return function
-//   return MXFunction(inputv_,ret_out);
-// }
-
-FX MXFunctionInternal::jacobian(const std::vector<std::pair<int,int> >& jblocks){
-  log("MXFunctionInternal::jacobian begin");
-  
-  // Jacobian blocks
-  vector<MX> jac_out(jblocks.size());
-  jac_out.reserve(jblocks.size());
-  
-  for(int el=0; el<jac_out.size(); ++el){
-    int oind = jblocks[el].first;
-    int iind = jblocks[el].second;
-    
-    if(iind==-1){
-      // Undifferentiated function
-      jac_out[el] = outputv_.at(oind);
-    } else {
-      // Jacobian (workaround)
-      jac_out[el] = jac(iind,oind);
-    }
-  }
-  
-  vector<MX> inputv_v(inputv_);
+FX MXFunctionInternal::getJacobian(int iind, int oind){
+  // Return function expression
+  vector<MX> ret_out;
+  ret_out.reserve(1+outputv_.size());
+  ret_out.push_back(jac(iind,oind));
+  ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
   
   // Return function
-  return MXFunction(inputv_v,jac_out);
+  return MXFunction(inputv_,ret_out);
 }
 
 MX MXFunctionInternal::jac(int iind, int oind, bool compact, bool symmetric){
