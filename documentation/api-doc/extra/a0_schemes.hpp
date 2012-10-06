@@ -8,6 +8,26 @@
 <tr><td>INTEGRATOR_RQF</td><td>Backward quadrature state at the initial time [rqf].</td></tr>
 </table>
 */
+/** \defgroup scheme_JACInput
+<table>
+<caption>Input scheme: CasADi::JACInput  (JAC_NUM_IN = 6) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>JAC_T</td><td></td></tr>
+<tr><td>JAC_X</td><td></td></tr>
+<tr><td>JAC_Z</td><td></td></tr>
+<tr><td>JAC_XDOT</td><td></td></tr>
+<tr><td>JAC_P</td><td></td></tr>
+<tr><td>JAC_CJ</td><td></td></tr>
+</table>
+*/
+/** \defgroup scheme_MUSCOD_FCN_Output
+<table>
+<caption>Output scheme: CasADi::MUSCOD_FCN_Output  (MUSCOD_FCN_NUM_OUT = 2) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>MUSCOD_FCN_RHS</td><td></td></tr>
+<tr><td>MUSCOD_FCN_RES</td><td></td></tr>
+</table>
+*/
 /** \defgroup scheme_QPInput
 <table>
 <caption>Input scheme: CasADi::QPInput  (QP_NUM_IN = 9) </caption>
@@ -73,12 +93,12 @@
 <tr><td>RDAE_RXDOT</td><td>Time derivative of backward differential state [rxdot].</td></tr>
 </table>
 */
-/** \defgroup scheme_MUSCOD_FCN_Output
+/** \defgroup scheme_LOFunInputs
 <table>
-<caption>Output scheme: CasADi::MUSCOD_FCN_Output  (MUSCOD_FCN_NUM_OUT = 2) </caption>
+<caption>Input scheme: CasADi::LOFunInputs  (LO_NUM_IN = 2) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>MUSCOD_FCN_RHS</td><td></td></tr>
-<tr><td>MUSCOD_FCN_RES</td><td></td></tr>
+<tr><td>LO_U</td><td></td></tr>
+<tr><td>LO_LAMBDA</td><td></td></tr>
 </table>
 */
 /** \defgroup scheme_QPOutput
@@ -100,6 +120,13 @@
 <tr><td>NLP_LAMBDA_G</td><td>Lagrange multipliers associated with G at the solution (m x 1) [lambda_g].</td></tr>
 <tr><td>NLP_LAMBDA_X</td><td>Lagrange multipliers associated with bounds on X at the solution (n x 1) [lambda_x].</td></tr>
 <tr><td>NLP_G</td><td>The constraints evaluated at the optimal solution (m x 1) [g].</td></tr>
+</table>
+*/
+/** \defgroup scheme_JACOutput
+<table>
+<caption>Output scheme: CasADi::JACOutput  (JAC_NUM_OUT = 1) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>JAC_J</td><td></td></tr>
 </table>
 */
 /** \defgroup scheme_DAEInput
@@ -136,6 +163,9 @@
 <table>
 <caption>Input scheme: CasADi::InputOutputScheme  ( = 18) </caption>
 <tr><th>Name</th><th>Description</th></tr>
+<tr><td>SCHEME_ACADO_Input</td><td></td></tr>
+<tr><td>SCHEME_ACADO_Output</td><td></td></tr>
+<tr><td>SCHEME_ACADO_FCN_Input</td><td></td></tr>
 <tr><td>SCHEME_ControlledDAEInput</td><td></td></tr>
 <tr><td>SCHEME_ControlSimulatorInput</td><td></td></tr>
 <tr><td>SCHEME_DAEInput</td><td></td></tr>
@@ -151,9 +181,6 @@
 <tr><td>SCHEME_OCPOutput</td><td></td></tr>
 <tr><td>SCHEME_QPInput</td><td></td></tr>
 <tr><td>SCHEME_QPOutput</td><td></td></tr>
-<tr><td>SCHEME_ACADO_Input</td><td></td></tr>
-<tr><td>SCHEME_ACADO_Output</td><td></td></tr>
-<tr><td>SCHEME_ACADO_FCN_Input</td><td></td></tr>
 <tr><td>SCHEME_unknown</td><td></td></tr>
 </table>
 */
@@ -161,6 +188,9 @@
 <table>
 <caption>Output scheme: CasADi::InputOutputScheme  ( = 18) </caption>
 <tr><th>Name</th><th>Description</th></tr>
+<tr><td>SCHEME_ACADO_Input</td><td></td></tr>
+<tr><td>SCHEME_ACADO_Output</td><td></td></tr>
+<tr><td>SCHEME_ACADO_FCN_Input</td><td></td></tr>
 <tr><td>SCHEME_ControlledDAEInput</td><td></td></tr>
 <tr><td>SCHEME_ControlSimulatorInput</td><td></td></tr>
 <tr><td>SCHEME_DAEInput</td><td></td></tr>
@@ -176,10 +206,14 @@
 <tr><td>SCHEME_OCPOutput</td><td></td></tr>
 <tr><td>SCHEME_QPInput</td><td></td></tr>
 <tr><td>SCHEME_QPOutput</td><td></td></tr>
-<tr><td>SCHEME_ACADO_Input</td><td></td></tr>
-<tr><td>SCHEME_ACADO_Output</td><td></td></tr>
-<tr><td>SCHEME_ACADO_FCN_Input</td><td></td></tr>
 <tr><td>SCHEME_unknown</td><td></td></tr>
+</table>
+*/
+/** \defgroup scheme_MOutput
+<table>
+<caption>Output scheme: CasADi::MOutput  (M_NUM_OUT = 1) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>M_M</td><td></td></tr>
 </table>
 */
 /** \defgroup scheme_MayerInput
@@ -248,6 +282,17 @@
 <tr><td>RDAE_QUAD</td><td>Right hand side of quadratures. [quad].</td></tr>
 </table>
 */
+/** \defgroup scheme_MUSCOD_FCN_Input
+<table>
+<caption>Input scheme: CasADi::MUSCOD_FCN_Input  (MUSCOD_FCN_NUM_IN = 5) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>MUSCOD_FCN_T</td><td></td></tr>
+<tr><td>MUSCOD_FCN_XD</td><td></td></tr>
+<tr><td>MUSCOD_FCN_XA</td><td></td></tr>
+<tr><td>MUSCOD_FCN_U</td><td></td></tr>
+<tr><td>MUSCOD_FCN_P</td><td></td></tr>
+</table>
+*/
 /** \defgroup scheme_OCPInput
 <table>
 <caption>Input scheme: CasADi::OCPInput  (OCP_NUM_IN = 17) </caption>
@@ -280,16 +325,40 @@
 <tr><td>CONTROLSIMULATOR_U</td><td>Parameters that change over the integration intervals (dimension (ns-1)-by-nu) [u].</td></tr>
 </table>
 */
-/** \defgroup scheme_MUSCOD_FCN_Input
+/** \defgroup scheme_MInput
 <table>
-<caption>Input scheme: CasADi::MUSCOD_FCN_Input  (MUSCOD_FCN_NUM_IN = 5) </caption>
+<caption>Input scheme: CasADi::MInput  (M_NUM_IN = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>MUSCOD_FCN_T</td><td></td></tr>
-<tr><td>MUSCOD_FCN_XD</td><td></td></tr>
-<tr><td>MUSCOD_FCN_XA</td><td></td></tr>
-<tr><td>MUSCOD_FCN_U</td><td></td></tr>
-<tr><td>MUSCOD_FCN_P</td><td></td></tr>
+<tr><td>M_T</td><td></td></tr>
+<tr><td>M_Y</td><td></td></tr>
+<tr><td>M_P</td><td></td></tr>
+<tr><td>M_GAMMA</td><td></td></tr>
 </table>
+*/
+/** \defgroup scheme_LOFunOutputs
+<table>
+<caption>Output scheme: CasADi::LOFunOutputs  (LO_NUM_OUT = 5) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>LO_OBJRES</td><td></td></tr>
+<tr><td>LO_EQ</td><td></td></tr>
+<tr><td>LO_INEQ</td><td></td></tr>
+<tr><td>LO_OBJ</td><td></td></tr>
+<tr><td>LO_LAGFCN</td><td></td></tr>
+</table>
+*/
+/** \class CasADi::LiftoptInternal
+\n
+\par
+@copydoc scheme_NLPInput
+<br/>
+@copydoc scheme_NLPOutput
+*/
+/** \class CasADi::LiftoptSolver
+\n
+\par
+@copydoc scheme_NLPInput
+<br/>
+@copydoc scheme_NLPOutput
 */
 /** \class CasADi::NLPSolverInternal
 \n
@@ -305,20 +374,6 @@
 <br/>
 @copydoc scheme_NLPOutput
 */
-/** \class CasADi::Interfaces::OOQPInternal
-\n
-\par
-@copydoc scheme_QPInput
-<br/>
-@copydoc scheme_QPOutput
-*/
-/** \class CasADi::Interfaces::OOQPSolver
-\n
-\par
-@copydoc scheme_QPInput
-<br/>
-@copydoc scheme_QPOutput
-*/
 /** \class CasADi::CollocationIntegratorInternal
 \n
 \par
@@ -333,14 +388,14 @@
 <br/>
 @copydoc scheme_IntegratorOutput
 */
-/** \class CasADi::OptimalControl::MultipleShootingInternal
+/** \class CasADi::CollocationInternal
 \n
 \par
 @copydoc scheme_OCPInput
 <br/>
 @copydoc scheme_OCPOutput
 */
-/** \class CasADi::OptimalControl::MultipleShooting
+/** \class CasADi::Collocation
 \n
 \par
 @copydoc scheme_OCPInput
@@ -361,20 +416,6 @@
 <br/>
 @copydoc scheme_NLPOutput
 */
-/** \class CasADi::Sundials::SundialsInternal
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
-*/
-/** \class CasADi::Sundials::SundialsIntegrator
-\n
-\par
-@copydoc scheme_IntegratorInput
-<br/>
-@copydoc scheme_IntegratorOutput
-*/
 /** \class CasADi::SimulatorInternal
 \n
 \par
@@ -384,6 +425,20 @@
 \n
 \par
 @copydoc scheme_IntegratorInput
+*/
+/** \class CasADi::CVodesInternal
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
+/** \class CasADi::CVodesIntegrator
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
 */
 /** \class CasADi::QPSolverInternal
 \n
@@ -399,19 +454,19 @@
 <br/>
 @copydoc scheme_QPOutput
 */
-/** \class CasADi::Interfaces::QPOasesInternal
+/** \class CasADi::MultipleShootingInternal
 \n
 \par
-@copydoc scheme_QPInput
+@copydoc scheme_OCPInput
 <br/>
-@copydoc scheme_QPOutput
+@copydoc scheme_OCPOutput
 */
-/** \class CasADi::Interfaces::QPOasesSolver
+/** \class CasADi::MultipleShooting
 \n
 \par
-@copydoc scheme_QPInput
+@copydoc scheme_OCPInput
 <br/>
-@copydoc scheme_QPOutput
+@copydoc scheme_OCPOutput
 */
 /** \class CasADi::LiftedSQPInternal
 \n
@@ -427,6 +482,20 @@
 <br/>
 @copydoc scheme_NLPOutput
 */
+/** \class CasADi::OOQPInternal
+\n
+\par
+@copydoc scheme_QPInput
+<br/>
+@copydoc scheme_QPOutput
+*/
+/** \class CasADi::OOQPSolver
+\n
+\par
+@copydoc scheme_QPInput
+<br/>
+@copydoc scheme_QPOutput
+*/
 /** \class CasADi::IpoptInternal
 \n
 \par
@@ -441,14 +510,28 @@
 <br/>
 @copydoc scheme_NLPOutput
 */
-/** \class CasADi::Sundials::CVodesInternal
+/** \class CasADi::QPOasesInternal
+\n
+\par
+@copydoc scheme_QPInput
+<br/>
+@copydoc scheme_QPOutput
+*/
+/** \class CasADi::QPOasesSolver
+\n
+\par
+@copydoc scheme_QPInput
+<br/>
+@copydoc scheme_QPOutput
+*/
+/** \class CasADi::IdasInternal
 \n
 \par
 @copydoc scheme_IntegratorInput
 <br/>
 @copydoc scheme_IntegratorOutput
 */
-/** \class CasADi::Sundials::CVodesIntegrator
+/** \class CasADi::IdasIntegrator
 \n
 \par
 @copydoc scheme_IntegratorInput
@@ -468,20 +551,6 @@
 @copydoc scheme_IntegratorInput
 <br/>
 @copydoc scheme_IntegratorOutput
-*/
-/** \class CasADi::Interfaces::IpoptQPInternal
-\n
-\par
-@copydoc scheme_QPInput
-<br/>
-@copydoc scheme_QPOutput
-*/
-/** \class CasADi::Interfaces::IpoptQPSolver
-\n
-\par
-@copydoc scheme_QPInput
-<br/>
-@copydoc scheme_QPOutput
 */
 /** \class CasADi::CplexInternal
 \n
@@ -505,20 +574,6 @@
 @copydoc scheme_NLPOutput
 */
 /** \class CasADi::KnitroSolver
-\n
-\par
-@copydoc scheme_NLPInput
-<br/>
-@copydoc scheme_NLPOutput
-*/
-/** \class CasADi::Interfaces::LiftoptInternal
-\n
-\par
-@copydoc scheme_NLPInput
-<br/>
-@copydoc scheme_NLPOutput
-*/
-/** \class CasADi::Interfaces::LiftoptSolver
 \n
 \par
 @copydoc scheme_NLPInput
@@ -553,19 +608,19 @@
 <br/>
 @copydoc scheme_NLPOutput
 */
-/** \class CasADi::Sundials::IdasInternal
+/** \class CasADi::IpoptQPInternal
 \n
 \par
-@copydoc scheme_IntegratorInput
+@copydoc scheme_QPInput
 <br/>
-@copydoc scheme_IntegratorOutput
+@copydoc scheme_QPOutput
 */
-/** \class CasADi::Sundials::IdasIntegrator
+/** \class CasADi::IpoptQPSolver
 \n
 \par
-@copydoc scheme_IntegratorInput
+@copydoc scheme_QPInput
 <br/>
-@copydoc scheme_IntegratorOutput
+@copydoc scheme_QPOutput
 */
 /** \class CasADi::RKIntegratorInternal
 \n
@@ -595,6 +650,20 @@
 <br/>
 @copydoc scheme_OCPOutput
 */
+/** \class CasADi::SundialsInternal
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
+/** \class CasADi::SundialsIntegrator
+\n
+\par
+@copydoc scheme_IntegratorInput
+<br/>
+@copydoc scheme_IntegratorOutput
+*/
 /** \class CasADi::ControlSimulatorInternal
 \n
 \par
@@ -604,20 +673,6 @@
 \n
 \par
 @copydoc scheme_ControlSimulatorInput
-*/
-/** \class CasADi::OptimalControl::CollocationInternal
-\n
-\par
-@copydoc scheme_OCPInput
-<br/>
-@copydoc scheme_OCPOutput
-*/
-/** \class CasADi::OptimalControl::Collocation
-\n
-\par
-@copydoc scheme_OCPInput
-<br/>
-@copydoc scheme_OCPOutput
 */
 /** \class CasADi::WorhpInternal
 \n

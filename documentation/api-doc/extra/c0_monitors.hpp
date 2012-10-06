@@ -1,23 +1,23 @@
-/** \class CasADi::Sundials::KinsolInternal
+/** \class CasADi::KinsolInternal
 \n
 \par
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>eval_djac</td><td>CasADi::Sundials::KinsolInternal</td></tr>
-<tr><td>eval_f</td><td>CasADi::Sundials::KinsolInternal</td></tr>
+<tr><td>eval_djac</td><td>CasADi::KinsolInternal</td></tr>
+<tr><td>eval_f</td><td>CasADi::KinsolInternal</td></tr>
 <tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
 </table>
 */
-/** \class CasADi::Sundials::KinsolSolver
+/** \class CasADi::KinsolSolver
 \n
 \par
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
-<tr><td>eval_djac</td><td>CasADi::Sundials::KinsolInternal</td></tr>
-<tr><td>eval_f</td><td>CasADi::Sundials::KinsolInternal</td></tr>
+<tr><td>eval_djac</td><td>CasADi::KinsolInternal</td></tr>
+<tr><td>eval_f</td><td>CasADi::KinsolInternal</td></tr>
 <tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -44,6 +44,34 @@
 <tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
 <tr><td>step</td><td>CasADi::SimulatorInternal</td></tr>
+</table>
+*/
+/** \class CasADi::CVodesInternal
+\n
+\par
+<table>
+<caption>List of available monitors</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>res</td><td>CasADi::CVodesInternal</td></tr>
+<tr><td>resB</td><td>CasADi::CVodesInternal</td></tr>
+<tr><td>resQB</td><td>CasADi::CVodesInternal</td></tr>
+<tr><td>reset</td><td>CasADi::CVodesInternal</td></tr>
+</table>
+*/
+/** \class CasADi::CVodesIntegrator
+\n
+\par
+<table>
+<caption>List of available monitors</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>res</td><td>CasADi::CVodesInternal</td></tr>
+<tr><td>resB</td><td>CasADi::CVodesInternal</td></tr>
+<tr><td>resQB</td><td>CasADi::CVodesInternal</td></tr>
+<tr><td>reset</td><td>CasADi::CVodesInternal</td></tr>
 </table>
 */
 /** \class CasADi::LiftedSQPInternal
@@ -106,32 +134,30 @@
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
 </table>
 */
-/** \class CasADi::Sundials::CVodesInternal
+/** \class CasADi::IdasInternal
 \n
 \par
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
+<tr><td>correctInitialConditions</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
-<tr><td>res</td><td>CasADi::Sundials::CVodesInternal</td></tr>
-<tr><td>resB</td><td>CasADi::Sundials::CVodesInternal</td></tr>
-<tr><td>resQB</td><td>CasADi::Sundials::CVodesInternal</td></tr>
-<tr><td>reset</td><td>CasADi::Sundials::CVodesInternal</td></tr>
+<tr><td>res</td><td>CasADi::IdasInternal</td></tr>
+<tr><td>resS</td><td>CasADi::IdasInternal</td></tr>
 </table>
 */
-/** \class CasADi::Sundials::CVodesIntegrator
+/** \class CasADi::IdasIntegrator
 \n
 \par
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
+<tr><td>correctInitialConditions</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
-<tr><td>res</td><td>CasADi::Sundials::CVodesInternal</td></tr>
-<tr><td>resB</td><td>CasADi::Sundials::CVodesInternal</td></tr>
-<tr><td>resQB</td><td>CasADi::Sundials::CVodesInternal</td></tr>
-<tr><td>reset</td><td>CasADi::Sundials::CVodesInternal</td></tr>
+<tr><td>res</td><td>CasADi::IdasInternal</td></tr>
+<tr><td>resS</td><td>CasADi::IdasInternal</td></tr>
 </table>
 */
 /** \class CasADi::XFunctionInternal
@@ -196,32 +222,6 @@
 <tr><th>Id</th><th>Used in</th></tr>
 <tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
-</table>
-*/
-/** \class CasADi::Sundials::IdasInternal
-\n
-\par
-<table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>correctInitialConditions</td><td>CasADi::Sundials::IdasInternal</td></tr>
-<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
-<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
-<tr><td>res</td><td>CasADi::Sundials::IdasInternal</td></tr>
-<tr><td>resS</td><td>CasADi::Sundials::IdasInternal</td></tr>
-</table>
-*/
-/** \class CasADi::Sundials::IdasIntegrator
-\n
-\par
-<table>
-<caption>List of available monitors</caption>
-<tr><th>Id</th><th>Used in</th></tr>
-<tr><td>correctInitialConditions</td><td>CasADi::Sundials::IdasInternal</td></tr>
-<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
-<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
-<tr><td>res</td><td>CasADi::Sundials::IdasInternal</td></tr>
-<tr><td>resS</td><td>CasADi::Sundials::IdasInternal</td></tr>
 </table>
 */
 /** \class CasADi::WorhpInternal
