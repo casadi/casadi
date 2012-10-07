@@ -45,26 +45,47 @@ integrator.setOption("quad_err_con",True)
 integrator.setOption("abstol",1e-6)
 integrator.setOption("reltol",1e-6)
 tend=10
+integrator.setOption("t0",0)
 integrator.setOption("tf",tend)
 integrator.init()
-#! The integrator is really just a special kind of FX.
-#$ Quoting the integrator.hpp header documentation:
+#$ The integrator is really just a special kind of FX. Assume that we have an ODE/DAE in either explicit form:
 #$ \begin{verbatim}
-#$ An "integrator" is a function that solves
-#$   an initial value problem (IVP) of the generic form:
-#$   
-#$   F(x,der(x),p,t) == 0
-#$   x(t0) = x0
+#$   der(x) = fx(x,z,p,t)
+#$ \end{verbatim}
+#$  or in implicit form
+#$ \begin{verbatim}
+#$   0 = fx(x,z,p,t,der(x))
+#$   0 = fz(x,z,p,t)
+#$ \end{verbatim}
 #$ 
-#$   It has 4 inputs, initial time, final time,
-#$   initial state (vector-valued) and parameter (vector-valued)
-#$   and one output, the state at the final time. 
-#$   In addition to this, the integrator provides some additional functionality,
-#$   such as getting the value of the state and/or sensitivities
-#$   at certain time points.
-#$   Controls are assumed to be parametrized at this point. 
-#$     
-#$   \end{verbatim}
+#$ Also assume a fixed time interval [t0,tf] and that the
+#$ state x is given at the t0.
+#$ 
+#$ An integrator can then be thought of as a mapping from the state at
+#$ the initial time and the parameters to the state at the final time:
+#$ \begin{verbatim}
+#$   x(tf) = F(x(t0),p)
+#$ \end{verbatim}
+#$ 
+#$ Integrators in CasADi are a little more general than this, allowing
+#$ the user to augment the ODE/DAE with a set of quadrature equations:
+#$ \begin{verbatim}
+#$     der(q) = fq(x,z,p,t), q(t0) = 0
+#$ \end{verbatim}
+#$ 
+#$ As well as another DAE with terminal value constraints depending on the
+#$ solution of the forward DAE:
+#$ \begin{verbatim}
+#$           0 = gx(rx,rz,rp,x,z,p,t,der(rx))
+#$           0 = gz(rx,rz,rp,x,z,p,t)
+#$     der(rq) = gq(rx,rz,rp,x,z,p,t)
+#$ \end{verbatim}
+#$ 
+#$ This gives us in total four inputs and four outputs:
+#$ \begin{verbatim}
+#$   [x(tf),q(tf),rx(t0),rq(t0)]  = F(x(t0),p,rx(0),rp)
+#$ \end{verbatim}
+#$ 
 print isinstance(integrator,FX)
 print "%d -> %d" % (integrator.getNumInputs(),integrator.getNumOutputs())
 #! Setup the Integrator to integrate from 0 to t=tend, starting at [x0,y0]
@@ -144,12 +165,9 @@ show()
 #$ A common approach to visualise sensitivity for initial conditions is to overlay the phase space solution with ellipses defined by the local jacobian $\frac{\partial x(t)}{\partial x(0)} = [\frac{dx_1(t)}{dx_1(0)}\quad\frac{dx_1(t)}{dx_2(0)};\frac{dx_2(t)}{dx_1(0)}\quad\frac{dx_2(t)}{dx_2(0)}]$
 #! The interpetation is that a small initial circular patch of phase space evolves into ellipsoid patches at later stages.
 
-integrator.reset() # start integration from time zero again
-
 def out(t):
-	integrator.setFinalTime(t)
 	integrator.fwdSeed(INTEGRATOR_X0).set([1,0])
-	integrator.integrate(t)
+        integrator.evaluate(1,0)
 	A=integrator.fwdSens().toArray()
 	integrator.fwdSeed(INTEGRATOR_X0).set([0,1])
 	integrator.evaluate(1,0)
@@ -185,7 +203,7 @@ show()
 #! Symbolic intergator results
 #! ---------------------------
 #! Since CVodesIntegrator is just another FX, 
-#! the usual CasAdi rules for symbolic evaluation are active.
+#! the usual CasADi rules for symbolic evaluation are active.
 #!
 #! We create an MX 'w' that contains the result of a time integration with:
 #! - a fixed integration start time , t=0s
@@ -193,7 +211,6 @@ show()
 #! - a fixed initial condition (1,0)
 #! - a free symbolic input, held constant during integration interval
 u=MX("u")
-integrator.setFinalTime(tend)
 w,_,_,_ = integrator.call(integratorIn(x0=MX([1,0]),p=u))
 
 #! We construct an MXfunction and a python help function 'out'
