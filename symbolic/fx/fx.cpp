@@ -103,22 +103,7 @@ vector<MX> FX::call(const vector<MX> &arg){
 
 void FX::call(const MXVector& arg, MXVector& res,  const MXVectorVector& fseed, MXVectorVector& fsens, 
 	      const MXVectorVector& aseed, MXVectorVector& asens, bool output_given){
-  assertInit();
-  
-  // Argument checking
-  casadi_assert_message(arg.size()<=getNumInputs(), "FX::call: number of passed-in dependencies (" << arg.size() << ") should not exceed the number of inputs of the function (" << getNumInputs() << ").");
-
-  // Assumes initialised
-  for(int i=0; i<arg.size(); ++i){
-    if(arg[i].isNull() || arg[i].empty()) continue;
-    casadi_assert_message(arg[i].size1()==input(i).size1() && arg[i].size2()==input(i).size2(),
-			  "Evaluation::shapes of passed-in dependencies should match shapes of inputs of function." << 
-			  std::endl << "Input argument " << i << " has shape (" << input(i).size1() << 
-			  "," << input(i).size2() << ") while a shape (" << arg[i].size1() << "," << arg[i].size2() << 
-			  ") was supplied.");
-  }
-  
-  EvaluationMX::create(*this,arg,res,fseed,fsens,aseed,asens);
+  (*this)->call(arg,res,fseed,fsens,aseed,asens,output_given,false,true);
 }
 
 vector<vector<MX> > FX::call(const vector<vector<MX> > &x, const Dictionary& paropt){
@@ -357,7 +342,7 @@ vector<SXMatrix> FX::evalSX(const vector<SXMatrix>& arg){
   vector<vector<SXMatrix> > dummy;
   
   // Evaluate the algorithm
-  (*this)->eval(arg2,res,dummy,dummy,dummy,dummy,false);
+  (*this)->evalSX(arg2,res,dummy,dummy,dummy,dummy,false);
   
   // Return the result
   return res;
@@ -388,14 +373,14 @@ void FX::eval(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res,
 		     const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
 		     const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
 		     bool output_given){
-  (*this)->eval(arg,res,fseed,fsens,aseed,asens,output_given);
+  (*this)->evalSX(arg,res,fseed,fsens,aseed,asens,output_given);
 }
 
 void FX::eval(const std::vector<MX>& arg, std::vector<MX>& res, 
 		     const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
 		     const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
 		     bool output_given){
-  (*this)->eval(arg,res,fseed,fsens,aseed,asens,output_given);
+  (*this)->evalMX(arg,res,fseed,fsens,aseed,asens,output_given);
 }
 
 void FX::spEvaluate(bool fwd){

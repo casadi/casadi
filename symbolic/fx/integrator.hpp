@@ -27,16 +27,7 @@
 #include "linear_solver.hpp"
 
 /** \defgroup DAE_doc
-  Solves the following initial value problem (IVP):
-  
-  \verbatim
-  F(t,x,der(x),z,p) == 0
-  x(t0) = x0
-  over a time interval [t0, tf].
-  \endverbatim 
-  
-  NOTE: The ODE/DAE initial-value problem formulation in CasADi is being replaced with a new 
-  formulation which solves an initial value problem (IVP) coupled to a terminal value problem
+  Solves an initial value problem (IVP) coupled to a terminal value problem
   with differential equation given as an implicit ODE coupled to an algebraic
   equation and a set of quadratures:
   \verbatim
@@ -62,21 +53,33 @@
   (i.e. dfx/dxdot, dfz/dz, dgz/drz, dgx/drxdot are invertible) and furthermore that 
   gx, gz and gq have a linear dependency on rx, rz and rp and that f_x and g_x have a 
   linear dependence on xdot and rxdot respectively.
+  
+  Note that not all integrators support this general form. In particular, an explicit 
+  integrator may requite that there are no algebraic states of equations and that the 
+  ODE is given in explicit form:
+    der(x)  = fx_explicit(x,z,p,t)
+  
+  Integrators requite explicit ODEs also accept implict ODEs if they can be formally
+  decomposed in the following way:
+    0 = fx(x,z,p,t,der(x)) := fx_explicit(x,z,p,t) - der(x)
+  This form allows the same ODE/DAE to be used for both explicit and implicit
+  integrators. Explicit integrators will simply pass zeros as the state derivatives,
+  recovering the explicit formulation. This also applies to the backward integration.
+  
+  Solving the DAE defines a mapping from the four inputs:
+  x0:    The differential state at the initial time (INTEGRATOR_X0=0)
+  p:     Parameters (INTEGRATOR_P=1)
+  rx0:   Backward differential state at the final time (INTEGRATOR_RX0=2)
+  rp:    Backward parameter vector (INTEGRATOR_RP=3)
+  
+  ... and four outputs:
+  xf:    Differential state at the final time (INTEGRATOR_XF=0)
+  qf:    Quadrature state at the final time (INTEGRATOR_QF=1)
+  rxf:   Backward differential state at the initial time (INTEGRATOR_RXF=2)
+  rqf:   Backward quadrature state at the initial time (INTEGRATOR_RQF=3)
+  
   \endverbatim 
 */
-
-/** \defgroup ODE_doc
-  Solves the following initial value problem (IVP):
-  
-  \verbatim
-  xdot == f(t,x,p)
-  from t0 to tf
-  
-  given the initial condition
-  x(t0) == x0;
-  \endverbatim 
-*/
-
 namespace CasADi{
 
 /// Input arguments of an ODE/DAE function [daeIn]
@@ -177,11 +180,10 @@ class IntegratorInternal;
 /** Integrator abstract base class
   @copydoc DAE_doc
   
-  The Integrator class provides some additional functionality, such as getting the value of the state and/or sensitivities at certain time points.
-  Controls are assumed to be parametrized at this point. 
+  The Integrator class provides some additional functionality, such as getting the value of the state 
+  and/or sensitivities at certain time points.
     
-  The class does not specify how the function F above should be represented, nor the method used for the integration, but assumes that it steps forward in time 
-  (ruling out collocation in particular). The actual form of the ODE/DAE is defined in the derived classes.
+  The class does not specify the method used for the integration. This is defined in derived classes.
 
   \author Joel Andersson
   \date 2010

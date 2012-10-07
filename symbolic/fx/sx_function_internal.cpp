@@ -265,7 +265,7 @@ SXMatrix SXFunctionInternal::jac(int iind, int oind, bool compact, bool symmetri
   if(input(iind).empty() || output(oind).empty()){
     return Matrix<SX>(); // quick return
   } else {
-    return jacGen(iind,oind,compact,symmetric);
+    return jacGen(iind,oind,compact,symmetric,true,false);
   }
 }
 

@@ -38,7 +38,7 @@ class CVodesInternal;
 
 /** Function that integrates the ODE:
 
-  @copydoc ODE_doc
+  @copydoc DAE_doc
   
   A call to evaluate will integrate to the end.
   

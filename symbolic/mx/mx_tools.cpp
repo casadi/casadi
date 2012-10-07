@@ -628,7 +628,7 @@ void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, std::vec
 
   // Replace expression
   std::vector<MX> outputv = f->outputv_;
-  f->eval(f->inputv_, outputv, dummy, dummy, dummy, dummy, false);
+  f.eval(f->inputv_, outputv, dummy, dummy, dummy, dummy, false);
   
   // Replace the result
   std::vector<MX>::iterator outputv_it = outputv.begin();

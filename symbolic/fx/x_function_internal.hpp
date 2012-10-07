@@ -55,7 +55,7 @@ class XFunctionInternal : public FXInternal{
     static void resort_postpone(std::vector<NodeType*>& algnodes, std::vector<int>& lind);
              
     /** \brief  Construct a complete Jacobian by compression */
-    MatType jacGen(int iind, int oind, bool compact, bool symmetric);
+    MatType jacGen(int iind, int oind, bool compact, bool symmetric, bool always_inline, bool never_inline);
 
     // Data members (all public)
     
@@ -439,7 +439,7 @@ std::cout << "  "<< ii++ << ": ";
 }
 
 template<typename DerivedType, typename MatType, typename NodeType>
-MatType XFunctionInternal<DerivedType,MatType,NodeType>::jacGen(int iind, int oind, bool compact, bool symmetric){
+MatType XFunctionInternal<DerivedType,MatType,NodeType>::jacGen(int iind, int oind, bool compact, bool symmetric, bool always_inline, bool never_inline){
   using namespace std;
   if(verbose()) std::cout << "XFunctionInternal::jacGen begin" << std::endl;
   
@@ -517,7 +517,7 @@ MatType XFunctionInternal<DerivedType,MatType,NodeType>::jacGen(int iind, int oi
   }
   
   // Evaluate symbolically
-  eval(inputv_,outputv_,fseed,fsens,aseed,asens,true);
+  call(inputv_,outputv_,fseed,fsens,aseed,asens,true,always_inline,never_inline);
 
   // Get transposes and mappings for all jacobian sparsity patterns if we are using forward mode
   if(verbose())   std::cout << "XFunctionInternal::jac transposes and mapping" << std::endl;

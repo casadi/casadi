@@ -38,7 +38,7 @@
 namespace CasADi{
   
 /**
-  @copydoc ODE_doc
+  @copydoc DAE_doc
 */
 class CVodesInternal : public SundialsInternal{
   friend class CVodesIntegrator;

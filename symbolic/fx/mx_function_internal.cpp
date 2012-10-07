@@ -537,7 +537,7 @@ void MXFunctionInternal::spEvaluate(bool fwd){
 }
 
 FX MXFunctionInternal::getJacobian(int iind, int oind, bool compact, bool symmetric){
-  // Return function expression
+  // Create expressions for the Jacobian
   vector<MX> ret_out;
   ret_out.reserve(1+outputv_.size());
   ret_out.push_back(jac(iind,oind,compact,symmetric));
@@ -547,9 +547,20 @@ FX MXFunctionInternal::getJacobian(int iind, int oind, bool compact, bool symmet
   return MXFunction(inputv_,ret_out);
 }
 
-MX MXFunctionInternal::jac(int iind, int oind, bool compact, bool symmetric){
+FX MXFunctionInternal::getNumericJacobian(int iind, int oind, bool compact, bool symmetric){
+  // Create expressions for the Jacobian
+  vector<MX> ret_out;
+  ret_out.reserve(1+outputv_.size());
+  ret_out.push_back(jac(iind,oind,compact,symmetric,false,true));
+  // ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end()); // NOTE: Commented out for similarity with the Jacobian class
+  
+  // Return function
+  return MXFunction(inputv_,ret_out);  
+}
+
+MX MXFunctionInternal::jac(int iind, int oind, bool compact, bool symmetric, bool always_inline, bool never_inline){
   log("MXFunctionInternal::jac begin");
-  return jacGen(iind,oind,compact,symmetric);
+  return jacGen(iind,oind,compact,symmetric,always_inline,never_inline);
 }
 
 void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 
@@ -854,7 +865,7 @@ SXFunction MXFunctionInternal::expand(const std::vector<SXMatrix>& inputvsx ){
   vector<vector<SXMatrix> > dummy;
   
   // Evaluate symbolically
-  eval(arg,res,dummy,dummy,dummy,dummy,false);
+  evalSX(arg,res,dummy,dummy,dummy,dummy,false);
   
   // Create function
   SXFunction f(arg,res);

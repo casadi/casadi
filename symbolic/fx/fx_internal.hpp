@@ -85,22 +85,18 @@ class FXInternal : public OptionsFunctionalityNode{
                         const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
                         const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
                         bool output_given);
-
-    /** \brief  Evaluate symbolically, SX type (overloaded)*/
-    void eval(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
+    
+    /** \brief Call a function, MX type (overloaded) */
+    void call(const MXVector& arg, MXVector& res, 
+              const MXVectorVector& fseed, MXVectorVector& fsens, 
+              const MXVectorVector& aseed, MXVectorVector& asens,
+              bool output_given, bool always_inline, bool never_inline);
+    
+    /** \brief Call a function, SX type (overloaded) */
+    void call(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
               const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
               const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
-              bool output_given){
-      evalSX(arg,res,fseed,fsens,aseed,asens,output_given);
-    }
-
-    /** \brief  Evaluate symbolically, MX type (overloaded)*/
-    void eval(const std::vector<MX>& arg, std::vector<MX>& res, 
-              const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
-              const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
-              bool output_given){
-      evalMX(arg,res,fseed,fsens,aseed,asens,output_given);
-    }
+              bool output_given, bool always_inline, bool never_inline);
     
     /// Get a function that calculates nfwd forward derivatives and nadj adjoint derivatives (cached)
     FX derivative(int nfwd, int nadj);
@@ -113,6 +109,9 @@ class FXInternal : public OptionsFunctionalityNode{
     
     /// Generate a function that calculates a Jacobian function
     virtual FX getJacobian(int iind, int oind, bool compact, bool symmetric);
+    
+    /// Generate a function that calculates a Jacobian function by operator overloading
+    virtual FX getNumericJacobian(int iind, int oind, bool compact, bool symmetric);
     
     /** \brief  Access an input */
     FunctionIO& iStruct(int i){

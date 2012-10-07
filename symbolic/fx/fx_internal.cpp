@@ -574,6 +574,8 @@ FX FXInternal::jacobian(int iind, int oind, bool compact, bool symmetric){
       ret = jacgen_(fcn,iind,oind,user_data_);
     } else if(numeric_jacobian_){
       // Generate Jacobian instance
+      // ret = getNumericJacobian(iind,oind,compact,symmetric); // NOTE: replaces the below
+      
       casadi_assert_message(!compact, "Not implemented");
       ret = Jacobian(shared_from_this<FX>(),iind,oind);
     } else {
@@ -603,6 +605,8 @@ FX FXInternal::jacobian(int iind, int oind, bool compact, bool symmetric){
 }
 
 FX FXInternal::getJacobian(int iind, int oind, bool compact, bool symmetric){
+  //   return getNumericJacobian(iind,oind,compact,symmetric); // NOTE: Replaces the below
+  
   Jacobian ret(shared_from_this<FX>(),iind,oind);
   ret.setOption("verbose",getOption("verbose"));
   return ret;
@@ -677,6 +681,56 @@ int FXInternal::schemeEntry(InputOutputScheme scheme, const std::string &name) c
   int n = getSchemeEntryEnum(scheme,name);
   if (n==-1) casadi_error("FXInternal::inputSchemeEntry: could not find entry '" << name << "' in " << getSchemeName(scheme) << ". Available names are: " << getSchemeEntryNames(scheme) << ".");
   return n;
+}
+
+void FXInternal::call(const MXVector& arg, MXVector& res,  const MXVectorVector& fseed, MXVectorVector& fsens, 
+                      const MXVectorVector& aseed, MXVectorVector& asens, 
+                      bool output_given, bool always_inline, bool never_inline){
+  casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
+  
+  // Lo logic for inlining yet
+  bool inline_function = always_inline;
+  
+  if(inline_function){
+    // Evaluate the function symbolically
+    evalMX(arg,res,fseed,fsens,aseed,asens,output_given);
+    
+  } else {
+    // Create a call-node
+    assertInit();
+    
+    // Argument checking
+    casadi_assert_message(arg.size()<=getNumInputs(), "FX::call: number of passed-in dependencies (" << arg.size() << ") should not exceed the number of inputs of the function (" << getNumInputs() << ").");
+
+    // Assumes initialised
+    for(int i=0; i<arg.size(); ++i){
+      if(arg[i].isNull() || arg[i].empty()) continue;
+      casadi_assert_message(arg[i].size1()==input(i).size1() && arg[i].size2()==input(i).size2(),
+                            "Evaluation::shapes of passed-in dependencies should match shapes of inputs of function." << 
+                            std::endl << "Input argument " << i << " has shape (" << input(i).size1() << 
+                            "," << input(i).size2() << ") while a shape (" << arg[i].size1() << "," << arg[i].size2() << 
+                            ") was supplied.");
+    }
+    EvaluationMX::create(shared_from_this<FX>(),arg,res,fseed,fsens,aseed,asens);
+  }
+}
+
+void FXInternal::call(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
+                      const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
+                      const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
+                      bool output_given, bool always_inline, bool never_inline){
+  casadi_assert_message(!(always_inline && never_inline), "Inconsistent options");
+  casadi_assert_message(!never_inline, "SX expressions do not support call-nodes");
+  evalSX(arg,res,fseed,fsens,aseed,asens,output_given);
+}
+
+FX FXInternal::getNumericJacobian(int iind, int oind, bool compact, bool symmetric){
+  vector<MX> arg = symbolicInput();
+  vector<MX> res = shared_from_this<FX>().call(arg);
+  FX f = MXFunction(arg,res);
+  f.setOption("numeric_jacobian", false);
+  f.init();
+  return f->getNumericJacobian(iind,oind,compact,symmetric);
 }
 
 } // namespace CasADi
