@@ -134,6 +134,58 @@
 <tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>false</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>CasADi::NLPSolverInternal</td></tr>
 </table>
 */
+/** \class CasADi::QPOasesInternal
+\n
+\par
+<table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>CPUtime</td><td>OT_REAL</td><td></td><td>The maximum allowed CPU time in seconds for the whole initialisation (and the actually required one on output). Disabled if unset.</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>ad_mode</td><td>OT_STRING</td><td>automatic</td><td>How to calculate the Jacobians: "forward" (only forward mode) "reverse" (only adjoint mode) or "automatic" (a heuristic decides which is more appropriate)</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>convex</td><td>OT_BOOLEAN</td><td>False</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>False</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td></td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td></td><td>Monitors to be activated</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>nWSR</td><td>OT_INTEGER</td><td></td><td>The maximum number of working set recalculations to be performed during the initial homotopy. Default is 5(nx + nc)</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>unnamed_shared_object</td><td>n/a</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>False</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>False</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>printLevel</td><td>OT_STRING</td><td>medium</td><td>Defines the amount of text output during QP solution, see Section 5.7</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>sparse</td><td>OT_BOOLEAN</td><td>True</td><td>function is sparse</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td></td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>False</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td></td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>False</td><td>verbose evaluation -- for debugging</td><td>CasADi::QPOasesInternal</td></tr>
+</table>
+*/
+/** \class CasADi::QPOasesSolver
+\n
+\par
+<table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>CPUtime</td><td>OT_REAL</td><td></td><td>The maximum allowed CPU time in seconds for the whole initialisation (and the actually required one on output). Disabled if unset.</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>ad_mode</td><td>OT_STRING</td><td>automatic</td><td>How to calculate the Jacobians: "forward" (only forward mode) "reverse" (only adjoint mode) or "automatic" (a heuristic decides which is more appropriate)</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>convex</td><td>OT_BOOLEAN</td><td>False</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>False</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td></td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td></td><td>Monitors to be activated</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>nWSR</td><td>OT_INTEGER</td><td></td><td>The maximum number of working set recalculations to be performed during the initial homotopy. Default is 5(nx + nc)</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>unnamed_shared_object</td><td>n/a</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>False</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>False</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>printLevel</td><td>OT_STRING</td><td>medium</td><td>Defines the amount of text output during QP solution, see Section 5.7</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>sparse</td><td>OT_BOOLEAN</td><td>True</td><td>function is sparse</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td></td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>False</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td></td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>False</td><td>verbose evaluation -- for debugging</td><td>CasADi::QPOasesInternal</td></tr>
+</table>
+*/
 /** \class CasADi::CSparseInternal
 \n
 \par
@@ -178,6 +230,64 @@
 <tr><td>trans</td><td>OT_BOOLEAN</td><td>false</td><td></td><td>CasADi::LinearSolverInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
+</table>
+*/
+/** \class CasADi::MuscodInternal
+\n
+\par
+<table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>acc</td><td>OT_REAL</td><td>1e-6</td><td>accuracy of NLP solution</td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>backupfile</td><td>OT_STRING</td><td>"restart.bin"</td><td></td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>bflag</td><td>OT_INTEGER</td><td>-1</td><td></td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>cflag</td><td>OT_INTEGER</td><td>0</td><td></td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>datfile</td><td>OT_STRING</td><td></td><td></td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>eflag</td><td>OT_INTEGER</td><td>0</td><td>use two gradient evaluations per SQP iteration</td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>itol</td><td>OT_REAL</td><td>1e-7</td><td>initial integration tolerance</td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>levmar</td><td>OT_REAL</td><td>0.0</td><td>Levenberg Marquardt regularization of hessian</td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>logfile</td><td>OT_STRING</td><td>"log.txt"</td><td></td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>mf</td><td>OT_INTEGER</td><td>0</td><td>maximum # of successive ``fixed'' iterations</td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>mi</td><td>OT_INTEGER</td><td>100</td><td>maximum total # of SQP iterations</td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"muscod_problem"</td><td></td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>nhtopy</td><td>OT_INTEGER</td><td>0</td><td># of homotopy steps</td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>ppath</td><td>OT_STRING</td><td>"PAR"</td><td></td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>resfile</td><td>OT_STRING</td><td>"muscod_results.txt"</td><td></td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>restartfile</td><td>OT_STRING</td><td>"restart.bin"</td><td></td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>rfac</td><td>OT_INTEGER</td><td>0.0</td><td></td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>sf</td><td>OT_INTEGER</td><td>0</td><td>index of first SQP iteration using fixed discretization</td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>sflag</td><td>OT_INTEGER</td><td>0</td><td>stop after each SQP iteration</td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>tol</td><td>OT_REAL</td><td>1e-7</td><td>integration tolerance</td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>wflag</td><td>OT_INTEGER</td><td>0</td><td>warm/cool start using final data of previous run</td><td>CasADi::MuscodInternal</td></tr>
+</table>
+*/
+/** \class CasADi::MuscodInterface
+\n
+\par
+<table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>acc</td><td>OT_REAL</td><td>1e-6</td><td>accuracy of NLP solution</td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>backupfile</td><td>OT_STRING</td><td>"restart.bin"</td><td></td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>bflag</td><td>OT_INTEGER</td><td>-1</td><td></td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>cflag</td><td>OT_INTEGER</td><td>0</td><td></td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>datfile</td><td>OT_STRING</td><td></td><td></td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>eflag</td><td>OT_INTEGER</td><td>0</td><td>use two gradient evaluations per SQP iteration</td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>itol</td><td>OT_REAL</td><td>1e-7</td><td>initial integration tolerance</td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>levmar</td><td>OT_REAL</td><td>0.0</td><td>Levenberg Marquardt regularization of hessian</td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>logfile</td><td>OT_STRING</td><td>"log.txt"</td><td></td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>mf</td><td>OT_INTEGER</td><td>0</td><td>maximum # of successive ``fixed'' iterations</td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>mi</td><td>OT_INTEGER</td><td>100</td><td>maximum total # of SQP iterations</td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"muscod_problem"</td><td></td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>nhtopy</td><td>OT_INTEGER</td><td>0</td><td># of homotopy steps</td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>ppath</td><td>OT_STRING</td><td>"PAR"</td><td></td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>resfile</td><td>OT_STRING</td><td>"muscod_results.txt"</td><td></td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>restartfile</td><td>OT_STRING</td><td>"restart.bin"</td><td></td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>rfac</td><td>OT_INTEGER</td><td>0.0</td><td></td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>sf</td><td>OT_INTEGER</td><td>0</td><td>index of first SQP iteration using fixed discretization</td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>sflag</td><td>OT_INTEGER</td><td>0</td><td>stop after each SQP iteration</td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>tol</td><td>OT_REAL</td><td>1e-7</td><td>integration tolerance</td><td>CasADi::MuscodInternal</td></tr>
+<tr><td>wflag</td><td>OT_INTEGER</td><td>0</td><td>warm/cool start using final data of previous run</td><td>CasADi::MuscodInternal</td></tr>
 </table>
 */
 /** \class CasADi::KinsolInternal
@@ -1566,58 +1676,6 @@
 <tr><td>wsmp_write_matrix_iteration</td><td>OT_INTEGER</td><td>-1</td><td>Iteration in which the matrices are written to files. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 </table>
 */
-/** \class CasADi::QPOasesInternal
-\n
-\par
-<table>
-<caption>List of available options</caption>
-<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>CPUtime</td><td>OT_REAL</td><td></td><td>The maximum allowed CPU time in seconds for the whole initialisation (and the actually required one on output). Disabled if unset.</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>ad_mode</td><td>OT_STRING</td><td>automatic</td><td>How to calculate the Jacobians: "forward" (only forward mode) "reverse" (only adjoint mode) or "automatic" (a heuristic decides which is more appropriate)</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>False</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>False</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td></td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td></td><td>Monitors to be activated</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>nWSR</td><td>OT_INTEGER</td><td></td><td>The maximum number of working set recalculations to be performed during the initial homotopy. Default is 5(nx + nc)</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>name</td><td>OT_STRING</td><td>unnamed_shared_object</td><td>n/a</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>False</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>False</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>printLevel</td><td>OT_STRING</td><td>medium</td><td>Defines the amount of text output during QP solution, see Section 5.7</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>sparse</td><td>OT_BOOLEAN</td><td>True</td><td>function is sparse</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td></td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>False</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>user_data</td><td>OT_VOIDPTR</td><td></td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>verbose</td><td>OT_BOOLEAN</td><td>False</td><td>verbose evaluation -- for debugging</td><td>CasADi::QPOasesInternal</td></tr>
-</table>
-*/
-/** \class CasADi::QPOasesSolver
-\n
-\par
-<table>
-<caption>List of available options</caption>
-<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>CPUtime</td><td>OT_REAL</td><td></td><td>The maximum allowed CPU time in seconds for the whole initialisation (and the actually required one on output). Disabled if unset.</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>ad_mode</td><td>OT_STRING</td><td>automatic</td><td>How to calculate the Jacobians: "forward" (only forward mode) "reverse" (only adjoint mode) or "automatic" (a heuristic decides which is more appropriate)</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>False</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>False</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td></td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td></td><td>Monitors to be activated</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>nWSR</td><td>OT_INTEGER</td><td></td><td>The maximum number of working set recalculations to be performed during the initial homotopy. Default is 5(nx + nc)</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>name</td><td>OT_STRING</td><td>unnamed_shared_object</td><td>n/a</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>False</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>False</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>printLevel</td><td>OT_STRING</td><td>medium</td><td>Defines the amount of text output during QP solution, see Section 5.7</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>sparse</td><td>OT_BOOLEAN</td><td>True</td><td>function is sparse</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td></td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>False</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>user_data</td><td>OT_VOIDPTR</td><td></td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>verbose</td><td>OT_BOOLEAN</td><td>False</td><td>verbose evaluation -- for debugging</td><td>CasADi::QPOasesInternal</td></tr>
-</table>
-*/
 /** \class CasADi::AcadoOCPInternal
 \n
 \par
@@ -1904,7 +1962,7 @@
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>ad_mode</td><td>OT_STRING</td><td>"default"</td><td>default means both (forward|adjoint|default)</td><td>CasADi::JacobianInternal</td></tr>
+<tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
@@ -1926,7 +1984,7 @@
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>ad_mode</td><td>OT_STRING</td><td>"default"</td><td>default means both (forward|adjoint|default)</td><td>CasADi::JacobianInternal</td></tr>
+<tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
@@ -1990,64 +2048,6 @@
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
-</table>
-*/
-/** \class CasADi::MuscodInternal
-\n
-\par
-<table>
-<caption>List of available options</caption>
-<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>acc</td><td>OT_REAL</td><td>1e-6</td><td>accuracy of NLP solution</td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>backupfile</td><td>OT_STRING</td><td>"restart.bin"</td><td></td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>bflag</td><td>OT_INTEGER</td><td>-1</td><td></td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>cflag</td><td>OT_INTEGER</td><td>0</td><td></td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>datfile</td><td>OT_STRING</td><td></td><td></td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>eflag</td><td>OT_INTEGER</td><td>0</td><td>use two gradient evaluations per SQP iteration</td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>itol</td><td>OT_REAL</td><td>1e-7</td><td>initial integration tolerance</td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>levmar</td><td>OT_REAL</td><td>0.0</td><td>Levenberg Marquardt regularization of hessian</td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>logfile</td><td>OT_STRING</td><td>"log.txt"</td><td></td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>mf</td><td>OT_INTEGER</td><td>0</td><td>maximum # of successive ``fixed'' iterations</td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>mi</td><td>OT_INTEGER</td><td>100</td><td>maximum total # of SQP iterations</td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>name</td><td>OT_STRING</td><td>"muscod_problem"</td><td></td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>nhtopy</td><td>OT_INTEGER</td><td>0</td><td># of homotopy steps</td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>ppath</td><td>OT_STRING</td><td>"PAR"</td><td></td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>resfile</td><td>OT_STRING</td><td>"muscod_results.txt"</td><td></td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>restartfile</td><td>OT_STRING</td><td>"restart.bin"</td><td></td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>rfac</td><td>OT_INTEGER</td><td>0.0</td><td></td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>sf</td><td>OT_INTEGER</td><td>0</td><td>index of first SQP iteration using fixed discretization</td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>sflag</td><td>OT_INTEGER</td><td>0</td><td>stop after each SQP iteration</td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>tol</td><td>OT_REAL</td><td>1e-7</td><td>integration tolerance</td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>wflag</td><td>OT_INTEGER</td><td>0</td><td>warm/cool start using final data of previous run</td><td>CasADi::MuscodInternal</td></tr>
-</table>
-*/
-/** \class CasADi::MuscodInterface
-\n
-\par
-<table>
-<caption>List of available options</caption>
-<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>acc</td><td>OT_REAL</td><td>1e-6</td><td>accuracy of NLP solution</td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>backupfile</td><td>OT_STRING</td><td>"restart.bin"</td><td></td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>bflag</td><td>OT_INTEGER</td><td>-1</td><td></td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>cflag</td><td>OT_INTEGER</td><td>0</td><td></td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>datfile</td><td>OT_STRING</td><td></td><td></td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>eflag</td><td>OT_INTEGER</td><td>0</td><td>use two gradient evaluations per SQP iteration</td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>itol</td><td>OT_REAL</td><td>1e-7</td><td>initial integration tolerance</td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>levmar</td><td>OT_REAL</td><td>0.0</td><td>Levenberg Marquardt regularization of hessian</td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>logfile</td><td>OT_STRING</td><td>"log.txt"</td><td></td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>mf</td><td>OT_INTEGER</td><td>0</td><td>maximum # of successive ``fixed'' iterations</td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>mi</td><td>OT_INTEGER</td><td>100</td><td>maximum total # of SQP iterations</td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>name</td><td>OT_STRING</td><td>"muscod_problem"</td><td></td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>nhtopy</td><td>OT_INTEGER</td><td>0</td><td># of homotopy steps</td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>ppath</td><td>OT_STRING</td><td>"PAR"</td><td></td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>resfile</td><td>OT_STRING</td><td>"muscod_results.txt"</td><td></td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>restartfile</td><td>OT_STRING</td><td>"restart.bin"</td><td></td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>rfac</td><td>OT_INTEGER</td><td>0.0</td><td></td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>sf</td><td>OT_INTEGER</td><td>0</td><td>index of first SQP iteration using fixed discretization</td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>sflag</td><td>OT_INTEGER</td><td>0</td><td>stop after each SQP iteration</td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>tol</td><td>OT_REAL</td><td>1e-7</td><td>integration tolerance</td><td>CasADi::MuscodInternal</td></tr>
-<tr><td>wflag</td><td>OT_INTEGER</td><td>0</td><td>warm/cool start using final data of previous run</td><td>CasADi::MuscodInternal</td></tr>
 </table>
 */
 /** \class CasADi::CplexInternal

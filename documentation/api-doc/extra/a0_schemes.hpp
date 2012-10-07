@@ -374,6 +374,20 @@
 <br/>
 @copydoc scheme_NLPOutput
 */
+/** \class CasADi::QPOasesInternal
+\n
+\par
+@copydoc scheme_QPInput
+<br/>
+@copydoc scheme_QPOutput
+*/
+/** \class CasADi::QPOasesSolver
+\n
+\par
+@copydoc scheme_QPInput
+<br/>
+@copydoc scheme_QPOutput
+*/
 /** \class CasADi::CollocationIntegratorInternal
 \n
 \par
@@ -509,20 +523,6 @@
 @copydoc scheme_NLPInput
 <br/>
 @copydoc scheme_NLPOutput
-*/
-/** \class CasADi::QPOasesInternal
-\n
-\par
-@copydoc scheme_QPInput
-<br/>
-@copydoc scheme_QPOutput
-*/
-/** \class CasADi::QPOasesSolver
-\n
-\par
-@copydoc scheme_QPInput
-<br/>
-@copydoc scheme_QPOutput
 */
 /** \class CasADi::IdasInternal
 \n
