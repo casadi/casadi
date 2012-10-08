@@ -151,44 +151,24 @@ void OOQPInternal::evaluate(int nfdir, int nadir) {
   // Get multipliers for the bounds
   vector<double> &lambda_x = output(QP_LAMBDA_X).data();
 
-  // BUG?
-  #if 0
-  // Lower bounds
-  casadi_assert(dual_x.size()==vars_->gamma->length());
-  vars_->gamma->copyIntoArray(getPtr(dual_x));
-  
-  // Upper bounds
-  casadi_assert(dual_x.size()==vars_->phi->length());
-  vars_->phi->copyIntoArray(getPtr(temp_));
-    for(int k=0; k<dual_x.size(); ++k){
-      dual_x[k] -= temp_[k];
-    }
-  #else
-  // Workaround not counting the infinite values?
+  // Set multipliers to zero
+  output(QP_LAMBDA_X).setAll(0);
   
   // Lower bounds
-  int k_gamma=0;
-  vars_->gamma->copyIntoArray(getPtr(temp_));
-  for(int k=0; k<lambda_x.size(); ++k){
-    if(ixlow_[k]){
-      lambda_x[k] = -temp_[k_gamma++];
-    } else {
-      lambda_x[k] = 0;
-    }
+  if (vars_->gamma->length() > 0) {
+    casadi_assert(lambda_x.size()==vars_->gamma->length());
+    vars_->gamma->copyIntoArray(getPtr(lambda_x));
+    output(QP_LAMBDA_X)*= -1;
   }
-  casadi_assert(k_gamma==vars_->gamma->length());
-  
-  // Upper bounds
-  int k_phi=0;
-  vars_->phi->copyIntoArray(getPtr(temp_));
-  for(int k=0; k<lambda_x.size(); ++k){
-    if(ixupp_[k]){
-      lambda_x[k] += temp_[k_phi++];
-    }
-  }
-  casadi_assert(k_phi==vars_->phi->length());
-  #endif
 
+  // Upper bounds
+  if (vars_->phi->length() > 0) {
+    casadi_assert(lambda_x.size()==vars_->phi->length());
+    vars_->phi->copyIntoArray(getPtr(temp_));
+    for(int k=0; k<lambda_x.size(); ++k){
+      lambda_x[k] += temp_[k];
+    }
+  }
   
   // Get multipliers for the equality constraints
   vector<double> &lambda_a = output(QP_LAMBDA_A).data();
@@ -231,6 +211,7 @@ void OOQPInternal::allocate() {
       ineq_.push_back(k);
     }
   }
+  casadi_assert(uba.size()==eq_.size() + ineq_.size());
   
   // Set up a Sparse solver
   qp_ = new QpGenSparseMa27( nx_, eq_.size(), ineq_.size(), input(QP_H).size() , input(QP_G).size(), input(QP_A).size() );
@@ -311,7 +292,7 @@ void OOQPInternal::allocate() {
                                        getPtr(ubA_ineq_),  getPtr(icupp_));
                                        
 
-
+  
   // Further setup of the QP problem
   vars_ = (QpGenVars *) qp_->makeVariables( prob_ );
 
