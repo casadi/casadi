@@ -800,51 +800,50 @@ class Integrationtests(casadiTestCase):
     #print qeJ.output()
     #print qeJ.adjSens(INTEGRATOR_X0)
     
-  # Joel: I have commented out the following test as the error that occurs will be resolved once the new_integrator2 branch is merged with trunk
-  #def test_hessian2D(self):
-    #self.message("hessian")
-    #N=2
 
-    #x0_ = DMatrix([1,0.1])
-    #A_  = DMatrix([[3,1],[0.74,4]])
+  def test_hessian2D(self):
+    self.message("hessian")
+    N=2
 
-    #A = ssym("A",N,N)
-    #x = ssym("x",N)
+    x0_ = DMatrix([1,0.1])
+    A_  = DMatrix([[3,1],[0.74,4]])
 
-    #ode = SXFunction(daeIn(x=x, p=vec(A)),daeOut(ode=mul(A,x)))
-    #I = CVodesIntegrator(ode)
-    #I.setOption("fsens_err_con", True)
-    #I.setOption('reltol',1e-12)
-    #I.init()
-    #I.input(INTEGRATOR_X0).set(x0_)
-    #I.input(INTEGRATOR_P).set(vec(A_))
-    #I.evaluate()
+    A = ssym("A",N,N)
+    x = ssym("x",N)
 
-    #q0=MX("q0",N)
-    #p=MX("p",N*N)
-    #qe = MXFunction([q0,p],I.call([q0,p]))
-    #qe.init()
+    ode = SXFunction(daeIn(x=x, p=vec(A)),daeOut(ode=mul(A,x)))
+    I = CVodesIntegrator(ode)
+    I.setOption("fsens_err_con", True)
+    I.setOption('reltol',1e-12)
+    I.init()
+    I.input(INTEGRATOR_X0).set(x0_)
+    I.input(INTEGRATOR_P).set(vec(A_))
+    I.evaluate()
 
-    #JT = MXFunction([q0,p],[qe.jac(1,0).T])
-    #JT.init()
+    q0=MX("q0",N)
+    p=MX("p",N*N)
+    qe = MXFunction([q0,p],I.call([q0,p]))
+    qe.init()
 
-    #H  = Jacobian(JT,1)
-    #H.init()
-    #H.input(0).set(x0_)
-    #H.input(1).set(vec(A_))
-    #H.evaluate()
+    JT = MXFunction([q0,p],[qe.jac(1,0).T])
+    JT.init()
 
-    #H1 = DMatrix(H.output())
+    H  = Jacobian(JT,1)
+    H.init()
+    H.input(0).set(x0_)
+    H.input(1).set(vec(A_))
+    H.evaluate()
+
+    H1 = DMatrix(H.output())
     
-    #H = qe.hessian(1)
-    #H.init()
-    #H.input(0).set(x0_)
-    #H.input(1).set(vec(A_))
-    #H.evaluate()
-    #H2 = DMatrix(H.output())
+    H = qe.hessian(1)
+    H.init()
+    H.input(0).set(x0_)
+    H.input(1).set(vec(A_))
+    H.evaluate()
+    H2 = DMatrix(H.output())
     
-    #self.checkarray(H1,H2,"hessian")
-    #print H.output()
+    self.checkarray(H1,H2,"hessian")
 
     
 if __name__ == '__main__':
