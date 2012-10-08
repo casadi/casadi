@@ -104,6 +104,9 @@ std::map<std::string,opt_type> ops_;
   
   /// Will do inspections on bounds and do a reinitialisation if needed
   void checkinit();
+  
+  /// Pass the supplied options to  Wprhp
+  void passOptions();
 };
 
 } // namespace CasADi

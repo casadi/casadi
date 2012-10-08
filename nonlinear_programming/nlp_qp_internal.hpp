@@ -20,32 +20,32 @@
  *
  */
 
-#ifndef IPOPT_QP_INTERNAL_HPP
-#define IPOPT_QP_INTERNAL_HPP
+#ifndef NLP_QP_INTERNAL_HPP
+#define NLP_QP_INTERNAL_HPP
 
 #include "symbolic/fx/qp_solver_internal.hpp"
-#include "interfaces/ipopt/ipopt_solver.hpp"
+#include "symbolic/fx/nlp_solver.hpp"
 
 namespace CasADi{
 
-  /** \brief Internal class for IpoptQPSolver
+  /** \brief Internal class for NlpQPInternal
    * 
       @copydoc QPSolver_doc
    * */
-class IpoptQPInternal : public QPSolverInternal {
-  friend class IpoptQPSolver;
+class NlpQPInternal : public QPSolverInternal {
+  friend class NlpQPSolver;
 public:
   /** \brief  Constructor */
-  explicit IpoptQPInternal();
+  explicit NlpQPInternal();
 
   /** \brief  Clone */
-  virtual IpoptQPInternal* clone() const;
+  virtual NlpQPInternal* clone() const;
   
   /** \brief  Create a new Solver */
-  explicit IpoptQPInternal(const CRSSparsity& H, const CRSSparsity &A);
+  explicit NlpQPInternal(const CRSSparsity& H, const CRSSparsity &A);
 
   /** \brief  Destructor */
-  virtual ~IpoptQPInternal();
+  virtual ~NlpQPInternal();
 
   /** \brief  Initialize */
   virtual void init();
@@ -53,7 +53,7 @@ public:
   virtual void evaluate(int nfdir, int nadir);
   
   protected:
-    IpoptSolver solver;
+    NLPSolver nlpsolver_;
     
     // an MX that represents H, but dependant on a common MX.
     MX H_;
@@ -65,5 +65,5 @@ public:
 
 } // namespace CasADi
 
-#endif //IPOPT_QP_INTERNAL_HPP
+#endif //NLP_QP_INTERNAL_HPP
 

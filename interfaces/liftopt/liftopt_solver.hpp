@@ -61,7 +61,19 @@ public:
   /// Node init?
   std::vector<double> &nodeInit();
   const std::vector<double> &nodeInit() const;
-  
+
+  /// Static creator function 
+  #ifdef SWIG
+  %callback("%s_cb");
+  #endif
+  static NLPSolver creator(const FX& F, const FX& G, const FX& H, const FX& J){ return LiftoptSolver(F,G);}
+  #ifdef SWIG
+  %nocallback;
+  #endif
+
+  /// @Joris: This would be an alternative
+  static NLPSolverCreator getCreator(){return creator;}
+    
   
 };
 

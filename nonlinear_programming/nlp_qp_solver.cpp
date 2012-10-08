@@ -20,31 +20,31 @@
  *
  */
 
-#include "ipopt_qp_internal.hpp"
-#include "ipopt_qp_solver.hpp"
+#include "nlp_qp_internal.hpp"
+#include "nlp_qp_solver.hpp"
 
 using namespace std;
 namespace CasADi{
 
-IpoptQPSolver::IpoptQPSolver(){ 
+NlpQPSolver::NlpQPSolver(){ 
 }
 
 
-IpoptQPSolver::IpoptQPSolver(const CRSSparsity & H, const CRSSparsity & A)  {
-  assignNode(new IpoptQPInternal(H,A));
+NlpQPSolver::NlpQPSolver(const CRSSparsity & H, const CRSSparsity & A)  {
+  assignNode(new NlpQPInternal(H,A));
 }
 
-IpoptQPInternal* IpoptQPSolver::operator->(){
-  return (IpoptQPInternal*)(FX::operator->());
+NlpQPInternal* NlpQPSolver::operator->(){
+  return (NlpQPInternal*)(FX::operator->());
 }
 
-const IpoptQPInternal* IpoptQPSolver::operator->() const{
-  return (const IpoptQPInternal*)(FX::operator->());
+const NlpQPInternal* NlpQPSolver::operator->() const{
+  return (const NlpQPInternal*)(FX::operator->());
 
 }
 
-bool IpoptQPSolver::checkNode() const{
-  return dynamic_cast<const IpoptQPInternal*>(get());
+bool NlpQPSolver::checkNode() const{
+  return dynamic_cast<const NlpQPInternal*>(get());
 }
 
 } // namespace CasADi

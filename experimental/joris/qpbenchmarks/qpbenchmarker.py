@@ -29,17 +29,17 @@ class OnlineQPBenchMark:
     
     self.nQP,self.nV,self.nC,self.nEC = self.readmatrix('dims.oqp')
 
-    self.H  = self.readmatrix('H.oqp')
-    self.g  = self.readmatrix('g.oqp')
-    self.lb = self.readmatrix('lb.oqp')
-    self.ub = self.readmatrix('ub.oqp')
+    self.H  = DMatrix(self.readmatrix('H.oqp'))
+    self.g  = DMatrix(self.readmatrix('g.oqp'))
+    self.lb = DMatrix(self.readmatrix('lb.oqp'))
+    self.ub = DMatrix(self.readmatrix('ub.oqp'))
 
     if self.nC > 0:
-        self.A   = self.readmatrix('A.oqp')
-        self.lbA = self.readmatrix('lbA.oqp')
-        self.ubA = self.readmatrix('ubA.oqp')
+        self.A   = DMatrix(self.readmatrix('A.oqp'))
+        self.lbA = DMatrix(self.readmatrix('lbA.oqp'))
+        self.ubA = DMatrix(self.readmatrix('ubA.oqp'))
 
-    self.x_opt   = self.readmatrix('x_opt.oqp')
+    self.x_opt   = DMatrix(self.readmatrix('x_opt.oqp'))
     self.y_opt   = self.readmatrix('y_opt.oqp')
     self.obj_opt = self.readmatrix('obj_opt.oqp')
 
@@ -48,39 +48,41 @@ class OnlineQPBenchMark:
 
 qp = OnlineQPBenchMark('diesel')
 
-V = Variables()
+qpsolvers = []
+try:
+  qpsolvers.append(IpoptQPSolver)
+except:
+  pass
+try:
+  qpsolvers.append(OOQPSolver)
+except:
+  pass
+try:
+  qpsolvers.append(QPOasesSolver)
+except:
+  pass
 
-V.x = ssym("x",int(qp.nV))
-#V.g = ssym("g",int(qp.nV))
+for qpsolver in qpsolvers:
+  print qpsolver
 
-V.freeze()
+  solver = qpsolver(qp.H.sparsity(),qp.A.sparsity())
+  solver.init()
+  solver.setInput(qp.H,QP_H)
+  solver.setInput(qp.A,QP_A)
+  for i in range(qp.g.shape[1]):
+    solver.setInput(qp.lbA[i,:].T,QP_LBA)
+    solver.setInput(qp.ubA[i,:].T,QP_UBA)
+    solver.setInput(qp.lb[i,:].T,QP_LBX)
+    solver.setInput(qp.ub[i,:].T,QP_UBX)
+    solver.setInput(qp.g[i,:].T,QP_G)
 
-x = V.x
-g = SXMatrix(qp.g[0,:])
-H = qp.H
-A = qp.A
+    solver.solve()
 
-f = SXFunction([V.veccat()],[0.5*mul(mul(x.T,H),x) + mul(g.T,x)])
-g = SXFunction([V.veccat()],[mul(A,x)])
-g.init()
-
-solver = WorhpSolver(f,g)
-#solver.setOption("tol",1e-12)
-#solver.setOption("hessian_approximation","exact")
-solver.setOption("generate_hessian",True)
-solver.setOption("UserHM",True)
-solver.setOption("TolOpti",1e-12)
-#solver.setOption("monitor",["eval_h","eval_f","eval_g","eval_jac_g","eval_grad_f"])
-solver.init()
-
-for i in range(1):
-  solver.input(NLP_LBX)[V.i_x] = qp.lb[i,:].T
-  solver.input(NLP_UBX)[V.i_x] = qp.ub[i,:].T
-  solver.input(NLP_LBG).set(qp.lbA[i,:].T)
-  solver.input(NLP_UBG).set(qp.ubA[i,:].T)
-  #solver.input(NLP_LBX)[V.i_g] = qp.g[i,:].T
-  #solver.input(NLP_UBX)[V.i_g] = qp.g[i,:].T
-  #solver.input(NLP_X_INIT)[V.i_g] = qp.g[i,:].T
-  solver.evaluate()
-  print "Error = ", max(fabs(solver.output()[V.i_x] - qp.x_opt[i,:]))
-  
+    print solver.output(QP_PRIMAL)
+    print qp.x_opt[i,:].T
+    print qp.y_opt[i,:].T
+    print qp.obj_opt[i]
+    print solver.output(QP_COST)
+    print fabs(solver.output(QP_PRIMAL)-qp.x_opt[i,:].T)
+    assert(all(fabs(solver.output(QP_PRIMAL)-qp.x_opt[i,:].T)<1e-4))
+    assert(fabs(qp.obj_opt[i]-solver.output(QP_COST))<1e-5)

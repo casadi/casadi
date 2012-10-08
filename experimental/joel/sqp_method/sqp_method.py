@@ -80,7 +80,7 @@ g = [s[100]-s100, v[100]-v100]
 # Create NLP functions
 ffcn = SXFunction([u],[f])
 ffcn.init()
-gfcn = SXFunction([u],[g])
+gfcn = SXFunction([u],[vertcat(g)])
 gfcn.init()
 
 # Solve with IPOPT
@@ -180,7 +180,8 @@ qp_solver = QPOasesSolver(H_sparsity,A_sparsity)
 qp_solver.setOption("printLevel","low")
 
 # IPOPT
-#qp_solver = IpoptQPSolver(H_sparsity,A_sparsity)
+#qp_solver =  NlpQPSolver(H_sparsity,A_sparsity)
+#qp_solver.setOption("nlp_solver", IpoptSolver)
 
 # OOQP
 #qp_solver = OOQPSolver(H_sparsity,A_sparsity)

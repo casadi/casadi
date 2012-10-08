@@ -76,7 +76,10 @@ public:
   void reportConstraints(std::ostream &stream=std::cout);
   
   /// Warns the user about inital bounds, if option 'warn_initial_bounds' is true
-  void checkInitialBounds();
+  virtual void checkInitialBounds();
+  
+  /// Set options that make the NLP solver more suitable for solving QPs
+  virtual void setQPOptions(bool convex=false) { };
     
 };
 

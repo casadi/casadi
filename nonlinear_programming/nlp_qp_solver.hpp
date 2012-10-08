@@ -20,8 +20,8 @@
  *
  */
 
-#ifndef IPOPT_QP_SOLVER_HPP
-#define IPOPT_QP_SOLVER_HPP
+#ifndef NLP_QP_SOLVER_HPP
+#define NLP_QP_SOLVER_HPP
 
 #include "symbolic/fx/qp_solver.hpp"
 
@@ -29,7 +29,7 @@ namespace CasADi {
   
   
 // Forward declaration of internal class 
-class IpoptQPInternal;
+class NlpQPInternal;
 
   /** \brief IPOPT QP Solver for quadratic programming
 
@@ -38,17 +38,17 @@ class IpoptQPInternal;
    \author Joris Gillis
    \date 2011
   */
-class IpoptQPSolver : public QPSolver {
+class NlpQPSolver : public QPSolver {
 public:
 
   /** \brief  Default constructor */
-  IpoptQPSolver();
+  NlpQPSolver();
   
-  explicit IpoptQPSolver(const CRSSparsity & H, const CRSSparsity & A);
+  explicit NlpQPSolver(const CRSSparsity & H, const CRSSparsity & A);
   
   /** \brief  Access functions of the node */
-  IpoptQPInternal* operator->();
-  const IpoptQPInternal* operator->() const;
+  NlpQPInternal* operator->();
+  const NlpQPInternal* operator->() const;
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
@@ -57,7 +57,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static QPSolver creator(const CRSSparsity& H, const CRSSparsity& A){ return IpoptQPSolver(H,A);}
+  static QPSolver creator(const CRSSparsity& H, const CRSSparsity& A){ return NlpQPSolver(H,A);}
   #ifdef SWIG
   %nocallback;
   #endif
@@ -67,5 +67,5 @@ public:
 
 } // namespace CasADi
 
-#endif //IPOPT_QP_SOLVER_HPP
+#endif //NLP_QP_SOLVER_HPP
 

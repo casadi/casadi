@@ -899,4 +899,16 @@ void IpoptInternal::finalize_metadata(int n,
   }
 }
 
+void IpoptInternal::setQPOptions(bool convex) {
+  if (convex) {
+    setOption("mehrotra_algorithm","yes");
+    setOption("mu_oracle","probing");
+  }
+
+  setOption("fixed_variable_treatment", "relax_bounds");
+  setOption("jac_c_constant","yes");
+  setOption("jac_d_constant","yes");
+  setOption("hessian_constant","yes");
+}
+
 } // namespace CasADi

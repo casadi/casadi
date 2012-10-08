@@ -44,6 +44,10 @@ void NLPSolver::reportConstraints(std::ostream &stream) {
   (*this)->reportConstraints();
 }
 
+void NLPSolver::setQPOptions(bool convex) {
+  (*this)->setQPOptions(convex);
+}
+
 FX NLPSolver::getF() const { return isNull()? FX() : dynamic_cast<const NLPSolverInternal*>(get())->F_; }
   
 FX NLPSolver::getG() const { return isNull()? FX() : dynamic_cast<const NLPSolverInternal*>(get())->G_; }

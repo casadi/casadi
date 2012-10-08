@@ -28,22 +28,27 @@ from helpers import *
 
 qpsolvers = []
 try:
-  qpsolvers.append(IpoptQPSolver)
+  qpsolvers.append((NlpQPSolver,{"nlp_solver":IpoptSolver, "nlp_solver_options": {"tol": 1e-12}}))
 except:
   pass
 try:
-  qpsolvers.append(OOQPSolver)
+  #qpsolvers.append((NlpQPSolver,{"nlp_solver": WorhpSolver, "nlp_solver_options": {"TolOpti": 1e-12}}))
+  pass
 except:
   pass
 try:
-  qpsolvers.append(QPOasesSolver)
+  qpsolvers.append((OOQPSolver,{}))
+except:
+  pass
+try:
+  qpsolvers.append((QPOasesSolver,{}))
 except:
   pass
 
 class QPSolverTests(casadiTestCase):
 
-  def test_general_convex(self):
-  
+  def test_general_convex_dense(self):
+    self.message("Convex dense QP with solvers: " + str([qpsolver for qpsolver,options in qpsolvers]))
     H = DMatrix([[1,-1],[-1,2]])
     G = DMatrix([-2,-6])
     A =  DMatrix([[1, 1],[-1, 2],[2, 1]])
@@ -55,13 +60,14 @@ class QPSolverTests(casadiTestCase):
 
     options = {"convex": True, "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
       
-    for qpsolver in qpsolvers:
+    for qpsolver, qp_options in qpsolvers:
       self.message("general_convex: " + str(qpsolver))
 
       solver = qpsolver(H.sparsity(),A.sparsity())
       for key, val in options.iteritems():
         if solver.hasOption(key):
            solver.setOption(key,val)
+      solver.setOption(qp_options)
       solver.init()
 
       solver.input(QP_H).set(H)
@@ -116,7 +122,7 @@ class QPSolverTests(casadiTestCase):
 
       solver.input(QP_UBX).setAll(5)
 
-      if ('Ipopt' in str(qpsolver)): # bug? 
+      if not('OOQP' in solver.__class__.__name__):
         solver.evaluate()
         self.assertAlmostEqual(solver.output()[0],5,6,str(qpsolver))
         self.assertAlmostEqual(solver.output()[1],5,6,str(qpsolver))
@@ -127,11 +133,98 @@ class QPSolverTests(casadiTestCase):
 
         self.assertAlmostEqual(solver.output(QP_LAMBDA_A)[0],0,4,str(qpsolver))
         self.assertAlmostEqual(solver.output(QP_LAMBDA_A)[1],0,6,str(qpsolver))
+    
+
+  def test_general_convex_sparse(self):
+    self.message("Convex sparse QP with solvers: " + str([qpsolver for qpsolver,options in qpsolvers]))
+    H = c.diag([2,1,0.2,0.7,1.3])
+
+    H[1,2]=0.1
+    H[2,1]=0.1
+    
+    G = DMatrix([-2,-6,1,0,0])
+    A =  DMatrix([[1, 0,0.1,0.7,-1],[0.1, 2,-0.3,4,0.1]])
+    makeSparse(A)
+    UBA = DMatrix([2, 2])
+    LBA = DMatrix([-inf])
+
+    LBX = DMatrix([0]*5)
+    UBX = DMatrix([inf]*5)
+
+    options = {"convex": True, "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
       
-      #solver.input(QP_UBA).set([-inf]*3)
+    for qpsolver, qp_options in qpsolvers:
+      self.message("general_convex: " + str(qpsolver))
+
+      solver = qpsolver(H.sparsity(),A.sparsity())
+      for key, val in options.iteritems():
+        if solver.hasOption(key):
+           solver.setOption(key,val)
+      solver.setOption(qp_options)
+      solver.init()
+
+      solver.input(QP_H).set(H)
+      solver.input(QP_G).set(G)
+      solver.input(QP_A).set(A)
+      solver.input(QP_LBX).set(LBX)
+      solver.input(QP_UBX).set(UBX)
+      solver.input(QP_LBA).set(LBA)
+      solver.input(QP_UBA).set(UBA)
+
+      solver.solve()
       
-      #self.assertRaises(Exception,lambda : solver.evaluate())
+      self.checkarray(solver.output(),DMatrix([0.873908,0.95630465,0,0,0]),str(qpsolver),digits=6)
       
+      self.checkarray(solver.output(QP_LAMBDA_X),DMatrix([0,0,-0.339076,-10.0873907,-0.252185]),6,str(qpsolver),digits=6)
+
+      self.checkarray(solver.output(QP_LAMBDA_A),DMatrix([0,2.52184767]),str(qpsolver),digits=6)
+
+      self.assertAlmostEqual(solver.output(QP_COST)[0],-6.264669320767,6,str(qpsolver))
+
+  def test_general_nonconvex_dense(self):
+    self.message("Non convex dense QP with solvers: " + str([qpsolver for qpsolver,options in qpsolvers]))
+    H = DMatrix([[1,-1],[-1,-2]])
+    G = DMatrix([-2,-6])
+    A =  DMatrix([[1, 1],[-1, 2],[2, 1]])
+    UBA = DMatrix([2, 2, 3])
+    LBA = DMatrix([-inf]*3)
+
+    LBX = DMatrix([0]*2)
+    UBX = DMatrix([inf]*2)
+
+    options = {"convex": True, "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+      
+    for qpsolver, qp_options in qpsolvers:
+      self.message("general_convex: " + str(qpsolver))
+
+      solver = qpsolver(H.sparsity(),A.sparsity())
+      for key, val in options.iteritems():
+        if solver.hasOption(key):
+           solver.setOption(key,val)
+      solver.setOption(qp_options)
+      solver.init()
+
+      solver.input(QP_H).set(H)
+      solver.input(QP_G).set(G)
+      solver.input(QP_A).set(A)
+      solver.input(QP_LBX).set(LBX)
+      solver.input(QP_UBX).set(UBX)
+      solver.input(QP_LBA).set(LBA)
+      solver.input(QP_UBA).set(UBA)
+
+      solver.solve()
+
+      self.assertAlmostEqual(solver.output()[0],2.0/3,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output()[1],4.0/3,6,str(qpsolver))
+    
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[0],0,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[1],0,6,str(qpsolver))
+
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_A)[0],4+8.0/9,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_A)[1],20.0/9,6,str(qpsolver))
+      
+      self.assertAlmostEqual(solver.output(QP_COST)[0],-10-16.0/9,6,str(qpsolver))
+
     
 if __name__ == '__main__':
     unittest.main()
