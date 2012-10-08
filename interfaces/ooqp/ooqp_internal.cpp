@@ -33,6 +33,10 @@
 using namespace std;
 namespace CasADi {
 
+/**
+* Caveats:   lba = -inf && uba = inf is not allowed. Must be filtered out.
+*
+*/
 OOQPInternal* OOQPInternal::clone() const{
   // Return a deep copy
   OOQPInternal* node = new OOQPInternal(input(QP_H).sparsity(),input(QP_A).sparsity());
@@ -64,13 +68,18 @@ OOQPInternal::~OOQPInternal(){
   }
 }
 
+bool OOQPInternal::isDirty() {
+  return true;
+}
+
 void OOQPInternal::evaluate(int nfdir, int nadir) {
   casadi_assert_message(nfdir==0 && nadir==0, "OOQPSolve::evaluate() not implemented for forward or backward mode");
-  if (qp_==0) {
+  
+  if (qp_==0 || isDirty()) {
     allocate();
     casadi_assert(qp_!=0);
   }
-  
+
   // Access nonzeros
   const vector<double> &data_A = input(QP_A).data();
   vector<double> &data_Aeq = A_eq_.data();
@@ -170,6 +179,9 @@ void OOQPInternal::evaluate(int nfdir, int nadir) {
     }
   }
   
+  // Set multipliers to zero
+  output(QP_LAMBDA_A).setAll(0);
+  
   // Get multipliers for the equality constraints
   vector<double> &lambda_a = output(QP_LAMBDA_A).data();
   casadi_assert(vars_->y->length()==eq_.size());
@@ -208,10 +220,15 @@ void OOQPInternal::allocate() {
     if(uba[k]==lba[k]){
       eq_.push_back(k);
     } else {
-      ineq_.push_back(k);
+      if (uba[k]==numeric_limits<double>::infinity() && lba[k]==-numeric_limits<double>::infinity()) {
+        unbounded_.push_back(k);
+      } else {
+        ineq_.push_back(k);
+      }
+
     }
   }
-  casadi_assert(uba.size()==eq_.size() + ineq_.size());
+  casadi_assert(uba.size()==eq_.size() + ineq_.size() + unbounded_.size());
   
   // Set up a Sparse solver
   qp_ = new QpGenSparseMa27( nx_, eq_.size(), ineq_.size(), input(QP_H).size() , input(QP_G).size(), input(QP_A).size() );

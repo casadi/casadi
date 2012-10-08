@@ -52,8 +52,9 @@ class QPSolverTests(casadiTestCase):
     H = DMatrix([[1,-1],[-1,2]])
     G = DMatrix([-2,-6])
     A =  DMatrix([[1, 1],[-1, 2],[2, 1]])
-    UBA = DMatrix([2, 2, 3])
+    
     LBA = DMatrix([-inf]*3)
+    UBA = DMatrix([2, 2, 3])
 
     LBX = DMatrix([0]*2)
     UBX = DMatrix([inf]*2)
@@ -86,8 +87,7 @@ class QPSolverTests(casadiTestCase):
       self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[0],0,6,str(qpsolver))
       self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[1],0,6,str(qpsolver))
 
-      self.assertAlmostEqual(solver.output(QP_LAMBDA_A)[0],3+1.0/9,6,str(qpsolver))
-      self.assertAlmostEqual(solver.output(QP_LAMBDA_A)[1],4.0/9,6,str(qpsolver))
+      self.checkarray(solver.output(QP_LAMBDA_A),DMatrix([3+1.0/9,4.0/9,0]),str(qpsolver),digits=6)
       
       self.assertAlmostEqual(solver.output(QP_COST)[0],-8-2.0/9,6,str(qpsolver))
       
@@ -101,8 +101,7 @@ class QPSolverTests(casadiTestCase):
       self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[0],0,6,str(qpsolver))
       self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[1],0,6,str(qpsolver))
 
-      self.assertAlmostEqual(solver.output(QP_LAMBDA_A)[0],2,4,str(qpsolver))
-      self.assertAlmostEqual(solver.output(QP_LAMBDA_A)[1],0,6,str(qpsolver))
+      self.checkarray(solver.output(QP_LAMBDA_A),DMatrix([2,0,0]),str(qpsolver),digits=4)
       
       solver.input(QP_H).set(0)
 
@@ -114,26 +113,22 @@ class QPSolverTests(casadiTestCase):
       self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[0],0,6,str(qpsolver))
       self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[1],0,6,str(qpsolver))
 
-      self.assertAlmostEqual(solver.output(QP_LAMBDA_A)[0],10.0/3,4,str(qpsolver))
-      self.assertAlmostEqual(solver.output(QP_LAMBDA_A)[1],4.0/3,6,str(qpsolver))
-      
+      self.checkarray(solver.output(QP_LAMBDA_A),DMatrix([10.0/3,4.0/3,0]),str(qpsolver),digits=4)
+
       solver.input(QP_LBA).set([-inf]*3) #  Upper _and_ lower 
       solver.input(QP_UBA).set([inf]*3)  #  bounds infinite?
 
       solver.input(QP_UBX).setAll(5)
 
-      if not('OOQP' in solver.__class__.__name__):
-        solver.evaluate()
-        self.assertAlmostEqual(solver.output()[0],5,6,str(qpsolver))
-        self.assertAlmostEqual(solver.output()[1],5,6,str(qpsolver))
-        self.assertAlmostEqual(solver.output(QP_COST),-40,5,str(qpsolver))
-        
-        self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[0],2,6,str(qpsolver))
-        self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[1],6,6,str(qpsolver))
+      solver.evaluate()
+      self.assertAlmostEqual(solver.output()[0],5,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output()[1],5,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output(QP_COST),-40,5,str(qpsolver))
+      
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[0],2,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[1],6,6,str(qpsolver))
 
-        self.assertAlmostEqual(solver.output(QP_LAMBDA_A)[0],0,4,str(qpsolver))
-        self.assertAlmostEqual(solver.output(QP_LAMBDA_A)[1],0,6,str(qpsolver))
-    
+      self.checkarray(solver.output(QP_LAMBDA_A),DMatrix([0,0,0]),str(qpsolver),digits=4)
 
   def test_general_convex_sparse(self):
     self.message("Convex sparse QP with solvers: " + str([qpsolver for qpsolver,options in qpsolvers]))
@@ -145,8 +140,9 @@ class QPSolverTests(casadiTestCase):
     G = DMatrix([-2,-6,1,0,0])
     A =  DMatrix([[1, 0,0.1,0.7,-1],[0.1, 2,-0.3,4,0.1]])
     makeSparse(A)
-    UBA = DMatrix([2, 2])
+    
     LBA = DMatrix([-inf])
+    UBA = DMatrix([2, 2])
 
     LBX = DMatrix([0]*5)
     UBX = DMatrix([inf]*5)
@@ -186,8 +182,9 @@ class QPSolverTests(casadiTestCase):
     H = DMatrix([[1,-1],[-1,-2]])
     G = DMatrix([-2,-6])
     A =  DMatrix([[1, 1],[-1, 2],[2, 1]])
-    UBA = DMatrix([2, 2, 3])
+    
     LBA = DMatrix([-inf]*3)
+    UBA = DMatrix([2, 2, 3])
 
     LBX = DMatrix([0]*2)
     UBX = DMatrix([inf]*2)
@@ -220,11 +217,84 @@ class QPSolverTests(casadiTestCase):
       self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[0],0,6,str(qpsolver))
       self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[1],0,6,str(qpsolver))
 
-      self.assertAlmostEqual(solver.output(QP_LAMBDA_A)[0],4+8.0/9,6,str(qpsolver))
-      self.assertAlmostEqual(solver.output(QP_LAMBDA_A)[1],20.0/9,6,str(qpsolver))
+      self.checkarray(solver.output(QP_LAMBDA_A),DMatrix([4+8.0/9,20.0/9,0]),str(qpsolver),digits=6)
       
       self.assertAlmostEqual(solver.output(QP_COST)[0],-10-16.0/9,6,str(qpsolver))
 
+  def test_equality(self):
+    self.message("Regression 452 test: equality constraints give wrong multipliers")
+    H = DMatrix([[1,-1],[-1,2]])
+    G = DMatrix([-2,-6])
+
+    options = {"convex": True, "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+      
+    for qpsolver, qp_options in qpsolvers:
+      self.message("general_convex: " + str(qpsolver))
+      #if "OOQP" in str(qpsolver):
+      #  continue
+      solver = qpsolver(H.sparsity(),sp_dense(3,2))
+      for key, val in options.iteritems():
+        if solver.hasOption(key):
+           solver.setOption(key,val)
+      solver.setOption(qp_options)
+      solver.init()
+      
+      
+      A =  DMatrix([[1, 1],[-1, 2],[2, 1]])
+
+      LBA = DMatrix([-inf]*3)
+      UBA = DMatrix([2, 2, 3])
+
+      LBX = DMatrix([0.5,0])
+      UBX = DMatrix([0.5,inf])
+
+      solver.input(QP_H).set(H)
+      solver.input(QP_G).set(G)
+      solver.input(QP_A).set(A)
+      solver.input(QP_LBX).set(LBX)
+      solver.input(QP_UBX).set(UBX)
+      solver.input(QP_LBA).set(LBA)
+      solver.input(QP_UBA).set(UBA)
+
+      solver.solve()
+
+      self.assertAlmostEqual(solver.output()[0],0.5,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output()[1],1.25,6,str(qpsolver))
     
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[0],4.75,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[1],0,6,str(qpsolver))
+
+      self.checkarray(solver.output(QP_LAMBDA_A),DMatrix([0,2,0]),str(qpsolver),digits=6)
+      
+      self.assertAlmostEqual(solver.output(QP_COST)[0],-7.4375,6,str(qpsolver))
+    
+      A =  DMatrix([[1, 1],[-1, 2],[2, 1]])
+      LBA = DMatrix([2,-inf,-inf])
+      UBA = DMatrix([2, inf, inf])
+
+      LBX = DMatrix([-inf]*2)
+      UBX = DMatrix([inf]*2)
+
+
+      solver.input(QP_H).set(H)
+      solver.input(QP_G).set(G)
+      solver.input(QP_A).set(A)
+      solver.input(QP_LBX).set(LBX)
+      solver.input(QP_UBX).set(UBX)
+      solver.input(QP_LBA).set(LBA)
+      solver.input(QP_UBA).set(UBA)
+
+      solver.solve()
+
+      self.assertAlmostEqual(solver.output()[0],0.4,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output()[1],1.6,6,str(qpsolver))
+    
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[0],0,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[1],0,6,str(qpsolver))
+
+      self.checkarray(solver.output(QP_LAMBDA_A),DMatrix([3.2,0,0]),str(qpsolver),digits=6)
+       
+      self.assertAlmostEqual(solver.output(QP_COST)[0],-8.4,6,str(qpsolver))
+      
 if __name__ == '__main__':
     unittest.main()

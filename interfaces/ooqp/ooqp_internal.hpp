@@ -42,6 +42,15 @@ namespace CasADi{
  * */
 class OOQPInternal : public QPSolverInternal {
   friend class OOQPSolver;
+  
+private:
+  /** \brief  Allocate
+  *  Because constraints after initialization, we cannot allocate a Solver during init
+  */
+  virtual void allocate();
+  
+  /** \brief check if a new solver structure must be allocated*/
+  bool isDirty();
 public:
   /** \brief  Constructor */
   explicit OOQPInternal();
@@ -58,10 +67,7 @@ public:
   /** \brief  Initialize */
   virtual void init();
   
-  /** \brief  Allocate
-  *  Because constraints after initialization, we cannot allocate a Solver during init
-  */
-  virtual void allocate();
+
   
   virtual void evaluate(int nfdir, int nadir);
   
@@ -77,8 +83,8 @@ public:
     GondzioSolver  * s_;
     /* @} */
     
-    /// The non-zero indices of the equality and inequality constraints
-    std::vector<int> eq_, ineq_;
+    /// The non-zero indices of the equality, inequality & unbounded constraints
+    std::vector<int> eq_, ineq_, unbounded_;
         
     /// The lower triangular part of H
     DMatrix Hl_;
