@@ -1258,13 +1258,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::AcadoIntegratorInternal::eval "
+%feature("docstring")  CasADi::AcadoIntegratorInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::AcadoIntegratorInternal::eval "
+%feature("docstring")  CasADi::AcadoIntegratorInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::AcadoIntegratorInternal::derivative "
 
@@ -1274,6 +1274,11 @@ derivatives (cached) ";
 %feature("docstring")  CasADi::AcadoIntegratorInternal::jacobian "
 
 Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::AcadoIntegratorInternal::iStruct "
 
@@ -2479,13 +2484,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::AcadoOCPInternal::eval "
+%feature("docstring")  CasADi::AcadoOCPInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::AcadoOCPInternal::eval "
+%feature("docstring")  CasADi::AcadoOCPInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::AcadoOCPInternal::derivative "
 
@@ -2504,6 +2509,11 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::AcadoOCPInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::AcadoOCPInternal::iStruct "
 
@@ -4443,13 +4453,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::CFunctionInternal::eval "
+%feature("docstring")  CasADi::CFunctionInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::CFunctionInternal::eval "
+%feature("docstring")  CasADi::CFunctionInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::CFunctionInternal::derivative "
 
@@ -4468,6 +4478,11 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::CFunctionInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::CFunctionInternal::iStruct "
 
@@ -6744,13 +6759,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::CollocationIntegratorInternal::eval "
+%feature("docstring")  CasADi::CollocationIntegratorInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::CollocationIntegratorInternal::eval "
+%feature("docstring")  CasADi::CollocationIntegratorInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::CollocationIntegratorInternal::derivative "
 
@@ -6760,6 +6775,12 @@ derivatives (cached) ";
 %feature("docstring")  CasADi::CollocationIntegratorInternal::jacobian "
 
 Access a Jacobian function (cached) ";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::CollocationIntegratorInternal::iStruct "
 
@@ -7348,13 +7369,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::CollocationInternal::eval "
+%feature("docstring")  CasADi::CollocationInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::CollocationInternal::eval "
+%feature("docstring")  CasADi::CollocationInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::CollocationInternal::derivative "
 
@@ -7373,6 +7394,11 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::CollocationInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::CollocationInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::CollocationInternal::iStruct "
 
@@ -9117,13 +9143,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::ControlSimulatorInternal::eval "
+%feature("docstring")  CasADi::ControlSimulatorInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::ControlSimulatorInternal::eval "
+%feature("docstring")  CasADi::ControlSimulatorInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::ControlSimulatorInternal::derivative "
 
@@ -9142,6 +9168,12 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::ControlSimulatorInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::getNumericJacobian
+"
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::ControlSimulatorInternal::iStruct "
 
@@ -9765,13 +9797,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::CplexInternal::eval "
+%feature("docstring")  CasADi::CplexInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::CplexInternal::eval "
+%feature("docstring")  CasADi::CplexInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::CplexInternal::derivative "
 
@@ -9790,6 +9822,11 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::CplexInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::CplexInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::CplexInternal::iStruct "
 
@@ -12496,13 +12533,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::CSparseInternal::eval "
+%feature("docstring")  CasADi::CSparseInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::CSparseInternal::eval "
+%feature("docstring")  CasADi::CSparseInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::CSparseInternal::derivative "
 
@@ -12521,6 +12558,11 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::CSparseInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::CSparseInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::CSparseInternal::iStruct "
 
@@ -12738,9 +12780,37 @@ Assert that the object has been initialized. ";
 
 Function that integrates the ODE:
 
-Solves the following initial value problem (IVP):
-
-xdot == f(t,x,p) from t0 to tf  given the initial condition x(t0) == x0;
+Solves an initial value problem (IVP) coupled to a terminal value problem
+with differential equation given as an implicit ODE coupled to an algebraic
+equation and a set of quadratures:Initial conditions at t=t0   x(t0)  = x0
+q(t0)  = 0  Forward integration from t=t0 to t=tf        0 =
+fx(x,z,p,t,der(x)) Forward ODE        0 = fz(x,z,p,t)
+Forward algebraic equations   der(q) = fq(x,z,p,t)                  Forward
+quadratures Terminal conditions at t=tf   rx(tf)  = rx0   rq(tf)  = 0
+Backward integration from t=tf to t=t0         0 =
+gx(rx,rz,rp,x,z,p,t,der(rx)) Backward ODE         0 = gz(rx,rz,rp,x,z,p,t)
+Backward algebraic equations   der(rq) = gq(rx,rz,rp,x,z,p,t) Backward
+quadratures  where we assume that both the forward and backwards
+integrations are index-1 (i.e. dfx/dxdot, dfz/dz, dgz/drz, dgx/drxdot are
+invertible) and furthermore that  gx, gz and gq have a linear dependency on
+rx, rz and rp and that f_x and g_x have a  linear dependence on xdot and
+rxdot respectively.  Note that not all integrators support this general
+form. In particular, an explicit integrator may requite that there are no
+algebraic states of equations and that the  ODE is given in explicit form:
+der(x)  = fx_explicit(x,z,p,t)  Integrators requite explicit ODEs also
+accept implict ODEs if they can be formally decomposed in the following way:
+0 = fx(x,z,p,t,der(x)) := fx_explicit(x,z,p,t) - der(x) This form allows the
+same ODE/DAE to be used for both explicit and implicit integrators. Explicit
+integrators will simply pass zeros as the state derivatives, recovering the
+explicit formulation. This also applies to the backward integration.
+Solving the DAE defines a mapping from the four inputs: x0:    The
+differential state at the initial time (INTEGRATOR_X0=0) p:     Parameters
+(INTEGRATOR_P=1) rx0:   Backward differential state at the final time
+(INTEGRATOR_RX0=2) rp: Backward parameter vector (INTEGRATOR_RP=3)  ... and
+four outputs: xf: Differential state at the final time (INTEGRATOR_XF=0) qf:
+Quadrature state at the final time (INTEGRATOR_QF=1) rxf:   Backward
+differential state at the initial time (INTEGRATOR_RXF=2) rqf: Backward
+quadrature state at the initial time (INTEGRATOR_RQF=3)
 
 A call to evaluate will integrate to the end.
 
@@ -13741,9 +13811,37 @@ Return a string with a destription (for SWIG) ";
 // File: classCasADi_1_1CVodesInternal.xml
 %feature("docstring") CasADi::CVodesInternal "
 
-Solves the following initial value problem (IVP):
-
-xdot == f(t,x,p) from t0 to tf  given the initial condition x(t0) == x0;
+Solves an initial value problem (IVP) coupled to a terminal value problem
+with differential equation given as an implicit ODE coupled to an algebraic
+equation and a set of quadratures:Initial conditions at t=t0   x(t0)  = x0
+q(t0)  = 0  Forward integration from t=t0 to t=tf        0 =
+fx(x,z,p,t,der(x)) Forward ODE        0 = fz(x,z,p,t)
+Forward algebraic equations   der(q) = fq(x,z,p,t)                  Forward
+quadratures Terminal conditions at t=tf   rx(tf)  = rx0   rq(tf)  = 0
+Backward integration from t=tf to t=t0         0 =
+gx(rx,rz,rp,x,z,p,t,der(rx)) Backward ODE         0 = gz(rx,rz,rp,x,z,p,t)
+Backward algebraic equations   der(rq) = gq(rx,rz,rp,x,z,p,t) Backward
+quadratures  where we assume that both the forward and backwards
+integrations are index-1 (i.e. dfx/dxdot, dfz/dz, dgz/drz, dgx/drxdot are
+invertible) and furthermore that  gx, gz and gq have a linear dependency on
+rx, rz and rp and that f_x and g_x have a  linear dependence on xdot and
+rxdot respectively.  Note that not all integrators support this general
+form. In particular, an explicit integrator may requite that there are no
+algebraic states of equations and that the  ODE is given in explicit form:
+der(x)  = fx_explicit(x,z,p,t)  Integrators requite explicit ODEs also
+accept implict ODEs if they can be formally decomposed in the following way:
+0 = fx(x,z,p,t,der(x)) := fx_explicit(x,z,p,t) - der(x) This form allows the
+same ODE/DAE to be used for both explicit and implicit integrators. Explicit
+integrators will simply pass zeros as the state derivatives, recovering the
+explicit formulation. This also applies to the backward integration.
+Solving the DAE defines a mapping from the four inputs: x0:    The
+differential state at the initial time (INTEGRATOR_X0=0) p:     Parameters
+(INTEGRATOR_P=1) rx0:   Backward differential state at the final time
+(INTEGRATOR_RX0=2) rp: Backward parameter vector (INTEGRATOR_RP=3)  ... and
+four outputs: xf: Differential state at the final time (INTEGRATOR_XF=0) qf:
+Quadrature state at the final time (INTEGRATOR_QF=1) rxf:   Backward
+differential state at the initial time (INTEGRATOR_RXF=2) rqf: Backward
+quadrature state at the initial time (INTEGRATOR_RQF=3)
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 4)
 +----------------+------------------------------------------------------+
@@ -14363,13 +14461,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::CVodesInternal::eval "
+%feature("docstring")  CasADi::CVodesInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::CVodesInternal::eval "
+%feature("docstring")  CasADi::CVodesInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::CVodesInternal::derivative "
 
@@ -14379,6 +14477,11 @@ derivatives (cached) ";
 %feature("docstring")  CasADi::CVodesInternal::jacobian "
 
 Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::CVodesInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::CVodesInternal::iStruct "
 
@@ -16014,13 +16117,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::ExternalFunctionInternal::eval "
+%feature("docstring")  CasADi::ExternalFunctionInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::ExternalFunctionInternal::eval "
+%feature("docstring")  CasADi::ExternalFunctionInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::ExternalFunctionInternal::derivative "
 
@@ -16039,6 +16142,12 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::ExternalFunctionInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::getNumericJacobian
+"
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::ExternalFunctionInternal::iStruct "
 
@@ -17528,13 +17637,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::FXInternal::eval "
+%feature("docstring")  CasADi::FXInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::FXInternal::eval "
+%feature("docstring")  CasADi::FXInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::FXInternal::derivative "
 
@@ -17553,6 +17662,11 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::FXInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::FXInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::FXInternal::iStruct "
 
@@ -19994,13 +20108,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::IdasInternal::eval "
+%feature("docstring")  CasADi::IdasInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::IdasInternal::eval "
+%feature("docstring")  CasADi::IdasInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::IdasInternal::derivative "
 
@@ -20010,6 +20124,11 @@ derivatives (cached) ";
 %feature("docstring")  CasADi::IdasInternal::jacobian "
 
 Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::IdasInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::IdasInternal::iStruct "
 
@@ -21339,13 +21458,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::ImplicitFunctionInternal::eval "
+%feature("docstring")  CasADi::ImplicitFunctionInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::ImplicitFunctionInternal::eval "
+%feature("docstring")  CasADi::ImplicitFunctionInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::derivative "
 
@@ -21364,6 +21483,12 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::ImplicitFunctionInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::getNumericJacobian
+"
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::iStruct "
 
@@ -21815,36 +21940,43 @@ Check if smooth. ";
 // File: classCasADi_1_1Integrator.xml
 %feature("docstring") CasADi::Integrator "
 
-Integrator abstract base class Solves the following initial value problem
-(IVP):
-
-F(t,x,der(x),z,p) == 0 x(t0) = x0 over a time interval [t0, tf].
-
-NOTE: The ODE/DAE initial-value problem formulation in CasADi is being
-replaced with a new formulation which solves an initial value problem (IVP)
-coupled to a terminal value problem with differential equation given as an
-implicit ODE coupled to an algebraic equation and a set of
-quadratures:Initial conditions at t=t0   x(t0)  = x0   q(t0)  = 0  Forward
-integration from t=t0 to t=tf        0 = fx(x,z,p,t,der(x)) Forward ODE
-0 = fz(x,z,p,t)                  Forward algebraic equations   der(q) =
-fq(x,z,p,t)                  Forward quadratures Terminal conditions at t=tf
-rx(tf)  = rx0   rq(tf)  = 0  Backward integration from t=tf to t=t0
-0 = gx(rx,rz,rp,x,z,p,t,der(rx)) Backward ODE         0 =
-gz(rx,rz,rp,x,z,p,t)           Backward algebraic equations   der(rq) =
-gq(rx,rz,rp,x,z,p,t) Backward quadratures  where we assume that both the
-forward and backwards integrations are index-1 (i.e. dfx/dxdot, dfz/dz,
-dgz/drz, dgx/drxdot are invertible) and furthermore that  gx, gz and gq have
-a linear dependency on rx, rz and rp and that f_x and g_x have a  linear
-dependence on xdot and rxdot respectively.
+Integrator abstract base class Solves an initial value problem (IVP) coupled
+to a terminal value problem with differential equation given as an implicit
+ODE coupled to an algebraic equation and a set of quadratures:Initial
+conditions at t=t0   x(t0)  = x0   q(t0)  = 0  Forward integration from t=t0
+to t=tf        0 = fx(x,z,p,t,der(x)) Forward ODE        0 = fz(x,z,p,t)
+Forward algebraic equations   der(q) = fq(x,z,p,t)                  Forward
+quadratures Terminal conditions at t=tf   rx(tf)  = rx0   rq(tf)  = 0
+Backward integration from t=tf to t=t0         0 =
+gx(rx,rz,rp,x,z,p,t,der(rx)) Backward ODE         0 = gz(rx,rz,rp,x,z,p,t)
+Backward algebraic equations   der(rq) = gq(rx,rz,rp,x,z,p,t) Backward
+quadratures  where we assume that both the forward and backwards
+integrations are index-1 (i.e. dfx/dxdot, dfz/dz, dgz/drz, dgx/drxdot are
+invertible) and furthermore that  gx, gz and gq have a linear dependency on
+rx, rz and rp and that f_x and g_x have a  linear dependence on xdot and
+rxdot respectively.  Note that not all integrators support this general
+form. In particular, an explicit integrator may requite that there are no
+algebraic states of equations and that the  ODE is given in explicit form:
+der(x)  = fx_explicit(x,z,p,t)  Integrators requite explicit ODEs also
+accept implict ODEs if they can be formally decomposed in the following way:
+0 = fx(x,z,p,t,der(x)) := fx_explicit(x,z,p,t) - der(x) This form allows the
+same ODE/DAE to be used for both explicit and implicit integrators. Explicit
+integrators will simply pass zeros as the state derivatives, recovering the
+explicit formulation. This also applies to the backward integration.
+Solving the DAE defines a mapping from the four inputs: x0:    The
+differential state at the initial time (INTEGRATOR_X0=0) p:     Parameters
+(INTEGRATOR_P=1) rx0:   Backward differential state at the final time
+(INTEGRATOR_RX0=2) rp: Backward parameter vector (INTEGRATOR_RP=3)  ... and
+four outputs: xf: Differential state at the final time (INTEGRATOR_XF=0) qf:
+Quadrature state at the final time (INTEGRATOR_QF=1) rxf:   Backward
+differential state at the initial time (INTEGRATOR_RXF=2) rqf: Backward
+quadrature state at the initial time (INTEGRATOR_RQF=3)
 
 The Integrator class provides some additional functionality, such as getting
-the value of the state and/or sensitivities at certain time points. Controls
-are assumed to be parametrized at this point.
+the value of the state and/or sensitivities at certain time points.
 
-The class does not specify how the function F above should be represented,
-nor the method used for the integration, but assumes that it steps forward
-in time (ruling out collocation in particular). The actual form of the
-ODE/DAE is defined in the derived classes.
+The class does not specify the method used for the integration. This is
+defined in derived classes.
 
 Joel Andersson
 
@@ -22566,26 +22698,37 @@ Return a string with a destription (for SWIG) ";
 
 Internal storage for integrator related data.
 
-Solves the following initial value problem (IVP):
-
-F(t,x,der(x),z,p) == 0 x(t0) = x0 over a time interval [t0, tf].
-
-NOTE: The ODE/DAE initial-value problem formulation in CasADi is being
-replaced with a new formulation which solves an initial value problem (IVP)
-coupled to a terminal value problem with differential equation given as an
-implicit ODE coupled to an algebraic equation and a set of
-quadratures:Initial conditions at t=t0   x(t0)  = x0   q(t0)  = 0  Forward
-integration from t=t0 to t=tf        0 = fx(x,z,p,t,der(x)) Forward ODE
-0 = fz(x,z,p,t)                  Forward algebraic equations   der(q) =
-fq(x,z,p,t)                  Forward quadratures Terminal conditions at t=tf
-rx(tf)  = rx0   rq(tf)  = 0  Backward integration from t=tf to t=t0
-0 = gx(rx,rz,rp,x,z,p,t,der(rx)) Backward ODE         0 =
-gz(rx,rz,rp,x,z,p,t)           Backward algebraic equations   der(rq) =
-gq(rx,rz,rp,x,z,p,t) Backward quadratures  where we assume that both the
-forward and backwards integrations are index-1 (i.e. dfx/dxdot, dfz/dz,
-dgz/drz, dgx/drxdot are invertible) and furthermore that  gx, gz and gq have
-a linear dependency on rx, rz and rp and that f_x and g_x have a  linear
-dependence on xdot and rxdot respectively.
+Solves an initial value problem (IVP) coupled to a terminal value problem
+with differential equation given as an implicit ODE coupled to an algebraic
+equation and a set of quadratures:Initial conditions at t=t0   x(t0)  = x0
+q(t0)  = 0  Forward integration from t=t0 to t=tf        0 =
+fx(x,z,p,t,der(x)) Forward ODE        0 = fz(x,z,p,t)
+Forward algebraic equations   der(q) = fq(x,z,p,t)                  Forward
+quadratures Terminal conditions at t=tf   rx(tf)  = rx0   rq(tf)  = 0
+Backward integration from t=tf to t=t0         0 =
+gx(rx,rz,rp,x,z,p,t,der(rx)) Backward ODE         0 = gz(rx,rz,rp,x,z,p,t)
+Backward algebraic equations   der(rq) = gq(rx,rz,rp,x,z,p,t) Backward
+quadratures  where we assume that both the forward and backwards
+integrations are index-1 (i.e. dfx/dxdot, dfz/dz, dgz/drz, dgx/drxdot are
+invertible) and furthermore that  gx, gz and gq have a linear dependency on
+rx, rz and rp and that f_x and g_x have a  linear dependence on xdot and
+rxdot respectively.  Note that not all integrators support this general
+form. In particular, an explicit integrator may requite that there are no
+algebraic states of equations and that the  ODE is given in explicit form:
+der(x)  = fx_explicit(x,z,p,t)  Integrators requite explicit ODEs also
+accept implict ODEs if they can be formally decomposed in the following way:
+0 = fx(x,z,p,t,der(x)) := fx_explicit(x,z,p,t) - der(x) This form allows the
+same ODE/DAE to be used for both explicit and implicit integrators. Explicit
+integrators will simply pass zeros as the state derivatives, recovering the
+explicit formulation. This also applies to the backward integration.
+Solving the DAE defines a mapping from the four inputs: x0:    The
+differential state at the initial time (INTEGRATOR_X0=0) p:     Parameters
+(INTEGRATOR_P=1) rx0:   Backward differential state at the final time
+(INTEGRATOR_RX0=2) rp: Backward parameter vector (INTEGRATOR_RP=3)  ... and
+four outputs: xf: Differential state at the final time (INTEGRATOR_XF=0) qf:
+Quadrature state at the final time (INTEGRATOR_QF=1) rxf:   Backward
+differential state at the initial time (INTEGRATOR_RXF=2) rqf: Backward
+quadrature state at the initial time (INTEGRATOR_RQF=3)
 
 Joel Andersson
 
@@ -22954,13 +23097,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::IntegratorInternal::eval "
+%feature("docstring")  CasADi::IntegratorInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::IntegratorInternal::eval "
+%feature("docstring")  CasADi::IntegratorInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::IntegratorInternal::derivative "
 
@@ -22970,6 +23113,11 @@ derivatives (cached) ";
 %feature("docstring")  CasADi::IntegratorInternal::jacobian "
 
 Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::IntegratorInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::IntegratorInternal::iStruct "
 
@@ -23588,13 +23736,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::IPInternal::eval "
+%feature("docstring")  CasADi::IPInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::IPInternal::eval "
+%feature("docstring")  CasADi::IPInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::IPInternal::derivative "
 
@@ -23613,6 +23761,11 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::IPInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::IPInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::IPInternal::iStruct "
 
@@ -27717,13 +27870,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::IpoptInternal::eval "
+%feature("docstring")  CasADi::IpoptInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::IpoptInternal::eval "
+%feature("docstring")  CasADi::IpoptInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::IpoptInternal::derivative "
 
@@ -27742,6 +27895,11 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::IpoptInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::IpoptInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::IpoptInternal::iStruct "
 
@@ -28652,13 +28810,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::IpoptQPInternal::eval "
+%feature("docstring")  CasADi::IpoptQPInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::IpoptQPInternal::eval "
+%feature("docstring")  CasADi::IpoptQPInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::IpoptQPInternal::derivative "
 
@@ -28677,6 +28835,11 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::IpoptQPInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::IpoptQPInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::IpoptQPInternal::iStruct "
 
@@ -33532,10 +33695,27 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| ad_mode      | OT_STRING    | \"default\"    | default      | CasADi::Jaco |
-|              |              |              | means both ( | bianInternal |
-|              |              |              | forward|adjo |              |
-|              |              |              | int|default) |              |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
+|              |              |              | calculate    | ternal       |
+|              |              |              | the          |              |
+|              |              |              | Jacobians:   |              |
+|              |              |              | \"forward\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | forward      |              |
+|              |              |              | mode)        |              |
+|              |              |              | \"reverse\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | adjoint      |              |
+|              |              |              | mode) or     |              |
+|              |              |              | \"automatic\"  |              |
+|              |              |              | (a heuristic |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
+|              |              |              | (forward|rev |              |
+|              |              |              | erse|automat |              |
+|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
@@ -34140,10 +34320,27 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| ad_mode      | OT_STRING    | \"default\"    | default      | CasADi::Jaco |
-|              |              |              | means both ( | bianInternal |
-|              |              |              | forward|adjo |              |
-|              |              |              | int|default) |              |
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
+|              |              |              | calculate    | ternal       |
+|              |              |              | the          |              |
+|              |              |              | Jacobians:   |              |
+|              |              |              | \"forward\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | forward      |              |
+|              |              |              | mode)        |              |
+|              |              |              | \"reverse\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | adjoint      |              |
+|              |              |              | mode) or     |              |
+|              |              |              | \"automatic\"  |              |
+|              |              |              | (a heuristic |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
+|              |              |              | (forward|rev |              |
+|              |              |              | erse|automat |              |
+|              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
@@ -34373,13 +34570,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::JacobianInternal::eval "
+%feature("docstring")  CasADi::JacobianInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::JacobianInternal::eval "
+%feature("docstring")  CasADi::JacobianInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::JacobianInternal::derivative "
 
@@ -34398,6 +34595,11 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::JacobianInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::JacobianInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::JacobianInternal::iStruct "
 
@@ -34977,13 +35179,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::KinsolInternal::eval "
+%feature("docstring")  CasADi::KinsolInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::KinsolInternal::eval "
+%feature("docstring")  CasADi::KinsolInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::KinsolInternal::derivative "
 
@@ -35002,6 +35204,11 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::KinsolInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::KinsolInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::KinsolInternal::iStruct "
 
@@ -36585,13 +36792,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::KnitroInternal::eval "
+%feature("docstring")  CasADi::KnitroInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::KnitroInternal::eval "
+%feature("docstring")  CasADi::KnitroInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::KnitroInternal::derivative "
 
@@ -36610,6 +36817,11 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::KnitroInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::KnitroInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::KnitroInternal::iStruct "
 
@@ -38682,13 +38894,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::LapackLUDenseInternal::eval "
+%feature("docstring")  CasADi::LapackLUDenseInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::LapackLUDenseInternal::eval "
+%feature("docstring")  CasADi::LapackLUDenseInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::LapackLUDenseInternal::derivative "
 
@@ -38707,6 +38919,11 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::LapackLUDenseInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::LapackLUDenseInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::LapackLUDenseInternal::iStruct "
 
@@ -39861,13 +40078,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::LapackQRDenseInternal::eval "
+%feature("docstring")  CasADi::LapackQRDenseInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::LapackQRDenseInternal::eval "
+%feature("docstring")  CasADi::LapackQRDenseInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::LapackQRDenseInternal::derivative "
 
@@ -39886,6 +40103,11 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::LapackQRDenseInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::LapackQRDenseInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::LapackQRDenseInternal::iStruct "
 
@@ -41469,13 +41691,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::LiftedSQPInternal::eval "
+%feature("docstring")  CasADi::LiftedSQPInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::LiftedSQPInternal::eval "
+%feature("docstring")  CasADi::LiftedSQPInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::LiftedSQPInternal::derivative "
 
@@ -41494,6 +41716,11 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::LiftedSQPInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::LiftedSQPInternal::iStruct "
 
@@ -42116,13 +42343,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::LiftoptInternal::eval "
+%feature("docstring")  CasADi::LiftoptInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::LiftoptInternal::eval "
+%feature("docstring")  CasADi::LiftoptInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::LiftoptInternal::derivative "
 
@@ -42141,6 +42368,11 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::LiftoptInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::LiftoptInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::LiftoptInternal::iStruct "
 
@@ -44060,13 +44292,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::LinearSolverInternal::eval "
+%feature("docstring")  CasADi::LinearSolverInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::LinearSolverInternal::eval "
+%feature("docstring")  CasADi::LinearSolverInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::LinearSolverInternal::derivative "
 
@@ -44085,6 +44317,11 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::LinearSolverInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::LinearSolverInternal::iStruct "
 
@@ -46904,13 +47141,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::MultipleShootingInternal::eval "
+%feature("docstring")  CasADi::MultipleShootingInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::MultipleShootingInternal::eval "
+%feature("docstring")  CasADi::MultipleShootingInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::MultipleShootingInternal::derivative "
 
@@ -46929,6 +47166,12 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::MultipleShootingInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::MultipleShootingInternal::getNumericJacobian
+"
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::MultipleShootingInternal::iStruct "
 
@@ -49461,6 +49704,11 @@ adjoint derivatives. ";
 
 Calculate the jacobian of output oind with respect to input iind. ";
 
+%feature("docstring")  CasADi::MXFunctionInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
+
 %feature("docstring")  CasADi::MXFunctionInternal::collectFree "
 
 Collect the free variables. ";
@@ -49504,13 +49752,13 @@ Reset the sparsity propagation. ";
 
 Construct a complete Jacobian by compression. ";
 
-%feature("docstring")  CasADi::MXFunctionInternal::eval "
+%feature("docstring")  CasADi::MXFunctionInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::MXFunctionInternal::eval "
+%feature("docstring")  CasADi::MXFunctionInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::derivative "
 
@@ -51220,13 +51468,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::NLPSolverInternal::eval "
+%feature("docstring")  CasADi::NLPSolverInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::NLPSolverInternal::eval "
+%feature("docstring")  CasADi::NLPSolverInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::NLPSolverInternal::derivative "
 
@@ -51245,6 +51493,11 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::NLPSolverInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::NLPSolverInternal::iStruct "
 
@@ -54137,13 +54390,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::OCPSolverInternal::eval "
+%feature("docstring")  CasADi::OCPSolverInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::OCPSolverInternal::eval "
+%feature("docstring")  CasADi::OCPSolverInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::OCPSolverInternal::derivative "
 
@@ -54162,6 +54415,11 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::OCPSolverInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::OCPSolverInternal::iStruct "
 
@@ -54803,13 +55061,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::OOQPInternal::eval "
+%feature("docstring")  CasADi::OOQPInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::OOQPInternal::eval "
+%feature("docstring")  CasADi::OOQPInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::OOQPInternal::derivative "
 
@@ -54828,6 +55086,11 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::OOQPInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::OOQPInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::OOQPInternal::iStruct "
 
@@ -57249,13 +57512,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::ParallelizerInternal::eval "
+%feature("docstring")  CasADi::ParallelizerInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::ParallelizerInternal::eval "
+%feature("docstring")  CasADi::ParallelizerInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::ParallelizerInternal::derivative "
 
@@ -57265,6 +57528,11 @@ derivatives (cached) ";
 %feature("docstring")  CasADi::ParallelizerInternal::jacobian "
 
 Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::ParallelizerInternal::iStruct "
 
@@ -57840,13 +58108,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::QPOasesInternal::eval "
+%feature("docstring")  CasADi::QPOasesInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::QPOasesInternal::eval "
+%feature("docstring")  CasADi::QPOasesInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::QPOasesInternal::derivative "
 
@@ -57865,6 +58133,11 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::QPOasesInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::QPOasesInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::QPOasesInternal::iStruct "
 
@@ -59767,13 +60040,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::QPSolverInternal::eval "
+%feature("docstring")  CasADi::QPSolverInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::QPSolverInternal::eval "
+%feature("docstring")  CasADi::QPSolverInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::QPSolverInternal::derivative "
 
@@ -59792,6 +60065,11 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::QPSolverInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::QPSolverInternal::iStruct "
 
@@ -61284,13 +61562,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::RKIntegratorInternal::eval "
+%feature("docstring")  CasADi::RKIntegratorInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::RKIntegratorInternal::eval "
+%feature("docstring")  CasADi::RKIntegratorInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::RKIntegratorInternal::derivative "
 
@@ -61300,6 +61578,11 @@ derivatives (cached) ";
 %feature("docstring")  CasADi::RKIntegratorInternal::jacobian "
 
 Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::RKIntegratorInternal::iStruct "
 
@@ -62882,13 +63165,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::SimulatorInternal::eval "
+%feature("docstring")  CasADi::SimulatorInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::SimulatorInternal::eval "
+%feature("docstring")  CasADi::SimulatorInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::SimulatorInternal::derivative "
 
@@ -62907,6 +63190,11 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::SimulatorInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::SimulatorInternal::iStruct "
 
@@ -63914,13 +64202,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::SQPInternal::eval "
+%feature("docstring")  CasADi::SQPInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::SQPInternal::eval "
+%feature("docstring")  CasADi::SQPInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::SQPInternal::derivative "
 
@@ -63939,6 +64227,11 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::SQPInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::SQPInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::SQPInternal::iStruct "
 
@@ -66549,13 +66842,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::SundialsInternal::eval "
+%feature("docstring")  CasADi::SundialsInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::SundialsInternal::eval "
+%feature("docstring")  CasADi::SundialsInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::SundialsInternal::derivative "
 
@@ -66565,6 +66858,11 @@ derivatives (cached) ";
 %feature("docstring")  CasADi::SundialsInternal::jacobian "
 
 Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::SundialsInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::SundialsInternal::iStruct "
 
@@ -68190,13 +68488,13 @@ Construct a complete Jacobian by compression. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::SXFunctionInternal::eval "
+%feature("docstring")  CasADi::SXFunctionInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::SXFunctionInternal::eval "
+%feature("docstring")  CasADi::SXFunctionInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::derivative "
 
@@ -68206,6 +68504,11 @@ derivatives (cached) ";
 %feature("docstring")  CasADi::SXFunctionInternal::jacobian "
 
 Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::iStruct "
 
@@ -71109,13 +71412,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::WorhpInternal::eval "
+%feature("docstring")  CasADi::WorhpInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::WorhpInternal::eval "
+%feature("docstring")  CasADi::WorhpInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::WorhpInternal::derivative "
 
@@ -71134,6 +71437,11 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::WorhpInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::WorhpInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::WorhpInternal::iStruct "
 
@@ -73127,13 +73435,13 @@ Evaluate symbolically, SX type. ";
 
 Evaluate symbolically, MX type. ";
 
-%feature("docstring")  CasADi::XFunctionInternal::eval "
+%feature("docstring")  CasADi::XFunctionInternal::call "
 
-Evaluate symbolically, SX type (overloaded) ";
+Call a function, MX type (overloaded) ";
 
-%feature("docstring")  CasADi::XFunctionInternal::eval "
+%feature("docstring")  CasADi::XFunctionInternal::call "
 
-Evaluate symbolically, MX type (overloaded) ";
+Call a function, SX type (overloaded) ";
 
 %feature("docstring")  CasADi::XFunctionInternal::derivative "
 
@@ -73152,6 +73460,11 @@ Access a Jacobian function (cached) ";
 %feature("docstring")  CasADi::XFunctionInternal::getJacobian "
 
 Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
 
 %feature("docstring")  CasADi::XFunctionInternal::iStruct "
 
@@ -76998,9 +77311,6 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: group__DAE__doc.xml
-
-
-// File: group__ODE__doc.xml
 
 
 // File: group__LinearSolver__doc.xml
