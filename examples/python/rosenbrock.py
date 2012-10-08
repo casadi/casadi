@@ -41,13 +41,13 @@ nlp_solver = SQPMethod
 
 # Choose a qp solver (for CasADi NLP methods)
 qp_solver = QPOasesSolver
-#qp_solver = NlpQPSolver
+#qp_solver = NLPQPSolver
 #qp_solver = OOQPSolver
 
 # QP solver options
 if qp_solver == QPOasesSolver:
   qp_solver_options = {"printLevel" : "none"}
-elif qp_solver ==  NlpQPSolver:
+elif qp_solver ==  NLPQPSolver:
   qp_solver_options = {"nlp_solver":IpoptSolver, "nlp_solver_options": {"print_level" : 0}}
 else:
   qp_solver_options = {}

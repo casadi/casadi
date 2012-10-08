@@ -28,24 +28,24 @@
 
 namespace CasADi{
 
-  /** \brief Internal class for NlpQPInternal
+  /** \brief Internal class for NLPQPInternal
    * 
       @copydoc QPSolver_doc
    * */
-class NlpQPInternal : public QPSolverInternal {
-  friend class NlpQPSolver;
+class NLPQPInternal : public QPSolverInternal {
+  friend class NLPQPSolver;
 public:
   /** \brief  Constructor */
-  explicit NlpQPInternal();
+  explicit NLPQPInternal();
 
   /** \brief  Clone */
-  virtual NlpQPInternal* clone() const;
+  virtual NLPQPInternal* clone() const;
   
   /** \brief  Create a new Solver */
-  explicit NlpQPInternal(const CRSSparsity& H, const CRSSparsity &A);
+  explicit NLPQPInternal(const CRSSparsity& H, const CRSSparsity &A);
 
   /** \brief  Destructor */
-  virtual ~NlpQPInternal();
+  virtual ~NLPQPInternal();
 
   /** \brief  Initialize */
   virtual void init();

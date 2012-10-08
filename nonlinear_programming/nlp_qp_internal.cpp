@@ -28,26 +28,26 @@
 using namespace std;
 namespace CasADi {
 
-NlpQPInternal* NlpQPInternal::clone() const{
+NLPQPInternal* NLPQPInternal::clone() const{
   // Return a deep copy
-  NlpQPInternal* node = new NlpQPInternal(input(QP_H).sparsity(),input(QP_A).sparsity());
+  NLPQPInternal* node = new NLPQPInternal(input(QP_H).sparsity(),input(QP_A).sparsity());
   if(!node->is_init_)
     node->init();
   return node;
 }
   
-NlpQPInternal::NlpQPInternal(const CRSSparsity& H_, const CRSSparsity &A_) : QPSolverInternal(H_,A_) {
+NLPQPInternal::NLPQPInternal(const CRSSparsity& H_, const CRSSparsity &A_) : QPSolverInternal(H_,A_) {
 
   addOption("nlp_solver",       OT_NLPSOLVER, GenericType(), "The NLPSOlver used to solve the QPs.");
   addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLPSOlver");
   
 }
 
-NlpQPInternal::~NlpQPInternal(){ 
+NLPQPInternal::~NLPQPInternal(){ 
 }
 
-void NlpQPInternal::evaluate(int nfdir, int nadir) {
-  if (nfdir!=0 || nadir!=0) throw CasadiException("NlpQPInternal::evaluate() not implemented for forward or backward mode");
+void NLPQPInternal::evaluate(int nfdir, int nadir) {
+  if (nfdir!=0 || nadir!=0) throw CasadiException("NLPQPInternal::evaluate() not implemented for forward or backward mode");
 
   // Pass inputs of QP to NLP form 
   nlpsolver_.input(NLP_P)[H_.mapping()] = input(QP_H);
@@ -70,7 +70,7 @@ void NlpQPInternal::evaluate(int nfdir, int nadir) {
   output(QP_LAMBDA_X).set(nlpsolver_.output(NLP_LAMBDA_X));
 }
 
-void NlpQPInternal::init(){
+void NLPQPInternal::init(){
 
   
   QPSolverInternal::init();

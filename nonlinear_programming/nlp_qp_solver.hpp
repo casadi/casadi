@@ -29,7 +29,7 @@ namespace CasADi {
   
   
 // Forward declaration of internal class 
-class NlpQPInternal;
+class NLPQPInternal;
 
   /** \brief IPOPT QP Solver for quadratic programming
 
@@ -38,17 +38,17 @@ class NlpQPInternal;
    \author Joris Gillis
    \date 2011
   */
-class NlpQPSolver : public QPSolver {
+class NLPQPSolver : public QPSolver {
 public:
 
   /** \brief  Default constructor */
-  NlpQPSolver();
+  NLPQPSolver();
   
-  explicit NlpQPSolver(const CRSSparsity & H, const CRSSparsity & A);
+  explicit NLPQPSolver(const CRSSparsity & H, const CRSSparsity & A);
   
   /** \brief  Access functions of the node */
-  NlpQPInternal* operator->();
-  const NlpQPInternal* operator->() const;
+  NLPQPInternal* operator->();
+  const NLPQPInternal* operator->() const;
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
@@ -57,7 +57,7 @@ public:
   #ifdef SWIG
   %callback("%s_cb");
   #endif
-  static QPSolver creator(const CRSSparsity& H, const CRSSparsity& A){ return NlpQPSolver(H,A);}
+  static QPSolver creator(const CRSSparsity& H, const CRSSparsity& A){ return NLPQPSolver(H,A);}
   #ifdef SWIG
   %nocallback;
   #endif

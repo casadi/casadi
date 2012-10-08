@@ -180,7 +180,7 @@ qp_solver = QPOasesSolver(H_sparsity,A_sparsity)
 qp_solver.setOption("printLevel","low")
 
 # IPOPT
-#qp_solver =  NlpQPSolver(H_sparsity,A_sparsity)
+#qp_solver =  NLPQPSolver(H_sparsity,A_sparsity)
 #qp_solver.setOption("nlp_solver", IpoptSolver)
 
 # OOQP

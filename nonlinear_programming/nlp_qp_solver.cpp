@@ -26,25 +26,25 @@
 using namespace std;
 namespace CasADi{
 
-NlpQPSolver::NlpQPSolver(){ 
+NLPQPSolver::NLPQPSolver(){ 
 }
 
 
-NlpQPSolver::NlpQPSolver(const CRSSparsity & H, const CRSSparsity & A)  {
-  assignNode(new NlpQPInternal(H,A));
+NLPQPSolver::NLPQPSolver(const CRSSparsity & H, const CRSSparsity & A)  {
+  assignNode(new NLPQPInternal(H,A));
 }
 
-NlpQPInternal* NlpQPSolver::operator->(){
-  return (NlpQPInternal*)(FX::operator->());
+NLPQPInternal* NLPQPSolver::operator->(){
+  return (NLPQPInternal*)(FX::operator->());
 }
 
-const NlpQPInternal* NlpQPSolver::operator->() const{
-  return (const NlpQPInternal*)(FX::operator->());
+const NLPQPInternal* NLPQPSolver::operator->() const{
+  return (const NLPQPInternal*)(FX::operator->());
 
 }
 
-bool NlpQPSolver::checkNode() const{
-  return dynamic_cast<const NlpQPInternal*>(get());
+bool NLPQPSolver::checkNode() const{
+  return dynamic_cast<const NLPQPInternal*>(get());
 }
 
 } // namespace CasADi
