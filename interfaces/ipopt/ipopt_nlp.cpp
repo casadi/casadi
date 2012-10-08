@@ -22,6 +22,7 @@
 
 #include "ipopt_nlp.hpp"
 #include "ipopt_internal.hpp"
+#include <ctime>
 
 namespace CasADi{
 
