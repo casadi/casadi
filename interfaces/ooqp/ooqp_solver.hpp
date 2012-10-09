@@ -54,16 +54,6 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
   
-  /**
-   * \brief Reinitialize the problem 
-   * This method needs to be called before evaluate() whenever the nature of any constraint has changed. This occurs when: \n
-   *  - Any of LBA, UBA, LBX, UBX changes to/from (+-)infinity  \n
-   *  - An entry of LBA becomes equal/unequal to UBA: this indicates that an inequality becomes an equality or visa versa. \n
-   * 
-   * You do not need to call this method before doing the very first evaluate() run
-   */
-  void reInit();
-  
   /// Static creator function
   #ifdef SWIG
   %callback("%s_cb");

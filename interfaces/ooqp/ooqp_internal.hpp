@@ -42,15 +42,7 @@ namespace CasADi{
  * */
 class OOQPInternal : public QPSolverInternal {
   friend class OOQPSolver;
-  
-private:
-  /** \brief  Allocate
-  *  Because constraints after initialization, we cannot allocate a Solver during init
-  */
-  virtual void allocate();
-  
-  /** \brief check if a new solver structure must be allocated*/
-  bool isDirty();
+
 public:
   /** \brief  Constructor */
   explicit OOQPInternal();
@@ -83,30 +75,28 @@ public:
     GondzioSolver  * s_;
     /* @} */
     
-    /// The non-zero indices of the equality, inequality & unbounded constraints
-    std::vector<int> eq_, ineq_, unbounded_;
-        
-    /// The lower triangular part of H
-    DMatrix Hl_;
     
-    /// The equality and inequality parts of A
-    DMatrix A_eq_, A_ineq_;
+    /// Reformulated A : horzcat([A,-DMatrix.eye(nc_)]) 
+    DMatrix A_;
     
-    /// The equality part of LBA/UBA
-    std::vector<double> bA_eq_;
+    /// Reformulated G : horzcat([G,-DMatrix.zeros(nc_)])
+    DMatrix G_;
     
-    /// The inequality part of LBA and UBA
-    std::vector<double> lbA_ineq_, ubA_ineq_;
+    /// Reformulated H : [tril(H) 0;0 0]
+    DMatrix H_;
     
     /// The LBX/UBX with infinities substituted by 0 (needed for OOQP)
     std::vector<double> lbX_, ubX_;
+    
+    /// Vector with the equalities rhs (identically zero) for the reformulated system
+    std::vector<double> b_;
     
     /** 
      *  In OOQP, infinite bounds need a special treatment. They must be deactivated by setting the i-something std::vector<char>.
      *  they have to be zero for infinite bounds and 1 otherwise
      * @{
      */
-    std::vector<char> ixlow_, ixupp_, iclow_, icupp_;
+    std::vector<char> ixlow_, ixupp_;
 
     
     /// Temporary vector

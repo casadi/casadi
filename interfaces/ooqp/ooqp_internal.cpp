@@ -37,6 +37,32 @@ namespace CasADi {
 * Caveats:   lba = -inf && uba = inf is not allowed. Must be filtered out.
 *
 */
+
+  /**
+   * \brief Reinitialize the problem 
+   * This method needs to be called before evaluate() whenever the nature of any constraint has changed. This occurs when: \n
+   *  - Any of LBA, UBA, LBX, UBX changes to/from (+-)infinity  \n
+   *  - An entry of LBA becomes equal/unequal to UBA: this indicates that an inequality becomes an equality or visa versa. \n
+   * 
+   * You do not need to call this method before doing the very first evaluate() run
+   */
+
+
+/**
+* The following transformation is performed on the problem:
+*
+*
+* min f(x)
+* s.t.  lbg <= g(x) <= ubg
+*       lbx <=     x   <= ubx
+*
+* solve:
+* min f([x,s])
+*      s.t.  g(x) -s == 0
+*      lbg <= s <= ubg
+*      lbx <=     x   <= ubx
+*/
+
 OOQPInternal* OOQPInternal::clone() const{
   // Return a deep copy
   OOQPInternal* node = new OOQPInternal(input(QP_H).sparsity(),input(QP_A).sparsity());
@@ -68,77 +94,84 @@ OOQPInternal::~OOQPInternal(){
   }
 }
 
-bool OOQPInternal::isDirty() {
-  return true;
-}
-
 void OOQPInternal::evaluate(int nfdir, int nadir) {
   casadi_assert_message(nfdir==0 && nadir==0, "OOQPSolve::evaluate() not implemented for forward or backward mode");
   
-  if (qp_==0 || isDirty()) {
-    allocate();
-    casadi_assert(qp_!=0);
+  // Copy the bounds on X
+  std::copy(input(QP_LBX).data().begin(),input(QP_LBX).data().end(),lbX_.begin());
+  std::copy(input(QP_UBX).data().begin(),input(QP_UBX).data().end(),ubX_.begin());
+  
+  // Copy the constraint bounds
+  std::copy(input(QP_LBA).data().begin(),input(QP_LBA).data().end(),lbX_.begin()+nx_);
+  std::copy(input(QP_UBA).data().begin(),input(QP_UBA).data().end(),ubX_.begin()+nx_);
+  
+  // Infinities on LBX & UBX are set to zero (required for OOQp)
+  // Set ixlow & ixupp: they have to be zero for infinite bounds and 1 otherwise
+  for (int k=0; k<lbX_.size(); ++k) {
+    ixlow_[k] = (lbX_[k] != -numeric_limits<double>::infinity());
+    if (!ixlow_[k]) lbX_[k]=0;
+    ixupp_[k] = (ubX_[k] != numeric_limits<double>::infinity());
+    if (!ixupp_[k]) ubX_[k]=0;
   }
-
-  // Access nonzeros
-  const vector<double> &data_A = input(QP_A).data();
-  vector<double> &data_Aeq = A_eq_.data();
-  vector<double> &data_Aineq = A_ineq_.data();
   
-  // Get bounds 
-  const vector<double>& lba = input(QP_LBA).data();
-  const vector<double>& uba = input(QP_UBA).data();
-  
-  // Sparsity of A
-  const vector<int> &rowind_A = input(QP_A).sparsity().rowind();
-
-  // Loop over the rows of A corresponding to equalities
-  const vector<int> &rowind_Aeq = A_eq_.sparsity().rowind();
-  for(int i=0; i<eq_.size(); ++i){
-    // Row of A
-    int iA = eq_[i];
+  // Obtain G
+  std::copy(input(QP_G).data().begin(),input(QP_G).data().end(),G_.data().begin());
     
-    // Copy the nonzeros of A
-    int el, elA;
-    for(el=rowind_Aeq[i], elA=rowind_A[iA]; el<rowind_Aeq[i+1]; ++el, ++elA){
-      data_Aeq[el] = data_A[elA];
+  // Obtain H
+  input(QP_H).get(H_.data(),SPARSESYM);
+  
+  // Pass on QP_A
+  vector<int> rowind,col;
+  A_.sparsity().getSparsityCRS(rowind,col);
+  int k_orig = 0;
+  int k_new = 0;
+  for(int r=0; r<rowind.size()-1; ++r) {
+    for(int el=rowind[r]; el<rowind[r+1]; ++el){
+      if (el<rowind[r+1]-1) {
+        A_.data()[k_new] = input(QP_A).data()[k_orig];
+        k_orig++;
+      }
+      k_new ++;
     }
-    
-    // Copy bounds
-    bA_eq_[i] = lba[iA];
   }
 
-  // Loop over the rows of A corresponding to inequalities
-  const vector<int> &rowind_Aineq = A_ineq_.sparsity().rowind();
-  for(int i=0; i<ineq_.size(); ++i){
-    // Row of A
-    int iA = ineq_[i];
-    
-    // Copy the nonzeros of A
-    int el, elA;
-    for(el=rowind_Aineq[i], elA=rowind_A[iA]; el<rowind_Aineq[i+1]; ++el, ++elA){
-      data_Aineq[el] = data_A[elA];
-    }
-    
-    // Copy bounds
-    lbA_ineq_[i] = iclow_[i] ? lba[iA] : 0;
-    ubA_ineq_[i] = icupp_[i] ? uba[iA] : 0;
-  }
-  
-  // Lower variable bounds, 0 if infinity
-  input(QP_LBX).get(lbX_);
-  for(int k=0; k<lbX_.size();++k)
-    if(ixlow_[k]==0)
-      lbX_[k] = 0;
+  // Get references to sparsity (NOTE: OOQP does not appear do be const correct)
+  int *H_rowind = const_cast<int*>(getPtr(H_.sparsity().rowind()));
+  int *H_col = const_cast<int*>(getPtr(H_.sparsity().col()));
 
-  // Upper variable bounds, 0 if infinity
-  input(QP_UBX).get(ubX_);
-  for(int k=0; k<ubX_.size();++k)
-    if(ixupp_[k]==0)
-      ubX_[k] = 0;
+  int *A_rowind = const_cast<int*>(getPtr(A_.sparsity().rowind()));
+  int *A_col = const_cast<int*>(getPtr(A_.sparsity().col()));
+
+  if (qp_) {
+    delete qp_;
+    delete prob_;
+    delete vars_;
+    delete resid_;
+  }
+
+  // Set up a Sparse solver; the decision space is [x,s]; there are no inequalities
+  qp_ = new QpGenSparseMa27( nx_ + nc_, nc_, 0, H_.size() , G_.size(), A_.size() );
   
-  // Hessian data
-  input(QP_H).get(Hl_.data(),SPARSESYM);
+  std::vector<int> rowind_empty_(1,0);
+  
+  // Set all pointers to problem data
+  prob_ = (QpGenData * )qp_->makeData( getPtr(G_),
+                                       H_rowind,  H_col,  getPtr(H_),
+                                       getPtr(lbX_),  getPtr(ixlow_),
+                                       getPtr(ubX_),  getPtr(ixupp_),
+                                       A_rowind, A_col,  getPtr(A_),
+                                       getPtr(b_),
+                                       getPtr(rowind_empty_), 0,  0,
+                                       0,  0,
+                                       0,  0);
+                                       
+  // Further setup of the QP problem
+  vars_ = (QpGenVars *) qp_->makeVariables( prob_ );
+
+  resid_ = (QpGenResiduals *) qp_->makeResiduals( prob_ );
+  
+  // Temporary vector
+  temp_.resize(nx_+nc_,0);
   
   // Just calling s_->solve repeatedly on a GondzioSolver is a memory leak
   // So we must always allocate a fresh solver
@@ -151,184 +184,78 @@ void OOQPInternal::evaluate(int nfdir, int nadir) {
   int flag = s_->solve(prob_,vars_, resid_);
     
   // Get primal solution
-  casadi_assert(vars_->x->length()==output(QP_PRIMAL).size());
-  vars_->x->copyIntoArray(getPtr(output(QP_PRIMAL)));
-  if (isnan(output(QP_PRIMAL).at(0))) {
-    casadi_warning("nan in decision variables. You probably need to do a solver.reInit() call before evaluate().");
-  }
-  
+  vars_->x->copyIntoArray(getPtr(temp_));
+  std::copy(temp_.begin(),temp_.begin()+nx_,output(QP_PRIMAL).begin());
+
   // Get multipliers for the bounds
   vector<double> &lambda_x = output(QP_LAMBDA_X).data();
-
+  
   // Set multipliers to zero
   output(QP_LAMBDA_X).setAll(0);
+  output(QP_LAMBDA_A).setAll(0);
   
   // Lower bounds
   if (vars_->gamma->length() > 0) {
-    casadi_assert(lambda_x.size()==vars_->gamma->length());
-    vars_->gamma->copyIntoArray(getPtr(lambda_x));
-    output(QP_LAMBDA_X)*= -1;
+    vars_->gamma->copyIntoArray(getPtr(temp_));
+    for (int k=0;k<nx_;++k) 
+      output(QP_LAMBDA_X).data()[k] = -temp_[k];
+    for (int k=0;k<nc_;++k) 
+      output(QP_LAMBDA_A).data()[k] = -temp_[nx_+k];
   }
 
   // Upper bounds
   if (vars_->phi->length() > 0) {
-    casadi_assert(lambda_x.size()==vars_->phi->length());
     vars_->phi->copyIntoArray(getPtr(temp_));
-    for(int k=0; k<lambda_x.size(); ++k){
-      lambda_x[k] += temp_[k];
-    }
-  }
-  
-  // Set multipliers to zero
-  output(QP_LAMBDA_A).setAll(0);
-  
-  // Get multipliers for the equality constraints
-  vector<double> &lambda_a = output(QP_LAMBDA_A).data();
-  casadi_assert(vars_->y->length()==eq_.size());
-  vars_->y->copyIntoArray(getPtr(temp_));
-  for(int k=0; k<eq_.size(); ++k){
-    lambda_a[eq_[k]] = -temp_[k];
-  }
-  
-  // Get multipliers for the inequality constraints
-  casadi_assert(vars_->z->length()==ineq_.size());
-  vars_->z->copyIntoArray(getPtr(temp_));
-  for(int k=0; k<ineq_.size(); ++k){
-    lambda_a[ineq_[k]] = -temp_[k];
+    for (int k=0;k<nx_;++k)
+      output(QP_LAMBDA_X).data()[k] += temp_[k];
+    for (int k=0;k<nc_;++k) 
+      output(QP_LAMBDA_A).data()[k] += temp_[nx_+k];
   }
   
   if(flag!=SUCCESSFUL_TERMINATION) ooqp_error("Solve",flag);
-
   
   output(QP_COST).at(0) = prob_->objectiveValue(vars_);
-}
 
-void OOQPInternal::allocate() {
-  if (qp_) {
-    delete qp_;
-    delete prob_;
-    delete vars_;
-    delete resid_;
-  }
-
-  // Decide if constraints are equality or inequality
-  ineq_.clear();
-  eq_.clear();
-  const vector<double>& uba = input(QP_UBA).data();
-  const vector<double>& lba = input(QP_LBA).data();
-  for(int k=0; k<uba.size(); ++k){
-    if(uba[k]==lba[k]){
-      eq_.push_back(k);
-    } else {
-      if (uba[k]==numeric_limits<double>::infinity() && lba[k]==-numeric_limits<double>::infinity()) {
-        unbounded_.push_back(k);
-      } else {
-        ineq_.push_back(k);
-      }
-
-    }
-  }
-  casadi_assert(uba.size()==eq_.size() + ineq_.size() + unbounded_.size());
-  
-  // Set up a Sparse solver
-  qp_ = new QpGenSparseMa27( nx_, eq_.size(), ineq_.size(), input(QP_H).size() , input(QP_G).size(), input(QP_A).size() );
-  
-
-  // Split A in equalities and inequalities
-  vector<int> all_A = range(0,input(QP_A).size2());
-  A_eq_   = input(QP_A)(eq_,all_A);
-  A_ineq_ = input(QP_A)(ineq_,all_A);
-  
-  // Split up LBA & UBA in equalities and inequalities
-  bA_eq_.resize(eq_.size());
-  
-  lbA_ineq_ = input(QP_LBA)(ineq_,0).data();
-  ubA_ineq_ = input(QP_UBA)(ineq_,0).data();
-  
-  // Copy the decision variables bounds
-  lbX_.resize(nx_);
-  ubX_.resize(nx_);
-  
-  // Infinities on LBX & UBX are set to zero (required for OOQp)
-  for (int k=0; k<input(QP_LBX).size(); ++k) {
-    if (input(QP_LBX).at(k)==-numeric_limits<double>::infinity()) 
-      lbX_.at(k)=0;
-  }
-  for (int k=0; k<input(QP_UBX).size(); ++k) {
-    if (input(QP_UBX).at(k)==numeric_limits<double>::infinity()) 
-      ubX_.at(k)=0;
-  }
-  
-  
-  // Set ixlow & ixupp: they have to be zero for infinite bounds and 1 otherwise
-  for (int k=0; k<input(QP_LBX).size(); ++k) 
-    ixlow_[k] = (input(QP_LBX).at(k) != -numeric_limits<double>::infinity());
-  for (int k=0; k<input(QP_UBX).size(); ++k) 
-    ixupp_[k] = (input(QP_UBX).at(k) != numeric_limits<double>::infinity());
-  
-  // Set iclow & icupp: they have to be zero for infinite bounds and 1 otherwise
-  iclow_.resize(ineq_.size(),0);
-  icupp_.resize(ineq_.size(),0);
-  
-  for (int k=0; k<lbA_ineq_.size();++k) 
-    iclow_[k] = (lbA_ineq_.at(k) != -numeric_limits<double>::infinity());
-  
-  for (int k=0; k<ubA_ineq_.size();++k) 
-    icupp_[k] = (ubA_ineq_.at(k) != numeric_limits<double>::infinity());
-
-  // Infinities on LBA & UBA are set to zero (required for OOQp)
-  for (int k=0; k<lbA_ineq_.size();k++) {
-    if (lbA_ineq_.at(k) == -numeric_limits<double>::infinity()) 
-      lbA_ineq_.at(k)=0;
-  } 
-  
-  for (int k=0; k<ubA_ineq_.size();k++) {
-    if (ubA_ineq_.at(k) == numeric_limits<double>::infinity()) 
-      ubA_ineq_.at(k)=0;
-  }
-  
-  // Get references to sparsity (NOTE: OOQP does not appear do be const correct)
-  int *Hl_rowind = const_cast<int*>(getPtr(Hl_.sparsity().rowind()));
-  int *Hl_col = const_cast<int*>(getPtr(Hl_.sparsity().col()));
-
-  int *eq_rowind = const_cast<int*>(getPtr(A_eq_.sparsity().rowind()));
-  int *eq_col = const_cast<int*>(getPtr(A_eq_.sparsity().col()));
-  
-  int *ineq_rowind = const_cast<int*>(getPtr(A_ineq_.sparsity().rowind()));
-  int *ineq_col = const_cast<int*>(getPtr(A_ineq_.sparsity().col()));
-  
-  // Set all pointers to problem data
-  prob_ = (QpGenData * )qp_->makeData( getPtr(input(QP_G)),
-                                       Hl_rowind,  Hl_col,  getPtr(Hl_),
-                                       getPtr(lbX_),  getPtr(ixlow_),
-                                       getPtr(ubX_),  getPtr(ixupp_),
-                                       eq_rowind, eq_col,  getPtr(A_eq_),
-                                       getPtr(bA_eq_),
-                                       ineq_rowind, ineq_col,  getPtr(A_ineq_),
-                                       getPtr(lbA_ineq_),  getPtr(iclow_),
-                                       getPtr(ubA_ineq_),  getPtr(icupp_));
-                                       
-
-  
-  // Further setup of the QP problem
-  vars_ = (QpGenVars *) qp_->makeVariables( prob_ );
-
-  resid_ = (QpGenResiduals *) qp_->makeResiduals( prob_ );
 }
 
 void OOQPInternal::init(){
    // Call the init method of the base class
   QPSolverInternal::init();
   
-  // Structure to hold the sparsity and data of the lower triangular part of the Hessian
-  Hl_ = DMatrix(lowerSparsity(input(QP_H).sparsity()));
+  // Reformulation of A
+  std::vector<DMatrix> A_trans;
+  A_trans.push_back(input(QP_A));
+  A_trans.push_back(-DMatrix::eye(nc_));
+  A_ = horzcat(A_trans);
+  
+  // Reformulation of G
+  std::vector<DMatrix> G_trans;
+  G_trans.push_back(input(QP_G));
+  G_trans.push_back(DMatrix::zeros(nc_));
+  G_ = vertcat(G_trans);
+  
+  // Reformulation of H
+  std::vector<DMatrix> H_trans;
+  H_trans.push_back(DMatrix(lowerSparsity(input(QP_H).sparsity())));
+  H_trans.push_back(DMatrix(nx_,nc_));
+  
+  H_ = horzcat(H_trans);
+  H_trans.clear();
+  H_trans.push_back(H_);
+  H_trans.push_back(DMatrix(nc_,nx_+nc_));
+  
+  H_ = vertcat(H_trans);
   
   // Allocate vectors to hold indicators of infinite variable bounds
-  ixlow_.resize(nx_,0);
-  ixupp_.resize(nx_,0);
-
-  // Temporary vector
-  temp_.resize(std::max(nx_,nc_));
+  ixlow_.resize(nx_+nc_,0);
+  ixupp_.resize(nx_+nc_,0);
+  
+  // Copy the decision variables bounds
+  lbX_.resize(nx_+nc_,0);
+  ubX_.resize(nx_+nc_,0);
+  
+  // The b vector of the transformation matrix is identcially zero
+  b_.resize(nx_+nc_,0);
   
   gOoqpPrintLevel = getOption("print_level");
 }

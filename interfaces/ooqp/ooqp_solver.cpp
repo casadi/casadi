@@ -47,8 +47,4 @@ bool OOQPSolver::checkNode() const{
   return dynamic_cast<const OOQPInternal*>(get());
 }
 
-void OOQPSolver::reInit() {
-  dynamic_cast<OOQPInternal*>(get())->allocate();
-}
-
 } // namespace CasADi
