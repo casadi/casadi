@@ -149,9 +149,6 @@ class SXFunctionInternal : public XFunctionInternal<SXFunctionInternal,Matrix<SX
   /** \brief  Print to a c file */
   void generateCode(const std::string& filename);
       
-  // Evaluate with inplace operations (experimental)
-  bool evaluate_inplace_;
-  
   /** \brief Clear the function from its symbolic representation, to free up memory, no symbolic evaluations are possible after this */
   void clearSymbolic();
   

@@ -1109,7 +1109,7 @@ void extractSubexpressions(std::vector<SXMatrix>& ex, SXMatrix& v, SXMatrix& vde
       default:
       {
         switch(it->op){
-          CASADI_MATH_FUN_ALL_BUILTIN(s_work[it->arg.i[0]],s_work[it->arg.i[1]],s_work[it->res])
+          CASADI_MATH_FUN_BUILTIN(s_work[it->arg.i[0]],s_work[it->arg.i[1]],s_work[it->res])
         }
         s_work2[it->res] = *b_it++; 
         

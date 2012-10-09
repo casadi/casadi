@@ -58,7 +58,6 @@ SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix >& inputv, const ve
   XFunctionInternal<SXFunctionInternal,SXMatrix,SXNode>(inputv,outputv) {
   setOption("name","unnamed_sx_function");
   addOption("live_variables",OT_BOOLEAN,true,"Reuse variables in the work vector");
-  addOption("inplace",OT_BOOLEAN,false,"Evaluate with inplace operations (experimental)");
   addOption("just_in_time",OT_BOOLEAN,false,"Just-in-time compilation for numeric evaluation (experimental)");
 
   // Check for duplicate entries among the input expressions
@@ -154,7 +153,7 @@ void SXFunctionInternal::evaluateGen(T1 nfdir_c, T2 nadir_c){
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
       switch(it->op){
         // Start by adding all of the built operations
-        CASADI_MATH_FUN_ALL_BUILTIN(work_[it->arg.i[0]],work_[it->arg.i[1]],work_[it->res])
+        CASADI_MATH_FUN_BUILTIN(work_[it->arg.i[0]],work_[it->arg.i[1]],work_[it->res])
         
         // Constant
         case OP_CONST: work_[it->res] = it->arg.d; break;
@@ -555,13 +554,6 @@ void SXFunctionInternal::init(){
   // Use live variables?
   bool live_variables = getOption("live_variables");
 
-  // Evaluate with inplace operations (experimental)
-  evaluate_inplace_ = getOption("inplace");
-  if(evaluate_inplace_){
-    casadi_warning("Inplace variables not available for the current version of CasADi.");
-    evaluate_inplace_ = false;
-  }
-  
   // Input instructions
   vector<pair<int,SXNode*> > symb_loc;
   
@@ -1064,7 +1056,7 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
           f = *b_it++;
         } else {
           switch(it->op){
-            CASADI_MATH_FUN_ALL_BUILTIN(s_work_[it->arg.i[0]],s_work_[it->arg.i[1]],f)
+            CASADI_MATH_FUN_BUILTIN(s_work_[it->arg.i[0]],s_work_[it->arg.i[1]],f)
           }
           
           // If this new expression is identical to the expression used to define the algorithm, then reuse

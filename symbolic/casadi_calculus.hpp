@@ -294,26 +294,6 @@ struct BinaryOperationE{
   }
 };
 
-template<int I>
-struct AddBinaryOperation{
-  template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f+= BinaryOperationE<I>::fcn(x,y);}
-};
-
-template<int I>
-struct SubBinaryOperation{
-  template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f-= BinaryOperationE<I>::fcn(x,y);}
-};
-
-template<int I>
-struct MulBinaryOperation{
-  template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f*= BinaryOperationE<I>::fcn(x,y);}
-};
-
-template<int I>
-struct DivBinaryOperation{
-  template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f/= BinaryOperationE<I>::fcn(x,y);}
-};
-
 /// Calculate function and derivative
 template<int I>
 struct DerBinaryOpertion{

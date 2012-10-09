@@ -148,58 +148,51 @@ struct casadi_math<int>{
 template<typename T>
 inline void casadi_math<T>::fun(unsigned char op, const T& x, const T& y, T& f){
 // NOTE: We define the implementation in a preprocessor macro to be able to force inlining, and to allow extensions in the VM
-#define CASADI_MATH_FUN_BUILTIN(X,Y,F,C,OFF) \
-    case OP_ASSIGN+OFF:    C<OP_ASSIGN>::fcn(X,Y,F);        break;\
-    case OP_ADD+OFF:       C<OP_ADD>::fcn(X,Y,F);           break;\
-    case OP_SUB+OFF:       C<OP_SUB>::fcn(X,Y,F);           break;\
-    case OP_MUL+OFF:       C<OP_MUL>::fcn(X,Y,F);           break;\
-    case OP_DIV+OFF:       C<OP_DIV>::fcn(X,Y,F);           break;\
-    case OP_NEG+OFF:       C<OP_NEG>::fcn(X,Y,F);           break;\
-    case OP_EXP+OFF:       C<OP_EXP>::fcn(X,Y,F);           break;\
-    case OP_LOG+OFF:       C<OP_LOG>::fcn(X,Y,F);           break;\
-    case OP_POW+OFF:       C<OP_POW>::fcn(X,Y,F);           break;\
-    case OP_CONSTPOW+OFF:  C<OP_CONSTPOW>::fcn(X,Y,F);      break;\
-    case OP_SQRT+OFF:      C<OP_SQRT>::fcn(X,Y,F);          break;\
-    case OP_SIN+OFF:       C<OP_SIN>::fcn(X,Y,F);           break;\
-    case OP_COS+OFF:       C<OP_COS>::fcn(X,Y,F);           break;\
-    case OP_TAN+OFF:       C<OP_TAN>::fcn(X,Y,F);           break;\
-    case OP_ASIN+OFF:      C<OP_ASIN>::fcn(X,Y,F);          break;\
-    case OP_ACOS+OFF:      C<OP_ACOS>::fcn(X,Y,F);          break;\
-    case OP_ATAN+OFF:      C<OP_ATAN>::fcn(X,Y,F);          break;\
-    case OP_LT+OFF:        C<OP_LT>::fcn(X,Y,F);            break;\
-    case OP_LE+OFF:        C<OP_LE>::fcn(X,Y,F);            break;\
-    case OP_EQ+OFF:        C<OP_EQ>::fcn(X,Y,F);            break;\
-    case OP_NE+OFF:        C<OP_NE>::fcn(X,Y,F);            break;\
-    case OP_NOT+OFF:       C<OP_NOT>::fcn(X,Y,F);           break;\
-    case OP_AND+OFF:       C<OP_AND>::fcn(X,Y,F);           break;\
-    case OP_OR+OFF:        C<OP_OR>::fcn(X,Y,F);            break;\
-    case OP_FLOOR+OFF:     C<OP_FLOOR>::fcn(X,Y,F);         break;\
-    case OP_CEIL+OFF:      C<OP_CEIL>::fcn(X,Y,F);          break;\
-    case OP_FABS+OFF:      C<OP_FABS>::fcn(X,Y,F);          break;\
-    case OP_SIGN+OFF:      C<OP_SIGN>::fcn(X,Y,F);          break;\
-    case OP_ERF+OFF:       C<OP_ERF>::fcn(X,Y,F);           break;\
-    case OP_FMIN+OFF:      C<OP_FMIN>::fcn(X,Y,F);          break;\
-    case OP_FMAX+OFF:      C<OP_FMAX>::fcn(X,Y,F);          break;\
-    case OP_INV+OFF:       C<OP_INV>::fcn(X,Y,F);           break;\
-    case OP_SINH+OFF:      C<OP_SINH>::fcn(X,Y,F);          break;\
-    case OP_COSH+OFF:      C<OP_COSH>::fcn(X,Y,F);          break;\
-    case OP_TANH+OFF:      C<OP_TANH>::fcn(X,Y,F);          break;\
-    case OP_ASINH+OFF:     C<OP_ASINH>::fcn(X,Y,F);         break;\
-    case OP_ACOSH+OFF:     C<OP_ACOSH>::fcn(X,Y,F);         break;\
-    case OP_ATANH+OFF:     C<OP_ATANH>::fcn(X,Y,F);         break;\
-    case OP_ATAN2+OFF:     C<OP_ATAN2>::fcn(X,Y,F);         break; \
-    case OP_ERFINV+OFF:    C<OP_ERFINV>::fcn(X,Y,F);        break;\
-    case OP_PRINTME+OFF:   C<OP_PRINTME>::fcn(X,Y,F);       break;
-  
-  #define CASADI_MATH_FUN_ALL_BUILTIN(X,Y,F) \
-    CASADI_MATH_FUN_BUILTIN(X,Y,F,BinaryOperation,0)\
-    CASADI_MATH_FUN_BUILTIN(X,Y,F,AddBinaryOperation,NUM_BUILT_IN_OPS)\
-    CASADI_MATH_FUN_BUILTIN(X,Y,F,SubBinaryOperation,2*NUM_BUILT_IN_OPS)\
-    CASADI_MATH_FUN_BUILTIN(X,Y,F,MulBinaryOperation,3*NUM_BUILT_IN_OPS)\
-    CASADI_MATH_FUN_BUILTIN(X,Y,F,DivBinaryOperation,4*NUM_BUILT_IN_OPS)
+#define CASADI_MATH_FUN_BUILTIN(X,Y,F) \
+    case OP_ASSIGN:    BinaryOperation<OP_ASSIGN>::fcn(X,Y,F);        break;\
+    case OP_ADD:       BinaryOperation<OP_ADD>::fcn(X,Y,F);           break;\
+    case OP_SUB:       BinaryOperation<OP_SUB>::fcn(X,Y,F);           break;\
+    case OP_MUL:       BinaryOperation<OP_MUL>::fcn(X,Y,F);           break;\
+    case OP_DIV:       BinaryOperation<OP_DIV>::fcn(X,Y,F);           break;\
+    case OP_NEG:       BinaryOperation<OP_NEG>::fcn(X,Y,F);           break;\
+    case OP_EXP:       BinaryOperation<OP_EXP>::fcn(X,Y,F);           break;\
+    case OP_LOG:       BinaryOperation<OP_LOG>::fcn(X,Y,F);           break;\
+    case OP_POW:       BinaryOperation<OP_POW>::fcn(X,Y,F);           break;\
+    case OP_CONSTPOW:  BinaryOperation<OP_CONSTPOW>::fcn(X,Y,F);      break;\
+    case OP_SQRT:      BinaryOperation<OP_SQRT>::fcn(X,Y,F);          break;\
+    case OP_SIN:       BinaryOperation<OP_SIN>::fcn(X,Y,F);           break;\
+    case OP_COS:       BinaryOperation<OP_COS>::fcn(X,Y,F);           break;\
+    case OP_TAN:       BinaryOperation<OP_TAN>::fcn(X,Y,F);           break;\
+    case OP_ASIN:      BinaryOperation<OP_ASIN>::fcn(X,Y,F);          break;\
+    case OP_ACOS:      BinaryOperation<OP_ACOS>::fcn(X,Y,F);          break;\
+    case OP_ATAN:      BinaryOperation<OP_ATAN>::fcn(X,Y,F);          break;\
+    case OP_LT:        BinaryOperation<OP_LT>::fcn(X,Y,F);            break;\
+    case OP_LE:        BinaryOperation<OP_LE>::fcn(X,Y,F);            break;\
+    case OP_EQ:        BinaryOperation<OP_EQ>::fcn(X,Y,F);            break;\
+    case OP_NE:        BinaryOperation<OP_NE>::fcn(X,Y,F);            break;\
+    case OP_NOT:       BinaryOperation<OP_NOT>::fcn(X,Y,F);           break;\
+    case OP_AND:       BinaryOperation<OP_AND>::fcn(X,Y,F);           break;\
+    case OP_OR:        BinaryOperation<OP_OR>::fcn(X,Y,F);            break;\
+    case OP_FLOOR:     BinaryOperation<OP_FLOOR>::fcn(X,Y,F);         break;\
+    case OP_CEIL:      BinaryOperation<OP_CEIL>::fcn(X,Y,F);          break;\
+    case OP_FABS:      BinaryOperation<OP_FABS>::fcn(X,Y,F);          break;\
+    case OP_SIGN:      BinaryOperation<OP_SIGN>::fcn(X,Y,F);          break;\
+    case OP_ERF:       BinaryOperation<OP_ERF>::fcn(X,Y,F);           break;\
+    case OP_FMIN:      BinaryOperation<OP_FMIN>::fcn(X,Y,F);          break;\
+    case OP_FMAX:      BinaryOperation<OP_FMAX>::fcn(X,Y,F);          break;\
+    case OP_INV:       BinaryOperation<OP_INV>::fcn(X,Y,F);           break;\
+    case OP_SINH:      BinaryOperation<OP_SINH>::fcn(X,Y,F);          break;\
+    case OP_COSH:      BinaryOperation<OP_COSH>::fcn(X,Y,F);          break;\
+    case OP_TANH:      BinaryOperation<OP_TANH>::fcn(X,Y,F);          break;\
+    case OP_ASINH:     BinaryOperation<OP_ASINH>::fcn(X,Y,F);         break;\
+    case OP_ACOSH:     BinaryOperation<OP_ACOSH>::fcn(X,Y,F);         break;\
+    case OP_ATANH:     BinaryOperation<OP_ATANH>::fcn(X,Y,F);         break;\
+    case OP_ATAN2:     BinaryOperation<OP_ATAN2>::fcn(X,Y,F);         break; \
+    case OP_ERFINV:    BinaryOperation<OP_ERFINV>::fcn(X,Y,F);        break;\
+    case OP_PRINTME:   BinaryOperation<OP_PRINTME>::fcn(X,Y,F);       break;
   
   switch(op){
-    CASADI_MATH_FUN_ALL_BUILTIN(x,y,f)
+    CASADI_MATH_FUN_BUILTIN(x,y,f)
   }
 }
 
