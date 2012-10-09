@@ -22,7 +22,6 @@
 
 #include "fx_internal.hpp"
 #include "../mx/evaluation_mx.hpp"
-#include "../sx/evaluation_sx.hpp"
 #include <typeinfo> 
 #include "../stl_vector_tools.hpp"
 #include "jacobian.hpp"
@@ -574,9 +573,8 @@ FX FXInternal::jacobian(int iind, int oind, bool compact, bool symmetric){
       ret = jacgen_(fcn,iind,oind,user_data_);
     } else if(numeric_jacobian_){
       // Generate Jacobian instance
-      // ret = getNumericJacobian(iind,oind,compact,symmetric); // NOTE: replaces the below
-      
       casadi_assert_message(!compact, "Not implemented");
+      //ret = getNumericJacobian(iind,oind,false,false);  // NOTE: Replaces the below
       ret = Jacobian(shared_from_this<FX>(),iind,oind);
     } else {
       // Use internal routine to calculate Jacobian
@@ -605,8 +603,7 @@ FX FXInternal::jacobian(int iind, int oind, bool compact, bool symmetric){
 }
 
 FX FXInternal::getJacobian(int iind, int oind, bool compact, bool symmetric){
-  //   return getNumericJacobian(iind,oind,compact,symmetric); // NOTE: Replaces the below
-  
+  //return getNumericJacobian(iind,oind,false,false); // NOTE: Replaces the below
   Jacobian ret(shared_from_this<FX>(),iind,oind);
   ret.setOption("verbose",getOption("verbose"));
   return ret;

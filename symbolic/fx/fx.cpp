@@ -22,7 +22,6 @@
 
 #include "fx_internal.hpp"
 #include "../mx/evaluation_mx.hpp"
-#include "../sx/evaluation_sx.hpp"
 #include "../fx/mx_function.hpp"
 #include <typeinfo> 
 #include "../stl_vector_tools.hpp"
@@ -52,41 +51,6 @@ const FXInternal* FX::operator->() const{
 
 FXInternal* FX::operator->(){
   return (FXInternal*)OptionsFunctionality::operator->();
-}
-
-vector<SXMatrix> FX::callSX(const std::vector<SXMatrix> &arg){
-  casadi_warning("FX::callSX is currently only experimental.");
-  
-  // Make sure that the number of inputs matches
-  casadi_assert_message(arg.size()<=getNumInputs(),"Too many input arguments.");
-  
-  // Assemble all the scalar inputs
-  vector<SX> f_in(getNumScalarInputs());
-  SX* f_in_local = getPtr(f_in);
-  for(int iind=0; iind<arg.size(); ++iind){
-    const CRSSparsity& sp_in = input(iind).sparsity();
-    sp_in.set(f_in_local,getPtr(arg[iind].data()),arg[iind].sparsity());
-    f_in_local += sp_in.size();
-  }
-  
-  // Make sure that there are no unset input arguments
-  for(int iind=arg.size(); iind<getNumInputs(); ++iind){
-    casadi_assert_message(input(iind).empty(),"Nonzeros not set for input argument " << iind << ".");
-  }
-  
-  // Create call node
-  vector<SX> f_out = EvaluationSX::create(*this,f_in);
-  
-  // Return value
-  vector<SX>::const_iterator f_out_this = f_out.begin(), f_out_next;
-  vector<SXMatrix> ret(getNumOutputs());
-  for(int oind=0; oind<getNumOutputs(); ++oind){
-    f_out_next = f_out_this+output(oind).size();
-    ret[oind] = SXMatrix(output(oind).sparsity(),vector<SX>(f_out_this,f_out_next));
-    f_out_this = f_out_next;
-  }
-  
-  return ret;
 }
 
 vector<MX> FX::call(const MX &arg){

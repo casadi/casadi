@@ -36,8 +36,6 @@ SET(CASADI_SRCS
   sx/constant_sx.hpp                                    # A constant SX node
   sx/unary_sx.hpp                                       # A unary operation
   sx/binary_sx.hpp                                      # A binary operation
-  sx/aux_output_sx.hpp                                  # An auxillary output
-  sx/evaluation_sx.hpp                                  # A function call node
   sx/sx_tools.cpp            sx/sx_tools.hpp            # Set of functions
 
   # More general graph representation with sparse matrix expressions and function evaluations

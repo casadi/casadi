@@ -162,9 +162,6 @@ class FX : public OptionsFunctionality{
   /** \brief  Create a function call (MX graph) */
   std::vector<MX> call(const std::vector<MX> &arg);
 
-  /** \brief  Create a function call (SX graph) NOTE: UNDER DEVELOPMENT */
-  std::vector<SXMatrix> callSX(const std::vector<SXMatrix> &arg);
-
   /** \brief  Create a function call with directional derivatives 
    * Note: return by reference with SWIG
    */
