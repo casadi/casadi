@@ -501,11 +501,10 @@ void getAdjSens(T val, int ind=0, int dir=0) const;
   /** \brief Propagate the sparsity pattern through a set of directional derivatives forward or backward (for usage, see the example propagating_sparsity.cpp) */
   void spEvaluate(bool fwd);
 
-private:
-  /// Add modules to be monitored
+  /** \brief Add modules to be monitored */
   void addMonitor(const std::string& mon);
   
-  /// Remove modules to be monitored
+  /** \brief Remove modules to be monitored */
   void removeMonitor(const std::string& mon);
 
 };

@@ -799,16 +799,12 @@ void Matrix<T>::get(std::vector<T>& val, Sparsity sp) const{
 
 template<class T>
 void Matrix<T>::set(const Matrix<T>& val, Sparsity sp){
-	if (val.size()!=size()) casadi_error("Error in Matrix::set(const Matrix&): number of nonzeros must match. But got lhs " << dimString() << " and rhs " << val.dimString());
-	if (val.numel()!=0 && numel()!=0 && val.sparsity()!=sparsity()) casadi_error("Error in Matrix::set(const Matrix&): sparsities must match. But got lhs " << dimString() << " and rhs " << val.dimString());
   sparsity().set(getPtr(data()),getPtr(val.data()),val.sparsity());
 }
 
 template<class T>
 void Matrix<T>::get(Matrix<T>& val, Sparsity sp) const{
-	if (val.size()!=size()) casadi_error("Error in Matrix::get(const Matrix&): number of nonzeros must match. But got lhs " << dimString() << " and rhs " << val.dimString());
-  if (val.numel()!=0 && numel()!=0 && val.sparsity()!=sparsity()) casadi_error("Error in Matrix::get(const Matrix&): sparsities must match. But got lhs " << dimString() << " and rhs " << val.dimString());
-	val.set(*this,sp);
+  val.set(*this,sp);
 }
 
 template<class T>

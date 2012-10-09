@@ -108,7 +108,7 @@ void EvaluationMX::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res,
 
   // Pass the inputs to the function
   for (int i = 0; i < num_in; ++i) {
-    if (arg[i] != 0 && arg[i]->size() != 0) {
+    if (arg[i] != 0) {
       fcn_.setInput(*arg[i], i);
     }
   }
@@ -121,41 +121,30 @@ void EvaluationMX::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res,
     int nadj_f_batch = std::min(nadj - offset_adj, max_nadj);
 
     // Pass the forward seeds to the function
-    for (int d = 0; d < nfwd_f_batch; ++d) {
+    for(int d = 0; d < nfwd_f_batch; ++d){
       int dir = offset_fwd + d;
-      for (int i = 0; i < num_in; ++i) {
-        DMatrix *a =
-            is_diff ?
-                arg[num_in + dir * num_in + i] : fseed[dir][i];
-        if (a != 0 && a->size() != 0) {
-          fcn_.setFwdSeed(a->data(), i, d);
-        }
+      for(int i = 0; i < num_in; ++i){
+        DMatrix *a = is_diff ? arg[num_in + dir * num_in + i] : fseed[dir][i];
+        if(a != 0) fcn_.setFwdSeed(*a, i, d);
       }
     }
 
     // Pass the adjoint seed to the function
-    for (int d = 0; d < nadj_f_batch; ++d) {
+    for(int d = 0; d < nadj_f_batch; ++d){
       int dir = offset_adj + d;
-      for (int i = 0; i < num_out; ++i) {
-        DMatrix *a =
-            is_diff ?
-                arg[num_in + nfwd * num_in + dir * num_out + i] :
-                aseed[dir][i];
-        if (a != 0 && a->size() != 0) {
-          fcn_.setAdjSeed(a->data(), i, d);
-        }
+      for(int i = 0; i < num_out; ++i) {
+        DMatrix *a = is_diff ? arg[num_in + nfwd * num_in + dir * num_out + i] : aseed[dir][i];
+        if(a != 0) fcn_.setAdjSeed(*a, i, d);
       }
     }
 
     // Evaluate
     fcn_.evaluate(nfwd_f_batch, nadj_f_batch);
-
+    
     // Get the outputs if first evaluation
-    if (!fcn_evaluated) {
-      for (int i = 0; i < num_out; ++i) {
-        if (res[i] != 0 && res[i]->size() != 0) {
-          fcn_.getOutput(res[i]->data(), i);
-        }
+    if(!fcn_evaluated){
+      for(int i = 0; i < num_out; ++i) {
+        if(res[i] != 0) fcn_.getOutput(*res[i], i);
       }
     }
 
@@ -163,16 +152,11 @@ void EvaluationMX::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res,
     fcn_evaluated = true;
 
     // Get the forward sensitivities
-    for (int d = 0; d < nfwd_f_batch; ++d) {
+    for(int d = 0; d < nfwd_f_batch; ++d){
       int dir = offset_fwd + d;
-      for (int i = 0; i < num_out; ++i) {
-        DMatrix *a =
-            is_diff ?
-                res[num_out + dir * num_out + i] :
-                fsens[dir][i];
-        if (a != 0 && a->size() != 0) {
-          fcn_.getFwdSens(a->data(), i, d);
-        }
+      for(int i = 0; i < num_out; ++i) {
+        DMatrix *a = is_diff ? res[num_out + dir * num_out + i] : fsens[dir][i];
+        if(a != 0) fcn_.getFwdSens(*a, i, d);
       }
     }
 
@@ -180,13 +164,13 @@ void EvaluationMX::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res,
     for (int d = 0; d < nadj_f_batch; ++d) {
       int dir = offset_adj + d;
       for (int i = 0; i < num_in; ++i) {
-        DMatrix *a =
-            is_diff ?
-                res[num_out + nfwd * num_out + dir * num_in + i] :
-                asens[dir][i];
-        if (a != 0 && a->size() != 0) {
-          transform(a->begin(), a->end(), fcn_.adjSens(i, d).begin(),
-              a->begin(), plus<double>());
+        DMatrix *a = is_diff ? res[num_out + nfwd * num_out + dir * num_in + i] : asens[dir][i];
+        if(a != 0){
+          if(is_diff){
+            fcn_.getAdjSens(*a,i,d);
+          } else {
+            a->sparsity().add(a->ptr(),fcn_.adjSens(i,d).ptr(),fcn_.adjSens(i,d).sparsity());
+          }
         }
       }
     }
@@ -221,6 +205,10 @@ FX& EvaluationMX::getFunction() {
 void EvaluationMX::evaluateSX(const SXMatrixPtrV& arg, SXMatrixPtrV& res,
     const SXMatrixPtrVV& fseed, SXMatrixPtrVV& fsens,
     const SXMatrixPtrVV& aseed, SXMatrixPtrVV& asens) {
+  
+  casadi_assert_message(nfwd_f_==0,"Not implemented");
+  casadi_assert_message(nadj_f_==0,"Not implemented");
+  
   // Create input arguments
   vector<SXMatrix> argv = getVector(arg);
 
@@ -235,6 +223,8 @@ void EvaluationMX::evaluateSX(const SXMatrixPtrV& arg, SXMatrixPtrV& res,
 }
 
 void EvaluationMX::evaluateMX(const MXPtrV& arg, MXPtrV& res, const MXPtrVV& fseed, MXPtrVV& fsens, const MXPtrVV& aseed, MXPtrVV& asens, bool output_given) {
+  casadi_assert_message(nfwd_f_==0,"Not implemented");
+  casadi_assert_message(nadj_f_==0,"Not implemented");
   
   // Number of sensitivity directions
   int nfwd = fsens.size();
