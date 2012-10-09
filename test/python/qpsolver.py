@@ -229,9 +229,7 @@ class QPSolverTests(casadiTestCase):
     options = {"convex": True, "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
       
     for qpsolver, qp_options in qpsolvers:
-      self.message("general_convex: " + str(qpsolver))
-      #if "OOQP" in str(qpsolver):
-      #  continue
+      self.message("equality: " + str(qpsolver))
       solver = qpsolver(H.sparsity(),sp_dense(3,2))
       for key, val in options.iteritems():
         if solver.hasOption(key):
@@ -295,6 +293,153 @@ class QPSolverTests(casadiTestCase):
       self.checkarray(solver.output(QP_LAMBDA_A),DMatrix([3.2,0,0]),str(qpsolver),digits=6)
        
       self.assertAlmostEqual(solver.output(QP_COST)[0],-8.4,6,str(qpsolver))
+
+  def test_degenerate_hessian(self):
+    self.message("Degenerate hessian")
+    
+    H = DMatrix([[1,-1,0],[-1,2,0],[0,0,0]])
+    makeSparse(H)
+    G = DMatrix([-2,-6,1])
+    A =  DMatrix([[1, 1,1]])
+
+      
+
+
+    LBA = DMatrix([0.5])
+    UBA = DMatrix([0.5])
+
+    LBX = DMatrix([-10])
+    UBX = DMatrix([10])
+
+    options = {"convex": True, "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+      
+      
+    for qpsolver, qp_options in qpsolvers:
+      self.message("degenerate hessian: " + str(qpsolver))
+      solver = qpsolver(H.sparsity(),A.sparsity())
+      for key, val in options.iteritems():
+        if solver.hasOption(key):
+           solver.setOption(key,val)
+      solver.setOption(qp_options)
+      solver.init()
+        
+      solver.input(QP_H).set(H)
+      solver.input(QP_G).set(G)
+      solver.input(QP_A).set(A)
+      solver.input(QP_LBX).set(LBX)
+      solver.input(QP_UBX).set(UBX)
+      solver.input(QP_LBA).set(LBA)
+      solver.input(QP_UBA).set(UBA)
+
+      solver.solve()
+
+      self.checkarray(solver.output(),DMatrix([5.5,5,-10]),str(qpsolver),digits=6) 
+      
+      self.checkarray(solver.output(QP_LAMBDA_X),DMatrix([0,0,-2.5]),str(qpsolver),digits=6)
+
+      self.checkarray(solver.output(QP_LAMBDA_A),DMatrix([1.5]),str(qpsolver),digits=6)
+       
+      self.assertAlmostEqual(solver.output(QP_COST)[0],-38.375,6,str(qpsolver))
+        
+    
+  def test_no_inequality(self):
+    self.message("No inequalities present")
+    H = DMatrix([[1,-1],[-1,2]])
+    G = DMatrix([-2,-6])
+    A =  DMatrix([[1, 1]])
+
+      
+
+
+    LBA = DMatrix([0.5])
+    UBA = DMatrix([0.5])
+
+    LBX = DMatrix([-10])
+    UBX = DMatrix([10])
+
+
+    options = {"convex": True, "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+      
+    for qpsolver, qp_options in qpsolvers:
+      self.message("no inequality: " + str(qpsolver))
+      solver = qpsolver(H.sparsity(),A.sparsity())
+      for key, val in options.iteritems():
+        if solver.hasOption(key):
+           solver.setOption(key,val)
+      solver.setOption(qp_options)
+      solver.init()
+      
+
+
+      solver.input(QP_H).set(H)
+      solver.input(QP_G).set(G)
+      solver.input(QP_A).set(A)
+      solver.input(QP_LBX).set(LBX)
+      solver.input(QP_UBX).set(UBX)
+      solver.input(QP_LBA).set(LBA)
+      solver.input(QP_UBA).set(UBA)
+
+      solver.solve()
+
+      self.assertAlmostEqual(solver.output()[0],-0.5,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output()[1],1,6,str(qpsolver))
+    
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[0],0,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[1],0,6,str(qpsolver))
+
+
+      self.checkarray(solver.output(QP_LAMBDA_A),DMatrix([3.5]),str(qpsolver),digits=6)
+      
+      self.assertAlmostEqual(solver.output(QP_COST)[0],-3.375,6,str(qpsolver))
+
+  def test_no_A(self):
+    self.message("No A present")
+    H = DMatrix([[1,-1],[-1,2]])
+    G = DMatrix([-2,-6])
+    A =  DMatrix(0,2)
+
+    LBA = DMatrix(0,1)
+    UBA = DMatrix(0,1)
+
+    LBX = DMatrix([-10])
+    UBX = DMatrix([10])
+
+
+    options = {"convex": True, "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+      
+    for qpsolver, qp_options in qpsolvers:
+      self.message("no A: " + str(qpsolver))
+      if 'NLP' in str(qpsolver):
+        continue
+      solver = qpsolver(H.sparsity(),A.sparsity())
+      for key, val in options.iteritems():
+        if solver.hasOption(key):
+           solver.setOption(key,val)
+      solver.setOption(qp_options)
+      solver.init()
+      
+
+
+      solver.input(QP_H).set(H)
+      solver.input(QP_G).set(G)
+      solver.input(QP_A).set(A)
+      solver.input(QP_LBX).set(LBX)
+      solver.input(QP_UBX).set(UBX)
+      solver.input(QP_LBA).set(LBA)
+      solver.input(QP_UBA).set(UBA)
+
+      solver.solve()
+
+      self.assertAlmostEqual(solver.output()[0],10,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output()[1],8,6,str(qpsolver))
+    
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[0],0,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[1],0,6,str(qpsolver))
+
+
+      self.checkarray(solver.output(QP_LAMBDA_A),DMatrix([]),str(qpsolver),digits=6)
+      
+      self.assertAlmostEqual(solver.output(QP_COST)[0],-34,6,str(qpsolver))
       
 if __name__ == '__main__':
     unittest.main()
