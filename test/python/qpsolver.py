@@ -409,8 +409,6 @@ class QPSolverTests(casadiTestCase):
       
     for qpsolver, qp_options in qpsolvers:
       self.message("no A: " + str(qpsolver))
-      if 'NLP' in str(qpsolver):
-        continue
       solver = qpsolver(H.sparsity(),A.sparsity())
       for key, val in options.iteritems():
         if solver.hasOption(key):
@@ -430,16 +428,16 @@ class QPSolverTests(casadiTestCase):
 
       solver.solve()
 
-      self.assertAlmostEqual(solver.output()[0],10,6,str(qpsolver))
-      self.assertAlmostEqual(solver.output()[1],8,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output()[0],10,5,str(qpsolver))
+      self.assertAlmostEqual(solver.output()[1],8,5,str(qpsolver))
     
-      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[0],0,6,str(qpsolver))
-      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[1],0,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[0],0,5,str(qpsolver))
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[1],0,5,str(qpsolver))
 
 
-      self.checkarray(solver.output(QP_LAMBDA_A),DMatrix([]),str(qpsolver),digits=6)
+      self.checkarray(solver.output(QP_LAMBDA_A),DMatrix([]),str(qpsolver),digits=5)
       
-      self.assertAlmostEqual(solver.output(QP_COST)[0],-34,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output(QP_COST)[0],-34,5,str(qpsolver))
       
 if __name__ == '__main__':
     unittest.main()

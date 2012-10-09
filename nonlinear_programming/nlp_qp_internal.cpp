@@ -52,7 +52,8 @@ void NLPQPInternal::evaluate(int nfdir, int nadir) {
   // Pass inputs of QP to NLP form 
   nlpsolver_.input(NLP_P)[H_.mapping()] = input(QP_H);
   nlpsolver_.input(NLP_P)[G_.mapping()] = input(QP_G);
-  nlpsolver_.input(NLP_P)[A_.mapping()] = input(QP_A);
+  if (A_.size1()>0)
+    nlpsolver_.input(NLP_P)[A_.mapping()] = input(QP_A);
   
   nlpsolver_.input(NLP_LBX).set(input(QP_LBX));
   nlpsolver_.input(NLP_UBX).set(input(QP_UBX));
