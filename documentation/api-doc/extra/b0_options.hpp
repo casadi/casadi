@@ -2450,286 +2450,6 @@
 <tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>false</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>CasADi::NLPSolverInternal</td></tr>
 </table>
 */
-/** \class CasADi::IpoptQPInternal
-\n
-\par
-<table>
-<caption>List of available options</caption>
-<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>accept_every_trial_step</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>acceptable_compl_inf_tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>acceptable_constr_viol_tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>acceptable_dual_inf_tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>acceptable_iter</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>acceptable_obj_change_tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>acceptable_tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>alpha_for_y</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>alpha_for_y_tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>barrier_tol_factor</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>bound_frac</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>bound_mult_init_method</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>bound_mult_init_val</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>bound_mult_reset_threshold</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>bound_push</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>bound_relax_factor</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>check_derivatives_for_naninf</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>compl_inf_tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>constr_mult_init_max</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>constr_mult_reset_threshold</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>constr_viol_tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>false</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPSolverInternal</td></tr>
-<tr><td>corrector_type</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>derivative_test</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>derivative_test_perturbation</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>derivative_test_print_all</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>derivative_test_tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>diverging_iterates_tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>dual_inf_tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>evaluate_orig_obj_at_resto_trial</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>expect_infeasible_problem</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>expect_infeasible_problem_ctol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>expect_infeasible_problem_ytol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>file_print_level</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>first_hessian_perturbation</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>fixed_mu_oracle</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>fixed_variable_treatment</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>hessian_approximation</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>honor_original_bounds</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
-<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>jacobian_regularization_value</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>limited_memory_max_history</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>limited_memory_max_skipping</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>linear_scaling_on_demand</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>linear_system_scaling</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>ma27_la_init_factor</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>ma27_liw_init_factor</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>ma27_meminc_factor</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>ma27_pivtol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>ma27_pivtolmax</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>ma57_automatic_scaling</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>ma57_block_size</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>ma57_node_amalgamation</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>ma57_pivot_order</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>ma57_pivtol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>ma57_pivtolmax</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>ma57_pre_alloc</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>max_cpu_time</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>max_hessian_perturbation</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>max_iter</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>max_refinement_steps</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>max_soc</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mehrotra_algorithm</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>min_hessian_perturbation</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>min_refinement_steps</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>mu_init</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mu_linear_decrease_factor</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mu_max</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mu_max_fact</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mu_min</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mu_oracle</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mu_strategy</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mu_superlinear_decrease_power</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mu_target</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mumps_mem_percent</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mumps_permuting_scaling</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mumps_pivot_order</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mumps_pivtol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mumps_pivtolmax</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mumps_scaling</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
-<tr><td>nlp_lower_bound_inf</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>nlp_upper_bound_inf</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
-<tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
-<tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>option_file_name</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>output_file</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>pardiso_matching_strategy</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>pardiso_msglvl</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>pardiso_out_of_core_power</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>perturb_dec_fact</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>perturb_inc_fact</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>perturb_inc_fact_first</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>point_perturbation_radius</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>print_level</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>print_options_documentation</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>print_user_options</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>quality_function_max_section_steps</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>recalc_y</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>recalc_y_feas_tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>required_infeasibility_reduction</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>slack_bound_frac</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>slack_bound_push</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>soft_resto_pderror_reduction_factor</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
-<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>start_with_resto</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
-<tr><td>tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
-<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
-<tr><td>warm_start_bound_frac</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>warm_start_bound_push</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>warm_start_init_point</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>warm_start_mult_bound_push</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>warm_start_mult_init_max</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>warm_start_slack_bound_frac</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>warm_start_slack_bound_push</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>watchdog_shortened_iter_trigger</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>watchdog_trial_iter_max</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>wsmp_num_threads</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>wsmp_ordering_option</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>wsmp_pivtol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>wsmp_pivtolmax</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>wsmp_scaling</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>wsmp_singularity_threshold</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-</table>
-*/
-/** \class CasADi::IpoptQPSolver
-\n
-\par
-<table>
-<caption>List of available options</caption>
-<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>accept_every_trial_step</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>acceptable_compl_inf_tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>acceptable_constr_viol_tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>acceptable_dual_inf_tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>acceptable_iter</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>acceptable_obj_change_tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>acceptable_tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>alpha_for_y</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>alpha_for_y_tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>barrier_tol_factor</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>bound_frac</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>bound_mult_init_method</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>bound_mult_init_val</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>bound_mult_reset_threshold</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>bound_push</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>bound_relax_factor</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>check_derivatives_for_naninf</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>compl_inf_tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>constr_mult_init_max</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>constr_mult_reset_threshold</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>constr_viol_tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>false</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPSolverInternal</td></tr>
-<tr><td>corrector_type</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>derivative_test</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>derivative_test_perturbation</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>derivative_test_print_all</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>derivative_test_tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>diverging_iterates_tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>dual_inf_tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>evaluate_orig_obj_at_resto_trial</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>expect_infeasible_problem</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>expect_infeasible_problem_ctol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>expect_infeasible_problem_ytol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>file_print_level</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>first_hessian_perturbation</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>fixed_mu_oracle</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>fixed_variable_treatment</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>hessian_approximation</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>honor_original_bounds</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
-<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>jacobian_regularization_value</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>limited_memory_max_history</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>limited_memory_max_skipping</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>linear_scaling_on_demand</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>linear_system_scaling</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>ma27_la_init_factor</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>ma27_liw_init_factor</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>ma27_meminc_factor</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>ma27_pivtol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>ma27_pivtolmax</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>ma57_automatic_scaling</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>ma57_block_size</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>ma57_node_amalgamation</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>ma57_pivot_order</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>ma57_pivtol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>ma57_pivtolmax</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>ma57_pre_alloc</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>max_cpu_time</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>max_hessian_perturbation</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>max_iter</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>max_refinement_steps</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>max_soc</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mehrotra_algorithm</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>min_hessian_perturbation</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>min_refinement_steps</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>mu_init</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mu_linear_decrease_factor</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mu_max</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mu_max_fact</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mu_min</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mu_oracle</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mu_strategy</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mu_superlinear_decrease_power</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mu_target</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mumps_mem_percent</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mumps_permuting_scaling</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mumps_pivot_order</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mumps_pivtol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mumps_pivtolmax</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>mumps_scaling</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
-<tr><td>nlp_lower_bound_inf</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>nlp_upper_bound_inf</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
-<tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
-<tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
-<tr><td>option_file_name</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>output_file</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>pardiso_matching_strategy</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>pardiso_msglvl</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>pardiso_out_of_core_power</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>perturb_dec_fact</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>perturb_inc_fact</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>perturb_inc_fact_first</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>point_perturbation_radius</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>print_level</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>print_options_documentation</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>print_user_options</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>quality_function_max_section_steps</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>recalc_y</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>recalc_y_feas_tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>required_infeasibility_reduction</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>slack_bound_frac</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>slack_bound_push</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>soft_resto_pderror_reduction_factor</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
-<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>start_with_resto</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
-<tr><td>tol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
-<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
-<tr><td>warm_start_bound_frac</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>warm_start_bound_push</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>warm_start_init_point</td><td>OT_STRING</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>warm_start_mult_bound_push</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>warm_start_mult_init_max</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>warm_start_slack_bound_frac</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>warm_start_slack_bound_push</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>watchdog_shortened_iter_trigger</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>watchdog_trial_iter_max</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>wsmp_num_threads</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>wsmp_ordering_option</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>wsmp_pivtol</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>wsmp_pivtolmax</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>wsmp_scaling</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-<tr><td>wsmp_singularity_threshold</td><td>OT_REAL</td><td></td><td></td><td>CasADi::IpoptQPInternal</td></tr>
-</table>
-*/
 /** \class CasADi::ExternalFunctionInternal
 \n
 \par
@@ -2961,6 +2681,56 @@
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
+<tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
+</table>
+*/
+/** \class CasADi::NLPQPInternal
+\n
+\par
+<table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>convex</td><td>OT_BOOLEAN</td><td>false</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPSolverInternal</td></tr>
+<tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
+<tr><td>nlp_solver</td><td>OT_NLPSOLVER</td><td>GenericType()</td><td>The NLPSOlver used to solve the QPs.</td><td>CasADi::NLPQPInternal</td></tr>
+<tr><td>nlp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the NLPSOlver</td><td>CasADi::NLPQPInternal</td></tr>
+<tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
+<tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
+</table>
+*/
+/** \class CasADi::NLPQPSolver
+\n
+\par
+<table>
+<caption>List of available options</caption>
+<tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
+<tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>convex</td><td>OT_BOOLEAN</td><td>false</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPSolverInternal</td></tr>
+<tr><td>jac_for_sens</td><td>OT_BOOLEAN</td><td>false</td><td>Create the a Jacobian function and use this to calculate forward sensitivities</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)</td><td>CasADi::FXInternal</td></tr>
+<tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
+<tr><td>nlp_solver</td><td>OT_NLPSOLVER</td><td>GenericType()</td><td>The NLPSOlver used to solve the QPs.</td><td>CasADi::NLPQPInternal</td></tr>
+<tr><td>nlp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the NLPSOlver</td><td>CasADi::NLPQPInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>

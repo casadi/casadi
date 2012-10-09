@@ -9767,6 +9767,10 @@ all constraints. ";
 Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
 ";
 
+%feature("docstring")  CasADi::CplexInternal::setQPOptions "
+
+Set options that make the NLP solver more suitable for solving QPs. ";
+
 %feature("docstring")  CasADi::CplexInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -10496,9 +10500,16 @@ Set CPLEX double parameters. ";
 
 Check if the node is pointing to the right type of object. ";
 
-%feature("docstring")  CasADi::CplexSolver::reportConstraints "";
+%feature("docstring")  CasADi::CplexSolver::reportConstraints "
+
+Prints out a human readable report about possible constraint violations,
+after solving. ";
 
 %feature("docstring")  CasADi::CplexSolver::getReportConstraints "";
+
+%feature("docstring")  CasADi::CplexSolver::setQPOptions "
+
+Set options that make the NLP solver more suitable for solving QPs. ";
 
 %feature("docstring")  CasADi::CplexSolver::getF "
 
@@ -23706,6 +23717,10 @@ all constraints. ";
 Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
 ";
 
+%feature("docstring")  CasADi::IPInternal::setQPOptions "
+
+Set options that make the NLP solver more suitable for solving QPs. ";
+
 %feature("docstring")  CasADi::IPInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -24398,9 +24413,16 @@ approximation. ";
 
 Check if the node is pointing to the right type of object. ";
 
-%feature("docstring")  CasADi::IPMethod::reportConstraints "";
+%feature("docstring")  CasADi::IPMethod::reportConstraints "
+
+Prints out a human readable report about possible constraint violations,
+after solving. ";
 
 %feature("docstring")  CasADi::IPMethod::getReportConstraints "";
+
+%feature("docstring")  CasADi::IPMethod::setQPOptions "
+
+Set options that make the NLP solver more suitable for solving QPs. ";
 
 %feature("docstring")  CasADi::IPMethod::getF "
 
@@ -27830,6 +27852,10 @@ should invoke this function when initialized. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::IpoptInternal::setQPOptions "
+
+Set options that make the NLP solver more suitable for solving QPs. ";
+
 %feature("docstring")  CasADi::IpoptInternal::reportConstraints "
 
 Prints out a human readable report about possible constraint violations -
@@ -28115,14 +28141,6 @@ Assert that the object has been initialized. ";
 // File: classCasADi_1_1IpoptQPInternal.xml
 %feature("docstring") CasADi::IpoptQPInternal "
 
-Internal class for IpoptQPSolver.
-
-Solves the following problem:
-
-min          x'.H.x + G'.x   x  subject to             LBA <= A.x <= UBA
-LBX <= x   <= UBX                  nx: number of decision variables (x)
-nc: number of constraints (A)
-
 >Input scheme: CasADi::QPInput (QP_NUM_IN = 9)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
@@ -28688,383 +28706,12 @@ nc: number of constraints (A)
 | ld           |              |              |              |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-C++ includes: ipopt_qp_internal.hpp ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::input "
-
-Access input argument. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::input "";
-
-%feature("docstring")  CasADi::IpoptQPInternal::input "";
-
-%feature("docstring")  CasADi::IpoptQPInternal::input "";
-
-%feature("docstring")  CasADi::IpoptQPInternal::inputNoCheck "";
-
-%feature("docstring")  CasADi::IpoptQPInternal::inputNoCheck "";
-
-%feature("docstring")  CasADi::IpoptQPInternal::output "
-
-Access output argument. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::output "";
-
-%feature("docstring")  CasADi::IpoptQPInternal::outputNoCheck "";
-
-%feature("docstring")  CasADi::IpoptQPInternal::outputNoCheck "";
-
-%feature("docstring")  CasADi::IpoptQPInternal::fwdSeed "
-
-Access forward seed. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::fwdSeed "";
-
-%feature("docstring")  CasADi::IpoptQPInternal::fwdSeedNoCheck "";
-
-%feature("docstring")  CasADi::IpoptQPInternal::fwdSeedNoCheck "";
-
-%feature("docstring")  CasADi::IpoptQPInternal::fwdSens "
-
-Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::fwdSens "";
-
-%feature("docstring")  CasADi::IpoptQPInternal::fwdSensNoCheck "";
-
-%feature("docstring")  CasADi::IpoptQPInternal::fwdSensNoCheck "";
-
-%feature("docstring")  CasADi::IpoptQPInternal::adjSeed "
-
-Access adjoint seed. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::adjSeed "";
-
-%feature("docstring")  CasADi::IpoptQPInternal::adjSeedNoCheck "";
-
-%feature("docstring")  CasADi::IpoptQPInternal::adjSeedNoCheck "";
-
-%feature("docstring")  CasADi::IpoptQPInternal::adjSens "
-
-Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::adjSens "";
-
-%feature("docstring")  CasADi::IpoptQPInternal::adjSensNoCheck "";
-
-%feature("docstring")  CasADi::IpoptQPInternal::adjSensNoCheck "";
-
-%feature("docstring")  CasADi::IpoptQPInternal::IpoptQPInternal "
-
-Constructor. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::clone "
-
-Clone. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::IpoptQPInternal "
-
-Create a new Solver. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::~IpoptQPInternal "
-
-Destructor. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::init "
-
-Initialize. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::evaluate "
-
-Evaluate. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::solve "";
-
-%feature("docstring")  CasADi::IpoptQPInternal::updateNumSens "
-
-Update the number of sensitivity directions during or after initialization,
-if recursive==true, updateNumSens is also invoked for the baseclass. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::hessian "
-
-Hessian of output oind with respect to input iind. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::spEvaluate "
-
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::spCanEvaluate "
-
-Is the class able to propate seeds through the algorithm? ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::spInit "
-
-Reset the sparsity propagation. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::evalSX "
-
-Evaluate symbolically, SX type. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::evalMX "
-
-Evaluate symbolically, MX type. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::call "
-
-Call a function, MX type (overloaded) ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::call "
-
-Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::iStruct "
-
-Access an input. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::iStruct "
-
-Const access an input. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::oStruct "
-
-Access an output. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::oStruct "
-
-Const access an output. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::print "
-
-Print. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::repr "
-
-Print. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::inputSchemeEntry "
-
-Find the index for a string describing a particular entry of an input scheme
-example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
-to SCHEME_NLPINput. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::outputSchemeEntry "
-
-Find the index for a string describing a particular entry of an output
-scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
-adheres to SCHEME_NLPINput. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::schemeEntry "
-
-Find the index for a string describing a particular entry of a scheme
-example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
-to SCHEME_NLPINput. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::getPartition "
-
-Get the unidirectional or bidirectional partition. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::verbose "
-
-Verbose mode? ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::monitored "
-
-Is function fcn being monitored. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::setNumInputs "
-
-Set the number of function inputs. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::setNumOutputs "
-
-Set the number of function outputs. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::getNumInputs "
-
-Get the number of function inputs. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::getNumOutputs "
-
-Get the number of function outputs. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::getNumScalarInputs "
-
-Get total number of scalar inputs (i.e. the number of nonzeros in all of the
-matrix-valued inputs) ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::getNumScalarOutputs "
-
-Get total number of scalar outputs (i.e. the number of nonzeros in all of
-the matrix-valued outputs) ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::getStats "
-
-Get all statistics obtained at the end of the last evaluate call. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::getStat "
-
-Get single statistic obtained at the end of the last evaluate call. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::getJacSparsity "
-
-Generate the sparsity of a Jacobian block. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::setJacSparsity "
-
-Generate the sparsity of a Jacobian block. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::jacSparsity "
-
-Get, if necessary generate, the sparsity of a Jacobian block. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::symbolicInput "
-
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
-
-%feature("docstring")  CasADi::IpoptQPInternal::symbolicInputSX "
-
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
-
-%feature("docstring")  CasADi::IpoptQPInternal::log "
-
-Log the status of the solver. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::log "
-
-Log the status of the solver, function given. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::setOption "
-
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::setOption "
-
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::getOptionNames "
-
-Get a list of all option names. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::getOptionDescription "
-
-Get the description of a certain option. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::getOptionType "
-
-Get the type of a certain option. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::getOptionTypeName "
-
-Get the type name of a certain option. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::getOptionDefault "
-
-Get the default of a certain option. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::getOptionAllowed "
-
-Get the allowed values of a certain option. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::hasOption "
-
-check if there is an option str ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::hasSetOption "
-
-check if the user has there is an option str ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::printOptions "
-
-Print options to a stream. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::printOption "
-
-Print all information there is to know about a certain option. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::getOption "
-
-get an option value ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::copyOptions "
-
-Copy all options from another object. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::dictionary "
-
-Get the dictionary. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::getBestMatches "
-
-Get th ebest suggestions of option names. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::unregRef "
-
-Unregister a weak reference. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::deepCopyMembers "
-
-Deep copy data members. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::getCount "
-
-Get the reference count. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::isInit "
-
-Check if the object has been initialized. ";
-
-%feature("docstring")  CasADi::IpoptQPInternal::assertInit "
-
-Assert that the object has been initialized. ";
+C++ includes: a0_schemes.hpp ";
 
 
 // File: classCasADi_1_1IpoptQPSolver.xml
 %feature("docstring") CasADi::IpoptQPSolver "
 
-IPOPT QP Solver for quadratic programming.
-
-Solves the following problem:
-
-min          x'.H.x + G'.x   x  subject to             LBA <= A.x <= UBA
-LBX <= x   <= UBX                  nx: number of decision variables (x)
-nc: number of constraints (A)
-
-Joris Gillis
-
 >Input scheme: CasADi::QPInput (QP_NUM_IN = 9)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
@@ -29630,486 +29277,7 @@ Joris Gillis
 | ld           |              |              |              |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-C++ includes: ipopt_qp_solver.hpp ";
-
-/*  Setters  */
-
-/* T can be double&, double*, std::vector<double>&, Matrix<double> &
-Assumes a properly allocated val.  Set/get an input, output, forward
-seed/sensitivity or adjoint seed/sensitivity
-
-*/
-
-%feature("docstring")  CasADi::IpoptQPSolver::setInput "
-
-Reads in the input argument from val. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::setOutput "
-
-Reads in the output argument from val. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::setFwdSeed "
-
-Reads in the forward seed from val. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::setFwdSens "
-
-Reads in the forward sensitivity from val. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::setAdjSeed "
-
-Reads in the adjoint seed from val. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::setAdjSens "
-
-Reads in the adjoint sensitivity from val. ";
-
-/*  Getters  */
-
-/* A group of accessor for numerical data that operate on preallocated data.
-get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-
-*/
-
-%feature("docstring")  CasADi::IpoptQPSolver::getInput "
-
-Writes out the input argument into val. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::getOutput "
-
-Writes out the output argument into val. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::getFwdSeed "
-
-Writes out the forward seed into val. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::getFwdSens "
-
-Writes out the forward sensitivity into val. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::getAdjSeed "
-
-Writes out the adjoint seed into val. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::getAdjSens "
-
-Writes out the adjoint sensitivity into val. ";
-
-/*  Option Functionality  */
-
-%feature("docstring")  CasADi::IpoptQPSolver::setOption "
-
-set an option. For a list of options, check the class documentation of this
-class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::setOption "
-
-set a set of options. For a list of options, check the class documentation
-of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::getOption "
-
-get an option value ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::hasOption "
-
-check if there is an option str ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::hasSetOption "
-
-check if the user has there is an option str ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::printOptions "
-
-Print options to a stream. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::copyOptions "
-
-Copy all options from another object. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::dictionary "
-
-Get the dictionary. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::makeUnique "
-
-If there are other references to the object, then make a deep copy of it and
-point to this new object. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::makeUnique "";
-
-%feature("docstring")  CasADi::IpoptQPSolver::IpoptQPSolver "
-
-Default constructor. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::IpoptQPSolver "";
-
-%feature("docstring")  CasADi::IpoptQPSolver::checkNode "
-
-Check if the node is pointing to the right type of object. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::getNumInputs "
-
-Get number of inputs. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::getNumOutputs "
-
-Get number of outputs. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::getNumScalarInputs "
-
-Get total number of scalar inputs (i.e. the number of nonzeros in all of the
-matrix-valued inputs) ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::getNumScalarOutputs "
-
-Get total number of scalar outputs (i.e. the number of nonzeros in all of
-the matrix-valued outputs) ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::setNumInputs "
-
-Set number of inputs (normally invoked internally) ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::setNumOutputs "
-
-Set number of outputs (normally invoked internally) ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::updateNumSens "
-
-Update the number of sensitivity directions during or after initialization
-(normally invoked internally) ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::evaluate "
-
-Evaluate. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::solve "
-
-the same as evaluate(0,0) ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::jacobian "
-
-Calculate jacobian of output oind with respect to input iind.
-
-Parameters:
------------
-
-oind:  The index of the output
-
-iind:  The index of the input
-
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::hessian "
-
-Hessian of output oind with respect to input iind. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::call "
-
-Create a function call (single input) ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::call "
-
-Create a function call ( MX graph) ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::call "
-
-Create a function call with directional derivatives Note: return by
-reference with SWIG. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::call "
-
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::callSX "
-
-Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::eval "
-
-evaluate symbolically, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::eval "
-
-evaluate symbolically, MX type (overloaded) ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::eval "
-
-Evaluate symbolically with with directional derivatives, SX type, overloaded
-The first two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The boolean
-argument allows the second argument to the functions to be used as an input
-instead of output, assuming it is already known. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::eval "
-
-Evaluate symbolically with with directional derivatives, MX type, overloaded
-The first two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The boolean
-argument allows the second argument to the functions to be used as an input
-instead of output, assuming it is already known. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::eval "
-
-evaluate symbolically, single input, single output ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::evalMX "
-
-evaluate symbolically, MX type (unambiguous) ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::evalMX "
-
-Evaluate symbolically with with directional derivatives, MX type The first
-two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The boolean
-argument allows the second argument to the functions to be used as an input
-instead of output, assuming it is already known. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::evalSX "
-
-evaluate symbolically, SX type (unambiguous) ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::evalSX "
-
-Evaluate symbolically with with directional derivatives, SX type The first
-two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The boolean
-argument allows the second argument to the functions to be used as an input
-instead of output, assuming it is already known. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
-(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
-nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
-seeds, one direction at a time and the last nadj*n_out inputs corresponds to
-adjoint seeds, one direction at a time. The first n_out outputs corresponds
-to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
-
-(n_in = getNumInputs(), n_out = getNumOutputs())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::jacSparsity "
-
-Get, if necessary generate, the sparsity of a Jacobian block. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::setJacSparsity "
-
-Generate the sparsity of a Jacobian block. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::indexed_one_based "";
-
-%feature("docstring")  CasADi::IpoptQPSolver::indexed_zero_based "";
-
-%feature("docstring")  CasADi::IpoptQPSolver::input "
-
-Const access input argument. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::input "
-
-Const access input argument. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::input "
-
-Access input argument. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::input "
-
-Access input argument. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::output "
-
-Const access input argument. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::output "
-
-Access output argument Note that copies in Python are shallow by default and
-fx.output() gives a reference/pointer to an internal data structure. So if
-you want save fx.output(), you need to make a deep copy using for example
-DMatrix(fx.output()). ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::fwdSeed "
-
-Const access forward seed. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::fwdSeed "
-
-Access forward seed. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::fwdSens "
-
-Const access forward sensitivity. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::fwdSens "
-
-Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::adjSeed "
-
-Const access adjoint seed. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::adjSeed "
-
-Access adjoint seed. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::adjSens "
-
-Const access forward sensitivity. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::adjSens "
-
-Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::getStats "
-
-Get all statistics obtained at the end of the last evaluate call. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::getStat "
-
-Get a single statistic obtained at the end of the last evaluate call. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::symbolicInput "
-
-Get a vector of symbolic variables with the same dimensions as the inputs
-There is no guarantee that consecutive calls return identical objects. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::symbolicInputSX "
-
-Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph There is no guarantee that consecutive calls return identical
-objects. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::spCanEvaluate "
-
-Is the class able to propate seeds through the algorithm? (for usage, see
-the example propagating_sparsity.cpp) ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::spInit "
-
-Reset the sparsity propagation (for usage, see the example
-propagating_sparsity.cpp) ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::spEvaluate "
-
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp) ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::getOptionNames "
-
-Get a list of all option names. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::getOptionDescription "
-
-Get the description of a certain option. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::getOptionType "
-
-Get the type of a certain option. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::getOptionTypeName "
-
-Get the type name of a certain option. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::getOptionAllowed "
-
-Get the allowed values of a certain option. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::getOptionDefault "
-
-Get the default of a certain option. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::clone "
-
-Deep copy. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::assignNode "
-
-Assign the node to a node class pointer (or null) ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::assignNodeNoCount "
-
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks! ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::get "
-
-Get a const pointer to the node. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::get "
-
-Get a pointer to the node. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::getCount "
-
-Get the reference count. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::swap "
-
-Swap content with another instance. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::repr "
-
-Print a representation of the object. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::print "
-
-Print a destription of the object. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::init "
-
-Initialize the object: more documentation in the node class (
-SharedObjectNode and derived classes) ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::isInit "
-
-Is initialized? ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::assertInit "
-
-Assert that it is initialized. ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::isNull "
-
-Is a null pointer? ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::getRepresentation "
-
-Return a string with a representation (for SWIG) ";
-
-%feature("docstring")  CasADi::IpoptQPSolver::getDescription "
-
-Return a string with a destription (for SWIG) ";
+C++ includes: a0_schemes.hpp ";
 
 
 // File: classCasADi_1_1IpoptSolver.xml
@@ -33220,9 +32388,16 @@ approximation. ";
 
 Check if the node is pointing to the right type of object. ";
 
-%feature("docstring")  CasADi::IpoptSolver::reportConstraints "";
+%feature("docstring")  CasADi::IpoptSolver::reportConstraints "
+
+Prints out a human readable report about possible constraint violations,
+after solving. ";
 
 %feature("docstring")  CasADi::IpoptSolver::getReportConstraints "";
+
+%feature("docstring")  CasADi::IpoptSolver::setQPOptions "
+
+Set options that make the NLP solver more suitable for solving QPs. ";
 
 %feature("docstring")  CasADi::IpoptSolver::getF "
 
@@ -36762,6 +35937,10 @@ all constraints. ";
 Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
 ";
 
+%feature("docstring")  CasADi::KnitroInternal::setQPOptions "
+
+Set options that make the NLP solver more suitable for solving QPs. ";
+
 %feature("docstring")  CasADi::KnitroInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -37558,9 +36737,16 @@ Set KNITRO string parameters. ";
 
 Check if the node is pointing to the right type of object. ";
 
-%feature("docstring")  CasADi::KnitroSolver::reportConstraints "";
+%feature("docstring")  CasADi::KnitroSolver::reportConstraints "
+
+Prints out a human readable report about possible constraint violations,
+after solving. ";
 
 %feature("docstring")  CasADi::KnitroSolver::getReportConstraints "";
+
+%feature("docstring")  CasADi::KnitroSolver::setQPOptions "
+
+Set options that make the NLP solver more suitable for solving QPs. ";
 
 %feature("docstring")  CasADi::KnitroSolver::getF "
 
@@ -40820,9 +40006,16 @@ approximation. ";
 
 Check if the node is pointing to the right type of object. ";
 
-%feature("docstring")  CasADi::LiftedSQP::reportConstraints "";
+%feature("docstring")  CasADi::LiftedSQP::reportConstraints "
+
+Prints out a human readable report about possible constraint violations,
+after solving. ";
 
 %feature("docstring")  CasADi::LiftedSQP::getReportConstraints "";
+
+%feature("docstring")  CasADi::LiftedSQP::setQPOptions "
+
+Set options that make the NLP solver more suitable for solving QPs. ";
 
 %feature("docstring")  CasADi::LiftedSQP::getF "
 
@@ -41661,6 +40854,10 @@ all constraints. ";
 Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
 ";
 
+%feature("docstring")  CasADi::LiftedSQPInternal::setQPOptions "
+
+Set options that make the NLP solver more suitable for solving QPs. ";
+
 %feature("docstring")  CasADi::LiftedSQPInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -42312,6 +41509,10 @@ all constraints. ";
 
 Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
 ";
+
+%feature("docstring")  CasADi::LiftoptInternal::setQPOptions "
+
+Set options that make the NLP solver more suitable for solving QPs. ";
 
 %feature("docstring")  CasADi::LiftoptInternal::updateNumSens "
 
@@ -43006,9 +42207,16 @@ Node init? ";
 
 %feature("docstring")  CasADi::LiftoptSolver::nodeInit "";
 
-%feature("docstring")  CasADi::LiftoptSolver::reportConstraints "";
+%feature("docstring")  CasADi::LiftoptSolver::reportConstraints "
+
+Prints out a human readable report about possible constraint violations,
+after solving. ";
 
 %feature("docstring")  CasADi::LiftoptSolver::getReportConstraints "";
+
+%feature("docstring")  CasADi::LiftoptSolver::setQPOptions "
+
+Set options that make the NLP solver more suitable for solving QPs. ";
 
 %feature("docstring")  CasADi::LiftoptSolver::getF "
 
@@ -50281,6 +49489,876 @@ Check if smooth. ";
 %feature("docstring")  CasADi::NanSX::mark "";
 
 
+// File: classCasADi_1_1NLPQPInternal.xml
+%feature("docstring") CasADi::NLPQPInternal "
+
+Internal class for NLPQPInternal.
+
+Solves the following problem:
+
+min          x'.H.x + G'.x   x  subject to             LBA <= A.x <= UBA
+LBX <= x   <= UBX                  nx: number of decision variables (x)
+nc: number of constraints (A)
+
+C++ includes: nlp_qp_internal.hpp ";
+
+%feature("docstring")  CasADi::NLPQPInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::input "";
+
+%feature("docstring")  CasADi::NLPQPInternal::input "";
+
+%feature("docstring")  CasADi::NLPQPInternal::input "";
+
+%feature("docstring")  CasADi::NLPQPInternal::inputNoCheck "";
+
+%feature("docstring")  CasADi::NLPQPInternal::inputNoCheck "";
+
+%feature("docstring")  CasADi::NLPQPInternal::output "
+
+Access output argument. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::output "";
+
+%feature("docstring")  CasADi::NLPQPInternal::outputNoCheck "";
+
+%feature("docstring")  CasADi::NLPQPInternal::outputNoCheck "";
+
+%feature("docstring")  CasADi::NLPQPInternal::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::fwdSeed "";
+
+%feature("docstring")  CasADi::NLPQPInternal::fwdSeedNoCheck "";
+
+%feature("docstring")  CasADi::NLPQPInternal::fwdSeedNoCheck "";
+
+%feature("docstring")  CasADi::NLPQPInternal::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::fwdSens "";
+
+%feature("docstring")  CasADi::NLPQPInternal::fwdSensNoCheck "";
+
+%feature("docstring")  CasADi::NLPQPInternal::fwdSensNoCheck "";
+
+%feature("docstring")  CasADi::NLPQPInternal::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::adjSeed "";
+
+%feature("docstring")  CasADi::NLPQPInternal::adjSeedNoCheck "";
+
+%feature("docstring")  CasADi::NLPQPInternal::adjSeedNoCheck "";
+
+%feature("docstring")  CasADi::NLPQPInternal::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::adjSens "";
+
+%feature("docstring")  CasADi::NLPQPInternal::adjSensNoCheck "";
+
+%feature("docstring")  CasADi::NLPQPInternal::adjSensNoCheck "";
+
+%feature("docstring")  CasADi::NLPQPInternal::NLPQPInternal "
+
+Constructor. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::clone "
+
+Clone. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::NLPQPInternal "
+
+Create a new Solver. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::~NLPQPInternal "
+
+Destructor. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::init "
+
+Initialize. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::solve "";
+
+%feature("docstring")  CasADi::NLPQPInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::hessian "
+
+Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::NLPQPInternal::spInit "
+
+Reset the sparsity propagation. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::evalSX "
+
+Evaluate symbolically, SX type. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::evalMX "
+
+Evaluate symbolically, MX type. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::call "
+
+Call a function, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::NLPQPInternal::call "
+
+Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::NLPQPInternal::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives (cached) ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::jacobian "
+
+Access a Jacobian function (cached) ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getJacobian "
+
+Generate a function that calculates a Jacobian function. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getNumericJacobian "
+
+Generate a function that calculates a Jacobian function by operator
+overloading. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::iStruct "
+
+Access an input. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::iStruct "
+
+Const access an input. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::oStruct "
+
+Access an output. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::oStruct "
+
+Const access an output. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::print "
+
+Print. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::repr "
+
+Print. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getPartition "
+
+Get the unidirectional or bidirectional partition. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::verbose "
+
+Verbose mode? ";
+
+%feature("docstring")  CasADi::NLPQPInternal::monitored "
+
+Is function fcn being monitored. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::setNumInputs "
+
+Set the number of function inputs. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::setNumOutputs "
+
+Set the number of function outputs. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getNumInputs "
+
+Get the number of function inputs. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getNumOutputs "
+
+Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getStat "
+
+Get single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::NLPQPInternal::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::NLPQPInternal::log "
+
+Log the status of the solver. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::log "
+
+Log the status of the solver, function given. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::setOption "
+
+set an option. The setOptions are in general only considered before the init
+function, if any. If properties changes, the init function should be called
+again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::NLPQPInternal::setOption "
+
+set a set of options. The setOptions are in general only considered before
+the init function, if any. If properties changes, the init function should
+be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::NLPQPInternal::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::NLPQPInternal::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::NLPQPInternal::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::unregRef "
+
+Unregister a weak reference. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::deepCopyMembers "
+
+Deep copy data members. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::assertInit "
+
+Assert that the object has been initialized. ";
+
+
+// File: classCasADi_1_1NLPQPSolver.xml
+%feature("docstring") CasADi::NLPQPSolver "
+
+IPOPT QP Solver for quadratic programming.
+
+Solves the following problem:
+
+min          x'.H.x + G'.x   x  subject to             LBA <= A.x <= UBA
+LBX <= x   <= UBX                  nx: number of decision variables (x)
+nc: number of constraints (A)
+
+Joris Gillis
+
+C++ includes: nlp_qp_solver.hpp ";
+
+/*  Setters  */
+
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
+
+*/
+
+%feature("docstring")  CasADi::NLPQPSolver::setInput "
+
+Reads in the input argument from val. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::setOutput "
+
+Reads in the output argument from val. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::setFwdSeed "
+
+Reads in the forward seed from val. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::setFwdSens "
+
+Reads in the forward sensitivity from val. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::setAdjSeed "
+
+Reads in the adjoint seed from val. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::setAdjSens "
+
+Reads in the adjoint sensitivity from val. ";
+
+/*  Getters  */
+
+/* A group of accessor for numerical data that operate on preallocated data.
+get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
+
+*/
+
+%feature("docstring")  CasADi::NLPQPSolver::getInput "
+
+Writes out the input argument into val. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::getOutput "
+
+Writes out the output argument into val. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::getFwdSeed "
+
+Writes out the forward seed into val. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::getFwdSens "
+
+Writes out the forward sensitivity into val. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::getAdjSeed "
+
+Writes out the adjoint seed into val. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::getAdjSens "
+
+Writes out the adjoint sensitivity into val. ";
+
+/*  Option Functionality  */
+
+%feature("docstring")  CasADi::NLPQPSolver::setOption "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::setOption "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::NLPQPSolver::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::NLPQPSolver::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::NLPQPSolver::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::makeUnique "
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::makeUnique "";
+
+%feature("docstring")  CasADi::NLPQPSolver::NLPQPSolver "
+
+Default constructor. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::NLPQPSolver "";
+
+%feature("docstring")  CasADi::NLPQPSolver::checkNode "
+
+Check if the node is pointing to the right type of object. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::getNumInputs "
+
+Get number of inputs. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::getNumOutputs "
+
+Get number of outputs. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::NLPQPSolver::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
+%feature("docstring")  CasADi::NLPQPSolver::setNumInputs "
+
+Set number of inputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::NLPQPSolver::setNumOutputs "
+
+Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::NLPQPSolver::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
+%feature("docstring")  CasADi::NLPQPSolver::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::solve "
+
+the same as evaluate(0,0) ";
+
+%feature("docstring")  CasADi::NLPQPSolver::jacobian "
+
+Calculate jacobian of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
+The default behaviour for FX is to use CasADi::Jacobian, which uses
+(numerical) directional derivatives (i.e. operator overloading) to form the
+Jacobian. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::hessian "
+
+Hessian of output oind with respect to input iind. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::call "
+
+Create a function call (single input) ";
+
+%feature("docstring")  CasADi::NLPQPSolver::call "
+
+Create a function call ( MX graph) ";
+
+%feature("docstring")  CasADi::NLPQPSolver::call "
+
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::call "
+
+Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
+be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::callSX "
+
+Create a function call ( SX graph) NOTE: UNDER DEVELOPMENT. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::eval "
+
+evaluate symbolically, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::NLPQPSolver::eval "
+
+evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::NLPQPSolver::eval "
+
+Evaluate symbolically with with directional derivatives, SX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::eval "
+
+Evaluate symbolically with with directional derivatives, MX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::eval "
+
+evaluate symbolically, single input, single output ";
+
+%feature("docstring")  CasADi::NLPQPSolver::evalMX "
+
+evaluate symbolically, MX type (unambiguous) ";
+
+%feature("docstring")  CasADi::NLPQPSolver::evalMX "
+
+Evaluate symbolically with with directional derivatives, MX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::evalSX "
+
+evaluate symbolically, SX type (unambiguous) ";
+
+%feature("docstring")  CasADi::NLPQPSolver::evalSX "
+
+Evaluate symbolically with with directional derivatives, SX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::indexed_one_based "";
+
+%feature("docstring")  CasADi::NLPQPSolver::indexed_zero_based "";
+
+%feature("docstring")  CasADi::NLPQPSolver::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::output "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::output "
+
+Access output argument Note that copies in Python are shallow by default and
+fx.output() gives a reference/pointer to an internal data structure. So if
+you want save fx.output(), you need to make a deep copy using for example
+DMatrix(fx.output()). ";
+
+%feature("docstring")  CasADi::NLPQPSolver::fwdSeed "
+
+Const access forward seed. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::fwdSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::adjSeed "
+
+Const access adjoint seed. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::adjSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::getStat "
+
+Get a single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::NLPQPSolver::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::NLPQPSolver::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::NLPQPSolver::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::clone "
+
+Deep copy. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::assignNode "
+
+Assign the node to a node class pointer (or null) ";
+
+%feature("docstring")  CasADi::NLPQPSolver::assignNodeNoCount "
+
+Assign the node to a node class pointer without reference counting: inproper
+use will cause memory leaks! ";
+
+%feature("docstring")  CasADi::NLPQPSolver::get "
+
+Get a const pointer to the node. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::get "
+
+Get a pointer to the node. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::swap "
+
+Swap content with another instance. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::repr "
+
+Print a representation of the object. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::print "
+
+Print a destription of the object. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::init "
+
+Initialize the object: more documentation in the node class (
+SharedObjectNode and derived classes) ";
+
+%feature("docstring")  CasADi::NLPQPSolver::isInit "
+
+Is initialized? ";
+
+%feature("docstring")  CasADi::NLPQPSolver::assertInit "
+
+Assert that it is initialized. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::isNull "
+
+Is a null pointer? ";
+
+%feature("docstring")  CasADi::NLPQPSolver::getRepresentation "
+
+Return a string with a representation (for SWIG) ";
+
+%feature("docstring")  CasADi::NLPQPSolver::getDescription "
+
+Return a string with a destription (for SWIG) ";
+
+
 // File: classCasADi_1_1NLPSolver.xml
 %feature("docstring") CasADi::NLPSolver "
 
@@ -50686,9 +50764,16 @@ Default constructor. ";
 
 Check if the node is pointing to the right type of object. ";
 
-%feature("docstring")  CasADi::NLPSolver::reportConstraints "";
+%feature("docstring")  CasADi::NLPSolver::reportConstraints "
+
+Prints out a human readable report about possible constraint violations,
+after solving. ";
 
 %feature("docstring")  CasADi::NLPSolver::getReportConstraints "";
+
+%feature("docstring")  CasADi::NLPSolver::setQPOptions "
+
+Set options that make the NLP solver more suitable for solving QPs. ";
 
 %feature("docstring")  CasADi::NLPSolver::getF "
 
@@ -51433,6 +51518,10 @@ all constraints. ";
 
 Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
 ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::setQPOptions "
+
+Set options that make the NLP solver more suitable for solving QPs. ";
 
 %feature("docstring")  CasADi::NLPSolverInternal::evaluate "
 
@@ -55006,7 +55095,9 @@ Constructor. ";
 
 %feature("docstring")  CasADi::OOQPInternal::clone "
 
-Clone. ";
+Clone.
+
+Caveats: lba = -inf && uba = inf is not allowed. Must be filtered out. ";
 
 %feature("docstring")  CasADi::OOQPInternal::OOQPInternal "
 
@@ -55019,11 +55110,6 @@ Destructor. ";
 %feature("docstring")  CasADi::OOQPInternal::init "
 
 Initialize. ";
-
-%feature("docstring")  CasADi::OOQPInternal::allocate "
-
-Allocate Because constraints after initialization, we cannot allocate a
-Solver during init. ";
 
 %feature("docstring")  CasADi::OOQPInternal::evaluate "
 
@@ -64172,6 +64258,10 @@ all constraints. ";
 Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
 ";
 
+%feature("docstring")  CasADi::SQPInternal::setQPOptions "
+
+Set options that make the NLP solver more suitable for solving QPs. ";
+
 %feature("docstring")  CasADi::SQPInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -64955,9 +65045,16 @@ approximation. ";
 
 Check if the node is pointing to the right type of object. ";
 
-%feature("docstring")  CasADi::SQPMethod::reportConstraints "";
+%feature("docstring")  CasADi::SQPMethod::reportConstraints "
+
+Prints out a human readable report about possible constraint violations,
+after solving. ";
 
 %feature("docstring")  CasADi::SQPMethod::getReportConstraints "";
+
+%feature("docstring")  CasADi::SQPMethod::setQPOptions "
+
+Set options that make the NLP solver more suitable for solving QPs. ";
 
 %feature("docstring")  CasADi::SQPMethod::getF "
 
@@ -71364,9 +71461,7 @@ evaluating. If passed to another class (in the constructor), this class
 should invoke this function when initialized.
 
 Known issue in WORHP: Worhp cannot handle the degenerate case of constant
-objective value.
-
-Autogenerated from C_worhp_aux.h with params.pl ";
+objective value. ";
 
 %feature("docstring")  CasADi::WorhpInternal::evaluate "
 
@@ -71381,6 +71476,10 @@ all constraints. ";
 
 Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
 ";
+
+%feature("docstring")  CasADi::WorhpInternal::setQPOptions "
+
+Set options that make the NLP solver more suitable for solving QPs. ";
 
 %feature("docstring")  CasADi::WorhpInternal::updateNumSens "
 
@@ -72786,9 +72885,16 @@ approximation. ";
 
 Check if the node is pointing to the right type of object. ";
 
-%feature("docstring")  CasADi::WorhpSolver::reportConstraints "";
+%feature("docstring")  CasADi::WorhpSolver::reportConstraints "
+
+Prints out a human readable report about possible constraint violations,
+after solving. ";
 
 %feature("docstring")  CasADi::WorhpSolver::getReportConstraints "";
+
+%feature("docstring")  CasADi::WorhpSolver::setQPOptions "
+
+Set options that make the NLP solver more suitable for solving QPs. ";
 
 %feature("docstring")  CasADi::WorhpSolver::getF "
 
@@ -76709,18 +76815,6 @@ This file does absolutely nothing but including all headers ";
 // File: ipopt__nlp_8hpp.xml
 
 
-// File: ipopt__qp__internal_8cpp.xml
-
-
-// File: ipopt__qp__internal_8hpp.xml
-
-
-// File: ipopt__qp__solver_8cpp.xml
-
-
-// File: ipopt__qp__solver_8hpp.xml
-
-
 // File: ipopt__solver_8cpp.xml
 
 
@@ -76968,6 +77062,18 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: mx__tools_8hpp.xml
+
+
+// File: nlp__qp__internal_8cpp.xml
+
+
+// File: nlp__qp__internal_8hpp.xml
+
+
+// File: nlp__qp__solver_8cpp.xml
+
+
+// File: nlp__qp__solver_8hpp.xml
 
 
 // File: nlp__solver_8cpp.xml

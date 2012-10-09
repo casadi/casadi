@@ -608,20 +608,6 @@
 <br/>
 @copydoc scheme_NLPOutput
 */
-/** \class CasADi::IpoptQPInternal
-\n
-\par
-@copydoc scheme_QPInput
-<br/>
-@copydoc scheme_QPOutput
-*/
-/** \class CasADi::IpoptQPSolver
-\n
-\par
-@copydoc scheme_QPInput
-<br/>
-@copydoc scheme_QPOutput
-*/
 /** \class CasADi::RKIntegratorInternal
 \n
 \par
@@ -635,6 +621,20 @@
 @copydoc scheme_IntegratorInput
 <br/>
 @copydoc scheme_IntegratorOutput
+*/
+/** \class CasADi::NLPQPInternal
+\n
+\par
+@copydoc scheme_QPInput
+<br/>
+@copydoc scheme_QPOutput
+*/
+/** \class CasADi::NLPQPSolver
+\n
+\par
+@copydoc scheme_QPInput
+<br/>
+@copydoc scheme_QPOutput
 */
 /** \class CasADi::OCPSolverInternal
 \n
