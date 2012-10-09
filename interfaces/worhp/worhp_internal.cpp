@@ -279,6 +279,10 @@ void WorhpInternal::init(){
   
 }
 
+void WorhpInternal::setQPOptions(bool convex) {
+  setOption("UserHM", true);
+}
+
 void WorhpInternal::passOptions() {
 
   if (hasSetOption("Ares")) {
@@ -683,6 +687,7 @@ void WorhpInternal::evaluate(int nfdir, int nadir){
     if (!Fmod_.isNull()) Fmod_.setInput(input(NLP_P),Fmod_.getNumInputs()-2);
     if (!Gmod_.isNull()) Gmod_.setInput(input(NLP_P),Gmod_.getNumInputs()-2);
     if (!Hmod_.isNull()) Hmod_.setInput(input(NLP_P),Hmod_.getNumInputs()-2);
+    if (!H_tril_.isNull()) H_tril_.setInput(input(NLP_P),H_tril_.getNumInputs()-2);
     if (!Jmod_.isNull()) Jmod_.setInput(input(NLP_P),Jmod_.getNumInputs()-2);
     if (!GFmod_.isNull()) GFmod_.setInput(input(NLP_P),GFmod_.getNumInputs()-2);
   }
@@ -693,6 +698,7 @@ void WorhpInternal::evaluate(int nfdir, int nadir){
   if (!Fmod_.isNull()) Fmod_.setInput(bx,Fmod_.getNumInputs()-1);
   if (!Gmod_.isNull()) Gmod_.setInput(bx,Gmod_.getNumInputs()-1);
   if (!Hmod_.isNull()) Hmod_.setInput(bx,Hmod_.getNumInputs()-1);
+  if (!H_tril_.isNull()) H_tril_.setInput(bx,H_tril_.getNumInputs()-1);
   if (!Jmod_.isNull()) Jmod_.setInput(bx,Jmod_.getNumInputs()-1);
   if (!GFmod_.isNull()) GFmod_.setInput(bx,GFmod_.getNumInputs()-1);
   
@@ -843,6 +849,7 @@ bool WorhpInternal::eval_h(const double* x, double obj_factor, const double* lam
           *it *= obj_factor;
         }
       }
+      std::cout << "H = " << Hmod_.output() << std::endl;
 
     }
 
