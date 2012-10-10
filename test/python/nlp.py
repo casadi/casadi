@@ -196,8 +196,8 @@ class NLPtests(casadiTestCase):
       solver.input(NLP_UBG).set([10])
       solver.solve()
       self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,str(Solver))
-      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,9,str(Solver))
-      self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,9,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,7,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,7,str(Solver))
       self.assertAlmostEqual(solver.output(NLP_LAMBDA_X)[0],0,8,str(Solver))
       self.assertAlmostEqual(solver.output(NLP_LAMBDA_X)[1],0,8,str(Solver))
       self.assertAlmostEqual(solver.output(NLP_LAMBDA_G)[0],0,8,str(Solver))
@@ -922,6 +922,33 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver.output(NLP_LAMBDA_X)[0],0,8,str(Solver))
       self.assertAlmostEqual(solver.output(NLP_LAMBDA_X)[1],5.39346608659e-2,4,str(Solver))
       self.assertAlmostEqual(solver.output(NLP_LAMBDA_G)[0],0,8,str(Solver))
+      
+  def test_QP(self):
+    self.message("QP")
+
+    N = 50 
+
+    x = ssym("x",N)
+    x0 = DMatrix(range(N))
+    H = diag(range(1,N+1))
+    obj = 0.5*mul([(x-x0).T,H,(x-x0)])
+
+    f = SXFunction([x],[obj])
+    for Solver in solvers:
+      self.message(str(Solver))
+      if "SQP" in str(Solver):
+        continue
+      solver = Solver(f)
+      for k,v in ({"tol":1e-8,"tol_pr":1e-10,"TolOpti":1e-25,"hessian_approximation":"limited-memory","max_iter":100, "MaxIter": 100,"print_level":0,"qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
+        if solver.hasOption(k):
+          solver.setOption(k,v)
+      solver.init()
+      solver.input(NLP_LBX).setAll(-1000)
+      solver.input(NLP_UBX).setAll(1000)
+      solver.solve()
+      self.checkarray(solver.output(NLP_X_OPT),x0,str(Solver),digits=2)
+      self.assertAlmostEqual(solver.output(NLP_COST)[0],0,3,str(Solver))
+      self.checkarray(solver.output(NLP_LAMBDA_X),DMatrix.zeros(N,1),str(Solver),digits=4)
       
 if __name__ == '__main__':
     unittest.main()
