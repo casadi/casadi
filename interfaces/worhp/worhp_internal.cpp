@@ -552,7 +552,12 @@ void WorhpInternal::checkinit() {
     Jmod_in.push_back(nonfreeX);
     J_in.at(0)[nonfreeX_] = nonfreeX;
     J_in.at(0)[freeX_] = freeX;
-    Jmod_ = MXFunction(Jmod_in,J_.call(J_in).at(0)(nonfreeG_,freeX_));
+    MX J_call = J_.call(J_in).at(0);
+    if (J_call.isNull()) {
+      Jmod_ = MXFunction(Jmod_in,MX());
+    } else {
+      Jmod_ = MXFunction(Jmod_in,J_call(nonfreeG_,freeX_));
+    }
     Jmod_.init(); 
   }
   
@@ -760,7 +765,7 @@ void WorhpInternal::evaluate(int nfdir, int nadir){
     }
 
     if (GetUserAction(&worhp_c, evalF)) {
-      eval_f(worhp_o.X, worhp_o.F);
+      eval_f(worhp_o.X, worhp_w.ScaleObj, worhp_o.F);
       DoneUserAction(&worhp_c, evalF);
     }
 
@@ -902,7 +907,7 @@ bool WorhpInternal::eval_jac_g(const double* x,double* values){
   }
 }
 
-bool WorhpInternal::eval_f(const double* x, double& obj_value)
+bool WorhpInternal::eval_f(const double* x, double scale, double& obj_value)
 {
   try {
     log("eval_f started");
@@ -924,6 +929,7 @@ bool WorhpInternal::eval_f(const double* x, double& obj_value)
       cout << "x = " << Fmod_.input() << endl;
       cout << "obj_value = " << obj_value << endl;
     }
+    obj_value *= scale;
 
     double time2 = clock();
     t_eval_f_ += double(time2-time1)/CLOCKS_PER_SEC;

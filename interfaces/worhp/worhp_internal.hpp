@@ -74,7 +74,7 @@ std::map<std::string,opt_type> ops_;
   FX GFmod_; 
   
   // Worhp callback functions
-  bool eval_f(const double* x, double& obj_value);
+  bool eval_f(const double* x, double scale, double& obj_value);
   bool eval_grad_f(const double* x, double scale , double* grad_f);
   bool eval_g(const double* x, double* g);
   bool eval_jac_g(const double* x, double* values);
