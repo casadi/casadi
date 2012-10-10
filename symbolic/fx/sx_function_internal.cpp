@@ -978,26 +978,26 @@ FX SXFunctionInternal::hessian(int iind, int oind){
   }
 }
 
-void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
-                                const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
-                                const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
+void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
+                                const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
+                                const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
                                 bool output_given, int offset_begin, int offset_end){
   
   if(verbose()) cout << "SXFunctionInternal::eval begin" << endl;
   
-  casadi_assert_message(inputv_.size() == input.size(),"SXFunctionInternal::eval: wrong number of inputs." << std::endl << "Expecting " << inputv_.size() << " inputs, but got " << input.size() << " instead.");
-  for(int i=0; i<input.size(); ++i){
-    casadi_assert_message(input[i].sparsity()==inputv_[i].sparsity() || (input[i].empty() && inputv_[i].empty()), "SXFunctionInternal::eval: sparsity of argument " << i << " inconsistent");
+  casadi_assert_message(inputv_.size() == arg.size(),"SXFunctionInternal::eval: wrong number of inputs." << std::endl << "Expecting " << inputv_.size() << " inputs, but got " << arg.size() << " instead.");
+  for(int i=0; i<arg.size(); ++i){
+    casadi_assert_message(arg[i].sparsity()==inputv_[i].sparsity() || (arg[i].empty() && inputv_[i].empty()), "SXFunctionInternal::eval: sparsity of argument " << i << " inconsistent");
   }
   
-  casadi_assert_message(outputv_.size() == output.size(),"SXFunctionInternal::eval: wrong number of outputs." << std::endl << "Expecting " << outputv_.size() << " inputs, but got " << output.size() << " instead.");
-  for(int i=0; i<output.size(); ++i){
-    casadi_assert_message(output[i].sparsity()==outputv_[i].sparsity(), "SXFunctionInternal::evals: result sparsity inconsistent");
+  casadi_assert_message(outputv_.size() == res.size(),"SXFunctionInternal::eval: wrong number of outputs." << std::endl << "Expecting " << outputv_.size() << " inputs, but got " << res.size() << " instead.");
+  for(int i=0; i<res.size(); ++i){
+    casadi_assert_message(res[i].sparsity()==outputv_[i].sparsity(), "SXFunctionInternal::evals: result sparsity inconsistent");
   }
 
   // Get the number of forward and adjoint sweeps
-  int nfdir = fwdSens.size();
-  int nadir = adjSeed.size();
+  int nfdir = fsens.size();
+  int nadir = aseed.size();
 
   // Do we need taping?
   bool taping = nfdir>0 || nadir>0;
@@ -1039,9 +1039,9 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
   for(; it!=alg_end; ++it){
     switch(it->op){
       case OP_INPUT:
-        s_work_[it->res] = input[it->arg.i[0]].data()[it->arg.i[1]]; break;
+        s_work_[it->res] = arg[it->arg.i[0]].data()[it->arg.i[1]]; break;
       case OP_OUTPUT:
-        output[it->res].data()[it->arg.i[1]] = s_work_[it->arg.i[0]]; 
+        res[it->res].data()[it->arg.i[1]] = s_work_[it->arg.i[0]]; 
         break;
       case OP_CONST:
         s_work_[it->res] = *c_it++; 
@@ -1089,9 +1089,9 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
     for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
       switch(it->op){
         case OP_INPUT:
-          s_work_[it->res] = fwdSeed[dir][it->arg.i[0]].data()[it->arg.i[1]]; break;
+          s_work_[it->res] = fseed[dir][it->arg.i[0]].data()[it->arg.i[1]]; break;
         case OP_OUTPUT:
-          fwdSens[dir][it->res].data()[it->arg.i[1]] = s_work_[it->arg.i[0]]; break;
+          fsens[dir][it->res].data()[it->arg.i[1]] = s_work_[it->arg.i[0]]; break;
         case OP_CONST:
         case OP_PARAMETER:
           s_work_[it->res] = 0;
@@ -1112,11 +1112,11 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& input, std::vector<
       SX seed;
       switch(it->op){
         case OP_INPUT:
-          adjSens[dir][it->arg.i[0]].data()[it->arg.i[1]] = s_work_[it->res];
+          asens[dir][it->arg.i[0]].data()[it->arg.i[1]] = s_work_[it->res];
           s_work_[it->res] = 0;
           break;
         case OP_OUTPUT:
-          s_work_[it->arg.i[0]] += adjSeed[dir][it->res].data()[it->arg.i[1]];
+          s_work_[it->arg.i[0]] += aseed[dir][it->res].data()[it->arg.i[1]];
           break;
         case OP_CONST:
         case OP_PARAMETER:

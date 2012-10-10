@@ -573,10 +573,12 @@ FX FXInternal::jacobian(int iind, int oind, bool compact, bool symmetric){
       ret = jacgen_(fcn,iind,oind,user_data_);
     } else if(numeric_jacobian_){
       // Generate Jacobian instance
-      ret = getNumericJacobian(iind,oind,compact,false);  // NOTE: This function should already be general enough to handle symmetric=true
+      casadi_assert_message(!compact, "Not implemented");
+      //ret = getNumericJacobian(iind,oind,false,false);  // NOTE: Replaces the below
+      ret = Jacobian(shared_from_this<FX>(),iind,oind);
     } else {
       // Use internal routine to calculate Jacobian
-      ret = getJacobian(iind,oind,compact,symmetric);
+      ret = getJacobian(iind,oind,compact, symmetric);
     }
     casadi_assert(!ret.isNull());
     
@@ -601,7 +603,10 @@ FX FXInternal::jacobian(int iind, int oind, bool compact, bool symmetric){
 }
 
 FX FXInternal::getJacobian(int iind, int oind, bool compact, bool symmetric){
-  return getNumericJacobian(iind,oind,compact,false); // NOTE: This function should already be general enough to handle symmetric=true
+  //return getNumericJacobian(iind,oind,false,false); // NOTE: Replaces the below
+  Jacobian ret(shared_from_this<FX>(),iind,oind);
+  ret.setOption("verbose",getOption("verbose"));
+  return ret;
 }
 
 FX FXInternal::derivative(int nfwd, int nadj){

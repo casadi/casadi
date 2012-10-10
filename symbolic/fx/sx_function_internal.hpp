@@ -80,9 +80,9 @@ class SXFunctionInternal : public XFunctionInternal<SXFunctionInternal,Matrix<SX
   void evaluateGen(T1 nfdir_c, T2 nadir_c);
   
   /** \brief  evaluate symbolically while also propagating directional derivatives */
-  virtual void evalSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 
-                      const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
-                      const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,
+  virtual void evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
+                      const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
+                      const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
                       bool output_given, int offset_begin=0, int offset_end=0);
                           
   /** \brief  Check if smooth */
