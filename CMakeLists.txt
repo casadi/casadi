@@ -270,9 +270,6 @@ endif()
 
 add_subdirectory(documentation/examples/ctemplate)
 
-# Make a pkg-config file
-configure_file(${CMAKE_SOURCE_DIR}/casadi.pc.in ${LIBRARY_OUTPUT_PATH}/casadi.pc)
-
 # Print a summary
 feature_summary(WHAT ALL)
 
