@@ -45,5 +45,10 @@ const WorhpInternal* WorhpSolver::operator->() const{
 bool WorhpSolver::checkNode() const{
   return dynamic_cast<const WorhpInternal*>(get());
 }
+  
+void WorhpSolver::setOptionsFromFile(const std::string & file) {
+  dynamic_cast<WorhpInternal*>(get())->setOptionsFromFile(file);
+}
+
 
 } // namespace CasADi

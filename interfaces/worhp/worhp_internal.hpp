@@ -43,6 +43,10 @@ virtual void init();
 virtual void evaluate(int nfdir, int nadir);
 virtual void setQPOptions(bool convex);
 
+  
+/// Read options from worhp parameter xml
+void setOptionsFromFile(const std::string & file);
+  
 protected:
 
   /// H_ transformed such that only lower triangular elements + diagonals are retained
@@ -108,6 +112,8 @@ std::map<std::string,opt_type> ops_;
   
   /// Pass the supplied options to  Wprhp
   void passOptions();
+
+  
 };
 
 } // namespace CasADi

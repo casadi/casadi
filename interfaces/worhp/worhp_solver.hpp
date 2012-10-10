@@ -53,6 +53,9 @@ class WorhpSolver : public NLPSolver {
     WorhpInternal* operator->();
     const WorhpInternal* operator->() const;
 
+    /// Read options from worhp parameter xml
+    void setOptionsFromFile(const std::string & file);
+
     /// Check if the node is pointing to the right type of object
     virtual bool checkNode() const;
 
