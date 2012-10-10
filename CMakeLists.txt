@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.0)
 project(casadi C CXX)
+set(PACKAGE_NAME "CasADi")
+set(PACKAGE_VERSION "1.4.1")
 
 # find the macports python libs if they exist
 if(APPLE)
@@ -36,10 +38,10 @@ option(WITH_DOC "Enable documentation generation" OFF)
 option(WITH_PYTHON_INTERRUPTS "With interrupt handling inside python interface" OFF)
 # option(WITH_GSL "Compile the GSL interface" ON)
 option(WITH_OPENMP "Compile with parallelization support" OFF)
-option(WITH_OOQP "Enable OOQP interface" OFF)
+option(WITH_OOQP "Enable OOQP interface" ON)
 option(WITH_FORTRAN "Enable Fortran linking, if this is set to OFF, no Fortran linking will be invoked (should not be needed, CMakeDetermineFortranCompiler should do the job)" ON)
 option(WITH_SWIG_SPLIT "Split SWIG wrapper generation into multiple modules" OFF) 
-option(WITH_WORHP "Compile the WORHP interface" OFF) 
+option(WITH_WORHP "Compile the WORHP interface" ON) 
 option(WITH_ACADO "Compile the interfaces to ACADO and qpOASES, if it can be found" OFF) 
 option(WITH_EIGEN3 "Use Eigen3 backend for matrix operations" OFF) 
 option(WITH_SUNDIALS "Compile the interface to Sundials (the source code for Sundials 2.5 is included)" ON)
@@ -58,8 +60,8 @@ endif()
 # For code optimization
 if(CMAKE_BUILD_TYPE)
 else(CMAKE_BUILD_TYPE)
-  # set(CMAKE_BUILD_TYPE Release)
-  set(CMAKE_BUILD_TYPE Debug)
+ set(CMAKE_BUILD_TYPE Release)
+ # set(CMAKE_BUILD_TYPE Debug)
 endif(CMAKE_BUILD_TYPE)
 
 # Necessary for Visual C++
@@ -76,23 +78,6 @@ if(WITH_PRINTME)
 endif()
 
 include_directories(.)
-
-# The following code canonicalizes paths:
-# e.g.  converts "foo/bar/..;foo/../foo"   to "foo;foo"
-# When a library is present in "foo" directory, "foo/bar/..;foo/../foo" would make CMake
-#  complain about this library being present in two different folders, 
-#  which would be a recipe for trouble where it not for
-#  the fact that these directories are really identical.
-#  It could be considered a workaround for a bug in CMake.
-function(canonicalize_paths MYPATH)
-set(MYPATH_NEW "")
-
-foreach(arg ${${MYPATH}})
-  get_filename_component(CANONICAL_PATH ${arg} REALPATH)
-  SET(MYPATH_NEW ${MYPATH_NEW} "${CANONICAL_PATH}")
-endforeach()
-SET(${MYPATH} ${MYPATH_NEW} PARENT_SCOPE)
-endfunction()
 
 # Check if the compiler supports C++11
 foreach(CXX11FLAG_TEST "" "-std=c++11" "-std=c++0x" "-std=gnu++0x")
@@ -196,12 +181,10 @@ add_feature_info(just-in-time WITH_LLVM "Just-in-time compiliation via the LLVM 
 
 # Optional auxillary dependencies
 find_package(BLAS QUIET)
-find_package(LibXml2)
+
 find_package(LAPACK)
 
-if(WITH_IPOPT)
-  find_package(IPOPT)
-endif()
+find_package(IPOPT)
 add_feature_info(ipopt-interface IPOPT_FOUND "Interface to the NLP solver Ipopt.")
 
 if(WITH_ACADO)
@@ -267,6 +250,9 @@ if(WITH_DOC)
 endif()
 
 add_subdirectory(documentation/examples/ctemplate)
+
+# Make a pkg-config file
+configure_file(${CMAKE_SOURCE_DIR}/casadi.pc.in ${LIBRARY_OUTPUT_PATH}/casadi.pc)
 
 # Print a summary
 feature_summary(WHAT ALL)
