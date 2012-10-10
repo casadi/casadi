@@ -79,6 +79,23 @@ endif()
 
 include_directories(.)
 
+# The following code canonicalizes paths: 
+# e.g.  converts "foo/bar/..;foo/../foo"   to "foo;foo" 
+# When a library is present in "foo" directory, "foo/bar/..;foo/../foo" would make CMake 
+#  complain about this library being present in two different folders,  
+#  which would be a recipe for trouble where it not for 
+#  the fact that these directories are really identical. 
+#  It could be considered a workaround for a bug in CMake. 
+function(canonicalize_paths MYPATH) 
+set(MYPATH_NEW "") 
+ 
+foreach(arg ${${MYPATH}}) 
+  get_filename_component(CANONICAL_PATH ${arg} REALPATH) 
+  SET(MYPATH_NEW ${MYPATH_NEW} "${CANONICAL_PATH}") 
+endforeach() 
+SET(${MYPATH} ${MYPATH_NEW} PARENT_SCOPE) 
+endfunction() 
+
 # Check if the compiler supports C++11
 foreach(CXX11FLAG_TEST "" "-std=c++11" "-std=c++0x" "-std=gnu++0x")
   if(NOT USE_CXX11)
@@ -181,10 +198,12 @@ add_feature_info(just-in-time WITH_LLVM "Just-in-time compiliation via the LLVM 
 
 # Optional auxillary dependencies
 find_package(BLAS QUIET)
-
+find_package(LibXml2) 
 find_package(LAPACK)
 
-find_package(IPOPT)
+if(WITH_IPOPT)
+  find_package(IPOPT)
+endif()
 add_feature_info(ipopt-interface IPOPT_FOUND "Interface to the NLP solver Ipopt.")
 
 if(WITH_ACADO)
