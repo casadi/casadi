@@ -45,6 +45,7 @@ option(WITH_EIGEN3 "Use Eigen3 backend for matrix operations" OFF)
 option(WITH_SUNDIALS "Compile the interface to Sundials (the source code for Sundials 2.5 is included)" ON)
 option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES 3.0beta is included)" ON)
 option(WITH_CSPARSE "Compile the interface to CSparse (the source code for CSparse is included)" ON)
+option(WITH_IPOPT "Compile the interface to IPOPT" ON)
 
 # Enable Fortran linking (needed e.g. for LAPACK/BLAS), if Fortran is available
 if(WITH_FORTRAN)
@@ -57,8 +58,8 @@ endif()
 # For code optimization
 if(CMAKE_BUILD_TYPE)
 else(CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
-  # set(CMAKE_BUILD_TYPE Debug)
+  # set(CMAKE_BUILD_TYPE Release)
+  set(CMAKE_BUILD_TYPE Debug)
 endif(CMAKE_BUILD_TYPE)
 
 # Necessary for Visual C++
@@ -75,6 +76,23 @@ if(WITH_PRINTME)
 endif()
 
 include_directories(.)
+
+# The following code canonicalizes paths:
+# e.g.  converts "foo/bar/..;foo/../foo"   to "foo;foo"
+# When a library is present in "foo" directory, "foo/bar/..;foo/../foo" would make CMake
+#  complain about this library being present in two different folders, 
+#  which would be a recipe for trouble where it not for
+#  the fact that these directories are really identical.
+#  It could be considered a workaround for a bug in CMake.
+function(canonicalize_paths MYPATH)
+set(MYPATH_NEW "")
+
+foreach(arg ${${MYPATH}})
+  get_filename_component(CANONICAL_PATH ${arg} REALPATH)
+  SET(MYPATH_NEW ${MYPATH_NEW} "${CANONICAL_PATH}")
+endforeach()
+SET(${MYPATH} ${MYPATH_NEW} PARENT_SCOPE)
+endfunction()
 
 # Check if the compiler supports C++11
 foreach(CXX11FLAG_TEST "" "-std=c++11" "-std=c++0x" "-std=gnu++0x")
@@ -178,10 +196,12 @@ add_feature_info(just-in-time WITH_LLVM "Just-in-time compiliation via the LLVM 
 
 # Optional auxillary dependencies
 find_package(BLAS QUIET)
-
+find_package(LibXml2)
 find_package(LAPACK)
 
-find_package(IPOPT)
+if(WITH_IPOPT)
+  find_package(IPOPT)
+endif()
 add_feature_info(ipopt-interface IPOPT_FOUND "Interface to the NLP solver Ipopt.")
 
 if(WITH_ACADO)
