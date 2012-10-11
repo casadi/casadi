@@ -5,27 +5,19 @@ using namespace std;
 
 int main(){
     
-  SXMatrix u = ssym("u");
-  SXMatrix x = ssym("x",2);
-  SXMatrix f = x + u;
-  f[0] += 1/x[1];
-  f[1] += x[0];
-
-  // Integrator
+  // Create simple function
   vector<SXMatrix> ux(2);
-  ux[0] = u;
-  ux[1] = x;
-  SXFunction F(ux,f);
+  SXMatrix u = ux[0] = ssym("u");
+  SXMatrix x = ux[1] = ssym("x");
+  SXFunction F(ux,u + 1/x);
   F.setOption("name","F");
   F.init();
   
+  // Call this function in a graph
   MX U("U");
-  vector<double> X0(2);
-  X0[0] = 0;
-  X0[1] = 1;
   vector<MX> UX(2);
   UX[0] = U;
-  UX[1] = X0;
+  UX[1] = U;
   MX X = F.call(UX).at(0);
   UX[0] = U;
   UX[1] = X;
@@ -50,7 +42,7 @@ int main(){
     gfcn.setOption("ad_mode","reverse");
     
     gfcn.init();
-//     gfcn.print();
+    gfcn.print();
     FX J = gfcn.jacobian();
     J.init();
  //   J.print();
