@@ -342,13 +342,10 @@ class FXInternal : public OptionsFunctionalityNode{
     /** \brief  Dictionary of statistics (resulting from evaluate) */
     Dictionary stats_;
 
-    /// Cache for full jacobian functions
-    std::vector<std::vector<WeakRef> > jacobian_fcn_;
-    
     /// Cache for functions to evaluate directional derivatives
     std::vector<std::vector<FX> > derivative_fcn_;
 
-    /// Sparsity of the Jacobian blocks
+    /// Cache for sparsities of the Jacobian blocks
     std::vector<std::vector<CRSSparsity> > jac_sparsity_, jac_sparsity_compact_;
 
     /// Use numeric jacobian instead of symbolic

@@ -26,7 +26,6 @@
 #include <typeinfo> 
 #include "../stl_vector_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
-#include "jacobian.hpp"
 #include "parallelizer.hpp"
 
 using namespace std;

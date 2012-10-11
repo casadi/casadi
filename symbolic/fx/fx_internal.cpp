@@ -548,58 +548,19 @@ void FXInternal::spEvaluate(bool fwd){
 }
 
 FX FXInternal::jacobian(int iind, int oind, bool compact, bool symmetric){
-  casadi_assert(iind>=0 && iind<getNumInputs());
-  casadi_assert(oind>=0 && oind<getNumOutputs());
-  
-  // Make sure that enough cache entries have been allocated
-  if(jacobian_fcn_.size()!=getNumInputs() || jacobian_fcn_[iind].size()!=getNumOutputs()){
-    jacobian_fcn_.resize(getNumInputs());
-    for(vector<vector<WeakRef> >::iterator it=jacobian_fcn_.begin(); it!=jacobian_fcn_.end(); ++it){
-      it->resize(getNumOutputs());
-    }
-  }
-  
-  // Weak reference
-  WeakRef& ref = jacobian_fcn_[iind][oind];
-
-  // Return value
-  FX ret;
-
-  // Check if already cached
-  if(ref.isNull()){
-    if(jacgen_!=0){
-      // Use user-provided routine to calculate Jacobian
-      FX fcn = shared_from_this<FX>();
-      ret = jacgen_(fcn,iind,oind,user_data_);
-    } else if(numeric_jacobian_){
-      // Generate Jacobian instance
-      casadi_assert_message(!compact, "Not implemented");
-      //ret = getNumericJacobian(iind,oind,false,false);  // NOTE: Replaces the below
-      ret = Jacobian(shared_from_this<FX>(),iind,oind);
-    } else {
-      // Use internal routine to calculate Jacobian
-      ret = getJacobian(iind,oind,compact, symmetric);
-    }
-    casadi_assert(!ret.isNull());
-    
-    // Give it a suitable name
-    stringstream ss;
-    ss << "jacobian[" << iind << "," << oind << "](" << getOption("name") << ")";
-    ret.setOption("name",ss.str());
-    
-    // Initialize it
-    ret.init();
-
-    // Cache function for later reference
-    ref = ret;
-    
+  if(jacgen_!=0){
+    // Use user-provided routine to calculate Jacobian
+    FX fcn = shared_from_this<FX>();
+    return jacgen_(fcn,iind,oind,user_data_);
+  } else if(numeric_jacobian_){
+    // Generate Jacobian instance
+    casadi_assert_message(!compact, "Not implemented");
+    //ret = getNumericJacobian(iind,oind,false,false);  // NOTE: Replaces the below
+    return Jacobian(shared_from_this<FX>(),iind,oind);
   } else {
-    // Retrieve cached function
-    ret = ref;
+    // Use internal routine to calculate Jacobian
+    return getJacobian(iind,oind,compact, symmetric);
   }
-
-  // Return cached or generated function
-  return ret;
 }
 
 FX FXInternal::getJacobian(int iind, int oind, bool compact, bool symmetric){
