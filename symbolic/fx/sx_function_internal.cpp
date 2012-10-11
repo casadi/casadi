@@ -338,7 +338,7 @@ void SXFunctionInternal::print(ostream &stream) const{
   }
 }
 
-void SXFunctionInternal::printVector(std::ostream &cfile, const std::string& name, const std::vector<int>& v){
+void SXFunctionInternal::printVector(std::ostream &cfile, const std::string& name, const vector<int>& v){
   cfile << "int " << name << "[] = {";
   for(int i=0; i<v.size(); ++i){
     if(i!=0) cfile << ",";
@@ -506,7 +506,7 @@ void SXFunctionInternal::init(){
   stack<SXNode*> s;
 
   // All nodes
-  std::vector<SXNode*> nodes;
+  vector<SXNode*> nodes;
 
   // Add the list of nodes
   int ind=0;
@@ -782,10 +782,10 @@ void SXFunctionInternal::init(){
     OurFPM.doInitialization();
 
     // Single argument
-    std::vector<llvm::Type*> unaryArg(1,llvm::Type::getDoubleTy(llvm::getGlobalContext()));
+    vector<llvm::Type*> unaryArg(1,llvm::Type::getDoubleTy(llvm::getGlobalContext()));
 
     // Two arguments
-    std::vector<llvm::Type*> binaryArg(2,llvm::Type::getDoubleTy(llvm::getGlobalContext()));
+    vector<llvm::Type*> binaryArg(2,llvm::Type::getDoubleTy(llvm::getGlobalContext()));
     
     // Unary operation
     llvm::FunctionType *unaryFun = llvm::FunctionType::get(llvm::Type::getDoubleTy(llvm::getGlobalContext()),unaryArg, false);
@@ -830,7 +830,7 @@ void SXFunctionInternal::init(){
     llvm::IntegerType *int32Ty = llvm::IntegerType::get(llvm::getGlobalContext(), 32);
     
     // Two arguments in and two references
-    std::vector<llvm::Type*> genArg(2);
+    vector<llvm::Type*> genArg(2);
     genArg[0] = double_ptr_ptr_t;
     genArg[1] = double_ptr_ptr_t;
     
@@ -850,17 +850,17 @@ void SXFunctionInternal::init(){
     AI->setName("r");  llvm::Value *r_ptr = AI++;
 
     // Allocate work vector
-    std::vector<llvm::Value*> jwork(work_.size());
+    vector<llvm::Value*> jwork(work_.size());
 
     // Input vectors
-    std::vector<llvm::Value*> input_v(getNumInputs());
+    vector<llvm::Value*> input_v(getNumInputs());
     for(int ind=0; ind<input_v.size(); ++ind){
       llvm::Value *ind_v = llvm::ConstantInt::get(int32Ty, ind);
       input_v[ind] = builder.CreateLoad(builder.CreateGEP(x_ptr,ind_v));
     }
     
     // Output vectors
-    std::vector<llvm::Value*> output_v(getNumOutputs());
+    vector<llvm::Value*> output_v(getNumOutputs());
     for(int ind=0; ind<output_v.size(); ++ind){
       llvm::Value *ind_v = llvm::ConstantInt::get(int32Ty, ind);
       output_v[ind] = builder.CreateLoad(builder.CreateGEP(r_ptr,ind_v));
@@ -869,7 +869,7 @@ void SXFunctionInternal::init(){
     // Build up the LLVM expression graphs
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
       // Argument of the operation
-      std::vector<llvm::Value*> oarg(casadi_math<double>::ndeps(it->op));
+      vector<llvm::Value*> oarg(casadi_math<double>::ndeps(it->op));
       for(int d=0; d<oarg.size(); ++d){
         oarg[d] = jwork[it->arg.i[d]];
       }
@@ -978,26 +978,129 @@ FX SXFunctionInternal::hessian(int iind, int oind){
   }
 }
 
-void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
-                                const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
-                                const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
+void SXFunctionInternal::evalSX(const vector<SXMatrix>& arg, vector<SXMatrix>& res, 
+                                const vector<vector<SXMatrix> >& fseed, vector<vector<SXMatrix> >& fsens, 
+                                const vector<vector<SXMatrix> >& aseed, vector<vector<SXMatrix> >& asens,
                                 bool output_given, int offset_begin, int offset_end){
-  
+
   if(verbose()) cout << "SXFunctionInternal::eval begin" << endl;
   
-  casadi_assert_message(inputv_.size() == arg.size(),"SXFunctionInternal::eval: wrong number of inputs." << std::endl << "Expecting " << inputv_.size() << " inputs, but got " << arg.size() << " instead.");
-  for(int i=0; i<arg.size(); ++i){
-    casadi_assert_message(arg[i].sparsity()==inputv_[i].sparsity() || (arg[i].empty() && inputv_[i].empty()), "SXFunctionInternal::eval: sparsity of argument " << i << " inconsistent");
+  // Assert number of inputs
+  casadi_assert_message(inputv_.size() == arg.size(),"Wrong number of inputs. Expecting " << inputv_.size() << ", got " << arg.size());
+
+  // Assert number of forward seeds
+  int nfdir = fsens.size();
+  for(int dir=0; dir<nfdir; ++dir){
+    casadi_assert_message(inputv_.size() == fseed[dir].size(),"Wrong number of forward seeds in direction " << dir << ". Expecting " << inputv_.size() << ", got " << fseed[dir].size());
   }
   
-  casadi_assert_message(outputv_.size() == res.size(),"SXFunctionInternal::eval: wrong number of outputs." << std::endl << "Expecting " << outputv_.size() << " inputs, but got " << res.size() << " instead.");
-  for(int i=0; i<res.size(); ++i){
-    casadi_assert_message(res[i].sparsity()==outputv_[i].sparsity(), "SXFunctionInternal::evals: result sparsity inconsistent");
-  }
-
-  // Get the number of forward and adjoint sweeps
-  int nfdir = fsens.size();
+  // Assert number of adjoint seeds
   int nadir = aseed.size();
+  for(int dir=0; dir<nadir; ++dir){
+    casadi_assert_message(outputv_.size() == aseed[dir].size(),"Wrong number of adjoint seeds in direction " << dir << ". Expecting " << outputv_.size() << ", got " << aseed[dir].size());
+  }
+  
+  // Check if input sparsity pattern match (quick if sparsity matches)
+  bool sparsity_matches = true;
+  for(int i=0; i<inputv_.size() && sparsity_matches; ++i){
+    sparsity_matches = arg[i].sparsity()==inputv_[i].sparsity();
+  }
+  if(!sparsity_matches){
+    casadi_assert_message(!output_given,"Inconsistent arguments.");
+    vector<SXMatrix> arg_new(arg.size());
+    for(int i=0; i<arg.size(); ++i){
+      try{
+        arg_new[i] = SXMatrix(inputv_[i].sparsity());
+        arg_new[i].set(arg[i]);
+      } catch(exception& ex){
+        stringstream ss;
+        ss << "SXFunctionInternal::evalSX: Failed to set input " << i << ": " << ex.what();
+        throw CasadiException(ss.str());
+      }
+    }
+    evalSX(arg_new,res,fseed,fsens,aseed,asens,output_given,offset_begin,offset_end);
+    return;
+  }
+  
+  // Check if forward seed sparsity pattern match (quick if sparsity matches)
+  for(int dir=0; dir<nfdir && sparsity_matches; ++dir){
+    for(int i=0; i<inputv_.size() && sparsity_matches; ++i){
+      sparsity_matches = fseed[dir][i].sparsity()==inputv_[i].sparsity();
+    }
+  }
+  if(!sparsity_matches){
+    vector<vector<SXMatrix> > fseed_new(nfdir);
+    for(int dir=0; dir<nfdir; ++dir){
+      fseed_new[dir].resize(inputv_.size());
+      for(int i=0; i<inputv_.size(); ++i){
+        try{
+          fseed_new[dir][i] = SXMatrix(inputv_[i].sparsity());
+          fseed_new[dir][i].set(fseed[dir][i]);
+        } catch(exception& ex){
+          stringstream ss;
+          ss << "SXFunctionInternal::evalSX: Failed to set forward seed  " << i << ", direction " << dir << ": " << ex.what();
+          throw CasadiException(ss.str());
+        }
+      }
+    }
+    evalSX(arg,res,fseed_new,fsens,aseed,asens,output_given,offset_begin,offset_end);
+    return;
+  }
+  
+  // Check if adjoint seed sparsity pattern match (quick if sparsity matches)
+  for(int dir=0; dir<nadir && sparsity_matches; ++dir){
+    for(int i=0; i<outputv_.size() && sparsity_matches; ++i){
+      sparsity_matches = aseed[dir][i].sparsity()==outputv_[i].sparsity();
+    }
+  }
+  if(!sparsity_matches){
+    vector<vector<SXMatrix> > aseed_new(nadir);
+    for(int dir=0; dir<nadir; ++dir){
+      aseed_new[dir].resize(outputv_.size());
+      for(int i=0; i<outputv_.size(); ++i){
+        try{
+          aseed_new[dir][i] = SXMatrix(outputv_[i].sparsity());
+          aseed_new[dir][i].set(aseed[dir][i]);
+        } catch(exception& ex){
+          stringstream ss;
+          ss << "SXFunctionInternal::evalSX: Failed to set adjoint seed  " << i << ", direction " << dir << ": " << ex.what();
+          throw CasadiException(ss.str());
+        }
+      }
+    }
+    evalSX(arg,res,fseed,fsens,aseed_new,asens,output_given,offset_begin,offset_end);
+    return;
+  }
+    
+  // Resize (if needed) the number of outputs and make sure that the sparsity pattern is correct (cheap if already ok)
+  res.resize(outputv_.size());
+  for(int i=0; i<outputv_.size(); ++i){
+    if(res[i].sparsity()!=outputv_[i].sparsity()){
+      res[i] = SXMatrix(outputv_[i].sparsity());
+    }
+  }
+  
+  // Resize (if needed) the number of forward sensitivities and make sure that the sparsity pattern is correct (cheap if already ok)
+  fsens.resize(nfdir);
+  for(int dir=0; dir<nfdir; ++dir){
+    fsens[dir].resize(outputv_.size());
+    for(int i=0; i<outputv_.size(); ++i){
+      if(fsens[dir][i].sparsity()!=outputv_[i].sparsity()){
+        fsens[dir][i] = SXMatrix(outputv_[i].sparsity());
+      }
+    }
+  }
+  
+  // Resize (if needed) the number of adjoint sensitivities and make sure that the sparsity pattern is correct (cheap if already ok)
+  asens.resize(nadir);
+  for(int dir=0; dir<nadir; ++dir){
+    asens[dir].resize(inputv_.size());
+    for(int i=0; i<inputv_.size(); ++i){
+      if(asens[dir][i].sparsity()!=inputv_[i].sparsity()){
+        asens[dir][i] = SXMatrix(inputv_[i].sparsity());
+      }
+    }
+  }
 
   // Do we need taping?
   bool taping = nfdir>0 || nadir>0;
@@ -1012,7 +1115,7 @@ void SXFunctionInternal::evalSX(const std::vector<SXMatrix>& arg, std::vector<SX
   vector<SX>::const_iterator p_it = free_vars_.begin();
   
   // Tape
-  std::vector<TapeEl<SX> > s_pdwork;
+  vector<TapeEl<SX> > s_pdwork;
   vector<TapeEl<SX> >::iterator it1;
   if(taping){
     s_pdwork.resize(operations_.size());
@@ -1174,7 +1277,7 @@ void SXFunctionInternal::spEvaluate(bool fwd){
 
   if(fwd){
     // Propagate sparsity forward
-    for(std::vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
+    for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
       switch(it->op){
         case OP_CONST:
         case OP_PARAMETER:

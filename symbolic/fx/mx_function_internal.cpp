@@ -360,6 +360,7 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
 
     // Evaluate
     it->op->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_);
+  
     // Lifting
     if(liftfun_ && it->op->isNonLinear()){
       for(int i=0; i<it->res.size(); ++i){
@@ -419,16 +420,25 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
 
 void MXFunctionInternal::print(ostream &stream) const{
   FXInternal::print(stream);
-  for(int i=0; i<algorithm_.size(); ++i){
-    stream << "i_" << i<< " =  ";
-    algorithm_[i].op->printPart(stream,0);
-    for(int j=0; j<algorithm_[i].op->ndep(); ++j){
-      if(algorithm_[i].arg[j]>=0){
-        stream << "i_" << algorithm_[i].arg[j];
+  for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
+    stream << "{";
+    for(int i=0; i<it->res.size(); ++i){
+      if(i!=0) stream << ",";
+      if(it->res[i]>=0){
+        stream << "i_" << it->res[i];
       } else {
-        stream << "[]";
+        stream << "NULL";
       }
-      algorithm_[i].op->printPart(stream,j+1);
+    }
+    stream << "} = ";
+    it->op->printPart(stream,0);
+    for(int i=0; i<it->arg.size(); ++i){
+      if(it->arg[i]>=0){
+        stream << "i_" << it->arg[i];
+      } else {
+        stream << "NULL";
+      }
+      it->op->printPart(stream,i+1);
     }
     stream << endl;
   }
@@ -753,8 +763,58 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
       }
 
       // Call the evaluation function
-//       cout << "evaluating " << typeid(*it->op.get()).name() << endl;
       it->op->evaluateMX(input_p,output_p,dummy_p,dummy_p,aseed_p,asens_p,true);
+      
+// For debugging #491
+#if 0
+        cout << "{";
+        for(int i=0; i<it->res.size(); ++i){
+          if(i!=0) cout << ",";
+          if(it->res[i]>=0){
+            cout << "i_" << it->res[i];
+          } else {
+            cout << "NULL";
+          }
+        }
+        cout << "} = ";
+        it->op->printPart(cout,0);
+        for(int i=0; i<it->arg.size(); ++i){
+          if(it->arg[i]>=0){
+            cout << "i_" << it->arg[i];
+          } else {
+            cout << "NULL";
+          }
+          it->op->printPart(cout,i+1);
+        }
+        cout << endl;
+      
+        cout << "aseed" << endl;
+      for(int d=0; d<aseed_p.size(); ++d){
+        for(int i=0; i<aseed_p[d].size(); ++i){
+          if(aseed_p[d][i]==0){
+            cout << "NULL";
+          } else {
+            cout << *aseed_p[d][i];
+          }
+          cout << "," << endl;
+        }
+      }
+        cout << endl;
+        
+        cout << "asens" << endl;
+      for(int d=0; d<asens_p.size(); ++d){
+        for(int i=0; i<asens_p[d].size(); ++i){
+          if(asens_p[d][i]==0){
+            cout << "NULL";
+          } else {
+            cout << *asens_p[d][i];
+          }
+          cout << ",";
+        }
+        cout << endl;
+      }
+#endif
+        
     }
   }
   
