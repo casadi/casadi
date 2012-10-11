@@ -103,18 +103,6 @@ public:
 
   /// Const access functions of the node 
   const SXFunctionInternal* operator->() const;
-    
-  /** \brief Calculate the jacobian of output oind with respect to input iind 
-  *
-  * This is just the result of CasADi::SXFunction::jac,
-  * wrapped in an SXFunction.
-  *
-  * \see CasADi::Jacobian for an AD approach
-  */
-  SXFunction jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
-  
-  /// Hessian of output oind with respect to input iind 
-  SXFunction hessian(int iind=0, int oind=0);
 
   /** \brief Jacobian via source code transformation
   *

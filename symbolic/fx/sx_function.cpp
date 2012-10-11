@@ -84,14 +84,6 @@ SXFunctionInternal* SXFunction::operator->(){
   return (SXFunctionInternal*)FX::operator->();
 }
 
-SXFunction SXFunction::jacobian(int iind, int oind, bool compact, bool symmetric){
-  return shared_cast<SXFunction>(FX::jacobian(iind,oind,compact,symmetric));  
-}
-
-SXFunction SXFunction::hessian(int iind, int oind){
-  return shared_cast<SXFunction>(FX::hessian(iind,oind));
-}
-
 bool SXFunction::checkNode() const{
   return dynamic_cast<const SXFunctionInternal*>(get())!=0;
 }
