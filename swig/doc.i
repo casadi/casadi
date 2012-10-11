@@ -66737,12 +66737,6 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| inplace      | OT_BOOLEAN   | false        | Evaluate     | CasADi::SXFu |
-|              |              |              | with inplace | nctionIntern |
-|              |              |              | operations ( | al           |
-|              |              |              | experimental |              |
-|              |              |              | )            |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
 |              |              |              | function and |              |
@@ -67506,12 +67500,6 @@ Joel Andersson
 |              |              |              | (forward|rev |              |
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
-+--------------+--------------+--------------+--------------+--------------+
-| inplace      | OT_BOOLEAN   | false        | Evaluate     | CasADi::SXFu |
-|              |              |              | with inplace | nctionIntern |
-|              |              |              | operations ( | al           |
-|              |              |              | experimental |              |
-|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
 |              |              |              | Jacobian     | ternal       |
@@ -70682,6 +70670,10 @@ Evaluate. ";
 
 Set options that make the NLP solver more suitable for solving QPs. ";
 
+%feature("docstring")  CasADi::WorhpInternal::setOptionsFromFile "
+
+Read options from worhp parameter xml. ";
+
 %feature("docstring")  CasADi::WorhpInternal::reportConstraints "
 
 Prints out a human readable report about possible constraint violations -
@@ -72091,6 +72083,10 @@ Default constructor. ";
 
 Constuct an NLP with non-linear constraints and provided hessian
 approximation. ";
+
+%feature("docstring")  CasADi::WorhpSolver::setOptionsFromFile "
+
+Read options from worhp parameter xml. ";
 
 %feature("docstring")  CasADi::WorhpSolver::checkNode "
 
