@@ -80,6 +80,9 @@ endif(IPOPT_FOUND)
 add_executable(ticket_309 ticket_309.cpp )
 target_link_libraries(ticket_309 casadi ${CASADI_DEPENDENCIES})
 
+add_executable(ticket_491 ticket_491.cpp )
+target_link_libraries(ticket_491 casadi ${CASADI_DEPENDENCIES})
+
 if(WITH_LLVM)
   add_subdirectory(llvm)
 endif(WITH_LLVM)
