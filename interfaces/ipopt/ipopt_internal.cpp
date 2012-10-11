@@ -398,8 +398,6 @@ void IpoptInternal::finalize_solution(const double* x, const double* z_L, const 
     vector<double>& lambda_x = output(NLP_LAMBDA_X).data();
     for(int i=0; i<lambda_x.size(); ++i){
       lambda_x[i] = z_U[i]-z_L[i];
-      std::cout << "hey" << z_U[i] << std::endl;
-      std::cout << "hey" << z_L[i] << std::endl;
     }
 
     // Get dual solution (nonlinear bounds)
