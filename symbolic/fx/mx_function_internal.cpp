@@ -206,14 +206,26 @@ void MXFunctionInternal::init(){
       // Get the index of the parent node
       int pind = place_in_alg[n->dep(0)->temp];
       
-      // Save output to the parent node
-      algorithm_[pind].res.at(oind) = work_.size();
-      
-      // Save place in work vector
-      place_in_work.push_back(work_.size());
-
       // Not in algorithm
       place_in_alg.push_back(-1);
+      
+      // Place in the work vector
+      int& wplace = algorithm_[pind].res.at(oind);
+      
+      // Check if the node already has been added
+      if(wplace>=0){
+        // Save place in work vector
+        place_in_work.push_back(wplace);
+        
+        // No work element needed
+        continue;
+      } else {
+        // Save output to the parent node
+        wplace = work_.size();
+
+        // Save place in work vector
+        place_in_work.push_back(wplace);
+      }
 
     } else {
       
@@ -764,57 +776,6 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
 
       // Call the evaluation function
       it->op->evaluateMX(input_p,output_p,dummy_p,dummy_p,aseed_p,asens_p,true);
-      
-// For debugging #491
-#if 0
-        cout << "{";
-        for(int i=0; i<it->res.size(); ++i){
-          if(i!=0) cout << ",";
-          if(it->res[i]>=0){
-            cout << "i_" << it->res[i];
-          } else {
-            cout << "NULL";
-          }
-        }
-        cout << "} = ";
-        it->op->printPart(cout,0);
-        for(int i=0; i<it->arg.size(); ++i){
-          if(it->arg[i]>=0){
-            cout << "i_" << it->arg[i];
-          } else {
-            cout << "NULL";
-          }
-          it->op->printPart(cout,i+1);
-        }
-        cout << endl;
-      
-        cout << "aseed" << endl;
-      for(int d=0; d<aseed_p.size(); ++d){
-        for(int i=0; i<aseed_p[d].size(); ++i){
-          if(aseed_p[d][i]==0){
-            cout << "NULL";
-          } else {
-            cout << *aseed_p[d][i];
-          }
-          cout << "," << endl;
-        }
-      }
-        cout << endl;
-        
-        cout << "asens" << endl;
-      for(int d=0; d<asens_p.size(); ++d){
-        for(int i=0; i<asens_p[d].size(); ++i){
-          if(asens_p[d][i]==0){
-            cout << "NULL";
-          } else {
-            cout << *asens_p[d][i];
-          }
-          cout << ",";
-        }
-        cout << endl;
-      }
-#endif
-        
     }
   }
   
