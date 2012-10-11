@@ -1882,6 +1882,36 @@ class MXtests(casadiTestCase):
     self.checkarray(f.fwdSens(),3*(-x0)**2*dx,"if_else sens")
     self.checkarray(f.adjSens(),3*(-x0)**2*dx,"if_else sens")
     
+  def test_regression491(self):
+    self.message("regression #491")
+    u = ssym("u")
+    x = ssym("x")
+
+    F = SXFunction([u,x],[u+1/x])
+    F.init()
+
+    U = MX("U")
+
+    X = F.call([U,U])[0]
+    G = F.call([U,X])[0]
+
+    for kk in range(3):
+      gfcn = 0
+      if kk==0:
+        tmp = MXFunction([U],[G])
+        tmp.init()
+        gfcn = tmp.expand()
+      else:
+        gfcn = MXFunction([U],[G])
+        gfcn.setOption("numeric_jacobian",kk==1)
+      gfcn.setOption("ad_mode","reverse")
+      gfcn.init()
+      J = gfcn.jacobian()
+      J.init()
+      J.setInput(1)
+      J.evaluate()
+      self.assertAlmostEqual(J.output(),1,9)
+  
 if __name__ == '__main__':
     unittest.main()
 
