@@ -40,6 +40,10 @@ class IpoptInternal;
 *       
 *  A good resource about the algorithms in IPOPT is: Wachter and L. T. Biegler, On the Implementation of an Interior-Point Filter Line-Search Algorithm for Large-Scale Nonlinear Programming, Mathematical Programming 106(1), pp. 25-57, 2006 (As Research Report RC 23149, IBM T. J. Watson Research Center, Yorktown, USA
 *
+* Caveats: 
+*   * with default options, multipliers for the decision variables are wrong for equality constraints.
+*     Change the 'fixed_variable_treatment' to 'make_constraint' or 'relax_bounds' to obtain correct results.
+* 
 *
 */
 class IpoptSolver : public NLPSolver {
