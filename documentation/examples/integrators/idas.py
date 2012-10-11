@@ -136,7 +136,7 @@ print f.output(DAE_ODE) # This should be all zeros
 print f.output(DAE_ALG) # This should be all zeros
 
 #! Let's check our jacobian:
-j = Jacobian(f,DAE_Z,DAE_ALG)
+j = f.jacobian(DAE_Z,DAE_ALG)
 j.init()
 
 j.input(DAE_P).set(P_)

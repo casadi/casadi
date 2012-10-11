@@ -227,9 +227,10 @@ class ADtests(casadiTestCase):
               self.message(" %s Jacobian on SX. Input %s %s, Output %s %s" % (mode,inputtype,inputshape,outputtype,outputshape) )
               f=SXFunction(self.sxinputs[inputshape][inputtype],self.sxoutputs[outputshape][outputtype])
               #f.setOption("verbose",True)
+              #f.setOption("ad_mode",mode)
+              f.setOption("numeric_jacobian",True)
               f.init()
-              Jf=Jacobian(f,0,0)
-              Jf.setOption("ad_mode",mode)
+              Jf=f.jacobian(0,0)
               Jf.init()
               Jf.input().set(n)
               Jf.evaluate()
@@ -316,9 +317,9 @@ class ADtests(casadiTestCase):
             for mode in ["forward","reverse"]:
               self.message("adj AD on MX. Input %s %s, Output %s %s" % (inputtype,inputshape,outputtype,outputshape) )
               f=MXFunction(self.mxinputs[inputshape][inputtype],self.mxoutputs[outputshape][outputtype](self.mxinputs[inputshape][inputtype][0]))
+              #f.setOption("ad_mode",mode)
               f.init()
-              Jf=Jacobian(f,0,0)
-              Jf.setOption("ad_mode",mode)
+              Jf=f.jacobian(0,0)
               Jf.init()
               Jf.input().set(n)
               Jf.evaluate()
@@ -385,23 +386,24 @@ class ADtests(casadiTestCase):
               
   def test_hessian(self):
     self.message("Jacobian chaining")
-    x=SX("x")
-    y=SX("y")
-    z=SX("z")
+    x=ssym("x")
+    y=ssym("y")
+    z=ssym("z")
     n=array([1.2,2.3,7])
-    f=SXFunction([vertcat([x,y,z])],[x+2*y**3+3*z**4])
+    f=SXFunction([vertcat([x,y,z])],[vertcat([x+2*y**3+3*z**4])])
+    f.setOption("numeric_jacobian",True)
+    #f.setOption("ad_mode","forward")
     f.init()
-    J=Jacobian(f,0,0)
-    J.setOption("ad_mode","forward")
+    J=f.jacobian(0,0)
     J.init()
     m=MX("m",3,1)
     [JT] = J.call([m])
     JT = MXFunction([m],[JT.T])
+    #JT.setOption("ad_mode","reverse")
     JT.init()
     JT.input().set(n)
     JT.evaluate()
-    H = Jacobian(JT,0,0)
-    H.setOption("ad_mode","reverse")
+    H = JT.jacobian(0,0)
     H.init()
     H.input().set(n)
     H.evaluate()
@@ -411,17 +413,18 @@ class ADtests(casadiTestCase):
     
   def test_bugshape(self):
     self.message("shape bug")
-    x=SX("x")
-    y=SX("y")
+    x=ssym("x")
+    y=ssym("y")
 
     inp=SXMatrix(5,1)
     inp[0,0]=x
     inp[3,0]=y
 
     f=SXFunction([inp],[vertcat([x+y,x,y])])
+    #f.setOption("ad_mode","forward")
+    f.setOption("numeric_jacobian",True)
     f.init()
-    J=Jacobian(f,0,0)
-    J.setOption("ad_mode","forward")
+    J=f.jacobian(0,0)
     J.init()
     J.input().set([2,7])
     J.evaluate()
@@ -440,17 +443,19 @@ class ADtests(casadiTestCase):
     inp[3,0]=y
 
     f=SXFunction([inp],[vertcat([x+y,x,y])])
+    #f.setOption("ad_mode","forward")
+    f.setOption("numeric_jacobian",True)
     f.init()
-    J=Jacobian(f,0,0)
-    J.setOption("ad_mode","forward")
+    J=f.jacobian(0,0)
     J.init()
     J.input().set([2,7])
     J.evaluate()
 
     f=SXFunction([inp],[vertcat([x+y,x,y])])
+    f.setOption("numeric_jacobian",True)
     f.init()
     print f.input().shape
-    J=Jacobian(f,0,0)
+    J=f.jacobian(0,0)
     
 if __name__ == '__main__':
     unittest.main()

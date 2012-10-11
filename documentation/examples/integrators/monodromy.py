@@ -58,6 +58,7 @@ integrator.setOption("tf",tf)
 integrator.setOption("reltol",1e-10)
 integrator.setOption("abstol",1e-10)
 integrator.setOption("fsens_err_con",True)
+integrator.setOption("numeric_jacobian",True)
 integrator.init()
 
 N = 500
@@ -91,7 +92,7 @@ x0 = DMatrix([-3.1,0])
 #! Monodromy matrix at tf - Jacobian of integrator
 #! ===============================================
 #! First argument is input index, second argument is output index
-jac = Jacobian(integrator,INTEGRATOR_X0,INTEGRATOR_XF)
+jac = integrator.jacobian(INTEGRATOR_X0,INTEGRATOR_XF)
 jac.init()
 
 jac.input(INTEGRATOR_X0).set(x0)
@@ -104,10 +105,7 @@ print Ji
 #! Monodromy matrix at various instances - Jacobian of Simulator
 #! =============================================================
 
-jacsim = Jacobian(sim,INTEGRATOR_X0,0)
-#! Only forward mode is supported for now
-
-jacsim.setOption("ad_mode","forward")
+jacsim = sim.jacobian(INTEGRATOR_X0,0)
 jacsim.init()
 
 jacsim.input(INTEGRATOR_X0).set(x0)
@@ -137,8 +135,7 @@ csim.setOption("integrator",CVodesIntegrator)
 csim.setOption("integrator_options",{"reltol":1e-11,"abstol":1e-11, "fsens_err_con": True})
 csim.init()
 
-jaccsim = Jacobian(csim,CONTROLSIMULATOR_X0,0)
-jaccsim.setOption("ad_mode","forward")
+jaccsim = csim.jacobian(CONTROLSIMULATOR_X0,0)
 jaccsim.init()
 jaccsim.input(CONTROLSIMULATOR_P).set(params_[:-1])
 jaccsim.input(CONTROLSIMULATOR_X0).set(x0)

@@ -48,9 +48,9 @@ print "Expanded expression = ", fSX.outputSX()
 #! Not all MX graphs can be expanded.
 #! Here is an example of a situation where it will not work.
 #!
-#! Jacobian will perform numerical AD. We cannot expand an internal numerical algorithm.
-
-j = Jacobian(f,0,0)
+f.setOption("numeric_jacobian",True)
+f.init()
+j = f.jacobian(0,0)
 j.init()
 
 J=MXFunction([x,y],j.call([x,y]))

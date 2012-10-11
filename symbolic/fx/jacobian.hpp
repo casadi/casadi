@@ -50,14 +50,16 @@ class JacobianInternal;
   \date 2010
 */ 
 class Jacobian : public FX{
-public:
-
+  friend class FXInternal;
+private: // NOTE constructors are private to prevent usage. The class will be removed.
+  
   /// Default constructor
   Jacobian();
 
   /// Create a Jacobian
   explicit Jacobian(const FX& fcn, int iind=0, int oind=0);
   
+public:
   /// Access functions of the node
   JacobianInternal* operator->();
 

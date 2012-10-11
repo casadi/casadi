@@ -252,7 +252,7 @@ class Integrationtests(casadiTestCase):
     f = MXFunction([var],[qend[0]])
     f.init()
 
-    J=Jacobian(f,0)
+    J=f.jacobian(0)
     J.init()
     J.input().set([1,0])
     J.evaluate()
@@ -352,7 +352,7 @@ class Integrationtests(casadiTestCase):
     qe.init()
 
     #J=self.qe.jacobian(2)
-    J=Jacobian(qe,0)
+    J=qe.jacobian(0)
     J.init()
     J.input(0).set(A)
     J.input(1).set(p0)
@@ -379,7 +379,7 @@ class Integrationtests(casadiTestCase):
     qe.init()
 
     #J=self.qe.jacobian(2)
-    J=Jacobian(qe,0)
+    J=qe.jacobian(0)
     J.init()
     J.input(0).set(A)
     J.input(1).set(p0)
@@ -431,9 +431,9 @@ class Integrationtests(casadiTestCase):
     q0=MX("q0")
     p=MX("p")
     Ji = MXFunction([q0,p],J.call([q0,p]))
+    #Ji.setOption("ad_mode","reverse")
     Ji.init()
-    H=Jacobian(Ji,1)
-    H.setOption("ad_mode","reverse")
+    H=Ji.jacobian(1)
     H.init()
     H.input(0).set([num['q0']])
     H.input(1).set([num['p']])
@@ -459,7 +459,7 @@ class Integrationtests(casadiTestCase):
     JT.evaluate(1,0)
     print JT.output()
 
-    H  = Jacobian(JT,1)
+    H  = JT.jacobian(1)
     H.init()
     H.input(0).set([num['q0']])
     H.input(1).set([num['p']])
@@ -603,7 +603,7 @@ class Integrationtests(casadiTestCase):
     qeJ2.evaluate()
     
     return # this should return identical zero
-    H=Jacobian(qeJ,0,0)
+    H=qeJ.jacobian(0,0)
     H.setOption("ad_mode","reverse")
     H.init()
     H.input(0).set(A)
@@ -716,18 +716,18 @@ class Integrationtests(casadiTestCase):
     Jr = array([[1,(sqrt(p0)*tan(sqrt(p0)*te+arctan(dy0/sqrt(p0)))-dy0)/(dy0**2+p0)],[0,(p0*tan(sqrt(p0)*te+arctan(dy0/sqrt(p0)))**2+p0)/(dy0**2+p0)]])
     self.checkarray(qeJ.output(),Jr,"jacobian of Nonlin ODE")
     
-    
-    Jf=Jacobian(qe,0,0)
-    Jf.setOption("ad_mode","reverse")
+    #qe.setOption("ad_mode","reverse")
+    #qe.init()
+    Jf=qe.jacobian(0,0)
     Jf.init()
     Jf.input(0).set(A)
     Jf.input(1).set(p0)
     Jf.evaluate()
     self.checkarray(Jf.output(),Jr,"Jacobian of Nonlin ODE")
     
-    
-    Jf=Jacobian(qe,0,0)
-    Jf.setOption("ad_mode","forward")
+    #qe.setOption("ad_mode","forward")
+    #qe.init();
+    Jf=qe.jacobian(0,0)
     Jf.init()
     Jf.input(0).set(A)
     Jf.input(1).set(p0)
@@ -745,16 +745,18 @@ class Integrationtests(casadiTestCase):
     
     Jr = matrix([[(sqrt(p0)*(te*yc0**2-yc0+p0*te)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te)+yc0**2)/(2*p0*yc0**2+2*p0**2)],[(sqrt(p0)*((te*yc0**2-yc0+p0*te)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te)**2+te*yc0**2-yc0+p0*te)+(yc0**2+p0)*tan(arctan(yc0/sqrt(p0))+sqrt(p0)*te))/(sqrt(p0)*(2*yc0**2+2*p0))]])  
     
-    Jf=Jacobian(qe,1,0)
-    Jf.setOption("ad_mode","reverse")
+    #qe.setOption("ad_mode","reverse")
+    #qe.init()
+    Jf=qe.jacobian(1,0)
     Jf.init()
     Jf.input(0).set(A)
     Jf.input(1).set(p0)
     Jf.evaluate()
     self.checkarray(Jf.output(),Jr,"Jacobian of Nonlin ODE")
     
-    Jf=Jacobian(qe,1,0)
-    Jf.setOption("ad_mode","forward")
+    #qe.setOption("ad_mode","forward")
+    #qe.init()
+    Jf=qe.jacobian(1,0)
     Jf.init()
     Jf.input(0).set(A)
     Jf.input(1).set(p0)
@@ -777,10 +779,10 @@ class Integrationtests(casadiTestCase):
     
     
     qeJf=MXFunction([q0,par],[vec(qeJ.call([q0,par])[0])])
+    #qeJf.setOption("ad_mode","reverse")
     qeJf.init()
     
-    H=Jacobian(qeJf,0,0)
-    H.setOption("ad_mode","reverse")
+    H=qeJf.jacobian(0,0)
     H.init()
     H.input(0).set(A)
     H.input(1).set(p0)
@@ -828,7 +830,7 @@ class Integrationtests(casadiTestCase):
     JT = MXFunction([q0,p],[qe.jac(1,0).T])
     JT.init()
 
-    H  = Jacobian(JT,1)
+    H  = JT.jacobian(1)
     H.init()
     H.input(0).set(x0_)
     H.input(1).set(vec(A_))

@@ -322,7 +322,6 @@ int main(){
     
     // Generate the jacobian by creating a new integrator for the sensitivity equations by source transformation
     FX intjac  = integrator.jacobian(INTEGRATOR_P,INTEGRATOR_XF);
-    FX intjac2 = Jacobian(integrator,INTEGRATOR_P,INTEGRATOR_XF);
 
     // Set options
     intjac.setOption("number_of_fwd_dir",0);
@@ -330,15 +329,11 @@ int main(){
     
     // Initialize the integrator
     intjac.init();
-    intjac2.init();
 
     // Set inputs
     intjac.setInput(u_init,INTEGRATOR_P);
     intjac.setInput(x0,INTEGRATOR_X0);
-    
-    intjac2.setInput(u_init,INTEGRATOR_P);
-    intjac2.setInput(x0,INTEGRATOR_X0);
-    
+        
     // Set adjoint seed
     vector<double> jacseed(3*1,0);
     jacseed[0] = 1;
@@ -346,11 +341,9 @@ int main(){
     
     // Evaluate the Jacobian
     intjac.evaluate(0,0);
-    intjac2.evaluate(0,0);
 
     
     cout << "jacobian                  " << intjac.output(0) << endl;
-    cout << "jacobian2                 " << intjac2.output(0) << endl;
     
     // Get the results
 /*    cout << "unperturbed via jacobian        " << intjac.output(1+INTEGRATOR_XF) << endl;*/
@@ -360,24 +353,16 @@ int main(){
 
     // Save the unpreturbed value
     Matrix<double> unpret = intjac.output();
-    Matrix<double> unpret2 = intjac2.output();
     
     // Perturb X0
     intjac.setInput(u_init+0.01,INTEGRATOR_P);
-    intjac2.setInput(u_init+0.01,INTEGRATOR_P);
 
     intjac.evaluate();
-    intjac2.evaluate();
     Matrix<double> pret = intjac.output();
-    Matrix<double> pret2 = intjac2.output();
     
     cout << "unperturbed fwd sens            " << unpret << endl;
     cout << "perturbed fwd sens              " << pret << endl;
     cout << "finite diff. (augmented dae)    " << (pret-unpret)/0.01 << endl;
-    
-    cout << "unperturbed fwd sens 2           " << unpret2 << endl;
-    cout << "perturbed fwd sens 2             " << pret2 << endl;
-    cout << "finite diff. (augmented dae) 2   " << (pret2-unpret2)/0.01 << endl;
     
   }
   

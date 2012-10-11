@@ -22,7 +22,6 @@
 
 %{
 #include "symbolic/fx/fx.hpp"
-#include "symbolic/fx/jacobian.hpp"
 #include "symbolic/fx/sx_function.hpp"
 #include "symbolic/fx/mx_function.hpp"
 #include "symbolic/fx/linear_solver.hpp"
@@ -49,7 +48,6 @@
 #endif
 
 %include "symbolic/fx/fx.hpp"
-%include "symbolic/fx/jacobian.hpp"
 %include "symbolic/fx/sx_function.hpp"
 %include "symbolic/fx/mx_function.hpp"
 %include "symbolic/fx/linear_solver.hpp"

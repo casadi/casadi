@@ -135,16 +135,20 @@ class SXtests(casadiTestCase):
       self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="SXMatrix unary operations, jacobian",fmod=fmod)
 
       def fmod(f,x):
-        J=Jacobian(f)
-        J.setOption("ad_mode","forward")
+        #f.setOption("ad_mode","forward")
+        f.setOption("numeric_jacobian",True)
+        f.init();
+        J=f.jacobian()
         J.init()
         return J
         
       self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="MX unary operations, jacobian",fmod=fmod)
       
       def fmod(f,x):
-        J=Jacobian(f)
-        J.setOption("ad_mode","reverse")
+        #f.setOption("ad_mode","reverse")
+        f.setOption("numeric_jacobian",True)
+        f.init();
+        J=f.jacobian()
         J.init()
         return J
         

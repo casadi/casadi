@@ -646,16 +646,20 @@ class MXtests(casadiTestCase):
     x0=array([[0.738]])
 
     def fmod(f,x):
-      J=Jacobian(f)
-      J.setOption("ad_mode","forward")
+      #f.setOption("ad_mode","forward")
+      f.setOption("numeric_jacobian",True)
+      f.init()
+      J=f.jacobian()
       J.init()
       return J
       
     self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="MX unary operations, jacobian",fmod=fmod)
     
     def fmod(f,x):
-      J=Jacobian(f)
-      J.setOption("ad_mode","reverse")
+      #f.setOption("ad_mode","reverse")
+      f.setOption("numeric_jacobian",True)
+      f.init()
+      J=f.jacobian()
       J.init()
       return J
       
@@ -663,21 +667,25 @@ class MXtests(casadiTestCase):
     
   def test_MXJacobians(self):
       self.message("MX(3,1) unary operation, jacobian")
-      x=MX("x",3,1)
+      x=msym("x",3,1)
       
       x0=array([0.738,0.9,0.3])
 
       def fmod(f,x):
-        J=Jacobian(f)
-        J.setOption("ad_mode","forward")
+        #f.setOption("ad_mode","forward")
+        f.setOption("numeric_jacobian",True)
+        f.init()
+        J=f.jacobian()
         J.init()
         return J
         
       self.numpyEvaluationCheckPool(self.Jpool,[x],x0,name="MX unary operations, jacobian",fmod=fmod)
       
       def fmod(f,x):
-        J=Jacobian(f)
-        J.setOption("ad_mode","reverse")
+        #f.setOption("ad_mode","reverse")
+        f.setOption("numeric_jacobian",True)
+        f.init()
+        J=f.jacobian()
         J.init()
         return J
         
@@ -1018,8 +1026,7 @@ class MXtests(casadiTestCase):
      f.input().set(xn)
      f.evaluate()
      self.checkarray(f.output(),zr,"mul(mapping.T,mapping)")
-     
-     J=Jacobian(f)
+     f.jacobian()
      for mode in ["forward","reverse"]:
        J.setOption("ad_mode",mode)
        J.init()
@@ -1047,11 +1054,11 @@ class MXtests(casadiTestCase):
      f.input().set(xn)
      f.evaluate()
      
-     J=Jacobian(f)
+     J=f.jacobian()
      J_ = array([[xn[0,0]*2,0,0],[xn[1,0],xn[0,0],0],[xn[2,0],0,xn[0,0]]])
      for mode in ["forward","reverse"]:
        self.message(":" + mode)
-       J.setOption("ad_mode",mode)
+       #f.setOption("ad_mode",mode)
        J.init()
        J.input().set(xn)
        J.evaluate()
@@ -1100,8 +1107,9 @@ class MXtests(casadiTestCase):
     J_ = dot(dot((dot(D_,x_)+e_).T,C_.T),A_) + dot(dot((dot(A_,x_)+b_).T,C_),D_)
     
     for mode in ["forward", "reverse"]:
-      J = Jacobian(f)
-      J.setOption("ad_mode",mode)
+      #f.setOption("ad_mode",mode)
+      f.init()
+      J = f.jacobian()
       J.init()
       J.input(0).set(x_)
       J.input(1).set(A_)
@@ -1171,8 +1179,9 @@ class MXtests(casadiTestCase):
     J_ = (D_*x_+e_).T*C_.T*A_ + (A_*x_+b_).T*C_*D_
     
     for mode in ["forward", "reverse"]:
-      J = Jacobian(f)
-      J.setOption("ad_mode","forward")
+      #f.setOption("ad_mode","forward")
+      f.init()
+      J = f.jacobian()
       J.init()
       J.input(0).set(x_)
       J.input(1).set(A_)
@@ -1246,8 +1255,9 @@ class MXtests(casadiTestCase):
     J_ = (D_*x_+e_).T*C_.T*A_ + (A_*x_+b_).T*C_*D_
     
     for mode in ["forward", "reverse"]:
-      J = Jacobian(f)
-      J.setOption("ad_mode","forward")
+      #f.setOption("ad_mode","forward")
+      f.init()
+      J = f.jacobian()
       J.init()
       J.input(0).set(x_)
       J.input(1).set(A_)
@@ -1453,7 +1463,7 @@ class MXtests(casadiTestCase):
     def grad(y,x):
       f = MXFunction(ins,[x])
       f.init()
-      J = Jacobian(f,[i for i in range(len(ins)) if ins[i] is y][0])
+      J = f.jacobian([i for i in range(len(ins)) if ins[i] is y][0])
       J.init()
       if x.shape[0]==1 and x.shape[1]==1:
         return (J.call(ins)[0].T).reshape(y.shape)
@@ -1560,8 +1570,7 @@ class MXtests(casadiTestCase):
 
     #F =MXFunction([X],[norm_2(X)])
 
-    #J = Jacobian(F,0,0)
-    #J.setOption("ad_mode","forward")
+    #J = F.jacobian(0,0)
     #J.init()
 
     #J.input().set(nums)
