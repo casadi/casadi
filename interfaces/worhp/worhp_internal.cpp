@@ -36,6 +36,7 @@ WorhpInternal::WorhpInternal(const FX& F, const FX& G, const FX& H, const FX& J,
 
   // Monitors
   addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h", true);
+  addOption("print_time",               OT_BOOLEAN, true, "print information about execution time");
   
   int status;
   InitParams(&status, &worhp_p);
@@ -687,6 +688,9 @@ void WorhpInternal::evaluate(int nfdir, int nadir){
   
   checkInitialBounds();
   
+  // Reset the counters
+  t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ = t_callback_prepare_ = t_mainloop_ = 0;
+  
   // Set the static parameter
   if (parametric_) {
     if (!Fmod_.isNull()) Fmod_.setInput(input(NLP_P),Fmod_.getNumInputs()-2);
@@ -718,7 +722,6 @@ void WorhpInternal::evaluate(int nfdir, int nadir){
 
   output(NLP_LAMBDA_X)[freeX_].getArray(worhp_o.Lambda,worhp_o.n);
   if (worhp_o.m>0) input(NLP_LAMBDA_INIT)[nonfreeG_].getArray(worhp_o.Mu,worhp_o.m);
-   
 
   if (worhp_o.m>0) lbg.getArray(worhp_o.GL,worhp_o.m);
   if (worhp_o.m>0) ubg.getArray(worhp_o.GU,worhp_o.m);
@@ -742,6 +745,8 @@ void WorhpInternal::evaluate(int nfdir, int nadir){
   std::vector<double> tempm(worhp_o.m,0);
   
   log("WorhpInternal::starting iteration");
+  double time1 = clock();
+  
   // Reverse Communication loop
   while(worhp_c.status < TerminateSuccess &&  worhp_c.status > TerminateError) {
     if (GetUserAction(&worhp_c, callWorhp)) {
@@ -750,14 +755,19 @@ void WorhpInternal::evaluate(int nfdir, int nadir){
 
     if (GetUserAction(&worhp_c, iterOutput)) {
       if (!callback_.isNull()) {
+        double time1 = clock();
         // Copy outputs
         copy(worhp_o.X,worhp_o.X+worhp_o.n,tempn.begin());callback_.input(NLP_X_OPT)[freeX_] = tempn;
         callback_.input(NLP_COST)[0] = worhp_o.F;
         if (worhp_o.m>0) copy(worhp_o.G,worhp_o.G+worhp_o.m,tempm.begin());callback_.input(NLP_G)[nonfreeG_] = tempm;
         copy(worhp_o.Lambda,worhp_o.Lambda+worhp_o.n,tempn.begin());callback_.input(NLP_LAMBDA_X)[freeX_] = tempn;
         if (worhp_o.m>0) copy(worhp_o.Mu,worhp_o.Mu+worhp_o.m,tempm.begin());callback_.input(NLP_LAMBDA_G)[nonfreeG_]=tempm;
-        
+        double time2 = clock();
+        t_callback_prepare_ += double(time2-time1)/CLOCKS_PER_SEC;
+        time1 = clock();
         callback_.evaluate();
+        time2 = clock();
+        t_callback_fun_ += double(time2-time1)/CLOCKS_PER_SEC;
       }
     
       IterationOutput(&worhp_o, &worhp_w, &worhp_p, &worhp_c);
@@ -794,6 +804,8 @@ void WorhpInternal::evaluate(int nfdir, int nadir){
     }
 
   }
+  double time2 = clock();
+  t_mainloop_ += double(time2-time1)/CLOCKS_PER_SEC;
   
   // Copy outputs
   copy(worhp_o.X,worhp_o.X+worhp_o.n,tempn.begin());output(NLP_X_OPT)[freeX_] = tempn;   
@@ -804,6 +816,27 @@ void WorhpInternal::evaluate(int nfdir, int nadir){
   
   StatusMsg(&worhp_o, &worhp_w, &worhp_p, &worhp_c);
  
+   if (hasOption("print_time") && bool(getOption("print_time"))) {
+    // Write timings
+    cout << "time spent in eval_f: " << t_eval_f_ << " s." << endl;
+    cout << "time spent in eval_grad_f: " << t_eval_grad_f_ << " s." << endl;
+    cout << "time spent in eval_g: " << t_eval_g_ << " s." << endl;
+    cout << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s." << endl;
+    cout << "time spent in eval_h: " << t_eval_h_ << " s." << endl;
+    cout << "time spent in main loop: " << t_mainloop_ << " s." << endl;
+    cout << "time spent in callback function: " << t_callback_fun_ << " s." << endl;
+    cout << "time spent in callback preparation: " << t_callback_prepare_ << " s." << endl;
+  }
+  
+  stats_["t_eval_f"] = t_eval_f_;
+  stats_["t_eval_grad_f"] = t_eval_grad_f_;
+  stats_["t_eval_g"] = t_eval_g_;
+  stats_["t_eval_jac_g"] = t_eval_jac_g_;
+  stats_["t_eval_h"] = t_eval_h_;
+  stats_["t_mainloop"] = t_mainloop_;
+  stats_["t_callback_fun"] = t_callback_fun_;
+  stats_["t_callback_prepare"] = t_callback_prepare_;
+    
 }
 
 bool WorhpInternal::eval_h(const double* x, double obj_factor, const double* lambda, double* values){

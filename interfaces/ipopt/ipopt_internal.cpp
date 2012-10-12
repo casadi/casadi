@@ -272,14 +272,17 @@ void IpoptInternal::evaluate(int nfdir, int nadir){
   }
 
   // Reset the counters
-  t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ = t_callback_prepare_ = 0;
+  t_eval_f_ = t_eval_grad_f_ = t_eval_g_ = t_eval_jac_g_ = t_eval_h_ = t_callback_fun_ = t_callback_prepare_ = t_mainloop_ = 0;
   
   // Get back the smart pointers
   Ipopt::SmartPtr<Ipopt::TNLP> *userclass = static_cast<Ipopt::SmartPtr<Ipopt::TNLP>*>(userclass_);
   Ipopt::SmartPtr<Ipopt::IpoptApplication> *app = static_cast<Ipopt::SmartPtr<Ipopt::IpoptApplication>*>(app_);
 
+  double time1 = clock();
   // Ask Ipopt to solve the problem
   Ipopt::ApplicationReturnStatus status = (*app)->OptimizeTNLP(*userclass);
+  double time2 = clock();
+  t_mainloop_ = double(time2-time1)/CLOCKS_PER_SEC;
   
   #ifdef WITH_SIPOPT
   if(run_sens_ || compute_red_hessian_){
@@ -297,6 +300,7 @@ void IpoptInternal::evaluate(int nfdir, int nadir){
     cout << "time spent in eval_g: " << t_eval_g_ << " s." << endl;
     cout << "time spent in eval_jac_g: " << t_eval_jac_g_ << " s." << endl;
     cout << "time spent in eval_h: " << t_eval_h_ << " s." << endl;
+    cout << "time spent in main loop: " << t_mainloop_ << " s." << endl;
     cout << "time spent in callback function: " << t_callback_fun_ << " s." << endl;
     cout << "time spent in callback preparation: " << t_callback_prepare_ << " s." << endl;
   }
@@ -334,7 +338,15 @@ void IpoptInternal::evaluate(int nfdir, int nadir){
   if (status == Insufficient_Memory)
     stats_["return_status"] = "Insufficient_Memory";
   
-
+  stats_["t_eval_f"] = t_eval_f_;
+  stats_["t_eval_grad_f"] = t_eval_grad_f_;
+  stats_["t_eval_g"] = t_eval_g_;
+  stats_["t_eval_jac_g"] = t_eval_jac_g_;
+  stats_["t_eval_h"] = t_eval_h_;
+  stats_["t_mainloop"] = t_mainloop_;
+  stats_["t_callback_fun"] = t_callback_fun_;
+  stats_["t_callback_prepare"] = t_callback_prepare_;
+  
 }
 
 bool IpoptInternal::intermediate_callback(const double* x, const double* z_L, const double* z_U, const double* g, const double* lambda, double obj_value, int iter, double inf_pr, double inf_du,double mu,double d_norm,double regularization_size,double alpha_du,double alpha_pr,int ls_trials) {

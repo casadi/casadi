@@ -92,6 +92,7 @@ std::map<std::string,opt_type> ops_;
   double t_eval_h_; // time spent in eval_h
   double t_callback_fun_;  // time spent in callback function
   double t_callback_prepare_; // time spent in callback preparation
+  double t_mainloop_; // time spent in the main loop of the solver
   
   std::string formatStatus(int status) const;
   
