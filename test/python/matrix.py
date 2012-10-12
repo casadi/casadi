@@ -75,13 +75,13 @@ class Matrixtests(casadiTestCase):
     # This is an example that failed on a windows machine
     import numpy as NP
     A = NP.zeros((3,4),dtype=SX)
-
+    
     x = ssym("x")
     A[:,1] = x
     A[1,:] = 5
+    #print A  -  printing does not seem to work for numpy 1.8.0dev
 
-
-    print "A = ", NP.dot(A.T,A)
+    NP.dot(A.T,A)
     
   def test_vertcat(self):
     self.message("vertcat")
