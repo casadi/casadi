@@ -28037,6 +28037,10 @@ Large-Scale Nonlinear Programming, Mathematical Programming 106(1), pp.
 25-57, 2006 (As Research Report RC 23149, IBM T. J. Watson Research Center,
 Yorktown, USA
 
+Caveats: with default options, multipliers for the decision variables are
+wrong for equality constraints. Change the 'fixed_variable_treatment' to
+'make_constraint' or 'relax_bounds' to obtain correct results.
+
 >Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
@@ -31854,14 +31858,6 @@ point to this new object. ";
 
 %feature("docstring")  CasADi::Jacobian::makeUnique "";
 
-%feature("docstring")  CasADi::Jacobian::Jacobian "
-
-Default constructor. ";
-
-%feature("docstring")  CasADi::Jacobian::Jacobian "
-
-Create a Jacobian. ";
-
 %feature("docstring")  CasADi::Jacobian::getNumInputs "
 
 Get number of inputs. ";
@@ -32437,7 +32433,7 @@ Access forward sensitivity. ";
 
 %feature("docstring")  CasADi::JacobianInternal::JacobianInternal "
 
-New constructor (not yet working) ";
+New constructor. ";
 
 %feature("docstring")  CasADi::JacobianInternal::clone "
 
@@ -67016,19 +67012,6 @@ Single (scalar/vector/matrix valued) input, multiple (vector valued) output.
 Single (scalar/vector/matrix valued) input, multiple (matrix valued) output.
 ";
 
-%feature("docstring")  CasADi::SXFunction::jacobian "
-
-Calculate the jacobian of output oind with respect to input iind.
-
-This is just the result of CasADi::SXFunction::jac, wrapped in an
-SXFunction.
-
-See:   CasADi::Jacobian for an AD approach ";
-
-%feature("docstring")  CasADi::SXFunction::hessian "
-
-Hessian of output oind with respect to input iind. ";
-
 %feature("docstring")  CasADi::SXFunction::jac "
 
 Jacobian via source code transformation.
@@ -67166,6 +67149,25 @@ Evaluate. ";
 %feature("docstring")  CasADi::SXFunction::solve "
 
 the same as evaluate(0,0) ";
+
+%feature("docstring")  CasADi::SXFunction::jacobian "
+
+Calculate jacobian of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+oind:  The index of the output
+
+iind:  The index of the input
+
+The default behaviour for FX is to use CasADi::Jacobian, which uses
+(numerical) directional derivatives (i.e. operator overloading) to form the
+Jacobian. ";
+
+%feature("docstring")  CasADi::SXFunction::hessian "
+
+Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::SXFunction::call "
 
