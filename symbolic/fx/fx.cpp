@@ -286,6 +286,10 @@ void FX::updateNumSens(){
   return (*this)->updateNumSens(true);
 }
 
+void FX::requestNumSens(int nfwd, int nadj){
+  (*this)->requestNumSens(nfwd,nadj);
+}
+
 vector<SXMatrix> FX::evalSX(const vector<SXMatrix>& arg){
   casadi_assert_message(isInit(),"Function has not been initialized");
   

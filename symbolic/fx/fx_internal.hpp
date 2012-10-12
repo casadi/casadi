@@ -62,6 +62,9 @@ class FXInternal : public OptionsFunctionalityNode{
         if recursive==true, updateNumSens is also invoked for the baseclass. */
     virtual void updateNumSens(bool recursive);
     
+    /** \brief Request a number of forward/adjoint derivative directions */
+    void requestNumSens(int nfwd, int nadj);
+  
     /** \brief  Propagate the sparsity pattern through a set of directional derivatives forward or backward */
     virtual void spEvaluate(bool fwd);
 

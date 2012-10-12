@@ -42,6 +42,9 @@ EvaluationMX::EvaluationMX(const FX& fcn, const std::vector<MX> &arg,
   // Number of directional derivatives
   nfwd_f_ = fseed.size();
   nadj_f_ = aseed.size();
+  
+  // Request more directional derivatives, if needed
+  fcn_.requestNumSens(nfwd_f_,nadj_f_);
 
   // All dependencies of the function
   vector<MX> d;

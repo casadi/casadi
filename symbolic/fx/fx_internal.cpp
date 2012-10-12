@@ -39,6 +39,8 @@ FXInternal::FXInternal(){
   addOption("sparse",                   OT_BOOLEAN,             true,           "function is sparse");
   addOption("number_of_fwd_dir",        OT_INTEGER,             1,              "number of forward derivatives to be calculated simultanously");
   addOption("number_of_adj_dir",        OT_INTEGER,             1,              "number of adjoint derivatives to be calculated simultanously");
+  addOption("max_number_of_fwd_dir",    OT_INTEGER,             100,            "Allow \"number_of_fwd_dir\" to grow until it reaches this number");
+  addOption("max_number_of_adj_dir",    OT_INTEGER,             100,            "Allow \"number_of_adj_dir\" to grow until it reaches this number");
   addOption("verbose",                  OT_BOOLEAN,             false,          "verbose evaluation -- for debugging");
   addOption("store_jacobians",          OT_BOOLEAN,             false,          "keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times");
   addOption("numeric_jacobian",         OT_BOOLEAN,             false,          "Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method");
@@ -108,16 +110,43 @@ void FXInternal::init(){
 }
 
 void FXInternal::updateNumSens(bool recursive){
+  // Get the new number
   nfdir_ = getOption("number_of_fwd_dir");
   nadir_ = getOption("number_of_adj_dir");
+  
+  // Warn if the number exceeds the maximum
+  casadi_assert_warning(nfdir_ <= int(getOption("max_number_of_fwd_dir")), "The number of forward directions exceeds the maximum number. Decrease \"number_of_fwd_dir\" or increase \"max_number_of_fwd_dir\"");
+  casadi_assert_warning(nadir_ <= int(getOption("max_number_of_adj_dir")), "The number of adjoint directions exceeds the maximum number. Decrease \"number_of_adj_dir\" or increase \"max_number_of_adj_dir\"");
+  
+  // Allocate memory for the seeds and sensitivities
   for(vector<FunctionIO>::iterator it=input_.begin(); it!=input_.end(); ++it){
     it->dataF.resize(nfdir_,it->data);
     it->dataA.resize(nadir_,it->data);
   }
-
   for(vector<FunctionIO>::iterator it=output_.begin(); it!=output_.end(); ++it){
     it->dataF.resize(nfdir_,it->data);
     it->dataA.resize(nadir_,it->data);
+  }
+}
+
+void FXInternal::requestNumSens(int nfwd, int nadj){
+  // Start with the current number of directions
+  int nfwd_new = nfdir_;
+  int nadj_new = nadir_;
+  
+  // Increase to the number set in the options (but possibly not yet initialized)
+  nfwd_new = std::max(nfwd_new,int(getOption("number_of_fwd_dir")));
+  nadj_new = std::max(nadj_new,int(getOption("number_of_adj_dir")));
+  
+  // Cap at the maximum
+  nfwd_new = std::min(nfwd_new,int(getOption("max_number_of_fwd_dir")));
+  nadj_new = std::min(nadj_new,int(getOption("max_number_of_adj_dir")));
+  
+  // Update the number of directions, if needed
+  if(nfwd_new>nfdir_ || nadj_new>nadir_){
+    setOption("number_of_fwd_dir",nfwd_new);
+    setOption("number_of_adj_dir",nadj_new);
+    updateNumSens(true);
   }
 }
 
