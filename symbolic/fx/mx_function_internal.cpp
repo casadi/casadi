@@ -790,7 +790,7 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
   }
 }
 
-FX MXFunctionInternal::hessian(int iind, int oind) {
+FX MXFunctionInternal::getHessian(int iind, int oind) {
   // Assert initialized
   casadi_assert_message(isInit(),"Function not initialized.");
   

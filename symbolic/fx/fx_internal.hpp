@@ -62,9 +62,6 @@ class FXInternal : public OptionsFunctionalityNode{
         if recursive==true, updateNumSens is also invoked for the baseclass. */
     virtual void updateNumSens(bool recursive);
     
-    /** \brief Hessian of output oind with respect to input iind */
-    virtual FX hessian(int iind=0, int oind=0);
-
     /** \brief  Propagate the sparsity pattern through a set of directional derivatives forward or backward */
     virtual void spEvaluate(bool fwd);
 
@@ -98,21 +95,31 @@ class FXInternal : public OptionsFunctionalityNode{
               const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
               bool output_given, bool always_inline, bool never_inline);
     
-    /// Get a function that calculates nfwd forward derivatives and nadj adjoint derivatives (cached)
-    FX derivative(int nfwd, int nadj);
+    //@{
+    /** \brief Return Hessian function */
+    FX hessian(int iind, int oind);
+    virtual FX getHessian(int iind, int oind);
+    //@}
 
-    /// Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives
-    virtual FX getDerivative(int nfwd, int nadj);
+    //@{
+    /** \brief Return gradient function */
+    FX gradient(int iind, int oind);
+    virtual FX getGradient(int iind, int oind);
+    //@}
 
-    /// Access a Jacobian function (cached)
+    //@{
+    /** \brief Return Jacobian function */
     FX jacobian(int iind, int oind, bool compact, bool symmetric);
-    
-    /// Generate a function that calculates a Jacobian function
     virtual FX getJacobian(int iind, int oind, bool compact, bool symmetric);
-    
-    /// Generate a function that calculates a Jacobian function by operator overloading
     virtual FX getNumericJacobian(int iind, int oind, bool compact, bool symmetric);
+    //@}
     
+    //@{
+    /** \brief Return function that calculates forward derivatives */
+    FX derivative(int nfwd, int nadj);
+    virtual FX getDerivative(int nfwd, int nadj);
+    //@}
+
     /** \brief  Access an input */
     FunctionIO& iStruct(int i){
       try{
@@ -348,8 +355,11 @@ class FXInternal : public OptionsFunctionalityNode{
     /// Cache for sparsities of the Jacobian blocks
     std::vector<std::vector<CRSSparsity> > jac_sparsity_, jac_sparsity_compact_;
 
-    /// Use numeric jacobian instead of symbolic
+    /// Use operator overloading Jacobian
     bool numeric_jacobian_;
+    
+    /// Use operator overloading Hessian
+    bool numeric_hessian_;
     
     /// User-provided Jacobian generator function
     JacobianGenerator jacgen_;

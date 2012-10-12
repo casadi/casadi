@@ -91,9 +91,6 @@ class SXFunctionInternal : public XFunctionInternal<SXFunctionInternal,Matrix<SX
   /** \brief  Print the algorithm */
   virtual void print(std::ostream &stream) const;
 
-  /** \brief Hessian of output oind with respect to input iind */
-  virtual FX hessian(int iind=0, int oind=0);
-
   /** \brief Calculate the expression for the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs */
   SXMatrix jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
   
@@ -106,8 +103,14 @@ class SXFunctionInternal : public XFunctionInternal<SXFunctionInternal,Matrix<SX
   /** \brief Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives */
   virtual FX getDerivative(int nfwd, int nadj);
   
-  /** \brief Calculate the jacobian of output oind with respect to input iind */
+  /** \brief Return gradient function  */
+  virtual FX getGradient(int iind, int oind);
+
+  /** \brief Return Jacobian function  */
   virtual FX getJacobian(int iind, int oind, bool compact, bool symmetric);
+
+  /** \brief Return Hessian function */
+  virtual FX getHessian(int iind=0, int oind=0);
 
   /** \brief  DATA MEMBERS */
   

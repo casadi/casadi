@@ -142,17 +142,40 @@ class FX : public OptionsFunctionality{
   /// the same as evaluate(0,0)
   void solve();
     
-  /** \brief Calculate jacobian of output oind with respect to input iind
-  * \param oind The index of the output
+  /** \brief Generate a Jacobian function of output oind with respect to input iind
   * \param iind The index of the input
+  * \param oind The index of the output
   *
-  * The default behaviour for FX is to use CasADi::Jacobian, which uses (numerical) directional
-  * derivatives (i.e. operator overloading) to form the Jacobian.
+  * The default behavior of this class is defined by the derived class.
+  * If compact is set to true, only the nonzeros of the input and output expressions are considered.
+  * If symmetric is set to true, the Jacobian being calculated is known to be symmetric (usually a Hessian),
+  * which can be exploited by the algorithm.
+  * 
+  * The generated Jacobian has one more output than the calling function corresponding to the Jacobian.
+  * 
   */
   FX jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
   
-  /** \brief Hessian of output oind with respect to input iind */
+  /** \brief Generate a gradient function of output oind with respect to input iind
+  * \param iind The index of the input
+  * \param oind The index of the output
+  *
+  * The default behavior of this class is defined by the derived class.
+  * Note that the output must be scalar. In other cases, use the Jacobian instead.
+  * 
+  */
+  FX gradient(int iind=0, int oind=0);
+  
+  /** \brief Generate a Hessian function of output oind with respect to input iind 
+  * \param iind The index of the input
+  * \param oind The index of the output
+  *
+  * The generated Hessian has two more outputs than the calling function corresponding to the Hessian
+  * and the gradients.
+  * 
+  */
   FX hessian(int iind=0, int oind=0);
+
 
 #ifndef SWIG
   /** \brief  Create a function call (single input) */

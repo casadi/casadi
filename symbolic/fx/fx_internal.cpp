@@ -52,6 +52,7 @@ FXInternal::FXInternal(){
   
   verbose_ = false;
   numeric_jacobian_ = false;
+  numeric_hessian_ = false;
   jacgen_ = 0;
   spgen_ = 0;
   user_data_ = 0;
@@ -73,6 +74,7 @@ void FXInternal::init(){
   casadi_assert_warning(!store_jacobians,"Option \"store_jacobians\" has been deprecated. Jacobians are now always cached.");
   
   numeric_jacobian_ = getOption("numeric_jacobian");
+  numeric_hessian_ = getOption("numeric_hessian");
   bool jac_for_sens = getOption("jac_for_sens");
   casadi_assert_warning(jac_for_sens==false,"The option \"jac_for_sens\" has been deprecated. Ignored.");
   
@@ -150,8 +152,42 @@ void FXInternal::repr(ostream &stream) const{
   stream << "function(\"" << getOption("name") << "\")";
 }
 
+FX FXInternal::gradient(int iind, int oind){
+  // Assert scalar
+  casadi_assert_message(output(oind).scalar(),"Only gradients of scalar functions allowed. Use jacobian instead.");
+  
+  // Generate gradient function
+  FX ret = getGradient(iind,oind);
+  
+  // Give it a suitable name
+  stringstream ss;
+  ss << "gradient_" << getOption("name") << "_" << iind << "_" << oind;
+  ret.setOption("name",ss.str());
+  
+  return ret;
+}
+  
 FX FXInternal::hessian(int iind, int oind){
-  casadi_error("FXInternal::hessian: hessian not defined for class " << typeid(*this).name());
+  // Assert scalar
+  casadi_assert_message(output(oind).scalar(),"Only hessians of scalar functions allowed.");
+  
+  // Generate gradient function
+  FX ret = getHessian(iind,oind);
+  
+  // Give it a suitable name
+  stringstream ss;
+  ss << "hessian_" << getOption("name") << "_" << iind << "_" << oind;
+  ret.setOption("name",ss.str());
+  
+  return ret;
+}
+  
+FX FXInternal::getGradient(int iind, int oind){
+  casadi_error("FXInternal::getGradient: getGradient not defined for class " << typeid(*this).name());
+}
+  
+FX FXInternal::getHessian(int iind, int oind){
+  casadi_error("FXInternal::getHessian: getHessian not defined for class " << typeid(*this).name());
 }
   
 void FXInternal::log(const string& msg) const{

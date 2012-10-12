@@ -152,7 +152,7 @@ void LiftedSQPInternal::init(){
     if(!v.empty()) lag += inner_prod(lam_v_eq,v_def);
     
     // Gradient of the Lagrangian
-    SXMatrix lgrad = gradient(lag,x);
+    SXMatrix lgrad = CasADi::gradient(lag,x);
     if(!v.empty()) lgrad -= vertcat(SXMatrix::zeros(nu),lam_v_eq); // Put here to ensure that lgrad is of the form "h_extended -v_extended"
     makeDense(lgrad);
     if(verbose_){

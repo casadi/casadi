@@ -838,14 +838,15 @@ class Integrationtests(casadiTestCase):
 
     H1 = DMatrix(H.output())
     
-    H = qe.hessian(1)
-    H.init()
-    H.input(0).set(x0_)
-    H.input(1).set(vec(A_))
-    H.evaluate()
-    H2 = DMatrix(H.output())
+    ## Joel: Only Hessians of scalar functions allowed
+    #H = qe.hessian(1)
+    #H.init()
+    #H.input(0).set(x0_)
+    #H.input(1).set(vec(A_))
+    #H.evaluate()
+    #H2 = DMatrix(H.output())
     
-    self.checkarray(H1,H2,"hessian")
+    #self.checkarray(H1,H2,"hessian")
 
     
 if __name__ == '__main__':

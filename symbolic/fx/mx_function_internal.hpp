@@ -109,7 +109,7 @@ class MXFunctionInternal : public XFunctionInternal<MXFunctionInternal,MX,MXNode
     void* liftfun_ud_;
     
     /** \brief Hessian of output oind with respect to input iind.  */
-    FX hessian(int iind, int oind);
+    FX getHessian(int iind, int oind);
     
     /** \brief Evaluate symbolically, SX type*/
     virtual void evalSX(const std::vector<SXMatrix>& input, std::vector<SXMatrix>& output, 

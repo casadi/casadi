@@ -233,7 +233,19 @@ void SXFunctionInternal::evaluateGen(T1 nfdir_c, T2 nadir_c){
 }
 
 SXMatrix SXFunctionInternal::grad(int iind, int oind){
+  casadi_assert_message(output(oind).scalar(),"Only gradients of scalar functions allowed. Use jacobian instead.");
   return trans(jac(iind,oind));
+}
+
+FX SXFunctionInternal::getGradient(int iind, int oind){
+  // Create expressions for the gradient
+  vector<SXMatrix> ret_out;
+  ret_out.reserve(1+outputv_.size());
+  ret_out.push_back(grad(iind,oind));
+  ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
+  
+  // Return function
+  return SXFunction(inputv_,ret_out);  
 }
 
 SXMatrix SXFunctionInternal::hess(int iind, int oind){
@@ -943,14 +955,14 @@ void SXFunctionInternal::updateNumSens(bool recursive){
   if(recursive) XFunctionInternal<SXFunctionInternal,SXMatrix,SXNode>::updateNumSens(recursive);
 }
 
-FX SXFunctionInternal::hessian(int iind, int oind){
+FX SXFunctionInternal::getHessian(int iind, int oind){
   casadi_assert_message(output(oind).numel() == 1, "Function must be scalar");
 
   // Numeric or symbolic hessian
   bool numeric_hessian = getOption("numeric_hessian");
   
   if(numeric_hessian){
-    // Calculate gradiant expression
+    // Calculate gradient expression
     if(verbose()) cout << "SXFunctionInternal::hessian: calculating gradient expression " << endl;
     SXMatrix g = grad(iind,oind);
     makeDense(g);

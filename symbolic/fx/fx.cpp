@@ -154,6 +154,11 @@ FX FX::jacobian(int iind, int oind, bool compact, bool symmetric){
   return (*this)->jacobian(iind,oind,compact,symmetric);
 }
 
+FX FX::gradient(int iind, int oind){
+  assertInit();
+  return (*this)->gradient(iind,oind);
+}
+
 FX FX::hessian(int iind, int oind){
   assertInit();
   return (*this)->hessian(iind,oind);  
