@@ -86,8 +86,9 @@ void SQPInternal::init(){
     setOption("hessian_approximation", "exact");
   }
   
-  // Allocate a QP solver
+    // Allocate a QP solver
   CRSSparsity H_sparsity = getOption("hessian_approximation")=="exact"? H_.output().sparsity() : sp_dense(n,n);
+  H_sparsity = H_sparsity + DMatrix::eye(n).sparsity();
   CRSSparsity A_sparsity = J_.isNull() ? CRSSparsity(0,n,false) : J_.output().sparsity();
 
   QPSolverCreator qp_solver_creator = getOption("qp_solver");
@@ -195,6 +196,36 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       }
       H_.evaluate();
       Bk = H_.output();
+      // Determing regularization parameter with Gershgorin theorem
+      vector<int> rowind,col;
+      Bk.sparsity().getSparsityCRS(rowind, col);
+      std::vector<double>& data = Bk.data();
+      int i, j;
+      double radius;
+      double reg_param = 0;
+      double mineig;
+      for(int r=0; r<rowind.size()-1; ++r){
+        radius = 0;
+        for(int el=rowind[r]; el<rowind[r+1]; ++el){
+          i = r;
+          j = col[el];
+          if (i != j){
+            radius += fabs(data[el]);
+          }
+//          cout << "(" << r << "," << col[el] << "): " << data[el] << endl; 
+        }
+        mineig = Bk(r, r).elem(0) - radius;
+        if (mineig < reg_param){
+          reg_param = mineig;
+        }
+      }
+//      cout << "Regularization parameter: " << -reg_param << endl;
+      if (reg_param < 0.){
+        Bk += -reg_param * DMatrix::eye(Bk.size1());
+      }
+      else{
+        Bk += 0. * DMatrix::eye(Bk.size1());
+      }
     }
     if (monitored("eval_h")) {
       cout << "(main loop) B = " << endl;
@@ -295,9 +326,19 @@ void SQPInternal::evaluate(int nfdir, int nadir){
 //    if ((norm_2(p) / norm_2(x)).at(0) > 500.){
 //      casadi_warning("Search direction has very large values, indefinite Hessian might have ouccured.");
 //    }
-    if (inner_prod(p, mul(Bk, p)).at(0) < 0){
+    double gain = inner_prod(p, mul(Bk, p)).at(0);
+    if (gain < 0){
       casadi_warning("Indefinite Hessian detected...");
+//      cout << "MEasure: " << gain << endl;
+      // Trying with identity Hessian instead
+//      Bk = DMatrix::eye(Bk.size1());
+//      //qp_solver_.setInput(Bk, QP_H);
+//      makeDense(qp_solver_.input(QP_H));
+//      qp_solver_.input(QP_H) = Bk;
+//
+//      p = qp_solver_.output(QP_PRIMAL);
     }
+    
     
     // Get the dual solution for the inequalities
     mu_qp = qp_solver_.output(QP_LAMBDA_A);
@@ -450,16 +491,22 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       DMatrix yk = gLag - gLag_old_bfgs;
       DMatrix qk = mul(Bk, sk);
       // Calculating theta
-      double omega = 0.;
+      double omega = 1.;
       if (inner_prod(yk, sk).at(0) < 0.2 * inner_prod(sk, qk).at(0) ){
         double skBksk = inner_prod(sk, qk).at(0);
         omega = 0.8 * skBksk / (skBksk - inner_prod(sk, yk).at(0)); 
       }
-      yk = yk + omega * (qk - yk);
+      //cout << "omega: " << omega << endl;
+      //yk = yk + omega * (qk - yk);
+      yk = (1 - omega) * yk + omega * qk;
+
       double theta = 1. / inner_prod(sk, yk).at(0);
+      //cout << "Inner product: " << inner_prod(sk, yk) << endl;
+      //cout << "mult: " << mul(sk.trans(), yk) << endl;
+      //cout << "theta: " << theta << endl;
       double phi = 1. / inner_prod(qk, sk).at(0);
       Bk = Bk + theta * mul(yk, yk.trans()) - phi * mul(qk, qk.trans());
-
+      //cout << "Symmetry: " << norm_2(Bk - Bk.trans()) << endl;
 
     }
     // Calculating optimality criterion

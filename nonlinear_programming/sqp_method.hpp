@@ -30,8 +30,8 @@ namespace CasADi{
 class SQPInternal;
   
 /**
-  \brief Sequential Quadratic Programming method
-  The algorithm is a classical SQP method with either exact (has to be provided) or 
+  \brief Sequential Quadratic Programming method.
+  The algorithm is a classical SQP method with either exact (may be also provided) or 
   damped BFGS Lagrange Hessian approximation.
   Two different line-search algorithms are available.
   First, Armijo (Wolfe) condition with backtracking (suffers from Maratos effect).
