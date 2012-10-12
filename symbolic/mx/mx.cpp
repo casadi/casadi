@@ -202,20 +202,25 @@ const MX MX::getSub(const CRSSparsity& sp, int dummy) const {
   vector<unsigned char> mappingc; // Mapping that will be filled by patternunion
   
   sparsity().patternUnion(sp,mappingc,true, false, true);
-  vector<int> mapping(sp.size(),-1); // -1 maps to identical zero
+  vector<int> inz;
+  vector<int> onz;
   
   int k = 0;     // Flat index into non-zeros of this matrix
   int j = 0;     // Flat index into non-zeros of the resultant matrix
   for (int i=0;i<mappingc.size();++i) {
     if (mappingc[i] & 1) { // If the original matrix has a non-zero entry in the union
-      if (!(mappingc[i] & 4)) mapping[j] = k; // If this non-zero entry appears in the intersection, add it to the mapping
+      if (!(mappingc[i] & 4)) {
+         // If this non-zero entry appears in the intersection, add it to the mapping
+         inz.push_back(k);
+         onz.push_back(j);
+      }
       k++;                 // Increment the original matrix' non-zero index counter
     }
     if (mappingc[i] & 2) j++;
   }
-  
+
   MX ret = MX::create(new Mapping(sp));
-  ret->assign(*this,mapping);
+  ret->assign(*this,inz,onz);
 
   return ret;
 }

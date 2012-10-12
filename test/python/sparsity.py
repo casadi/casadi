@@ -331,6 +331,8 @@ class Sparsitytests(casadiTestCase):
     
     self.checkarray(DMatrix(f.output().data()),DMatrix([1,0,0,7,0]),"sparsity index")
     
+    self.assertTrue(f.output().data()[1]==0)
+    
   def test_sparsityindex(self):
     self.message("sparsity indexing")
     nza = set([  (0,0),
