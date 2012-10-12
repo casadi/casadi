@@ -355,12 +355,6 @@ class FXInternal : public OptionsFunctionalityNode{
     /// Cache for sparsities of the Jacobian blocks
     std::vector<std::vector<CRSSparsity> > jac_sparsity_, jac_sparsity_compact_;
 
-    /// Use operator overloading Jacobian
-    bool numeric_jacobian_;
-    
-    /// Use operator overloading Hessian
-    bool numeric_hessian_;
-    
     /// User-provided Jacobian generator function
     JacobianGenerator jacgen_;
 

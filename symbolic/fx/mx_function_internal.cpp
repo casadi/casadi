@@ -774,25 +774,6 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
   }
 }
 
-FX MXFunctionInternal::getHessian(int iind, int oind) {
-  // Assert initialized
-  casadi_assert_message(isInit(),"Function not initialized.");
-  
-  // Make sure that the function is scalar valued
-  //casadi_assert_message(output(oind).numel()==1,"Can only create hessians for scalar valued functions");
-  
-  // Get the Jacobian of the function
-  MX J = jac(iind,oind);
-  // MX J = grad(oind).at(iind);
-  
-  // Construct the gradient function
-  MXFunction gfcn(inputv_,trans(J));
-  gfcn.init();
-  
-  // And return the jacobian of that gradient function
-  return gfcn.jacobian(iind,0,false,true);
-}
-
 void MXFunctionInternal::evalSX(const std::vector<SXMatrix>& input_s, std::vector<SXMatrix>& output_s, 
                                 const std::vector<std::vector<SXMatrix> >& fwdSeed, std::vector<std::vector<SXMatrix> >& fwdSens, 
                                 const std::vector<std::vector<SXMatrix> >& adjSeed, std::vector<std::vector<SXMatrix> >& adjSens,

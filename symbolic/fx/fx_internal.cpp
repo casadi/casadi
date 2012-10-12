@@ -46,13 +46,10 @@ FXInternal::FXInternal(){
   addOption("ad_mode",                  OT_STRING,              "automatic",    "How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate)","forward|reverse|automatic");
   addOption("jacobian_generator",       OT_JACOBIANGENERATOR,   GenericType(),  "Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines");
   addOption("sparsity_generator",       OT_SPARSITYGENERATOR,   GenericType(),  "Function that provides sparsity for a given input output block, overrides internal routines");
-  addOption("jac_for_sens",             OT_BOOLEAN,             false,          "Create the a Jacobian function and use this to calculate forward sensitivities");
   addOption("user_data",                OT_VOIDPTR,             GenericType(),  "A user-defined field that can be used to identify the function or pass additional information");
   addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "Monitors to be activated","inputs|outputs");
   
   verbose_ = false;
-  numeric_jacobian_ = false;
-  numeric_hessian_ = false;
   jacgen_ = 0;
   spgen_ = 0;
   user_data_ = 0;
@@ -72,11 +69,6 @@ void FXInternal::init(){
   verbose_ = getOption("verbose");
   bool store_jacobians = getOption("store_jacobians");
   casadi_assert_warning(!store_jacobians,"Option \"store_jacobians\" has been deprecated. Jacobians are now always cached.");
-  
-  numeric_jacobian_ = getOption("numeric_jacobian");
-  numeric_hessian_ = getOption("numeric_hessian");
-  bool jac_for_sens = getOption("jac_for_sens");
-  casadi_assert_warning(jac_for_sens==false,"The option \"jac_for_sens\" has been deprecated. Ignored.");
   
   // Allocate data for sensitivities (only the method in this class)
   FXInternal::updateNumSens(false);
@@ -600,7 +592,7 @@ FX FXInternal::jacobian(int iind, int oind, bool compact, bool symmetric){
     // Use user-provided routine to calculate Jacobian
     FX fcn = shared_from_this<FX>();
     ret = jacgen_(fcn,iind,oind,user_data_);
-  } else if(numeric_jacobian_){
+  } else if(bool(getOption("numeric_jacobian"))){
     // Generate Jacobian instance
     casadi_assert_message(!compact, "Not implemented");
 #ifdef NEW_JACOBIAN
