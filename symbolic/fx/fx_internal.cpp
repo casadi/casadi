@@ -547,25 +547,43 @@ void FXInternal::spEvaluate(bool fwd){
   }
 }
 
+//#define NEW_JACOBIAN
+
 FX FXInternal::jacobian(int iind, int oind, bool compact, bool symmetric){
+  // Return value
+  FX ret;
+  
+  // Generate Jacobian
   if(jacgen_!=0){
     // Use user-provided routine to calculate Jacobian
     FX fcn = shared_from_this<FX>();
-    return jacgen_(fcn,iind,oind,user_data_);
+    ret = jacgen_(fcn,iind,oind,user_data_);
   } else if(numeric_jacobian_){
     // Generate Jacobian instance
     casadi_assert_message(!compact, "Not implemented");
-    //ret = getNumericJacobian(iind,oind,false,false);  // NOTE: Replaces the below
-    return Jacobian(shared_from_this<FX>(),iind,oind);
+#ifdef NEW_JACOBIAN
+    ret = getNumericJacobian(iind,oind,false,false);
+#else // NEW_JACOBIAN
+    ret = Jacobian(shared_from_this<FX>(),iind,oind);
+#endif // NEW_JACOBIAN
   } else {
     // Use internal routine to calculate Jacobian
-    return getJacobian(iind,oind,compact, symmetric);
+    ret = getJacobian(iind,oind,compact, symmetric);
   }
+  
+  // Give it a suitable name
+  stringstream ss;
+  ss << "jacobian_" << getOption("name") << "_" << iind << "_" << oind;
+  ret.setOption("name",ss.str());
+  return ret;
 }
 
 FX FXInternal::getJacobian(int iind, int oind, bool compact, bool symmetric){
-  //return getNumericJacobian(iind,oind,false,false); // NOTE: Replaces the below
-  Jacobian ret(shared_from_this<FX>(),iind,oind);
+#ifdef NEW_JACOBIAN
+  FX ret = getNumericJacobian(iind,oind,false,false);
+#else // NEW_JACOBIAN
+  FX ret = Jacobian(shared_from_this<FX>(),iind,oind);
+#endif // NEW_JACOBIAN
   ret.setOption("verbose",getOption("verbose"));
   return ret;
 }
@@ -594,7 +612,7 @@ FX FXInternal::derivative(int nfwd, int nadj){
     
     // Give it a suitable name
     stringstream ss;
-    ss << "derivative[" << nfwd << "," << nadj << "](" << getOption("name") << ")";
+    ss << "derivative_" << getOption("name") << "_" << nfwd << "_" << nadj;
     ret.setOption("name",ss.str());
     
     // Initialize it

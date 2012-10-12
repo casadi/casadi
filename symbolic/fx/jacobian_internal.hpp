@@ -37,8 +37,8 @@ class JacobianInternal : public FXInternal{
   friend class Jacobian;
   public:
     
-    /// New constructor (not yet working)
-    JacobianInternal(const FX& fcn, const std::vector<std::pair<int,int> >& jblocks);
+    /// New constructor
+    JacobianInternal(const FX& fcn, int iind, int oind);
 
     /// Clone
     virtual JacobianInternal* clone() const;
@@ -58,9 +58,9 @@ class JacobianInternal : public FXInternal{
     // Function to be differentiated
     FX fcn_;
   
-    // Jacobian blocks requested
-    std::vector<std::pair<int,int> > jblocks_;
-
+    // Output and input indices
+    int iind_, oind_;
+    
     // Seeding matrices
     CRSSparsity D1_, D2_;
 
@@ -72,9 +72,6 @@ class JacobianInternal : public FXInternal{
     CRSSparsity js_;
     CRSSparsity js_trans_;
     std::vector<int> js_trans_mapping_;
-    
-    // Output and input indices
-    int iind_, oind_;
 };
 
 } // namespace CasADi

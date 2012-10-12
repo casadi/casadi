@@ -397,7 +397,7 @@ class ADtests(casadiTestCase):
     J=f.jacobian(0,0)
     J.init()
     m=MX("m",3,1)
-    [JT] = J.call([m])
+    JT,_ = J.call([m])
     JT = MXFunction([m],[JT.T])
     #JT.setOption("ad_mode","reverse")
     JT.init()
