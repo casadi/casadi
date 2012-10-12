@@ -187,7 +187,13 @@ FX FXInternal::getGradient(int iind, int oind){
 }
   
 FX FXInternal::getHessian(int iind, int oind){
-  casadi_error("FXInternal::getHessian: getHessian not defined for class " << typeid(*this).name());
+  // Create gradient function
+  FX g = gradient(iind,oind);
+  g.setOption("numeric_jacobian",getOption("numeric_hessian"));
+  g.init();
+  
+  // Return the Jacobian of the gradient, exploiting symmetry (the gradient has output index 0)
+  return g.jacobian(iind,0,false,true);
 }
   
 void FXInternal::log(const string& msg) const{

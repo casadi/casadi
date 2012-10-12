@@ -41,7 +41,7 @@ namespace CasADi{
   \author Joel Andersson 
   \date 2010
 */
-class SXFunctionInternal : public XFunctionInternal<SXFunctionInternal,Matrix<SX>,SXNode>{
+class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInternal,Matrix<SX>,SXNode>{
   friend class SXFunction;
   
   protected:
@@ -91,24 +91,12 @@ class SXFunctionInternal : public XFunctionInternal<SXFunctionInternal,Matrix<SX
   /** \brief  Print the algorithm */
   virtual void print(std::ostream &stream) const;
 
-  /** \brief Calculate the expression for the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs */
-  SXMatrix jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
-  
-  /** \brief Gradient via source code transformation */
-  SXMatrix grad(int iind=0, int oind=0);
-
   /** \brief Hessian (forward over adjoint) via source code transformation */
   SXMatrix hess(int iind=0, int oind=0);
   
   /** \brief Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives */
   virtual FX getDerivative(int nfwd, int nadj);
   
-  /** \brief Return gradient function  */
-  virtual FX getGradient(int iind, int oind);
-
-  /** \brief Return Jacobian function  */
-  virtual FX getJacobian(int iind, int oind, bool compact, bool symmetric);
-
   /** \brief Return Hessian function */
   virtual FX getHessian(int iind=0, int oind=0);
 

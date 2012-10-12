@@ -128,7 +128,7 @@ MX MXFunction::jac(int iind, int oind, bool compact, bool symmetric){
 }
 
 MX MXFunction::grad(int iind, int oind){
-  return trans(jac(iind,oind));
+  return (*this)->grad(iind,oind);
 }
 
 SXFunction MXFunction::expand(const std::vector<SXMatrix>& inputv){

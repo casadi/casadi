@@ -38,7 +38,7 @@ namespace CasADi{
   \author Joel Andersson 
   \date 2010
 */
-class MXFunctionInternal : public XFunctionInternal<MXFunctionInternal,MX,MXNode>{
+class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInternal,MX,MXNode>{
   friend class MXFunction;
   
   public:
@@ -70,14 +70,8 @@ class MXFunctionInternal : public XFunctionInternal<MXFunctionInternal,MX,MXNode
     /** \brief Set the lifting function */
     void setLiftingFunction(LiftingFunction liftfun, void* user_data);
 
-    /** \brief Calculate the expression for the jacobian of a number of function outputs with respect to a number of function inputs, optionally include the function outputs */
-    MX jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false, bool always_inline=true, bool never_inline=false);
-
     /** \brief Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives */
     virtual FX getDerivative(int nfwd, int nadj);
-
-    /** \brief Calculate the jacobian of output oind with respect to input iind */
-    virtual FX getJacobian(int iind, int oind, bool compact, bool symmetric);
 
     /** \brief Generate a function that calculates a Jacobian function by operator overloading */
     virtual FX getNumericJacobian(int iind, int oind, bool compact, bool symmetric);

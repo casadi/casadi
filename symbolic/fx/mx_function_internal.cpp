@@ -37,7 +37,7 @@ using namespace std;
 namespace CasADi{
 
 MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv, const std::vector<MX>& outputv) :
-  XFunctionInternal<MXFunctionInternal,MX,MXNode>(inputv,outputv) {
+  XFunctionInternal<MXFunction,MXFunctionInternal,MX,MXNode>(inputv,outputv) {
   
   setOption("name", "unnamed_mx_function");
   setOption("numeric_jacobian", true);
@@ -132,7 +132,7 @@ void MXFunctionInternal::init(){
   log("MXFunctionInternal::init begin");
       
   // Call the init function of the base class
-  XFunctionInternal<MXFunctionInternal,MX,MXNode>::init();    
+  XFunctionInternal<MXFunction,MXFunctionInternal,MX,MXNode>::init();    
 
   // Stack for nodes to be added to the list of nodes
   stack<MXNode*> s;
@@ -293,7 +293,7 @@ log("MXFunctionInternal::init end");
 
 void MXFunctionInternal::updateNumSens(bool recursive){
   // Call the base class if needed
-  if(recursive) XFunctionInternal<MXFunctionInternal,MX,MXNode>::updateNumSens(recursive);
+  if(recursive) XFunctionInternal<MXFunction,MXFunctionInternal,MX,MXNode>::updateNumSens(recursive);
   
   // Allocate work for directional derivatives
   for(vector<FunctionIO>::iterator it=work_.begin(); it!=work_.end(); it++){
@@ -461,7 +461,7 @@ MXFunctionInternal* MXFunctionInternal::clone() const{
 }
 
 void MXFunctionInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
-  XFunctionInternal<MXFunctionInternal,MX,MXNode>::deepCopyMembers(already_copied);
+  XFunctionInternal<MXFunction,MXFunctionInternal,MX,MXNode>::deepCopyMembers(already_copied);
   for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
     if(it->op->isEvaluation()){
       it->op.makeUnique(already_copied,false);
@@ -558,17 +558,6 @@ void MXFunctionInternal::spEvaluate(bool fwd){
   }
 }
 
-FX MXFunctionInternal::getJacobian(int iind, int oind, bool compact, bool symmetric){
-  // Create expressions for the Jacobian
-  vector<MX> ret_out;
-  ret_out.reserve(1+outputv_.size());
-  ret_out.push_back(jac(iind,oind,compact,symmetric));
-  ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
-  
-  // Return function
-  return MXFunction(inputv_,ret_out);
-}
-
 FX MXFunctionInternal::getNumericJacobian(int iind, int oind, bool compact, bool symmetric){
   // Create expressions for the Jacobian
   vector<MX> ret_out;
@@ -578,11 +567,6 @@ FX MXFunctionInternal::getNumericJacobian(int iind, int oind, bool compact, bool
   
   // Return function
   return MXFunction(inputv_,ret_out);  
-}
-
-MX MXFunctionInternal::jac(int iind, int oind, bool compact, bool symmetric, bool always_inline, bool never_inline){
-  log("MXFunctionInternal::jac begin");
-  return jacGen(iind,oind,compact,symmetric,always_inline,never_inline);
 }
 
 void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res, 

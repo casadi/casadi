@@ -55,7 +55,7 @@ using namespace std;
 
 
 SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix >& inputv, const vector<SXMatrix >& outputv) : 
-  XFunctionInternal<SXFunctionInternal,SXMatrix,SXNode>(inputv,outputv) {
+  XFunctionInternal<SXFunction,SXFunctionInternal,SXMatrix,SXNode>(inputv,outputv) {
   setOption("name","unnamed_sx_function");
   addOption("live_variables",OT_BOOLEAN,true,"Reuse variables in the work vector");
   addOption("just_in_time",OT_BOOLEAN,false,"Just-in-time compilation for numeric evaluation (experimental)");
@@ -232,22 +232,6 @@ void SXFunctionInternal::evaluateGen(T1 nfdir_c, T2 nadir_c){
   }
 }
 
-SXMatrix SXFunctionInternal::grad(int iind, int oind){
-  casadi_assert_message(output(oind).scalar(),"Only gradients of scalar functions allowed. Use jacobian instead.");
-  return trans(jac(iind,oind));
-}
-
-FX SXFunctionInternal::getGradient(int iind, int oind){
-  // Create expressions for the gradient
-  vector<SXMatrix> ret_out;
-  ret_out.reserve(1+outputv_.size());
-  ret_out.push_back(grad(iind,oind));
-  ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
-  
-  // Return function
-  return SXFunction(inputv_,ret_out);  
-}
-
 SXMatrix SXFunctionInternal::hess(int iind, int oind){
   casadi_assert_message(output(oind).numel() == 1, "Function must be scalar");
   SXMatrix g = grad(iind,oind);
@@ -270,14 +254,6 @@ SXMatrix SXFunctionInternal::hess(int iind, int oind){
   
   // Return jacobian of the gradient
   return ret;
-}
-
-SXMatrix SXFunctionInternal::jac(int iind, int oind, bool compact, bool symmetric){
-  if(input(iind).empty() || output(oind).empty()){
-    return Matrix<SX>(); // quick return
-  } else {
-    return jacGen(iind,oind,compact,symmetric,true,false);
-  }
 }
 
 bool SXFunctionInternal::isSmooth() const{
@@ -512,7 +488,7 @@ void SXFunctionInternal::generateCode(const string& src_name){
 void SXFunctionInternal::init(){
   
   // Call the init function of the base class
-  XFunctionInternal<SXFunctionInternal,SXMatrix,SXNode>::init();
+  XFunctionInternal<SXFunction,SXFunctionInternal,SXMatrix,SXNode>::init();
   
   // Stack used to sort the computational graph
   stack<SXNode*> s;
@@ -952,7 +928,7 @@ void SXFunctionInternal::init(){
 
 void SXFunctionInternal::updateNumSens(bool recursive){
   // Call the base class if needed
-  if(recursive) XFunctionInternal<SXFunctionInternal,SXMatrix,SXNode>::updateNumSens(recursive);
+  if(recursive) XFunctionInternal<SXFunction,SXFunctionInternal,SXMatrix,SXNode>::updateNumSens(recursive);
 }
 
 FX SXFunctionInternal::getHessian(int iind, int oind){
@@ -1263,17 +1239,6 @@ void SXFunctionInternal::clearSymbolic(){
   inputv_.clear();
   outputv_.clear();
   s_work_.clear();
-}
-
-FX SXFunctionInternal::getJacobian(int iind, int oind, bool compact, bool symmetric){
-  // Return function expression
-  vector<SXMatrix> ret_out;
-  ret_out.reserve(1+outputv_.size());
-  ret_out.push_back(jac(iind,oind,compact,symmetric));
-  ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
-  
-  // Return function
-  return SXFunction(inputv_,ret_out);
 }
 
 void SXFunctionInternal::spInit(bool fwd){

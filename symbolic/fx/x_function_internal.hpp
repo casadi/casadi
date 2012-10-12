@@ -35,7 +35,7 @@ namespace CasADi{
     \author Joel Andersson 
     \date 2011
 */
-template<typename DerivedType, typename MatType, typename NodeType>
+template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
 class XFunctionInternal : public FXInternal{
   public:
     
@@ -54,8 +54,17 @@ class XFunctionInternal : public FXInternal{
     /** \brief  Topological (re)sorting of the nodes with the purpose of postponing every calculation as much as possible, as long as it does not influence a dependent node */
     static void resort_postpone(std::vector<NodeType*>& algnodes, std::vector<int>& lind);
              
+    /** \brief Gradient via source code transformation */
+    MatType grad(int iind=0, int oind=0);
+  
     /** \brief  Construct a complete Jacobian by compression */
-    MatType jacGen(int iind, int oind, bool compact, bool symmetric, bool always_inline, bool never_inline);
+    MatType jac(int iind=0, int oind=0, bool compact=false, bool symmetric=false, bool always_inline=true, bool never_inline=false);
+
+    /** \brief Return gradient function  */
+    virtual FX getGradient(int iind, int oind);
+
+    /** \brief Return Jacobian function  */
+    virtual FX getJacobian(int iind, int oind, bool compact, bool symmetric);
 
     // Data members (all public)
     
@@ -68,8 +77,8 @@ class XFunctionInternal : public FXInternal{
 
 // Template implementations
 
-template<typename DerivedType, typename MatType, typename NodeType>
-XFunctionInternal<DerivedType,MatType,NodeType>::XFunctionInternal(
+template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
+XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::XFunctionInternal(
     const std::vector<MatType>& inputv, const std::vector<MatType>& outputv) : inputv_(inputv),  outputv_(outputv){
       addOption("topological_sorting",OT_STRING,"depth-first","Topological sorting algorithm","depth-first|breadth-first");
   
@@ -101,8 +110,8 @@ XFunctionInternal<DerivedType,MatType,NodeType>::XFunctionInternal(
 }
 
 
-template<typename DerivedType, typename MatType, typename NodeType>
-void XFunctionInternal<DerivedType,MatType,NodeType>::sort_depth_first(std::stack<NodeType*>& s, std::vector<NodeType*>& nodes){
+template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
+void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::sort_depth_first(std::stack<NodeType*>& s, std::vector<NodeType*>& nodes){
 
     while(!s.empty()){
       
@@ -151,8 +160,8 @@ void XFunctionInternal<DerivedType,MatType,NodeType>::sort_depth_first(std::stac
     }
 }
 
-template<typename DerivedType, typename MatType, typename NodeType>
-void XFunctionInternal<DerivedType,MatType,NodeType>::resort_postpone(std::vector<NodeType*>& algnodes, std::vector<int>& lind){
+template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
+void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::resort_postpone(std::vector<NodeType*>& algnodes, std::vector<int>& lind){
 
   // Number of levels
   int nlevels = lind.size()-1;
@@ -255,8 +264,8 @@ void XFunctionInternal<DerivedType,MatType,NodeType>::resort_postpone(std::vecto
 
 }
 
-template<typename DerivedType, typename MatType, typename NodeType>
-void XFunctionInternal<DerivedType,MatType,NodeType>::resort_breadth_first(std::vector<NodeType*>& algnodes){
+template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
+void XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::resort_breadth_first(std::vector<NodeType*>& algnodes){
 
   // We shall assign a "level" to each element of the algorithm. A node which does not depend on other binary nodes are assigned level 0 and for nodes that depend on other nodes of the algorithm, the level will be the maximum level of any of the children plus 1. Note that all nodes of a level can be evaluated in parallel. The level will be saved in the temporary variable
 
@@ -438,11 +447,41 @@ std::cout << "  "<< ii++ << ": ";
 
 }
 
-template<typename DerivedType, typename MatType, typename NodeType>
-MatType XFunctionInternal<DerivedType,MatType,NodeType>::jacGen(int iind, int oind, bool compact, bool symmetric, bool always_inline, bool never_inline){
-  using namespace std;
-  if(verbose()) std::cout << "XFunctionInternal::jacGen begin" << std::endl;
+template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
+MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::grad(int iind, int oind){
+  casadi_assert_message(output(oind).scalar(),"Only gradients of scalar functions allowed. Use jacobian instead.");
   
+  // Dummy forward seeds and sensitivities
+  typename std::vector<std::vector<MatType> > fseed, fsens;
+  
+  // Adjoint seeds
+  typename std::vector<std::vector<MatType> > aseed(1,std::vector<MatType>(outputv_.size()));
+  for(int i=0; i<outputv_.size(); ++i){
+    aseed[0][i] = MatType(outputv_[i].sparsity(),i==oind ? 1 : 0);
+  }
+  
+  // Adjoint sensitivities
+  std::vector<std::vector<MatType> > asens(1,std::vector<MatType>(inputv_.size()));
+  for(int i=0; i<inputv_.size(); ++i){
+    asens[0][i] = MatType(inputv_[i].sparsity());
+  }
+  
+  // Calculate with adjoint mode AD
+  call(inputv_,outputv_,fseed,fsens,aseed,asens,true,true,false);
+  
+  // Return adjoint directional derivative
+  return asens[0].at(iind);
+}
+
+
+template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
+MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind, int oind, bool compact, bool symmetric, bool always_inline, bool never_inline){
+  using namespace std;
+  if(verbose()) std::cout << "XFunctionInternal::jac begin" << std::endl;
+  
+  // Quick return
+  if(input(iind).empty() || output(oind).empty()) return MatType(0,0);
+    
   // Create return object
   MatType ret = MatType(jacSparsity(iind,oind,compact));
   if(verbose()) std::cout << "XFunctionInternal::jac allocated return value" << std::endl;
@@ -641,6 +680,30 @@ MatType XFunctionInternal<DerivedType,MatType,NodeType>::jacGen(int iind, int oi
   // Return
   if(verbose()) std::cout << "XFunctionInternal::jac end" << std::endl;
   return ret;
+}
+
+template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
+FX XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::getGradient(int iind, int oind){
+  // Create expressions for the gradient
+  std::vector<MatType> ret_out;
+  ret_out.reserve(1+outputv_.size());
+  ret_out.push_back(grad(iind,oind));
+  ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
+  
+  // Return function
+  return PublicType(inputv_,ret_out);  
+}
+
+template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
+FX XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::getJacobian(int iind, int oind, bool compact, bool symmetric){
+  // Return function expression
+  std::vector<MatType> ret_out;
+  ret_out.reserve(1+outputv_.size());
+  ret_out.push_back(jac(iind,oind,compact,symmetric));
+  ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
+  
+  // Return function
+  return PublicType(inputv_,ret_out);
 }
 
 } // namespace CasADi
