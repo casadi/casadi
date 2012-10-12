@@ -1920,7 +1920,11 @@ class MXtests(casadiTestCase):
       J.setInput(1)
       J.evaluate()
       self.assertAlmostEqual(J.output(),1,9)
-  
+
+  def test_ticket(self):
+    J = [] + msym("x")
+    J = msym("x") + []
+    
 if __name__ == '__main__':
     unittest.main()
 

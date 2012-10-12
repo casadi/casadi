@@ -493,7 +493,7 @@ MX MX::scalar_matrix(int op, const MX &x, const MX &y){
 MX MX::matrix_scalar(int op, const MX &x, const MX &y){
   // Check if the scalar is sparse (i.e. zero)
   if(x.size()==0){
-    return matrix_scalar(op,x,0);
+    return matrix_scalar(op,0,y);
   } else {
     // Check if it is ok to loop over nonzeros only
     if(x.dense() || operation_checker<F0XChecker>(op)){
