@@ -21,9 +21,7 @@
 # 
 # -*- coding: utf-8 -*-
 """
-Created on Mon Jan 16 10:57:20 2012
-
-@author: mzanon
+@author: Mario Zanon and Sebastien Gross, K.U. Leuven 2012
 """
 
 from casadi import *
@@ -34,8 +32,18 @@ import matplotlib.pyplot as plt
 # Collocation setup
 # -----------------------------------------------------------------------------
 nicp = 1        # Number of (intermediate) collocation points per control interval
-nk = 10         # Control discretization
-tf = 2.5        # End time
+
+xref = 0.1 # chariot reference
+
+l = 1. #- -> crane, + -> pendulum
+m = 1.
+M = 1.
+g = 9.81
+tf = 5.0
+nk = 50
+ndstate = 6
+nastate = 1
+ninput = 1
 
 # Legendre collocation points
 legendre_points1 = [0,0.500000]
@@ -64,7 +72,7 @@ deg = 4
 cp = RADAU
 # Size of the finite elements
 h = tf/nk/nicp
-
+ 
 # Coefficients of the collocation equation
 C = np.zeros((deg+1,deg+1))
 # Coefficients of the continuity equation
@@ -108,52 +116,78 @@ for j in range(deg+1):
 # Declare variables (use scalar graph)
 t  = ssym("t")          # time
 u  = ssym("u")          # control
-xd  = ssym("xd",3)      # differential state
-xa  = ssym("xa",0,1)    # algebraic state
-xddot  = ssym("xdot",3) # differential state time derivative
-p = ssym("xa",0,1)      # parameters
+xd  = ssym("xd",ndstate)      # differential state
+xa  = ssym("xa",nastate)    # algebraic state
+xddot  = ssym("xdot",ndstate) # differential state time derivative
+p = ssym("p",0,1)      # parameters
+ 
+x = ssym("x")
+y = ssym("y")
+w = ssym("w")
 
-# ODE right hand side function
-rhs = vertcat([(1 - xd[1]*xd[1])*xd[0] - xd[1] + u, \
-       xd[0], \
-       xd[0]*xd[0] + xd[1]*xd[1] + u*u])
+dx = ssym("dx")
+dy = ssym("dy")
+dw = ssym("dw")
+
+      
+res = vertcat([xddot[0] - dx,\
+       xddot[1] - dy,\
+       xddot[2] - dw,\
+       m*xddot[3] + (x-w)*xa, \
+       m*xddot[4] +     y*xa - g*m,\
+       M*xddot[5] + (w-x)*xa +   u,\
+       (x-w)*(xddot[3] - xddot[5]) + y*xddot[4] + dy*dy + (dx-dw)*(dx-dw)])       
+
+     
+xd[0] = x
+xd[1] = y
+xd[2] = w
+xd[3] = dx
+xd[4] = dy
+xd[5] = dw
+                   
+
 # System dynamics (implicit formulation)
-ffcn = SXFunction([t,xddot,xd,xa,u,p],[xddot - rhs])
+ffcn = SXFunction([t,xddot,xd,xa,u,p],[res])
 
-# Objective function (meyer term)
-mfcn = SXFunction([t,xd,xa,u,p],[xd[2]])
+# Objective function 
+MayerTerm = SXFunction([t,xd,xa,u,p],[(x-xref)*(x-xref) + (w-xref)*(w-xref) + dx*dx + dy*dy])
+LagrangeTerm = SXFunction([t,xd,xa,u,p],[(x-xref)*(x-xref) + (w-xref)*(w-xref)])
 
 # Control bounds
-u_min = np.array([-0.75])
-u_max = np.array([ 1.0])
+u_min = np.array([-2])
+u_max = np.array([ 2])
 u_init = np.array((nk*nicp*(deg+1))*[[0.0]]) # needs to be specified for every time interval (even though it stays constant)
 
-# Differential state bounds and initial guess
-xD_min =  np.array([-inf, -inf, -inf])
-xD_max =  np.array([ inf,  inf,  inf])
-xDi_min = np.array([ 0.0,  1.0,  0.0])
-xDi_max = np.array([ 0.0,  1.0,  0.0])
-xDf_min = np.array([ 0.0,  0.0, -inf])
-xDf_max = np.array([ 0.0,  0.0,  inf])
-xD_init = np.array((nk*nicp*(deg+1))*[[ 0.0,  0.0,  0.0]]) # needs to be specified for every time interval
+# Differential state bounds
+#Path bounds
+xD_min =  np.array([-inf, -inf, -inf, -inf, -inf, -inf]) 
+xD_max =  np.array([ inf,  inf,  inf,  inf,  inf,  inf])
+#Initial bounds
+xDi_min = np.array([ 0.0,  l,  0.0,  0.0,  0.0,  0.0])
+xDi_max = np.array([ 0.0,  l,  0.0,  0.0,  0.0,  0.0])
+#Final bounds
+xDf_min = np.array([-inf, -inf, -inf, -inf, -inf, -inf])
+xDf_max = np.array([ inf,  inf,  inf,  inf,  inf,  inf])
+
+#Initial guess for differential states
+xD_init = np.array((nk*nicp*(deg+1))*[[ 0.0,  l,  0.0,  0.0,  0.0,  0.0]]) # needs to be specified for every time interval
 
 # Algebraic state bounds and initial guess
-xA_min =  np.array([])
-xA_max =  np.array([])
-xAi_min = np.array([])
-xAi_max = np.array([])
-xAf_min = np.array([])
-xAf_max = np.array([])
-xA_init = np.array((nk*nicp*(deg+1))*[[]])
+xA_min =  np.array([-inf])
+xA_max =  np.array([ inf])
+xAi_min = np.array([-inf])
+xAi_max = np.array([ inf])
+xAf_min = np.array([-inf])
+xAf_max = np.array([ inf])
+xA_init = np.array((nk*nicp*(deg+1))*[[sign(l)*9.81]])
 
 # Parameter bounds and initial guess
 p_min = np.array([])
 p_max = np.array([])
 p_init = np.array([])
 
-# Initialize functions
-ffcn.init()
-mfcn.init()
+
 
 
 # -----------------------------------------------------------------------------
@@ -179,19 +213,22 @@ fc = SXMatrix()
 fcfcn = SXFunction([t,xd,xa,u,p],[fc])
 
 # Initialize the functions
+ffcn.init()
 icfcn.init()
 pcfcn.init()
 fcfcn.init()
+LagrangeTerm.init()
+MayerTerm.init()
 
 # -----------------------------------------------------------------------------
 # NLP setup
 # -----------------------------------------------------------------------------
 # Dimensions of the problem
-nx = xd.size()          # total number of states
-ndiff = nx              # number of differential states
-nalg = xa.size()        # number of algebraic states
-nu = u.size()           # number of controls
-NP  = p.size()          # number of parameters
+nx = xd.size() + xa.size()  # total number of states        #MODIF
+ndiff = xd.size()           # number of differential states #MODIF
+nalg = xa.size()            # number of algebraic states
+nu = u.size()               # number of controls
+NP  = p.size()              # number of parameters
 
 # Total number of variables
 NXD = nicp*nk*(deg+1)*ndiff # Collocated differential states
@@ -215,6 +252,7 @@ vars_init[offset:offset+NP] = p_init
 vars_lb[offset:offset+NP] = p_min
 vars_ub[offset:offset+NP] = p_max
 offset += NP
+
 # Get collocated states and parametrized control
 XD = np.resize(np.array([],dtype=MX),(nk+1,nicp,deg+1)) # NB: same name as above
 XA = np.resize(np.array([],dtype=MX),(nk,nicp,deg)) # NB: same name as above
@@ -239,7 +277,7 @@ for k in range(nk):
                 offset += ndiff
             else:
                 if j!=0:
-                    vars_init[offset:offset+nx] = np.append(xD_init[index,:],xA_init[index,:])
+                    vars_init[offset:offset+nx] = np.append(xD_init[index,:],xA_init[index,:]) 
                     
                     vars_lb[offset:offset+nx] = np.append(xD_min,xA_min)
                     vars_ub[offset:offset+nx] = np.append(xD_max,xA_max)
@@ -320,7 +358,7 @@ for k in range(nk):
         ubg.append(np.zeros(ndiff))
 
 # Periodicity constraints 
-
+#   none
 
 # Final constraints (Const, dConst, ConstQ)
 [fck] = fcfcn.call([0., XD[k][i][j], XA[k][i][j-1], U[k], P])
@@ -332,20 +370,20 @@ ubg.append(fc_max)
 # Nonlinear constraint function
 gfcn = MXFunction([V],[vertcat(g)])
 
+
 # Objective function of the NLP
-# Regularization
+#Implment Mayer term
 Obj = 0
-#for k in range(nk):
-#    for i in range(nicp):
-#        # For all collocation points
-#        for j in range(1,deg+1):
-#            [obj] = mfcn2.call([XD[k][i][j],U[k], P])
-#            Obj += obj
-#[obj] = mfcn2.call([XD[nk][0][0],zeros(9), P])
-#Obj += obj
-# Energy
-[obj] = mfcn.call([0., XD[k][i][j], XA[k][i][j-1], U[k], P])
+[obj] = MayerTerm.call([0., XD[k][i][j], XA[k][i][j-1], U[k], P])
 Obj += obj
+
+#Implement Lagrange term
+for k in range(nk):
+    for i in range(nicp):
+        # For all collocation points
+        for j in range(1,deg+1):
+            [obj] = LagrangeTerm.call([0., XD[k][i][j], XA[k][i][j-1], U[k], P])
+            Obj += obj
 
 ofcn = MXFunction([V], [Obj])
 
@@ -471,12 +509,31 @@ tgrid = np.append(tgrid,tgrid[-1])
 # Plot the results
 plt.figure(1)
 plt.clf()
+plt.subplot(2,2,1)
 plt.plot(tgrid,xD_opt[0,:],'--')
+plt.title("x")
+plt.grid
+plt.subplot(2,2,2)
 plt.plot(tgrid,xD_opt[1,:],'-')
+plt.title("y")
+plt.grid
+plt.subplot(2,2,3)
+plt.plot(tgrid,xD_opt[2,:],'-.')
+plt.title("w")
+plt.grid
+
+plt.figure(2)
+plt.clf()
 plt.plot(tgrid,u_opt[0,:],'-.')
-plt.title("Van der Pol optimization")
+plt.title("Crane, inputs")
 plt.xlabel('time')
-plt.legend(['x0 trajectory','x1 trajectory','u trajectory'])
+
+
+plt.figure(3)
+plt.clf()
+plt.plot(tgrid,xA_plt[0,:],'-.')
+plt.title("Crane, lambda")
+plt.xlabel('time')
 plt.grid()
 plt.show()
 
