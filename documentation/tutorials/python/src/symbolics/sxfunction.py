@@ -127,7 +127,7 @@ f.init()
 f.setInput([2,3])
 f.evaluate()
 print f.output()
-G=f.grad()
+G=f.jac().T
 print G
 
 #$ Notice how G is a 2-nd order tensor $ {\buildrel\leftrightarrow\over{G}} = \vec{\nabla}{\vec{f}} = \frac{\partial [x*y, x+y]}{\partial [x , y]}$
@@ -152,8 +152,8 @@ f.setInput([1,2,3,4],0); # instead of f.setInput([[1,2],[3,4]],0);
 f.setInput([4,5,6,7],1);
 f.evaluate()
 print f.output()
-print f.grad(0)
-print f.grad(1)
+print f.jac(0).T
+print f.jac(1).T
 
 print 12
 
