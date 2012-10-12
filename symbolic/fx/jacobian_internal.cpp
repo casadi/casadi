@@ -58,11 +58,11 @@ void JacobianInternal::init(){
   }
 
   // Get the output dimensions (specified by jblocks)
-  setNumOutputs(1+fcn_.getNumOutputs());
+  setNumOutputs(1/*+fcn_.getNumOutputs()*/);
   output(0) = DMatrix(fcn_.jacSparsity(iind_,oind_),0);
-  for(int i=0; i<fcn_.getNumOutputs(); ++i){
-    output(i+1) = fcn_.output(i);
-  }
+//   for(int i=0; i<fcn_.getNumOutputs(); ++i){
+//     output(i+1) = fcn_.output(i);
+//   }
   
   // Only now, when we know the sparsity of the inputs and outputs, we are able to call the init function of the base class
   FXInternal::init();
@@ -242,10 +242,10 @@ void JacobianInternal::evaluate(int nfdir, int nadir){
   }
   
   // Nondifferentiated output
-  if(!called_once) fcn_.evaluate();
-  for(int i=0; i<output_.size()-1; ++i){
-    fcn_.getOutput(output(i+1),i);
-  }
+//   if(!called_once) fcn_.evaluate();
+//   for(int i=0; i<output_.size()-1; ++i){
+//     fcn_.getOutput(output(i+1),i);
+//   }
 }
 
 } // namespace CasADi
