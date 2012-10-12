@@ -118,7 +118,7 @@ figure(2)
 title('Deviation from reference simulation, with perturbed initial condition')
 plot(tf,sim.output()-out,linewidth=3)
 
-jacsim = Jacobian(sim,CONTROLSIMULATOR_X0,0)
+jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
 jacsim.init()
 jacsim.setInput(x0,CONTROLSIMULATOR_X0)
 jacsim.setInput(u_,CONTROLSIMULATOR_U)
@@ -161,7 +161,7 @@ plot(tf,sim.output()-out,linewidth=3)
 
 
 
-jacsim = Jacobian(sim,CONTROLSIMULATOR_U,0)
+jacsim = sim.jacobian(CONTROLSIMULATOR_U,0)
 jacsim.init()
 jacsim.setInput(x0,CONTROLSIMULATOR_X0)
 jacsim.setInput(u_,CONTROLSIMULATOR_U)
@@ -467,7 +467,7 @@ sim.setOption("integrator_options", {"fsens_err_con": True,"reltol":1e-8})
 sim.setOption("nf",20)
 sim.init()
 
-jacsim = Jacobian(sim,CONTROLSIMULATOR_X0,0)
+jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
 jacsim.init()
 
 figure(7)
@@ -564,7 +564,7 @@ for i,c in enumerate(['b','g']):
   plot(tf,sim.output(2)[:,i],c+'--')
 title('controls (%s)' % caption)
   
-jacsim = Jacobian(sim,CONTROLSIMULATOR_X0,0)
+jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
 jacsim.init()
 
 # Calculate monodromy matrix
@@ -619,7 +619,7 @@ for i,c in enumerate(['b','g']):
   plot(tf,sim.output(2)[:,i],c+'--')
 title('controls (%s)' % caption)
 
-jacsim = Jacobian(sim,CONTROLSIMULATOR_X0,0)
+jacsim = sim.jacobian(CONTROLSIMULATOR_X0,0)
 jacsim.init()
 
 # Calculate monodromy matrix
