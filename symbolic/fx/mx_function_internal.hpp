@@ -70,9 +70,6 @@ class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInterna
     /** \brief Set the lifting function */
     void setLiftingFunction(LiftingFunction liftfun, void* user_data);
 
-    /** \brief Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives */
-    virtual FX getDerivative(int nfwd, int nadj);
-
     /** \brief Generate a function that calculates a Jacobian function by operator overloading */
     virtual FX getNumericJacobian(int iind, int oind, bool compact, bool symmetric);
     

@@ -66,6 +66,9 @@ class XFunctionInternal : public FXInternal{
     /** \brief Return Jacobian function  */
     virtual FX getJacobian(int iind, int oind, bool compact, bool symmetric);
 
+    /** \brief Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives */
+    virtual FX getDerivative(int nfwd, int nadj);
+    
     // Data members (all public)
     
     /** \brief  Inputs of the function (needed for symbolic calculations) */
@@ -705,6 +708,75 @@ FX XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::getJacobian(int i
   // Return function
   return PublicType(inputv_,ret_out);
 }
+
+template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
+FX XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::getDerivative(int nfwd, int nadj){
+  
+  // Forward seeds
+  std::vector<std::vector<MatType> > fseed(nfwd,inputv_);
+  for(int dir=0; dir<nfwd; ++dir){
+    // Replace symbolic inputs
+    int iind=0;
+    for(typename std::vector<MatType>::iterator i=fseed[dir].begin(); i!=fseed[dir].end(); ++i, ++iind){
+      // Name of the forward seed
+      std::stringstream ss;
+      ss << "f";
+      if(nfwd>1) ss << dir;
+      ss << "_";
+      ss << iind;
+
+      // Save to matrix
+      *i = MatType::sym(ss.str(),i->sparsity());
+      
+    }
+  }
+  
+  // Adjoint seeds
+  std::vector<std::vector<MatType> > aseed(nadj,outputv_);
+  for(int dir=0; dir<nadj; ++dir){
+    // Replace symbolic inputs
+    int oind=0;
+    for(typename std::vector<MatType>::iterator i=aseed[dir].begin(); i!=aseed[dir].end(); ++i, ++oind){
+      // Name of the adjoint seed
+      std::stringstream ss;
+      ss << "a";
+      if(nadj>1) ss << dir << "_";
+      ss << oind;
+
+      // Save to matrix
+      *i = MatType::sym(ss.str(),i->sparsity());
+      
+    }
+  }
+  
+  // Evaluate symbolically
+  std::vector<std::vector<MatType> > fsens(nfwd,outputv_), asens(nadj,inputv_);
+  call(inputv_,outputv_,fseed,fsens,aseed,asens,true,true,false);
+
+  // All inputs of the return function
+  std::vector<MatType> ret_in;
+  ret_in.reserve(inputv_.size()*(1+nfwd) + outputv_.size()*nadj);
+  ret_in.insert(ret_in.end(),inputv_.begin(),inputv_.end());
+  for(int dir=0; dir<nfwd; ++dir)
+    ret_in.insert(ret_in.end(),fseed[dir].begin(),fseed[dir].end());
+  for(int dir=0; dir<nadj; ++dir)
+    ret_in.insert(ret_in.end(),aseed[dir].begin(),aseed[dir].end());
+
+  // All outputs of the return function
+  std::vector<MatType> ret_out;
+  ret_out.reserve(outputv_.size()*(1+nfwd) + inputv_.size()*nadj);
+  ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
+  for(int dir=0; dir<nfwd; ++dir)
+    ret_out.insert(ret_out.end(),fsens[dir].begin(),fsens[dir].end());
+  for(int dir=0; dir<nadj; ++dir)
+    ret_out.insert(ret_out.end(),asens[dir].begin(),asens[dir].end());
+
+  // Assemble function and return
+  PublicType ret(ret_in,ret_out);
+  ret.init();
+  return ret;
+}
+
 
 } // namespace CasADi
 

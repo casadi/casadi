@@ -931,41 +931,6 @@ void SXFunctionInternal::updateNumSens(bool recursive){
   if(recursive) XFunctionInternal<SXFunction,SXFunctionInternal,SXMatrix,SXNode>::updateNumSens(recursive);
 }
 
-FX SXFunctionInternal::getHessian(int iind, int oind){
-  casadi_assert_message(output(oind).numel() == 1, "Function must be scalar");
-
-  // Numeric or symbolic hessian
-  bool numeric_hessian = getOption("numeric_hessian");
-  
-  if(numeric_hessian){
-    // Calculate gradient expression
-    if(verbose()) cout << "SXFunctionInternal::hessian: calculating gradient expression " << endl;
-    SXMatrix g = grad(iind,oind);
-    makeDense(g);
-    
-    // Create gradient function
-    SXFunction gfcn(inputv_,g);
-    
-    // Create function including all inputs
-    gfcn.setOption("verbose",getOption("verbose"));
-    gfcn.setOption("numeric_jacobian",true);
-    gfcn.setOption("number_of_fwd_dir",getOption("number_of_fwd_dir"));
-    gfcn.setOption("number_of_adj_dir",getOption("number_of_adj_dir"));
-    gfcn.init();
-    
-    if(verbose()) cout << "SXFunctionInternal::hessian: calculating numeric Jacobian " << endl;
-    return static_cast<FX&>(gfcn).jacobian(iind,0); // TODO: SXFunction::Jacobian cannot return SXFunction!!!
-    
-  } else {
-    // Calculate Hessian expression
-    if(verbose()) cout << "SXFunctionInternal::hessian: calculating hessian expression " << endl;
-    SXMatrix h = hess(iind,oind);
-    
-    // Use the expression to create a function
-    return SXFunction(inputv_,h);
-  }
-}
-
 void SXFunctionInternal::evalSX(const vector<SXMatrix>& arg, vector<SXMatrix>& res, 
                                 const vector<vector<SXMatrix> >& fseed, vector<vector<SXMatrix> >& fsens, 
                                 const vector<vector<SXMatrix> >& aseed, vector<vector<SXMatrix> >& asens,
@@ -1296,72 +1261,6 @@ void SXFunctionInternal::spEvaluate(bool fwd){
       }
     }
   }
-}
-
-FX SXFunctionInternal::getDerivative(int nfwd, int nadj){
-  // Forward seeds
-  vector<vector<SXMatrix> > fseed(nfwd,inputv_);
-  for(int dir=0; dir<nfwd; ++dir){
-    // Replace symbolic inputs
-    for(vector<SXMatrix>::iterator j=fseed[dir].begin(); j!=fseed[dir].end(); ++j){
-      for(vector<SX>::iterator i=j->begin(); i!=j->end(); ++i){
-        // Name of the forward seed
-        std::stringstream ss;
-        ss << "f";
-        if(nfwd>1) ss << dir;
-        ss << "_" << *i;
-        
-        // Save to matrix
-        *i = SX(ss.str());
-      }
-    }
-  }
-  
-  // Adjoint seeds
-  vector<vector<SXMatrix> > aseed(nadj,outputv_);
-  for(int dir=0; dir<nadj; ++dir){
-    // Replace symbolic inputs
-    int oind=0;
-    for(vector<SXMatrix>::iterator j=aseed[dir].begin(); j!=aseed[dir].end(); ++j, ++oind){
-      int k=0;
-      for(vector<SX>::iterator i=j->begin(); i!=j->end(); ++i, ++k){
-        // Name of the adjoint seed
-        std::stringstream ss;
-        ss << "a";
-        if(nadj>1) ss << dir << "_";
-        ss << oind << "_" << k;
-
-        // Save to matrix
-        *i = SX(ss.str());
-      }
-    }
-  }
-  
-  // Evaluate symbolically
-  vector<vector<SXMatrix> > fsens(nfwd,outputv_), asens(nadj,inputv_);
-  evalSX(inputv_,outputv_,fseed,fsens,aseed,asens,true);
-
-  // All inputs of the return function
-  vector<SXMatrix> ret_in;
-  ret_in.reserve(inputv_.size()*(1+nfwd) + outputv_.size()*nadj);
-  ret_in.insert(ret_in.end(),inputv_.begin(),inputv_.end());
-  for(int dir=0; dir<nfwd; ++dir)
-    ret_in.insert(ret_in.end(),fseed[dir].begin(),fseed[dir].end());
-  for(int dir=0; dir<nadj; ++dir)
-    ret_in.insert(ret_in.end(),aseed[dir].begin(),aseed[dir].end());
-  
-  // All outputs of the return function
-  vector<SXMatrix> ret_out;
-  ret_out.reserve(outputv_.size()*(1+nfwd) + inputv_.size()*nadj);
-  ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
-  for(int dir=0; dir<nfwd; ++dir)
-    ret_out.insert(ret_out.end(),fsens[dir].begin(),fsens[dir].end());
-  for(int dir=0; dir<nadj; ++dir)
-    ret_out.insert(ret_out.end(),asens[dir].begin(),asens[dir].end());
-
-  // Assemble function and return
-  SXFunction ret(ret_in,ret_out);
-  return ret;
 }
 
 } // namespace CasADi

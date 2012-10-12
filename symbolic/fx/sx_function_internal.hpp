@@ -94,12 +94,6 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   /** \brief Hessian (forward over adjoint) via source code transformation */
   SXMatrix hess(int iind=0, int oind=0);
   
-  /** \brief Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives */
-  virtual FX getDerivative(int nfwd, int nadj);
-  
-  /** \brief Return Hessian function */
-  virtual FX getHessian(int iind=0, int oind=0);
-
   /** \brief  DATA MEMBERS */
   
   /** \brief  An elemenent of the algorithm, namely a binary operation */
