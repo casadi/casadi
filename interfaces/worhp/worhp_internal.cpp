@@ -192,6 +192,9 @@ WorhpInternal::WorhpInternal(const FX& F, const FX& G, const FX& H, const FX& J,
   worhp_p.initialised = false;
   worhp_c.initialised = false;
   
+  // The default value for ScaleConIter (False) makes IPOPT fail for decision variable bounds where lbx==ubx
+  setOption("ScaleConIter",true);
+  
 }
 
 WorhpInternal::~WorhpInternal(){
@@ -450,7 +453,8 @@ void WorhpInternal::checkinit() {
   
   // Populate temporary freeX
   for (int i=0;i<input(NLP_LBX).size();++i) {
-    if (input(NLP_LBX).at(i)!=input(NLP_UBX).at(i)) {freeXi.push_back(i);} else {nonfreeX_.push_back(i);}
+    //if (input(NLP_LBX).at(i)!=input(NLP_UBX).at(i)) {freeXi.push_back(i);} else {nonfreeX_.push_back(i);}
+    if (true) {freeXi.push_back(i);} else {nonfreeX_.push_back(i);}
   }
   
   // Check if temprary freeX equals previous freeX and set dirty if so
@@ -726,9 +730,9 @@ void WorhpInternal::evaluate(int nfdir, int nadir){
   if (worhp_o.m>0) lbg.getArray(worhp_o.GL,worhp_o.m);
   if (worhp_o.m>0) ubg.getArray(worhp_o.GU,worhp_o.m);
   
-  for (int i=0;i<lbx.size();++i) {
-    casadi_assert_message(lbx.at(i)!=ubx.at(i),"WorhpSolver::evaluate: Worhp cannot handle the case when LBX == UBX. You have that case at non-zero " << i << " , which has value " << ubx.at(i) << ".");
-  }
+  //for (int i=0;i<lbx.size();++i) {
+  //  casadi_assert_message(lbx.at(i)!=ubx.at(i),"WorhpSolver::evaluate: Worhp cannot handle the case when LBX == UBX. You have that case at non-zero " << i << " , which has value " << ubx.at(i) << ".");
+  //}
   
   double inf = numeric_limits<double>::infinity();
   
