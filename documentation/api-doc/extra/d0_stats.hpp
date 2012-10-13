@@ -36,6 +36,14 @@
 <tr><td>mu</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>regularization_size</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>return_status</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>t_callback_fun</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>t_callback_prepare</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>t_eval_f</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>t_eval_g</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>t_eval_grad_f</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>t_eval_h</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>t_eval_jac_g</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>t_mainloop</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>var_integer_md</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>var_numeric_md</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>var_string_md</td><td>CasADi::IpoptInternal</td></tr>
@@ -61,6 +69,14 @@
 <tr><td>mu</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>regularization_size</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>return_status</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>t_callback_fun</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>t_callback_prepare</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>t_eval_f</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>t_eval_g</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>t_eval_grad_f</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>t_eval_h</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>t_eval_jac_g</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>t_mainloop</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>var_integer_md</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>var_numeric_md</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>var_string_md</td><td>CasADi::IpoptInternal</td></tr>
@@ -112,5 +128,37 @@
 <tr><td>task_endtime</td><td>CasADi::ParallelizerInternal</td></tr>
 <tr><td>task_order</td><td>CasADi::ParallelizerInternal</td></tr>
 <tr><td>task_starttime</td><td>CasADi::ParallelizerInternal</td></tr>
+</table>
+*/
+/** \class CasADi::WorhpInternal
+\n
+\par
+<table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>t_callback_fun</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>t_callback_prepare</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>t_eval_f</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>t_eval_g</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>t_eval_grad_f</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>t_eval_h</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>t_eval_jac_g</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>t_mainloop</td><td>CasADi::WorhpInternal</td></tr>
+</table>
+*/
+/** \class CasADi::WorhpSolver
+\n
+\par
+<table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>t_callback_fun</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>t_callback_prepare</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>t_eval_f</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>t_eval_g</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>t_eval_grad_f</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>t_eval_h</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>t_eval_jac_g</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>t_mainloop</td><td>CasADi::WorhpInternal</td></tr>
 </table>
 */

@@ -464,6 +464,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::AcadoIntegrator::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::AcadoIntegrator::evaluate "
 
 Evaluate. ";
@@ -474,22 +486,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::AcadoIntegrator::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::AcadoIntegrator::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::AcadoIntegrator::call "
 
@@ -1066,6 +1107,28 @@ thus x := [xd,xa]
 
 C++ includes: acado_integrator_internal.hpp ";
 
+%feature("docstring")  CasADi::AcadoIntegratorInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getHessian "";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getGradient "";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
 %feature("docstring")  CasADi::AcadoIntegratorInternal::input "
 
 Access input argument. ";
@@ -1246,9 +1309,9 @@ adjoint sensitivities (generic) ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::AcadoIntegratorInternal::hessian "
+%feature("docstring")  CasADi::AcadoIntegratorInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::AcadoIntegratorInternal::spInit "
 
@@ -1269,20 +1332,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::AcadoIntegratorInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::AcadoIntegratorInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::AcadoIntegratorInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::AcadoIntegratorInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::AcadoIntegratorInternal::iStruct "
 
@@ -1850,6 +1899,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::AcadoOCP::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::AcadoOCP::evaluate "
 
 Evaluate. ";
@@ -1860,22 +1921,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::AcadoOCP::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::AcadoOCP::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::AcadoOCP::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::AcadoOCP::call "
 
@@ -2378,6 +2468,32 @@ Return a string with a destription (for SWIG) ";
 
 C++ includes: acado_ocp_internal.hpp ";
 
+%feature("docstring")  CasADi::AcadoOCPInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getHessian "";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getGradient "";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getJacobian "";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getDerivative "";
+
 %feature("docstring")  CasADi::AcadoOCPInternal::input "
 
 Access input argument. ";
@@ -2467,9 +2583,9 @@ Solve the problem. ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::AcadoOCPInternal::hessian "
+%feature("docstring")  CasADi::AcadoOCPInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::AcadoOCPInternal::spEvaluate "
 
@@ -2499,29 +2615,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::AcadoOCPInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::AcadoOCPInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::AcadoOCPInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::AcadoOCPInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::AcadoOCPInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::AcadoOCPInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::AcadoOCPInternal::iStruct "
 
@@ -3786,6 +3879,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::CFunction::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::CFunction::evaluate "
 
 Evaluate. ";
@@ -3796,22 +3901,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::CFunction::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::CFunction::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::CFunction::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::CFunction::call "
 
@@ -4260,6 +4394,32 @@ Joel Andersson
 
 C++ includes: c_function_internal.hpp ";
 
+%feature("docstring")  CasADi::CFunctionInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::getHessian "";
+
+%feature("docstring")  CasADi::CFunctionInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::getGradient "";
+
+%feature("docstring")  CasADi::CFunctionInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::getJacobian "";
+
+%feature("docstring")  CasADi::CFunctionInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::CFunctionInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::getDerivative "";
+
 %feature("docstring")  CasADi::CFunctionInternal::input "
 
 Access input argument. ";
@@ -4349,9 +4509,9 @@ Initialize. ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::CFunctionInternal::hessian "
+%feature("docstring")  CasADi::CFunctionInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::CFunctionInternal::spEvaluate "
 
@@ -4381,29 +4541,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::CFunctionInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::CFunctionInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::CFunctionInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::CFunctionInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::CFunctionInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::CFunctionInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::CFunctionInternal::iStruct "
 
@@ -5051,6 +5188,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::Collocation::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::Collocation::evaluate "
 
 Evaluate. ";
@@ -5061,22 +5210,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::Collocation::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::Collocation::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::Collocation::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::Collocation::call "
 
@@ -5889,6 +6067,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::CollocationIntegrator::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::CollocationIntegrator::evaluate "
 
 Evaluate. ";
@@ -5899,22 +6089,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::call "
 
@@ -6478,6 +6697,29 @@ Return a string with a destription (for SWIG) ";
 
 C++ includes: collocation_integrator_internal.hpp ";
 
+%feature("docstring")  CasADi::CollocationIntegratorInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::getHessian "";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::getGradient "";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
 %feature("docstring")  CasADi::CollocationIntegratorInternal::input "
 
 Access input argument. ";
@@ -6672,9 +6914,10 @@ adjoint sensitivities (generic) ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::CollocationIntegratorInternal::hessian "
+%feature("docstring")  CasADi::CollocationIntegratorInternal::requestNumSens
+"
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::CollocationIntegratorInternal::spInit "
 
@@ -6695,21 +6938,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::CollocationIntegratorInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::CollocationIntegratorInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::CollocationIntegratorInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")
-CasADi::CollocationIntegratorInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::CollocationIntegratorInternal::iStruct "
 
@@ -7178,6 +7406,32 @@ Assert that the object has been initialized. ";
 
 C++ includes: collocation_internal.hpp ";
 
+%feature("docstring")  CasADi::CollocationInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::CollocationInternal::getHessian "";
+
+%feature("docstring")  CasADi::CollocationInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::CollocationInternal::getGradient "";
+
+%feature("docstring")  CasADi::CollocationInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::CollocationInternal::getJacobian "";
+
+%feature("docstring")  CasADi::CollocationInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::CollocationInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::CollocationInternal::getDerivative "";
+
 %feature("docstring")  CasADi::CollocationInternal::input "
 
 Access input argument. ";
@@ -7273,9 +7527,9 @@ Evaluate. ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::CollocationInternal::hessian "
+%feature("docstring")  CasADi::CollocationInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::CollocationInternal::spEvaluate "
 
@@ -7305,29 +7559,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::CollocationInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::CollocationInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::CollocationInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::CollocationInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::CollocationInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::CollocationInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::CollocationInternal::iStruct "
 
@@ -8404,6 +8635,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::ControlSimulator::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::ControlSimulator::evaluate "
 
 Evaluate. ";
@@ -8414,22 +8657,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::ControlSimulator::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::ControlSimulator::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::ControlSimulator::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::ControlSimulator::call "
 
@@ -8951,6 +9223,33 @@ Joel Andersson
 
 C++ includes: control_simulator_internal.hpp ";
 
+%feature("docstring")  CasADi::ControlSimulatorInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::getHessian "";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::getGradient "";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::getJacobian "";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::getNumericJacobian
+"";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::getDerivative "";
+
 %feature("docstring")  CasADi::ControlSimulatorInternal::input "
 
 Access input argument. ";
@@ -9051,9 +9350,9 @@ timescale. ";
 
 Get the index i such that gridfine[i] == gridcoarse. ";
 
-%feature("docstring")  CasADi::ControlSimulatorInternal::hessian "
+%feature("docstring")  CasADi::ControlSimulatorInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::ControlSimulatorInternal::spEvaluate "
 
@@ -9083,30 +9382,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::ControlSimulatorInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::ControlSimulatorInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::ControlSimulatorInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::ControlSimulatorInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::ControlSimulatorInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::ControlSimulatorInternal::getNumericJacobian
-"
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::ControlSimulatorInternal::iStruct "
 
@@ -9603,6 +9878,32 @@ Assert that the object has been initialized. ";
 
 C++ includes: cplex_internal.hpp ";
 
+%feature("docstring")  CasADi::CplexInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::CplexInternal::getHessian "";
+
+%feature("docstring")  CasADi::CplexInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::CplexInternal::getGradient "";
+
+%feature("docstring")  CasADi::CplexInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::CplexInternal::getJacobian "";
+
+%feature("docstring")  CasADi::CplexInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::CplexInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::CplexInternal::getDerivative "";
+
 %feature("docstring")  CasADi::CplexInternal::input "
 
 Access input argument. ";
@@ -9709,9 +10010,9 @@ Set options that make the NLP solver more suitable for solving QPs. ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::CplexInternal::hessian "
+%feature("docstring")  CasADi::CplexInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::CplexInternal::spEvaluate "
 
@@ -9741,29 +10042,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::CplexInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::CplexInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::CplexInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::CplexInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::CplexInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::CplexInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::CplexInternal::iStruct "
 
@@ -10491,6 +10769,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::CplexSolver::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::CplexSolver::evaluate "
 
 Evaluate. ";
@@ -10501,22 +10791,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::CplexSolver::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::CplexSolver::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::CplexSolver::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::CplexSolver::call "
 
@@ -11882,28 +12201,69 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::CSparse::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::CSparse::evaluate "
 
 Evaluate. ";
 
 %feature("docstring")  CasADi::CSparse::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::CSparse::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::CSparse::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::CSparse::call "
 
@@ -12354,6 +12714,32 @@ Solves the linear system A.x = b for x
 
 C++ includes: csparse_internal.hpp ";
 
+%feature("docstring")  CasADi::CSparseInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::CSparseInternal::getHessian "";
+
+%feature("docstring")  CasADi::CSparseInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::CSparseInternal::getGradient "";
+
+%feature("docstring")  CasADi::CSparseInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::CSparseInternal::getJacobian "";
+
+%feature("docstring")  CasADi::CSparseInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::CSparseInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::CSparseInternal::getDerivative "";
+
 %feature("docstring")  CasADi::CSparseInternal::input "
 
 Access input argument. ";
@@ -12460,9 +12846,9 @@ Evaluate. ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::CSparseInternal::hessian "
+%feature("docstring")  CasADi::CSparseInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::CSparseInternal::spEvaluate "
 
@@ -12492,29 +12878,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::CSparseInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::CSparseInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::CSparseInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::CSparseInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::CSparseInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::CSparseInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::CSparseInternal::iStruct "
 
@@ -13437,6 +13800,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::CVodesIntegrator::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::CVodesIntegrator::evaluate "
 
 Evaluate. ";
@@ -13447,22 +13822,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::CVodesIntegrator::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::CVodesIntegrator::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::CVodesIntegrator::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::CVodesIntegrator::call "
 
@@ -14229,6 +14633,28 @@ quadrature state at the initial time (INTEGRATOR_RQF=3)
 
 C++ includes: cvodes_internal.hpp ";
 
+%feature("docstring")  CasADi::CVodesInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::CVodesInternal::getHessian "";
+
+%feature("docstring")  CasADi::CVodesInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::CVodesInternal::getGradient "";
+
+%feature("docstring")  CasADi::CVodesInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::CVodesInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::CVodesInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
 %feature("docstring")  CasADi::CVodesInternal::input "
 
 Access input argument. ";
@@ -14401,9 +14827,9 @@ adjoint sensitivities. ";
 Generate a augmented DAE system with nfwd forward sensitivities and nadj
 adjoint sensitivities (generic) ";
 
-%feature("docstring")  CasADi::CVodesInternal::hessian "
+%feature("docstring")  CasADi::CVodesInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::CVodesInternal::spInit "
 
@@ -14424,20 +14850,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::CVodesInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::CVodesInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::CVodesInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::CVodesInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::CVodesInternal::iStruct "
 
@@ -15400,6 +15812,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::ExternalFunction::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::ExternalFunction::evaluate "
 
 Evaluate. ";
@@ -15410,22 +15834,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::ExternalFunction::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::ExternalFunction::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::ExternalFunction::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::ExternalFunction::call "
 
@@ -15870,6 +16323,33 @@ Return a string with a destription (for SWIG) ";
 
 C++ includes: external_function_internal.hpp ";
 
+%feature("docstring")  CasADi::ExternalFunctionInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::getHessian "";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::getGradient "";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::getJacobian "";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::getNumericJacobian
+"";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::getDerivative "";
+
 %feature("docstring")  CasADi::ExternalFunctionInternal::input "
 
 Access input argument. ";
@@ -15961,9 +16441,9 @@ Initialize. ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::ExternalFunctionInternal::hessian "
+%feature("docstring")  CasADi::ExternalFunctionInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::ExternalFunctionInternal::spEvaluate "
 
@@ -15993,30 +16473,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::ExternalFunctionInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::ExternalFunctionInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::ExternalFunctionInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::ExternalFunctionInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::ExternalFunctionInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::ExternalFunctionInternal::getNumericJacobian
-"
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::ExternalFunctionInternal::iStruct "
 
@@ -16896,6 +17352,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::FX::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::FX::evaluate "
 
 Evaluate. ";
@@ -16906,22 +17374,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::FX::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::FX::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::FX::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::FX::call "
 
@@ -17401,6 +17898,32 @@ Joel Andersson
 
 C++ includes: fx_internal.hpp ";
 
+%feature("docstring")  CasADi::FXInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::FXInternal::getHessian "";
+
+%feature("docstring")  CasADi::FXInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::FXInternal::getGradient "";
+
+%feature("docstring")  CasADi::FXInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::FXInternal::getJacobian "";
+
+%feature("docstring")  CasADi::FXInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::FXInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::FXInternal::getDerivative "";
+
 %feature("docstring")  CasADi::FXInternal::input "
 
 Access input argument. ";
@@ -17485,9 +18008,9 @@ should invoke this function when initialized. ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::FXInternal::hessian "
+%feature("docstring")  CasADi::FXInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::FXInternal::spEvaluate "
 
@@ -17517,29 +18040,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::FXInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::FXInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::FXInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::FXInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::FXInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::FXInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::FXInternal::iStruct "
 
@@ -18926,6 +19426,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::IdasIntegrator::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::IdasIntegrator::evaluate "
 
 Evaluate. ";
@@ -18936,22 +19448,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::IdasIntegrator::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::IdasIntegrator::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::IdasIntegrator::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::IdasIntegrator::call "
 
@@ -19764,6 +20305,28 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 
 C++ includes: idas_internal.hpp ";
 
+%feature("docstring")  CasADi::IdasInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::IdasInternal::getHessian "";
+
+%feature("docstring")  CasADi::IdasInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::IdasInternal::getGradient "";
+
+%feature("docstring")  CasADi::IdasInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::IdasInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::IdasInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
 %feature("docstring")  CasADi::IdasInternal::input "
 
 Access input argument. ";
@@ -19969,9 +20532,9 @@ adjoint sensitivities. ";
 Generate a augmented DAE system with nfwd forward sensitivities and nadj
 adjoint sensitivities (generic) ";
 
-%feature("docstring")  CasADi::IdasInternal::hessian "
+%feature("docstring")  CasADi::IdasInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::IdasInternal::spInit "
 
@@ -19992,20 +20555,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::IdasInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::IdasInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::IdasInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::IdasInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::IdasInternal::iStruct "
 
@@ -20746,6 +21295,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::ImplicitFunction::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::ImplicitFunction::evaluate "
 
 Evaluate. ";
@@ -20756,22 +21317,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::ImplicitFunction::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::ImplicitFunction::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::ImplicitFunction::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::ImplicitFunction::call "
 
@@ -21222,6 +21812,33 @@ Internal class.
 
 C++ includes: implicit_function_internal.hpp ";
 
+%feature("docstring")  CasADi::ImplicitFunctionInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::getHessian "";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::getGradient "";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::getJacobian "";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::getNumericJacobian
+"";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::getDerivative "";
+
 %feature("docstring")  CasADi::ImplicitFunctionInternal::input "
 
 Access input argument. ";
@@ -21314,9 +21931,9 @@ Solve the system of equations. ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::ImplicitFunctionInternal::hessian "
+%feature("docstring")  CasADi::ImplicitFunctionInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::spEvaluate "
 
@@ -21346,30 +21963,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::ImplicitFunctionInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::ImplicitFunctionInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::ImplicitFunctionInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::ImplicitFunctionInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::ImplicitFunctionInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::ImplicitFunctionInternal::getNumericJacobian
-"
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::iStruct "
 
@@ -22251,6 +22844,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::Integrator::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::Integrator::evaluate "
 
 Evaluate. ";
@@ -22261,22 +22866,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::Integrator::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::Integrator::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::Integrator::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::Integrator::call "
 
@@ -22808,6 +23442,28 @@ Joel Andersson
 
 C++ includes: integrator_internal.hpp ";
 
+%feature("docstring")  CasADi::IntegratorInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::getHessian "";
+
+%feature("docstring")  CasADi::IntegratorInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::getGradient "";
+
+%feature("docstring")  CasADi::IntegratorInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::IntegratorInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
 %feature("docstring")  CasADi::IntegratorInternal::input "
 
 Access input argument. ";
@@ -22966,9 +23622,9 @@ adjoint sensitivities (generic) ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::IntegratorInternal::hessian "
+%feature("docstring")  CasADi::IntegratorInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::IntegratorInternal::spInit "
 
@@ -22989,20 +23645,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::IntegratorInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::IntegratorInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::IntegratorInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::IntegratorInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::IntegratorInternal::iStruct "
 
@@ -23498,6 +24140,32 @@ Assert that the object has been initialized. ";
 
 C++ includes: ip_internal.hpp ";
 
+%feature("docstring")  CasADi::IPInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::IPInternal::getHessian "";
+
+%feature("docstring")  CasADi::IPInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::IPInternal::getGradient "";
+
+%feature("docstring")  CasADi::IPInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::IPInternal::getJacobian "";
+
+%feature("docstring")  CasADi::IPInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::IPInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::IPInternal::getDerivative "";
+
 %feature("docstring")  CasADi::IPInternal::input "
 
 Access input argument. ";
@@ -23600,9 +24268,9 @@ Set options that make the NLP solver more suitable for solving QPs. ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::IPInternal::hessian "
+%feature("docstring")  CasADi::IPInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::IPInternal::spEvaluate "
 
@@ -23632,29 +24300,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::IPInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::IPInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::IPInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::IPInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::IPInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::IPInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::IPInternal::iStruct "
 
@@ -24345,6 +24990,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::IPMethod::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::IPMethod::evaluate "
 
 Evaluate. ";
@@ -24355,22 +25012,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::IPMethod::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::IPMethod::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::IPMethod::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::IPMethod::call "
 
@@ -27643,6 +28329,32 @@ n: number of decision variables (x)     m: number of constraints (A)
 
 C++ includes: ipopt_internal.hpp ";
 
+%feature("docstring")  CasADi::IpoptInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::IpoptInternal::getHessian "";
+
+%feature("docstring")  CasADi::IpoptInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::IpoptInternal::getGradient "";
+
+%feature("docstring")  CasADi::IpoptInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::IpoptInternal::getJacobian "";
+
+%feature("docstring")  CasADi::IpoptInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::IpoptInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::IpoptInternal::getDerivative "";
+
 %feature("docstring")  CasADi::IpoptInternal::input "
 
 Access input argument. ";
@@ -27749,9 +28461,9 @@ Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::IpoptInternal::hessian "
+%feature("docstring")  CasADi::IpoptInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::IpoptInternal::spEvaluate "
 
@@ -27781,29 +28493,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::IpoptInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::IpoptInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::IpoptInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::IpoptInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::IpoptInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::IpoptInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::IpoptInternal::iStruct "
 
@@ -31186,6 +31875,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::IpoptSolver::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::IpoptSolver::evaluate "
 
 Evaluate. ";
@@ -31196,22 +31897,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::IpoptSolver::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::IpoptSolver::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::IpoptSolver::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::IpoptSolver::call "
 
@@ -31889,6 +32619,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::Jacobian::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::Jacobian::evaluate "
 
 Evaluate. ";
@@ -31899,22 +32641,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::Jacobian::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::Jacobian::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::Jacobian::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::Jacobian::call "
 
@@ -32367,6 +33138,32 @@ Joel Andersson
 
 C++ includes: jacobian_internal.hpp ";
 
+%feature("docstring")  CasADi::JacobianInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::JacobianInternal::getHessian "";
+
+%feature("docstring")  CasADi::JacobianInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::JacobianInternal::getGradient "";
+
+%feature("docstring")  CasADi::JacobianInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::JacobianInternal::getJacobian "";
+
+%feature("docstring")  CasADi::JacobianInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::JacobianInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::JacobianInternal::getDerivative "";
+
 %feature("docstring")  CasADi::JacobianInternal::input "
 
 Access input argument. ";
@@ -32460,9 +33257,9 @@ Initialize. ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::JacobianInternal::hessian "
+%feature("docstring")  CasADi::JacobianInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::JacobianInternal::spEvaluate "
 
@@ -32492,29 +33289,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::JacobianInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::JacobianInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::JacobianInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::JacobianInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::JacobianInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::JacobianInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::JacobianInternal::iStruct "
 
@@ -32934,6 +33708,32 @@ Assert that the object has been initialized. ";
 
 C++ includes: kinsol_internal.hpp ";
 
+%feature("docstring")  CasADi::KinsolInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::KinsolInternal::getHessian "";
+
+%feature("docstring")  CasADi::KinsolInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::KinsolInternal::getGradient "";
+
+%feature("docstring")  CasADi::KinsolInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::KinsolInternal::getJacobian "";
+
+%feature("docstring")  CasADi::KinsolInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::KinsolInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::KinsolInternal::getDerivative "";
+
 %feature("docstring")  CasADi::KinsolInternal::input "
 
 Access input argument. ";
@@ -33069,9 +33869,9 @@ Residual. ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::KinsolInternal::hessian "
+%feature("docstring")  CasADi::KinsolInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::KinsolInternal::spEvaluate "
 
@@ -33101,29 +33901,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::KinsolInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::KinsolInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::KinsolInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::KinsolInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::KinsolInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::KinsolInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::KinsolInternal::iStruct "
 
@@ -33741,6 +34518,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::KinsolSolver::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::KinsolSolver::evaluate "
 
 Evaluate. ";
@@ -33751,22 +34540,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::KinsolSolver::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::KinsolSolver::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::KinsolSolver::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::KinsolSolver::call "
 
@@ -34582,6 +35400,32 @@ n: number of decision variables (x)     m: number of constraints (A)
 
 C++ includes: knitro_internal.hpp ";
 
+%feature("docstring")  CasADi::KnitroInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::KnitroInternal::getHessian "";
+
+%feature("docstring")  CasADi::KnitroInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::KnitroInternal::getGradient "";
+
+%feature("docstring")  CasADi::KnitroInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::KnitroInternal::getJacobian "";
+
+%feature("docstring")  CasADi::KnitroInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::KnitroInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::KnitroInternal::getDerivative "";
+
 %feature("docstring")  CasADi::KnitroInternal::input "
 
 Access input argument. ";
@@ -34690,9 +35534,9 @@ Set options that make the NLP solver more suitable for solving QPs. ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::KnitroInternal::hessian "
+%feature("docstring")  CasADi::KnitroInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::KnitroInternal::spEvaluate "
 
@@ -34722,29 +35566,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::KnitroInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::KnitroInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::KnitroInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::KnitroInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::KnitroInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::KnitroInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::KnitroInternal::iStruct "
 
@@ -35539,6 +36360,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::KnitroSolver::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::KnitroSolver::evaluate "
 
 Evaluate. ";
@@ -35549,22 +36382,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::KnitroSolver::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::KnitroSolver::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::KnitroSolver::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::KnitroSolver::call "
 
@@ -36221,28 +37083,69 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::LapackLUDense::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::LapackLUDense::evaluate "
 
 Evaluate. ";
 
 %feature("docstring")  CasADi::LapackLUDense::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::LapackLUDense::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::LapackLUDense::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::LapackLUDense::call "
 
@@ -36701,6 +37604,32 @@ Internal class.
 
 C++ includes: lapack_lu_dense.hpp ";
 
+%feature("docstring")  CasADi::LapackLUDenseInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::LapackLUDenseInternal::getHessian "";
+
+%feature("docstring")  CasADi::LapackLUDenseInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::LapackLUDenseInternal::getGradient "";
+
+%feature("docstring")  CasADi::LapackLUDenseInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::LapackLUDenseInternal::getJacobian "";
+
+%feature("docstring")  CasADi::LapackLUDenseInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::LapackLUDenseInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::LapackLUDenseInternal::getDerivative "";
+
 %feature("docstring")  CasADi::LapackLUDenseInternal::input "
 
 Access input argument. ";
@@ -36807,9 +37736,9 @@ Evaluate. ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::LapackLUDenseInternal::hessian "
+%feature("docstring")  CasADi::LapackLUDenseInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::LapackLUDenseInternal::spEvaluate "
 
@@ -36839,29 +37768,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::LapackLUDenseInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::LapackLUDenseInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::LapackLUDenseInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::LapackLUDenseInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::LapackLUDenseInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::LapackLUDenseInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::LapackLUDenseInternal::iStruct "
 
@@ -37417,28 +38323,69 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::LapackQRDense::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::LapackQRDense::evaluate "
 
 Evaluate. ";
 
 %feature("docstring")  CasADi::LapackQRDense::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::LapackQRDense::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::LapackQRDense::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::LapackQRDense::call "
 
@@ -37889,6 +38836,32 @@ Internal class.
 
 C++ includes: lapack_qr_dense.hpp ";
 
+%feature("docstring")  CasADi::LapackQRDenseInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::LapackQRDenseInternal::getHessian "";
+
+%feature("docstring")  CasADi::LapackQRDenseInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::LapackQRDenseInternal::getGradient "";
+
+%feature("docstring")  CasADi::LapackQRDenseInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::LapackQRDenseInternal::getJacobian "";
+
+%feature("docstring")  CasADi::LapackQRDenseInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::LapackQRDenseInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::LapackQRDenseInternal::getDerivative "";
+
 %feature("docstring")  CasADi::LapackQRDenseInternal::input "
 
 Access input argument. ";
@@ -37995,9 +38968,9 @@ Evaluate. ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::LapackQRDenseInternal::hessian "
+%feature("docstring")  CasADi::LapackQRDenseInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::LapackQRDenseInternal::spEvaluate "
 
@@ -38027,29 +39000,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::LapackQRDenseInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::LapackQRDenseInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::LapackQRDenseInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::LapackQRDenseInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::LapackQRDenseInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::LapackQRDenseInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::LapackQRDenseInternal::iStruct "
 
@@ -38820,6 +39770,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::LiftedSQP::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::LiftedSQP::evaluate "
 
 Evaluate. ";
@@ -38830,22 +39792,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::LiftedSQP::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::LiftedSQP::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::LiftedSQP::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::LiftedSQP::call "
 
@@ -39521,6 +40512,32 @@ Return a string with a destription (for SWIG) ";
 
 C++ includes: lifted_sqp_internal.hpp ";
 
+%feature("docstring")  CasADi::LiftedSQPInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::getHessian "";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::getGradient "";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::getJacobian "";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::getDerivative "";
+
 %feature("docstring")  CasADi::LiftedSQPInternal::input "
 
 Access input argument. ";
@@ -39623,9 +40640,9 @@ Set options that make the NLP solver more suitable for solving QPs. ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::LiftedSQPInternal::hessian "
+%feature("docstring")  CasADi::LiftedSQPInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::LiftedSQPInternal::spEvaluate "
 
@@ -39655,29 +40672,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::LiftedSQPInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::LiftedSQPInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::LiftedSQPInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::LiftedSQPInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::LiftedSQPInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::LiftedSQPInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::LiftedSQPInternal::iStruct "
 
@@ -40177,6 +41171,32 @@ n: number of decision variables (x)     m: number of constraints (A)
 
 C++ includes: liftopt_internal.hpp ";
 
+%feature("docstring")  CasADi::LiftoptInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::LiftoptInternal::getHessian "";
+
+%feature("docstring")  CasADi::LiftoptInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::LiftoptInternal::getGradient "";
+
+%feature("docstring")  CasADi::LiftoptInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::LiftoptInternal::getJacobian "";
+
+%feature("docstring")  CasADi::LiftoptInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::LiftoptInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::LiftoptInternal::getDerivative "";
+
 %feature("docstring")  CasADi::LiftoptInternal::input "
 
 Access input argument. ";
@@ -40279,9 +41299,9 @@ Set options that make the NLP solver more suitable for solving QPs. ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::LiftoptInternal::hessian "
+%feature("docstring")  CasADi::LiftoptInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::LiftoptInternal::spEvaluate "
 
@@ -40311,29 +41331,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::LiftoptInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::LiftoptInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::LiftoptInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::LiftoptInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::LiftoptInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::LiftoptInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::LiftoptInternal::iStruct "
 
@@ -41025,6 +42022,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::LiftoptSolver::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::LiftoptSolver::evaluate "
 
 Evaluate. ";
@@ -41035,22 +42044,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::LiftoptSolver::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::LiftoptSolver::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::LiftoptSolver::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::LiftoptSolver::call "
 
@@ -41671,28 +42709,69 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::LinearSolver::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::LinearSolver::evaluate "
 
 Evaluate. ";
 
 %feature("docstring")  CasADi::LinearSolver::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::LinearSolver::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::LinearSolver::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::LinearSolver::call "
 
@@ -42143,6 +43222,32 @@ Internal class Solves the linear system A.x = b for x
 
 C++ includes: linear_solver_internal.hpp ";
 
+%feature("docstring")  CasADi::LinearSolverInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::getHessian "";
+
+%feature("docstring")  CasADi::LinearSolverInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::getGradient "";
+
+%feature("docstring")  CasADi::LinearSolverInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::getJacobian "";
+
+%feature("docstring")  CasADi::LinearSolverInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::LinearSolverInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::getDerivative "";
+
 %feature("docstring")  CasADi::LinearSolverInternal::input "
 
 Access input argument. ";
@@ -42243,9 +43348,9 @@ Evaluate. ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::LinearSolverInternal::hessian "
+%feature("docstring")  CasADi::LinearSolverInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::LinearSolverInternal::spEvaluate "
 
@@ -42275,29 +43380,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::LinearSolverInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::LinearSolverInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::LinearSolverInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::LinearSolverInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::LinearSolverInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::LinearSolverInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::LinearSolverInternal::iStruct "
 
@@ -44414,6 +45496,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::MultipleShooting::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::MultipleShooting::evaluate "
 
 Evaluate. ";
@@ -44424,22 +45518,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::MultipleShooting::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::MultipleShooting::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::MultipleShooting::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::MultipleShooting::call "
 
@@ -44992,6 +46115,33 @@ Return a string with a destription (for SWIG) ";
 
 C++ includes: multiple_shooting_internal.hpp ";
 
+%feature("docstring")  CasADi::MultipleShootingInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::MultipleShootingInternal::getHessian "";
+
+%feature("docstring")  CasADi::MultipleShootingInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::MultipleShootingInternal::getGradient "";
+
+%feature("docstring")  CasADi::MultipleShootingInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::MultipleShootingInternal::getJacobian "";
+
+%feature("docstring")  CasADi::MultipleShootingInternal::getNumericJacobian
+"";
+
+%feature("docstring")  CasADi::MultipleShootingInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::MultipleShootingInternal::getDerivative "";
+
 %feature("docstring")  CasADi::MultipleShootingInternal::input "
 
 Access input argument. ";
@@ -45091,9 +46241,9 @@ Evaluate. ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::MultipleShootingInternal::hessian "
+%feature("docstring")  CasADi::MultipleShootingInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::MultipleShootingInternal::spEvaluate "
 
@@ -45123,30 +46273,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::MultipleShootingInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::getNumericJacobian
-"
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::MultipleShootingInternal::iStruct "
 
@@ -47092,6 +48218,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::MXFunction::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::MXFunction::evaluate "
 
 Evaluate. ";
@@ -47102,22 +48240,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::MXFunction::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::MXFunction::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::MXFunction::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::MXFunction::call "
 
@@ -47566,6 +48733,24 @@ Joel Andersson
 
 C++ includes: mx_function_internal.hpp ";
 
+%feature("docstring")  CasADi::MXFunctionInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::getHessian "";
+
+%feature("docstring")  CasADi::MXFunctionInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
 %feature("docstring")  CasADi::MXFunctionInternal::input "
 
 Access input argument. ";
@@ -47668,21 +48853,6 @@ Update the number of sensitivity directions during or after initialization.
 
 Set the lifting function. ";
 
-%feature("docstring")  CasADi::MXFunctionInternal::jac "
-
-Calculate the expression for the jacobian of a number of function outputs
-with respect to a number of function inputs, optionally include the function
-outputs. ";
-
-%feature("docstring")  CasADi::MXFunctionInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::MXFunctionInternal::getJacobian "
-
-Calculate the jacobian of output oind with respect to input iind. ";
-
 %feature("docstring")  CasADi::MXFunctionInternal::getNumericJacobian "
 
 Generate a function that calculates a Jacobian function by operator
@@ -47691,10 +48861,6 @@ overloading. ";
 %feature("docstring")  CasADi::MXFunctionInternal::collectFree "
 
 Collect the free variables. ";
-
-%feature("docstring")  CasADi::MXFunctionInternal::hessian "
-
-Hessian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::evalSX "
 
@@ -47727,9 +48893,30 @@ Is the class able to propate seeds through the algorithm? ";
 
 Reset the sparsity propagation. ";
 
-%feature("docstring")  CasADi::MXFunctionInternal::jacGen "
+%feature("docstring")  CasADi::MXFunctionInternal::grad "
+
+Gradient via source code transformation. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::jac "
 
 Construct a complete Jacobian by compression. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::getGradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::getJacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::requestNumSens "
+
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::call "
 
@@ -47738,15 +48925,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::MXFunctionInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::MXFunctionInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::MXFunctionInternal::jacobian "
-
-Access a Jacobian function (cached) ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::iStruct "
 
@@ -48469,6 +49647,32 @@ nc: number of constraints (A)
 
 C++ includes: nlp_qp_internal.hpp ";
 
+%feature("docstring")  CasADi::NLPQPInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getHessian "";
+
+%feature("docstring")  CasADi::NLPQPInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getGradient "";
+
+%feature("docstring")  CasADi::NLPQPInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getJacobian "";
+
+%feature("docstring")  CasADi::NLPQPInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::NLPQPInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getDerivative "";
+
 %feature("docstring")  CasADi::NLPQPInternal::input "
 
 Access input argument. ";
@@ -48564,9 +49768,9 @@ Evaluate. ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::NLPQPInternal::hessian "
+%feature("docstring")  CasADi::NLPQPInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::NLPQPInternal::spEvaluate "
 
@@ -48596,29 +49800,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::NLPQPInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::NLPQPInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::NLPQPInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::NLPQPInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::NLPQPInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::NLPQPInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::NLPQPInternal::iStruct "
 
@@ -49195,6 +50376,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::NLPQPSolver::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::NLPQPSolver::evaluate "
 
 Evaluate. ";
@@ -49205,22 +50398,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::NLPQPSolver::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::NLPQPSolver::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::NLPQPSolver::call "
 
@@ -49989,6 +51211,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::NLPSolver::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::NLPSolver::evaluate "
 
 Evaluate. ";
@@ -49999,22 +51233,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::NLPSolver::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::NLPSolver::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::NLPSolver::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::NLPSolver::call "
 
@@ -50605,6 +51868,32 @@ Joel Andersson
 
 C++ includes: nlp_solver_internal.hpp ";
 
+%feature("docstring")  CasADi::NLPSolverInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::getHessian "";
+
+%feature("docstring")  CasADi::NLPSolverInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::getGradient "";
+
+%feature("docstring")  CasADi::NLPSolverInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::getJacobian "";
+
+%feature("docstring")  CasADi::NLPSolverInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::NLPSolverInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::getDerivative "";
+
 %feature("docstring")  CasADi::NLPSolverInternal::input "
 
 Access input argument. ";
@@ -50703,9 +51992,9 @@ Evaluate. ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::NLPSolverInternal::hessian "
+%feature("docstring")  CasADi::NLPSolverInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::NLPSolverInternal::spEvaluate "
 
@@ -50735,29 +52024,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::NLPSolverInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::NLPSolverInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::NLPSolverInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::NLPSolverInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::NLPSolverInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::NLPSolverInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::NLPSolverInternal::iStruct "
 
@@ -52962,6 +54228,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::OCPSolver::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::OCPSolver::evaluate "
 
 Evaluate. ";
@@ -52972,22 +54250,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::OCPSolver::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::OCPSolver::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::OCPSolver::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::OCPSolver::call "
 
@@ -53521,6 +54828,32 @@ Joel Andersson
 
 C++ includes: ocp_solver_internal.hpp ";
 
+%feature("docstring")  CasADi::OCPSolverInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::getHessian "";
+
+%feature("docstring")  CasADi::OCPSolverInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::getGradient "";
+
+%feature("docstring")  CasADi::OCPSolverInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::getJacobian "";
+
+%feature("docstring")  CasADi::OCPSolverInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::OCPSolverInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::getDerivative "";
+
 %feature("docstring")  CasADi::OCPSolverInternal::input "
 
 Access input argument. ";
@@ -53629,9 +54962,9 @@ Evaluate. ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::OCPSolverInternal::hessian "
+%feature("docstring")  CasADi::OCPSolverInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::OCPSolverInternal::spEvaluate "
 
@@ -53661,29 +54994,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::OCPSolverInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::OCPSolverInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::OCPSolverInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::OCPSolverInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::OCPSolverInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::OCPSolverInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::OCPSolverInternal::iStruct "
 
@@ -54200,6 +55510,32 @@ nc: number of constraints (A)
 
 C++ includes: ooqp_internal.hpp ";
 
+%feature("docstring")  CasADi::OOQPInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::OOQPInternal::getHessian "";
+
+%feature("docstring")  CasADi::OOQPInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::OOQPInternal::getGradient "";
+
+%feature("docstring")  CasADi::OOQPInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::OOQPInternal::getJacobian "";
+
+%feature("docstring")  CasADi::OOQPInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::OOQPInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::OOQPInternal::getDerivative "";
+
 %feature("docstring")  CasADi::OOQPInternal::input "
 
 Access input argument. ";
@@ -54311,9 +55647,9 @@ Evaluate. ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::OOQPInternal::hessian "
+%feature("docstring")  CasADi::OOQPInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::OOQPInternal::spEvaluate "
 
@@ -54343,29 +55679,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::OOQPInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::OOQPInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::OOQPInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::OOQPInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::OOQPInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::OOQPInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::OOQPInternal::iStruct "
 
@@ -54954,6 +56267,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::OOQPSolver::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::OOQPSolver::evaluate "
 
 Evaluate. ";
@@ -54964,22 +56289,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::OOQPSolver::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::OOQPSolver::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::OOQPSolver::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::OOQPSolver::call "
 
@@ -56141,6 +57495,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::Parallelizer::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::Parallelizer::evaluate "
 
 Evaluate. ";
@@ -56151,22 +57517,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::Parallelizer::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::Parallelizer::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::Parallelizer::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::Parallelizer::call "
 
@@ -56646,6 +58041,28 @@ Joel Andersson
 
 C++ includes: parallelizer_internal.hpp ";
 
+%feature("docstring")  CasADi::ParallelizerInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::getHessian "";
+
+%feature("docstring")  CasADi::ParallelizerInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::getGradient "";
+
+%feature("docstring")  CasADi::ParallelizerInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::ParallelizerInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
 %feature("docstring")  CasADi::ParallelizerInternal::input "
 
 Access input argument. ";
@@ -56770,9 +58187,9 @@ Deep copy data members. ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::ParallelizerInternal::hessian "
+%feature("docstring")  CasADi::ParallelizerInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::ParallelizerInternal::evalSX "
 
@@ -56789,20 +58206,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::ParallelizerInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::ParallelizerInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::ParallelizerInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::ParallelizerInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::ParallelizerInternal::iStruct "
 
@@ -57258,6 +58661,32 @@ nc: number of constraints (A)
 
 C++ includes: qpoases_internal.hpp ";
 
+%feature("docstring")  CasADi::QPOasesInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::QPOasesInternal::getHessian "";
+
+%feature("docstring")  CasADi::QPOasesInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::QPOasesInternal::getGradient "";
+
+%feature("docstring")  CasADi::QPOasesInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::QPOasesInternal::getJacobian "";
+
+%feature("docstring")  CasADi::QPOasesInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::QPOasesInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::QPOasesInternal::getDerivative "";
+
 %feature("docstring")  CasADi::QPOasesInternal::input "
 
 Access input argument. ";
@@ -57353,9 +58782,9 @@ Evaluate. ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::QPOasesInternal::hessian "
+%feature("docstring")  CasADi::QPOasesInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::QPOasesInternal::spEvaluate "
 
@@ -57385,29 +58814,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::QPOasesInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::QPOasesInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::QPOasesInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::QPOasesInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::QPOasesInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::QPOasesInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::QPOasesInternal::iStruct "
 
@@ -58000,6 +59406,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::QPOasesSolver::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::QPOasesSolver::evaluate "
 
 Evaluate. ";
@@ -58010,22 +59428,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::QPOasesSolver::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::QPOasesSolver::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::QPOasesSolver::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::QPOasesSolver::call "
 
@@ -58682,6 +60129,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::QPSolver::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::QPSolver::evaluate "
 
 Evaluate. ";
@@ -58692,22 +60151,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::QPSolver::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::QPSolver::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::QPSolver::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::QPSolver::call "
 
@@ -59205,6 +60693,32 @@ Internal class.
 
 C++ includes: qp_solver_internal.hpp ";
 
+%feature("docstring")  CasADi::QPSolverInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::getHessian "";
+
+%feature("docstring")  CasADi::QPSolverInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::getGradient "";
+
+%feature("docstring")  CasADi::QPSolverInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::getJacobian "";
+
+%feature("docstring")  CasADi::QPSolverInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::QPSolverInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::getDerivative "";
+
 %feature("docstring")  CasADi::QPSolverInternal::input "
 
 Access input argument. ";
@@ -59293,9 +60807,9 @@ Evaluate. ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::QPSolverInternal::hessian "
+%feature("docstring")  CasADi::QPSolverInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::QPSolverInternal::spEvaluate "
 
@@ -59325,29 +60839,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::QPSolverInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::QPSolverInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::QPSolverInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::QPSolverInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::QPSolverInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::QPSolverInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::QPSolverInternal::iStruct "
 
@@ -60107,6 +61598,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::RKIntegrator::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::RKIntegrator::evaluate "
 
 Evaluate. ";
@@ -60117,22 +61620,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::RKIntegrator::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::RKIntegrator::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::RKIntegrator::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::RKIntegrator::call "
 
@@ -60648,6 +62180,28 @@ Return a string with a destription (for SWIG) ";
 
 C++ includes: rk_integrator_internal.hpp ";
 
+%feature("docstring")  CasADi::RKIntegratorInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getHessian "";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getGradient "";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
 %feature("docstring")  CasADi::RKIntegratorInternal::input "
 
 Access input argument. ";
@@ -60828,9 +62382,9 @@ adjoint sensitivities (generic) ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::RKIntegratorInternal::hessian "
+%feature("docstring")  CasADi::RKIntegratorInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::RKIntegratorInternal::spInit "
 
@@ -60851,20 +62405,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::RKIntegratorInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::RKIntegratorInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::RKIntegratorInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::RKIntegratorInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::RKIntegratorInternal::iStruct "
 
@@ -61836,6 +63376,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::Simulator::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::Simulator::evaluate "
 
 Evaluate. ";
@@ -61846,22 +63398,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::Simulator::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::Simulator::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::Simulator::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::Simulator::call "
 
@@ -62337,6 +63918,32 @@ Joel Andersson
 
 C++ includes: simulator_internal.hpp ";
 
+%feature("docstring")  CasADi::SimulatorInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::getHessian "";
+
+%feature("docstring")  CasADi::SimulatorInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::getGradient "";
+
+%feature("docstring")  CasADi::SimulatorInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::getJacobian "";
+
+%feature("docstring")  CasADi::SimulatorInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::SimulatorInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::getDerivative "";
+
 %feature("docstring")  CasADi::SimulatorInternal::input "
 
 Access input argument. ";
@@ -62426,9 +64033,9 @@ Integrate. ";
 Update the number of sensitivity directions during or after initialization.
 ";
 
-%feature("docstring")  CasADi::SimulatorInternal::hessian "
+%feature("docstring")  CasADi::SimulatorInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::SimulatorInternal::spEvaluate "
 
@@ -62458,29 +64065,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::SimulatorInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::SimulatorInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::SimulatorInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::SimulatorInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::SimulatorInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::SimulatorInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::SimulatorInternal::iStruct "
 
@@ -63365,6 +64949,32 @@ Assert that the object has been initialized. ";
 
 C++ includes: sqp_internal.hpp ";
 
+%feature("docstring")  CasADi::SQPInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::SQPInternal::getHessian "";
+
+%feature("docstring")  CasADi::SQPInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::SQPInternal::getGradient "";
+
+%feature("docstring")  CasADi::SQPInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::SQPInternal::getJacobian "";
+
+%feature("docstring")  CasADi::SQPInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::SQPInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::SQPInternal::getDerivative "";
+
 %feature("docstring")  CasADi::SQPInternal::input "
 
 Access input argument. ";
@@ -63467,9 +65077,9 @@ Set options that make the NLP solver more suitable for solving QPs. ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::SQPInternal::hessian "
+%feature("docstring")  CasADi::SQPInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::SQPInternal::spEvaluate "
 
@@ -63499,29 +65109,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::SQPInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::SQPInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::SQPInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::SQPInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::SQPInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::SQPInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::SQPInternal::iStruct "
 
@@ -63737,8 +65324,8 @@ Assert that the object has been initialized. ";
 // File: classCasADi_1_1SQPMethod.xml
 %feature("docstring") CasADi::SQPMethod "
 
-Sequential Quadratic Programming method The algorithm is a classical SQP
-method with either exact (has to be provided) or damped BFGS Lagrange
+Sequential Quadratic Programming method. The algorithm is a classical SQP
+method with either exact (may be also provided) or damped BFGS Lagrange
 Hessian approximation. Two different line-search algorithms are available.
 First, Armijo (Wolfe) condition with backtracking (suffers from Maratos
 effect). Second, a line-search method that checks if the merit function is
@@ -64303,6 +65890,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::SQPMethod::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::SQPMethod::evaluate "
 
 Evaluate. ";
@@ -64313,22 +65912,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::SQPMethod::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::SQPMethod::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::SQPMethod::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::SQPMethod::call "
 
@@ -65245,6 +66873,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::SundialsIntegrator::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::SundialsIntegrator::evaluate "
 
 Evaluate. ";
@@ -65255,22 +66895,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::SundialsIntegrator::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::SundialsIntegrator::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::SundialsIntegrator::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::SundialsIntegrator::call "
 
@@ -65964,6 +67633,28 @@ Return a string with a destription (for SWIG) ";
 
 C++ includes: sundials_internal.hpp ";
 
+%feature("docstring")  CasADi::SundialsInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::SundialsInternal::getHessian "";
+
+%feature("docstring")  CasADi::SundialsInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::SundialsInternal::getGradient "";
+
+%feature("docstring")  CasADi::SundialsInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::SundialsInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::SundialsInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
 %feature("docstring")  CasADi::SundialsInternal::input "
 
 Access input argument. ";
@@ -66126,9 +67817,9 @@ adjoint sensitivities (generic) ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::SundialsInternal::hessian "
+%feature("docstring")  CasADi::SundialsInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::SundialsInternal::spInit "
 
@@ -66149,20 +67840,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::SundialsInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::SundialsInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::SundialsInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::SundialsInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::SundialsInternal::iStruct "
 
@@ -67142,6 +68819,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::SXFunction::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::SXFunction::evaluate "
 
 Evaluate. ";
@@ -67152,22 +68841,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::SXFunction::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::SXFunction::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::SXFunction::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::SXFunction::call "
 
@@ -67625,6 +69343,26 @@ Joel Andersson
 
 C++ includes: sx_function_internal.hpp ";
 
+%feature("docstring")  CasADi::SXFunctionInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::getHessian "";
+
+%feature("docstring")  CasADi::SXFunctionInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::SXFunctionInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
 %feature("docstring")  CasADi::SXFunctionInternal::input "
 
 Access input argument. ";
@@ -67721,32 +69459,9 @@ Check if smooth. ";
 
 Print the algorithm. ";
 
-%feature("docstring")  CasADi::SXFunctionInternal::hessian "
-
-Hessian of output oind with respect to input iind. ";
-
-%feature("docstring")  CasADi::SXFunctionInternal::jac "
-
-Calculate the expression for the jacobian of a number of function outputs
-with respect to a number of function inputs, optionally include the function
-outputs. ";
-
-%feature("docstring")  CasADi::SXFunctionInternal::grad "
-
-Gradient via source code transformation. ";
-
 %feature("docstring")  CasADi::SXFunctionInternal::hess "
 
 Hessian (forward over adjoint) via source code transformation. ";
-
-%feature("docstring")  CasADi::SXFunctionInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::SXFunctionInternal::getJacobian "
-
-Calculate the jacobian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::init "
 
@@ -67778,9 +69493,30 @@ Is the class able to propate seeds through the algorithm? ";
 
 Reset the sparsity propagation. ";
 
-%feature("docstring")  CasADi::SXFunctionInternal::jacGen "
+%feature("docstring")  CasADi::SXFunctionInternal::grad "
+
+Gradient via source code transformation. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::jac "
 
 Construct a complete Jacobian by compression. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::getGradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::getJacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::requestNumSens "
+
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::evalMX "
 
@@ -67793,20 +69529,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::SXFunctionInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::SXFunctionInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::SXFunctionInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::SXFunctionInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::iStruct "
 
@@ -70580,6 +72302,32 @@ n: number of decision variables (x)     m: number of constraints (A)
 
 C++ includes: worhp_internal.hpp ";
 
+%feature("docstring")  CasADi::WorhpInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::WorhpInternal::getHessian "";
+
+%feature("docstring")  CasADi::WorhpInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::WorhpInternal::getGradient "";
+
+%feature("docstring")  CasADi::WorhpInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::WorhpInternal::getJacobian "";
+
+%feature("docstring")  CasADi::WorhpInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::WorhpInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::WorhpInternal::getDerivative "";
+
 %feature("docstring")  CasADi::WorhpInternal::input "
 
 Access input argument. ";
@@ -70691,9 +72439,9 @@ Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::WorhpInternal::hessian "
+%feature("docstring")  CasADi::WorhpInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::WorhpInternal::spEvaluate "
 
@@ -70723,29 +72471,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::WorhpInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::WorhpInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::WorhpInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::WorhpInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::WorhpInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::WorhpInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::WorhpInternal::iStruct "
 
@@ -72152,6 +73877,18 @@ Set number of outputs (normally invoked internally) ";
 Update the number of sensitivity directions during or after initialization
 (normally invoked internally) ";
 
+%feature("docstring")  CasADi::WorhpSolver::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
 %feature("docstring")  CasADi::WorhpSolver::evaluate "
 
 Evaluate. ";
@@ -72162,22 +73899,51 @@ the same as evaluate(0,0) ";
 
 %feature("docstring")  CasADi::WorhpSolver::jacobian "
 
-Calculate jacobian of output oind with respect to input iind.
+Generate a Jacobian function of output oind with respect to input iind.
 
 Parameters:
 -----------
 
+iind:  The index of the input
+
 oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::WorhpSolver::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
 
 iind:  The index of the input
 
-The default behaviour for FX is to use CasADi::Jacobian, which uses
-(numerical) directional derivatives (i.e. operator overloading) to form the
-Jacobian. ";
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
 
 %feature("docstring")  CasADi::WorhpSolver::hessian "
 
-Hessian of output oind with respect to input iind. ";
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
 
 %feature("docstring")  CasADi::WorhpSolver::call "
 
@@ -72637,6 +74403,26 @@ Joel Andersson
 
 C++ includes: x_function_internal.hpp ";
 
+%feature("docstring")  CasADi::XFunctionInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::getHessian "";
+
+%feature("docstring")  CasADi::XFunctionInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::XFunctionInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
 %feature("docstring")  CasADi::XFunctionInternal::input "
 
 Access input argument. ";
@@ -72709,9 +74495,26 @@ Constructor. ";
 
 Destructor. ";
 
-%feature("docstring")  CasADi::XFunctionInternal::jacGen "
+%feature("docstring")  CasADi::XFunctionInternal::grad "
+
+Gradient via source code transformation. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::jac "
 
 Construct a complete Jacobian by compression. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::getGradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::getJacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::getDerivative "
+
+Generate a function that calculates nfwd forward derivatives and nadj
+adjoint derivatives. ";
 
 %feature("docstring")  CasADi::XFunctionInternal::evaluate "
 
@@ -72729,9 +74532,9 @@ should invoke this function when initialized. ";
 Update the number of sensitivity directions during or after initialization,
 if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
-%feature("docstring")  CasADi::XFunctionInternal::hessian "
+%feature("docstring")  CasADi::XFunctionInternal::requestNumSens "
 
-Hessian of output oind with respect to input iind. ";
+Request a number of forward/adjoint derivative directions. ";
 
 %feature("docstring")  CasADi::XFunctionInternal::spEvaluate "
 
@@ -72761,29 +74564,6 @@ Call a function, MX type (overloaded) ";
 %feature("docstring")  CasADi::XFunctionInternal::call "
 
 Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::XFunctionInternal::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives (cached) ";
-
-%feature("docstring")  CasADi::XFunctionInternal::getDerivative "
-
-Generate a function that calculates nfwd forward derivatives and nadj
-adjoint derivatives. ";
-
-%feature("docstring")  CasADi::XFunctionInternal::jacobian "
-
-Access a Jacobian function (cached) ";
-
-%feature("docstring")  CasADi::XFunctionInternal::getJacobian "
-
-Generate a function that calculates a Jacobian function. ";
-
-%feature("docstring")  CasADi::XFunctionInternal::getNumericJacobian "
-
-Generate a function that calculates a Jacobian function by operator
-overloading. ";
 
 %feature("docstring")  CasADi::XFunctionInternal::iStruct "
 
