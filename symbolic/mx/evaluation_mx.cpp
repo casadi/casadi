@@ -487,7 +487,7 @@ void EvaluationMX::create(const FX& fcn, const std::vector<MX> &arg,
   for (int dir = 0; dir < nadj; ++dir) {
     asens[dir].resize(num_in);
     for (int i = 0; i < num_in; ++i, ++ind) {
-      if (!fcn.output(i).empty()) {
+      if (!fcn.input(i).empty()) {
         asens[dir][i].assignNode(new OutputNode(ev, ind));
       } else {
         asens[dir][i] = MX();
