@@ -559,6 +559,7 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
   }
   
   // Evaluate symbolically
+  if(verbose()) std::cout << "XFunctionInternal::jac making function call" << std::endl;
   call(inputv_,outputv_,fseed,fsens,aseed,asens,true,always_inline,never_inline);
 
   // Get transposes and mappings for all jacobian sparsity patterns if we are using forward mode

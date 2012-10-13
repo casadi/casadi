@@ -423,7 +423,7 @@ CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
     
     // Return sparsity pattern
     if(verbose()){
-      std::cout << "Formed Jacobian sparsity pattern (" << 100*double(ret.size())/ret.numel() << " \% nonzeros)." << endl;
+      std::cout << "Formed Jacobian sparsity pattern (dimension " << ret.shape() << ", " << 100*double(ret.size())/ret.numel() << " \% nonzeros)." << endl;
       std::cout << "FXInternal::getJacSparsity end " << std::endl;
     }
     return ret;
@@ -504,7 +504,7 @@ CRSSparsity& FXInternal::jacSparsity(int iind, int oind, bool compact){
 }
 
 void FXInternal::getPartition(int iind, int oind, CRSSparsity& D1, CRSSparsity& D2, bool compact, bool symmetric){
-  log("MXFunctionInternal::getPartition begin");
+  log("FXInternal::getPartition begin");
   
   // Sparsity pattern with transpose
   CRSSparsity &A = jacSparsity(iind,oind,compact);
@@ -524,18 +524,22 @@ void FXInternal::getPartition(int iind, int oind, CRSSparsity& D1, CRSSparsity& 
   
   // Get seed matrices by graph coloring
   if(symmetric){
+  
     // Star coloring if symmetric
+    log("FXInternal::getPartition starColoring");
     D1 = A.starColoring();
     
   } else {
     
     // Test unidirectional coloring using forward mode
     if(test_ad_fwd){
+      log("FXInternal::getPartition unidirectional coloring (adjoint mode)");
       D1 = AT.unidirectionalColoring(A);
     }
       
     // Test unidirectional coloring using reverse mode
     if(test_ad_adj){
+      log("FXInternal::getPartition unidirectional coloring (adjoint mode)");
       D2 = A.unidirectionalColoring(AT);
     }
 
@@ -546,6 +550,12 @@ void FXInternal::getPartition(int iind, int oind, CRSSparsity& D1, CRSSparsity& 
       } else {
         D1=CRSSparsity();
       }
+    }
+    if(verbose()){
+      bool use_fwd = D2.isNull();
+      int ndir = use_fwd ? D1.size1() : D2.size1();
+      const char* mode = use_fwd ? "forward" : "adjoint";
+      cout << "FXInternal::getPartition end, " << ndir << " " << mode << " mode directional derivatives needed." << endl;
     }
   }
 }
@@ -610,7 +620,7 @@ void FXInternal::spEvaluate(bool fwd){
   }
 }
 
-//#define NEW_JACOBIAN
+// #define NEW_JACOBIAN
 
 FX FXInternal::jacobian(int iind, int oind, bool compact, bool symmetric){
   // Return value

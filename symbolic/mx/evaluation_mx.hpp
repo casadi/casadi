@@ -92,11 +92,11 @@ class EvaluationMX : public MultipleOutput{
     // Function to be evaluated
     FX fcn_;
     
+    // Is the argument identical to the input of the function
+    bool output_given_f_;
+    
     // Number of directional derivatives
     int nfwd_f_, nadj_f_;
-    
-    // Is the argument identical to the input of the function
-    bool output_given_f_;    
 };
 
 } // namespace CasADi

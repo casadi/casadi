@@ -574,6 +574,7 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
                                 const std::vector<std::vector<MX> >& fseed, std::vector<std::vector<MX> >& fsens, 
                                 const std::vector<std::vector<MX> >& aseed, std::vector<std::vector<MX> >& asens,
                                 bool output_given){
+  log("MXFunctionInternal::evalMX begin");
   assertInit();
   casadi_assert_message(arg.size()==getNumInputs(),"Wrong number of input arguments");
   if(output_given){

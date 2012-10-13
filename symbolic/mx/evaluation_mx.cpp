@@ -115,7 +115,7 @@ void EvaluationMX::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res,
       fcn_.setInput(*arg[i], i);
     }
   }
-
+  
   // Evaluate until everything has been determinated
   while (!fcn_evaluated || offset_fwd < nfwd || offset_adj < nadj) {
 
@@ -462,7 +462,7 @@ void EvaluationMX::create(const FX& fcn, const std::vector<MX> &arg,
   // Create the output nodes corresponding to the nondifferented function
   res.resize(num_out);
   for (int i = 0; i < num_out; ++i, ++ind) {
-    if (fcn.output(i).size1() > 0 && fcn.output(i).size2() > 0) {
+    if(!fcn.output(i).empty()){
       res[i].assignNode(new OutputNode(ev, ind));
     } else {
       res[i] = MX();
@@ -471,10 +471,10 @@ void EvaluationMX::create(const FX& fcn, const std::vector<MX> &arg,
 
   // Forward sensitivities
   fsens.resize(nfwd);
-  for (int dir = 0; dir < nfwd; ++dir) {
+  for(int dir = 0; dir < nfwd; ++dir){
     fsens[dir].resize(num_out);
     for (int i = 0; i < num_out; ++i, ++ind) {
-      if (fcn.output(i).size1() > 0 && fcn.output(i).size2() > 0) {
+      if (!fcn.output(i).empty()){
         fsens[dir][i].assignNode(new OutputNode(ev, ind));
       } else {
         fsens[dir][i] = MX();
@@ -487,7 +487,7 @@ void EvaluationMX::create(const FX& fcn, const std::vector<MX> &arg,
   for (int dir = 0; dir < nadj; ++dir) {
     asens[dir].resize(num_in);
     for (int i = 0; i < num_in; ++i, ++ind) {
-      if (fcn.output(i).size1() > 0 && fcn.output(i).size2() > 0) {
+      if (!fcn.output(i).empty()) {
         asens[dir][i].assignNode(new OutputNode(ev, ind));
       } else {
         asens[dir][i] = MX();
