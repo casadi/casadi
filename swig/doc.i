@@ -106,14 +106,6 @@ Joel Andersson
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -126,6 +118,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -961,14 +967,6 @@ thus x := [xd,xa]
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -981,6 +979,20 @@ thus x := [xd,xa]
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -1602,14 +1614,6 @@ Assert that the object has been initialized. ";
 | integrator_t | OT_REAL      |              |              | CasADi::Acad |
 | olerance     |              |              |              | oOCPInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -1631,6 +1635,20 @@ Assert that the object has been initialized. ";
 +--------------+--------------+--------------+--------------+--------------+
 | max_num_iter | OT_INTEGER   |              |              | CasADi::Acad |
 | ations       |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -2331,14 +2349,6 @@ Return a string with a destription (for SWIG) ";
 | integrator_t | OT_REAL      |              |              | CasADi::Acad |
 | olerance     |              |              |              | oOCPInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -2360,6 +2370,20 @@ Return a string with a destription (for SWIG) ";
 +--------------+--------------+--------------+--------------+--------------+
 | max_num_iter | OT_INTEGER   |              |              | CasADi::Acad |
 | ations       |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -3610,14 +3634,6 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -3630,6 +3646,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -4284,14 +4314,6 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -4304,6 +4326,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -4869,14 +4905,6 @@ Joel Andersson
 |              |              |              | the          | nal          |
 |              |              |              | integrator   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -4889,6 +4917,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -5679,14 +5721,6 @@ Joel Andersson
 |              |              |              | g            | ratorInterna |
 |              |              |              | polynomials  | l            |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -5699,6 +5733,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -6544,14 +6592,6 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | g            | ratorInterna |
 |              |              |              | polynomials  | l            |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -6564,6 +6604,20 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -7275,14 +7329,6 @@ Assert that the object has been initialized. ";
 |              |              |              | the          | nal          |
 |              |              |              | integrator   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -7295,6 +7341,20 @@ Assert that the object has been initialized. ";
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -8202,14 +8262,6 @@ Joris Gillis
 |              |              |              | the          | Internal     |
 |              |              |              | integrator   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -8222,6 +8274,20 @@ Joris Gillis
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | minor_grid   | OT_INTEGERVE | GenericType( | The local    | CasADi::Cont |
 |              | CTOR         | )            | grid used on | rolSimulator |
@@ -9079,14 +9145,6 @@ Joel Andersson
 |              |              |              | the          | Internal     |
 |              |              |              | integrator   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -9099,6 +9157,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | minor_grid   | OT_INTEGERVE | GenericType( | The local    | CasADi::Cont |
 |              | CTOR         | )            | grid used on | rolSimulator |
@@ -9746,14 +9818,6 @@ Assert that the object has been initialized. ";
 |              |              |              | every few    |              |
 |              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -9766,6 +9830,20 @@ Assert that the object has been initialized. ";
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -10446,14 +10524,6 @@ be set with this interface, it is ignored! Carlo Savorgnan
 |              |              |              | every few    |              |
 |              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -10466,6 +10536,20 @@ be set with this interface, it is ignored! Carlo Savorgnan
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -11912,14 +11996,6 @@ therefore more expensive if A is invariant.
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -11932,6 +12008,20 @@ therefore more expensive if A is invariant.
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -12600,14 +12690,6 @@ Solves the linear system A.x = b for x
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -12620,6 +12702,20 @@ Solves the linear system A.x = b for x
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -13340,14 +13436,6 @@ times t_i.
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
 | lver         |              |              | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -13398,6 +13486,20 @@ times t_i.
 | s            |              |              | number of    | ialsInternal |
 |              |              |              | integrator   |              |
 |              |              |              | steps        |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal   Cas |
@@ -14410,14 +14512,6 @@ quadrature state at the initial time (INTEGRATOR_RQF=3)
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
 | lver         |              |              | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -14468,6 +14562,20 @@ quadrature state at the initial time (INTEGRATOR_RQF=3)
 | s            |              |              | number of    | ialsInternal |
 |              |              |              | integrator   |              |
 |              |              |              | steps        |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal   Cas |
@@ -15545,14 +15653,6 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -15565,6 +15665,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -16213,14 +16327,6 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -16233,6 +16339,20 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -17082,14 +17202,6 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -17102,6 +17214,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -17779,14 +17905,6 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -17799,6 +17917,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -18958,14 +19090,6 @@ Joel Andersson
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
 | lver         |              |              | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -19012,6 +19136,20 @@ Joel Andersson
 | s            |              |              | number of    | ialsInternal |
 |              |              |              | integrator   |              |
 |              |              |              | steps        |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | max_step_siz | OT_REAL      | 0            | Maximim step | CasADi::Idas |
 | e            |              |              | size         | Internal     |
@@ -20082,14 +20220,6 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
 | lver         |              |              | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -20136,6 +20266,20 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 | s            |              |              | number of    | ialsInternal |
 |              |              |              | integrator   |              |
 |              |              |              | steps        |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | max_step_siz | OT_REAL      | 0            | Maximim step | CasADi::Idas |
 | e            |              |              | size         | Internal     |
@@ -21038,14 +21182,6 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -21058,6 +21194,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -21702,14 +21852,6 @@ Internal class.
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -21722,6 +21864,20 @@ Internal class.
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -22522,14 +22678,6 @@ Joel Andersson
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -22542,6 +22690,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -23319,14 +23481,6 @@ Joel Andersson
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -23339,6 +23493,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -24002,14 +24170,6 @@ Assert that the object has been initialized. ";
 |              |              |              | every few    |              |
 |              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -24032,6 +24192,20 @@ Assert that the object has been initialized. ";
 | r_options    | Y            | )            | be passed to | ternal       |
 |              |              |              | the linear   |              |
 |              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -24669,14 +24843,6 @@ Joel Andersson
 |              |              |              | every few    |              |
 |              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -24699,6 +24865,20 @@ Joel Andersson
 | r_options    | Y            | )            | be passed to | ternal       |
 |              |              |              | the linear   |              |
 |              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -26283,14 +26463,6 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | False        | Create the a | CasADi::Ipop |
-|              |              |              | Jacobian     | tInternal    |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_app | OT_STRING    | exact        | Specifies    | CasADi::Ipop |
 | roximation   |              |              | technique to | tInternal    |
 |              |              |              | compute      |              |
@@ -26775,6 +26947,20 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | (see IPOPT d |              |
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::Ipop |
+| f_adj_dir    |              |              | r_of_adj_dir | tInternal    |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::Ipop |
+| f_fwd_dir    |              |              | r_of_fwd_dir | tInternal    |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | max_refineme | OT_INTEGER   | 10           | Maximum      | CasADi::Ipop |
 | nt_steps     |              |              | number of    | tInternal    |
@@ -28319,6 +28505,22 @@ n: number of decision variables (x)     m: number of constraints (A)
 | regularization_size | CasADi::IpoptInternal |
 +---------------------+-----------------------+
 | return_status       | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| t_callback_fun      | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| t_callback_prepare  | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| t_eval_f            | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| t_eval_g            | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| t_eval_grad_f       | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| t_eval_h            | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| t_eval_jac_g        | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| t_mainloop          | CasADi::IpoptInternal |
 +---------------------+-----------------------+
 | var_integer_md      | CasADi::IpoptInternal |
 +---------------------+-----------------------+
@@ -29644,14 +29846,6 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | False        | Create the a | CasADi::Ipop |
-|              |              |              | Jacobian     | tInternal    |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_app | OT_STRING    | exact        | Specifies    | CasADi::Ipop |
 | roximation   |              |              | technique to | tInternal    |
 |              |              |              | compute      |              |
@@ -30136,6 +30330,20 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | (see IPOPT d |              |
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::Ipop |
+| f_adj_dir    |              |              | r_of_adj_dir | tInternal    |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::Ipop |
+| f_fwd_dir    |              |              | r_of_fwd_dir | tInternal    |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | max_refineme | OT_INTEGER   | 10           | Maximum      | CasADi::Ipop |
 | nt_steps     |              |              | number of    | tInternal    |
@@ -31681,6 +31889,22 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 +---------------------+-----------------------+
 | return_status       | CasADi::IpoptInternal |
 +---------------------+-----------------------+
+| t_callback_fun      | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| t_callback_prepare  | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| t_eval_f            | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| t_eval_g            | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| t_eval_grad_f       | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| t_eval_h            | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| t_eval_jac_g        | CasADi::IpoptInternal |
++---------------------+-----------------------+
+| t_mainloop          | CasADi::IpoptInternal |
++---------------------+-----------------------+
 | var_integer_md      | CasADi::IpoptInternal |
 +---------------------+-----------------------+
 | var_numeric_md      | CasADi::IpoptInternal |
@@ -32366,14 +32590,6 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -32386,6 +32602,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -33028,14 +33258,6 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -33048,6 +33270,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -33548,14 +33784,6 @@ Assert that the object has been initialized. ";
 | iterative_so | OT_STRING    | \"gmres\"      |              | CasADi::Kins |
 | lver         |              |              |              | olInternal   |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -33586,6 +33814,20 @@ Assert that the object has been initialized. ";
 +--------------+--------------+--------------+--------------+--------------+
 | max_krylov   | OT_INTEGER   | 0            |              | CasADi::Kins |
 |              |              |              |              | olInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal   Cas |
@@ -34178,14 +34420,6 @@ See:   ImplicitFunction for more information
 | iterative_so | OT_STRING    | \"gmres\"      |              | CasADi::Kins |
 | lver         |              |              |              | olInternal   |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -34216,6 +34450,20 @@ See:   ImplicitFunction for more information
 +--------------+--------------+--------------+--------------+--------------+
 | max_krylov   | OT_INTEGER   | 0            |              | CasADi::Kins |
 |              |              |              |              | olInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal   Cas |
@@ -35272,14 +35520,6 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | every few    |              |
 |              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -35292,6 +35532,20 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -36037,14 +36291,6 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | every few    |              |
 |              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -36057,6 +36303,20 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -36794,14 +37054,6 @@ therefore more expensive if A is invariant.
 | n            |              |              |              | ckLUDenseInt |
 |              |              |              |              | ernal        |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -36814,6 +37066,20 @@ therefore more expensive if A is invariant.
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -37490,14 +37756,6 @@ Internal class.
 | n            |              |              |              | ckLUDenseInt |
 |              |              |              |              | ernal        |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -37510,6 +37768,20 @@ Internal class.
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -38034,14 +38306,6 @@ therefore more expensive if A is invariant.
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -38054,6 +38318,20 @@ therefore more expensive if A is invariant.
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -38722,14 +39000,6 @@ Internal class.
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -38742,6 +39012,20 @@ Internal class.
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -39375,14 +39659,6 @@ Joel Andersson
 |              |              |              | every few    |              |
 |              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -39395,6 +39671,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | maxiter      | OT_INTEGER   | 100          | Maximum      | CasADi::Lift |
 |              |              |              | number of    | edSQPInterna |
@@ -40300,14 +40590,6 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | every few    |              |
 |              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -40320,6 +40602,20 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | maxiter      | OT_INTEGER   | 100          | Maximum      | CasADi::Lift |
 |              |              |              | number of    | edSQPInterna |
@@ -41037,14 +41333,6 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | every few    |              |
 |              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -41060,6 +41348,20 @@ n: number of decision variables (x)     m: number of constraints (A)
 +--------------+--------------+--------------+--------------+--------------+
 | lifted       | OT_BOOLEAN   | true         |              | CasADi::Lift |
 |              |              |              |              | optInternal  |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -41696,14 +41998,6 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | every few    |              |
 |              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -41719,6 +42013,20 @@ n: number of decision variables (x)     m: number of constraints (A)
 +--------------+--------------+--------------+--------------+--------------+
 | lifted       | OT_BOOLEAN   | true         |              | CasADi::Lift |
 |              |              |              |              | optInternal  |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -42428,14 +42736,6 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -42448,6 +42748,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -43108,14 +43422,6 @@ Internal class Solves the linear system A.x = b for x
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -43128,6 +43434,20 @@ Internal class Solves the linear system A.x = b for x
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -45116,14 +45436,6 @@ Joel Andersson
 |              |              |              | the          | Internal     |
 |              |              |              | integrator   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -45136,6 +45448,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -45984,14 +46310,6 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | the          | Internal     |
 |              |              |              | integrator   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -46004,6 +46322,20 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -47877,14 +48209,6 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -47897,6 +48221,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -48623,14 +48961,6 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -48643,6 +48973,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -49526,14 +49870,6 @@ nc: number of constraints (A)
 |              |              |              | positive     |              |
 |              |              |              | definite     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -49546,6 +49882,20 @@ nc: number of constraints (A)
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -50102,14 +50452,6 @@ Joris Gillis
 |              |              |              | positive     |              |
 |              |              |              | definite     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -50122,6 +50464,20 @@ Joris Gillis
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -50905,14 +51261,6 @@ Joel Andersson
 |              |              |              | every few    |              |
 |              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -50925,6 +51273,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -51740,14 +52102,6 @@ Joel Andersson
 |              |              |              | every few    |              |
 |              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -51760,6 +52114,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -53955,14 +54323,6 @@ Joel Andersson
 |              |              |              |              | olverInterna |
 |              |              |              |              | l            |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -53975,6 +54335,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -54710,14 +55084,6 @@ Joel Andersson
 |              |              |              |              | olverInterna |
 |              |              |              |              | l            |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -54730,6 +55096,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -55387,14 +55767,6 @@ nc: number of constraints (A)
 |              |              |              | positive     |              |
 |              |              |              | definite     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -55407,6 +55779,20 @@ nc: number of constraints (A)
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -55991,14 +56377,6 @@ reInit();
 |              |              |              | positive     |              |
 |              |              |              | definite     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -56011,6 +56389,20 @@ reInit();
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -57207,14 +57599,6 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -57227,6 +57611,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -57904,14 +58302,6 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -57924,6 +58314,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -58534,14 +58938,6 @@ nc: number of constraints (A)
 |              |              |              | positive     |              |
 |              |              |              | definite     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | False        | Create the a | CasADi::QPOa |
-|              |              |              | Jacobian     | sesInternal  |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG |              | Function     | CasADi::QPOa |
 | erator       | ENERATOR     |              | pointer that | sesInternal  |
 |              |              |              | returns a    |              |
@@ -58554,6 +58950,20 @@ nc: number of constraints (A)
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::QPOa |
+| f_adj_dir    |              |              | r_of_adj_dir | sesInternal  |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::QPOa |
+| f_fwd_dir    |              |              | r_of_fwd_dir | sesInternal  |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC |              | Monitors to  | CasADi::QPOa |
 |              | TOR          |              | be activated | sesInternal  |
@@ -59126,14 +59536,6 @@ Joris Gillis, Joel Andersson
 |              |              |              | positive     |              |
 |              |              |              | definite     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | False        | Create the a | CasADi::QPOa |
-|              |              |              | Jacobian     | sesInternal  |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG |              | Function     | CasADi::QPOa |
 | erator       | ENERATOR     |              | pointer that | sesInternal  |
 |              |              |              | returns a    |              |
@@ -59146,6 +59548,20 @@ Joris Gillis, Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::QPOa |
+| f_adj_dir    |              |              | r_of_adj_dir | sesInternal  |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::QPOa |
+| f_fwd_dir    |              |              | r_of_fwd_dir | sesInternal  |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC |              | Monitors to  | CasADi::QPOa |
 |              | TOR          |              | be activated | sesInternal  |
@@ -59868,14 +60284,6 @@ Joel Andersson
 |              |              |              | positive     |              |
 |              |              |              | definite     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -59888,6 +60296,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -60583,14 +61005,6 @@ Internal class.
 |              |              |              | positive     |              |
 |              |              |              | definite     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -60603,6 +61017,20 @@ Internal class.
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -61238,14 +61666,6 @@ Joel Andersson
 |              |              |              | g            | rnal         |
 |              |              |              | polynomials  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -61258,6 +61678,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -62053,14 +62487,6 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | g            | rnal         |
 |              |              |              | polynomials  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -62073,6 +62499,20 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -63070,14 +63510,6 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -63090,6 +63522,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal   Cas |
@@ -63794,14 +64240,6 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -63814,6 +64252,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal   Cas |
@@ -64745,14 +65197,6 @@ Assert that the object has been initialized. ";
 |              |              |              | every few    |              |
 |              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -64769,6 +65213,20 @@ Assert that the object has been initialized. ";
 | lbfgs_memory | OT_INTEGER   | 10           | Size of      | CasADi::SQPI |
 |              |              |              | L-BFGS       | nternal      |
 |              |              |              | memory.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | maxiter      | OT_INTEGER   | 50           | Maximum      | CasADi::SQPI |
 |              |              |              | number of    | nternal      |
@@ -65503,14 +65961,6 @@ Joel Andersson and Attila Kozma
 |              |              |              | every few    |              |
 |              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -65527,6 +65977,20 @@ Joel Andersson and Attila Kozma
 | lbfgs_memory | OT_INTEGER   | 10           | Size of      | CasADi::SQPI |
 |              |              |              | L-BFGS       | nternal      |
 |              |              |              | memory.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | maxiter      | OT_INTEGER   | 50           | Maximum      | CasADi::SQPI |
 |              |              |              | number of    | nternal      |
@@ -66474,14 +66938,6 @@ Constructor. ";
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
 | lver         |              |              | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -66528,6 +66984,20 @@ Constructor. ";
 | s            |              |              | number of    | ialsInternal |
 |              |              |              | integrator   |              |
 |              |              |              | steps        |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -67437,14 +67907,6 @@ Return a string with a destription (for SWIG) ";
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
 | lver         |              |              | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -67491,6 +67953,20 @@ Return a string with a destription (for SWIG) ";
 | s            |              |              | number of    | ialsInternal |
 |              |              |              | integrator   |              |
 |              |              |              | steps        |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -68410,14 +68886,6 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -68442,6 +68910,20 @@ Joel Andersson
 | es           |              |              | variables in | nctionIntern |
 |              |              |              | the work     | al           |
 |              |              |              | vector       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -69221,14 +69703,6 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -69253,6 +69727,20 @@ Joel Andersson
 | es           |              |              | variables in | nctionIntern |
 |              |              |              | the work     | al           |
 |              |              |              | vector       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
@@ -72158,14 +72646,6 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | every few    |              |
 |              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | False        | Create the a | CasADi::Worh |
-|              |              |              | Jacobian     | pInternal    |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG |              | Function     | CasADi::Worh |
 | erator       | ENERATOR     |              | pointer that | pInternal    |
 |              |              |              | returns a    |              |
@@ -72178,6 +72658,20 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::Worh |
+| f_adj_dir    |              |              | r_of_adj_dir | pInternal    |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::Worh |
+| f_fwd_dir    |              |              | r_of_fwd_dir | pInternal    |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC |              | Monitors to  | CasADi::Worh |
 |              | TOR          |              | be activated | pInternal    |
@@ -72232,6 +72726,12 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | denoting     |              |
 |              |              |              | fixed        |              |
 |              |              |              | parameters.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| print_time   | OT_BOOLEAN   | True         | print        | CasADi::Worh |
+|              |              |              | information  | pInternal    |
+|              |              |              | about        |              |
+|              |              |              | execution    |              |
+|              |              |              | time         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | True         | function is  | CasADi::Worh |
 |              |              |              | sparse       | pInternal    |
@@ -72299,6 +72799,27 @@ n: number of decision variables (x)     m: number of constraints (A)
 +-------------+-----------------------+
 | outputs     | CasADi::FXInternal    |
 +-------------+-----------------------+
+
+>List of available stats
++--------------------+-----------------------+
+|         Id         |        Used in        |
++====================+=======================+
+| t_callback_fun     | CasADi::WorhpInternal |
++--------------------+-----------------------+
+| t_callback_prepare | CasADi::WorhpInternal |
++--------------------+-----------------------+
+| t_eval_f           | CasADi::WorhpInternal |
++--------------------+-----------------------+
+| t_eval_g           | CasADi::WorhpInternal |
++--------------------+-----------------------+
+| t_eval_grad_f      | CasADi::WorhpInternal |
++--------------------+-----------------------+
+| t_eval_h           | CasADi::WorhpInternal |
++--------------------+-----------------------+
+| t_eval_jac_g       | CasADi::WorhpInternal |
++--------------------+-----------------------+
+| t_mainloop         | CasADi::WorhpInternal |
++--------------------+-----------------------+
 
 C++ includes: worhp_internal.hpp ";
 
@@ -73546,14 +74067,6 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | every few    |              |
 |              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | False        | Create the a | CasADi::Worh |
-|              |              |              | Jacobian     | pInternal    |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG |              | Function     | CasADi::Worh |
 | erator       | ENERATOR     |              | pointer that | pInternal    |
 |              |              |              | returns a    |              |
@@ -73566,6 +74079,20 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::Worh |
+| f_adj_dir    |              |              | r_of_adj_dir | pInternal    |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::Worh |
+| f_fwd_dir    |              |              | r_of_fwd_dir | pInternal    |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC |              | Monitors to  | CasADi::Worh |
 |              | TOR          |              | be activated | pInternal    |
@@ -73620,6 +74147,12 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | denoting     |              |
 |              |              |              | fixed        |              |
 |              |              |              | parameters.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| print_time   | OT_BOOLEAN   | True         | print        | CasADi::Worh |
+|              |              |              | information  | pInternal    |
+|              |              |              | about        |              |
+|              |              |              | execution    |              |
+|              |              |              | time         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | True         | function is  | CasADi::Worh |
 |              |              |              | sparse       | pInternal    |
@@ -73687,6 +74220,27 @@ n: number of decision variables (x)     m: number of constraints (A)
 +-------------+-----------------------+
 | outputs     | CasADi::FXInternal    |
 +-------------+-----------------------+
+
+>List of available stats
++--------------------+-----------------------+
+|         Id         |        Used in        |
++====================+=======================+
+| t_callback_fun     | CasADi::WorhpInternal |
++--------------------+-----------------------+
+| t_callback_prepare | CasADi::WorhpInternal |
++--------------------+-----------------------+
+| t_eval_f           | CasADi::WorhpInternal |
++--------------------+-----------------------+
+| t_eval_g           | CasADi::WorhpInternal |
++--------------------+-----------------------+
+| t_eval_grad_f      | CasADi::WorhpInternal |
++--------------------+-----------------------+
+| t_eval_h           | CasADi::WorhpInternal |
++--------------------+-----------------------+
+| t_eval_jac_g       | CasADi::WorhpInternal |
++--------------------+-----------------------+
+| t_mainloop         | CasADi::WorhpInternal |
++--------------------+-----------------------+
 
 C++ includes: worhp_solver.hpp ";
 
@@ -74284,14 +74838,6 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jac_for_sens | OT_BOOLEAN   | false        | Create the a | CasADi::FXIn |
-|              |              |              | Jacobian     | ternal       |
-|              |              |              | function and |              |
-|              |              |              | use this to  |              |
-|              |              |              | calculate    |              |
-|              |              |              | forward sens |              |
-|              |              |              | itivities    |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -74304,6 +74850,20 @@ Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
 |              | TOR          | )            | be activated | ternal       |
