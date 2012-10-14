@@ -26,13 +26,15 @@ import unittest
 from types import *
 from helpers import *
 
+CasadiOptions.setCatchErrorsPython(False)
+
 qpsolvers = []
 try:
   qpsolvers.append((NLPQPSolver,{"nlp_solver":IpoptSolver, "nlp_solver_options": {"tol": 1e-12}}))
 except:
   pass
 try:
-  #qpsolvers.append((NLPQPSolver,{"nlp_solver": WorhpSolver, "nlp_solver_options": {"TolOpti": 1e-12}}))
+  qpsolvers.append((NLPQPSolver,{"nlp_solver": WorhpSolver, "nlp_solver_options": {}}))
   pass
 except:
   pass
@@ -94,14 +96,14 @@ class QPSolverTests(casadiTestCase):
       solver.input(QP_H).set(H*4)
 
       solver.evaluate()
-      self.assertAlmostEqual(solver.output()[0],1,6,str(qpsolver))
-      self.assertAlmostEqual(solver.output()[1],1,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output()[0],1,4,str(qpsolver))
+      self.assertAlmostEqual(solver.output()[1],1,4,str(qpsolver))
       self.assertAlmostEqual(solver.output(QP_COST),-6,6,str(qpsolver))
       
       self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[0],0,6,str(qpsolver))
       self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[1],0,6,str(qpsolver))
 
-      self.checkarray(solver.output(QP_LAMBDA_A),DMatrix([2,0,0]),str(qpsolver),digits=4)
+      self.checkarray(solver.output(QP_LAMBDA_A),DMatrix([2,0,0]),str(qpsolver),digits=2)
       
       solver.input(QP_H).set(0)
 
@@ -284,15 +286,15 @@ class QPSolverTests(casadiTestCase):
 
       solver.solve()
 
-      self.assertAlmostEqual(solver.output()[0],0.4,6,str(qpsolver))
-      self.assertAlmostEqual(solver.output()[1],1.6,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output()[0],0.4,4,str(qpsolver))
+      self.assertAlmostEqual(solver.output()[1],1.6,4,str(qpsolver))
     
-      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[0],0,6,str(qpsolver))
-      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[1],0,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[0],0,5,str(qpsolver))
+      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[1],0,5,str(qpsolver))
 
-      self.checkarray(solver.output(QP_LAMBDA_A),DMatrix([3.2,0,0]),str(qpsolver),digits=6)
+      self.checkarray(solver.output(QP_LAMBDA_A),DMatrix([3.2,0,0]),str(qpsolver),digits=5)
        
-      self.assertAlmostEqual(solver.output(QP_COST)[0],-8.4,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output(QP_COST)[0],-8.4,5,str(qpsolver))
 
   def test_degenerate_hessian(self):
     self.message("Degenerate hessian")
@@ -333,13 +335,13 @@ class QPSolverTests(casadiTestCase):
 
       solver.solve()
 
-      self.checkarray(solver.output(),DMatrix([5.5,5,-10]),str(qpsolver),digits=6) 
+      self.checkarray(solver.output(),DMatrix([5.5,5,-10]),str(qpsolver),digits=4) 
       
-      self.checkarray(solver.output(QP_LAMBDA_X),DMatrix([0,0,-2.5]),str(qpsolver),digits=6)
+      self.checkarray(solver.output(QP_LAMBDA_X),DMatrix([0,0,-2.5]),str(qpsolver),digits=4)
 
-      self.checkarray(solver.output(QP_LAMBDA_A),DMatrix([1.5]),str(qpsolver),digits=6)
+      self.checkarray(solver.output(QP_LAMBDA_A),DMatrix([1.5]),str(qpsolver),digits=4)
        
-      self.assertAlmostEqual(solver.output(QP_COST)[0],-38.375,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output(QP_COST)[0],-38.375,5,str(qpsolver))
         
     
   def test_no_inequality(self):
@@ -393,7 +395,6 @@ class QPSolverTests(casadiTestCase):
       self.assertAlmostEqual(solver.output(QP_COST)[0],-3.375,6,str(qpsolver))
 
   def test_no_A(self):
-    return # hotfix
     self.message("No A present")
     H = DMatrix([[1,-1],[-1,2]])
     G = DMatrix([-2,-6])
@@ -429,7 +430,7 @@ class QPSolverTests(casadiTestCase):
 
       solver.solve()
 
-      self.assertAlmostEqual(solver.output()[0],10,5,str(qpsolver))
+      self.assertAlmostEqual(solver.output()[0],10,4,str(qpsolver))
       self.assertAlmostEqual(solver.output()[1],8,5,str(qpsolver))
     
       self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[0],0,5,str(qpsolver))
@@ -439,6 +440,47 @@ class QPSolverTests(casadiTestCase):
       self.checkarray(solver.output(QP_LAMBDA_A),DMatrix([]),str(qpsolver),digits=5)
       
       self.assertAlmostEqual(solver.output(QP_COST)[0],-34,5,str(qpsolver))
+      
+  def test_badscaling(self):
+    return
+    self.message("Badly scaled problem")
+    N = 50
+    H = c.diag(range(1,N+1))
+    x0 = DMatrix(range(N))
+    
+    G = -1.0*mul(H,x0)
+    print -1.0*mul(H,x0)
+    print -mul(H,x0)
+    A =  DMatrix(0,N)
+
+    LBX = DMatrix([-1000]*N)
+    UBX = DMatrix([1000]*N)
+
+
+    options = {"convex": True, "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+      
+    for qpsolver, qp_options in qpsolvers:
+      solver = qpsolver(H.sparsity(),A.sparsity())
+      for key, val in options.iteritems():
+        if solver.hasOption(key):
+           solver.setOption(key,val)
+      solver.setOption(qp_options)
+      solver.init()
+      
+
+
+      solver.input(QP_H).set(H)
+      solver.input(QP_G).set(G)
+      solver.input(QP_A).set(A)
+      solver.input(QP_LBX).set(LBX)
+      solver.input(QP_UBX).set(UBX)
+
+      solver.solve()
+
+      self.checkarray(solver.output(NLP_X_OPT),x0,str(qpsolver),digits=2)
+      self.assertAlmostEqual(solver.output(NLP_COST)[0],0,3,str(qpsolver))
+      self.checkarray(solver.output(NLP_LAMBDA_X),DMatrix.zeros(N,1),str(qpsolver),digits=4)
+      
       
 if __name__ == '__main__':
     unittest.main()

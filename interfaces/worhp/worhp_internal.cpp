@@ -195,6 +195,9 @@ WorhpInternal::WorhpInternal(const FX& F, const FX& G, const FX& H, const FX& J,
   // The default value for ScaleConIter (False) makes IPOPT fail for decision variable bounds where lbx==ubx
   setOption("ScaleConIter",true);
   
+  // qpsolver unittests fail for ScaledObj == True
+  setOption("ScaledObj",false);
+  
 }
 
 WorhpInternal::~WorhpInternal(){

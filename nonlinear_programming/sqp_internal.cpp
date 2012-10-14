@@ -420,12 +420,15 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     gLag = F_.adjSens(); 
     //cout << "Objective gradient:\n" << gLag << endl;
     // Adjoint derivative of constraint function
-    G_.setAdjSeed(mu);
-    G_.evaluate(0, 1);
-    //cout << "Constraint adjoint:\n" << G_.adjSens() << endl;
-    //cout << "mu:\n" << mu << endl;
-    //cout << "mu_qp:\n" << mu_qp << endl;
-    gLag += G_.adjSens();
+    
+    if (!G_.isNull()){
+      G_.setAdjSeed(mu);
+      G_.evaluate(0, 1);
+      //cout << "Constraint adjoint:\n" << G_.adjSens() << endl;
+      //cout << "mu:\n" << mu << endl;
+      //cout << "mu_qp:\n" << mu_qp << endl;
+      gLag += G_.adjSens();
+    }
     gLag += mu_x;
     //cout << "Lagrange gradient:\n" << gLag << endl;
     //cout << "mu_x:\n" << mu_x << endl;
@@ -435,10 +438,12 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     F_.setAdjSeed(1.0);
     F_.evaluate(0, 1);
     gLag_old_bfgs = F_.adjSens();
-    G_.setInput(x_old);
-    G_.setAdjSeed(mu);
-    G_.evaluate(0, 1);
-    gLag_old_bfgs += G_.adjSens();
+    if (!G_.isNull()){
+      G_.setInput(x_old);
+      G_.setAdjSeed(mu);
+      G_.evaluate(0, 1);
+      gLag_old_bfgs += G_.adjSens();
+    }
     gLag_old_bfgs += mu_x;
 
     // Updating Lagrange Hessian if needed. (BFGS with careful updates and restarts)

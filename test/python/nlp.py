@@ -491,9 +491,9 @@ class NLPtests(casadiTestCase):
       solver.solve()
       self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,str(Solver))
       self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,9,str(Solver))
-      self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,9,str(Solver))
-      self.assertAlmostEqual(solver.output(NLP_LAMBDA_X)[0],0,8,str(Solver))
-      self.assertAlmostEqual(solver.output(NLP_LAMBDA_X)[1],0,8,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,6,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_LAMBDA_X)[0],0,6,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_LAMBDA_X)[1],0,6,str(Solver))
       
   def testIPOPTrhb_par(self):
     self.message("rosenbrock, exact hessian, parametric")
@@ -853,7 +853,7 @@ class NLPtests(casadiTestCase):
     for Solver in solvers:
       self.message(str(Solver))
       solver = Solver(f,g)
-      for k,v in ({"tol":1e-8,"TolOpti":1e-20,"hessian_approximation":"exact","max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options, "generate_hessian": True, "UserHM": True}).iteritems():
+      for k,v in ({"tol":1e-8,"TolOpti":1e-20,"hessian_approximation":"exact","max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options, "generate_hessian": True, "UserHM": True }).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
       solver.init()
@@ -868,7 +868,7 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1.1348189166291160,6,str(Solver))
       self.assertAlmostEqual(solver.output(NLP_LAMBDA_X)[0],0,8,str(Solver))
       self.assertAlmostEqual(solver.output(NLP_LAMBDA_X)[1],0,4,str(Solver))
-      self.assertAlmostEqual(solver.output(NLP_LAMBDA_G)[0],-4.1644422845712e-2,6,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_LAMBDA_G)[0],-4.1644422845712e-2,3,str(Solver))
 
   def testactiveUBG(self):
     self.message("active UBG")
@@ -891,11 +891,11 @@ class NLPtests(casadiTestCase):
       solver.input(NLP_UBG).set([1.8])
       solver.solve()
       self.assertAlmostEqual(solver.output(NLP_COST)[0],4.64801220074552e-3,6,str(Solver))
-      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],9.318651964592811e-1,6,str(Solver))
-      self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],8.68134821123689e-1,6,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],9.318651964592811e-1,5,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],8.68134821123689e-1,5,str(Solver))
       self.assertAlmostEqual(solver.output(NLP_LAMBDA_X)[0],0,8,str(Solver))
       self.assertAlmostEqual(solver.output(NLP_LAMBDA_X)[1],0,4,str(Solver))
-      self.assertAlmostEqual(solver.output(NLP_LAMBDA_G)[0],4.75846495145007e-2,6,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_LAMBDA_G)[0],4.75846495145007e-2,5,str(Solver))
       
   def testactiveUBX(self):
     self.message("active UBX")
