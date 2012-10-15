@@ -620,7 +620,7 @@ void FXInternal::spEvaluate(bool fwd){
   }
 }
 
-// #define NEW_JACOBIAN
+#define NEW_JACOBIAN
 
 FX FXInternal::jacobian(int iind, int oind, bool compact, bool symmetric){
   // Return value
@@ -632,11 +632,11 @@ FX FXInternal::jacobian(int iind, int oind, bool compact, bool symmetric){
     FX fcn = shared_from_this<FX>();
     ret = jacgen_(fcn,iind,oind,user_data_);
   } else if(bool(getOption("numeric_jacobian"))){
+#ifdef NEW_JACOBIAN
+    ret = getNumericJacobian(iind,oind,compact,false); // NOTE: Change "false" to symmetric to enable symmetry exploitation
+#else // NEW_JACOBIAN
     // Generate Jacobian instance
     casadi_assert_message(!compact, "Not implemented");
-#ifdef NEW_JACOBIAN
-    ret = getNumericJacobian(iind,oind,false,false);
-#else // NEW_JACOBIAN
     ret = Jacobian(shared_from_this<FX>(),iind,oind);
 #endif // NEW_JACOBIAN
   } else {
@@ -648,16 +648,16 @@ FX FXInternal::jacobian(int iind, int oind, bool compact, bool symmetric){
   stringstream ss;
   ss << "jacobian_" << getOption("name") << "_" << iind << "_" << oind;
   ret.setOption("name",ss.str());
+  ret.setOption("verbose",getOption("verbose"));
   return ret;
 }
 
 FX FXInternal::getJacobian(int iind, int oind, bool compact, bool symmetric){
 #ifdef NEW_JACOBIAN
-  FX ret = getNumericJacobian(iind,oind,false,false);
+  FX ret = getNumericJacobian(iind,oind,compact,false); // NOTE: Change "false" to symmetric to enable symmetry exploitation
 #else // NEW_JACOBIAN
   FX ret = Jacobian(shared_from_this<FX>(),iind,oind);
 #endif // NEW_JACOBIAN
-  ret.setOption("verbose",getOption("verbose"));
   return ret;
 }
 
@@ -760,7 +760,7 @@ void FXInternal::call(const MXVector& arg, MXVector& res,  const MXVectorVector&
                             "," << input(i).size2() << ") while a shape (" << arg[i].size1() << "," << arg[i].size2() << 
                             ") was supplied.");
     }
-    EvaluationMX::create(shared_from_this<FX>(),arg,res,fseed,fsens,aseed,asens);
+    EvaluationMX::create(shared_from_this<FX>(),arg,res,fseed,fsens,aseed,asens,output_given);
   }
 }
 

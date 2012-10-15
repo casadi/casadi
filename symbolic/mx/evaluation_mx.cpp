@@ -32,8 +32,6 @@ using namespace std;
 namespace CasADi {
 
 EvaluationMX::EvaluationMX(const FX& fcn, const std::vector<MX> &arg) : fcn_(fcn) {
-  std::vector<std::vector<MX> > fseed;
-  std::vector<std::vector<MX> > aseed;
       
   // Number inputs and outputs
   int num_in = fcn.getNumInputs();
@@ -439,10 +437,12 @@ void EvaluationMX::create(const FX& fcn, const std::vector<MX> &arg,
   // Create the output nodes corresponding to the nondifferented function
   res.resize(num_out);
   for (int i = 0; i < num_out; ++i, ++ind) {
-    if(!fcn.output(i).empty()){
-      res[i].assignNode(new OutputNode(ev, ind));
-    } else {
-      res[i] = MX();
+    if(!output_given){
+      if(!fcn.output(i).empty()){
+        res[i].assignNode(new OutputNode(ev, ind));
+      } else {
+        res[i] = MX();
+      }
     }
   }
 
