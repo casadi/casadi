@@ -483,6 +483,12 @@ void WorhpInternal::checkinit() {
   } else {
     dirty = true;
   }
+
+  bool p_init_backup = worhp_p.initialised;
+  worhp_p.initialised = false;
+  if (worhp_o.initialised || worhp_w.initialised || worhp_c.initialised)
+    WorhpFree(&worhp_o, &worhp_w, &worhp_p, &worhp_c);
+  worhp_p.initialised = p_init_backup;
   
   /// Control data structure needs to be reset every time
   worhp_c.initialised = false;
@@ -491,8 +497,7 @@ void WorhpInternal::checkinit() {
   
   // Fast return if not dirty
   //if (!dirty) return;
-  
-
+    
   // Save temporary freeX
   freeX_ = freeXi;
   
