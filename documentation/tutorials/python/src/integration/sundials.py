@@ -211,7 +211,7 @@ show()
 #! - a fixed initial condition (1,0)
 #! - a free symbolic input, held constant during integration interval
 u=MX("u")
-w,_,_,_ = integrator.call(integratorIn(x0=MX([1,0]),p=u))
+w = integrator.call(integratorIn(x0=MX([1,0]),p=u))[0]
 
 #! We construct an MXfunction and a python help function 'out'
 f=MXFunction([u],[w])
