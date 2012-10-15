@@ -907,10 +907,8 @@ class NLPtests(casadiTestCase):
     f = SXFunction([x],[obj])
     for Solver in solvers:
       self.message(str(Solver))
-      if "SQP" in str(Solver):
-        continue
       solver = Solver(f)
-      for k,v in ({"tol":1e-8,"tol_pr":1e-10,"TolOpti":1e-25,"hessian_approximation":"limited-memory","max_iter":100, "MaxIter": 100,"print_level":0,"qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
+      for k,v in ({"tol":1e-8,"tol_pr":1e-10,"TolOpti":1e-25,"hessian_approximation":"limited-memory","max_iter":100,"maxiter":100, "MaxIter": 100,"print_level":0,"qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
       solver.init()
@@ -939,10 +937,10 @@ class NLPtests(casadiTestCase):
 
     for Solver in solvers:
       self.message(str(Solver))
-      if "SQP" in str(Solver):
+      if "SQPMethod" in str(Solver):
         continue
       solver = Solver(f,g)
-      for k,v in ({"tol":1e-8,"tol_pr":1e-10,"TolOpti":1e-25,"hessian_approximation":"limited-memory","max_iter":100, "MaxIter": 100,"print_level":0,"qp_solver": qpsolver,"qp_solver_options" : qpsolver_options, "fixed_variable_treatment": "make_constraint"}).iteritems():
+      for k,v in ({"tol":1e-8,"tol_pr":1e-10,"TolOpti":1e-25,"hessian_approximation":"limited-memory","max_iter":100, "maxiter": 100,"MaxIter": 100,"print_level":0,"qp_solver": qpsolver,"qp_solver_options" : qpsolver_options, "fixed_variable_treatment": "make_constraint"}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
           
@@ -957,12 +955,14 @@ class NLPtests(casadiTestCase):
       self.assertAlmostEqual(solver.output()[0],0.5,6,str(qpsolver))
       self.assertAlmostEqual(solver.output()[1],1.25,6,str(qpsolver))
     
-      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[0],4.75,6,str(qpsolver))
-      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[1],0,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output(NLP_LAMBDA_X)[0],4.75,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output(NLP_LAMBDA_X)[1],0,6,str(qpsolver))
 
-      self.checkarray(solver.output(QP_LAMBDA_A),DMatrix([0,2,0]),str(qpsolver),digits=6)
+      self.checkarray(solver.output(NLP_LAMBDA_G),DMatrix([0,2,0]),str(qpsolver),digits=6)
       
-      self.assertAlmostEqual(solver.output(QP_COST)[0],-7.4375,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output(NLP_COST)[0],-7.4375,6,str(qpsolver))
+
+
       
 if __name__ == '__main__':
     unittest.main()
