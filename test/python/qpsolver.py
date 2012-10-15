@@ -189,7 +189,7 @@ class QPSolverTests(casadiTestCase):
     LBX = DMatrix([0]*2)
     UBX = DMatrix([inf]*2)
 
-    options = {"convex": True, "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+    options = {"convex": False, "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
       
     for qpsolver, qp_options in qpsolvers:
       self.message("general_convex: " + str(qpsolver))

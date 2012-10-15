@@ -920,7 +920,9 @@ class NLPtests(casadiTestCase):
       self.checkarray(solver.output(NLP_LAMBDA_X),DMatrix.zeros(N,1),str(Solver),digits=4)
       
       
-  def test_QP2(self):
+  def test_tol_pr(self):
+    return
+    self.message("Low tol_pr")
     H = DMatrix([[1,-1],[-1,2]])
     G = DMatrix([-2,-6])
     A =  DMatrix([[1, 1],[-1, 2],[2, 1]])
@@ -937,8 +939,6 @@ class NLPtests(casadiTestCase):
 
     for Solver in solvers:
       self.message(str(Solver))
-      if "SQPMethod" in str(Solver):
-        continue
       solver = Solver(f,g)
       for k,v in ({"tol":1e-8,"tol_pr":1e-10,"TolOpti":1e-25,"hessian_approximation":"limited-memory","max_iter":100, "maxiter": 100,"MaxIter": 100,"print_level":0,"qp_solver": qpsolver,"qp_solver_options" : qpsolver_options, "fixed_variable_treatment": "make_constraint"}).iteritems():
         if solver.hasOption(k):
@@ -961,8 +961,132 @@ class NLPtests(casadiTestCase):
       self.checkarray(solver.output(NLP_LAMBDA_G),DMatrix([0,2,0]),str(qpsolver),digits=6)
       
       self.assertAlmostEqual(solver.output(NLP_COST)[0],-7.4375,6,str(qpsolver))
+      
+  def test_QP2(self):
+    H = DMatrix([[1,-1],[-1,2]])
+    G = DMatrix([-2,-6])
+    A =  DMatrix([[1, 1],[-1, 2],[2, 1]])
 
+    LBA = DMatrix([-inf]*3)
+    UBA = DMatrix([2, 2, 3])
 
+    LBX = DMatrix([0.5,0])
+    UBX = DMatrix([0.5,inf])
+
+    x=ssym("x",2)
+    f=SXFunction([x],[0.5*mul([x.T,H,x])+mul(G.T,x)])
+    g=SXFunction([x],[mul(A,x)])
+
+    for Solver in solvers:
+      self.message(str(Solver))
+      solver = Solver(f,g)
+      for k,v in ({"tol":1e-8,"TolOpti":1e-25,"hessian_approximation":"limited-memory","max_iter":100, "maxiter": 100,"MaxIter": 100,"print_level":0,"qp_solver": qpsolver,"qp_solver_options" : qpsolver_options, "fixed_variable_treatment": "make_constraint"}).iteritems():
+        if solver.hasOption(k):
+          solver.setOption(k,v)
+          
+      solver.init()
+      solver.input(NLP_LBX).set(LBX)
+      solver.input(NLP_UBX).set(UBX)
+      solver.input(NLP_LBG).set(LBA)
+      solver.input(NLP_UBG).set(UBA)
+
+      solver.solve()
+
+      self.assertAlmostEqual(solver.output()[0],0.5,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output()[1],1.25,6,str(qpsolver))
+    
+      self.assertAlmostEqual(solver.output(NLP_LAMBDA_X)[0],4.75,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output(NLP_LAMBDA_X)[1],0,6,str(qpsolver))
+
+      self.checkarray(solver.output(NLP_LAMBDA_G),DMatrix([0,2,0]),str(qpsolver),digits=6)
+      
+      self.assertAlmostEqual(solver.output(NLP_COST)[0],-7.4375,6,str(qpsolver))
+      
+      solver = Solver(f,g)
+      for k,v in ({"tol":1e-8,"TolOpti":1e-25,"hessian_approximation":"exact","UserHM":True,"generate_hessian": True,"max_iter":100, "maxiter": 100,"MaxIter": 100,"print_level":0,"qp_solver": qpsolver,"qp_solver_options" : qpsolver_options, "fixed_variable_treatment": "make_constraint"}).iteritems():
+        if solver.hasOption(k):
+          solver.setOption(k,v)
+          
+      solver.init()
+      solver.input(NLP_LBX).set(LBX)
+      solver.input(NLP_UBX).set(UBX)
+      solver.input(NLP_LBG).set(LBA)
+      solver.input(NLP_UBG).set(UBA)
+
+      solver.solve()
+
+      self.assertAlmostEqual(solver.output()[0],0.5,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output()[1],1.25,6,str(qpsolver))
+    
+      self.assertAlmostEqual(solver.output(NLP_LAMBDA_X)[0],4.75,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output(NLP_LAMBDA_X)[1],0,6,str(qpsolver))
+
+      self.checkarray(solver.output(NLP_LAMBDA_G),DMatrix([0,2,0]),str(qpsolver),digits=6)
+      
+      self.assertAlmostEqual(solver.output(NLP_COST)[0],-7.4375,6,str(qpsolver))
+
+  def test_QP2_unconvex(self):
+    H = DMatrix([[1,-1],[-1,-2]])
+    G = DMatrix([-2,-6])
+    A =  DMatrix([[1, 1],[-1, 2],[2, 1]])
+    
+    LBA = DMatrix([-inf]*3)
+    UBA = DMatrix([2, 2, 3])
+
+    LBX = DMatrix([0]*2)
+    UBX = DMatrix([inf]*2)
+
+    x=ssym("x",2)
+    f=SXFunction([x],[0.5*mul([x.T,H,x])+mul(G.T,x)])
+    g=SXFunction([x],[mul(A,x)])
+
+    for Solver in solvers:
+      self.message(str(Solver))
+      solver = Solver(f,g)
+      for k,v in ({"tol":1e-8,"TolOpti":1e-25,"hessian_approximation":"limited-memory","max_iter":100, "maxiter": 100,"MaxIter": 100,"print_level":0,"qp_solver": qpsolver,"qp_solver_options" : qpsolver_options, "fixed_variable_treatment": "make_constraint"}).iteritems():
+        if solver.hasOption(k):
+          solver.setOption(k,v)
+          
+      solver.init()
+      solver.input(NLP_LBX).set(LBX)
+      solver.input(NLP_UBX).set(UBX)
+      solver.input(NLP_LBG).set(LBA)
+      solver.input(NLP_UBG).set(UBA)
+
+      solver.solve()
+
+      self.assertAlmostEqual(solver.output()[0],2.0/3,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output()[1],4.0/3,6,str(qpsolver))
+    
+      self.assertAlmostEqual(solver.output(NLP_LAMBDA_X)[0],0,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output(NLP_LAMBDA_X)[1],0,6,str(qpsolver))
+
+      self.checkarray(solver.output(NLP_LAMBDA_G),DMatrix([4+8.0/9,20.0/9,0]),str(qpsolver),digits=6)
+      
+      self.assertAlmostEqual(solver.output(NLP_COST)[0],-10-16.0/9,6,str(qpsolver))
+
+      solver = Solver(f,g)
+      for k,v in ({"tol":1e-8,"TolOpti":1e-25,"hessian_approximation":"exact","UserHM":True,"generate_hessian": True,"max_iter":100, "maxiter": 100,"MaxIter": 100,"print_level":0,"qp_solver": qpsolver,"qp_solver_options" : qpsolver_options, "fixed_variable_treatment": "make_constraint"}).iteritems():
+        if solver.hasOption(k):
+          solver.setOption(k,v)
+          
+      solver.init()
+      solver.input(NLP_LBX).set(LBX)
+      solver.input(NLP_UBX).set(UBX)
+      solver.input(NLP_LBG).set(LBA)
+      solver.input(NLP_UBG).set(UBA)
+
+      solver.solve()
+
+      self.assertAlmostEqual(solver.output()[0],2.0/3,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output()[1],4.0/3,6,str(qpsolver))
+    
+      self.assertAlmostEqual(solver.output(NLP_LAMBDA_X)[0],0,6,str(qpsolver))
+      self.assertAlmostEqual(solver.output(NLP_LAMBDA_X)[1],0,6,str(qpsolver))
+
+      self.checkarray(solver.output(NLP_LAMBDA_G),DMatrix([4+8.0/9,20.0/9,0]),str(qpsolver),digits=6)
+      
+      self.assertAlmostEqual(solver.output(NLP_COST)[0],-10-16.0/9,6,str(qpsolver))
       
 if __name__ == '__main__':
     unittest.main()
