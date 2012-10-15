@@ -128,11 +128,9 @@ class NLPtests(casadiTestCase):
     f=SXFunction([vertcat([x,y])],[(1-x)**2+100*(y-x**2)**2])
     
     for Solver in solvers:
-      if ("SQPMethod" in Solver.__name__):
-        continue # incorrect
       self.message(str(Solver))
       solver = Solver(f)
-      for k,v in ({"tol":1e-9,"TolOpti":1e-14,"hessian_approximation":"limited-memory","max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
+      for k,v in ({"tol":1e-9,"TolOpti":1e-14,"hessian_approximation":"limited-memory","maxiter":100,"max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
       solver.init()
@@ -140,8 +138,8 @@ class NLPtests(casadiTestCase):
       solver.input(NLP_UBX).set([10]*2)
       solver.solve()
       self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,str(Solver))
-      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,8,str(Solver))
-      self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,8,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,7,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,7,str(Solver))
       self.assertAlmostEqual(solver.output(NLP_LAMBDA_X)[0],0,9,str(Solver))
       self.assertAlmostEqual(solver.output(NLP_LAMBDA_X)[1],0,9,str(Solver))
     
