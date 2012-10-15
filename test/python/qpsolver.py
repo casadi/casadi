@@ -26,8 +26,6 @@ import unittest
 from types import *
 from helpers import *
 
-CasadiOptions.setCatchErrorsPython(False)
-
 qpsolvers = []
 try:
   qpsolvers.append((NLPQPSolver,{"nlp_solver":IpoptSolver, "nlp_solver_options": {"tol": 1e-12}}))
