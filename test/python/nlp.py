@@ -33,6 +33,12 @@ try:
   print "Will test WorhpSolver"
 except:
   pass
+  
+try:
+  solvers.append(IpoptSolver)
+  print "Will test IpoptSolver"
+except:
+  pass
 
 #try:
 #  solvers.append(KnitroSolver)
