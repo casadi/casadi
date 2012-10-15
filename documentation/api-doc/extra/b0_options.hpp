@@ -2446,6 +2446,7 @@
 <tr><td>parametric</td><td>OT_BOOLEAN</td><td>false</td><td>Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>qp_solver</td><td>OT_QPSOLVER</td><td>GenericType()</td><td>The QP solver to be used by the SQP method</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>qp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the QP solver</td><td>CasADi::SQPInternal</td></tr>
+<tr><td>regularize</td><td>OT_BOOLEAN</td><td>0</td><td>Automatic regularization of Lagrange Hessian.</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
@@ -2491,6 +2492,7 @@
 <tr><td>parametric</td><td>OT_BOOLEAN</td><td>false</td><td>Expect F, G, H, J to have an additional input argument appended at the end, denoting fixed parameters.</td><td>CasADi::NLPSolverInternal</td></tr>
 <tr><td>qp_solver</td><td>OT_QPSOLVER</td><td>GenericType()</td><td>The QP solver to be used by the SQP method</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>qp_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the QP solver</td><td>CasADi::SQPInternal</td></tr>
+<tr><td>regularize</td><td>OT_BOOLEAN</td><td>0</td><td>Automatic regularization of Lagrange Hessian.</td><td>CasADi::SQPInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
