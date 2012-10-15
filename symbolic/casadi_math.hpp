@@ -53,6 +53,7 @@ bool operation_checker(unsigned int op){
     case OP_NOT:           return F<OP_NOT>::check;
     case OP_AND:           return F<OP_AND>::check;
     case OP_OR:            return F<OP_OR>::check;
+    case OP_IF_ELSE_ZERO:   return F<OP_IF_ELSE_ZERO>::check;
     case OP_FLOOR:         return F<OP_FLOOR>::check;
     case OP_CEIL:          return F<OP_CEIL>::check;
     case OP_FABS:          return F<OP_FABS>::check;
@@ -173,6 +174,7 @@ inline void casadi_math<T>::fun(unsigned char op, const T& x, const T& y, T& f){
     case OP_NOT:       BinaryOperation<OP_NOT>::fcn(X,Y,F);           break;\
     case OP_AND:       BinaryOperation<OP_AND>::fcn(X,Y,F);           break;\
     case OP_OR:        BinaryOperation<OP_OR>::fcn(X,Y,F);            break;\
+    case OP_IF_ELSE_ZERO: BinaryOperation<OP_IF_ELSE_ZERO>::fcn(X,Y,F); break;\
     case OP_FLOOR:     BinaryOperation<OP_FLOOR>::fcn(X,Y,F);         break;\
     case OP_CEIL:      BinaryOperation<OP_CEIL>::fcn(X,Y,F);          break;\
     case OP_FABS:      BinaryOperation<OP_FABS>::fcn(X,Y,F);          break;\
@@ -224,6 +226,7 @@ inline void casadi_math<T>::der(unsigned char op, const T& x, const T& y, const 
     case OP_NOT:       BinaryOperation<OP_NOT>::der(X,Y,F,D);        break;\
     case OP_AND:       BinaryOperation<OP_AND>::der(X,Y,F,D);        break;\
     case OP_OR:        BinaryOperation<OP_OR>::der(X,Y,F,D);         break;\
+    case OP_IF_ELSE_ZERO: BinaryOperation<OP_IF_ELSE_ZERO>::der(X,Y,F,D);         break;\
     case OP_FLOOR:     BinaryOperation<OP_FLOOR>::der(X,Y,F,D);      break;\
     case OP_CEIL:      BinaryOperation<OP_CEIL>::der(X,Y,F,D);       break;\
     case OP_FABS:      BinaryOperation<OP_FABS>::der(X,Y,F,D);       break;\
@@ -276,6 +279,7 @@ inline void casadi_math<T>::derF(unsigned char op, const T& x, const T& y, T& f,
     case OP_NOT:       DerBinaryOpertion<OP_NOT>::derf(X,Y,F,D);        break;\
     case OP_AND:       DerBinaryOpertion<OP_AND>::derf(X,Y,F,D);        break;\
     case OP_OR:        DerBinaryOpertion<OP_OR>::derf(X,Y,F,D);         break;\
+    case OP_IF_ELSE_ZERO: DerBinaryOpertion<OP_IF_ELSE_ZERO>::derf(X,Y,F,D);         break;\
     case OP_FLOOR:     DerBinaryOpertion<OP_FLOOR>::derf(X,Y,F,D);      break;\
     case OP_CEIL:      DerBinaryOpertion<OP_CEIL>::derf(X,Y,F,D);       break;\
     case OP_FABS:      DerBinaryOpertion<OP_FABS>::derf(X,Y,F,D);       break;\
@@ -314,6 +318,7 @@ inline int casadi_math<T>::ndeps(unsigned char op){
     case OP_NE:\
     case OP_AND:\
     case OP_OR:\
+    case OP_IF_ELSE_ZERO:\
     case OP_FMIN:\
     case OP_FMAX:\
     case OP_ATAN2:\
@@ -376,6 +381,7 @@ inline void casadi_math<T>::printPre(unsigned char op, std::ostream &stream){
     case OP_NOT:       stream << "(!";       break;
     case OP_AND:       stream << "(";        break;
     case OP_OR:        stream << "(";        break;
+    case OP_IF_ELSE_ZERO: stream << "(";        break;
     case OP_FLOOR:     stream << "floor(";   break;
     case OP_CEIL:      stream << "ceil(";    break;
     case OP_FABS:      stream << "fabs(";    break;
@@ -406,6 +412,7 @@ inline void casadi_math<T>::printSep(unsigned char op, std::ostream &stream){
     case OP_NE:        stream << "!=";       break;
     case OP_AND:       stream << "&&";       break;
     case OP_OR:        stream << "||";       break;
+    case OP_IF_ELSE_ZERO: stream << "?";      break;
     default:           stream << ",";        break;
   }
 }
@@ -413,8 +420,9 @@ inline void casadi_math<T>::printSep(unsigned char op, std::ostream &stream){
 template<typename T>
 inline void casadi_math<T>::printPost(unsigned char op, std::ostream &stream){
   switch(op){
-    case OP_ASSIGN:                       break;
-    default:        stream << ")";        break;
+    case OP_ASSIGN:                        break;
+    case OP_IF_ELSE_ZERO: stream << ":0)"; break;
+    default:        stream << ")";         break;
   }
 }
 

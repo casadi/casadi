@@ -371,7 +371,7 @@ SXNode* SX::operator->(){
 }
 
 SX if_else(const SX& cond, const SX& if_true, const SX& if_false){
-  return if_false + (if_true-if_false)*cond;
+  return if_else_zero(cond,if_true) + if_else_zero(!cond,if_false);
 }
 
 SX SX::binary(int op, const SX& x, const SX& y){
@@ -725,6 +725,10 @@ SX SX::logic_and(const SX& y) const{
 
 SX SX::logic_or(const SX& y) const{
   return BinarySX::create(OP_OR,*this,y);
+}
+
+SX SX::if_else_zero(const SX& y) const{
+  return BinarySX::create(OP_IF_ELSE_ZERO,*this,y);
 }
 
 int SX::getTemp() const{

@@ -256,10 +256,7 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Cached
   
   /// Check if commutative operation
   bool isCommutative() const;
-  
-  /// Check if if-test
-  bool isIfTest() const;
-  
+    
   /// Check if norm
   bool isNorm () const;
   
@@ -403,6 +400,7 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Cached
   MX arctan2(const MX& y) const;
   MX logic_and(const MX& y) const;
   MX logic_or(const MX& y) const;
+  MX if_else_zero(const MX& y) const;
 
   // all unary operations
   MX exp() const;

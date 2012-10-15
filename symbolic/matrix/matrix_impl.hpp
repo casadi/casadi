@@ -1082,6 +1082,11 @@ Matrix<T> Matrix<T>::logic_or(const Matrix<T>& y) const{
 }
 
 template<class T>
+Matrix<T> Matrix<T>::if_else_zero(const Matrix<T>& y) const{
+  return binary(OP_IF_ELSE_ZERO,*this,y);
+}
+
+template<class T>
 std::vector<T>& Matrix<T>::data(){
   return data_;  
 }

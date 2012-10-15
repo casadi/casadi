@@ -24,7 +24,6 @@
 #include "mapping.hpp"
 #include "norm.hpp"
 #include "constant_mx.hpp"
-#include "if_else_node.hpp"
 #include "../fx/mx_function.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "../stl_vector_tools.hpp"
@@ -287,13 +286,6 @@ MX vecNZ(const MX &x) {
   simplifyMapping(ret);
   return ret;
 }
-
-MX if_else_zero(const MX &cond, const MX &if_true){
-  MX ret;
-  ret.assignNode(new IfNode(cond,if_true));
-  return ret;
-}
-
 
 MX if_else(const MX &cond, const MX &if_true, const MX &if_false){
   return if_else_zero(cond,if_true) + if_else_zero(!cond,if_false);

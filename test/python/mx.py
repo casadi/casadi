@@ -1842,7 +1842,7 @@ class MXtests(casadiTestCase):
 
   def test_if_else_zero(self):
     x = MX("x")
-    y = if_else_zero(x,5)
+    y = if_else(x,5,0)
     f = MXFunction([x],[y])
     f.init()
     f.input().set(1)

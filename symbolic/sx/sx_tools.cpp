@@ -113,7 +113,7 @@ Matrix<SX> pw_lin(const SX &t, const Matrix<SX> &tval, const Matrix<SX> &val){
 }
 
 Matrix<SX> if_else(const Matrix<SX> &cond, const Matrix<SX> &if_true, const Matrix<SX> &if_false){
-  return if_false + (if_true-if_false)*cond;
+  return if_else_zero(cond,if_true) + if_else_zero(!cond,if_false);
 }
 
 Matrix<SX> heaviside(const Matrix<SX>& a){

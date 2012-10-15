@@ -111,11 +111,6 @@ Ternary operator, "cond ? if_true : if_false"
 */
 MX if_else(const MX &cond, const MX &if_true, const MX &if_false); 
 
-/** \brief Conditional evaluation
-cond ? if_true : 0
-*/
-MX if_else_zero(const MX &cond, const MX &if_true); 
-
 #ifndef SWIG
 //! \brief Returns a reshaped version of the MX
 MX reshape(const MX &x, int n, int m);

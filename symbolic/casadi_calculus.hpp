@@ -43,7 +43,7 @@ enum Operation{
   OP_SQRT,  OP_SIN,  OP_COS,  OP_TAN,  
   OP_ASIN,  OP_ACOS,  OP_ATAN,  
   OP_LT, OP_LE, OP_EQ, OP_NE, OP_NOT, OP_AND, OP_OR,
-  OP_FLOOR,  OP_CEIL,  OP_FABS, OP_SIGN, 
+  OP_FLOOR,  OP_CEIL,  OP_FABS, OP_SIGN, OP_IF_ELSE_ZERO,
   OP_ERF,  OP_FMIN,  OP_FMAX,
   OP_INV,
   OP_SINH,  OP_COSH,  OP_TANH,
@@ -220,6 +220,12 @@ enum Operation{
   /// Sign function, note that sign(nan) == nan
   inline double sign(double x){ return x<0 ? -1 : x>0 ? 1 : x;}
 
+  /// Conditional assignment
+  template<class T> T if_else_zero(const T &x, const T &y){return x.if_else_zero(y);}
+
+  /// Conditional assignment
+  inline double if_else_zero(double x, double y){ return x ? y : 0;}
+
   /// Inverse of the error function
   template<class T> T erfinv(const T &x){return x.erfinv();}
   #ifdef HAS_ERFINV
@@ -327,6 +333,7 @@ struct DerBinaryOpertion{
   template<>      struct SmoothChecker<OP_NOT>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_AND>{ static const bool check=false;};
   template<>      struct SmoothChecker<OP_OR>{ static const bool check=false;};
+  template<>      struct SmoothChecker<OP_IF_ELSE_ZERO>{ static const bool check=false;};
 //@}
 
 //@{
@@ -351,6 +358,7 @@ struct DerBinaryOpertion{
   template<>      struct F0XChecker<OP_ATANH>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_ERFINV>{ static const bool check=true;};
   template<>      struct F0XChecker<OP_AND>{ static const bool check=true;};
+  template<>      struct F0XChecker<OP_IF_ELSE_ZERO>{ static const bool check=true;};
 //@}
 
 //@{
@@ -358,6 +366,7 @@ struct DerBinaryOpertion{
   template<int I> struct FX0Checker{ static const bool check=false;};
   template<>      struct FX0Checker<OP_MUL>{ static const bool check=true;};
   template<>      struct FX0Checker<OP_AND>{ static const bool check=true;};
+  template<>      struct FX0Checker<OP_IF_ELSE_ZERO>{ static const bool check=true;};
 //@}
 
 //@{
@@ -380,6 +389,7 @@ struct DerBinaryOpertion{
   template<>      struct CommChecker<OP_CONSTPOW>{ static const bool check=false;};
   template<>      struct CommChecker<OP_PRINTME>{ static const bool check=false;};
   template<>      struct CommChecker<OP_ATAN2>{ static const bool check=false;};
+  template<>      struct CommChecker<OP_IF_ELSE_ZERO>{ static const bool check=false;};
 //@}
 
 //@{
@@ -399,6 +409,7 @@ struct DerBinaryOpertion{
   template<>      struct BinaryChecker<OP_FMAX>{ static const bool check=true;};
   template<>      struct BinaryChecker<OP_PRINTME>{ static const bool check=true;};
   template<>      struct BinaryChecker<OP_ATAN2>{ static const bool check=true;};
+  template<>      struct BinaryChecker<OP_IF_ELSE_ZERO>{ static const bool check=true;};
 //@}
 
 /// Simple assignment
@@ -710,6 +721,14 @@ struct BinaryOperation<OP_ATAN2>{
   public:
     template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f = atan2(x,y);}
     template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ T t = x*x+y*y; d[0]=y/t; d[1]=-x/t;}
+};
+
+/// Conditional assignment
+template<>
+struct BinaryOperation<OP_IF_ELSE_ZERO>{
+  public:
+    template<typename T> static inline void fcn(const T& x, const T& y, T& f){ f = if_else_zero(x,y);}
+    template<typename T> static inline void der(const T& x, const T& y, const T& f, T* d){ d[0]=0; d[1]=x;}
 };
 
 #endif // SWIG

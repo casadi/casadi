@@ -34,7 +34,6 @@
 #include "../stl_vector_tools.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "multiplication.hpp"
-#include "if_else_node.hpp"
 #include "densification.hpp"
 #include "norm.hpp"
 #include "../casadi_math.hpp"
@@ -902,6 +901,10 @@ MX MX::logic_or(const MX& y) const{
   return MX::binary(OP_OR,*this,y);
 }
   
+MX MX::if_else_zero(const MX& y) const{
+  return MX::binary(OP_IF_ELSE_ZERO,*this,y);
+}
+  
 MX MX::__constpow__(const MX& b) const { return (*this).constpow(b);}
 MX MX::__mrdivide__(const MX& b) const { if (b.scalar()) return *this/b; throw CasadiException("mrdivide: Not implemented");}
 MX MX::__mpower__(const MX& b) const   { return pow(*this,b); throw CasadiException("mpower: Not implemented");}
@@ -937,8 +940,6 @@ int 	MX::getEvaluationOutput () const { return !isNull() ? (*this)->getFunctionO
     
 bool 	MX::isOperation (int op) const { return !isNull() ? (*this)->isOperation(op) : false; }
 bool 	MX::isMultiplication () const { return !isNull() ? (*this)->isMultiplication() : false; }
-
-bool 	MX::isIfTest () const { return !isNull() ? dynamic_cast<const IfNode*>(get())!=0 : false; }
 
 bool 	MX::isNorm () const { return !isNull() ? dynamic_cast<const Norm*>(get())!=0 : false; }
 
