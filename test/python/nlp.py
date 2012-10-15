@@ -789,8 +789,8 @@ class NLPtests(casadiTestCase):
       solver.solve()
       
       self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,str(Solver))
-      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,9,str(Solver))
-      self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,9,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,7,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,7,str(Solver))
 
   def testactiveLBX(self):
     self.message("active LBX")

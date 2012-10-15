@@ -48,8 +48,9 @@ SQPInternal::SQPInternal(const FX& F, const FX& G, const FX& H, const FX& J) : N
   addOption("tol_du",            OT_REAL,       1e-6,             "Stopping criterion for dual infeasability");
   addOption("c1",                OT_REAL,       1E-4,             "Armijo condition, coefficient of decrease in merit");
   addOption("beta",              OT_REAL,       0.8,              "Line-search parameter, restoration factor of stepsize");
-  addOption("merit_memory",         OT_INTEGER,    4,             "Size of memory to store history of merit function values");
-  addOption("lbfgs_memory",      OT_INTEGER,    10,               "Size of L-BFGS memory.");
+  addOption("merit_memory",      OT_INTEGER,      4,              "Size of memory to store history of merit function values");
+  addOption("lbfgs_memory",      OT_INTEGER,     10,              "Size of L-BFGS memory.");
+  addOption("regularize",        OT_BOOLEAN,      0,              "Automatic regularization of Lagrange Hessian.");
   
   // Monitors
   addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp|dx", true);
@@ -88,6 +89,7 @@ void SQPInternal::init(){
   
   // Allocate a QP solver
   CRSSparsity H_sparsity = getOption("hessian_approximation")=="exact"? H_.output().sparsity() : sp_dense(n,n);
+  H_sparsity = H_sparsity + DMatrix::eye(n).sparsity();
   CRSSparsity A_sparsity = J_.isNull() ? CRSSparsity(0,n,false) : J_.output().sparsity();
 
   QPSolverCreator qp_solver_creator = getOption("qp_solver");
@@ -195,6 +197,38 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       }
       H_.evaluate();
       Bk = H_.output();
+      // Determing regularization parameter with Gershgorin theorem
+      if (bool(getOption("regularize"))){
+        vector<int> rowind,col;
+        Bk.sparsity().getSparsityCRS(rowind, col);
+        std::vector<double>& data = Bk.data();
+        int i, j;
+        double radius;
+        double reg_param = 0;
+        double mineig;
+        for(int r=0; r<rowind.size()-1; ++r){
+          radius = 0;
+          for(int el=rowind[r]; el<rowind[r+1]; ++el){
+            i = r;
+            j = col[el];
+            if (i != j){
+              radius += fabs(data[el]);
+            }
+  //          cout << "(" << r << "," << col[el] << "): " << data[el] << endl; 
+          }
+          mineig = Bk(r, r).elem(0) - radius;
+          if (mineig < reg_param){
+            reg_param = mineig;
+          }
+        }
+  //      cout << "Regularization parameter: " << -reg_param << endl;
+        if ( reg_param < 0.){
+          Bk += -reg_param * DMatrix::eye(Bk.size1());
+        }
+        else{
+          Bk += 0. * DMatrix::eye(Bk.size1());
+        }
+      }
     }
     if (monitored("eval_h")) {
       cout << "(main loop) B = " << endl;
@@ -295,9 +329,11 @@ void SQPInternal::evaluate(int nfdir, int nadir){
 //    if ((norm_2(p) / norm_2(x)).at(0) > 500.){
 //      casadi_warning("Search direction has very large values, indefinite Hessian might have ouccured.");
 //    }
-    if (inner_prod(p, mul(Bk, p)).at(0) < 0){
+    double gain = inner_prod(p, mul(Bk, p)).at(0);
+    if (gain < 0){
       casadi_warning("Indefinite Hessian detected...");
     }
+    
     
     // Get the dual solution for the inequalities
     mu_qp = qp_solver_.output(QP_LAMBDA_A);
@@ -387,13 +423,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
         break;
       }
       else{
-        //cout << "L1merit:      " << L1merit << endl;
-        //cout << "L1dir:        " << L1dir << endl;
-        //cout << "L1merit_cand: " << meritmax << endl;
-        //cout << "merit diff: " << L1merit - L1merit_cand << endl;
-        //cout << "lhs:" << L1merit_cand - L1merit << endl;
-        //cout << "rhs:" << t * c1_ * L1dir << endl;
-        //cout << "difference: " << L1merit_cand - L1merit - t * c1_ * L1dir << endl;
+        // Backtracking
         t = beta_ * t; 
       }
 
@@ -418,20 +448,14 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     F_.setAdjSeed(1.0);
     F_.evaluate(0, 1);
     gLag = F_.adjSens(); 
-    //cout << "Objective gradient:\n" << gLag << endl;
+
     // Adjoint derivative of constraint function
-    
     if (!G_.isNull()){
       G_.setAdjSeed(mu);
       G_.evaluate(0, 1);
-      //cout << "Constraint adjoint:\n" << G_.adjSens() << endl;
-      //cout << "mu:\n" << mu << endl;
-      //cout << "mu_qp:\n" << mu_qp << endl;
       gLag += G_.adjSens();
     }
     gLag += mu_x;
-    //cout << "Lagrange gradient:\n" << gLag << endl;
-    //cout << "mu_x:\n" << mu_x << endl;
 
     DMatrix gLag_old_bfgs;
     F_.setInput(x_old);
@@ -455,16 +479,16 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       DMatrix yk = gLag - gLag_old_bfgs;
       DMatrix qk = mul(Bk, sk);
       // Calculating theta
-      double omega = 0.;
+      double omega = 1.;
       if (inner_prod(yk, sk).at(0) < 0.2 * inner_prod(sk, qk).at(0) ){
         double skBksk = inner_prod(sk, qk).at(0);
         omega = 0.8 * skBksk / (skBksk - inner_prod(sk, yk).at(0)); 
       }
-      yk = yk + omega * (qk - yk);
+      yk = omega * yk + (1 - omega) * qk;
+
       double theta = 1. / inner_prod(sk, yk).at(0);
       double phi = 1. / inner_prod(qk, sk).at(0);
       Bk = Bk + theta * mul(yk, yk.trans()) - phi * mul(qk, qk.trans());
-
 
     }
     // Calculating optimality criterion
