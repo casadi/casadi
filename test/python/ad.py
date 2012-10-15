@@ -406,7 +406,7 @@ class ADtests(casadiTestCase):
     H = JT.jacobian(0,0)
     H.init()
     H.input().set(n)
-    H.evaluate()
+    #H.evaluate()
     
     #print array(JT.output())
     #print array(H.output())

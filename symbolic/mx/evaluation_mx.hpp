@@ -36,9 +36,7 @@ class EvaluationMX : public MultipleOutput{
   public:
 
     /** \brief  Constructor */
-    explicit EvaluationMX(const FX& fcn, const std::vector<MX> &arg, 
-			const std::vector<std::vector<MX> > &fseed, const std::vector<std::vector<MX> > &aseed,
-			bool output_given);
+    explicit EvaluationMX(const FX& fcn, const std::vector<MX> &arg);
 
     /** \brief  Creator function, arranges the outputs */
     static void create(const FX& fcn, 
@@ -91,12 +89,6 @@ class EvaluationMX : public MultipleOutput{
 
     // Function to be evaluated
     FX fcn_;
-    
-    // Is the argument identical to the input of the function
-    bool output_given_f_;
-    
-    // Number of directional derivatives
-    int nfwd_f_, nadj_f_;
 };
 
 } // namespace CasADi

@@ -390,25 +390,28 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
   }
 
   // Get the forward sensitivities
-  for(int dir=0; dir<nfdir; ++dir)
+  for(int dir=0; dir<nfdir; ++dir){
     for(int ind=0; ind<outputv_.size(); ++ind){
       work_[output_ind_[ind]].dataF.at(dir).get(fwdSens(ind,dir));
     }
+  }
           
   if(nadir>0){
     log("MXFunctionInternal::evaluate evaluating adjoint");
 
     // Clear the adjoint seeds
-    for(vector<FunctionIO>::iterator it=work_.begin(); it!=work_.end(); it++)
+    for(vector<FunctionIO>::iterator it=work_.begin(); it!=work_.end(); it++){
       for(int dir=0; dir<nadir; ++dir){
         fill(it->dataA.at(dir).begin(),it->dataA.at(dir).end(),0.0);
       }
+    }
 
     // Pass the adjoint seeds
-    for(int ind=0; ind<outputv_.size(); ++ind)
+    for(int ind=0; ind<outputv_.size(); ++ind){
       for(int dir=0; dir<nadir; ++dir){
         work_[output_ind_[ind]].dataA.at(dir).set(adjSeed(ind,dir));
       }
+    }
 
     // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
     for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); it++){
