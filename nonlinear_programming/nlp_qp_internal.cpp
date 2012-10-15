@@ -49,12 +49,15 @@ NLPQPInternal::~NLPQPInternal(){
 void NLPQPInternal::evaluate(int nfdir, int nadir) {
   if (nfdir!=0 || nadir!=0) throw CasadiException("NLPQPInternal::evaluate() not implemented for forward or backward mode");
 
-  // Pass inputs of QP to NLP form 
-  nlpsolver_.input(NLP_P)[H_.mapping()] = input(QP_H);
-  nlpsolver_.input(NLP_P)[G_.mapping()] = input(QP_G);
-  if (A_.size1()>0)
-    nlpsolver_.input(NLP_P)[A_.mapping()] = input(QP_A);
+  int k = 0;
   
+ // Pass inputs of QP to NLP form 
+  
+  std::copy(input(QP_H).data().begin(),input(QP_H).data().end(),nlpsolver_.input(NLP_P).data().begin()+k); k+= input(QP_H).size();
+  std::copy(input(QP_G).data().begin(),input(QP_G).data().end(),nlpsolver_.input(NLP_P).data().begin()+k); k+= input(QP_G).size();
+  std::copy(input(QP_A).data().begin(),input(QP_A).data().end(),nlpsolver_.input(NLP_P).data().begin()+k);
+  
+
   nlpsolver_.input(NLP_LBX).set(input(QP_LBX));
   nlpsolver_.input(NLP_UBX).set(input(QP_UBX));
   
@@ -84,7 +87,7 @@ void NLPQPInternal::init(){
   sps.push_back(input(QP_H).sparsity());
   sps.push_back(input(QP_G).sparsity());
   sps.push_back(input(QP_A).sparsity());
-  
+   
   // So that we can pass it on to createParent
   std::pair< MX, std::vector< MX > > mypair = createParent(sps);
   
