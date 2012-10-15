@@ -33,6 +33,9 @@ namespace CasADi{
 KnitroInternal::KnitroInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF) : NLPSolverInternal(F,G,H,J), GF_(GF){
   casadi_warning("KnitroInternal: the KNITRO interface is still experimental, more tests are needed");
 
+// Monitors
+  addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h", true);
+  
   // Not yet ready
   //addOption("algorithm",                OT_STRING, GenericType(), "Which algorithm to use. See KNITRO documentation.", "auto|direct|cg|active");
   //addOption("bar_directinterval",       OT_INTEGER, GenericType(), "When using the Interior/Direct algorithm, this parameter controls the maximum number of consecutive CG steps before trying to force the algorithm to take a direct step again. See KNITRO documentation.");
@@ -307,6 +310,16 @@ void KnitroInternal::evalfc(const double* x, double& obj, double *c){
 
   // Get the result
   G_.getOutput(c);
+  
+  // Printing
+  if(monitored("eval_f")){
+     cout << "x = " << F_.input(0) << endl;
+     cout << "f = " << F_.output() << endl;
+  }
+  if(monitored("eval_g")){
+     cout << "x = " << G_.input(0) << endl;
+     cout << "g = " << G_.output() << endl;
+  }
 }
 
 void KnitroInternal::evalga(const double* x, double* objGrad, double* jac){
@@ -328,6 +341,17 @@ void KnitroInternal::evalga(const double* x, double* objGrad, double* jac){
   
   // Get the result
   J_.getOutput(jac);
+  
+  // Printing
+  if(monitored("eval_grad_f")){
+     cout << "x = " << F_.input(0) << endl;
+     cout << "grad_f = " << F_.adjSens() << endl;
+  }
+  if(monitored("eval_jac_g")){
+     cout << "x = " << J_.input(0) << endl;
+     cout << "jac_g = " << J_.output() << endl;
+  }
+  
 }
 
 void KnitroInternal::evalh(const double* x, const double* lambda, double* hessian){
@@ -341,6 +365,16 @@ void KnitroInternal::evalh(const double* x, const double* lambda, double* hessia
 
   // Get results
   H_.output().get(hessian,SPARSESYM);
+  
+  // Printing
+  if(monitored("eval_h")){
+     cout << "eval_h" << endl;
+     cout << "x = " << H_.input(0) << endl;
+     cout << "lambda = " << H_.input(1) << endl;
+     cout << "scale = " << H_.input(2) << endl;
+     cout << "H = " << H_ << endl;
+  }
+      
 }
 
 
