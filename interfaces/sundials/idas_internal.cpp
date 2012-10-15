@@ -839,6 +839,7 @@ void IdasInternal::integrate(double t_out){
       copy(NV_DATA_S(xzF_[i]),NV_DATA_S(xzF_[i])+nx_,fwdSens(INTEGRATOR_XF,i).begin());
     }
   }
+  copy(NV_DATA_S(xz_)+nx_,NV_DATA_S(xz_)+nx_+nz_,output(INTEGRATOR_ZF).begin());
     
   // Print statistics
   if(getOption("print_stats")) printStats(std::cout);

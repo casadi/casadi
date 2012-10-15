@@ -160,8 +160,8 @@ I.input(INTEGRATOR_P).set(P_)
 I.input(INTEGRATOR_X0).set(X_)
 I.evaluate()
 
-print I.output(INTEGRATOR_XF)
-
+print "output = ", I.output(INTEGRATOR_XF)
+print "z = ", I.output(INTEGRATOR_ZF)
 
 #! Possible problems
 #! ==================

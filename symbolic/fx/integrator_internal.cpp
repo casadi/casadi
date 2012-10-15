@@ -208,6 +208,7 @@ void IntegratorInternal::init(){
     output(INTEGRATOR_RXF)  = g_.output(RDAE_ODE);
     output(INTEGRATOR_RQF)  = g_.output(RDAE_QUAD);
   }
+  output(INTEGRATOR_ZF) = f_.input(DAE_Z);
   
   // Call the base class method
   FXInternal::init();
