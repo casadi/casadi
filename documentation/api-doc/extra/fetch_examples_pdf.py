@@ -44,8 +44,8 @@ for example in examples:
   m=re.search('^(.*)\.py$',name)
   if m:
     try:
-      os.makedirs(os.path.dirname('html/'+path+m.group(1) + '.pdf'))
+      os.makedirs(os.path.dirname('html/'+m.group(1) + '.pdf'))
     except:
       pass
-    shutil.copyfile(src+m.group(1) + '.pdf','html/'+path+m.group(1) + '.pdf')
+    shutil.copyfile(src+m.group(1) + '.pdf','html/'+m.group(1) + '.pdf')
     print m.group(1) + '.pdf'
