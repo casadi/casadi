@@ -51,7 +51,7 @@ Joel Andersson
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -62,6 +62,8 @@ Joel Andersson
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -912,7 +914,7 @@ thus x := [xd,xa]
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -923,6 +925,8 @@ thus x := [xd,xa]
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -5628,7 +5632,7 @@ Joel Andersson
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -5639,6 +5643,8 @@ Joel Andersson
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -6499,7 +6505,7 @@ Return a string with a destription (for SWIG) ";
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -6510,6 +6516,8 @@ Return a string with a destription (for SWIG) ";
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -9672,6 +9680,12 @@ Assert that the object has been initialized. ";
 // File: classCasADi_1_1CplexInternal.xml
 %feature("docstring") CasADi::CplexInternal "
 
+Internal class for CplexSolver Solves the following problem:
+
+min          x'.H.x + G'.x   x  subject to             LBA <= A.x <= UBA
+LBX <= x   <= UBX                  nx: number of decision variables (x)
+nc: number of constraints (A)
+
 >Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
@@ -10046,17 +10060,21 @@ Access forward sensitivity. ";
 
 %feature("docstring")  CasADi::CplexInternal::adjSensNoCheck "";
 
-%feature("docstring")  CasADi::CplexInternal::CplexInternal "";
+%feature("docstring")  CasADi::CplexInternal::CplexInternal "
 
-%feature("docstring")  CasADi::CplexInternal::~CplexInternal "";
+Default constructor. ";
 
 %feature("docstring")  CasADi::CplexInternal::clone "
 
-Make a deep copy of the instance. ";
+Clone. ";
 
-%feature("docstring")  CasADi::CplexInternal::setX "";
+%feature("docstring")  CasADi::CplexInternal::CplexInternal "
 
-%feature("docstring")  CasADi::CplexInternal::getSol "";
+Constructor using sparsity patterns. ";
+
+%feature("docstring")  CasADi::CplexInternal::~CplexInternal "
+
+Destructor. ";
 
 %feature("docstring")  CasADi::CplexInternal::init "
 
@@ -10069,19 +10087,7 @@ should invoke this function when initialized. ";
 
 Evaluate. ";
 
-%feature("docstring")  CasADi::CplexInternal::reportConstraints "
-
-Prints out a human readable report about possible constraint violations -
-all constraints. ";
-
-%feature("docstring")  CasADi::CplexInternal::checkInitialBounds "
-
-Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
-";
-
-%feature("docstring")  CasADi::CplexInternal::setQPOptions "
-
-Set options that make the NLP solver more suitable for solving QPs. ";
+%feature("docstring")  CasADi::CplexInternal::solve "";
 
 %feature("docstring")  CasADi::CplexInternal::updateNumSens "
 
@@ -10332,51 +10338,18 @@ Check if the object has been initialized. ";
 Assert that the object has been initialized. ";
 
 
-// File: classCasADi_1_1CplexMatrix.xml
-%feature("docstring") CasADi::CplexMatrix "
-
-CplexMatrix is a class used to convert CasADi matrices to CPLEX format
-(similar to CSC). The class definition can be found in cplex_internal.cpp.
-
-Solves the following nonlinear optimization problem:min          F(x,p)  x
-subject to             LBG <= G(x,p) <= UBG LBX <= x    <= UBX
-n: number of decision variables (x)     m: number of constraints (A)
-
-Carlo Savorgnan
-
-C++ includes: cplex_internal.hpp ";
-
-%feature("docstring")  CasADi::CplexMatrix::set "
-
-reads matrix in casadi format ";
-
-%feature("docstring")  CasADi::CplexMatrix::matval "
-
-returns non-zero values ";
-
-%feature("docstring")  CasADi::CplexMatrix::matbeg "
-
-returns indices of the beginning of columns ";
-
-%feature("docstring")  CasADi::CplexMatrix::matcnt "
-
-returns number of entries per column ";
-
-%feature("docstring")  CasADi::CplexMatrix::matind "
-
-returns row numbers ";
-
-
 // File: classCasADi_1_1CplexSolver.xml
 %feature("docstring") CasADi::CplexSolver "
 
-Interface to CPLEX solver.
+Interface to Cplex solver for sparse Quadratic Programs.
 
-Solves the following nonlinear optimization problem:min          F(x,p)  x
-subject to             LBG <= G(x,p) <= UBG LBX <= x    <= UBX
-n: number of decision variables (x)     m: number of constraints (A)
-Attention! The interface is not complete yet. Also if a quadratic term can
-be set with this interface, it is ignored! Carlo Savorgnan
+Solves the following problem:
+
+min          x'.H.x + G'.x   x  subject to             LBA <= A.x <= UBA
+LBX <= x   <= UBX                  nx: number of decision variables (x)
+nc: number of constraints (A)
+
+Attila Kozma, Joel Andersson
 
 >Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
 +------------------------------------+------------------------------------+
@@ -10780,47 +10753,11 @@ Default constructor. ";
 
 %feature("docstring")  CasADi::CplexSolver::CplexSolver "
 
-Constuct an NLP with non-linear constraints and provided hessian
-approximation. ";
-
-%feature("docstring")  CasADi::CplexSolver::setIntParam "
-
-Set CPLEX integer parameters. ";
-
-%feature("docstring")  CasADi::CplexSolver::setDoubleParam "
-
-Set CPLEX double parameters. ";
+Constructor with sparsity given. ";
 
 %feature("docstring")  CasADi::CplexSolver::checkNode "
 
 Check if the node is pointing to the right type of object. ";
-
-%feature("docstring")  CasADi::CplexSolver::reportConstraints "
-
-Prints out a human readable report about possible constraint violations,
-after solving. ";
-
-%feature("docstring")  CasADi::CplexSolver::getReportConstraints "";
-
-%feature("docstring")  CasADi::CplexSolver::setQPOptions "
-
-Set options that make the NLP solver more suitable for solving QPs. ";
-
-%feature("docstring")  CasADi::CplexSolver::getF "
-
-Access the objective function F. ";
-
-%feature("docstring")  CasADi::CplexSolver::getG "
-
-Access the objective function G. ";
-
-%feature("docstring")  CasADi::CplexSolver::getH "
-
-Access the hessian of the Lagrangian function H. ";
-
-%feature("docstring")  CasADi::CplexSolver::getJ "
-
-Access the jacobian of the constraint function J. ";
 
 %feature("docstring")  CasADi::CplexSolver::getNumInputs "
 
@@ -13242,7 +13179,7 @@ times t_i.
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -13253,6 +13190,8 @@ times t_i.
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -14318,7 +14257,7 @@ quadrature state at the initial time (INTEGRATOR_RQF=3)
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -14329,6 +14268,8 @@ quadrature state at the initial time (INTEGRATOR_RQF=3)
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -18830,7 +18771,7 @@ Joel Andersson
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -18841,6 +18782,8 @@ Joel Andersson
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -19960,7 +19903,7 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -19971,6 +19914,8 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -22623,7 +22568,7 @@ Joel Andersson
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -22634,6 +22579,8 @@ Joel Andersson
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -23426,7 +23373,7 @@ Joel Andersson
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -23437,6 +23384,8 @@ Joel Andersson
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -61595,7 +61544,7 @@ Joel Andersson
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -61606,6 +61555,8 @@ Joel Andersson
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -62416,7 +62367,7 @@ Return a string with a destription (for SWIG) ";
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -62427,6 +62378,8 @@ Return a string with a destription (for SWIG) ";
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -65317,6 +65270,11 @@ Assert that the object has been initialized. ";
 |              |              |              | the QP       |              |
 |              |              |              | solver       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularize   | OT_BOOLEAN   | 0            | Automatic re | CasADi::SQPI |
+|              |              |              | gularization | nternal      |
+|              |              |              | of Lagrange  |              |
+|              |              |              | Hessian.     |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -66081,6 +66039,11 @@ Joel Andersson and Attila Kozma
 |              |              |              | the QP       |              |
 |              |              |              | solver       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularize   | OT_BOOLEAN   | 0            | Automatic re | CasADi::SQPI |
+|              |              |              | gularization | nternal      |
+|              |              |              | of Lagrange  |              |
+|              |              |              | Hessian.     |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -66758,7 +66721,7 @@ Constructor. ";
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -66769,6 +66732,8 @@ Constructor. ";
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -67727,7 +67692,7 @@ Return a string with a destription (for SWIG) ";
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -67738,6 +67703,8 @@ Return a string with a destription (for SWIG) ";
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -76020,7 +75987,7 @@ Helper function for 'IntegratorInput' Input arguments of an integrator
 
 Helper function for 'IntegratorOutput' Output arguments of an integrator
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -76031,6 +75998,8 @@ Helper function for 'IntegratorOutput' Output arguments of an integrator
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
++----------------+--------------------------------------------------------+
+| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 ";
 

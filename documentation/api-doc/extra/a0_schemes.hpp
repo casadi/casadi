@@ -556,16 +556,16 @@
 /** \class CasADi::CplexInternal
 \n
 \par
-@copydoc scheme_NLPInput
+@copydoc scheme_QPInput
 <br/>
-@copydoc scheme_NLPOutput
+@copydoc scheme_QPOutput
 */
 /** \class CasADi::CplexSolver
 \n
 \par
-@copydoc scheme_NLPInput
+@copydoc scheme_QPInput
 <br/>
-@copydoc scheme_NLPOutput
+@copydoc scheme_QPOutput
 */
 /** \class CasADi::KnitroInternal
 \n
