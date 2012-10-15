@@ -129,10 +129,10 @@ class NLPtests(casadiTestCase):
     
     for Solver in solvers:
       if ("SQPMethod" in Solver.__name__):
-        continue # SQPMethod must have constraints
+        continue # incorrect
       self.message(str(Solver))
       solver = Solver(f)
-      for k,v in ({"tol":1e-9,"TolOpti":1e-14,"hessian_approximation":"limited-memory","max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver}).iteritems():
+      for k,v in ({"tol":1e-9,"TolOpti":1e-14,"hessian_approximation":"limited-memory","max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
       solver.init()
@@ -153,8 +153,6 @@ class NLPtests(casadiTestCase):
     f=SXFunction([vertcat([x,y])],[(1-x)**2+100*(y-x**2)**2])
     g=SXFunction([vertcat([x,y])],[x+y])
     for Solver in solvers:
-      if ("SQPMethod" in Solver.__name__):
-        return # too hard to solve
       self.message(str(Solver))
       solver = Solver(f,g)
       for k,v in ({"tol":1e-8,"TolOpti":1e-20,"hessian_approximation":"limited-memory","max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options, "maxiter": 1000}).iteritems():
@@ -167,11 +165,11 @@ class NLPtests(casadiTestCase):
       solver.input(NLP_UBG).set([10])
       solver.solve()
       
-      digits = 10
+      digits = 6
 
-      self.assertAlmostEqual(solver.output(NLP_COST)[0],0,10,str(Solver))
-      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,8,str(Solver))
-      self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,8,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_COST)[0],0,digits,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],1,digits,str(Solver))
+      self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],1,digits,str(Solver))
       self.assertAlmostEqual(solver.output(NLP_LAMBDA_X)[0],0,9,str(Solver))
       self.assertAlmostEqual(solver.output(NLP_LAMBDA_X)[1],0,9,str(Solver))
       self.assertAlmostEqual(solver.output(NLP_LAMBDA_G)[0],0,9,str(Solver))
@@ -240,8 +238,6 @@ class NLPtests(casadiTestCase):
       solver.solve()
       
       digits = 5
-      if ("SQPMethod" in Solver.__name__):
-        digits = 2
         
       self.assertAlmostEqual(solver.output(NLP_COST)[0],c_r,digits,str(Solver))
       self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],x_r[0],digits,str(Solver))
@@ -306,8 +302,6 @@ class NLPtests(casadiTestCase):
       solver.solve()
       
       digits = 5
-      if ("SQPMethod" in Solver.__name__):
-        digits = 2
       
       self.assertAlmostEqual(solver.output(NLP_COST)[0],c_r,digits,str(Solver) + str(solver.output(NLP_COST)[0]) + ":" + str(c_r))
       self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],x_r[0],digits,str(Solver))
@@ -350,8 +344,6 @@ class NLPtests(casadiTestCase):
       solver.solve()
       
       digits = 5
-      if ("SQPMethod" in Solver.__name__):
-        digits = 2
         
       self.assertAlmostEqual(solver.output(NLP_COST)[0],c_r,digits,str(Solver))
       self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],x_r[0],digits,str(Solver))
@@ -395,9 +387,7 @@ class NLPtests(casadiTestCase):
       solver.solve()
       
       digits = 5
-      if ("SQPMethod" in Solver.__name__):
-        digits = 2
-      
+
       self.assertAlmostEqual(solver.output(NLP_COST)[0],c_r,digits,str(Solver))
       self.assertAlmostEqual(solver.output(NLP_X_OPT)[0],x_r[0],digits,str(Solver))
       self.assertAlmostEqual(solver.output(NLP_X_OPT)[1],x_r[1],digits,str(Solver))
@@ -417,8 +407,6 @@ class NLPtests(casadiTestCase):
     
     h=SXFunction([vertcat([x,y]),[],sigma],[sigma*hessian(obj,vertcat([x,y]))])
     for Solver in solvers:
-      if ("SQPMethod" in Solver.__name__):
-        continue # SQPMethod must have constraints
       self.message(str(Solver))
       solver = Solver(f,FX(),h)
       for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
@@ -446,8 +434,6 @@ class NLPtests(casadiTestCase):
     sigma=SX("sigma")
     
     for Solver in solvers:
-      if ("SQPMethod" in Solver.__name__):
-        continue # SQPMethod must have constraints
       self.message(str(Solver))
       solver = Solver(f)
       for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
@@ -476,8 +462,6 @@ class NLPtests(casadiTestCase):
     sigma=SX("sigma")
     
     for Solver in solvers:
-      if ("SQPMethod" in Solver.__name__):
-        continue # SQPMethod must have constraints
       self.message(str(Solver))
       solver = Solver(f)
       for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
@@ -508,8 +492,6 @@ class NLPtests(casadiTestCase):
     
     h=SXFunction([vertcat([x,y]),[],sigma,p],[sigma*hessian(obj,vertcat([x,y]))])
     for Solver in solvers:
-      if ("SQPMethod" in Solver.__name__):
-        continue # SQPMethod must have constraints
       self.message(str(Solver))
       solver = Solver(f,FX(),h)
       for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
@@ -540,8 +522,6 @@ class NLPtests(casadiTestCase):
     sigma=SX("sigma")
     
     for Solver in solvers:
-      if ("SQPMethod" in Solver.__name__):
-        continue # SQPMethod must have constraints
       self.message(str(Solver))
       solver = Solver(f)
       for k,v in ({"tol":1e-10,"TolOpti":1e-20,"hessian_approximation":"exact","UserHM":True,"max_iter":100, "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
@@ -594,8 +574,6 @@ class NLPtests(casadiTestCase):
     x=ssym("x")
     f=SXFunction([x],[(x-1)**2])
     for Solver in solvers:
-      if ("SQPMethod" in Solver.__name__):
-        continue # SQPMethod must have constraints
       self.message(str(Solver))
       solver = Solver(f)
       for k,v in ({"tol":1e-10,"max_iter":103, "MaxIter": 103,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
@@ -695,18 +673,15 @@ class NLPtests(casadiTestCase):
 
   def testIPOPTdeg(self):
     self.message("degenerate optimization IPOPT")
-    return
     x=SX("x")
     y=SX("y")
     f=SXFunction([vertcat([x,y])],[0])
-    g=SXFunction([vertcat([x,y])],[[x-y,x]])
+    g=SXFunction([vertcat([x,y])],[vertcat([x-y,x])])
     
     for Solver in solvers:
-      if ("SQPMethod" in Solver.__name__):
-        continue # linesearch failed
       self.message(str(Solver))
       solver = Solver(f,g)
-      for k,v in ({"tol":1e-5,"max_iter":100, "hessian_approximation": "limited-memory", "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver}).iteritems():
+      for k,v in ({"tol":1e-5,"max_iter":100, "hessian_approximation": "limited-memory", "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
       solver.init()
@@ -725,11 +700,9 @@ class NLPtests(casadiTestCase):
     g=SXFunction([vertcat([x,y])],[vertcat([x-y,x,x+y])])
     
     for Solver in solvers:
-      if ("SQPMethod" in Solver.__name__):
-        continue # linesearch failed
       self.message(str(Solver))
       solver = Solver(f,g)
-      for k,v in ({"tol":1e-5,"max_iter":100, "hessian_approximation": "limited-memory", "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver}).iteritems():
+      for k,v in ({"tol":1e-5,"max_iter":100, "hessian_approximation": "limited-memory", "MaxIter": 100,"print_level":0,"derivative_test":"first-order","qp_solver": qpsolver,"qp_solver_options" : qpsolver_options}).iteritems():
         if solver.hasOption(k):
           solver.setOption(k,v)
 
@@ -787,7 +760,6 @@ class NLPtests(casadiTestCase):
     
   def testXfreeChange(self):
     self.message("Change in X settings")
-    return # Does not work yet with WORHP
     x=SX("x")
     y=SX("y")
     
