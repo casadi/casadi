@@ -23,76 +23,123 @@
 #define CPLEX_INTERNAL_HPP
 
 #include "ilcplex/cplex.h"
-#include "symbolic/fx/nlp_solver_internal.hpp"
+#include "symbolic/fx/qp_solver_internal.hpp"
+
+#include <string>
 
 namespace CasADi{
 
-/** \brief CplexMatrix is a class used to convert CasADi matrices to CPLEX format (similar to CSC).
-  The class definition can be found in cplex_internal.cpp.
+/** Internal class for CplexSolver
+  @copydoc QPSolver_doc
+ */
+class CplexInternal : public QPSolverInternal{
+  friend class CplexSolver;
+public:
+  /** \brief Default constructor */
+  explicit CplexInternal();
   
-  @copydoc NLPSolver_doc
-  \author Carlo Savorgnan
-  \date 2011
-*/
-// The following class is just used to make the interfaced code cleaner. 
-class CplexMatrix{
-    bool symm_; // true if the matrix is symmetric
-    CRSSparsity sparsity_;
-    FX function_;
-    int n_out_;
-    std::vector<int> matcnt_;
-    std::vector<double> data_; // used to store data for non symmetric matrices
-    std::vector<int> mapping_; // used for non symmetric matrices
-  public:
-    /// reads matrix in casadi format
-    void set(const FX& funct, int n_out, bool symm);
-    /// returns non-zero values
-    double* matval();
-    /// returns indices of the beginning of columns
-    int* matbeg();
-    /// returns number of entries per column
-    int* matcnt();
-    /// returns row numbers
-    int* matind();
+  /// Clone
+  virtual CplexInternal* clone() const;
+  
+  /// Constructor using sparsity patterns
+  explicit CplexInternal(const CRSSparsity& H, const CRSSparsity& A);
+
+  ~CplexInternal();
+
+  virtual void init();
+
+  virtual void evaluate(int nfdir, int nadir);
+
+private:
+
+  /// Converts DMatrix to CPLEX matrix types
+  void dmatrixToCplex(DMatrix&, int* matbeg, int* matcnt, int* matind, double* matval);
+  // OPTIONS 
+  /** Which algorithm to use
+   * 0 -> Automatic (default)
+   * 1 -> Primal simplex
+   * 2 -> Dual simplex
+   * 3 -> Network optimizer
+   * 4 -> Barrier 
+   * 5 -> Sifting
+   * 6 -> Concurent
+   */
+  int qp_method_;
+  /// Print to file (for later use)
+  bool dump_to_file_;
+  
+//  /// Filaname to use when printing
+//  char* dump_filename_;
+
+  /// Print debug messages
+  bool debug_;
+  
+  /// Accuracy
+  double tol_;
+//
+//  /// Dense storage for H
+//  std::vector<double> h_data_;
+//
+//  /// Dense storage for A
+//  std::vector<double> a_data_;
+//
+//  /// Storage for dual variables
+//  std::vector<double> dual_;
+//  
+  /// Number of variables
+  int NUMCOLS_;
+
+  /// Number of constrains (altogether)
+  int NUMROWS_;
+  
+  /// Nature of problem (always minimization)
+  int objsen_;
+  
+  /// Linear term of objective
+  double* obj_;
+  /// Right-hand side of constraints
+  std::vector<double> rhs_;
+  /// Range of constraints
+  std::vector<double> rngval_;
+
+  /// Determines relation >,<,= in the lin. constraints
+  std::vector<char> sense_;
+
+  /// Coefficients of matrix A (constraint Jacobian)
+  std::vector<int> matbeg_;
+  std::vector<int> matcnt_;
+  std::vector<int> matind_;
+  std::vector<double> matval_;
+//
+  /// Simple bounds on x
+  double  *lb_;
+  double  *ub_;
+  
+  /// Coefficients of matrix H (objective Hessian)
+  std::vector<int> qmatbeg_;
+  std::vector<int> qmatcnt_;
+  std::vector<int> qmatind_;
+  std::vector<double> qmatval_;
+  
+  /// Storage for optimal solution
+//  std::vector<double> xopt_;
+//  std::vector<double> lambA_;
+
+//
+//  /// Other things I do not know
+//  double* dj;
+//  double* slack;
+//
+//  // CPLEX-specific things
+  CPXENVptr env_;
+  CPXLPptr lp_;
+
+  // Data for vectors
+  //std::vector<double> g;
+
+
 };
 
-class CplexInternal : public NLPSolverInternal{
-  // TODO comment me!!!!
-  public:
-    explicit CplexInternal(const FX& F, const FX& G, const FX& H, const FX& J, const FX& GF);
-    virtual ~CplexInternal();
-    virtual CplexInternal* clone() const{ return new CplexInternal(*this);}
-    void setX(const std::vector<double>& x);
-    std::vector<double> getSol();
-    virtual void init();
-    virtual void evaluate(int nfdir, int nadir);
-    
-    /// point used for the linearization
-    std::vector<double> x_;
-    /// used to store the solution
-    std::vector<double> sol_;
-    /// Gradient of the objective function
-    FX GF_;
-    /// Hessian of the Lagrangian function (used for format conversion)
-    CplexMatrix H_mat_;
-    /// Jacobian of the constraint function (used for format conversion)
-    CplexMatrix J_mat_; 
-    
-    // CPLEX environment pointer
-    CPXENVptr env_;
-    // CPLEX lp pointer
-    CPXLPptr lp_;
-    
-    // CPLEX double parameter
-    std::map<std::string, double> double_param_;
-    
-    // CPLEX int parameter
-    std::map<std::string, int> int_param_;
-    
-    // sense of the optimization (min or max)
-    int sense_;
-};
-
-} // namespace CasADi
+} // end namespace CasADi
 
 #endif //CPLEX_INTERNAL_HPP

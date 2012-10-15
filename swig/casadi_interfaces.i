@@ -71,7 +71,7 @@
 %{ 
   #include "interfaces/cplex/cplex_solver.hpp"
 %}
-#include "interfaces/cplex/cplex_solver.hpp"
+%include "interfaces/cplex/cplex_solver.hpp"
 #endif
 
 #ifdef WITH_LIFTOPT

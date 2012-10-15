@@ -22,59 +22,44 @@
 #ifndef CPLEX_SOLVER_HPP
 #define CPLEX_SOLVER_HPP
 
-#include "symbolic/fx/nlp_solver.hpp"
+#include "symbolic/fx/qp_solver.hpp"
 
 namespace CasADi{
-  
+
+
+// Forward declaration of internal class
 class CplexInternal;
+
+  /** \brief Interface to Cplex solver for sparse Quadratic Programs
+   @copydoc QPSolver_doc
+   \author Attila Kozma, Joel Andersson
+   \date 2012
+   */
+class CplexSolver : public QPSolver{
+public:
+
+  /** \brief Default constructor  */
+  CplexSolver();
+  /** \brief Constructor with sparsity given */
+  CplexSolver(const CRSSparsity& H, const CRSSparsity& A);
   
-/** \brief Interface to CPLEX solver.
-  @copydoc NLPSolver_doc
-  Attention! The interface is not complete yet.
-  Also if a quadratic term can be set with this interface, it is ignored!
-  \author Carlo Savorgnan
-  \date 2011
-*/
-class CplexSolver : public NLPSolver {
-  // TODO comment me!!!!
-  public:
-    /// Default constructor
-    CplexSolver();
-    
-    /// Constuct an NLP with non-linear constraints and provided hessian approximation
-    explicit CplexSolver(const FX& F,         /**< F objective function */
-                         const FX& G = FX(),  /**< constraint function (default only bound constraints) */
-                         const FX& H = FX(),  /**< Hessian of the lagrangian function (default: limited memory). NOT USED*/
-                         const FX& J = FX(),  /**< Jacobian of G (default -> differentiate) */
-                         const FX& GF = FX()  /**< Gradient of the objective function (default: adjoint mode AD on F) */
-                        );
+  CplexInternal* operator->();
+  const CplexInternal* operator->() const;
 
-    /// Access functions of the node
-    CplexInternal* operator->();
-    const CplexInternal* operator->() const;
-    
-    /// Set CPLEX integer parameters
-    void setIntParam(const std::string& name, int val);
-    
-    /// Set CPLEX double parameters
-    void setDoubleParam(const std::string& name, double val);
-
-    /// Check if the node is pointing to the right type of object
-    virtual bool checkNode() const;
-
-    /// Static creator function 
-    #ifdef SWIG
-    %callback("%s_cb");
-    #endif
-    static NLPSolver creator(const FX& F, const FX& G, const FX& H, const FX& J){ return CplexSolver(F,G,H,J);}
-    #ifdef SWIG
-    %nocallback;
-    #endif
  
-    /// @Joris: This would be an alternative
-    static NLPSolverCreator getCreator(){return creator;} 
+  virtual bool checkNode() const;
+
+  /// Static creator function 
+  #ifdef SWIG
+  %callback("%s_cb");
+  #endif
+  static QPSolver creator(const CRSSparsity& H, const CRSSparsity& A){ return CplexSolver(H,A);}
+  #ifdef SWIG
+  %nocallback;
+  #endif
 };
 
-} // namespace CasADi
+
+} // end namespace CasADi
 
 #endif //CPLEX_SOLVER_HPP
