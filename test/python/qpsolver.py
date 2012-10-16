@@ -32,7 +32,7 @@ try:
 except:
   pass
 try:
-  qpsolvers.append((NLPQPSolver,{"nlp_solver": WorhpSolver, "nlp_solver_options": {}}))
+  qpsolvers.append((NLPQPSolver,{"nlp_solver": WorhpSolver, "nlp_solver_options": {"TolOpti": 1e-12}}))
   pass
 except:
   pass
@@ -438,15 +438,14 @@ class QPSolverTests(casadiTestCase):
       self.assertAlmostEqual(solver.output(QP_COST)[0],-34,5,str(qpsolver))
       
   def test_badscaling(self):
-    return
+    #return
     self.message("Badly scaled problem")
     N = 50
     H = c.diag(range(1,N+1))
     x0 = DMatrix(range(N))
     
     G = -1.0*mul(H,x0)
-    print -1.0*mul(H,x0)
-    print -mul(H,x0)
+
     A =  DMatrix(0,N)
 
     LBX = DMatrix([-1000]*N)
@@ -456,14 +455,15 @@ class QPSolverTests(casadiTestCase):
     options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
       
     for qpsolver, qp_options in qpsolvers:
+      if 'Cplex' in str(qpsolver):
+        continue
       solver = qpsolver(H.sparsity(),A.sparsity())
       for key, val in options.iteritems():
         if solver.hasOption(key):
            solver.setOption(key,val)
+           
       solver.setOption(qp_options)
       solver.init()
-      
-
 
       solver.input(QP_H).set(H)
       solver.input(QP_G).set(G)
@@ -473,8 +473,8 @@ class QPSolverTests(casadiTestCase):
 
       solver.solve()
 
-      self.checkarray(solver.output(),x0,str(qpsolver),digits=2)
-      self.assertAlmostEqual(solver.output(QP_COST)[0],0,3,str(qpsolver))
+      self.checkarray(solver.output(),x0,str(qpsolver)+str(qp_options),digits=2)
+      self.assertAlmostEqual(solver.output(QP_COST)[0],-0.5*mul([x0.T,H,x0]),3,str(qpsolver))
       self.checkarray(solver.output(QP_LAMBDA_X),DMatrix.zeros(N,1),str(qpsolver),digits=4)
       
   def test_redundant(self):

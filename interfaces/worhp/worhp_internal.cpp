@@ -198,6 +198,10 @@ WorhpInternal::WorhpInternal(const FX& F, const FX& G, const FX& H, const FX& J,
   // qpsolver unittests fail for ScaledObj == True
   setOption("ScaledObj",false);
   
+  //setOption("ScaledKKT",false);
+  //setOption("ScaledFD",false);
+  //setOption("ScaledQP",false);
+  
 }
 
 WorhpInternal::~WorhpInternal(){
@@ -286,7 +290,7 @@ void WorhpInternal::init(){
   
 }
 
-void WorhpInternal::setQPOptions(bool convex) {
+void WorhpInternal::setQPOptions() {
   setOption("UserHM", true);
 }
 
