@@ -2903,6 +2903,11 @@ casadi_calculus.hpp ";
 casadi_calculus.hpp ";
 
 
+// File: structCasADi_1_1BinaryChecker_3_01OP__IF__ELSE__ZERO_01_4.xml
+%feature("docstring") CasADi::BinaryChecker< OP_IF_ELSE_ZERO > " C++
+includes: casadi_calculus.hpp ";
+
+
 // File: structCasADi_1_1BinaryChecker_3_01OP__MUL_01_4.xml
 %feature("docstring") CasADi::BinaryChecker< OP_MUL > " C++ includes:
 casadi_calculus.hpp ";
@@ -3222,6 +3227,14 @@ C++ includes: casadi_calculus.hpp ";
 %feature("docstring") CasADi::BinaryOperation< OP_FMIN > "
 
 Minimum.
+
+C++ includes: casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1BinaryOperation_3_01OP__IF__ELSE__ZERO_01_4.xml
+%feature("docstring") CasADi::BinaryOperation< OP_IF_ELSE_ZERO > "
+
+Conditional assignment.
 
 C++ includes: casadi_calculus.hpp ";
 
@@ -7862,6 +7875,11 @@ casadi_calculus.hpp ";
 casadi_calculus.hpp ";
 
 
+// File: structCasADi_1_1CommChecker_3_01OP__IF__ELSE__ZERO_01_4.xml
+%feature("docstring") CasADi::CommChecker< OP_IF_ELSE_ZERO > " C++ includes:
+casadi_calculus.hpp ";
+
+
 // File: structCasADi_1_1CommChecker_3_01OP__POW_01_4.xml
 %feature("docstring") CasADi::CommChecker< OP_POW > " C++ includes:
 casadi_calculus.hpp ";
@@ -9686,54 +9704,47 @@ min          x'.H.x + G'.x   x  subject to             LBA <= A.x <= UBA
 LBX <= x   <= UBX                  nx: number of decision variables (x)
 nc: number of constraints (A)
 
->Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
+>Input scheme: CasADi::QPInput (QP_NUM_IN = 9)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1) [x_init].                  |
+| QP_H                               | The square matrix H: sparse, (nx x |
+|                                    | nx). Only the lower triangular     |
+|                                    | part is actually used. The matrix  |
+|                                    | is assumed to be symmetrical. [h]. |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound (n  |
-|                                    | x 1), default -inf [lbx].          |
+| QP_G                               | The column vector G: dense, (nx x  |
+|                                    | 1) [g].                            |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound (n  |
-|                                    | x 1), default +inf [ubx].          |
+| QP_A                               | The matrix A: sparse, (nc x nx) -  |
+|                                    | product with x must be dense. [a]. |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound (m x 1),   |
-|                                    | default -inf [lbg].                |
+| QP_LBA                             | dense, (nc x 1) [lba]              |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound (m x 1),   |
-|                                    | default +inf [ubg].                |
+| QP_UBA                             | dense, (nc x 1) [uba]              |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
-|                                    | with G, initial guess (m x 1)      |
-|                                    | [lambda_init].                     |
+| QP_LBX                             | dense, (nx x 1) [lbx]              |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Only for parametric NLP - static   |
-|                                    | parameters on which the objective  |
-|                                    | and constraints might depend [p].  |
+| QP_UBX                             | dense, (nx x 1) [ubx]              |
++------------------------------------+------------------------------------+
+| QP_X_INIT                          | dense, (nx x 1) [x_init]           |
++------------------------------------+------------------------------------+
+| QP_LAMBDA_INIT                     | dense [lambda_init]                |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
+>Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1) [x_opt].          |
+| QP_PRIMAL                          | The primal solution [primal].      |
 +------------------------------------+------------------------------------+
-| NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution (1 x 1) [cost].   |
+| QP_COST                            | The optimal cost [cost].           |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_G                       | Lagrange multipliers associated    |
-|                                    | with G at the solution (m x 1)     |
-|                                    | [lambda_g].                        |
+| QP_LAMBDA_A                        | The dual solution corresponding to |
+|                                    | linear bounds [lambda_a].          |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_X                       | Lagrange multipliers associated    |
-|                                    | with bounds on X at the solution   |
-|                                    | (n x 1) [lambda_x].                |
-+------------------------------------+------------------------------------+
-| NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1) [g].      |
+| QP_LAMBDA_X                        | The dual solution corresponding to |
+|                                    | simple bounds [lambda_x].          |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -9762,75 +9773,28 @@ nc: number of constraints (A)
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
-|              |              |              | objective    | olverInterna |
-|              |              |              | function in  | l            |
-|              |              |              | terms of     |              |
-|              |              |              | scalar       |              |
-|              |              |              | operations,  |              |
-|              |              |              | i.e. MX-> SX |              |
+| convex       | OT_BOOLEAN   | false        | Specify true | CasADi::QPSo |
+|              |              |              | if you can   | lverInternal |
+|              |              |              | guarantee    |              |
+|              |              |              | that H will  |              |
+|              |              |              | always be    |              |
+|              |              |              | positive     |              |
+|              |              |              | definite     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_g     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
-|              |              |              | constraint   | olverInterna |
-|              |              |              | function in  | l            |
-|              |              |              | terms of     |              |
-|              |              |              | scalar       |              |
-|              |              |              | operations,  |              |
-|              |              |              | i.e. MX-> SX |              |
+| debug        | OT_BOOLEAN   | 0            | Print debug  | CasADi::Cple |
+|              |              |              | information  | xInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
-|              |              |              | Newton       | olverInterna |
-|              |              |              | Hessian appr | l            |
-|              |              |              | oximation    |              |
+| dump_filenam | OT_STRING    | \"qp.dat\"     | The filename | CasADi::Cple |
+| e            |              |              | to dump to.  | xInternal    |
+|              |              |              | Default:     |              |
+|              |              |              | qp.dat       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
-| sian         |              |              | exact        | olverInterna |
-|              |              |              | Hessian of   | l            |
-|              |              |              | the          |              |
-|              |              |              | Lagrangian   |              |
-|              |              |              | if not       |              |
-|              |              |              | supplied     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
-| obian        |              |              | exact        | olverInterna |
-|              |              |              | Jacobian of  | l            |
-|              |              |              | the          |              |
-|              |              |              | constraints  |              |
-|              |              |              | if not       |              |
-|              |              |              | supplied     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
-| _vec         |              |              | true, the    | olverInterna |
-|              |              |              | input shape  | l            |
-|              |              |              | of F will    |              |
-|              |              |              | not be       |              |
-|              |              |              | checked.     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_FX        | FX()         | A function   | CasADi::NLPS |
-| llback       |              |              | that will be | olverInterna |
-|              |              |              | called at    | l            |
-|              |              |              | each         |              |
-|              |              |              | iteration.   |              |
-|              |              |              | Input scheme |              |
-|              |              |              | is the same  |              |
-|              |              |              | as NLPSolver |              |
-|              |              |              | 's output    |              |
-|              |              |              | scheme.      |              |
-|              |              |              | Output is    |              |
-|              |              |              | scalar.      |              |
-+--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
-| llback_ignor |              |              | true, errors | olverInterna |
-| e_errors     |              |              | thrown by it | l            |
-|              |              |              | eration_call |              |
-|              |              |              | back will be |              |
-|              |              |              | ignored.     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_INTEGER   | 1            | Only call    | CasADi::NLPS |
-| llback_step  |              |              | the callback | olverInterna |
-|              |              |              | function     | l            |
-|              |              |              | every few    |              |
-|              |              |              | iterations.  |              |
+| dump_to_file | OT_BOOLEAN   | 0            | Dumps QP to  | CasADi::Cple |
+|              |              |              | file in      | xInternal    |
+|              |              |              | CPLEX        |              |
+|              |              |              | format.      |              |
+|              |              |              | Default:     |              |
+|              |              |              | false        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -9844,6 +9808,13 @@ nc: number of constraints (A)
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| just_in_time | OT_BOOLEAN   | false        | Just-in-time | CasADi::Cple |
+|              |              |              | compilation  | xInternal    |
+|              |              |              | for numeric  |              |
+|              |              |              | evaluation ( |              |
+|              |              |              | experimental |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
 | f_adj_dir    |              |              | r_of_adj_dir | ternal       |
@@ -9864,8 +9835,9 @@ nc: number of constraints (A)
 |              |              |              | (inputs|outp |              |
 |              |              |              | uts)         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_cpl |              | CasADi::Cple |
-|              |              | ex_problem\"  |              | xInternal    |
+| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
 | j_dir        |              |              | adjoint      | ternal       |
@@ -9903,23 +9875,6 @@ nc: number of constraints (A)
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| objsense     | OT_INTEGER   | CPX_MIN      | optimization | CasADi::Cple |
-|              |              |              | sense        | xInternal    |
-|              |              |              | (CPX_MIN or  |              |
-|              |              |              | CPX_MAX)     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| parametric   | OT_BOOLEAN   | false        | Expect F, G, | CasADi::NLPS |
-|              |              |              | H, J to have | olverInterna |
-|              |              |              | an           | l            |
-|              |              |              | additional   |              |
-|              |              |              | input        |              |
-|              |              |              | argument     |              |
-|              |              |              | appended at  |              |
-|              |              |              | the end,     |              |
-|              |              |              | denoting     |              |
-|              |              |              | fixed        |              |
-|              |              |              | parameters.  |              |
-+--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -9946,6 +9901,9 @@ nc: number of constraints (A)
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| tol          | OT_REAL      | 0.000        | Tolerance of | CasADi::Cple |
+|              |              |              | solver       | xInternal    |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
 |              |              | )            | defined      | ternal       |
 |              |              |              | field that   |              |
@@ -9960,12 +9918,6 @@ nc: number of constraints (A)
 |              |              |              | evaluation   | ternal       |
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
-| _bounds      |              |              | initial      | olverInterna |
-|              |              |              | guess does   | l            |
-|              |              |              | not satisfy  |              |
-|              |              |              | LBX and UBX  |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 C++ includes: cplex_internal.hpp ";
@@ -10351,54 +10303,47 @@ nc: number of constraints (A)
 
 Attila Kozma, Joel Andersson
 
->Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
+>Input scheme: CasADi::QPInput (QP_NUM_IN = 9)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| NLP_X_INIT                         | Decision variables initial guess   |
-|                                    | (n x 1) [x_init].                  |
+| QP_H                               | The square matrix H: sparse, (nx x |
+|                                    | nx). Only the lower triangular     |
+|                                    | part is actually used. The matrix  |
+|                                    | is assumed to be symmetrical. [h]. |
 +------------------------------------+------------------------------------+
-| NLP_LBX                            | Decision variables lower bound (n  |
-|                                    | x 1), default -inf [lbx].          |
+| QP_G                               | The column vector G: dense, (nx x  |
+|                                    | 1) [g].                            |
 +------------------------------------+------------------------------------+
-| NLP_UBX                            | Decision variables upper bound (n  |
-|                                    | x 1), default +inf [ubx].          |
+| QP_A                               | The matrix A: sparse, (nc x nx) -  |
+|                                    | product with x must be dense. [a]. |
 +------------------------------------+------------------------------------+
-| NLP_LBG                            | Constraints lower bound (m x 1),   |
-|                                    | default -inf [lbg].                |
+| QP_LBA                             | dense, (nc x 1) [lba]              |
 +------------------------------------+------------------------------------+
-| NLP_UBG                            | Constraints upper bound (m x 1),   |
-|                                    | default +inf [ubg].                |
+| QP_UBA                             | dense, (nc x 1) [uba]              |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_INIT                    | Lagrange multipliers associated    |
-|                                    | with G, initial guess (m x 1)      |
-|                                    | [lambda_init].                     |
+| QP_LBX                             | dense, (nx x 1) [lbx]              |
 +------------------------------------+------------------------------------+
-| NLP_P                              | Only for parametric NLP - static   |
-|                                    | parameters on which the objective  |
-|                                    | and constraints might depend [p].  |
+| QP_UBX                             | dense, (nx x 1) [ubx]              |
++------------------------------------+------------------------------------+
+| QP_X_INIT                          | dense, (nx x 1) [x_init]           |
++------------------------------------+------------------------------------+
+| QP_LAMBDA_INIT                     | dense [lambda_init]                |
 +------------------------------------+------------------------------------+
 
->Output scheme: CasADi::NLPOutput (NLP_NUM_OUT = 5)
+>Output scheme: CasADi::QPOutput (QP_NUM_OUT = 4)
 +------------------------------------+------------------------------------+
 |                Name                |            Description             |
 +====================================+====================================+
-| NLP_X_OPT                          | Decision variables for optimal     |
-|                                    | solution (n x 1) [x_opt].          |
+| QP_PRIMAL                          | The primal solution [primal].      |
 +------------------------------------+------------------------------------+
-| NLP_COST                           | Objective/cost function for        |
-|                                    | optimal solution (1 x 1) [cost].   |
+| QP_COST                            | The optimal cost [cost].           |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_G                       | Lagrange multipliers associated    |
-|                                    | with G at the solution (m x 1)     |
-|                                    | [lambda_g].                        |
+| QP_LAMBDA_A                        | The dual solution corresponding to |
+|                                    | linear bounds [lambda_a].          |
 +------------------------------------+------------------------------------+
-| NLP_LAMBDA_X                       | Lagrange multipliers associated    |
-|                                    | with bounds on X at the solution   |
-|                                    | (n x 1) [lambda_x].                |
-+------------------------------------+------------------------------------+
-| NLP_G                              | The constraints evaluated at the   |
-|                                    | optimal solution (m x 1) [g].      |
+| QP_LAMBDA_X                        | The dual solution corresponding to |
+|                                    | simple bounds [lambda_x].          |
 +------------------------------------+------------------------------------+
 
 >List of available options
@@ -10427,75 +10372,28 @@ Attila Kozma, Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
-|              |              |              | objective    | olverInterna |
-|              |              |              | function in  | l            |
-|              |              |              | terms of     |              |
-|              |              |              | scalar       |              |
-|              |              |              | operations,  |              |
-|              |              |              | i.e. MX-> SX |              |
+| convex       | OT_BOOLEAN   | false        | Specify true | CasADi::QPSo |
+|              |              |              | if you can   | lverInternal |
+|              |              |              | guarantee    |              |
+|              |              |              | that H will  |              |
+|              |              |              | always be    |              |
+|              |              |              | positive     |              |
+|              |              |              | definite     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| expand_g     | OT_BOOLEAN   | false        | Expand the   | CasADi::NLPS |
-|              |              |              | constraint   | olverInterna |
-|              |              |              | function in  | l            |
-|              |              |              | terms of     |              |
-|              |              |              | scalar       |              |
-|              |              |              | operations,  |              |
-|              |              |              | i.e. MX-> SX |              |
+| debug        | OT_BOOLEAN   | 0            | Print debug  | CasADi::Cple |
+|              |              |              | information  | xInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
-|              |              |              | Newton       | olverInterna |
-|              |              |              | Hessian appr | l            |
-|              |              |              | oximation    |              |
+| dump_filenam | OT_STRING    | \"qp.dat\"     | The filename | CasADi::Cple |
+| e            |              |              | to dump to.  | xInternal    |
+|              |              |              | Default:     |              |
+|              |              |              | qp.dat       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| generate_hes | OT_BOOLEAN   | false        | Generate an  | CasADi::NLPS |
-| sian         |              |              | exact        | olverInterna |
-|              |              |              | Hessian of   | l            |
-|              |              |              | the          |              |
-|              |              |              | Lagrangian   |              |
-|              |              |              | if not       |              |
-|              |              |              | supplied     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| generate_jac | OT_BOOLEAN   | true         | Generate an  | CasADi::NLPS |
-| obian        |              |              | exact        | olverInterna |
-|              |              |              | Jacobian of  | l            |
-|              |              |              | the          |              |
-|              |              |              | constraints  |              |
-|              |              |              | if not       |              |
-|              |              |              | supplied     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| ignore_check | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
-| _vec         |              |              | true, the    | olverInterna |
-|              |              |              | input shape  | l            |
-|              |              |              | of F will    |              |
-|              |              |              | not be       |              |
-|              |              |              | checked.     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_FX        | FX()         | A function   | CasADi::NLPS |
-| llback       |              |              | that will be | olverInterna |
-|              |              |              | called at    | l            |
-|              |              |              | each         |              |
-|              |              |              | iteration.   |              |
-|              |              |              | Input scheme |              |
-|              |              |              | is the same  |              |
-|              |              |              | as NLPSolver |              |
-|              |              |              | 's output    |              |
-|              |              |              | scheme.      |              |
-|              |              |              | Output is    |              |
-|              |              |              | scalar.      |              |
-+--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_BOOLEAN   | false        | If set to    | CasADi::NLPS |
-| llback_ignor |              |              | true, errors | olverInterna |
-| e_errors     |              |              | thrown by it | l            |
-|              |              |              | eration_call |              |
-|              |              |              | back will be |              |
-|              |              |              | ignored.     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| iteration_ca | OT_INTEGER   | 1            | Only call    | CasADi::NLPS |
-| llback_step  |              |              | the callback | olverInterna |
-|              |              |              | function     | l            |
-|              |              |              | every few    |              |
-|              |              |              | iterations.  |              |
+| dump_to_file | OT_BOOLEAN   | 0            | Dumps QP to  | CasADi::Cple |
+|              |              |              | file in      | xInternal    |
+|              |              |              | CPLEX        |              |
+|              |              |              | format.      |              |
+|              |              |              | Default:     |              |
+|              |              |              | false        |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -10509,6 +10407,13 @@ Attila Kozma, Joel Andersson
 |              |              |              | overrides    |              |
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| just_in_time | OT_BOOLEAN   | false        | Just-in-time | CasADi::Cple |
+|              |              |              | compilation  | xInternal    |
+|              |              |              | for numeric  |              |
+|              |              |              | evaluation ( |              |
+|              |              |              | experimental |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
 | f_adj_dir    |              |              | r_of_adj_dir | ternal       |
@@ -10529,8 +10434,9 @@ Attila Kozma, Joel Andersson
 |              |              |              | (inputs|outp |              |
 |              |              |              | uts)         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_cpl |              | CasADi::Cple |
-|              |              | ex_problem\"  |              | xInternal    |
+| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
 | j_dir        |              |              | adjoint      | ternal       |
@@ -10568,23 +10474,6 @@ Attila Kozma, Joel Andersson
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| objsense     | OT_INTEGER   | CPX_MIN      | optimization | CasADi::Cple |
-|              |              |              | sense        | xInternal    |
-|              |              |              | (CPX_MIN or  |              |
-|              |              |              | CPX_MAX)     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| parametric   | OT_BOOLEAN   | false        | Expect F, G, | CasADi::NLPS |
-|              |              |              | H, J to have | olverInterna |
-|              |              |              | an           | l            |
-|              |              |              | additional   |              |
-|              |              |              | input        |              |
-|              |              |              | argument     |              |
-|              |              |              | appended at  |              |
-|              |              |              | the end,     |              |
-|              |              |              | denoting     |              |
-|              |              |              | fixed        |              |
-|              |              |              | parameters.  |              |
-+--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -10611,6 +10500,9 @@ Attila Kozma, Joel Andersson
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| tol          | OT_REAL      | 0.000        | Tolerance of | CasADi::Cple |
+|              |              |              | solver       | xInternal    |
++--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
 |              |              | )            | defined      | ternal       |
 |              |              |              | field that   |              |
@@ -10625,12 +10517,6 @@ Attila Kozma, Joel Andersson
 |              |              |              | evaluation   | ternal       |
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
-+--------------+--------------+--------------+--------------+--------------+
-| warn_initial | OT_BOOLEAN   | false        | Warn if the  | CasADi::NLPS |
-| _bounds      |              |              | initial      | olverInterna |
-|              |              |              | guess does   | l            |
-|              |              |              | not satisfy  |              |
-|              |              |              | LBX and UBX  |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 C++ includes: cplex_solver.hpp ";
@@ -15339,6 +15225,916 @@ Calculate function and derivative.
 C++ includes: casadi_calculus.hpp ";
 
 
+// File: classCasADi_1_1Derivative.xml
+%feature("docstring") CasADi::Derivative "
+
+Derivative class.
+
+Universal directional derivative class, calculates a number of forward and
+adjoint directional derivatives of a function based on operator overloading
+AD.
+
+This is an internal class. Users should use the syntax f.derivative()
+
+Joel Andersson
+
+C++ includes: derivative.hpp ";
+
+/*  Setters  */
+
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
+
+*/
+
+%feature("docstring")  CasADi::Derivative::setInput "
+
+Reads in the input argument from val. ";
+
+%feature("docstring")  CasADi::Derivative::setOutput "
+
+Reads in the output argument from val. ";
+
+%feature("docstring")  CasADi::Derivative::setFwdSeed "
+
+Reads in the forward seed from val. ";
+
+%feature("docstring")  CasADi::Derivative::setFwdSens "
+
+Reads in the forward sensitivity from val. ";
+
+%feature("docstring")  CasADi::Derivative::setAdjSeed "
+
+Reads in the adjoint seed from val. ";
+
+%feature("docstring")  CasADi::Derivative::setAdjSens "
+
+Reads in the adjoint sensitivity from val. ";
+
+/*  Getters  */
+
+/* A group of accessor for numerical data that operate on preallocated data.
+get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
+
+*/
+
+%feature("docstring")  CasADi::Derivative::getInput "
+
+Writes out the input argument into val. ";
+
+%feature("docstring")  CasADi::Derivative::getOutput "
+
+Writes out the output argument into val. ";
+
+%feature("docstring")  CasADi::Derivative::getFwdSeed "
+
+Writes out the forward seed into val. ";
+
+%feature("docstring")  CasADi::Derivative::getFwdSens "
+
+Writes out the forward sensitivity into val. ";
+
+%feature("docstring")  CasADi::Derivative::getAdjSeed "
+
+Writes out the adjoint seed into val. ";
+
+%feature("docstring")  CasADi::Derivative::getAdjSens "
+
+Writes out the adjoint sensitivity into val. ";
+
+/*  Option Functionality  */
+
+%feature("docstring")  CasADi::Derivative::setOption "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::Derivative::setOption "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::Derivative::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::Derivative::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::Derivative::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::Derivative::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::Derivative::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::Derivative::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::Derivative::makeUnique "
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object. ";
+
+%feature("docstring")  CasADi::Derivative::makeUnique "";
+
+%feature("docstring")  CasADi::Derivative::Derivative "
+
+Default constructor. ";
+
+%feature("docstring")  CasADi::Derivative::Derivative "
+
+Create a Derivative. ";
+
+%feature("docstring")  CasADi::Derivative::getNumInputs "
+
+Get number of inputs. ";
+
+%feature("docstring")  CasADi::Derivative::getNumOutputs "
+
+Get number of outputs. ";
+
+%feature("docstring")  CasADi::Derivative::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::Derivative::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
+%feature("docstring")  CasADi::Derivative::setNumInputs "
+
+Set number of inputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::Derivative::setNumOutputs "
+
+Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::Derivative::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
+%feature("docstring")  CasADi::Derivative::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
+%feature("docstring")  CasADi::Derivative::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::Derivative::solve "
+
+the same as evaluate(0,0) ";
+
+%feature("docstring")  CasADi::Derivative::jacobian "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::Derivative::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
+
+%feature("docstring")  CasADi::Derivative::hessian "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
+
+%feature("docstring")  CasADi::Derivative::call "
+
+Create a function call (single input) ";
+
+%feature("docstring")  CasADi::Derivative::call "
+
+Create a function call ( MX graph) ";
+
+%feature("docstring")  CasADi::Derivative::call "
+
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
+
+%feature("docstring")  CasADi::Derivative::call "
+
+Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
+be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::Derivative::eval "
+
+evaluate symbolically, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::Derivative::eval "
+
+evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::Derivative::eval "
+
+Evaluate symbolically with with directional derivatives, SX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::Derivative::eval "
+
+Evaluate symbolically with with directional derivatives, MX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::Derivative::eval "
+
+evaluate symbolically, single input, single output ";
+
+%feature("docstring")  CasADi::Derivative::evalMX "
+
+evaluate symbolically, MX type (unambiguous) ";
+
+%feature("docstring")  CasADi::Derivative::evalMX "
+
+Evaluate symbolically with with directional derivatives, MX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::Derivative::evalSX "
+
+evaluate symbolically, SX type (unambiguous) ";
+
+%feature("docstring")  CasADi::Derivative::evalSX "
+
+Evaluate symbolically with with directional derivatives, SX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::Derivative::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
+%feature("docstring")  CasADi::Derivative::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::Derivative::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::Derivative::indexed_one_based "";
+
+%feature("docstring")  CasADi::Derivative::indexed_zero_based "";
+
+%feature("docstring")  CasADi::Derivative::checkNode "
+
+Check if the node is pointing to the right type of object. ";
+
+%feature("docstring")  CasADi::Derivative::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::Derivative::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::Derivative::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::Derivative::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::Derivative::output "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::Derivative::output "
+
+Access output argument Note that copies in Python are shallow by default and
+fx.output() gives a reference/pointer to an internal data structure. So if
+you want save fx.output(), you need to make a deep copy using for example
+DMatrix(fx.output()). ";
+
+%feature("docstring")  CasADi::Derivative::fwdSeed "
+
+Const access forward seed. ";
+
+%feature("docstring")  CasADi::Derivative::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::Derivative::fwdSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::Derivative::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::Derivative::adjSeed "
+
+Const access adjoint seed. ";
+
+%feature("docstring")  CasADi::Derivative::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::Derivative::adjSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::Derivative::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::Derivative::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::Derivative::getStat "
+
+Get a single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::Derivative::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
+
+%feature("docstring")  CasADi::Derivative::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
+
+%feature("docstring")  CasADi::Derivative::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Derivative::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Derivative::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::Derivative::addMonitor "
+
+Add modules to be monitored. ";
+
+%feature("docstring")  CasADi::Derivative::removeMonitor "
+
+Remove modules to be monitored. ";
+
+%feature("docstring")  CasADi::Derivative::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::Derivative::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::Derivative::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::Derivative::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::Derivative::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::Derivative::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::Derivative::clone "
+
+Deep copy. ";
+
+%feature("docstring")  CasADi::Derivative::assignNode "
+
+Assign the node to a node class pointer (or null) ";
+
+%feature("docstring")  CasADi::Derivative::assignNodeNoCount "
+
+Assign the node to a node class pointer without reference counting: inproper
+use will cause memory leaks! ";
+
+%feature("docstring")  CasADi::Derivative::get "
+
+Get a const pointer to the node. ";
+
+%feature("docstring")  CasADi::Derivative::get "
+
+Get a pointer to the node. ";
+
+%feature("docstring")  CasADi::Derivative::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::Derivative::swap "
+
+Swap content with another instance. ";
+
+%feature("docstring")  CasADi::Derivative::repr "
+
+Print a representation of the object. ";
+
+%feature("docstring")  CasADi::Derivative::print "
+
+Print a destription of the object. ";
+
+%feature("docstring")  CasADi::Derivative::init "
+
+Initialize the object: more documentation in the node class (
+SharedObjectNode and derived classes) ";
+
+%feature("docstring")  CasADi::Derivative::isInit "
+
+Is initialized? ";
+
+%feature("docstring")  CasADi::Derivative::assertInit "
+
+Assert that it is initialized. ";
+
+%feature("docstring")  CasADi::Derivative::isNull "
+
+Is a null pointer? ";
+
+%feature("docstring")  CasADi::Derivative::getRepresentation "
+
+Return a string with a representation (for SWIG) ";
+
+%feature("docstring")  CasADi::Derivative::getDescription "
+
+Return a string with a destription (for SWIG) ";
+
+
+// File: classCasADi_1_1DerivativeInternal.xml
+%feature("docstring") CasADi::DerivativeInternal "
+
+Internal node class for Derivative.
+
+Joel Andersson
+
+C++ includes: derivative_internal.hpp ";
+
+%feature("docstring")  CasADi::DerivativeInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::getHessian "";
+
+%feature("docstring")  CasADi::DerivativeInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::getGradient "";
+
+%feature("docstring")  CasADi::DerivativeInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::getJacobian "";
+
+%feature("docstring")  CasADi::DerivativeInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::DerivativeInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::getDerivative "";
+
+%feature("docstring")  CasADi::DerivativeInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::input "";
+
+%feature("docstring")  CasADi::DerivativeInternal::input "";
+
+%feature("docstring")  CasADi::DerivativeInternal::input "";
+
+%feature("docstring")  CasADi::DerivativeInternal::inputNoCheck "";
+
+%feature("docstring")  CasADi::DerivativeInternal::inputNoCheck "";
+
+%feature("docstring")  CasADi::DerivativeInternal::output "
+
+Access output argument. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::output "";
+
+%feature("docstring")  CasADi::DerivativeInternal::outputNoCheck "";
+
+%feature("docstring")  CasADi::DerivativeInternal::outputNoCheck "";
+
+%feature("docstring")  CasADi::DerivativeInternal::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::fwdSeed "";
+
+%feature("docstring")  CasADi::DerivativeInternal::fwdSeedNoCheck "";
+
+%feature("docstring")  CasADi::DerivativeInternal::fwdSeedNoCheck "";
+
+%feature("docstring")  CasADi::DerivativeInternal::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::fwdSens "";
+
+%feature("docstring")  CasADi::DerivativeInternal::fwdSensNoCheck "";
+
+%feature("docstring")  CasADi::DerivativeInternal::fwdSensNoCheck "";
+
+%feature("docstring")  CasADi::DerivativeInternal::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::adjSeed "";
+
+%feature("docstring")  CasADi::DerivativeInternal::adjSeedNoCheck "";
+
+%feature("docstring")  CasADi::DerivativeInternal::adjSeedNoCheck "";
+
+%feature("docstring")  CasADi::DerivativeInternal::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::adjSens "";
+
+%feature("docstring")  CasADi::DerivativeInternal::adjSensNoCheck "";
+
+%feature("docstring")  CasADi::DerivativeInternal::adjSensNoCheck "";
+
+%feature("docstring")  CasADi::DerivativeInternal::DerivativeInternal "
+
+New constructor. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::clone "
+
+Clone. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::deepCopyMembers "
+
+Deep copy data members. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::~DerivativeInternal "
+
+Destructor. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::evaluate "
+
+Evaluate the jacobian. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::init "
+
+Initialize. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::requestNumSens "
+
+Request a number of forward/adjoint derivative directions. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::DerivativeInternal::spInit "
+
+Reset the sparsity propagation. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::evalSX "
+
+Evaluate symbolically, SX type. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::evalMX "
+
+Evaluate symbolically, MX type. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::call "
+
+Call a function, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::DerivativeInternal::call "
+
+Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::DerivativeInternal::iStruct "
+
+Access an input. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::iStruct "
+
+Const access an input. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::oStruct "
+
+Access an output. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::oStruct "
+
+Const access an output. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::print "
+
+Print. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::repr "
+
+Print. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::getPartition "
+
+Get the unidirectional or bidirectional partition. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::verbose "
+
+Verbose mode? ";
+
+%feature("docstring")  CasADi::DerivativeInternal::monitored "
+
+Is function fcn being monitored. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::setNumInputs "
+
+Set the number of function inputs. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::setNumOutputs "
+
+Set the number of function outputs. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::getNumInputs "
+
+Get the number of function inputs. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::getNumOutputs "
+
+Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::DerivativeInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
+%feature("docstring")  CasADi::DerivativeInternal::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::getStat "
+
+Get single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::getJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::DerivativeInternal::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::DerivativeInternal::log "
+
+Log the status of the solver. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::log "
+
+Log the status of the solver, function given. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::setOption "
+
+set an option. The setOptions are in general only considered before the init
+function, if any. If properties changes, the init function should be called
+again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::DerivativeInternal::setOption "
+
+set a set of options. The setOptions are in general only considered before
+the init function, if any. If properties changes, the init function should
+be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::DerivativeInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::DerivativeInternal::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::DerivativeInternal::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::DerivativeInternal::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::regRef "
+
+Register a weak reference. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::unregRef "
+
+Unregister a weak reference. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::assertInit "
+
+Assert that the object has been initialized. ";
+
+
 // File: classCasADi_1_1EvaluationMX.xml
 %feature("docstring") CasADi::EvaluationMX "
 
@@ -16850,6 +17646,11 @@ casadi_calculus.hpp ";
 casadi_calculus.hpp ";
 
 
+// File: structCasADi_1_1F0XChecker_3_01OP__IF__ELSE__ZERO_01_4.xml
+%feature("docstring") CasADi::F0XChecker< OP_IF_ELSE_ZERO > " C++ includes:
+casadi_calculus.hpp ";
+
+
 // File: structCasADi_1_1F0XChecker_3_01OP__MUL_01_4.xml
 %feature("docstring") CasADi::F0XChecker< OP_MUL > " C++ includes:
 casadi_calculus.hpp ";
@@ -17805,6 +18606,11 @@ C++ includes: casadi_calculus.hpp ";
 
 // File: structCasADi_1_1FX0Checker_3_01OP__AND_01_4.xml
 %feature("docstring") CasADi::FX0Checker< OP_AND > " C++ includes:
+casadi_calculus.hpp ";
+
+
+// File: structCasADi_1_1FX0Checker_3_01OP__IF__ELSE__ZERO_01_4.xml
+%feature("docstring") CasADi::FX0Checker< OP_IF_ELSE_ZERO > " C++ includes:
 casadi_calculus.hpp ";
 
 
@@ -20848,230 +21654,6 @@ Get the reference count. ";
 Check if the object has been initialized. ";
 
 %feature("docstring")  CasADi::IdasInternal::assertInit "
-
-Assert that the object has been initialized. ";
-
-
-// File: classCasADi_1_1IfNode.xml
-%feature("docstring") CasADi::IfNode "
-
-Represents a branch in an MX tree TODO: Change name of file.
-
-Joel Andersson
-
-C++ includes: if_else_node.hpp ";
-
-%feature("docstring")  CasADi::IfNode::IfNode "
-
-Constructors. ";
-
-%feature("docstring")  CasADi::IfNode::~IfNode "
-
-Destructor. ";
-
-%feature("docstring")  CasADi::IfNode::clone "
-
-Clone function. ";
-
-%feature("docstring")  CasADi::IfNode::printPart "
-
-Print a part of the expression. ";
-
-%feature("docstring")  CasADi::IfNode::evaluateD "
-
-Evaluate the function numerically. ";
-
-%feature("docstring")  CasADi::IfNode::evaluateSX "
-
-Evaluate the function symbolically ( SX) ";
-
-%feature("docstring")  CasADi::IfNode::evaluateMX "
-
-Evaluate the function symbolically ( MX) ";
-
-%feature("docstring")  CasADi::IfNode::propagateSparsity "
-
-Propagate sparsity. ";
-
-%feature("docstring")  CasADi::IfNode::__nonzero__ "
-
-Check the truth value of this node. ";
-
-%feature("docstring")  CasADi::IfNode::deepCopyMembers "
-
-Deep copy data members. ";
-
-%feature("docstring")  CasADi::IfNode::repr "
-
-Print a representation. ";
-
-%feature("docstring")  CasADi::IfNode::print "
-
-Print a description. ";
-
-%feature("docstring")  CasADi::IfNode::print "
-
-Print expression (make sure number of calls is not exceeded) ";
-
-%feature("docstring")  CasADi::IfNode::evaluateD "
-
-Evaluate the function, no derivatives. ";
-
-%feature("docstring")  CasADi::IfNode::evaluateSX "
-
-Evaluate symbolically ( SX), no derivatives. ";
-
-%feature("docstring")  CasADi::IfNode::evaluateMX "
-
-Evaluate symbolically ( MX), no derivatives. ";
-
-%feature("docstring")  CasADi::IfNode::getName "
-
-Get the name. ";
-
-%feature("docstring")  CasADi::IfNode::isSymbolic "
-
-Check if symbolic. ";
-
-%feature("docstring")  CasADi::IfNode::isConstant "
-
-Check if constant. ";
-
-%feature("docstring")  CasADi::IfNode::isMapping "
-
-Check if mapping. ";
-
-%feature("docstring")  CasADi::IfNode::isEvaluation "
-
-Check if evaluation. ";
-
-%feature("docstring")  CasADi::IfNode::isOutputNode "
-
-Check if evaluation output. ";
-
-%feature("docstring")  CasADi::IfNode::isMultipleOutput "
-
-Check if a multiple output node. ";
-
-%feature("docstring")  CasADi::IfNode::isMultiplication "
-
-Check if matrix multiplication. ";
-
-%feature("docstring")  CasADi::IfNode::getFunction "
-
-Get function reference. ";
-
-%feature("docstring")  CasADi::IfNode::getFunctionInput "
-
-Get function input. ";
-
-%feature("docstring")  CasADi::IfNode::getFunctionOutput "
-
-Get function output. ";
-
-%feature("docstring")  CasADi::IfNode::dep "
-
-dependencies - functions that have to be evaluated before this one ";
-
-%feature("docstring")  CasADi::IfNode::dep "";
-
-%feature("docstring")  CasADi::IfNode::ndep "
-
-Number of dependencies. ";
-
-%feature("docstring")  CasADi::IfNode::hasDep "
-
-Does the node depend on other nodes. ";
-
-%feature("docstring")  CasADi::IfNode::getNumOutputs "
-
-Number of outputs. ";
-
-%feature("docstring")  CasADi::IfNode::sparsity "
-
-Get the sparsity. ";
-
-%feature("docstring")  CasADi::IfNode::sparsity "
-
-Get the sparsity of output oind. ";
-
-%feature("docstring")  CasADi::IfNode::isNonLinear "
-
-Is the node nonlinear. ";
-
-%feature("docstring")  CasADi::IfNode::setSparsity "
-
-Set the sparsity. ";
-
-%feature("docstring")  CasADi::IfNode::setDependencies "
-
-Set unary dependency. ";
-
-%feature("docstring")  CasADi::IfNode::setDependencies "
-
-Set binary dependencies. ";
-
-%feature("docstring")  CasADi::IfNode::setDependencies "
-
-Set ternary dependencies. ";
-
-%feature("docstring")  CasADi::IfNode::setDependencies "
-
-Set multiple dependencies. ";
-
-%feature("docstring")  CasADi::IfNode::addDependency "
-
-Add a dependency. ";
-
-%feature("docstring")  CasADi::IfNode::assign "
-
-Assign nonzeros (mapping matrix) ";
-
-%feature("docstring")  CasADi::IfNode::assign "
-
-Assign nonzeros (mapping matrix), output indices sequential. ";
-
-%feature("docstring")  CasADi::IfNode::isOperation "
-
-Is it a certain operation. ";
-
-%feature("docstring")  CasADi::IfNode::numel "
-
-Number of elements. ";
-
-%feature("docstring")  CasADi::IfNode::size "
-
-Get size. ";
-
-%feature("docstring")  CasADi::IfNode::size1 "
-
-Get size. ";
-
-%feature("docstring")  CasADi::IfNode::size2 "
-
-Get size. ";
-
-%feature("docstring")  CasADi::IfNode::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::IfNode::unregRef "
-
-Unregister a weak reference. ";
-
-%feature("docstring")  CasADi::IfNode::getCount "
-
-Get the reference count. ";
-
-%feature("docstring")  CasADi::IfNode::init "
-
-Initialize the object. ";
-
-%feature("docstring")  CasADi::IfNode::isInit "
-
-Check if the object has been initialized. ";
-
-%feature("docstring")  CasADi::IfNode::assertInit "
 
 Assert that the object has been initialized. ";
 
@@ -44429,6 +45011,8 @@ compatibility. ";
 
 %feature("docstring")  CasADi::Matrix::logic_or "";
 
+%feature("docstring")  CasADi::Matrix::if_else_zero "";
+
 %feature("docstring")  CasADi::Matrix::print "
 
 Printing. ";
@@ -47790,10 +48374,6 @@ Check if multiplication. ";
 
 Check if commutative operation. ";
 
-%feature("docstring")  CasADi::MX::isIfTest "
-
-Check if if-test. ";
-
 %feature("docstring")  CasADi::MX::isNorm "
 
 Check if norm. ";
@@ -47939,6 +48519,8 @@ Division (with future.division in effect) ";
 %feature("docstring")  CasADi::MX::logic_and "";
 
 %feature("docstring")  CasADi::MX::logic_or "";
+
+%feature("docstring")  CasADi::MX::if_else_zero "";
 
 %feature("docstring")  CasADi::MX::exp "";
 
@@ -64734,6 +65316,11 @@ casadi_calculus.hpp ";
 casadi_calculus.hpp ";
 
 
+// File: structCasADi_1_1SmoothChecker_3_01OP__IF__ELSE__ZERO_01_4.xml
+%feature("docstring") CasADi::SmoothChecker< OP_IF_ELSE_ZERO > " C++
+includes: casadi_calculus.hpp ";
+
+
 // File: structCasADi_1_1SmoothChecker_3_01OP__LE_01_4.xml
 %feature("docstring") CasADi::SmoothChecker< OP_LE > " C++ includes:
 casadi_calculus.hpp ";
@@ -68771,6 +69358,8 @@ allow unambigous access. ";
 %feature("docstring")  CasADi::SX::logic_and "";
 
 %feature("docstring")  CasADi::SX::logic_or "";
+
+%feature("docstring")  CasADi::SX::if_else_zero "";
 
 %feature("docstring")  CasADi::SX::fmin "";
 
@@ -75557,6 +76146,14 @@ Sign function, note that sign(nan) == nan. ";
 
 Sign function, note that sign(nan) == nan. ";
 
+%feature("docstring")  CasADi::if_else_zero "
+
+Conditional assignment. ";
+
+%feature("docstring")  CasADi::if_else_zero "
+
+Conditional assignment. ";
+
 %feature("docstring")  CasADi::erfinv "
 
 Inverse of the error function. ";
@@ -76795,10 +77392,6 @@ a b c d ";
 %feature("docstring")  CasADi::vecNZ "
 
 Returns a flattened version of the MX, preserving only nonzeros. ";
-
-%feature("docstring")  CasADi::if_else_zero "
-
-Conditional evaluation cond ? if_true : 0. ";
 
 %feature("docstring")  CasADi::if_else "
 
@@ -78172,6 +78765,18 @@ This file does absolutely nothing but including all headers ";
 // File: densification_8hpp.xml
 
 
+// File: derivative_8cpp.xml
+
+
+// File: derivative_8hpp.xml
+
+
+// File: derivative__internal_8cpp.xml
+
+
+// File: derivative__internal_8hpp.xml
+
+
 // File: dotdraw_8hpp.xml
 
 
@@ -78272,12 +78877,6 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: idas__internal_8hpp.xml
-
-
-// File: if__else__node_8cpp.xml
-
-
-// File: if__else__node_8hpp.xml
 
 
 // File: implicit__function_8cpp.xml

@@ -160,6 +160,36 @@
 <tr><td>resS</td><td>CasADi::IdasInternal</td></tr>
 </table>
 */
+/** \class CasADi::KnitroInternal
+\n
+\par
+<table>
+<caption>List of available monitors</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>eval_f</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>eval_g</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>eval_grad_f</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>eval_h</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>eval_jac_g</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
+</table>
+*/
+/** \class CasADi::KnitroSolver
+\n
+\par
+<table>
+<caption>List of available monitors</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>eval_f</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>eval_g</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>eval_grad_f</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>eval_h</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>eval_jac_g</td><td>CasADi::KnitroInternal</td></tr>
+<tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
+</table>
+*/
 /** \class CasADi::XFunctionInternal
 \n
 \par
