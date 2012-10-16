@@ -45,9 +45,9 @@ CplexInternal::CplexInternal(const CRSSparsity& H, const CRSSparsity& A) : QPSol
     5: Sifting, \
     6: Concurent. \
     Default: 0");
-  addOption("dump_to_file",   OT_BOOLEAN,        0, "Dumps QP to file in CPLEX format. Default: false");
+  addOption("dump_to_file",   OT_BOOLEAN,        false, "Dumps QP to file in CPLEX format. Default: false");
   addOption("dump_filename",   OT_STRING, "qp.dat", "The filename to dump to. Default: qp.dat");
-  addOption("debug",          OT_BOOLEAN,        0, "Print debug information");
+  addOption("debug",          OT_BOOLEAN,        false, "Print debug information");
   addOption("tol",             OT_REAL,     1E-6, "Tolerance of solver");
   
   // Initializing members
@@ -70,7 +70,7 @@ void CplexInternal::init(){
 //  CPXsetintparam (env_, CPX_PARAM_SCRIND, CPX_OFF);
   env_ = CPXopenCPLEX (&status);
   if (!env_){
-    std::cerr << "Cannot initialize CPLEX environment.\n";
+    std::cerr << "Cannot initialize CPLEX environment. STATUS: " << status << "\n";
     throw("Cannot initialize CPLEX environment.\n");
   }
   // Turn on some debug messages if requested
@@ -108,14 +108,7 @@ void CplexInternal::init(){
   qmatcnt_.resize(NUMCOLS_);
   qmatind_.resize(input(QP_H).size());
   qmatval_.resize(input(QP_H).size());
-
-}
-
-void CplexInternal::evaluate(int nfdir, int nadir){
-
-  int status;
-
-  casadi_assert(nfdir == 0 && nadir == 0);
+  
   // Linear term
   if (!isDense(input(QP_G))){
     casadi_error("input(QP_G) must be dense.");
@@ -132,6 +125,14 @@ void CplexInternal::evaluate(int nfdir, int nadir){
   if (!isDense(input(QP_UBX))){
     casadi_error("input(QP_UBX) must be dense.");
   }
+
+}
+
+void CplexInternal::evaluate(int nfdir, int nadir){
+
+  int status;
+
+  casadi_assert(nfdir == 0 && nadir == 0);
 
   obj_ = input(QP_G).ptr();
   lb_ = input(QP_LBX).ptr();
@@ -206,7 +207,12 @@ void CplexInternal::evaluate(int nfdir, int nadir){
    output(QP_LAMBDA_A).ptr(),
    slack.data(),
    output(QP_LAMBDA_X).ptr()
-  );  
+  ); 
+  
+  // Flip the sign of the multipliers
+  for (int k=0;k<output(QP_LAMBDA_A).size();++k) output(QP_LAMBDA_A).data()[k]= - output(QP_LAMBDA_A).data()[k];
+  for (int k=0;k<output(QP_LAMBDA_X).size();++k) output(QP_LAMBDA_X).data()[k]= - output(QP_LAMBDA_X).data()[k];
+  
   if(status){
     std::cerr << "CPLEX: Failed to get solution.\n";
   } 

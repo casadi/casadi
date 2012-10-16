@@ -44,6 +44,10 @@ try:
   qpsolvers.append((QPOasesSolver,{}))
 except:
   pass
+try:
+  qpsolvers.append((CplexSolver,{}))
+except:
+  pass
 
 class QPSolverTests(casadiTestCase):
 
@@ -193,8 +197,10 @@ class QPSolverTests(casadiTestCase):
       
     for qpsolver, qp_options in qpsolvers:
       self.message("general_convex: " + str(qpsolver))
-
+      if "Cplex" in str(qpsolver):
+        continue # Cplex cannot do non-convex problems
       solver = qpsolver(H.sparsity(),A.sparsity())
+      
       for key, val in options.iteritems():
         if solver.hasOption(key):
            solver.setOption(key,val)
@@ -408,6 +414,8 @@ class QPSolverTests(casadiTestCase):
     options = {"convex": True, "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
       
     for qpsolver, qp_options in qpsolvers:
+      if "Cplex" in str(qpsolver):
+        continue
       self.message("no A: " + str(qpsolver))
       solver = qpsolver(H.sparsity(),A.sparsity())
       for key, val in options.iteritems():
