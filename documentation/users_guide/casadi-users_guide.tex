@@ -282,7 +282,7 @@ There is a growing set of operations that can be performed with the \texttt{SXMa
 \end{itemize}
 It is typically uncomplicated to add new such functions whenever they appear in applications.
 
-\subsection{\texttt{DMatrix}}
+\section{\texttt{DMatrix}}
 \texttt{DMatrix} is very similar to \texttt{SXMatrix} (in fact, they are just two template instantiations of the same C++ class \texttt{CasADi::Matrix<\,T\,>}), but with the difference that the nonzero elements are numerical values and not \texttt{SX} expressions. The syntax is also the same, except for functions such as \texttt{ssym} or \texttt{jacobian} which has no equivalent.
 
 \texttt{DMatrix} is mainly used for storing matrices in CasADi and as inputs and outputs of functions. It is \emph{not} intended to be used for computationally intensive calculations. For this purpose, use \texttt{numpy} or \texttt{scipy} matrices in Python or an expression template based library such as \texttt{eigen}, \texttt{ublas} or \texttt{MTL} in C++. Conversion between the types is usually straightforward:
@@ -299,7 +299,7 @@ It is typically uncomplicated to add new such functions whenever they appear in 
 
 More usage examples for \texttt{SX} can be found in the tutorials at \texttt{www.casadi.org}. For documentation of particular functions of this class (and others), find the ``C++ API docs'' on the website and search for information about \texttt{CasADi::Matrix<\,T\,>}.
 
-\subsection{\texttt{FX} and derived classes}
+\section{\texttt{FX} and derived classes}
 CasADi contains a number of functions that all derive from the \texttt{FX} base class. This includes functions that are defined by a symbolic expression, ODE/DAE integrators, QP solvers, NLP solvers etc.
 
 The usage skeleton of all these functions are:
@@ -339,6 +339,33 @@ One of the \texttt{FX} derived classes is \texttt{SXFunction}, which defines a f
 \begin{verbatim}
  f = SXFunction(list_of_inputs,list_of_outputs)
 \end{verbatim}
+
+There is no mechanism to distinguish the nature of \texttt{FX} functions. For example, any \texttt{FX} with \texttt{DAE\_NUM\_IN} inputs and \texttt{DAE\_NUM\_OUT} outputs can be cosidered to represent a dae function. The CasADi used to generate this documentation has:
+\begin{pytexoutput}
+print "DAE_NUM_IN = ", DAE_NUM_IN
+print "DAE_NUM_OUT = ", DAE_NUM_OUT
+\end{pytexoutput}
+There are a couple of global constants starting with \texttt{DAE\_} that together constitute the \emph{input/output scheme} of a dae. You can look these up in the API documentation or the python docstrings. You should use these constants and not replace them by the numerical values they happen to have in your version of CasADi, as they might change in the future.\\
+
+For example, here is an excerpt from the documentation for the constructor of a \texttt{CVOdesIntegrator}:
+\begin{pytexoutput}
+docs = CVodesIntegrator.__init__.__doc__.split("\n")
+start = docs.index(filter(lambda x: "DAEOutput" in x,docs)[0])
+print "\n".join(docs[start:start+4+2*DAE_NUM_OUT])
+\end{pytexoutput}
+
+Helper functions are available to construct lists of objects that adhere to a particular scheme. For example, to create a list of a \texttt{DAEOutput} scheme, you use \texttt{daeOut}:
+
+\begin{pytex}
+print daeOut()
+print daeOut(ode=ssym("fx"))
+print daeOut(alg=ssym("fz"),ode=ssym("fx"))
+\end{pytex}
+
+Consult the python docstrings for more information of how to use these helper functions:
+\begin{pytexoutput}
+print daeOut.__doc__
+\end{pytexoutput}
 
 \section{The \texttt{MX} symbolics}
 
