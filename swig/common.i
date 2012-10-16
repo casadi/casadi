@@ -348,6 +348,7 @@ memberbinops(pow,argtype,argCast,selfCast,returntype) \
  	
 #include "symbolic/fx/mx_function.hpp"
 #include "symbolic/fx/c_function.hpp"
+#include "symbolic/fx/jacobian.hpp"
 #include "symbolic/fx/ocp_solver.hpp"
 #include "symbolic/fx/simulator.hpp"
 #include "symbolic/fx/parallelizer.hpp"

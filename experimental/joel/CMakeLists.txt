@@ -67,6 +67,9 @@ target_link_libraries(det_minor casadi ${CASADI_DEPENDENCIES})
 add_executable(det_minor_paper det_minor_paper.cpp )
 target_link_libraries(det_minor_paper casadi ${CASADI_DEPENDENCIES})
 
+add_executable(mx_jacobian mx_jacobian.cpp)
+target_link_libraries(mx_jacobian casadi ${CASADI_DEPENDENCIES})
+
 if(IPOPT_FOUND)
   if(OOQP_FOUND)
     add_executable(test_ooqp test_ooqp.cpp )

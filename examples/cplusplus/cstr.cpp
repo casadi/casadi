@@ -31,6 +31,7 @@
 #include <symbolic/mx/mx_tools.hpp>
 #include <symbolic/sx/sx_tools.hpp>
 #include <symbolic/matrix/matrix_tools.hpp>
+#include <symbolic/fx/jacobian.hpp>
 
 #include <optimal_control/symbolic_ocp.hpp>
 #include <optimal_control/ocp_tools.hpp>

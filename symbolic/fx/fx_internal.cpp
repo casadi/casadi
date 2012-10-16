@@ -24,6 +24,7 @@
 #include "../mx/evaluation_mx.hpp"
 #include <typeinfo> 
 #include "../stl_vector_tools.hpp"
+#include "jacobian.hpp"
 #include "mx_function.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "../sx/sx_tools.hpp"
@@ -619,6 +620,8 @@ void FXInternal::spEvaluate(bool fwd){
   }
 }
 
+// #define NEW_JACOBIAN
+
 FX FXInternal::jacobian(int iind, int oind, bool compact, bool symmetric){
   // Return value
   FX ret;
@@ -629,7 +632,13 @@ FX FXInternal::jacobian(int iind, int oind, bool compact, bool symmetric){
     FX fcn = shared_from_this<FX>();
     ret = jacgen_(fcn,iind,oind,user_data_);
   } else if(bool(getOption("numeric_jacobian"))){
+#ifdef NEW_JACOBIAN
     ret = getNumericJacobian(iind,oind,compact,false); // NOTE: Change "false" to symmetric to enable symmetry exploitation
+#else // NEW_JACOBIAN
+    // Generate Jacobian instance
+    casadi_assert_message(!compact, "Not implemented");
+    ret = Jacobian(shared_from_this<FX>(),iind,oind);
+#endif // NEW_JACOBIAN
   } else {
     // Use internal routine to calculate Jacobian
     ret = getJacobian(iind,oind,compact, symmetric);
@@ -644,7 +653,11 @@ FX FXInternal::jacobian(int iind, int oind, bool compact, bool symmetric){
 }
 
 FX FXInternal::getJacobian(int iind, int oind, bool compact, bool symmetric){
+#ifdef NEW_JACOBIAN
   FX ret = getNumericJacobian(iind,oind,compact,false); // NOTE: Change "false" to symmetric to enable symmetry exploitation
+#else // NEW_JACOBIAN
+  FX ret = Jacobian(shared_from_this<FX>(),iind,oind);
+#endif // NEW_JACOBIAN
   return ret;
 }
 
