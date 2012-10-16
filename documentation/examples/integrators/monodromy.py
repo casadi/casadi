@@ -96,6 +96,7 @@ jac = integrator.jacobian(INTEGRATOR_X0,INTEGRATOR_XF)
 jac.init()
 
 jac.input(INTEGRATOR_X0).set(x0)
+jac.input(INTEGRATOR_P).set(params_)
 jac.evaluate()
 
 Ji = jac.output()
