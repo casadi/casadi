@@ -483,10 +483,51 @@ class QPSolverTests(casadiTestCase):
 
       solver.solve()
 
-      self.checkarray(solver.output(NLP_X_OPT),x0,str(qpsolver),digits=2)
-      self.assertAlmostEqual(solver.output(NLP_COST)[0],0,3,str(qpsolver))
-      self.checkarray(solver.output(NLP_LAMBDA_X),DMatrix.zeros(N,1),str(qpsolver),digits=4)
+      self.checkarray(solver.output(),x0,str(qpsolver),digits=2)
+      self.assertAlmostEqual(solver.output(QP_COST)[0],0,3,str(qpsolver))
+      self.checkarray(solver.output(QP_LAMBDA_X),DMatrix.zeros(N,1),str(qpsolver),digits=4)
       
+  def test_redundant(self):
+    self.message("Redundant constraints")
+    
+    H = DMatrix([[1,-1,0],[-1,2,0],[0,0,0]])
+    G = DMatrix([-2,-6,1])
+    a = DMatrix([1,0,1])
+    a_ = DMatrix([0,1,-2])
+    
+    for w0,w1 in [(0,2),(1,1),(0.1,0.6)]:
+      
+      A =  vertcat([a.T,a_.T,(w0*a+w1*a_).T])
+        
+      LBA = DMatrix([0,0,0])
+      UBA = DMatrix([0.5,0.3,w0*0.5+w1*0.3])
+
+      LBX = DMatrix([-10])
+      UBX = DMatrix([10])
+      
+      options = {"convex": True, "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+        
+      for qpsolver, qp_options in qpsolvers:
+        solver = qpsolver(H.sparsity(),A.sparsity())
+        for key, val in options.iteritems():
+          if solver.hasOption(key):
+             solver.setOption(key,val)
+        solver.setOption(qp_options)
+        solver.init()
+        
+        solver.input(QP_H).set(H)
+        solver.input(QP_G).set(G)
+        solver.input(QP_A).set(A)
+        solver.input(QP_LBX).set(LBX)
+        solver.input(QP_UBX).set(UBX)
+        solver.input(QP_LBA).set(LBA)
+        solver.input(QP_UBA).set(UBA)
+        solver.solve()
+        
+        self.checkarray(solver.output(),DMatrix([-0.19230768069,1.6846153915,0.692307690769276]),str(qpsolver),digits=6)
+        self.assertAlmostEqual(solver.output(QP_COST)[0],-5.850384678537,5,str(qpsolver))
+        self.checkarray(solver.output(QP_LAMBDA_X),DMatrix([0,0,0]),str(qpsolver),digits=6)
+        self.checkarray(mul(A.T,solver.output(QP_LAMBDA_A)),DMatrix([3.876923073076,2.4384615365384965,-1]),str(qpsolver),digits=6)
       
 if __name__ == '__main__':
     unittest.main()
