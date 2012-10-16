@@ -79,7 +79,7 @@ public:
   virtual void checkInitialBounds();
   
   /// Set options that make the NLP solver more suitable for solving QPs
-  virtual void setQPOptions(bool convex=false) { };
+  virtual void setQPOptions() { };
     
 };
 

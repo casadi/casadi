@@ -28,7 +28,7 @@
 
 /** \defgroup QPSolver_doc
 
-  Solves the following problem:
+  Solves the following strictly convex problem:
   
   \verbatim
   min          x'.H.x + G'.x 
@@ -38,9 +38,15 @@
               LBA <= A.x <= UBA
               LBX <= x   <= UBX
               
+      with H positive definite
+              
       nx: number of decision variables (x)
       nc: number of constraints (A)
+      
   \endverbatim
+  
+  If H is not positive-definite, the solver should throw an error.
+  
 */
       
 namespace CasADi{

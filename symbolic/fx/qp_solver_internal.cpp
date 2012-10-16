@@ -39,7 +39,6 @@ QPSolverInternal::QPSolverInternal() {
 
 // Constructor
 QPSolverInternal::QPSolverInternal(const CRSSparsity &H, const CRSSparsity &A){
-  addOption("convex", OT_BOOLEAN, false, "Specify true if you can guarantee that H will always be positive definite");
 
   nx_ = H.size2();
   nc_ = A.isNull() ? 0 : A.size1();

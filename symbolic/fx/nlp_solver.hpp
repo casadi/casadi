@@ -105,7 +105,7 @@ class NLPSolver : public FX{
   std::string getReportConstraints() { std::stringstream s; reportConstraints(s); return s.str(); }
   
   /// Set options that make the NLP solver more suitable for solving QPs
-  void setQPOptions(bool convex=false);
+  void setQPOptions();
   
   /// Access the objective function F
   FX getF() const;

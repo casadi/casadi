@@ -63,7 +63,7 @@ class QPSolverTests(casadiTestCase):
     LBX = DMatrix([0]*2)
     UBX = DMatrix([inf]*2)
 
-    options = {"convex": True, "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+    options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
       
     for qpsolver, qp_options in qpsolvers:
       self.message("general_convex: " + str(qpsolver))
@@ -98,8 +98,8 @@ class QPSolverTests(casadiTestCase):
       solver.input(QP_H).set(H*4)
 
       solver.evaluate()
-      self.assertAlmostEqual(solver.output()[0],1,4,str(qpsolver))
-      self.assertAlmostEqual(solver.output()[1],1,4,str(qpsolver))
+      self.assertAlmostEqual(solver.output()[0],1,3,str(qpsolver))
+      self.assertAlmostEqual(solver.output()[1],1,3,str(qpsolver))
       self.assertAlmostEqual(solver.output(QP_COST),-6,6,str(qpsolver))
       
       self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[0],0,6,str(qpsolver))
@@ -151,7 +151,7 @@ class QPSolverTests(casadiTestCase):
     LBX = DMatrix([0]*5)
     UBX = DMatrix([inf]*5)
 
-    options = {"convex": True, "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+    options = { "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
       
     for qpsolver, qp_options in qpsolvers:
       self.message("general_convex: " + str(qpsolver))
@@ -193,12 +193,12 @@ class QPSolverTests(casadiTestCase):
     LBX = DMatrix([0]*2)
     UBX = DMatrix([inf]*2)
 
-    options = {"convex": False, "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+    options = { "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
       
     for qpsolver, qp_options in qpsolvers:
       self.message("general_convex: " + str(qpsolver))
-      if "Cplex" in str(qpsolver):
-        continue # Cplex cannot do non-convex problems
+      if not("Cplex" in str(qpsolver)):
+        continue
       solver = qpsolver(H.sparsity(),A.sparsity())
       
       for key, val in options.iteritems():
@@ -215,24 +215,14 @@ class QPSolverTests(casadiTestCase):
       solver.input(QP_LBA).set(LBA)
       solver.input(QP_UBA).set(UBA)
 
-      solver.solve()
-
-      self.assertAlmostEqual(solver.output()[0],2.0/3,6,str(qpsolver))
-      self.assertAlmostEqual(solver.output()[1],4.0/3,6,str(qpsolver))
-    
-      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[0],0,6,str(qpsolver))
-      self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[1],0,6,str(qpsolver))
-
-      self.checkarray(solver.output(QP_LAMBDA_A),DMatrix([4+8.0/9,20.0/9,0]),str(qpsolver),digits=6)
-      
-      self.assertAlmostEqual(solver.output(QP_COST)[0],-10-16.0/9,6,str(qpsolver))
+      self.assertRaises(Exception,lambda : solver.solve())
 
   def test_equality(self):
     self.message("Regression 452 test: equality constraints give wrong multipliers")
     H = DMatrix([[1,-1],[-1,2]])
     G = DMatrix([-2,-6])
 
-    options = {"convex": True, "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+    options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
       
     for qpsolver, qp_options in qpsolvers:
       self.message("equality: " + str(qpsolver))
@@ -317,7 +307,7 @@ class QPSolverTests(casadiTestCase):
     LBX = DMatrix([-10])
     UBX = DMatrix([10])
 
-    options = {"convex": True, "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+    options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
       
       
     for qpsolver, qp_options in qpsolvers:
@@ -364,7 +354,7 @@ class QPSolverTests(casadiTestCase):
     UBX = DMatrix([10])
 
 
-    options = {"convex": True, "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+    options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
       
     for qpsolver, qp_options in qpsolvers:
       self.message("no inequality: " + str(qpsolver))
@@ -411,7 +401,7 @@ class QPSolverTests(casadiTestCase):
     UBX = DMatrix([10])
 
 
-    options = {"convex": True, "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+    options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
       
     for qpsolver, qp_options in qpsolvers:
       if "Cplex" in str(qpsolver):
@@ -436,8 +426,8 @@ class QPSolverTests(casadiTestCase):
 
       solver.solve()
 
-      self.assertAlmostEqual(solver.output()[0],10,4,str(qpsolver))
-      self.assertAlmostEqual(solver.output()[1],8,5,str(qpsolver))
+      self.assertAlmostEqual(solver.output()[0],10,3,str(qpsolver))
+      self.assertAlmostEqual(solver.output()[1],8,3,str(qpsolver))
     
       self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[0],0,5,str(qpsolver))
       self.assertAlmostEqual(solver.output(QP_LAMBDA_X)[1],0,5,str(qpsolver))
@@ -463,7 +453,7 @@ class QPSolverTests(casadiTestCase):
     UBX = DMatrix([1000]*N)
 
 
-    options = {"convex": True, "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+    options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
       
     for qpsolver, qp_options in qpsolvers:
       solver = qpsolver(H.sparsity(),A.sparsity())
@@ -505,7 +495,7 @@ class QPSolverTests(casadiTestCase):
       LBX = DMatrix([-10])
       UBX = DMatrix([10])
       
-      options = {"convex": True, "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
+      options = {"mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
         
       for qpsolver, qp_options in qpsolvers:
         solver = qpsolver(H.sparsity(),A.sparsity())
