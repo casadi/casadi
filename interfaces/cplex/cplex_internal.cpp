@@ -48,7 +48,15 @@ CplexInternal::CplexInternal(const CRSSparsity& H, const CRSSparsity& A) : QPSol
   addOption("dump_to_file",   OT_BOOLEAN,        false, "Dumps QP to file in CPLEX format. Default: false");
   addOption("dump_filename",   OT_STRING, "qp.dat", "The filename to dump to. Default: qp.dat");
   addOption("debug",          OT_BOOLEAN,        false, "Print debug information");
-  addOption("tol",             OT_REAL,     1E-6, "Tolerance of solver");
+  addOption("tol",               OT_REAL,     1E-6, "Tolerance of solver");
+  addOption("dep_check",      OT_INTEGER,        0, "Detect redundant constraints. \
+    -1: automatic\
+     0: off\
+     1: at the beginning of preprocessing\
+     2: at the end of preprocessing\
+     3: at the begining and at the end of preprocessing");
+  addOption("simplex_maxiter", OT_INTEGER,       2100000000, "Maximum number of simplex iterations.");
+  addOption("barrier_maxiter", OT_INTEGER,       2100000000, "Maximum number of barrier iterations.");
   
   // Initializing members
   // Number of vars
@@ -70,8 +78,8 @@ void CplexInternal::init(){
 //  CPXsetintparam (env_, CPX_PARAM_SCRIND, CPX_OFF);
   env_ = CPXopenCPLEX (&status);
   if (!env_){
-    std::cerr << "Cannot initialize CPLEX environment. STATUS: " << status << "\n";
-    throw("Cannot initialize CPLEX environment.\n");
+    cout << "CPLEX: Cannot initialize CPLEX environment. STATUS: " << status << "\n";
+    throw CasadiException("Cannot initialize CPLEX environment.\n");
   }
   // Turn on some debug messages if requested
   if (debug_){
@@ -81,7 +89,7 @@ void CplexInternal::init(){
     CPXsetintparam (env_, CPX_PARAM_SCRIND, CPX_OFF);
   }
   if (status){
-    std::cout << "Problem with setting parameter... ERROR: " << status << std::endl;
+    std::cout << "CPLEX: Problem with setting parameter... ERROR: " << status << std::endl;
   }
 
 
@@ -184,6 +192,21 @@ void CplexInternal::evaluate(int nfdir, int nadir){
 
   // Setting optimization method
   status = CPXsetintparam(env_, CPX_PARAM_QPMETHOD, qp_method_);
+  // Setting dependency check option
+  status = CPXsetintparam(env_, CPX_PARAM_DEPIND, getOption("dep_check"));
+  // Setting barrier iteration limit
+  status = CPXsetintparam(env_, CPX_PARAM_BARITLIM, getOption("barrier_maxiter"));
+  // Setting simplex iteration limit
+  status = CPXsetintparam(env_, CPX_PARAM_ITLIM, getOption("simplex_maxiter"));
+
+  // Exotic parameters, once they might become options...
+
+  // Do careful numerics with numerically unstable problem
+  //status = CPXsetintparam(env_, CPX_PARAM_NUMERICALEMPHASIS, 1);
+  // Set scaling approach
+  //status = CPXsetintparam(env_, CPX_PARAM_SCAIND, 1);
+  // Set Markowitz tolerance
+  //status = CPXsetdblparam(env_, CPX_PARAM_EPMRK, 0.9);
   
 
   if (dump_to_file_){
@@ -194,7 +217,7 @@ void CplexInternal::evaluate(int nfdir, int nadir){
   status = CPXqpopt(env_, lp_);
 
   if (status){
-    casadi_error("Failed to solve QP...");
+    casadi_error("CPLEX: Failed to solve QP...");
   }
   // Retrieving solution
   int solstat; 
@@ -214,22 +237,42 @@ void CplexInternal::evaluate(int nfdir, int nadir){
   for (int k=0;k<output(QP_LAMBDA_X).size();++k) output(QP_LAMBDA_X).data()[k]= - output(QP_LAMBDA_X).data()[k];
   
   if(status){
-    std::cerr << "CPLEX: Failed to get solution.\n";
+    cout << "CPLEX: Failed to get solution.\n";
   } 
+  int solnstat = CPXgetstat (env_, lp_);
+  string errormsg;
   if(debug_){
-    int solnstat = CPXgetstat (env_, lp_);
-    if      ( solnstat == CPX_STAT_UNBOUNDED ) {
-      printf ("Model is unbounded\n");
+    if      (solnstat == CPX_STAT_OPTIMAL){
+      errormsg = string("CPLEX: solution status: Optimal solution found.\n");
     }
-    else if ( solnstat == CPX_STAT_INFEASIBLE ) {
-      printf ("Model is infeasible\n");
+    else if (solnstat == CPX_STAT_UNBOUNDED) {
+      errormsg = string("CPLEX: solution status: Model is unbounded\n");
     }
-    else if ( solnstat == CPX_STAT_INForUNBD ) {
-      printf ("Model is infeasible or unbounded\n");
+    else if (solnstat == CPX_STAT_INFEASIBLE) {
+      errormsg = string("CPLEX: solution status: Model is infeasible\n");
     }
-  }
+    else if (solnstat == CPX_STAT_INForUNBD) {
+      errormsg = string("CPLEX: solution status: Model is infeasible or unbounded\n");
+    }
+    else if (solnstat == CPX_STAT_OPTIMAL_INFEAS){
+      errormsg = string("CPLEX: solution status: Optimal solution is available but with infeasibilities\n");
+    }
+    else if (solnstat == CPX_STAT_NUM_BEST){
+      errormsg = string("CPLEX: solution status: Solution available, but not proved optimal due to numeric difficulties.\n");
+    }
+    else{
+      errormsg = string("CPLEX: solution status: ") + to_string(solnstat) + string("\n");
+    }
+    cout << errormsg;
 
-  
+    // Printing basis condition number
+    //double cn;
+    //status = CPXgetdblquality(env_, lp_, &cn, CPX_KAPPA);
+    //cout << "CPLEX: Basis condition number: " << cn << endl;
+  }
+  if (solnstat != CPX_STAT_OPTIMAL){
+//    throw CasadiException(errormsg.c_str());
+  }
 
 }
 
