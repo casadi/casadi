@@ -146,7 +146,6 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>CPUtime</td><td>OT_REAL</td><td></td><td>The maximum allowed CPU time in seconds for the whole initialisation (and the actually required one on output). Disabled if unset.</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>automatic</td><td>How to calculate the Jacobians: "forward" (only forward mode) "reverse" (only adjoint mode) or "automatic" (a heuristic decides which is more appropriate)</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>False</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td></td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>100</td><td>Allow "number_of_adj_dir" to grow until it reaches this number</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>100</td><td>Allow "number_of_fwd_dir" to grow until it reaches this number</td><td>CasADi::QPOasesInternal</td></tr>
@@ -173,7 +172,6 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>CPUtime</td><td>OT_REAL</td><td></td><td>The maximum allowed CPU time in seconds for the whole initialisation (and the actually required one on output). Disabled if unset.</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>automatic</td><td>How to calculate the Jacobians: "forward" (only forward mode) "reverse" (only adjoint mode) or "automatic" (a heuristic decides which is more appropriate)</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>False</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td></td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>100</td><td>Allow "number_of_adj_dir" to grow until it reaches this number</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>100</td><td>Allow "number_of_fwd_dir" to grow until it reaches this number</td><td>CasADi::QPOasesInternal</td></tr>
@@ -871,7 +869,6 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>false</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPSolverInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>100</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>100</td><td>Allow \"number_of_fwd_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
@@ -895,7 +892,6 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>false</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPSolverInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>100</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>100</td><td>Allow \"number_of_fwd_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
@@ -1076,7 +1072,6 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>CasADi::OOQPInternal</td></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>false</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPSolverInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>100</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>100</td><td>Allow \"number_of_fwd_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
@@ -1103,7 +1098,6 @@
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>artol</td><td>OT_REAL</td><td>1e-8</td><td>tolerance as provided with setArTol to OOQP</td><td>CasADi::OOQPInternal</td></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>false</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPSolverInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>100</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>100</td><td>Allow \"number_of_fwd_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
@@ -2143,10 +2137,10 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>false</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPSolverInternal</td></tr>
-<tr><td>debug</td><td>OT_BOOLEAN</td><td>0</td><td>Print debug information</td><td>CasADi::CplexInternal</td></tr>
+<tr><td>barrier_maxiter</td><td>OT_INTEGER</td><td>2100000000</td><td>Maximum number of barrier iterations.</td><td>CasADi::CplexInternal</td></tr>
+<tr><td>debug</td><td>OT_BOOLEAN</td><td>false</td><td>Print debug information</td><td>CasADi::CplexInternal</td></tr>
 <tr><td>dump_filename</td><td>OT_STRING</td><td>"qp.dat"</td><td>The filename to dump to. Default: qp.dat</td><td>CasADi::CplexInternal</td></tr>
-<tr><td>dump_to_file</td><td>OT_BOOLEAN</td><td>0</td><td>Dumps QP to file in CPLEX format. Default: false</td><td>CasADi::CplexInternal</td></tr>
+<tr><td>dump_to_file</td><td>OT_BOOLEAN</td><td>false</td><td>Dumps QP to file in CPLEX format. Default: false</td><td>CasADi::CplexInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>just_in_time</td><td>OT_BOOLEAN</td><td>false</td><td>Just-in-time compilation for numeric evaluation (experimental)</td><td>CasADi::CplexInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>100</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
@@ -2157,6 +2151,7 @@
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>simplex_maxiter</td><td>OT_INTEGER</td><td>2100000000</td><td>Maximum number of simplex iterations.</td><td>CasADi::CplexInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
@@ -2172,10 +2167,10 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>false</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPSolverInternal</td></tr>
-<tr><td>debug</td><td>OT_BOOLEAN</td><td>0</td><td>Print debug information</td><td>CasADi::CplexInternal</td></tr>
+<tr><td>barrier_maxiter</td><td>OT_INTEGER</td><td>2100000000</td><td>Maximum number of barrier iterations.</td><td>CasADi::CplexInternal</td></tr>
+<tr><td>debug</td><td>OT_BOOLEAN</td><td>false</td><td>Print debug information</td><td>CasADi::CplexInternal</td></tr>
 <tr><td>dump_filename</td><td>OT_STRING</td><td>"qp.dat"</td><td>The filename to dump to. Default: qp.dat</td><td>CasADi::CplexInternal</td></tr>
-<tr><td>dump_to_file</td><td>OT_BOOLEAN</td><td>0</td><td>Dumps QP to file in CPLEX format. Default: false</td><td>CasADi::CplexInternal</td></tr>
+<tr><td>dump_to_file</td><td>OT_BOOLEAN</td><td>false</td><td>Dumps QP to file in CPLEX format. Default: false</td><td>CasADi::CplexInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>just_in_time</td><td>OT_BOOLEAN</td><td>false</td><td>Just-in-time compilation for numeric evaluation (experimental)</td><td>CasADi::CplexInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>100</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
@@ -2186,6 +2181,7 @@
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
+<tr><td>simplex_maxiter</td><td>OT_INTEGER</td><td>2100000000</td><td>Maximum number of simplex iterations.</td><td>CasADi::CplexInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
@@ -2796,7 +2792,6 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>false</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPSolverInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>100</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>100</td><td>Allow \"number_of_fwd_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
@@ -2822,7 +2817,6 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>convex</td><td>OT_BOOLEAN</td><td>false</td><td>Specify true if you can guarantee that H will always be positive definite</td><td>CasADi::QPSolverInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>100</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>100</td><td>Allow \"number_of_fwd_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>

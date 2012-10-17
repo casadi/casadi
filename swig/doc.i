@@ -9698,11 +9698,13 @@ Assert that the object has been initialized. ";
 // File: classCasADi_1_1CplexInternal.xml
 %feature("docstring") CasADi::CplexInternal "
 
-Internal class for CplexSolver Solves the following problem:
+Internal class for CplexSolver Solves the following strictly convex problem:
 
 min          x'.H.x + G'.x   x  subject to             LBA <= A.x <= UBA
-LBX <= x   <= UBX                  nx: number of decision variables (x)
-nc: number of constraints (A)
+LBX <= x   <= UBX                  with H positive definite
+nx: number of decision variables (x)     nc: number of constraints (A)
+
+If H is not positive-definite, the solver should throw an error.
 
 >Input scheme: CasADi::QPInput (QP_NUM_IN = 9)
 +------------------------------------+------------------------------------+
@@ -10295,11 +10297,13 @@ Assert that the object has been initialized. ";
 
 Interface to Cplex solver for sparse Quadratic Programs.
 
-Solves the following problem:
+Solves the following strictly convex problem:
 
 min          x'.H.x + G'.x   x  subject to             LBA <= A.x <= UBA
-LBX <= x   <= UBX                  nx: number of decision variables (x)
-nc: number of constraints (A)
+LBX <= x   <= UBX                  with H positive definite
+nx: number of decision variables (x)     nc: number of constraints (A)
+
+If H is not positive-definite, the solver should throw an error.
 
 Attila Kozma, Joel Andersson
 
@@ -15238,6 +15242,146 @@ This is an internal class. Users should use the syntax f.derivative()
 
 Joel Andersson
 
+>List of available options
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
+|              |              |              | calculate    | ternal       |
+|              |              |              | the          |              |
+|              |              |              | Jacobians:   |              |
+|              |              |              | \"forward\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | forward      |              |
+|              |              |              | mode)        |              |
+|              |              |              | \"reverse\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | adjoint      |              |
+|              |              |              | mode) or     |              |
+|              |              |              | \"automatic\"  |              |
+|              |              |              | (a heuristic |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
+|              |              |              | (forward|rev |              |
+|              |              |              | erse|automat |              |
+|              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | pointer that | ternal       |
+|              |              |              | returns a    |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | function     |              |
+|              |              |              | given a set  |              |
+|              |              |              | of desired   |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | blocks,      |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| j_dir        |              |              | adjoint      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| d_dir        |              |              | forward      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| ian          |              |              | Hessians     | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| bian         |              |              | Jacobians    | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
+|              |              |              | sparse       | ternal       |
++--------------+--------------+--------------+--------------+--------------+
+| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | that         | ternal       |
+|              |              |              | provides     |              |
+|              |              |              | sparsity for |              |
+|              |              |              | a given      |              |
+|              |              |              | input output |              |
+|              |              |              | block,       |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
+| ans          |              |              | references   | ternal       |
+|              |              |              | to generated |              |
+|              |              |              | Jacobians in |              |
+|              |              |              | order to     |              |
+|              |              |              | avoid        |              |
+|              |              |              | generating   |              |
+|              |              |              | identical    |              |
+|              |              |              | Jacobians    |              |
+|              |              |              | multiple     |              |
+|              |              |              | times        |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
+|              |              | )            | defined      | ternal       |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
+|              |              |              | evaluation   | ternal       |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+
 C++ includes: derivative.hpp ";
 
 /*  Setters  */
@@ -15773,6 +15917,146 @@ Return a string with a destription (for SWIG) ";
 Internal node class for Derivative.
 
 Joel Andersson
+
+>List of available options
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
+|              |              |              | calculate    | ternal       |
+|              |              |              | the          |              |
+|              |              |              | Jacobians:   |              |
+|              |              |              | \"forward\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | forward      |              |
+|              |              |              | mode)        |              |
+|              |              |              | \"reverse\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | adjoint      |              |
+|              |              |              | mode) or     |              |
+|              |              |              | \"automatic\"  |              |
+|              |              |              | (a heuristic |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
+|              |              |              | (forward|rev |              |
+|              |              |              | erse|automat |              |
+|              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | pointer that | ternal       |
+|              |              |              | returns a    |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | function     |              |
+|              |              |              | given a set  |              |
+|              |              |              | of desired   |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | blocks,      |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal       |
+|              |              |              | (inputs|outp |              |
+|              |              |              | uts)         |              |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| j_dir        |              |              | adjoint      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| d_dir        |              |              | forward      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| ian          |              |              | Hessians     | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| bian         |              |              | Jacobians    | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
+|              |              |              | sparse       | ternal       |
++--------------+--------------+--------------+--------------+--------------+
+| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | that         | ternal       |
+|              |              |              | provides     |              |
+|              |              |              | sparsity for |              |
+|              |              |              | a given      |              |
+|              |              |              | input output |              |
+|              |              |              | block,       |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
+| ans          |              |              | references   | ternal       |
+|              |              |              | to generated |              |
+|              |              |              | Jacobians in |              |
+|              |              |              | order to     |              |
+|              |              |              | avoid        |              |
+|              |              |              | generating   |              |
+|              |              |              | identical    |              |
+|              |              |              | Jacobians    |              |
+|              |              |              | multiple     |              |
+|              |              |              | times        |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
+|              |              | )            | defined      | ternal       |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
+|              |              |              | evaluation   | ternal       |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
 
 C++ includes: derivative_internal.hpp ";
 
@@ -36079,9 +36363,13 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
-|              | TOR          | )            | be activated | ternal       |
-|              |              |              | (inputs|outp |              |
-|              |              |              | uts)         |              |
+|              | TOR          | )            | be activated | ternal   Cas |
+|              |              |              | (inputs|outp | ADi::KnitroI |
+|              |              |              | uts)  (eval_ | nternal      |
+|              |              |              | f|eval_g|eva |              |
+|              |              |              | l_jac_g|eval |              |
+|              |              |              | _grad_f|eval |              |
+|              |              |              | _h)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -36182,6 +36470,25 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | not satisfy  |              |
 |              |              |              | LBX and UBX  |              |
 +--------------+--------------+--------------+--------------+--------------+
+
+>List of available monitors
++-------------+------------------------+
+|     Id      |        Used in         |
++=============+========================+
+| eval_f      | CasADi::KnitroInternal |
++-------------+------------------------+
+| eval_g      | CasADi::KnitroInternal |
++-------------+------------------------+
+| eval_grad_f | CasADi::KnitroInternal |
++-------------+------------------------+
+| eval_h      | CasADi::KnitroInternal |
++-------------+------------------------+
+| eval_jac_g  | CasADi::KnitroInternal |
++-------------+------------------------+
+| inputs      | CasADi::FXInternal     |
++-------------+------------------------+
+| outputs     | CasADi::FXInternal     |
++-------------+------------------------+
 
 C++ includes: knitro_internal.hpp ";
 
@@ -36850,9 +37157,13 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
-|              | TOR          | )            | be activated | ternal       |
-|              |              |              | (inputs|outp |              |
-|              |              |              | uts)         |              |
+|              | TOR          | )            | be activated | ternal   Cas |
+|              |              |              | (inputs|outp | ADi::KnitroI |
+|              |              |              | uts)  (eval_ | nternal      |
+|              |              |              | f|eval_g|eva |              |
+|              |              |              | l_jac_g|eval |              |
+|              |              |              | _grad_f|eval |              |
+|              |              |              | _h)          |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -36953,6 +37264,25 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | not satisfy  |              |
 |              |              |              | LBX and UBX  |              |
 +--------------+--------------+--------------+--------------+--------------+
+
+>List of available monitors
++-------------+------------------------+
+|     Id      |        Used in         |
++=============+========================+
+| eval_f      | CasADi::KnitroInternal |
++-------------+------------------------+
+| eval_g      | CasADi::KnitroInternal |
++-------------+------------------------+
+| eval_grad_f | CasADi::KnitroInternal |
++-------------+------------------------+
+| eval_h      | CasADi::KnitroInternal |
++-------------+------------------------+
+| eval_jac_g  | CasADi::KnitroInternal |
++-------------+------------------------+
+| inputs      | CasADi::FXInternal     |
++-------------+------------------------+
+| outputs     | CasADi::FXInternal     |
++-------------+------------------------+
 
 C++ includes: knitro_solver.hpp ";
 
@@ -50318,11 +50648,13 @@ Check if smooth. ";
 
 Internal class for NLPQPInternal.
 
-Solves the following problem:
+Solves the following strictly convex problem:
 
 min          x'.H.x + G'.x   x  subject to             LBA <= A.x <= UBA
-LBX <= x   <= UBX                  nx: number of decision variables (x)
-nc: number of constraints (A)
+LBX <= x   <= UBX                  with H positive definite
+nx: number of decision variables (x)     nc: number of constraints (A)
+
+If H is not positive-definite, the solver should throw an error.
 
 >Input scheme: CasADi::QPInput (QP_NUM_IN = 9)
 +------------------------------------+------------------------------------+
@@ -50898,11 +51230,13 @@ Assert that the object has been initialized. ";
 
 IPOPT QP Solver for quadratic programming.
 
-Solves the following problem:
+Solves the following strictly convex problem:
 
 min          x'.H.x + G'.x   x  subject to             LBA <= A.x <= UBA
-LBX <= x   <= UBX                  nx: number of decision variables (x)
-nc: number of constraints (A)
+LBX <= x   <= UBX                  with H positive definite
+nx: number of decision variables (x)     nc: number of constraints (A)
+
+If H is not positive-definite, the solver should throw an error.
 
 Joris Gillis
 
@@ -56209,11 +56543,13 @@ Check if smooth. ";
 
 Internal class for OOQPSolver.
 
-Solves the following problem:
+Solves the following strictly convex problem:
 
 min          x'.H.x + G'.x   x  subject to             LBA <= A.x <= UBA
-LBX <= x   <= UBX                  nx: number of decision variables (x)
-nc: number of constraints (A)
+LBX <= x   <= UBX                  with H positive definite
+nx: number of decision variables (x)     nc: number of constraints (A)
+
+If H is not positive-definite, the solver should throw an error.
 
 >Input scheme: CasADi::QPInput (QP_NUM_IN = 9)
 +------------------------------------+------------------------------------+
@@ -56813,11 +57149,13 @@ Assert that the object has been initialized. ";
 
 OOQP Solver for quadratic programming:
 
-Solves the following problem:
+Solves the following strictly convex problem:
 
 min          x'.H.x + G'.x   x  subject to             LBA <= A.x <= UBA
-LBX <= x   <= UBX                  nx: number of decision variables (x)
-nc: number of constraints (A)
+LBX <= x   <= UBX                  with H positive definite
+nx: number of decision variables (x)     nc: number of constraints (A)
+
+If H is not positive-definite, the solver should throw an error.
 
 The current implementation assumes that OOQP is configured with the MA27
 sparse linear solver.
@@ -59376,11 +59714,13 @@ Return a string with a destription (for SWIG) ";
 
 Internal class for QPOasesSolver.
 
-Solves the following problem:
+Solves the following strictly convex problem:
 
 min          x'.H.x + G'.x   x  subject to             LBA <= A.x <= UBA
-LBX <= x   <= UBX                  nx: number of decision variables (x)
-nc: number of constraints (A)
+LBX <= x   <= UBX                  with H positive definite
+nx: number of decision variables (x)     nc: number of constraints (A)
+
+If H is not positive-definite, the solver should throw an error.
 
 >Input scheme: CasADi::QPInput (QP_NUM_IN = 9)
 +------------------------------------+------------------------------------+
@@ -59972,11 +60312,13 @@ Assert that the object has been initialized. ";
 
 Interface to QPOases Solver for quadratic programming.
 
-Solves the following problem:
+Solves the following strictly convex problem:
 
 min          x'.H.x + G'.x   x  subject to             LBA <= A.x <= UBA
-LBX <= x   <= UBX                  nx: number of decision variables (x)
-nc: number of constraints (A)
+LBX <= x   <= UBX                  with H positive definite
+nx: number of decision variables (x)     nc: number of constraints (A)
+
+If H is not positive-definite, the solver should throw an error.
 
 Joris Gillis, Joel Andersson
 
@@ -60730,11 +61072,13 @@ Return a string with a destription (for SWIG) ";
 
 QPSolver.
 
-Solves the following problem:
+Solves the following strictly convex problem:
 
 min          x'.H.x + G'.x   x  subject to             LBA <= A.x <= UBA
-LBX <= x   <= UBX                  nx: number of decision variables (x)
-nc: number of constraints (A)
+LBX <= x   <= UBX                  with H positive definite
+nx: number of decision variables (x)     nc: number of constraints (A)
+
+If H is not positive-definite, the solver should throw an error.
 
 Joel Andersson
 
