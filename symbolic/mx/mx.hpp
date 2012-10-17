@@ -363,10 +363,10 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Cached
   MX getNZ(const std::vector<int>& k) const;
   MX getNZ(const Slice& k) const{ return getNZ(k.getAll(size()));}
   MX getNZ(const Matrix<int>& k) const;
-  void setNZ(int k, const MX& el, Inplace inplace=INPLACE_NONE);
-  void setNZ(const std::vector<int>& k, const MX& el, Inplace inplace=INPLACE_NONE);
-  void setNZ(const Slice& k, const MX& m, Inplace inplace=INPLACE_NONE){ setNZ(k.getAll(size()),m,inplace);}
-  void setNZ(const Matrix<int>& k, const MX& m, Inplace inplace=INPLACE_NONE);
+  void setNZ(int k, const MX& el);
+  void setNZ(const std::vector<int>& k, const MX& el);
+  void setNZ(const Slice& k, const MX& m){ setNZ(k.getAll(size()),m);}
+  void setNZ(const Matrix<int>& k, const MX& m);
 
   /** \brief Append a matrix to the end. */
   void append(const MX& y);

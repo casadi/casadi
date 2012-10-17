@@ -394,42 +394,64 @@ MX MX::getNZ(const Matrix<int>& k) const{
   return ret;
 }
 
-void MX::setNZ(int k, const MX& el, Inplace inplace){
+void MX::setNZ(int k, const MX& el){
   if (k<0) k+=size();
   casadi_assert_message(k<size(),"MX::setNZ: requested at(" <<  k << "), but that is out of bounds:  " << dimString() << ".");
-  setNZ(vector<int>(1,k),el,inplace);
+  setNZ(vector<int>(1,k),el);
 }
 
-void MX::setNZ(const vector<int>& k, const MX& el, Inplace inplace){
-  casadi_assert(inplace==INPLACE_NONE);
+void MX::setNZ(const vector<int>& k, const MX& el){
   casadi_assert_message(k.size()==el.size() || el.size()==1,
     "MX::setNZ: length of non-zero indices (" << k.size() << ") " <<
     "must match size of rhs (" << el.size() << ")."
   );
-
-  MX ret;
   
+  // Call recursively if points both objects point to the same node
+  if(this==&el){
+    MX el2 = el;
+    setNZ(k,el2);
+    return;
+  }
+  
+  // Assert correctness
   for(int i=0; i<k.size(); ++i){
     casadi_assert_message(k[i] < size(), "Mapping::assign: index vector reaches " << k[i] << ", while dependant is only of size " << size());
   }
-  ret.assignNode(new Mapping(sparsity()));
-  ret->assign(*this,range(size()));
-  if (el.size()==1) {
-    ret->assign(el,std::vector<int>(k.size(),0),k);
-  } else {
-    ret->assign(el,range(k.size()),k);
+  
+  // Quick return if no assignments to be made
+  if(k.empty()) return;
+
+  // Make mapping if not already so
+  if(!isMapping()){
+    MX x;
+    x.assignNode(new Mapping(sparsity()));
+    x->assign(*this,range(size()));
+    *this = x;
   }
-  simplifyMapping(ret);
-  *this = ret;
+  
+  // Make sure that the node is unique
+  //makeUnique();
+  const Mapping* n = dynamic_cast<const Mapping*>(get());
+  casadi_assert(n!=0);
+  assignNode(new Mapping(*n));
+
+  // Input nonzeros (see Mapping class)
+  std::vector<int> inz(k.size(),0);
+  if(!(el.scalar() && el.dense())){
+    for(int i=0; i<inz.size(); ++i) inz[i]=i;
+  }
+  
+  (*this)->assign(el,inz,k);
+  simplifyMapping(*this);
 }
 
-void MX::setNZ(const Matrix<int>& kk, const MX& m, Inplace inplace){
+void MX::setNZ(const Matrix<int>& kk, const MX& m){
   if (m.size()==1 && m.numel()==1) {
-    setNZ(kk.data(),m,inplace);
+    setNZ(kk.data(),m);
     return;
   }
   casadi_assert_message(kk.sparsity()==m.sparsity(),"Matrix<T>::setNZ: sparsity of IMatrix index " << kk.dimString() << " " << std::endl << "must match sparsity of rhs " << m.dimString() << ".");
-  setNZ(kk.data(),m,inplace);
+  setNZ(kk.data(),m);
 }
 
 const MX MX::at(int k) const {

@@ -317,39 +317,33 @@ const Matrix<T> Matrix<T>::getNZ(const Matrix<int>& k) const{
 }
 
 template<class T>
-void Matrix<T>::setNZ(int k, const Matrix<T>& m, Inplace inplace){
+void Matrix<T>::setNZ(int k, const Matrix<T>& m){
   if (k<0) k+=size();
-  switch(inplace){
-    case INPLACE_NONE: at(k) = m.toScalar(); break;
-    case INPLACE_ADD: at(k) += m.toScalar(); break;
-    case INPLACE_SUB: at(k) -= m.toScalar(); break;
-    case INPLACE_MUL: at(k) *= m.toScalar(); break;
-    case INPLACE_DIV: at(k) /= m.toScalar(); break;
-  }
+  at(k) = m.toScalar();
 }
 
 template<class T>
-void Matrix<T>::setNZ(const std::vector<int>& kk, const Matrix<T>& m, Inplace inplace){
+void Matrix<T>::setNZ(const std::vector<int>& kk, const Matrix<T>& m){
   if (m.scalar()){
     // Assign all elements with the same scalar
     for(int k=0; k<kk.size(); ++k){
-      setNZ(kk[k],m,inplace);
+      setNZ(kk[k],m);
     }
   } else {
     // Assignment elementwise
     casadi_assert_message(kk.size()==m.size(),"Matrix<T>::setNZ: length of non-zero indices (" << kk.size() << ") " << std::endl << "must match size of rhs (" << m.size() << ").");
     for(int k=0; k<kk.size(); ++k){
-      setNZ(kk[k],m[k],inplace);
+      setNZ(kk[k],m[k]);
     }
   }
 }
 
 template<class T>
-void Matrix<T>::setNZ(const Matrix<int>& kk, const Matrix<T>& m, Inplace inplace){
+void Matrix<T>::setNZ(const Matrix<int>& kk, const Matrix<T>& m){
   if (m.scalar()){
     // Assign all elements with the same scalar
     for(int k=0; k<kk.size(); ++k){
-      setNZ(kk.at(k),m,inplace);
+      setNZ(kk.at(k),m);
     }
   } else if (kk.dense() && !m.dense() && kk.size1()==m.size1() && kk.size2()==m.size2()) {
     const std::vector<int>& col = m.sparsity().col();
@@ -357,13 +351,13 @@ void Matrix<T>::setNZ(const Matrix<int>& kk, const Matrix<T>& m, Inplace inplace
     for(int i=0; i<rowind.size()-1; ++i){
       for(int k=rowind[i]; k<rowind[i+1]; ++k){
         int j=col[k];
-        setNZ(kk.elem(i,j),m[k],inplace);
+        setNZ(kk.elem(i,j),m[k]);
       }
     }
   } else {
     casadi_assert_message(kk.sparsity()==m.sparsity(),"Matrix<T>::setNZ: sparsity of IMatrix index " << kk.dimString() << " " << std::endl << "must match sparsity of rhs " << m.dimString() << ".");
     for(int k=0; k<kk.size(); ++k){
-      setNZ(kk.at(k),m[k],inplace);
+      setNZ(kk.at(k),m[k]);
     }
   }
 }

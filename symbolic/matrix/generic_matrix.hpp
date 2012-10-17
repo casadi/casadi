@@ -35,9 +35,6 @@ namespace CasADi{
   /** Sparsity format for getting and setting inputs and outputs */
   enum Sparsity{SPARSE,SPARSESYM,DENSE,DENSESYM};
 
-  /** In-place operations, = += -= *= /= */
-  enum Inplace{INPLACE_NONE,INPLACE_ADD,INPLACE_SUB,INPLACE_MUL,INPLACE_DIV};
-
   /** \brief Matrix base class
   This is a common base class for MX and Matrix<>, introducing a uniform syntax and implementing
   common functionality using the curiously recurring template pattern (CRTP) idiom.\n
