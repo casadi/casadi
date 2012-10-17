@@ -429,18 +429,16 @@ void MX::setNZ(const vector<int>& k, const MX& el){
     *this = x;
   }
   
-  // Make sure that the node is unique
-  //makeUnique();
-  const Mapping* n = dynamic_cast<const Mapping*>(get());
-  casadi_assert(n!=0);
-  assignNode(new Mapping(*n));
-
+  // Make sure that the assignment does not affect other nodes
+  makeUnique(false);
+  
   // Input nonzeros (see Mapping class)
   std::vector<int> inz(k.size(),0);
   if(!(el.scalar() && el.dense())){
     for(int i=0; i<inz.size(); ++i) inz[i]=i;
   }
   
+  // Add to mapping
   (*this)->assign(el,inz,k);
   simplifyMapping(*this);
 }
