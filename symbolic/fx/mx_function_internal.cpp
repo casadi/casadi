@@ -567,7 +567,7 @@ FX MXFunctionInternal::getNumericJacobian(int iind, int oind, bool compact, bool
   vector<MX> ret_out;
   ret_out.reserve(1+outputv_.size());
   ret_out.push_back(jac(iind,oind,compact,symmetric,false,true));
-  ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end()); // NOTE: Commented out for similarity with the Jacobian class
+  ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
   
   // Return function
   return MXFunction(inputv_,ret_out);  

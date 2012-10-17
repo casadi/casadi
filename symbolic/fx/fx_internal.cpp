@@ -629,7 +629,7 @@ FX FXInternal::jacobian(int iind, int oind, bool compact, bool symmetric){
     FX fcn = shared_from_this<FX>();
     ret = jacgen_(fcn,iind,oind,user_data_);
   } else if(bool(getOption("numeric_jacobian"))){
-    ret = getNumericJacobian(iind,oind,compact,false); // NOTE: Change "false" to symmetric to enable symmetry exploitation
+    ret = getNumericJacobian(iind,oind,compact,symmetric);
   } else {
     // Use internal routine to calculate Jacobian
     ret = getJacobian(iind,oind,compact, symmetric);
@@ -644,8 +644,7 @@ FX FXInternal::jacobian(int iind, int oind, bool compact, bool symmetric){
 }
 
 FX FXInternal::getJacobian(int iind, int oind, bool compact, bool symmetric){
-  FX ret = getNumericJacobian(iind,oind,compact,false); // NOTE: Change "false" to symmetric to enable symmetry exploitation
-  return ret;
+  return getNumericJacobian(iind,oind,compact,symmetric);
 }
 
 FX FXInternal::derivative(int nfwd, int nadj){
