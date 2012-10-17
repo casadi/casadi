@@ -394,13 +394,14 @@ MX MX::getNZ(const Matrix<int>& k) const{
   return ret;
 }
 
-void MX::setNZ(int k, const MX& el){
+void MX::setNZ(int k, const MX& el, Inplace inplace){
   if (k<0) k+=size();
   casadi_assert_message(k<size(),"MX::setNZ: requested at(" <<  k << "), but that is out of bounds:  " << dimString() << ".");
-  setNZ(vector<int>(1,k),el);
+  setNZ(vector<int>(1,k),el,inplace);
 }
 
-void MX::setNZ(const vector<int>& k, const MX& el){
+void MX::setNZ(const vector<int>& k, const MX& el, Inplace inplace){
+  casadi_assert(inplace==INPLACE_NONE);
   casadi_assert_message(k.size()==el.size() || el.size()==1,
     "MX::setNZ: length of non-zero indices (" << k.size() << ") " <<
     "must match size of rhs (" << el.size() << ")."
@@ -408,8 +409,7 @@ void MX::setNZ(const vector<int>& k, const MX& el){
 
   MX ret;
   
-  
-  for (int i=0;i<k.size();i++) {
+  for(int i=0; i<k.size(); ++i){
     casadi_assert_message(k[i] < size(), "Mapping::assign: index vector reaches " << k[i] << ", while dependant is only of size " << size());
   }
   ret.assignNode(new Mapping(sparsity()));
@@ -423,17 +423,13 @@ void MX::setNZ(const vector<int>& k, const MX& el){
   *this = ret;
 }
 
-void MX::setNZ(const Matrix<int>& kk, const MX& m){
+void MX::setNZ(const Matrix<int>& kk, const MX& m, Inplace inplace){
   if (m.size()==1 && m.numel()==1) {
-    setNZ(kk.data(),m);
+    setNZ(kk.data(),m,inplace);
     return;
   }
-  setNZ(kk.data(),m);
-
   casadi_assert_message(kk.sparsity()==m.sparsity(),"Matrix<T>::setNZ: sparsity of IMatrix index " << kk.dimString() << " " << std::endl << "must match sparsity of rhs " << m.dimString() << ".");
-
-  setNZ(kk.data(),m);
-
+  setNZ(kk.data(),m,inplace);
 }
 
 const MX MX::at(int k) const {

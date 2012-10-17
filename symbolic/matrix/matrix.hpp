@@ -337,10 +337,10 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     
     //@{
     /// Set a set of nonzeros
-    void setNZ(int k, const Matrix<T>& m);
-    void setNZ(const std::vector<int>& k, const Matrix<T>& m);
-    void setNZ(const Slice& k, const Matrix<T>& m){ setNZ(k.getAll(size()),m);}
-    void setNZ(const Matrix<int>& k, const Matrix<T>& m);
+    void setNZ(int k, const Matrix<T>& m, Inplace inplace=INPLACE_NONE);
+    void setNZ(const std::vector<int>& k, const Matrix<T>& m, Inplace inplace=INPLACE_NONE);
+    void setNZ(const Slice& k, const Matrix<T>& m, Inplace inplace=INPLACE_NONE){ setNZ(k.getAll(size()),m,inplace);}
+    void setNZ(const Matrix<int>& k, const Matrix<T>& m, Inplace inplace=INPLACE_NONE);
     //@}
 
     /// Append a matrix to the end
