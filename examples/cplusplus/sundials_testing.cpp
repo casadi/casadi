@@ -29,7 +29,6 @@
 #include <symbolic/fx/c_function.hpp>
 #include "symbolic/sx/sx_tools.hpp"
 #include "symbolic/fx/sx_function.hpp"
-#include "symbolic/fx/jacobian.hpp"
 #include <symbolic/casadi_calculus.hpp>
 
 #include <fstream>

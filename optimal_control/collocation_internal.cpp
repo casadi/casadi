@@ -22,7 +22,6 @@
 
 #include "collocation_internal.hpp"
 #include "../symbolic/fx/integrator.hpp"
-#include "../symbolic/fx/jacobian.hpp"
 #include "../symbolic/matrix/matrix_tools.hpp"
 #include "../symbolic/mx/mx_tools.hpp"
 #include "../symbolic/stl_vector_tools.hpp"
