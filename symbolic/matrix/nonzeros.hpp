@@ -40,13 +40,13 @@ class NonZeros : public M{
     NonZeros(M& mat, const K& k) : M(mat.getNZ(k)), mat_(mat), k_(k){}
 
     //@{
-    /// Methods that modify a part of the parent object (A[k] = ?, A[k] += ?, etc.)
+    /// Methods that modify a part of the parent obejct (A[k] = ?, A[k] += ?, etc.)
     const M& operator=(const NonZeros<M,K> &y);
     const M& operator=(const M &y);
-    const M& operator+=(const M &y);
-    const M& operator-=(const M &y);
-    const M& operator*=(const M &y);
-    const M& operator/=(const M &y);
+    M operator+=(const M &y);
+    M operator-=(const M &y);
+    M operator*=(const M &y);
+    M operator/=(const M &y);
     //@}
 
   private:
@@ -61,38 +61,42 @@ class NonZeros : public M{
 template<typename M, typename K>
 const M& NonZeros<M,K>::operator=(const NonZeros<M,K> &y){ 
   mat_.setNZ(k_,y); 
-  return mat_;
+  return y;
 }
 
 // Implementation
 template<typename M, typename K>
 const M& NonZeros<M,K>::operator=(const M &y) { 
   mat_.setNZ(k_,y); 
-  return mat_;
+  return y;
 }
 
 template<typename M, typename K>
-const M& NonZeros<M,K>::operator+=(const M &y){
-  mat_.setNZ(k_,*this + y); 
-  return mat_;
+M NonZeros<M,K>::operator+=(const M &y){
+  M s = *this+y;
+  mat_.setNZ(k_,s); 
+  return s;
 }
 
 template<typename M, typename K>
-const M& NonZeros<M,K>::operator-=(const M &y){ 
-  mat_.setNZ(k_,*this - y); 
-  return mat_;
+M NonZeros<M,K>::operator-=(const M &y){ 
+  M s = *this-y;
+  mat_.setNZ(k_,s); 
+  return s;
 }
 
 template<typename M, typename K>
-const M& NonZeros<M,K>::operator*=(const M &y){
-  mat_.setNZ(k_,*this * y); 
-  return mat_;
+M NonZeros<M,K>::operator*=(const M &y){ 
+   M s = *this*y;
+   mat_.setNZ(k_,s); 
+   return mat_;
 }
 
 template<typename M, typename K>
-const M& NonZeros<M,K>::operator/=(const M &y){ 
-  mat_.setNZ(k_,*this / y); 
-  return mat_;
+M NonZeros<M,K>::operator/=(const M &y){ 
+  M s = *this/y;
+  mat_.setNZ(k_,s); 
+  return s;
 }
 
 
