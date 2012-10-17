@@ -43,10 +43,10 @@ class SubMatrix : public M{
     /// Methods that modify a part of the parent obejct (A(i,j) = ?, A(i,j) += ?, etc.)
     const M& operator=(const SubMatrix<M,I,J> &y);
     const M& operator=(const M &y);
-    const M& operator+=(const M &y);
-    const M& operator-=(const M &y);
-    const M& operator*=(const M &y);
-    const M& operator/=(const M &y);
+    M operator+=(const M &y);
+    M operator-=(const M &y);
+    M operator*=(const M &y);
+    M operator/=(const M &y);
     //@}
     
   private:
@@ -62,38 +62,42 @@ class SubMatrix : public M{
 template<typename M, typename I, typename J>
 const M& SubMatrix<M,I,J>::operator=(const SubMatrix<M,I,J> &y) { 
   mat_.setSub(i_,j_,y); 
-  return mat_;
+  return y;
 }
 
 // Implementation
 template<typename M, typename I, typename J>
 const M& SubMatrix<M,I,J>::operator=(const M &y) { 
   mat_.setSub(i_,j_,y); 
-  return mat_;
+  return y;
 }
 
 template<typename M, typename I, typename J>
-const M& SubMatrix<M,I,J>::operator+=(const M &y){ 
-  mat_.setSub(i_,j_,*this + y); 
-  return mat_;
+M SubMatrix<M,I,J>::operator+=(const M &y){ 
+  M s = *this+y;
+  mat_.setSub(i_,j_,s); 
+  return s;
 }
 
 template<typename M, typename I, typename J>
-const M& SubMatrix<M,I,J>::operator-=(const M &y){ 
-  mat_.setSub(i_,j_,*this - y); 
-  return mat_;
+M SubMatrix<M,I,J>::operator-=(const M &y){ 
+  M s = *this-y;
+  mat_.setSub(i_,j_,s); 
+  return s;
 }
 
 template<typename M, typename I, typename J>
-const M& SubMatrix<M,I,J>::operator*=(const M &y){ 
-  mat_.setSub(i_,j_,*this * y);
-  return mat_;
+M SubMatrix<M,I,J>::operator*=(const M &y){ 
+   M s = *this*y;
+   mat_.setSub(i_,j_,s); 
+   return mat_;
 }
 
 template<typename M, typename I, typename J>
-const M& SubMatrix<M,I,J>::operator/=(const M &y){ 
-  mat_.setSub(i_,j_,*this / y); 
-  return mat_;
+M SubMatrix<M,I,J>::operator/=(const M &y){ 
+   M s = *this/y;
+  mat_.setSub(i_,j_,s); 
+  return s;
 }
 
 
