@@ -90,7 +90,7 @@ template<typename M, typename I, typename J>
 M SubMatrix<M,I,J>::operator*=(const M &y){ 
    M s = *this*y;
    mat_.setSub(i_,j_,s); 
-   return mat_;
+   return s;
 }
 
 template<typename M, typename I, typename J>
