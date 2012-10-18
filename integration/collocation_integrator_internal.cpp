@@ -315,10 +315,12 @@ void CollocationIntegratorInternal::init(){
   gfcn_in[1+INTEGRATOR_RX0] = RX0;
   gfcn_in[1+INTEGRATOR_RP] = RP;
 
-  vector<MX> gfcn_out(3);
+  vector<MX> gfcn_out(1+INTEGRATOR_NUM_OUT);
   gfcn_out[0] = gv;
-  gfcn_out[1] = QF;
-  gfcn_out[2] = RQF;
+  gfcn_out[1+INTEGRATOR_XF] = X[nk][0];
+  gfcn_out[1+INTEGRATOR_QF] = QF;
+  gfcn_out[1+INTEGRATOR_RXF] = RX[0][0];
+  gfcn_out[1+INTEGRATOR_RQF] = RQF;
   
   // Nonlinear constraint function
   MXFunction gfcn(gfcn_in,gfcn_out);
@@ -446,11 +448,11 @@ void CollocationIntegratorInternal::reset(int nsens, int nsensB, int nsensB_stor
   // Mark the system integrated at least once
   integrated_once_ = true;
   
-  output(INTEGRATOR_QF).set(gfcn_.output(1));
-  output(INTEGRATOR_RQF).set(gfcn_.output(2));
-  for(int dir=0; dir<nsens_; ++dir){
-    fwdSens(INTEGRATOR_QF,dir).set(gfcn_.fwdSens(1,dir));
-    fwdSens(INTEGRATOR_RQF,dir).set(gfcn_.fwdSens(2,dir));
+  for(int oind=0; oind<INTEGRATOR_NUM_OUT; ++oind){
+    output(oind).set(gfcn_.output(1+oind));
+    for(int dir=0; dir<nsens; ++dir){
+      fwdSens(oind,dir).set(gfcn_.fwdSens(1+oind,dir));
+    }
   }
 }
 
