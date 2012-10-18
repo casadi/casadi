@@ -1,8 +1,33 @@
+#
+#     This file is part of CasADi.
+# 
+#     CasADi -- A symbolic framework for dynamic optimization.
+#     Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+# 
+#     CasADi is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU Lesser General Public
+#     License as published by the Free Software Foundation; either
+#     version 3 of the License, or (at your option) any later version.
+# 
+#     CasADi is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#     Lesser General Public License for more details.
+# 
+#     You should have received a copy of the GNU Lesser General Public
+#     License along with CasADi; if not, write to the Free Software
+#     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+# 
+# 
+# -*- coding: utf-8 -*-
+
 from casadi import *
 from copy import deepcopy
-#deepcopy = DMatrix
-
 print "Testing sensitivity analysis in CasADi"
+
+# All ODE and DAE integrators to be tested
+DAE_integrators = [IdasIntegrator,CollocationIntegrator]
+ODE_integrators = [CVodesIntegrator] + DAE_integrators
 
 # Time 
 t = ssym("t")
@@ -34,6 +59,12 @@ quad = v**3 + ((3-sin(t)) - u)**2
 # DAE callback function
 ffcn = SXFunction(daeIn(t=t,x=x,xdot=xdot,p=u),daeOut(ode=ode,quad=quad))
 
+# Print DAE
+print "ODE: "
+print "0 = ", ode
+print "Quadratures:"
+print "dot(q) = ", quad
+
 # Time length
 tf = 0.5
 
@@ -44,7 +75,7 @@ x0 = [0.,0.,1.]
 u0 = 0.4
 
 # Integrator
-for MyIntegrator in (CVodesIntegrator,CollocationIntegrator):
+for MyIntegrator in ODE_integrators:
   print "========"
   print "Integrator: ", MyIntegrator.__name__
   print "========"
