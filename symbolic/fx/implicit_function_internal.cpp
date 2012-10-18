@@ -31,16 +31,20 @@ ImplicitFunctionInternal::ImplicitFunctionInternal(const FX& f, int nrhs) : f_(f
 
 void ImplicitFunctionInternal::init(){
   // Initialize the residual function
-  f_.init();
+  if(!f_.isInit()) f_.init();
   
   // Allocate inputs
   setNumInputs(f_.getNumInputs()-1);
-  for(int i=0; i<getNumInputs(); ++i)
+  for(int i=0; i<getNumInputs(); ++i){
     input(i) = f_.input(i+1);
+  }
   
   // Allocate outputs
-  setNumOutputs(1);
-  output() = f_.input(0);
+  setNumOutputs(f_.getNumOutputs());
+  output(0) = f_.input(0);
+  for(int i=1; i<getNumOutputs(); ++i){
+    output(i) = f_.output(i);
+  }
 
   // Call the base class initializer
   FXInternal::init();

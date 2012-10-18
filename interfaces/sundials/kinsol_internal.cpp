@@ -119,7 +119,7 @@ void KinsolInternal::init(){
   if(u_) N_VDestroy_Serial(u_);
   if(u_scale_) N_VDestroy_Serial(u_scale_);
   if(f_scale_) N_VDestroy_Serial(f_scale_);
-  u_ = N_VMake_Serial(N_,&output(0).front());
+  u_ = N_VNew_Serial(N_);
   u_scale_ = N_VNew_Serial(N_);
   f_scale_ = N_VNew_Serial(N_);
   
@@ -275,21 +275,34 @@ void KinsolInternal::evaluate(int nfdir, int nadir){
   t_jac_ = 0;
 
   if(verbose()){
-	cout << "KinsolInternal::evaluate: Initial guess = " << output(0).data() << endl;
+    cout << "KinsolInternal::evaluate: Initial guess = " << output(0).data() << endl;
   }
+  
+  // Get the initial guess
+  output().get(NV_DATA_S(u_));
   
   // Solve the nonlinear system of equations
   int flag = KINSol(mem_, u_, strategy_, u_scale_, f_scale_);
   if (flag<KIN_SUCCESS) kinsol_error("evaluate",flag);
-
+  
+  // Warn if not successful return
   if(verbose()){
-	// Warn if not successful return
-	if (flag!=KIN_SUCCESS) kinsol_error("evaluate",flag,false);
-	
-	// Print solution
-	cout << "KinsolInternal::evaluate: solution = " << output(0).data() << endl;
+    if(flag!=KIN_SUCCESS) kinsol_error("evaluate",flag,false);
   }
+  
+  // Save the solution
+  output(0).set(NV_DATA_S(u_));
 
+  // Save auxillary outputs
+  for(int i=1; i<getNumOutputs(); ++i){
+    output(i).set(f_.output(i));
+  }
+  
+  // Print solution
+  if(verbose()){
+    cout << "KinsolInternal::evaluate: solution = " << output(0).data() << endl;
+  }
+  
   // End of function if no sensitivities
   if(nfdir==0 && nadir==0)
     return;
@@ -302,7 +315,7 @@ void KinsolInternal::evaluate(int nfdir, int nadir){
   psetup(u_, u_scale_, 0, f_scale_, 0, 0);
 
   // Pass inputs to function
-  f_.setInput(NV_DATA_S(u_),0);
+  f_.setInput(output(0),0);
   for(int i=0; i<getNumInputs(); ++i)
     f_.input(i+1).set(input(i));
 
@@ -317,30 +330,40 @@ void KinsolInternal::evaluate(int nfdir, int nadir){
   // Solve for the adjoint seeds
   for(int dir=0; dir<nadir; ++dir){
     // Negate adjoint seed and pass to function
-    const Matrix<double>& aseed = adjSeed(0,dir);
     Matrix<double>& faseed = f_.adjSeed(0,dir);
-    casadi_assert(faseed.size()==aseed.size());
-    for(int i=0; i<aseed.size(); ++i)
-      faseed.data()[i] = -aseed.data()[i];
+    faseed.set(adjSeed(0,dir));
+    for(vector<double>::iterator it=faseed.begin(); it!=faseed.end(); ++it){
+      *it = -*it;
+    }
     
     // Solve the transposed linear system
     linsol_.solve(&faseed.front(),1,true);
-  }
 
+    // Set auxillary adjoint seeds
+    for(int oind=1; oind<getNumOutputs(); ++oind){
+      f_.adjSeed(oind,dir).set(adjSeed(oind,dir));
+    }
+  }
+  
   // Evaluate
   f_.evaluate(nfdir,nadir);
-
-  // Solve for the forward sensitivities
+  
+  // Get the forward sensitivities
   for(int dir=0; dir<nfdir; ++dir){
     // Negate intermediate result and copy to output
-    const Matrix<double>& ffsens = f_.fwdSens(0,dir);
     Matrix<double>& fsens = fwdSens(0,dir);
-    casadi_assert(ffsens.size()==fsens.size());
-    for(int i=0; i<fsens.size(); ++i)
-      fsens.data()[i] = -ffsens.data()[i];
+    fsens.set(f_.fwdSens(0,dir));
+    for(vector<double>::iterator it=fsens.begin(); it!=fsens.end(); ++it){
+      *it = -*it;
+    }
     
     // Solve the linear system
     linsol_.solve(&fsens.front());
+  
+    // Save auxillary forward sensitivities
+    for(int oind=1; oind<getNumOutputs(); ++oind){
+      fwdSens(oind,dir).set(f_.fwdSens(oind,dir));
+    }
   }
   
   // Get the adjoint sensitivities
