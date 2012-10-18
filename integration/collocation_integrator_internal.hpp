@@ -67,25 +67,10 @@ public:
   /// Integrate backwards in time until a specified time point
   virtual void integrateB(double t_out);
 
-  /// Get the jacobian in the nonlinear iteration
-  virtual FX getJacobian();
-  
-  /// Get the Linear solver
-  virtual LinearSolver getLinearSolver();
-
-  /// Set linear solver
-  virtual void setLinearSolver(const LinearSolver& linsol, const FX& jac);
-
-  /// Print statistics
-  virtual void printStats(std::ostream &stream) const;
-
-  /// Set the stop time of the forward integration
-  virtual void setStopTime(double tf);
-
-  // Nonlinear system of equations
+  // Nonlinear system of equations (NOTE: remove from here)
   FX gfcn_;
 
-  // Quadrature right hand side function
+  // Quadrature right hand side function (NOTE: remove from here)
   FX qfcn_;
 
   // Startup integrator (generates an initial trajectory guess)

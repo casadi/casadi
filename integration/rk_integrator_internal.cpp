@@ -180,23 +180,6 @@ void RKIntegratorInternal::integrate(double t_out){
 void RKIntegratorInternal::integrateB(double t_out){
 }
 
-FX RKIntegratorInternal::getJacobian(){
-  return FX();
-}
-  
-LinearSolver RKIntegratorInternal::getLinearSolver(){
-  return LinearSolver();
-}
-
-void RKIntegratorInternal::setLinearSolver(const LinearSolver& linsol, const FX& jac){
-}
-
-void RKIntegratorInternal::printStats(std::ostream &stream) const{
-}
-
-void RKIntegratorInternal::setStopTime(double tf){
-}
-
 FX RKIntegratorInternal::getJacobian(int iind, int oind, bool compact, bool symmetric){
   return yf_fun_.jacobian(iind,oind,compact,symmetric);
 }

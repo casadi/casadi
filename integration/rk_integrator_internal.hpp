@@ -70,21 +70,6 @@ public:
   /// Integrate backward in time until a specified time point
   virtual void integrateB(double t_out);
 
-  /// Get the jacobian in the nonlinear iteration
-  virtual FX getJacobian();
-  
-  /// Get the Linear solver
-  virtual LinearSolver getLinearSolver();
-
-  /// Set linear solver
-  virtual void setLinearSolver(const LinearSolver& linsol, const FX& jac);
-
-  /// Print statistics
-  virtual void printStats(std::ostream &stream) const;
-
-  /// Set the stop time of the forward integration
-  virtual void setStopTime(double tf);
-
   /// Generate a function that calculates a Jacobian function
   virtual FX getJacobian(int iind, int oind, bool compact, bool symmetric);
 

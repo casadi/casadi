@@ -487,21 +487,4 @@ void CollocationIntegratorInternal::integrate(double t_out){
 void CollocationIntegratorInternal::integrateB(double t_out){
 }
 
-FX CollocationIntegratorInternal::getJacobian(){
-  return FX();
-}
-  
-LinearSolver CollocationIntegratorInternal::getLinearSolver(){
-  return LinearSolver();
-}
-
-void CollocationIntegratorInternal::setLinearSolver(const LinearSolver& linsol, const FX& jac){
-}
-
-void CollocationIntegratorInternal::printStats(std::ostream &stream) const{
-}
-
-void CollocationIntegratorInternal::setStopTime(double tf){
-}
-
 } // namespace CasADi

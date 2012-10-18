@@ -51,11 +51,8 @@ public:
   /** \brief  Create a new integrator */
   virtual IntegratorInternal* create(const FX& f, const FX& g) const = 0;
   
-  /** \brief  Set linear solver */
-  virtual void setLinearSolver(const LinearSolver& linsol, const FX& jac)=0;
-  
   /** \brief  Print solver statistics */
-  virtual void printStats(std::ostream &stream) const = 0;
+  virtual void printStats(std::ostream &stream) const{}
 
   /** \brief  Reset the forward problem and bring the time back to t0 */
   virtual void reset(int nsens, int nsensB, int nsensB_store) = 0;
