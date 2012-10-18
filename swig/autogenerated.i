@@ -521,9 +521,8 @@ def integratorOut(*dummy,**kwargs):
     qf  -- Quadrature state at the final time [INTEGRATOR_QF]
     rxf -- Backward differential state at the initial time [INTEGRATOR_RXF]
     rqf -- Backward quadrature state at the initial time [INTEGRATOR_RQF]
-    zf  -- Algebraic state at the final time [INTEGRATOR_ZF]
   """
-  if(len(dummy)>0): raise Exception("Error in integratorOut: syntax has become more strict. You must use keyword arguments now, for your own safety.\n integratorOut(my_xf, my_qf, my_rxf, my_rqf, my_zf)\nmust be written\n integratorOut(xf=my_xf, qf=my_qf, rxf=my_rxf, rqf=my_rqf, zf=my_zf)\nwhere any keyword is optional.")
+  if(len(dummy)>0): raise Exception("Error in integratorOut: syntax has become more strict. You must use keyword arguments now, for your own safety.\n integratorOut(my_xf, my_qf, my_rxf, my_rqf)\nmust be written\n integratorOut(xf=my_xf, qf=my_qf, rxf=my_rxf, rqf=my_rqf)\nwhere any keyword is optional.")
   xf = []
   if 'xf' in kwargs:
     xf = kwargs['xf']
@@ -536,13 +535,10 @@ def integratorOut(*dummy,**kwargs):
   rqf = []
   if 'rqf' in kwargs:
     rqf = kwargs['rqf']
-  zf = []
-  if 'zf' in kwargs:
-    zf = kwargs['zf']
   for k in kwargs.keys():
-    if not(k in ['xf','qf','rxf','rqf','zf']):
-      raise Exception("Keyword error in integratorOut: '%s' is not recognized. Available keywords are: xf, qf, rxf, rqf, zf" % k )
-  return [xf,qf,rxf,rqf,zf]
+    if not(k in ['xf','qf','rxf','rqf']):
+      raise Exception("Keyword error in integratorOut: '%s' is not recognized. Available keywords are: xf, qf, rxf, rqf" % k )
+  return [xf,qf,rxf,rqf]
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON

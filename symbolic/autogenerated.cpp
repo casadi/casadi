@@ -59,7 +59,7 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
     case SCHEME_RDAEInput: return "rx, rz, rp, x, z, p, t, xdot, rxdot";
     case SCHEME_RDAEOutput: return "ode, alg, quad";
     case SCHEME_IntegratorInput: return "x0, p, rx0, rp";
-    case SCHEME_IntegratorOutput: return "xf, qf, rxf, rqf, zf";
+    case SCHEME_IntegratorOutput: return "xf, qf, rxf, rqf";
     case SCHEME_NLPInput: return "x_init, lbx, ubx, lbg, ubg, lambda_init, p";
     case SCHEME_NLPOutput: return "x_opt, cost, lambda_g, lambda_x, g";
     case SCHEME_MayerInput: return "x, p";
@@ -171,8 +171,7 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==1) return "qf";
       if(i==2) return "rxf";
       if(i==3) return "rqf";
-      if(i==4) return "zf";
-      casadi_error("getSchemeEntryName: supplied number is out of range. IntegratorOutput has only 5 entries: ('IntegratorOutput', 'xf, qf, rxf, rqf, zf')");
+      casadi_error("getSchemeEntryName: supplied number is out of range. IntegratorOutput has only 4 entries: ('IntegratorOutput', 'xf, qf, rxf, rqf')");
       break;
     case SCHEME_NLPInput: 
       if(i==0) return "x_init";
@@ -346,8 +345,7 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==1) return "Quadrature state at the final time";
       if(i==2) return "Backward differential state at the initial time";
       if(i==3) return "Backward quadrature state at the initial time";
-      if(i==4) return "Algebraic state at the final time";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. IntegratorOutput has only 5 entries: ('IntegratorOutput', 'xf, qf, rxf, rqf, zf')");
+      casadi_error("getSchemeEntryDoc: supplied number is out of range. IntegratorOutput has only 4 entries: ('IntegratorOutput', 'xf, qf, rxf, rqf')");
       break;
     case SCHEME_NLPInput: 
       if(i==0) return "Decision variables initial guess (n x 1) ";
@@ -522,8 +520,7 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==1) return "INTEGRATOR_QF";
       if(i==2) return "INTEGRATOR_RXF";
       if(i==3) return "INTEGRATOR_RQF";
-      if(i==4) return "INTEGRATOR_ZF";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. IntegratorOutput has only 5 entries: ('IntegratorOutput', 'xf, qf, rxf, rqf, zf')");
+      casadi_error("getSchemeEntryEnumName: supplied number is out of range. IntegratorOutput has only 4 entries: ('IntegratorOutput', 'xf, qf, rxf, rqf')");
       break;
     case SCHEME_NLPInput: 
       if(i==0) return "NLP_X_INIT";
@@ -688,7 +685,6 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if(name=="qf") return 1;
       if(name=="rxf") return 2;
       if(name=="rqf") return 3;
-      if(name=="zf") return 4;
       break;
     case SCHEME_NLPInput: 
       if(name=="x_init") return 0;
