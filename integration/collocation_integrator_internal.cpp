@@ -323,22 +323,20 @@ void CollocationIntegratorInternal::init(){
   gfcn_out[1+INTEGRATOR_RQF] = RQF;
   
   // Nonlinear constraint function
-  MXFunction gfcn(gfcn_in,gfcn_out);
+  FX gfcn = MXFunction(gfcn_in,gfcn_out);
   
   // Expand f?
   bool expand_f = getOption("expand_f");
   if(expand_f){
     gfcn.init();
-    gfcn_ = SXFunction(gfcn);
-  } else {
-    gfcn_ = gfcn;
+    gfcn = SXFunction(shared_cast<MXFunction>(gfcn));
   }
   
   // Get the NLP creator function
   implicitFunctionCreator implicit_function_creator = getOption("implicit_solver");
   
   // Allocate an NLP solver
-  implicit_solver_ = implicit_function_creator(gfcn_);
+  implicit_solver_ = implicit_function_creator(gfcn);
   
   // Pass options
   if(hasSetOption("implicit_solver_options")){
@@ -449,9 +447,9 @@ void CollocationIntegratorInternal::reset(int nsens, int nsensB, int nsensB_stor
   integrated_once_ = true;
   
   for(int oind=0; oind<INTEGRATOR_NUM_OUT; ++oind){
-    output(oind).set(gfcn_.output(1+oind));
+    output(oind).set(implicit_solver_.output(1+oind));
     for(int dir=0; dir<nsens; ++dir){
-      fwdSens(oind,dir).set(gfcn_.fwdSens(1+oind,dir));
+      fwdSens(oind,dir).set(implicit_solver_.fwdSens(1+oind,dir));
     }
   }
 }

@@ -86,6 +86,7 @@ for MyIntegrator in ODE_integrators:
   if MyIntegrator==CollocationIntegrator:
     opts["implicit_solver"] = KinsolSolver
     opts["implicit_solver_options"] = {"linear_solver_creator":CSparse}
+    opts["expand_f"]=True
 
   # Integrator
   I = MyIntegrator(ffcn)

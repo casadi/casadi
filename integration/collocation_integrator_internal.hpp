@@ -67,12 +67,6 @@ public:
   /// Integrate backwards in time until a specified time point
   virtual void integrateB(double t_out);
 
-  // Nonlinear system of equations (NOTE: remove from here)
-  FX gfcn_;
-
-  // Quadrature right hand side function (NOTE: remove from here)
-  FX qfcn_;
-
   // Startup integrator (generates an initial trajectory guess)
   Integrator startup_integrator_;
   
