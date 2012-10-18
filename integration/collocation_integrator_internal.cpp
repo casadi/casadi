@@ -260,7 +260,7 @@ void CollocationIntegratorInternal::init(){
         g_in[RDAE_X] = X[k][j];
         g_in[RDAE_P] = P;
         g_in[RDAE_RP] = RP;
-        g_in[RDAE_RX] = X[k][j];
+        g_in[RDAE_RX] = RX[k][j];
         
         vector<MX> g_out;
         if(explicit_ode){
@@ -335,7 +335,7 @@ void CollocationIntegratorInternal::init(){
   } else {
     gfcn_ = gfcn;
   }
-
+  
   // Get the NLP creator function
   implicitFunctionCreator implicit_function_creator = getOption("implicit_solver");
   
