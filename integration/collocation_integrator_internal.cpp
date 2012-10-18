@@ -99,9 +99,6 @@ void CollocationIntegratorInternal::init(){
   // All collocation time points
   double* tau_root = use_radau ? radau_points[deg] : legendre_points[deg];
 
-  // Collocated times
-  times_.clear();
-  
   // Size of the finite elements
   double h = (tf_-t0_)/nk;
   
@@ -156,28 +153,53 @@ void CollocationIntegratorInternal::init(){
   // Backward parameters
   MX RP("RP",nrp_);
   
-  // Collocated states
+  // Collocated differential states and algebraic variables
   int nX = (nk*(deg+1)+1)*(nx_+nrx_);
+  int nZ = nk*deg*(nz_+nrz_);
   
   // Unknowns
-  MX V("V",nX);
+  MX V("V",nX+nZ);
   int offset = 0;
   
-  // Get collocated states
+  // Get collocated states, algebraic variables and times
   vector<vector<MX> > X(nk+1);
   vector<vector<MX> > RX(nk+1);
+  vector<vector<MX> > Z(nk);
+  vector<vector<MX> > RZ(nk);
+  coll_time_.resize(nk+1);
   for(int k=0; k<nk+1; ++k){
-    // Number of collocation point, plus beginning of interval
+    // Number of time points
     int nj = k==nk ? 1 : deg+1;
+    
+    // Allocate differential states expressions at the time points
     X[k].resize(nj);
     RX[k].resize(nj);
+    coll_time_[k].resize(nj);
 
-    // Get the expression for the state vector
+    // Allocate algebraic variable expressions at the collocation points
+    if(k!=nk){
+      Z[k].resize(nj-1);
+      RZ[k].resize(nj-1);
+    }
+
+    // For all time points
     for(int j=0; j<nj; ++j){
+      // Get expressions for the differential state
       X[k][j] = V[range(offset,offset+nx_)];
       offset += nx_;
       RX[k][j] = V[range(offset,offset+nrx_)];
       offset += nrx_;
+      
+      // Get the local time
+      coll_time_[k][j] = h*(k + tau_root[j]);
+      
+      // Get expressions for the algebraic variables
+      if(j>0){
+        Z[k][j-1] = V[range(offset,offset+nz_)];
+        offset += nz_;
+        RZ[k][j-1] = V[range(offset,offset+nrz_)];
+        offset += nrz_;
+      }
     }
   }
   
@@ -204,8 +226,7 @@ void CollocationIntegratorInternal::init(){
     // For all collocation points
     for(int j=1; j<deg+1; ++j, ++jk){
       // Get the time
-      times_.push_back(h*(k + tau_root[j]));
-      MX tk = times_.back();
+      MX tkj = coll_time_[k][j];
       
       // Get an expression for the state derivative at the collocation point
       MX xp_jk = 0;
@@ -215,9 +236,10 @@ void CollocationIntegratorInternal::init(){
       
       // Add collocation equations to the NLP
       vector<MX> f_in(DAE_NUM_IN);
-      f_in[DAE_T] = tk;
+      f_in[DAE_T] = tkj;
       f_in[DAE_P] = P;
       f_in[DAE_X] = X[k][j];
+      f_in[DAE_Z] = Z[k][j-1];
       
       vector<MX> f_out;
       if(explicit_ode){
@@ -229,6 +251,11 @@ void CollocationIntegratorInternal::init(){
         f_in[DAE_XDOT] = xp_jk/h_mx;
         f_out = f_.call(f_in);
         g.push_back(f_out[DAE_ODE]);
+      }
+      
+      // Add the algebraic conditions
+      if(nz_>0){
+        g.push_back(f_out[DAE_ALG]);
       }
       
       // Add the quadrature
@@ -247,11 +274,13 @@ void CollocationIntegratorInternal::init(){
         
         // Add collocation equations to the NLP
         vector<MX> g_in(RDAE_NUM_IN);
-        g_in[RDAE_T] = tk;
+        g_in[RDAE_T] = tkj;
         g_in[RDAE_X] = X[k][j];
+        g_in[RDAE_Z] = Z[k][j-1];
         g_in[RDAE_P] = P;
         g_in[RDAE_RP] = RP;
         g_in[RDAE_RX] = RX[k][j];
+        g_in[RDAE_RZ] = RZ[k][j-1];
         
         vector<MX> g_out;
         if(explicit_ode){
@@ -266,15 +295,18 @@ void CollocationIntegratorInternal::init(){
           g.push_back(g_out[RDAE_ODE]);
         }
         
+        // Add the algebraic conditions
+        if(nrz_>0){
+          g.push_back(g_out[RDAE_ALG]);
+        }
+        
+        // Add the backward quadrature
         if(nrq_>0){
           RQF += D[j]*h_mx*g_out[RDAE_QUAD];
         }
       }
     }
     
-    // Add end time
-    times_.push_back(h*(k + 1));
-
     // Get an expression for the state at the end of the finite element
     MX xf_k = 0;
     for(int j=0; j<deg+1; ++j){
@@ -358,8 +390,8 @@ void CollocationIntegratorInternal::init(){
     // Pass options
     startup_integrator_.setOption("number_of_fwd_dir",0); // not needed
     startup_integrator_.setOption("number_of_adj_dir",0); // not needed
-    startup_integrator_.setOption("t0",times_.front());
-    startup_integrator_.setOption("tf",times_.back());
+    startup_integrator_.setOption("t0",coll_time_.front().front());
+    startup_integrator_.setOption("tf",coll_time_.back().back());
     if(hasSetOption("startup_integrator_options")){
       const Dictionary& startup_integrator_options = getOption("startup_integrator_options");
       startup_integrator_.setOption(startup_integrator_options);
@@ -397,46 +429,56 @@ void CollocationIntegratorInternal::reset(int nsens, int nsensB, int nsensB_stor
     vector<double>& v = implicit_solver_.output().data();
       
     // Check if an integrator for the startup trajectory has been supplied
-    if(!startup_integrator_.isNull()){
-      // Use supplied integrator, if any
+    bool has_startup_integrator = !startup_integrator_.isNull();
+    
+    // Use supplied integrator, if any
+    if(has_startup_integrator){
       for(int iind=0; iind<INTEGRATOR_NUM_IN; ++iind){
         startup_integrator_.input(iind).set(input(iind));
       }
       
       // Reset the integrator
       startup_integrator_.reset();
+    }
       
-      // Integrate, stopping at all time points
-      int offs=0;
-      for(vector<double>::const_iterator it=times_.begin(); it!=times_.end(); ++it){
-        // Integrate to the time point
-        startup_integrator_.integrate(*it);
+    // Integrate, stopping at all time points
+    int offs=0;
+    for(int k=0; k<coll_time_.size(); ++k){
+      for(int j=0; j<coll_time_[k].size(); ++j){
         
-        // Save the solution
-        startup_integrator_.output().getArray(&v[offs],nx_);
-        
-        // Update the vector offset
-        offs+=nx_+nrx_;
-      }
-      
-      // Print
-      if(verbose()){
-        cout << "startup trajectory generated, statistics:" << endl;
-        startup_integrator_.printStats();
-      }
-    
-    } else {
-      // Initialize with constant trajectory
-      const vector<double>& x0 = input(INTEGRATOR_X0).data();
-      const vector<double>& rx0 = input(INTEGRATOR_RX0).data();
-      for(int offs=0; offs<v.size(); offs+=nx_+nrx_){
+        if(has_startup_integrator){
+          // Integrate to the time point
+          startup_integrator_.integrate(coll_time_[k][j]);
+        }
+          
+        // Save the differential states
+        const DMatrix& x = has_startup_integrator ? startup_integrator_.output(INTEGRATOR_XF) : input(INTEGRATOR_X0);
         for(int i=0; i<nx_; ++i){
-          v[i+offs] = x0[i];
+          v.at(offs++) = x.at(i);
         }
+
+        // Skip algebraic variables (for now) // FIXME
+        if(j>0){
+          offs += nz_;
+        }
+        
+        // Skip backward states // FIXME
+        const DMatrix& rx = input(INTEGRATOR_RX0);
         for(int i=0; i<nrx_; ++i){
-          v[i+offs+nx_] = rx0[i];
+          v.at(offs++) = rx.at(i);
+        }
+        
+        // Skip backward algebraic variables // FIXME
+        if(j>0){
+          offs += nrz_;
         }
       }
+    }
+      
+    // Print
+    if(has_startup_integrator && verbose()){
+      cout << "startup trajectory generated, statistics:" << endl;
+      startup_integrator_.printStats();
     }
   }
     

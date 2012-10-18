@@ -80,7 +80,7 @@ public:
   bool integrated_once_;
   
   // Collocated times
-  std::vector<double> times_;
+  std::vector<std::vector<double> > coll_time_;
   
 };
 
