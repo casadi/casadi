@@ -9775,15 +9775,12 @@ If H is not positive-definite, the solver should throw an error.
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| convex       | OT_BOOLEAN   | false        | Specify true | CasADi::QPSo |
-|              |              |              | if you can   | lverInternal |
-|              |              |              | guarantee    |              |
-|              |              |              | that H will  |              |
-|              |              |              | always be    |              |
-|              |              |              | positive     |              |
-|              |              |              | definite     |              |
+| barrier_maxi | OT_INTEGER   | 2.100e+09    | Maximum      | CasADi::Cple |
+| ter          |              |              | number of    | xInternal    |
+|              |              |              | barrier      |              |
+|              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| debug        | OT_BOOLEAN   | 0            | Print debug  | CasADi::Cple |
+| debug        | OT_BOOLEAN   | false        | Print debug  | CasADi::Cple |
 |              |              |              | information  | xInternal    |
 +--------------+--------------+--------------+--------------+--------------+
 | dump_filenam | OT_STRING    | \"qp.dat\"     | The filename | CasADi::Cple |
@@ -9791,7 +9788,7 @@ If H is not positive-definite, the solver should throw an error.
 |              |              |              | Default:     |              |
 |              |              |              | qp.dat       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| dump_to_file | OT_BOOLEAN   | 0            | Dumps QP to  | CasADi::Cple |
+| dump_to_file | OT_BOOLEAN   | false        | Dumps QP to  | CasADi::Cple |
 |              |              |              | file in      | xInternal    |
 |              |              |              | CPLEX        |              |
 |              |              |              | format.      |              |
@@ -9876,6 +9873,11 @@ If H is not positive-definite, the solver should throw an error.
 |              |              |              | with the     |              |
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| simplex_maxi | OT_INTEGER   | 2.100e+09    | Maximum      | CasADi::Cple |
+| ter          |              |              | number of    | xInternal    |
+|              |              |              | simplex      |              |
+|              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
@@ -10376,15 +10378,12 @@ Attila Kozma, Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| convex       | OT_BOOLEAN   | false        | Specify true | CasADi::QPSo |
-|              |              |              | if you can   | lverInternal |
-|              |              |              | guarantee    |              |
-|              |              |              | that H will  |              |
-|              |              |              | always be    |              |
-|              |              |              | positive     |              |
-|              |              |              | definite     |              |
+| barrier_maxi | OT_INTEGER   | 2.100e+09    | Maximum      | CasADi::Cple |
+| ter          |              |              | number of    | xInternal    |
+|              |              |              | barrier      |              |
+|              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| debug        | OT_BOOLEAN   | 0            | Print debug  | CasADi::Cple |
+| debug        | OT_BOOLEAN   | false        | Print debug  | CasADi::Cple |
 |              |              |              | information  | xInternal    |
 +--------------+--------------+--------------+--------------+--------------+
 | dump_filenam | OT_STRING    | \"qp.dat\"     | The filename | CasADi::Cple |
@@ -10392,7 +10391,7 @@ Attila Kozma, Joel Andersson
 |              |              |              | Default:     |              |
 |              |              |              | qp.dat       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| dump_to_file | OT_BOOLEAN   | 0            | Dumps QP to  | CasADi::Cple |
+| dump_to_file | OT_BOOLEAN   | false        | Dumps QP to  | CasADi::Cple |
 |              |              |              | file in      | xInternal    |
 |              |              |              | CPLEX        |              |
 |              |              |              | format.      |              |
@@ -10477,6 +10476,11 @@ Attila Kozma, Joel Andersson
 |              |              |              | with the     |              |
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| simplex_maxi | OT_INTEGER   | 2.100e+09    | Maximum      | CasADi::Cple |
+| ter          |              |              | number of    | xInternal    |
+|              |              |              | simplex      |              |
+|              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
@@ -33363,22 +33367,6 @@ Retrieve information about variables and constraints ";
 // File: classCasADi_1_1Jacobian.xml
 %feature("docstring") CasADi::Jacobian "
 
-Jacobian class.
-
-Universal Jacobian class, calculates the Jacobian of a function based on AD
-forward or adjoint.
-
-Options:  \"finite_differences\" false  \"ad_mode\" \"forward\", \"adjoint\"
-or \"default\", i.e. forward if n_<=m_, otherwise adjoint  \"sparse\" false
-
-Any CasADi::FX can be used to take the Jacobian of.
-
-If the iind'th input argument has shape (m,n) and the oind'th output
-argument has shape (k,l), the output of this Jacobian will be of shape (k*l)
-x (m*n) .
-
-Joel Andersson
-
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
@@ -33519,534 +33507,12 @@ Joel Andersson
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-C++ includes: jacobian.hpp ";
-
-/*  Setters  */
-
-/* T can be double&, double*, std::vector<double>&, Matrix<double> &
-Assumes a properly allocated val.  Set/get an input, output, forward
-seed/sensitivity or adjoint seed/sensitivity
-
-*/
-
-%feature("docstring")  CasADi::Jacobian::setInput "
-
-Reads in the input argument from val. ";
-
-%feature("docstring")  CasADi::Jacobian::setOutput "
-
-Reads in the output argument from val. ";
-
-%feature("docstring")  CasADi::Jacobian::setFwdSeed "
-
-Reads in the forward seed from val. ";
-
-%feature("docstring")  CasADi::Jacobian::setFwdSens "
-
-Reads in the forward sensitivity from val. ";
-
-%feature("docstring")  CasADi::Jacobian::setAdjSeed "
-
-Reads in the adjoint seed from val. ";
-
-%feature("docstring")  CasADi::Jacobian::setAdjSens "
-
-Reads in the adjoint sensitivity from val. ";
-
-/*  Getters  */
-
-/* A group of accessor for numerical data that operate on preallocated data.
-get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-
-*/
-
-%feature("docstring")  CasADi::Jacobian::getInput "
-
-Writes out the input argument into val. ";
-
-%feature("docstring")  CasADi::Jacobian::getOutput "
-
-Writes out the output argument into val. ";
-
-%feature("docstring")  CasADi::Jacobian::getFwdSeed "
-
-Writes out the forward seed into val. ";
-
-%feature("docstring")  CasADi::Jacobian::getFwdSens "
-
-Writes out the forward sensitivity into val. ";
-
-%feature("docstring")  CasADi::Jacobian::getAdjSeed "
-
-Writes out the adjoint seed into val. ";
-
-%feature("docstring")  CasADi::Jacobian::getAdjSens "
-
-Writes out the adjoint sensitivity into val. ";
-
-/*  Option Functionality  */
-
-%feature("docstring")  CasADi::Jacobian::setOption "
-
-set an option. For a list of options, check the class documentation of this
-class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again. ";
-
-%feature("docstring")  CasADi::Jacobian::setOption "
-
-set a set of options. For a list of options, check the class documentation
-of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again. ";
-
-%feature("docstring")  CasADi::Jacobian::getOption "
-
-get an option value ";
-
-%feature("docstring")  CasADi::Jacobian::hasOption "
-
-check if there is an option str ";
-
-%feature("docstring")  CasADi::Jacobian::hasSetOption "
-
-check if the user has there is an option str ";
-
-%feature("docstring")  CasADi::Jacobian::printOptions "
-
-Print options to a stream. ";
-
-%feature("docstring")  CasADi::Jacobian::copyOptions "
-
-Copy all options from another object. ";
-
-%feature("docstring")  CasADi::Jacobian::dictionary "
-
-Get the dictionary. ";
-
-%feature("docstring")  CasADi::Jacobian::makeUnique "
-
-If there are other references to the object, then make a deep copy of it and
-point to this new object. ";
-
-%feature("docstring")  CasADi::Jacobian::makeUnique "";
-
-%feature("docstring")  CasADi::Jacobian::getNumInputs "
-
-Get number of inputs. ";
-
-%feature("docstring")  CasADi::Jacobian::getNumOutputs "
-
-Get number of outputs. ";
-
-%feature("docstring")  CasADi::Jacobian::getNumScalarInputs "
-
-Get total number of scalar inputs (i.e. the number of nonzeros in all of the
-matrix-valued inputs) ";
-
-%feature("docstring")  CasADi::Jacobian::getNumScalarOutputs "
-
-Get total number of scalar outputs (i.e. the number of nonzeros in all of
-the matrix-valued outputs) ";
-
-%feature("docstring")  CasADi::Jacobian::setNumInputs "
-
-Set number of inputs (normally invoked internally) ";
-
-%feature("docstring")  CasADi::Jacobian::setNumOutputs "
-
-Set number of outputs (normally invoked internally) ";
-
-%feature("docstring")  CasADi::Jacobian::updateNumSens "
-
-Update the number of sensitivity directions during or after initialization
-(normally invoked internally) ";
-
-%feature("docstring")  CasADi::Jacobian::requestNumSens "
-
-Request a number of forward/adjoint derivative directions This function
-tries to increase the number of directional derivatives allocated for the
-function so that the the number at least amounts to \"nfwd\" and \"nadj\"
-for forward and adjoint mode derivatives respectively. The allocated number
-is never decreased and never increased beyond the number set by the option
-\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
-
-If the number was changed during the call, updateNumSens() is automatically
-invoked. ";
-
-%feature("docstring")  CasADi::Jacobian::evaluate "
-
-Evaluate. ";
-
-%feature("docstring")  CasADi::Jacobian::solve "
-
-the same as evaluate(0,0) ";
-
-%feature("docstring")  CasADi::Jacobian::jacobian "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian. ";
-
-%feature("docstring")  CasADi::Jacobian::gradient "
-
-Generate a gradient function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead. ";
-
-%feature("docstring")  CasADi::Jacobian::hessian "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients. ";
-
-%feature("docstring")  CasADi::Jacobian::call "
-
-Create a function call (single input) ";
-
-%feature("docstring")  CasADi::Jacobian::call "
-
-Create a function call ( MX graph) ";
-
-%feature("docstring")  CasADi::Jacobian::call "
-
-Create a function call with directional derivatives Note: return by
-reference with SWIG. ";
-
-%feature("docstring")  CasADi::Jacobian::call "
-
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer. ";
-
-%feature("docstring")  CasADi::Jacobian::eval "
-
-evaluate symbolically, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::Jacobian::eval "
-
-evaluate symbolically, MX type (overloaded) ";
-
-%feature("docstring")  CasADi::Jacobian::eval "
-
-Evaluate symbolically with with directional derivatives, SX type, overloaded
-The first two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The boolean
-argument allows the second argument to the functions to be used as an input
-instead of output, assuming it is already known. ";
-
-%feature("docstring")  CasADi::Jacobian::eval "
-
-Evaluate symbolically with with directional derivatives, MX type, overloaded
-The first two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The boolean
-argument allows the second argument to the functions to be used as an input
-instead of output, assuming it is already known. ";
-
-%feature("docstring")  CasADi::Jacobian::eval "
-
-evaluate symbolically, single input, single output ";
-
-%feature("docstring")  CasADi::Jacobian::evalMX "
-
-evaluate symbolically, MX type (unambiguous) ";
-
-%feature("docstring")  CasADi::Jacobian::evalMX "
-
-Evaluate symbolically with with directional derivatives, MX type The first
-two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The boolean
-argument allows the second argument to the functions to be used as an input
-instead of output, assuming it is already known. ";
-
-%feature("docstring")  CasADi::Jacobian::evalSX "
-
-evaluate symbolically, SX type (unambiguous) ";
-
-%feature("docstring")  CasADi::Jacobian::evalSX "
-
-Evaluate symbolically with with directional derivatives, SX type The first
-two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The boolean
-argument allows the second argument to the functions to be used as an input
-instead of output, assuming it is already known. ";
-
-%feature("docstring")  CasADi::Jacobian::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
-(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
-nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
-seeds, one direction at a time and the last nadj*n_out inputs corresponds to
-adjoint seeds, one direction at a time. The first n_out outputs corresponds
-to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
-
-(n_in = getNumInputs(), n_out = getNumOutputs())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned. ";
-
-%feature("docstring")  CasADi::Jacobian::jacSparsity "
-
-Get, if necessary generate, the sparsity of a Jacobian block. ";
-
-%feature("docstring")  CasADi::Jacobian::setJacSparsity "
-
-Generate the sparsity of a Jacobian block. ";
-
-%feature("docstring")  CasADi::Jacobian::indexed_one_based "";
-
-%feature("docstring")  CasADi::Jacobian::indexed_zero_based "";
-
-%feature("docstring")  CasADi::Jacobian::checkNode "
-
-Check if the node is pointing to the right type of object. ";
-
-%feature("docstring")  CasADi::Jacobian::input "
-
-Const access input argument. ";
-
-%feature("docstring")  CasADi::Jacobian::input "
-
-Const access input argument. ";
-
-%feature("docstring")  CasADi::Jacobian::input "
-
-Access input argument. ";
-
-%feature("docstring")  CasADi::Jacobian::input "
-
-Access input argument. ";
-
-%feature("docstring")  CasADi::Jacobian::output "
-
-Const access input argument. ";
-
-%feature("docstring")  CasADi::Jacobian::output "
-
-Access output argument Note that copies in Python are shallow by default and
-fx.output() gives a reference/pointer to an internal data structure. So if
-you want save fx.output(), you need to make a deep copy using for example
-DMatrix(fx.output()). ";
-
-%feature("docstring")  CasADi::Jacobian::fwdSeed "
-
-Const access forward seed. ";
-
-%feature("docstring")  CasADi::Jacobian::fwdSeed "
-
-Access forward seed. ";
-
-%feature("docstring")  CasADi::Jacobian::fwdSens "
-
-Const access forward sensitivity. ";
-
-%feature("docstring")  CasADi::Jacobian::fwdSens "
-
-Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::Jacobian::adjSeed "
-
-Const access adjoint seed. ";
-
-%feature("docstring")  CasADi::Jacobian::adjSeed "
-
-Access adjoint seed. ";
-
-%feature("docstring")  CasADi::Jacobian::adjSens "
-
-Const access forward sensitivity. ";
-
-%feature("docstring")  CasADi::Jacobian::adjSens "
-
-Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::Jacobian::getStats "
-
-Get all statistics obtained at the end of the last evaluate call. ";
-
-%feature("docstring")  CasADi::Jacobian::getStat "
-
-Get a single statistic obtained at the end of the last evaluate call. ";
-
-%feature("docstring")  CasADi::Jacobian::symbolicInput "
-
-Get a vector of symbolic variables with the same dimensions as the inputs
-There is no guarantee that consecutive calls return identical objects. ";
-
-%feature("docstring")  CasADi::Jacobian::symbolicInputSX "
-
-Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph There is no guarantee that consecutive calls return identical
-objects. ";
-
-%feature("docstring")  CasADi::Jacobian::spCanEvaluate "
-
-Is the class able to propate seeds through the algorithm? (for usage, see
-the example propagating_sparsity.cpp) ";
-
-%feature("docstring")  CasADi::Jacobian::spInit "
-
-Reset the sparsity propagation (for usage, see the example
-propagating_sparsity.cpp) ";
-
-%feature("docstring")  CasADi::Jacobian::spEvaluate "
-
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp) ";
-
-%feature("docstring")  CasADi::Jacobian::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::Jacobian::removeMonitor "
-
-Remove modules to be monitored. ";
-
-%feature("docstring")  CasADi::Jacobian::getOptionNames "
-
-Get a list of all option names. ";
-
-%feature("docstring")  CasADi::Jacobian::getOptionDescription "
-
-Get the description of a certain option. ";
-
-%feature("docstring")  CasADi::Jacobian::getOptionType "
-
-Get the type of a certain option. ";
-
-%feature("docstring")  CasADi::Jacobian::getOptionTypeName "
-
-Get the type name of a certain option. ";
-
-%feature("docstring")  CasADi::Jacobian::getOptionAllowed "
-
-Get the allowed values of a certain option. ";
-
-%feature("docstring")  CasADi::Jacobian::getOptionDefault "
-
-Get the default of a certain option. ";
-
-%feature("docstring")  CasADi::Jacobian::clone "
-
-Deep copy. ";
-
-%feature("docstring")  CasADi::Jacobian::assignNode "
-
-Assign the node to a node class pointer (or null) ";
-
-%feature("docstring")  CasADi::Jacobian::assignNodeNoCount "
-
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks! ";
-
-%feature("docstring")  CasADi::Jacobian::get "
-
-Get a const pointer to the node. ";
-
-%feature("docstring")  CasADi::Jacobian::get "
-
-Get a pointer to the node. ";
-
-%feature("docstring")  CasADi::Jacobian::getCount "
-
-Get the reference count. ";
-
-%feature("docstring")  CasADi::Jacobian::swap "
-
-Swap content with another instance. ";
-
-%feature("docstring")  CasADi::Jacobian::repr "
-
-Print a representation of the object. ";
-
-%feature("docstring")  CasADi::Jacobian::print "
-
-Print a destription of the object. ";
-
-%feature("docstring")  CasADi::Jacobian::init "
-
-Initialize the object: more documentation in the node class (
-SharedObjectNode and derived classes) ";
-
-%feature("docstring")  CasADi::Jacobian::isInit "
-
-Is initialized? ";
-
-%feature("docstring")  CasADi::Jacobian::assertInit "
-
-Assert that it is initialized. ";
-
-%feature("docstring")  CasADi::Jacobian::isNull "
-
-Is a null pointer? ";
-
-%feature("docstring")  CasADi::Jacobian::getRepresentation "
-
-Return a string with a representation (for SWIG) ";
-
-%feature("docstring")  CasADi::Jacobian::getDescription "
-
-Return a string with a destription (for SWIG) ";
+C++ includes: b0_options.hpp ";
 
 
 // File: classCasADi_1_1JacobianInternal.xml
 %feature("docstring") CasADi::JacobianInternal "
 
-Internal node class for Jacobian.
-
-Joel Andersson
-
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
@@ -34187,365 +33653,7 @@ Joel Andersson
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-C++ includes: jacobian_internal.hpp ";
-
-%feature("docstring")  CasADi::JacobianInternal::hessian "
-
-Return Hessian function. ";
-
-%feature("docstring")  CasADi::JacobianInternal::getHessian "";
-
-%feature("docstring")  CasADi::JacobianInternal::gradient "
-
-Return gradient function. ";
-
-%feature("docstring")  CasADi::JacobianInternal::getGradient "";
-
-%feature("docstring")  CasADi::JacobianInternal::jacobian "
-
-Return Jacobian function. ";
-
-%feature("docstring")  CasADi::JacobianInternal::getJacobian "";
-
-%feature("docstring")  CasADi::JacobianInternal::getNumericJacobian "";
-
-%feature("docstring")  CasADi::JacobianInternal::derivative "
-
-Return function that calculates forward derivatives. ";
-
-%feature("docstring")  CasADi::JacobianInternal::getDerivative "";
-
-%feature("docstring")  CasADi::JacobianInternal::input "
-
-Access input argument. ";
-
-%feature("docstring")  CasADi::JacobianInternal::input "";
-
-%feature("docstring")  CasADi::JacobianInternal::input "";
-
-%feature("docstring")  CasADi::JacobianInternal::input "";
-
-%feature("docstring")  CasADi::JacobianInternal::inputNoCheck "";
-
-%feature("docstring")  CasADi::JacobianInternal::inputNoCheck "";
-
-%feature("docstring")  CasADi::JacobianInternal::output "
-
-Access output argument. ";
-
-%feature("docstring")  CasADi::JacobianInternal::output "";
-
-%feature("docstring")  CasADi::JacobianInternal::outputNoCheck "";
-
-%feature("docstring")  CasADi::JacobianInternal::outputNoCheck "";
-
-%feature("docstring")  CasADi::JacobianInternal::fwdSeed "
-
-Access forward seed. ";
-
-%feature("docstring")  CasADi::JacobianInternal::fwdSeed "";
-
-%feature("docstring")  CasADi::JacobianInternal::fwdSeedNoCheck "";
-
-%feature("docstring")  CasADi::JacobianInternal::fwdSeedNoCheck "";
-
-%feature("docstring")  CasADi::JacobianInternal::fwdSens "
-
-Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::JacobianInternal::fwdSens "";
-
-%feature("docstring")  CasADi::JacobianInternal::fwdSensNoCheck "";
-
-%feature("docstring")  CasADi::JacobianInternal::fwdSensNoCheck "";
-
-%feature("docstring")  CasADi::JacobianInternal::adjSeed "
-
-Access adjoint seed. ";
-
-%feature("docstring")  CasADi::JacobianInternal::adjSeed "";
-
-%feature("docstring")  CasADi::JacobianInternal::adjSeedNoCheck "";
-
-%feature("docstring")  CasADi::JacobianInternal::adjSeedNoCheck "";
-
-%feature("docstring")  CasADi::JacobianInternal::adjSens "
-
-Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::JacobianInternal::adjSens "";
-
-%feature("docstring")  CasADi::JacobianInternal::adjSensNoCheck "";
-
-%feature("docstring")  CasADi::JacobianInternal::adjSensNoCheck "";
-
-%feature("docstring")  CasADi::JacobianInternal::JacobianInternal "
-
-New constructor. ";
-
-%feature("docstring")  CasADi::JacobianInternal::clone "
-
-Clone. ";
-
-%feature("docstring")  CasADi::JacobianInternal::deepCopyMembers "
-
-Deep copy data members. ";
-
-%feature("docstring")  CasADi::JacobianInternal::~JacobianInternal "
-
-Destructor. ";
-
-%feature("docstring")  CasADi::JacobianInternal::evaluate "
-
-Evaluate the jacobian. ";
-
-%feature("docstring")  CasADi::JacobianInternal::init "
-
-Initialize. ";
-
-%feature("docstring")  CasADi::JacobianInternal::updateNumSens "
-
-Update the number of sensitivity directions during or after initialization,
-if recursive==true, updateNumSens is also invoked for the baseclass. ";
-
-%feature("docstring")  CasADi::JacobianInternal::requestNumSens "
-
-Request a number of forward/adjoint derivative directions. ";
-
-%feature("docstring")  CasADi::JacobianInternal::spEvaluate "
-
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward. ";
-
-%feature("docstring")  CasADi::JacobianInternal::spCanEvaluate "
-
-Is the class able to propate seeds through the algorithm? ";
-
-%feature("docstring")  CasADi::JacobianInternal::spInit "
-
-Reset the sparsity propagation. ";
-
-%feature("docstring")  CasADi::JacobianInternal::evalSX "
-
-Evaluate symbolically, SX type. ";
-
-%feature("docstring")  CasADi::JacobianInternal::evalMX "
-
-Evaluate symbolically, MX type. ";
-
-%feature("docstring")  CasADi::JacobianInternal::call "
-
-Call a function, MX type (overloaded) ";
-
-%feature("docstring")  CasADi::JacobianInternal::call "
-
-Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::JacobianInternal::iStruct "
-
-Access an input. ";
-
-%feature("docstring")  CasADi::JacobianInternal::iStruct "
-
-Const access an input. ";
-
-%feature("docstring")  CasADi::JacobianInternal::oStruct "
-
-Access an output. ";
-
-%feature("docstring")  CasADi::JacobianInternal::oStruct "
-
-Const access an output. ";
-
-%feature("docstring")  CasADi::JacobianInternal::print "
-
-Print. ";
-
-%feature("docstring")  CasADi::JacobianInternal::repr "
-
-Print. ";
-
-%feature("docstring")  CasADi::JacobianInternal::inputSchemeEntry "
-
-Find the index for a string describing a particular entry of an input scheme
-example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
-to SCHEME_NLPINput. ";
-
-%feature("docstring")  CasADi::JacobianInternal::outputSchemeEntry "
-
-Find the index for a string describing a particular entry of an output
-scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
-adheres to SCHEME_NLPINput. ";
-
-%feature("docstring")  CasADi::JacobianInternal::schemeEntry "
-
-Find the index for a string describing a particular entry of a scheme
-example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
-to SCHEME_NLPINput. ";
-
-%feature("docstring")  CasADi::JacobianInternal::getPartition "
-
-Get the unidirectional or bidirectional partition. ";
-
-%feature("docstring")  CasADi::JacobianInternal::verbose "
-
-Verbose mode? ";
-
-%feature("docstring")  CasADi::JacobianInternal::monitored "
-
-Is function fcn being monitored. ";
-
-%feature("docstring")  CasADi::JacobianInternal::setNumInputs "
-
-Set the number of function inputs. ";
-
-%feature("docstring")  CasADi::JacobianInternal::setNumOutputs "
-
-Set the number of function outputs. ";
-
-%feature("docstring")  CasADi::JacobianInternal::getNumInputs "
-
-Get the number of function inputs. ";
-
-%feature("docstring")  CasADi::JacobianInternal::getNumOutputs "
-
-Get the number of function outputs. ";
-
-%feature("docstring")  CasADi::JacobianInternal::getNumScalarInputs "
-
-Get total number of scalar inputs (i.e. the number of nonzeros in all of the
-matrix-valued inputs) ";
-
-%feature("docstring")  CasADi::JacobianInternal::getNumScalarOutputs "
-
-Get total number of scalar outputs (i.e. the number of nonzeros in all of
-the matrix-valued outputs) ";
-
-%feature("docstring")  CasADi::JacobianInternal::getStats "
-
-Get all statistics obtained at the end of the last evaluate call. ";
-
-%feature("docstring")  CasADi::JacobianInternal::getStat "
-
-Get single statistic obtained at the end of the last evaluate call. ";
-
-%feature("docstring")  CasADi::JacobianInternal::getJacSparsity "
-
-Generate the sparsity of a Jacobian block. ";
-
-%feature("docstring")  CasADi::JacobianInternal::setJacSparsity "
-
-Generate the sparsity of a Jacobian block. ";
-
-%feature("docstring")  CasADi::JacobianInternal::jacSparsity "
-
-Get, if necessary generate, the sparsity of a Jacobian block. ";
-
-%feature("docstring")  CasADi::JacobianInternal::symbolicInput "
-
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
-
-%feature("docstring")  CasADi::JacobianInternal::symbolicInputSX "
-
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
-
-%feature("docstring")  CasADi::JacobianInternal::log "
-
-Log the status of the solver. ";
-
-%feature("docstring")  CasADi::JacobianInternal::log "
-
-Log the status of the solver, function given. ";
-
-%feature("docstring")  CasADi::JacobianInternal::setOption "
-
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
-
-%feature("docstring")  CasADi::JacobianInternal::setOption "
-
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
-
-%feature("docstring")  CasADi::JacobianInternal::getOptionNames "
-
-Get a list of all option names. ";
-
-%feature("docstring")  CasADi::JacobianInternal::getOptionDescription "
-
-Get the description of a certain option. ";
-
-%feature("docstring")  CasADi::JacobianInternal::getOptionType "
-
-Get the type of a certain option. ";
-
-%feature("docstring")  CasADi::JacobianInternal::getOptionTypeName "
-
-Get the type name of a certain option. ";
-
-%feature("docstring")  CasADi::JacobianInternal::getOptionDefault "
-
-Get the default of a certain option. ";
-
-%feature("docstring")  CasADi::JacobianInternal::getOptionAllowed "
-
-Get the allowed values of a certain option. ";
-
-%feature("docstring")  CasADi::JacobianInternal::hasOption "
-
-check if there is an option str ";
-
-%feature("docstring")  CasADi::JacobianInternal::hasSetOption "
-
-check if the user has there is an option str ";
-
-%feature("docstring")  CasADi::JacobianInternal::printOptions "
-
-Print options to a stream. ";
-
-%feature("docstring")  CasADi::JacobianInternal::printOption "
-
-Print all information there is to know about a certain option. ";
-
-%feature("docstring")  CasADi::JacobianInternal::getOption "
-
-get an option value ";
-
-%feature("docstring")  CasADi::JacobianInternal::copyOptions "
-
-Copy all options from another object. ";
-
-%feature("docstring")  CasADi::JacobianInternal::dictionary "
-
-Get the dictionary. ";
-
-%feature("docstring")  CasADi::JacobianInternal::getBestMatches "
-
-Get th ebest suggestions of option names. ";
-
-%feature("docstring")  CasADi::JacobianInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::JacobianInternal::unregRef "
-
-Unregister a weak reference. ";
-
-%feature("docstring")  CasADi::JacobianInternal::getCount "
-
-Get the reference count. ";
-
-%feature("docstring")  CasADi::JacobianInternal::isInit "
-
-Check if the object has been initialized. ";
-
-%feature("docstring")  CasADi::JacobianInternal::assertInit "
-
-Assert that the object has been initialized. ";
+C++ includes: b0_options.hpp ";
 
 
 // File: classCasADi_1_1KinsolInternal.xml
@@ -50725,14 +49833,6 @@ If H is not positive-definite, the solver should throw an error.
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| convex       | OT_BOOLEAN   | false        | Specify true | CasADi::QPSo |
-|              |              |              | if you can   | lverInternal |
-|              |              |              | guarantee    |              |
-|              |              |              | that H will  |              |
-|              |              |              | always be    |              |
-|              |              |              | positive     |              |
-|              |              |              | definite     |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -51308,14 +50408,6 @@ Joris Gillis
 |              |              |              | (forward|rev |              |
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
-+--------------+--------------+--------------+--------------+--------------+
-| convex       | OT_BOOLEAN   | false        | Specify true | CasADi::QPSo |
-|              |              |              | if you can   | lverInternal |
-|              |              |              | guarantee    |              |
-|              |              |              | that H will  |              |
-|              |              |              | always be    |              |
-|              |              |              | positive     |              |
-|              |              |              | definite     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -56626,14 +55718,6 @@ If H is not positive-definite, the solver should throw an error.
 |              |              |              | setArTol to  |              |
 |              |              |              | OOQP         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| convex       | OT_BOOLEAN   | false        | Specify true | CasADi::QPSo |
-|              |              |              | if you can   | lverInternal |
-|              |              |              | guarantee    |              |
-|              |              |              | that H will  |              |
-|              |              |              | always be    |              |
-|              |              |              | positive     |              |
-|              |              |              | definite     |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -57237,14 +56321,6 @@ reInit();
 |              |              |              | with         |              |
 |              |              |              | setArTol to  |              |
 |              |              |              | OOQP         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| convex       | OT_BOOLEAN   | false        | Specify true | CasADi::QPSo |
-|              |              |              | if you can   | lverInternal |
-|              |              |              | guarantee    |              |
-|              |              |              | that H will  |              |
-|              |              |              | always be    |              |
-|              |              |              | positive     |              |
-|              |              |              | definite     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -59801,14 +58877,6 @@ If H is not positive-definite, the solver should throw an error.
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
-| convex       | OT_BOOLEAN   | False        | Specify true | CasADi::QPOa |
-|              |              |              | if you can   | sesInternal  |
-|              |              |              | guarantee    |              |
-|              |              |              | that H will  |              |
-|              |              |              | always be    |              |
-|              |              |              | positive     |              |
-|              |              |              | definite     |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG |              | Function     | CasADi::QPOa |
 | erator       | ENERATOR     |              | pointer that | sesInternal  |
 |              |              |              | returns a    |              |
@@ -60400,14 +59468,6 @@ Joris Gillis, Joel Andersson
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
-+--------------+--------------+--------------+--------------+--------------+
-| convex       | OT_BOOLEAN   | False        | Specify true | CasADi::QPOa |
-|              |              |              | if you can   | sesInternal  |
-|              |              |              | guarantee    |              |
-|              |              |              | that H will  |              |
-|              |              |              | always be    |              |
-|              |              |              | positive     |              |
-|              |              |              | definite     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG |              | Function     | CasADi::QPOa |
 | erator       | ENERATOR     |              | pointer that | sesInternal  |
@@ -61151,14 +60211,6 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
-| convex       | OT_BOOLEAN   | false        | Specify true | CasADi::QPSo |
-|              |              |              | if you can   | lverInternal |
-|              |              |              | guarantee    |              |
-|              |              |              | that H will  |              |
-|              |              |              | always be    |              |
-|              |              |              | positive     |              |
-|              |              |              | definite     |              |
-+--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -61871,14 +60923,6 @@ Internal class.
 |              |              |              | (forward|rev |              |
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
-+--------------+--------------+--------------+--------------+--------------+
-| convex       | OT_BOOLEAN   | false        | Specify true | CasADi::QPSo |
-|              |              |              | if you can   | lverInternal |
-|              |              |              | guarantee    |              |
-|              |              |              | that H will  |              |
-|              |              |              | always be    |              |
-|              |              |              | positive     |              |
-|              |              |              | definite     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -79278,18 +78322,6 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: ipopt__solver_8hpp.xml
-
-
-// File: jacobian_8cpp.xml
-
-
-// File: jacobian_8hpp.xml
-
-
-// File: jacobian__internal_8cpp.xml
-
-
-// File: jacobian__internal_8hpp.xml
 
 
 // File: jacSparsity_8hpp.xml
