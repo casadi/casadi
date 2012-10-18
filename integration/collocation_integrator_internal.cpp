@@ -160,45 +160,33 @@ void CollocationIntegratorInternal::init(){
   int nX = (nk*(deg+1)+1)*(nx_+nrx_);
   
   // Unknowns
-  MX V("V",nX-nx_-nrx_);
+  MX V("V",nX);
   int offset = 0;
   
   // Get collocated states
   vector<vector<MX> > X(nk+1);
   vector<vector<MX> > RX(nk+1);
-  for(int k=0; k<nk; ++k){
-    X[k].resize(deg+1);
-    RX[k].resize(deg+1);
+  for(int k=0; k<nk+1; ++k){
+    // Number of collocation point, plus beginning of interval
+    int nj = k==nk ? 1 : deg+1;
+    X[k].resize(nj);
+    RX[k].resize(nj);
 
     // Get the expression for the state vector
-    for(int j=0; j<deg+1; ++j){
-      
-      // If it's the first interval
-      if(k==0 && j==0){
-        X[k][j] = X0;
-      } else {
-        X[k][j] = V[range(offset,offset+nx_)];
-        offset += nx_;
-      }
+    for(int j=0; j<nj; ++j){
+      X[k][j] = V[range(offset,offset+nx_)];
+      offset += nx_;
       RX[k][j] = V[range(offset,offset+nrx_)];
       offset += nrx_;
     }
   }
-  
-  // State at end time
-  X[nk].resize(1);
-  X[nk][0] = V[range(offset,offset+nx_)];
-  offset += nx_;
-  
-  RX[nk].resize(1);
-  RX[nk][0] = RX0;
   
   // Check offset for consistency
   casadi_assert(offset==V.size());
 
   // Constraints
   vector<MX> g;
-  g.reserve(nk);
+  g.reserve(2*(nk+1));
   
   // Quadrature expressions
   MX QF = MX::zeros(nq_);
@@ -206,6 +194,9 @@ void CollocationIntegratorInternal::init(){
   
   // Counter
   int jk = 0;
+  
+  // Add initial condition
+  g.push_back(X[0][0]-X0);
   
   // For all finite elements
   for(int k=0; k<nk; ++k, ++jk){
@@ -303,6 +294,11 @@ void CollocationIntegratorInternal::init(){
       // Add continuity equation to NLP
       g.push_back(RX[k+1][0] - rxf_k);
     }
+  }
+  
+  // Add initial condition for the backward integration
+  if(nrx_>0){
+    g.push_back(RX[nk][0]-RX0);
   }
   
   // Constraint expression
@@ -411,7 +407,7 @@ void CollocationIntegratorInternal::reset(int nsens, int nsensB, int nsensB_stor
       startup_integrator_.reset();
       
       // Integrate, stopping at all time points
-      int offs=nrx_;
+      int offs=0;
       for(vector<double>::const_iterator it=times_.begin(); it!=times_.end(); ++it){
         // Integrate to the time point
         startup_integrator_.integrate(*it);
@@ -434,11 +430,11 @@ void CollocationIntegratorInternal::reset(int nsens, int nsensB, int nsensB_stor
       const vector<double>& x0 = input(INTEGRATOR_X0).data();
       const vector<double>& rx0 = input(INTEGRATOR_RX0).data();
       for(int offs=0; offs<v.size(); offs+=nx_+nrx_){
-        for(int i=0; i<nrx_; ++i){
-          v[i+offs] = rx0[i];
-        }
         for(int i=0; i<nx_; ++i){
-          v[i+offs+nrx_] = x0[i];
+          v[i+offs] = x0[i];
+        }
+        for(int i=0; i<nrx_; ++i){
+          v[i+offs+nx_] = rx0[i];
         }
       }
     }
@@ -466,11 +462,11 @@ void CollocationIntegratorInternal::integrate(double t_out){
   vector<double>& xf = output(INTEGRATOR_XF).data();
   vector<double>& rxf = output(INTEGRATOR_RXF).data();
   
-  for(int i=0; i<nrx_; ++i){
-    rxf[i] = V[i];
-  }
   for(int i=0; i<nx_; ++i){
-    xf[i] = V[V.size()-nx_+i];
+    xf[i] = V[V.size()-nx_-nrx_+i];
+  }
+  for(int i=0; i<nrx_; ++i){
+    rxf[i] = V[nx_+i];
   }
   
   for(int dir=0; dir<nsens_; ++dir){
@@ -479,8 +475,8 @@ void CollocationIntegratorInternal::integrate(double t_out){
     vector<double>& xf = fwdSens(INTEGRATOR_XF,dir).data();
     vector<double>& rxf = fwdSens(INTEGRATOR_RXF,dir).data();
     
-    for(int i=0; i<nrx_; ++i) rxf[i] = V[i];
-    for(int i=0; i<nx_; ++i)  xf[i] = V[V.size()-nx_+i];
+    for(int i=0; i<nx_; ++i)  xf[i] = V[V.size()-nx_-nrx_+i];
+    for(int i=0; i<nrx_; ++i) rxf[i] = V[nx_+i];
   }
 }
 
