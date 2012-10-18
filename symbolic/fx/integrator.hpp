@@ -170,8 +170,6 @@ enum IntegratorOutput{
   INTEGRATOR_RXF,
   ///  Backward quadrature state at the initial time [rqf]
   INTEGRATOR_RQF,
-  ///  Algebraic state at the final time [zf]
-  INTEGRATOR_ZF,
   /// Number of output arguments of an integrator
   INTEGRATOR_NUM_OUT
 };
