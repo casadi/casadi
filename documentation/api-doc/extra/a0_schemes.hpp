@@ -1,12 +1,11 @@
 /** \defgroup scheme_IntegratorOutput
 <table>
-<caption>Output scheme: CasADi::IntegratorOutput  (INTEGRATOR_NUM_OUT = 5) </caption>
+<caption>Output scheme: CasADi::IntegratorOutput  (INTEGRATOR_NUM_OUT = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>INTEGRATOR_XF</td><td>Differential state at the final time [xf].</td></tr>
 <tr><td>INTEGRATOR_QF</td><td>Quadrature state at the final time [qf].</td></tr>
 <tr><td>INTEGRATOR_RXF</td><td>Backward differential state at the initial time [rxf].</td></tr>
 <tr><td>INTEGRATOR_RQF</td><td>Backward quadrature state at the initial time [rqf].</td></tr>
-<tr><td>INTEGRATOR_ZF</td><td>Algebraic state at the final time [zf].</td></tr>
 </table>
 */
 /** \defgroup scheme_JACInput

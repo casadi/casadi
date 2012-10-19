@@ -6917,27 +6917,9 @@ Integrate until a specified time point. ";
 
 Integrate backwards in time until a specified time point. ";
 
-%feature("docstring")  CasADi::CollocationIntegratorInternal::getJacobian "
-
-Get the jacobian in the nonlinear iteration. ";
-
-%feature("docstring")
-CasADi::CollocationIntegratorInternal::getLinearSolver "
-
-Get the Linear solver. ";
-
-%feature("docstring")
-CasADi::CollocationIntegratorInternal::setLinearSolver "
-
-Set linear solver. ";
-
 %feature("docstring")  CasADi::CollocationIntegratorInternal::printStats "
 
-Print statistics. ";
-
-%feature("docstring")  CasADi::CollocationIntegratorInternal::setStopTime "
-
-Set the stop time of the forward integration. ";
+Print solver statistics. ";
 
 %feature("docstring")  CasADi::CollocationIntegratorInternal::evaluate "
 
@@ -21670,9 +21652,7 @@ Correct the initial conditions, i.e. calculate. ";
 
 %feature("docstring")  CasADi::IdasInternal::initUserDefinedLinearSolverB "";
 
-%feature("docstring")  CasADi::IdasInternal::setLinearSolver "
-
-Set linear solver. ";
+%feature("docstring")  CasADi::IdasInternal::setLinearSolver "";
 
 %feature("docstring")  CasADi::IdasInternal::evaluate "
 
@@ -24534,10 +24514,6 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::IntegratorInternal::create "
 
 Create a new integrator. ";
-
-%feature("docstring")  CasADi::IntegratorInternal::setLinearSolver "
-
-Set linear solver. ";
 
 %feature("docstring")  CasADi::IntegratorInternal::printStats "
 
@@ -33362,298 +33338,6 @@ Allows setting information about variables and constraints ";
 %feature("docstring")  CasADi::IpoptUserClass::finalize_metadata "
 
 Retrieve information about variables and constraints ";
-
-
-// File: classCasADi_1_1Jacobian.xml
-%feature("docstring") CasADi::Jacobian "
-
->List of available options
-+--------------+--------------+--------------+--------------+--------------+
-|      Id      |     Type     |   Default    | Description  |   Used in    |
-+==============+==============+==============+==============+==============+
-| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
-|              |              |              | calculate    | ternal       |
-|              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
-|              |              |              | decides      |              |
-|              |              |              | which is     |              |
-|              |              |              | more         |              |
-|              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
-| erator       | ENERATOR     | )            | pointer that | ternal       |
-|              |              |              | returns a    |              |
-|              |              |              | Jacobian     |              |
-|              |              |              | function     |              |
-|              |              |              | given a set  |              |
-|              |              |              | of desired   |              |
-|              |              |              | Jacobian     |              |
-|              |              |              | blocks,      |              |
-|              |              |              | overrides    |              |
-|              |              |              | internal     |              |
-|              |              |              | routines     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
-|              |              |              | \" to grow    |              |
-|              |              |              | until it     |              |
-|              |              |              | reaches this |              |
-|              |              |              | number       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
-|              |              |              | \" to grow    |              |
-|              |              |              | until it     |              |
-|              |              |              | reaches this |              |
-|              |              |              | number       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
-|              | TOR          | )            | be activated | ternal       |
-|              |              |              | (inputs|outp |              |
-|              |              |              | uts)         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
-| j_dir        |              |              | adjoint      | ternal       |
-|              |              |              | derivatives  |              |
-|              |              |              | to be        |              |
-|              |              |              | calculated s |              |
-|              |              |              | imultanously |              |
-+--------------+--------------+--------------+--------------+--------------+
-| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
-| d_dir        |              |              | forward      | ternal       |
-|              |              |              | derivatives  |              |
-|              |              |              | to be        |              |
-|              |              |              | calculated s |              |
-|              |              |              | imultanously |              |
-+--------------+--------------+--------------+--------------+--------------+
-| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
-| ian          |              |              | Hessians     | ternal       |
-|              |              |              | numerically  |              |
-|              |              |              | (using       |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives) |              |
-|              |              |              | rather than  |              |
-|              |              |              | with the     |              |
-|              |              |              | built-in     |              |
-|              |              |              | method       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
-| bian         |              |              | Jacobians    | ternal       |
-|              |              |              | numerically  |              |
-|              |              |              | (using       |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives) |              |
-|              |              |              | rather than  |              |
-|              |              |              | with the     |              |
-|              |              |              | built-in     |              |
-|              |              |              | method       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
-|              |              |              | sparse       | ternal       |
-+--------------+--------------+--------------+--------------+--------------+
-| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
-| erator       | ENERATOR     | )            | that         | ternal       |
-|              |              |              | provides     |              |
-|              |              |              | sparsity for |              |
-|              |              |              | a given      |              |
-|              |              |              | input output |              |
-|              |              |              | block,       |              |
-|              |              |              | overrides    |              |
-|              |              |              | internal     |              |
-|              |              |              | routines     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
-| ans          |              |              | references   | ternal       |
-|              |              |              | to generated |              |
-|              |              |              | Jacobians in |              |
-|              |              |              | order to     |              |
-|              |              |              | avoid        |              |
-|              |              |              | generating   |              |
-|              |              |              | identical    |              |
-|              |              |              | Jacobians    |              |
-|              |              |              | multiple     |              |
-|              |              |              | times        |              |
-+--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
-|              |              | )            | defined      | ternal       |
-|              |              |              | field that   |              |
-|              |              |              | can be used  |              |
-|              |              |              | to identify  |              |
-|              |              |              | the function |              |
-|              |              |              | or pass      |              |
-|              |              |              | additional   |              |
-|              |              |              | information  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
-|              |              |              | evaluation   | ternal       |
-|              |              |              | for          |              |
-|              |              |              | debugging    |              |
-+--------------+--------------+--------------+--------------+--------------+
-
-C++ includes: b0_options.hpp ";
-
-
-// File: classCasADi_1_1JacobianInternal.xml
-%feature("docstring") CasADi::JacobianInternal "
-
->List of available options
-+--------------+--------------+--------------+--------------+--------------+
-|      Id      |     Type     |   Default    | Description  |   Used in    |
-+==============+==============+==============+==============+==============+
-| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
-|              |              |              | calculate    | ternal       |
-|              |              |              | the          |              |
-|              |              |              | Jacobians:   |              |
-|              |              |              | \"forward\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | forward      |              |
-|              |              |              | mode)        |              |
-|              |              |              | \"reverse\"    |              |
-|              |              |              | (only        |              |
-|              |              |              | adjoint      |              |
-|              |              |              | mode) or     |              |
-|              |              |              | \"automatic\"  |              |
-|              |              |              | (a heuristic |              |
-|              |              |              | decides      |              |
-|              |              |              | which is     |              |
-|              |              |              | more         |              |
-|              |              |              | appropriate) |              |
-|              |              |              | (forward|rev |              |
-|              |              |              | erse|automat |              |
-|              |              |              | ic)          |              |
-+--------------+--------------+--------------+--------------+--------------+
-| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
-| erator       | ENERATOR     | )            | pointer that | ternal       |
-|              |              |              | returns a    |              |
-|              |              |              | Jacobian     |              |
-|              |              |              | function     |              |
-|              |              |              | given a set  |              |
-|              |              |              | of desired   |              |
-|              |              |              | Jacobian     |              |
-|              |              |              | blocks,      |              |
-|              |              |              | overrides    |              |
-|              |              |              | internal     |              |
-|              |              |              | routines     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
-|              |              |              | \" to grow    |              |
-|              |              |              | until it     |              |
-|              |              |              | reaches this |              |
-|              |              |              | number       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
-|              |              |              | \" to grow    |              |
-|              |              |              | until it     |              |
-|              |              |              | reaches this |              |
-|              |              |              | number       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
-|              | TOR          | )            | be activated | ternal       |
-|              |              |              | (inputs|outp |              |
-|              |              |              | uts)         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
-|              |              | red_object\"  | object       | onsFunctiona |
-|              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
-| j_dir        |              |              | adjoint      | ternal       |
-|              |              |              | derivatives  |              |
-|              |              |              | to be        |              |
-|              |              |              | calculated s |              |
-|              |              |              | imultanously |              |
-+--------------+--------------+--------------+--------------+--------------+
-| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
-| d_dir        |              |              | forward      | ternal       |
-|              |              |              | derivatives  |              |
-|              |              |              | to be        |              |
-|              |              |              | calculated s |              |
-|              |              |              | imultanously |              |
-+--------------+--------------+--------------+--------------+--------------+
-| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
-| ian          |              |              | Hessians     | ternal       |
-|              |              |              | numerically  |              |
-|              |              |              | (using       |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives) |              |
-|              |              |              | rather than  |              |
-|              |              |              | with the     |              |
-|              |              |              | built-in     |              |
-|              |              |              | method       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
-| bian         |              |              | Jacobians    | ternal       |
-|              |              |              | numerically  |              |
-|              |              |              | (using       |              |
-|              |              |              | directional  |              |
-|              |              |              | derivatives) |              |
-|              |              |              | rather than  |              |
-|              |              |              | with the     |              |
-|              |              |              | built-in     |              |
-|              |              |              | method       |              |
-+--------------+--------------+--------------+--------------+--------------+
-| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
-|              |              |              | sparse       | ternal       |
-+--------------+--------------+--------------+--------------+--------------+
-| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
-| erator       | ENERATOR     | )            | that         | ternal       |
-|              |              |              | provides     |              |
-|              |              |              | sparsity for |              |
-|              |              |              | a given      |              |
-|              |              |              | input output |              |
-|              |              |              | block,       |              |
-|              |              |              | overrides    |              |
-|              |              |              | internal     |              |
-|              |              |              | routines     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
-| ans          |              |              | references   | ternal       |
-|              |              |              | to generated |              |
-|              |              |              | Jacobians in |              |
-|              |              |              | order to     |              |
-|              |              |              | avoid        |              |
-|              |              |              | generating   |              |
-|              |              |              | identical    |              |
-|              |              |              | Jacobians    |              |
-|              |              |              | multiple     |              |
-|              |              |              | times        |              |
-+--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
-|              |              | )            | defined      | ternal       |
-|              |              |              | field that   |              |
-|              |              |              | can be used  |              |
-|              |              |              | to identify  |              |
-|              |              |              | the function |              |
-|              |              |              | or pass      |              |
-|              |              |              | additional   |              |
-|              |              |              | information  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
-|              |              |              | evaluation   | ternal       |
-|              |              |              | for          |              |
-|              |              |              | debugging    |              |
-+--------------+--------------+--------------+--------------+--------------+
-
-C++ includes: b0_options.hpp ";
 
 
 // File: classCasADi_1_1KinsolInternal.xml
@@ -62681,31 +62365,15 @@ Integrate backward in time until a specified time point. ";
 
 %feature("docstring")  CasADi::RKIntegratorInternal::getJacobian "
 
-Get the jacobian in the nonlinear iteration. ";
-
-%feature("docstring")  CasADi::RKIntegratorInternal::getLinearSolver "
-
-Get the Linear solver. ";
-
-%feature("docstring")  CasADi::RKIntegratorInternal::setLinearSolver "
-
-Set linear solver. ";
-
-%feature("docstring")  CasADi::RKIntegratorInternal::printStats "
-
-Print statistics. ";
-
-%feature("docstring")  CasADi::RKIntegratorInternal::setStopTime "
-
-Set the stop time of the forward integration. ";
-
-%feature("docstring")  CasADi::RKIntegratorInternal::getJacobian "
-
 Generate a function that calculates a Jacobian function. ";
 
 %feature("docstring")  CasADi::RKIntegratorInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::printStats "
+
+Print solver statistics. ";
 
 %feature("docstring")  CasADi::RKIntegratorInternal::spEvaluate "
 
@@ -68169,10 +67837,6 @@ Clone. ";
 
 Create a new integrator. ";
 
-%feature("docstring")  CasADi::SundialsInternal::setLinearSolver "
-
-Set linear solver. ";
-
 %feature("docstring")  CasADi::SundialsInternal::printStats "
 
 Print solver statistics. ";
@@ -69119,7 +68783,7 @@ Single (scalar/vector/matrix valued) input, multiple (matrix valued) output.
 
 Jacobian via source code transformation.
 
-See:   CasADi::Jacobian for an AD approach ";
+See:  CasADi::Jacobian for an AD approach ";
 
 %feature("docstring")  CasADi::SXFunction::grad "
 
