@@ -32,7 +32,7 @@
 #include <fstream>
 #include <cmath>
 #include <cfloat>
-
+#include <deque>
 
 using namespace std;
 namespace CasADi{
