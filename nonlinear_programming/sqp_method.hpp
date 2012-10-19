@@ -84,10 +84,6 @@ class SQPMethod : public NLPSolver {
     %nocallback;
     #endif
 
-    /// @Joris: This would be an alternative
-    static NLPSolverCreator getCreator(){return creator;}
-    
-    
     /// Access the QPSolver used internally
     const QPSolver getQPSolver() const;
     

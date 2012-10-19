@@ -77,11 +77,11 @@ SXFunction::SXFunction(const SXMatrix& arg, const std::vector< SXMatrix>& res){
 
 
 const SXFunctionInternal* SXFunction::operator->() const{
-  return (const SXFunctionInternal*)FX::operator->();
+  return static_cast<const SXFunctionInternal*>(FX::operator->());
 }
 
 SXFunctionInternal* SXFunction::operator->(){
-  return (SXFunctionInternal*)FX::operator->();
+  return static_cast<SXFunctionInternal*>(FX::operator->());
 }
 
 bool SXFunction::checkNode() const{

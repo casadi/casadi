@@ -34,19 +34,19 @@ SQPMethod::SQPMethod(const FX& F, const FX& G, const FX& H, const FX& J){
 }
 
 SQPInternal* SQPMethod::operator->(){
-  return (SQPInternal*)(NLPSolver::operator->());
+  return static_cast<SQPInternal*>(NLPSolver::operator->());
 }
 
 const SQPInternal* SQPMethod::operator->() const{
-  return (const SQPInternal*)(NLPSolver::operator->());
+  return static_cast<const SQPInternal*>(NLPSolver::operator->());
 }
     
 bool SQPMethod::checkNode() const{
-  return dynamic_cast<const SQPInternal*>(get());
+  return dynamic_cast<const SQPInternal*>(get())!=0;
 }
 
 const QPSolver SQPMethod::getQPSolver() const {
-  return dynamic_cast<const SQPInternal*>(get())->getQPSolver();
+  return (*this)->getQPSolver();
 }
     
 

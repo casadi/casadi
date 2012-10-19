@@ -61,11 +61,6 @@ class LiftedSQP : public NLPSolver {
     #ifdef SWIG
     %nocallback;
     #endif
-
-    /// @Joris: This would be an alternative
-    static NLPSolverCreator getCreator(){return creator;}
-
-    
 };
 
 } // namespace CasADi
