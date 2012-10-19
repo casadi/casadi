@@ -375,6 +375,9 @@ class FXInternal : public OptionsFunctionalityNode{
     /// The name of the output scheme of this function
     InputOutputScheme outputScheme;
     
+    /// Errors are thrown when NaN is produced
+    bool regularity_check_;
+    
 };
 
 

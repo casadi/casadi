@@ -253,6 +253,10 @@ namespace CasADi{
   #endif // SWIGPYTHON
   #endif // SWIG
   
+  /// Checks if vector does not contain NaN or Inf
+  template<typename T>
+  bool isRegular(const std::vector<T> &vec);
+  
 } // namespace CasADi
 
 // Implementations
@@ -583,6 +587,13 @@ namespace CasADi{
   }
   
   
+  template<typename T>
+  bool isRegular(const std::vector<T> &vec) {
+    for (int k=0;k<vec.size();++k) {
+      if (vec[k]!=vec[k] || vec[k]==std::numeric_limits<T>::infinity() || vec[k]==-std::numeric_limits<T>::infinity() ) return false;
+    }
+    return true;
+  }
   
 } // namespace CasADi
 
@@ -601,7 +612,8 @@ VTT_INST(T,isDecreasing) \
 VTT_INST(T,isNonIncreasing) \
 VTT_INST(T,isNonDecreasing) \
 VTT_INST(T,isMonotone) \
-VTT_INST(T,isStrictlyMonotone)
+VTT_INST(T,isStrictlyMonotone) \
+VTT_INST(T,isRegular) \
 
 #endif //SWIG
 

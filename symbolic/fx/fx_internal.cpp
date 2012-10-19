@@ -49,6 +49,7 @@ FXInternal::FXInternal(){
   addOption("sparsity_generator",       OT_SPARSITYGENERATOR,   GenericType(),  "Function that provides sparsity for a given input output block, overrides internal routines");
   addOption("user_data",                OT_VOIDPTR,             GenericType(),  "A user-defined field that can be used to identify the function or pass additional information");
   addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "Monitors to be activated","inputs|outputs");
+  addOption("regularity_check",         OT_BOOLEAN,             true,          "Throw exceptions when NaN or Inf appears during evaluation");
   
   verbose_ = false;
   jacgen_ = 0;
@@ -68,6 +69,7 @@ FXInternal::~FXInternal(){
 
 void FXInternal::init(){
   verbose_ = getOption("verbose");
+  regularity_check_ = getOption("regularity_check");
   bool store_jacobians = getOption("store_jacobians");
   casadi_assert_warning(!store_jacobians,"Option \"store_jacobians\" has been deprecated. Jacobians are now always cached.");
   

@@ -466,6 +466,8 @@ bool IpoptInternal::eval_h(const double* x, bool new_x, double obj_factor, const
       // Get results
       H_.output().get(values,SPARSESYM);
       
+      if (regularity_check_ && !isRegular(H_.output().data())) casadi_error("IpoptInternal::h: NaN or Inf detected.");
+      
     }
     double time2 = clock();
     t_eval_h_ += double(time2-time1)/CLOCKS_PER_SEC;
@@ -515,11 +517,12 @@ bool IpoptInternal::eval_jac_g(int n, const double* x, bool new_x,int m, int nel
         cout << "J = " << endl;
         J_.output().printSparse();
       }
+      if (regularity_check_ && !isRegular(J_.output().data())) casadi_error("IpoptInternal::jac_g: NaN or Inf detected.");
     }
     
     double time2 = clock();
     t_eval_jac_g_ += double(time2-time1)/CLOCKS_PER_SEC;
-    
+
     log("eval_jac_g ok");
     return true;
   } catch (exception& ex){
@@ -552,6 +555,8 @@ bool IpoptInternal::eval_f(int n, const double* x, bool new_x, double& obj_value
       cout << "obj_value = " << obj_value << endl;
     }
 
+    if (regularity_check_ && !isRegular(F_.output().data())) casadi_error("IpoptInternal::f: NaN or Inf detected.");
+    
     double time2 = clock();
     t_eval_f_ += double(time2-time1)/CLOCKS_PER_SEC;
 
@@ -586,10 +591,12 @@ bool IpoptInternal::eval_g(int n, const double* x, bool new_x, int m, double* g)
         cout << "g = " << G_.output() << endl;
       }
     }
-      
+    
+    if (regularity_check_ && !isRegular(G_.output().data())) casadi_error("IpoptInternal::g: NaN or Inf detected.");
+          
     double time2 = clock();
     t_eval_g_ += double(time2-time1)/CLOCKS_PER_SEC;
-    
+
     log("eval_g ok");
     return true;
   } catch (exception& ex){
@@ -625,6 +632,8 @@ bool IpoptInternal::eval_grad_f(int n, const double* x, bool new_x, double* grad
         cout << "grad_f = " << F_.adjSens() << endl;
       }
       
+      if (regularity_check_ && !isRegular(F_.adjSens().data())) casadi_error("IpoptInternal::grad_f: NaN or Inf detected.");
+      
     } else {
       
       // Pass the argument to the function
@@ -640,18 +649,12 @@ bool IpoptInternal::eval_grad_f(int n, const double* x, bool new_x, double* grad
       if(monitored("eval_grad_f")){
         cout << "grad_f = " << GF_.output() << endl;
       }
+
+      if (regularity_check_ && !isRegular(GF_.output().data())) casadi_error("IpoptInternal::grad_f: NaN or Inf detected.");
     }
     
     double time2 = clock();
     t_eval_grad_f_ += double(time2-time1)/CLOCKS_PER_SEC;
-
-    // Check the result for regularity
-    for(int i=0; i<n; ++i){
-        if(isnan(grad_f[i]) || isinf(grad_f[i])){
-          log("eval_grad_f: result not regular");
-          return false;
-      }
-    }
 
     log("eval_grad_f ok");
     return true;

@@ -907,6 +907,7 @@ bool WorhpInternal::eval_h(const double* x, double obj_factor, const double* lam
 
     }
 
+    if (regularity_check_ && !isRegular(Hmod_.output().data())) casadi_error("WorhpInternal::eval_h: NaN or Inf detected.");
       
     double time2 = clock();
     t_eval_h_ += double(time2-time1)/CLOCKS_PER_SEC;
@@ -980,6 +981,8 @@ bool WorhpInternal::eval_f(const double* x, double scale, double& obj_value)
     }
     obj_value *= scale;
 
+    if (regularity_check_ && !isRegular(Fmod_.output().data())) casadi_error("WorhpInternal::eval_f: NaN or Inf detected.");
+
     double time2 = clock();
     t_eval_f_ += double(time2-time1)/CLOCKS_PER_SEC;
 
@@ -1014,7 +1017,8 @@ bool WorhpInternal::eval_g(const double* x, double* g)
       }
     }
 
-      
+    if (regularity_check_ && !isRegular(Gmod_.output().data())) casadi_error("WorhpInternal::eval_g: NaN or Inf detected.");
+    
     double time2 = clock();
     t_eval_g_ += double(time2-time1)/CLOCKS_PER_SEC;
     
@@ -1052,6 +1056,8 @@ bool WorhpInternal::eval_grad_f(const double* x,double scale , double* grad_f )
         cout << "grad_f = " << Fmod_.adjSens() << endl;
       }
       
+      if (regularity_check_ && !isRegular(Fmod_.adjSens().data())) casadi_error("WorhpInternal::eval_grad_f: NaN or Inf detected.");
+      
     } else {
       
       // Pass the argument to the function
@@ -1068,6 +1074,8 @@ bool WorhpInternal::eval_grad_f(const double* x,double scale , double* grad_f )
       if(monitored("eval_grad_f")){
         cout << "grad_f = " << GFmod_.output() << endl;
       }
+      
+      if (regularity_check_ && !isRegular(Gmod_.output().data())) casadi_error("WorhpInternal::eval_grad_f: NaN or Inf detected.");
     }
     
     double time2 = clock();
