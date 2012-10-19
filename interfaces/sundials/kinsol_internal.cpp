@@ -359,10 +359,23 @@ void KinsolInternal::evaluate(int nfdir, int nadir){
     
     // Solve the linear system
     linsol_.solve(&fsens.front());
+  }
   
-    // Save auxillary forward sensitivities
-    for(int oind=1; oind<getNumOutputs(); ++oind){
-      fwdSens(oind,dir).set(f_.fwdSens(oind,dir));
+  // Get auxillary forward sensitivities
+  if(getNumOutputs()>1){
+    // Pass the seeds to the implicitly defined variables
+    for(int dir=0; dir<nfdir; ++dir){
+      f_.fwdSeed(0,dir).set(fwdSens(0,dir));
+    }
+    
+    // Evaluate
+    f_.evaluate(nfdir);
+  
+    // Get the sensitivities
+    for(int dir=0; dir<nfdir; ++dir){
+      for(int oind=1; oind<getNumOutputs(); ++oind){
+        fwdSens(oind,dir).set(f_.fwdSens(oind,dir));
+      }
     }
   }
   

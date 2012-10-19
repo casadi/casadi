@@ -487,38 +487,17 @@ void CollocationIntegratorInternal::reset(int nsens, int nsensB, int nsensB_stor
   
   // Mark the system integrated at least once
   integrated_once_ = true;
-  
-  for(int oind=0; oind<INTEGRATOR_NUM_OUT; ++oind){
-    output(oind).set(implicit_solver_.output(1+oind));
-    for(int dir=0; dir<nsens; ++dir){
-      fwdSens(oind,dir).set(implicit_solver_.fwdSens(1+oind,dir));
-    }
-  }
 }
 
 void CollocationIntegratorInternal::resetB(){
 }
 
 void CollocationIntegratorInternal::integrate(double t_out){
-  const vector<double>& V = implicit_solver_.output().data();
-  vector<double>& xf = output(INTEGRATOR_XF).data();
-  vector<double>& rxf = output(INTEGRATOR_RXF).data();
-  
-  for(int i=0; i<nx_; ++i){
-    xf[i] = V[V.size()-nx_-nrx_+i];
-  }
-  for(int i=0; i<nrx_; ++i){
-    rxf[i] = V[nx_+i];
-  }
-  
-  for(int dir=0; dir<nsens_; ++dir){
-    // Get the forward sensitivities
-    const vector<double>& V = implicit_solver_.fwdSens(0,dir).data();
-    vector<double>& xf = fwdSens(INTEGRATOR_XF,dir).data();
-    vector<double>& rxf = fwdSens(INTEGRATOR_RXF,dir).data();
-    
-    for(int i=0; i<nx_; ++i)  xf[i] = V[V.size()-nx_-nrx_+i];
-    for(int i=0; i<nrx_; ++i) rxf[i] = V[nx_+i];
+  for(int oind=0; oind<INTEGRATOR_NUM_OUT; ++oind){
+    output(oind).set(implicit_solver_.output(1+oind));
+    for(int dir=0; dir<nsens_; ++dir){
+      fwdSens(oind,dir).set(implicit_solver_.fwdSens(1+oind,dir));
+    }
   }
 }
 
