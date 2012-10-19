@@ -24,7 +24,7 @@
 #define OPTIONS_FUNCTIONALITY_HPP
 
 #include "generic_type.hpp"
-#include "cached_object.hpp"
+#include "shared_object.hpp"
 #include <map>
 
 namespace CasADi{
@@ -47,7 +47,7 @@ namespace CasADi{
   Joel Andersson, K.U. Leuven 2010
   joel.andersson@esat.kuleuven.be
 */
-class OptionsFunctionality : public CachedObject{
+class OptionsFunctionality : public SharedObject{
   public:
     /// Default constructor
     OptionsFunctionality();
@@ -130,7 +130,7 @@ class OptionsFunctionality : public CachedObject{
   \author Joel Andersson 
   \date 2010
 */
-class OptionsFunctionalityNode : public CachedObjectNode{
+class OptionsFunctionalityNode : public SharedObjectNode{
   friend class OptionsFunctionality;
   public:
   

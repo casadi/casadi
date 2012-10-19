@@ -534,11 +534,11 @@ MX MX::matrix_matrix(int op, const MX &x, const MX &y){
 }
 
 MXNode* MX::operator->(){
-  return (MXNode*)SharedObject::operator->();
+  return static_cast<MXNode*>(SharedObject::operator->());
 }
 
 const MXNode* MX::operator->() const{
-  return (const MXNode*)SharedObject::operator->();
+  return static_cast<const MXNode*>(SharedObject::operator->());
 }
 
 MX MX::repmat(const MX& x, const std::pair<int, int> &nm){
@@ -608,7 +608,7 @@ MX MX::operator-() const{
   }
 }
 
-MX::MX(const MX& x) : CachedObject(x){
+MX::MX(const MX& x) : SharedObject(x){
 }
 
 const CRSSparsity& MX::sparsity() const{

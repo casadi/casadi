@@ -25,7 +25,6 @@
 #include "symbolic/stl_vector_tools.hpp"
 #include "symbolic/printable_object.hpp"
 #include "symbolic/shared_object.hpp"
-#include "symbolic/cached_object.hpp"
 #include "symbolic/generic_type.hpp"
 #include "symbolic/options_functionality.hpp"
 #include "symbolic/casadi_calculus.hpp"
@@ -55,7 +54,6 @@ VECTOR_TOOLS_TEMPLATES(double)
 
 %include "symbolic/printable_object.hpp"
 %include "symbolic/shared_object.hpp"
-%include "symbolic/cached_object.hpp"
 %include "symbolic/casadi_types.hpp"
 %include "symbolic/generic_type.hpp"
 %include "symbolic/options_functionality.hpp"

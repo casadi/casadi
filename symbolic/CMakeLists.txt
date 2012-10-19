@@ -10,7 +10,6 @@ SET(CASADI_SRCS
   casadi_options.hpp          casadi_options.cpp
   printable_object.hpp        printable_object.cpp      # Base class enabling printing a Python-style "description" as well as a shorter "representation" of a class
   shared_object.hpp           shared_object.cpp         # This base class implements the reference counting (garbage collection) framework used in CasADi
-  cached_object.hpp           cached_object.cpp         # A reference counted class with caching
   generic_type.hpp            generic_type.cpp          # Generic type used for options and for compatibility with dynamically typed languages like Python
   generic_type_internal.hpp   generic_type_internal.cpp # Internal class for the same
   options_functionality.cpp   options_functionality.hpp # Functionality for getting and setting options of a derived class

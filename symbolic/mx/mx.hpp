@@ -23,7 +23,7 @@
 #ifndef MX_HPP
 #define MX_HPP
 
-#include "../cached_object.hpp"
+#include "../shared_object.hpp"
 #include "../matrix/matrix.hpp"
 #include "../matrix/generic_expression.hpp"
 #include <vector>
@@ -49,7 +49,7 @@ class FX;
   \author Joel Andersson 
   \date 2010-2011
 */
-class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public CachedObject{
+class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public SharedObject{
   public:
   
     /** \brief  Default constructor */
