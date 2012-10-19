@@ -60,6 +60,9 @@ public:
   int maxiter_ls_;
   int merit_memsize_;
 
+  /// Access QPSolver
+  const QPSolver getQPSolver() const { return qp_solver_;}
+  
   //@}
 };
 

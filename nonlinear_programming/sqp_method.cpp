@@ -45,4 +45,9 @@ bool SQPMethod::checkNode() const{
   return dynamic_cast<const SQPInternal*>(get());
 }
 
+const QPSolver SQPMethod::getQPSolver() const {
+  return dynamic_cast<const SQPInternal*>(get())->getQPSolver();
+}
+    
+
 } // namespace CasADi

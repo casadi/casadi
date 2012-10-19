@@ -87,6 +87,10 @@ class SQPMethod : public NLPSolver {
     /// @Joris: This would be an alternative
     static NLPSolverCreator getCreator(){return creator;}
     
+    
+    /// Access the QPSolver used internally
+    const QPSolver getQPSolver() const;
+    
 };
 
 } // namespace CasADi
