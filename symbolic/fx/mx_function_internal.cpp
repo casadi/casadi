@@ -533,29 +533,27 @@ void MXFunctionInternal::spInit(bool fwd){
 
 void MXFunctionInternal::spEvaluate(bool fwd){
   if(fwd){ // Forward propagation
+
+    // Propagate sparsity forward
+    for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
+      if(it->op==OP_PARAMETER) continue;
+      if(it->op==OP_INPUT){
+        // Pass input seeds
+        vector<double> &w = work_[it->res.front()].data.data();
+        bvec_t* iwork = get_bvec_t(w);
+        bvec_t* swork = get_bvec_t(input(it->arg.front()).data());
+        copy(swork,swork+w.size(),iwork);
     
-    // Pass input seeds
-    for(int ind=0; ind<input_ind_.size(); ++ind){
-      vector<double> &w = work_[input_ind_[ind]].data.data();
-      bvec_t* iwork = get_bvec_t(w);
-      bvec_t* swork = get_bvec_t(input(ind).data());
-      for(int k=0; k<w.size(); ++k){
-	iwork[k] = swork[k];
+      } else {
+        // Point pointers to the data corresponding to the element
+        updatePointers(*it,0,0);
+
+        // Propagate sparsity forwards
+        it->data->propagateSparsity(mx_input_, mx_output_,true);
       }
     }
     
-    // Propagate sparsity forward
-    for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
-      if(it->op==OP_PARAMETER || it->op==OP_INPUT) continue;
-      
-      // Point pointers to the data corresponding to the element
-      updatePointers(*it,0,0);
-
-      // Propagate sparsity forwards
-      it->data->propagateSparsity(mx_input_, mx_output_,true);
-    }
-    
-    // Get the output seeds
+    // Get the output sensitivities
     for(int ind=0; ind<output_ind_.size(); ++ind){
       vector<double> &w = work_[output_ind_[ind]].data.data();
       bvec_t* iwork = get_bvec_t(w);
@@ -579,32 +577,33 @@ void MXFunctionInternal::spEvaluate(bool fwd){
 
     // Propagate sparsity backwards
     for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); it++){
-      if(it->op==OP_PARAMETER || it->op==OP_INPUT) continue;
-      
-      // Point pointers to the data corresponding to the element
-      updatePointers(*it,0,0);
-      
-      // Propagate sparsity backwards
-      it->data->propagateSparsity(mx_input_, mx_output_,false);
-      
-      // Clear the seeds for the next sweep
-      for(DMatrixPtrV::iterator it=mx_output_.begin(); it!=mx_output_.end(); ++it){
-        DMatrix* seed = *it;
-        if(seed){
-          bvec_t *iseed = get_bvec_t(seed->data());
-          fill_n(iseed,seed->size(),0);
+      if(it->op==OP_PARAMETER) continue;
+      if(it->op==OP_INPUT){
+        // Get the input sensitivities and clear it from the work vector
+        vector<double> &w = work_[it->res.front()].data.data();
+        bvec_t* iwork = get_bvec_t(w);
+        bvec_t* swork = get_bvec_t(input(it->arg.front()).data());
+        for(int k=0; k<w.size(); ++k){
+          swork[k] |= iwork[k];
+          iwork[k] = 0;
         }
-      }
-    }
-    
-    // Get the input seeds and clear it from the work vector
-    for(int ind=0; ind<input_ind_.size(); ++ind){
-      vector<double> &w = work_[input_ind_[ind]].data.data();
-      bvec_t* iwork = get_bvec_t(w);
-      bvec_t* swork = get_bvec_t(input(ind).data());
-      for(int k=0; k<w.size(); ++k){
-	 swork[k] |= iwork[k];
-	 iwork[k] = 0;
+        
+      } else {
+      
+        // Point pointers to the data corresponding to the element
+        updatePointers(*it,0,0);
+        
+        // Propagate sparsity backwards
+        it->data->propagateSparsity(mx_input_, mx_output_,false);
+        
+        // Clear the seeds for the next sweep
+        for(DMatrixPtrV::iterator it=mx_output_.begin(); it!=mx_output_.end(); ++it){
+          DMatrix* seed = *it;
+          if(seed){
+            bvec_t *iseed = get_bvec_t(seed->data());
+            fill_n(iseed,seed->size(),0);
+          }
+        }
       }
     }
   }
