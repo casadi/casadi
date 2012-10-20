@@ -449,8 +449,6 @@ def createArtist(node,dep={},invdep={},graph=None,artists={}):
       return MXNormArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
     elif node.isDensification():
       return MXDensificationArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
-    elif node.isIfTest():
-      return MXIfTestArtist(node,dep=dep,invdep=invdep,graph=graph,artists=artists)
   else:
     raise Exception("Cannot create artist for %s" % str(type(s)))
         
