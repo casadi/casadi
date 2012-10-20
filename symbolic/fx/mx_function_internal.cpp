@@ -657,10 +657,8 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
   fill(dwork.begin(),dwork.end(),std::vector<MX>(nfwd));
 
   // Pass the inputs
-  if(!output_given){
-    for(int iind=0; iind<arg.size(); ++iind){
-      swork[input_ind_[iind]] = arg[iind];
-    }
+  for(int iind=0; iind<arg.size(); ++iind){
+    swork[input_ind_[iind]] = arg[iind];
   }
   
   // Pass the forward seeds
