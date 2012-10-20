@@ -601,7 +601,8 @@ MX MX::eye(int n){
 
 
 MX MX::operator-() const{
-  if((*this)->isOperation(OP_NEG)){
+
+  if((*this)->getOp()==OP_NEG){
     return (*this)->dep(0);
   } else {
     return unary(OP_NEG,*this);
@@ -712,7 +713,7 @@ MX MX::outer_prod(const MX& y) const{
 }
 
 MX MX::__pow__(const MX& n) const{
-  if(n->isConstant()){
+  if(n->getOp()==OP_CONST){
     return MX::binary(OP_CONSTPOW,*this,n);
   } else {
     return MX::binary(OP_POW,*this,n);
@@ -838,13 +839,13 @@ MX MX::__add__(const MX& y) const{
     return y;
   } else if((samedim || y.scalar()) && isZero(y)){
     return x;
-  } else if(y->isOperation(OP_NEG)){
+  } else if(y->getOp()==OP_NEG){
     return x - y->dep(0);
-  } else if(x->isOperation(OP_NEG)){
+  } else if(x->getOp()==OP_NEG){
     return y - x->dep(0);
-  } else if(x->isOperation(OP_SUB) && y.get()==x->dep(1).get()){
+  } else if(x->getOp()==OP_SUB && y.get()==x->dep(1).get()){
     return x->dep(0);
-  } else if(y->isOperation(OP_SUB) && x.get()==y->dep(1).get()){
+  } else if(y->getOp()==OP_SUB && x.get()==y->dep(1).get()){
     return y->dep(0);
   } else {
     return MX::binary(OP_ADD,x,y);
@@ -858,7 +859,7 @@ MX MX::__sub__(const MX& y) const{
     return -y;
   } else if((samedim || y.scalar()) && isZero(y)){
     return x;
-  } else if(y->isOperation(OP_NEG)){
+  } else if(y->getOp()==OP_NEG){
     return x+y->dep(0);
   } else if(y.get()==x.get()){
     return MX::sparse(x.size1(),x.size2());
@@ -945,17 +946,17 @@ int MX::getNdeps() const { return !isNull() ? (*this)->ndep() : 0; }
   
 std::string MX::getName() const { return !isNull() ? (*this)->getName() : "null"; }
 
-bool 	MX::isSymbolic () const { return !isNull() ? (*this)->isSymbolic() : false; }
-bool 	MX::isConstant () const { return !isNull() ? (*this)->isConstant() : false; }
-bool 	MX::isMapping () const { return !isNull() ? (*this)->isMapping() : false; }
-bool 	MX::isEvaluation () const { return !isNull() ? (*this)->isEvaluation() : false; }
+bool 	MX::isSymbolic () const { return !isNull() ? (*this)->getOp()==OP_PARAMETER : false; }
+bool 	MX::isConstant () const { return !isNull() ? (*this)->getOp()==OP_CONST : false; }
+bool 	MX::isMapping () const { return !isNull() ? (*this)->getOp()==OP_MAPPING : false; }
+bool 	MX::isEvaluation () const { return !isNull() ? (*this)->getOp()==OP_CALL : false; }
 bool 	MX::isEvaluationOutput () const { return !isNull() ? (*this)->isOutputNode() : false; }
 
 int 	MX::getEvaluationOutput () const { return !isNull() ? (*this)->getFunctionOutput() : -1; }
 
     
-bool 	MX::isOperation (int op) const { return !isNull() ? (*this)->isOperation(op) : false; }
-bool 	MX::isMultiplication () const { return !isNull() ? (*this)->isMultiplication() : false; }
+bool 	MX::isOperation (int op) const { return !isNull() ? (*this)->getOp()==op : false; }
+bool 	MX::isMultiplication () const { return !isNull() ? (*this)->getOp()==OP_MATMUL : false; }
 
 bool 	MX::isNorm () const { return !isNull() ? dynamic_cast<const Norm*>(get())!=0 : false; }
 

@@ -96,6 +96,9 @@ class OutputNode : public MXNode{
     /** \brief  Get function output */
     virtual int getFunctionOutput() const{ return oind_;}
 
+    /** \brief Get the operation */
+    virtual int getOp() const{ return -1;}
+    
     /** \brief  Output index */
     int oind_;
 };

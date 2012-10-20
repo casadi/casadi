@@ -134,26 +134,11 @@ class MXNode : public SharedObjectNode{
     /** \brief  Get the name */
     virtual const std::string& getName() const;
     
-    /** \brief  Check if symbolic */
-    virtual bool isSymbolic() const;
-
-    /** \brief  Check if constant */
-    virtual bool isConstant() const;
-
-    /** \brief  Check if mapping */
-    virtual bool isMapping() const{return false;}
-
-    /** \brief  Check if evaluation */
-    virtual bool isEvaluation() const{return false;}
-
     /** \brief  Check if evaluation output */
     virtual bool isOutputNode() const{return false;}
 
     /** \brief  Check if a multiple output node */
     virtual bool isMultipleOutput() const{return false;}
-
-    /** \brief  Check if matrix multiplication */
-    virtual bool isMultiplication() const {return false;}
 
     /** \brief  Get function reference */
     virtual FX& getFunction();
@@ -163,6 +148,9 @@ class MXNode : public SharedObjectNode{
 
     /** \brief  Get function output */
     virtual int getFunctionOutput() const;
+
+    /** \brief Get the operation */
+    virtual int getOp() const = 0;
 
     /** \brief  dependencies - functions that have to be evaluated before this one */
     const MX& dep(int ind=0) const;
@@ -210,9 +198,6 @@ class MXNode : public SharedObjectNode{
     /// Assign nonzeros (mapping matrix), output indices sequential
     virtual void assign(const MX& d, const std::vector<int>& inz, bool add=false);
 
-    /// Is it a certain operation
-    virtual bool isOperation(int op) const{ return false;}
-    
     /// Number of elements
     int numel() const;
     

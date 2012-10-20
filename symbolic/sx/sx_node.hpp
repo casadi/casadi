@@ -69,10 +69,9 @@ virtual int getIntValue() const;  // only works for integer nodes
 //@}
 
 virtual const std::string& getName() const; // get the name
-/** \brief get the operation 
-only for binary nodes
-*/
-virtual int getOp() const=0; // get the operation (only for binary nodes)
+
+/** \brief get the operation */
+virtual int getOp() const=0;
 
 /** \brief Check if two nodes are equivalent up to a given depth */
 virtual bool isEqual(const SXNode* node, int depth) const;

@@ -41,9 +41,9 @@ class BinaryMX : public MXNode{
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
 
-    /// Is it a certain operation
-    virtual bool isOperation(int op) const{ return op==op_;};
-
+    /** \brief Get the operation */
+    virtual int getOp() const{ return op_;}
+    
     /** \brief  Evaluate the function symbolically (MX) */
     virtual void evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given);
 

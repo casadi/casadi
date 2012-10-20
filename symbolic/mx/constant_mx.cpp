@@ -56,10 +56,6 @@ bool ConstantMX::__nonzero__() const {
   return x_.at(0)!=0;
 }
 
-bool ConstantMX::isConstant() const{
-  return true;
-}
-
 void ConstantMX::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
   SXMatrix r(x_);
   casadi_assert(output[0]->sparsity()==r.sparsity());

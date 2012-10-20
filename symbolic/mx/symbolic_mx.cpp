@@ -52,10 +52,6 @@ void SymbolicMX::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, con
 void SymbolicMX::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
 }
 
-bool SymbolicMX::isSymbolic() const{
-  return true;
-}
-
 const std::string& SymbolicMX::getName() const{
   return name_;
 }

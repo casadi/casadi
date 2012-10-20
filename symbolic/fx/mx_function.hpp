@@ -33,13 +33,16 @@ namespace CasADi{
 
 /** \brief  An elemenent of the algorithm, namely an MX node */
 struct MXAlgEl{
-  // Function to be evaluated
-  MX op;
+  /// Operator index
+  int op; 
   
-  // Indices of the children nodes
+  /// Data associated with the operation
+  MX data;
+  
+  /// Work vector indices of the arguments
   std::vector<int> arg;
 
-  // Indices of the children nodes
+  /// Work vector indices of the results
   std::vector<int> res;
 };
 

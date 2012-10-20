@@ -192,7 +192,7 @@ void Mapping::assign(const MX& d, const std::vector<int>& inz, const std::vector
   
   casadi_assert(!d.isNull());
   
-  if(ELIMINATE_NESTED && d->isMapping()){ // Move this logic to init!
+  if(ELIMINATE_NESTED && d->getOp()==OP_MAPPING){ // Move this logic to init!
     // Clear the existing element if we are not adding
     if(!add){
       for(int k=0; k<onz.size(); ++k){

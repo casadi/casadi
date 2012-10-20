@@ -58,10 +58,10 @@ class ConstantMX : public MXNode{
 
     /** \brief  Propagate sparsity */
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
-
-    /** \brief  Indicate that the node is constant */
-    virtual bool isConstant() const;
    
+    /** \brief Get the operation */
+    virtual int getOp() const{ return OP_CONST;}
+    
     /// Return truth value of an MX
     virtual bool __nonzero__() const;
 

@@ -59,11 +59,11 @@ class SymbolicMX : public MXNode{
     /** \brief  Propagate sparsity */
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
 
-    /** \brief  Is symbolic */
-    virtual bool isSymbolic() const;
-    
     /** \brief  Get the name */
     virtual const std::string& getName() const;
+
+    /** \brief Get the operation */
+    virtual int getOp() const{ return OP_PARAMETER;}
     
     /// Symbolic evaluation (matrix graph)
     virtual MX eval(const std::vector<MX>& x){return MX::create(this);}

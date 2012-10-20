@@ -322,7 +322,7 @@ MX unite(const MX& A, const MX& B){
 bool isSymbolic(const MX& ex){
   if (ex.isNull())
     return false;
-  return ex->isSymbolic();
+  return ex->getOp()==OP_PARAMETER;
 }
 
 bool isSymbolicSparse(const MX& ex){

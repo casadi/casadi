@@ -198,6 +198,9 @@ void MXFunctionInternal::init(){
     // Get pointer to node
     MXNode* n = *it;
     
+    // Get the operation
+    int op = n==0 ? OP_OUTPUT : n->getOp();
+    
     // Add an element to the algorithm
     if(n->isOutputNode()){
       
@@ -233,7 +236,8 @@ void MXFunctionInternal::init(){
       // Add an element to the algorithm
       place_in_alg.push_back(algorithm_.size());
       algorithm_.resize(algorithm_.size()+1);
-      algorithm_.back().op.assignNode(n);
+      algorithm_.back().data.assignNode(n);
+      algorithm_.back().op = op;
 
       // Save the indices of the arguments
       algorithm_.back().arg.resize(n->ndep());
@@ -372,12 +376,12 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
     updatePointers(*it,nfdir,0);
 
     // Evaluate
-    it->op->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_);
+    it->data->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_);
   
     // Lifting
-    if(liftfun_ && it->op->isNonLinear()){
+    if(liftfun_ && it->data->isNonLinear()){
       for(int i=0; i<it->res.size(); ++i){
-        liftfun_(&mx_output_[i]->front(),it->op.size(),liftfun_ud_);
+        liftfun_(&mx_output_[i]->front(),it->data.size(),liftfun_ud_);
       }
     }
   }
@@ -420,7 +424,7 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
       updatePointers(*it,0,nadir);
       
       // Evaluate
-      it->op->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_);
+      it->data->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_);
     }
 
     // Get the adjoint sensitivities
@@ -447,14 +451,14 @@ void MXFunctionInternal::print(ostream &stream) const{
       }
     }
     stream << "} = ";
-    it->op->printPart(stream,0);
+    it->data->printPart(stream,0);
     for(int i=0; i<it->arg.size(); ++i){
       if(it->arg[i]>=0){
         stream << "i_" << it->arg[i];
       } else {
         stream << "NULL";
       }
-      it->op->printPart(stream,i+1);
+      it->data->printPart(stream,i+1);
     }
     stream << endl;
   }
@@ -467,9 +471,9 @@ MXFunctionInternal* MXFunctionInternal::clone() const{
 void MXFunctionInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
   XFunctionInternal<MXFunction,MXFunctionInternal,MX,MXNode>::deepCopyMembers(already_copied);
   for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-    if(it->op->isEvaluation()){
-      it->op.makeUnique(already_copied,false);
-      it->op->getFunction() = deepcopy(it->op->getFunction(),already_copied);
+    if(it->op==OP_CALL){
+      it->data.makeUnique(already_copied,false);
+      it->data->getFunction() = deepcopy(it->data->getFunction(),already_copied);
     }
   }
 }
@@ -498,13 +502,13 @@ void MXFunctionInternal::spEvaluate(bool fwd){
     
     // Propagate sparsity forward
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
-      if(it->op->isSymbolic()) continue;
+      if(it->op==OP_PARAMETER) continue;
       
       // Point pointers to the data corresponding to the element
       updatePointers(*it,0,0);
 
       // Propagate sparsity forwards
-      it->op->propagateSparsity(mx_input_, mx_output_,true);
+      it->data->propagateSparsity(mx_input_, mx_output_,true);
     }
     
     // Get the output seeds
@@ -531,13 +535,13 @@ void MXFunctionInternal::spEvaluate(bool fwd){
 
     // Propagate sparsity backwards
     for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); it++){
-      if(it->op->isSymbolic()) continue;
+      if(it->op==OP_PARAMETER) continue;
       
       // Point pointers to the data corresponding to the element
       updatePointers(*it,0,0);
       
       // Propagate sparsity backwards
-      it->op->propagateSparsity(mx_input_, mx_output_,false);
+      it->data->propagateSparsity(mx_input_, mx_output_,false);
       
       // Clear the seeds for the next sweep
       for(DMatrixPtrV::iterator it=mx_output_.begin(); it!=mx_output_.end(); ++it){
@@ -638,15 +642,15 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
 
     // Copy answer of the evaluation, if known
     if(output_given){
-      if(it->op->isMultipleOutput()){
+      if(it->data->isMultipleOutput()){
         for(int oind=0; oind<output_p.size(); ++oind){
           if(output_p[oind]){
-            *output_p[oind] = MX::create(new OutputNode(it->op,oind));
+            *output_p[oind] = MX::create(new OutputNode(it->data,oind));
           }
         }
       } else {
         if(output_p[0]){
-          *output_p[0] = it->op;
+          *output_p[0] = it->data;
         }
       }
       
@@ -655,7 +659,7 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
     }
     
     // Skip node if it is given
-    if(it->op->isSymbolic()){
+    if(it->op==OP_PARAMETER){
       continue;
     }
 
@@ -684,7 +688,7 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
     }
 
     // Call the evaluation function
-    it->op->evaluateMX(input_p,output_p,fseed_p,fsens_p,dummy_p,dummy_p,output_given);
+    it->data->evaluateMX(input_p,output_p,fseed_p,fsens_p,dummy_p,dummy_p,output_given);
   }
   
   // Collect the results
@@ -764,7 +768,7 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
       }
 
       // Call the evaluation function
-      it->op->evaluateMX(input_p,output_p,dummy_p,dummy_p,aseed_p,asens_p,true);
+      it->data->evaluateMX(input_p,output_p,dummy_p,dummy_p,aseed_p,asens_p,true);
     }
   }
   
@@ -793,7 +797,7 @@ void MXFunctionInternal::evalSX(const std::vector<SXMatrix>& input_s, std::vecto
   for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
     for(int i=0; i<it->res.size(); ++i){
       if (it->res[i]>=0)
-        swork[it->res[i]] = SXMatrix(it->op->sparsity(i));
+        swork[it->res[i]] = SXMatrix(it->data->sparsity(i));
     }
   }
   
@@ -816,7 +820,7 @@ void MXFunctionInternal::evalSX(const std::vector<SXMatrix>& input_s, std::vecto
       int ind = it->res[c];
       sxres[c] = ind<0 ? 0 : &swork[ind];
     }
-    it->op->evaluateSX(sxarg,sxres);
+    it->data->evaluateSX(sxarg,sxres);
   }
   
   // Get the outputs
@@ -874,8 +878,8 @@ void MXFunctionInternal::collectFree(){
   free_vars_.clear();
   free_vars_ind_.clear();
   for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
-    if(it->op->isSymbolic() && it->op.getTemp()!=1){
-      free_vars_.push_back(it->op);
+    if(it->op==OP_PARAMETER && it->data.getTemp()!=1){
+      free_vars_.push_back(it->data);
       free_vars_ind_.push_back(it->res.front());
     }
   }

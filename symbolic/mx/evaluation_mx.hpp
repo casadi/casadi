@@ -66,9 +66,6 @@ class EvaluationMX : public MultipleOutput{
     /** \brief  Propagate sparsity */
     virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
 
-    /** \brief  Check if evaluation */
-    virtual bool isEvaluation() const{return true;}
-
     /** \brief  Get function reference */
     virtual FX& getFunction();
 
@@ -87,6 +84,9 @@ class EvaluationMX : public MultipleOutput{
     /** \brief  Get the sparsity of output oind */
     virtual const CRSSparsity& sparsity(int oind);
 
+    /** \brief Get the operation */
+    virtual int getOp() const{ return OP_CALL;}
+    
     // Function to be evaluated
     FX fcn_;
 };

@@ -73,6 +73,9 @@ class Norm2 : public Norm{
 
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
+
+    /** \brief Get the operation */
+    virtual int getOp() const{ return OP_NORM2;}
 };
 
 /** \brief Represents a Frobenius norm
@@ -93,6 +96,9 @@ class NormF : public Norm{
 
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
+
+    /** \brief Get the operation */
+    virtual int getOp() const{ return OP_NORMF;}
 };
 
 /** \brief 1-norm
@@ -114,6 +120,8 @@ class Norm1 : public Norm{
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
 
+    /** \brief Get the operation */
+    virtual int getOp() const{ return OP_NORM1;}
 };
 
 /** \brief Represents an infinity-norm operation on a MX
@@ -135,6 +143,8 @@ class NormInf : public Norm{
     /** \brief  Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
 
+    /** \brief Get the operation */
+    virtual int getOp() const{ return OP_NORMINF;}
 };
 
 } // namespace CasADi

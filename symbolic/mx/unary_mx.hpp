@@ -57,9 +57,9 @@ public:
   /** \brief  Propagate sparsity */
   virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
 
-  /// Is it a certain operation
-  virtual bool isOperation(int op) const{ return op==op_;};
-
+  /** \brief Get the operation */
+  virtual int getOp() const{ return op_;}
+    
   //! \brief operation
   Operation op_;
 };

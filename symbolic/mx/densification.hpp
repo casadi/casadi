@@ -57,6 +57,8 @@ public:
   /** \brief  Propagate sparsity */
   virtual void propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fwd);
 
+  /** \brief Get the operation */
+  virtual int getOp() const{ return OP_DENSIFY;}
 };
 
 } // namespace CasADi

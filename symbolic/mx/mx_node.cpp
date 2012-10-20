@@ -103,14 +103,6 @@ bool MXNode::__nonzero__() const {
 
 }
 
-bool MXNode::isSymbolic() const{
-  return false;
-}
-
-bool MXNode::isConstant() const{
-  return false;
-}
-
 const MX& MXNode::dep(int ind) const{
   return dep_.at(ind);
 }

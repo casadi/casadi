@@ -60,7 +60,19 @@ enum Operation{
   OP_PARAMETER,
   
   // Embedded function call
-  OP_FINPUT, OP_CALL, OP_FOUTPUT,
+  OP_CALL,
+  
+  // Matrix multiplication
+  OP_MATMUL,
+  
+  // Nonzero mapping
+  OP_MAPPING,
+  
+  // Densify
+  OP_DENSIFY,
+  
+  // Norms
+  OP_NORM2, OP_NORM1, OP_NORMINF, OP_NORMF,
   
   OP_ERFINV,
   OP_PRINTME,

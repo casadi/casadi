@@ -59,9 +59,6 @@ class Mapping : public MXNode{
     /// Print a part of the expression */
     virtual void printPart(std::ostream &stream, int part) const;
     
-    /// Is a mapping matrix
-    virtual bool isMapping() const{return true;}
-
     /// Assign/add nonzeros
     virtual void assign(const MX& d, const std::vector<int>& inz, const std::vector<int>& onz, bool add=false);
 
@@ -116,6 +113,9 @@ class Mapping : public MXNode{
     
     /// Check if the mapping is in fact a transpose
     bool isTranspose() const;
+
+    /** \brief Get the operation */
+    virtual int getOp() const{ return OP_DENSIFY;}    
 };
 
 } // namespace CasADi
