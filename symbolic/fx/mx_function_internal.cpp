@@ -381,7 +381,7 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
     // Lifting
     if(liftfun_ && it->data->isNonLinear()){
       for(int i=0; i<it->res.size(); ++i){
-        liftfun_(&mx_output_[i]->front(),it->data.size(),liftfun_ud_);
+        liftfun_(&mx_output_[i]->front(),mx_output_[i].size(),liftfun_ud_);
       }
     }
   }
