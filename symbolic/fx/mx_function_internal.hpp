@@ -92,9 +92,6 @@ class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInterna
     std::vector<MX> free_vars_;
     std::vector<int> free_vars_ind_;
     
-    /// Collect the free variables
-    void collectFree();
-    
     // Lifting function
     LiftingFunction liftfun_;
     void* liftfun_ud_;

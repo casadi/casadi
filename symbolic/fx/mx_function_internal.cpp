@@ -157,22 +157,6 @@ void MXFunctionInternal::init(){
     (*it)->temp = 0;
   }
   
-  // TODO: Make sure that the output nodes are placed directly after the corresponding multiple output node
-
-  // Get the sorting algorithm
-  bool breadth_first_search;
-  if(getOption("topological_sorting")=="breadth-first"){
-    breadth_first_search = true;
-  } else if(getOption("topological_sorting")=="depth-first"){
-    breadth_first_search = false;
-  } else {
-    casadi_error("Unrecongnized topological_sorting: " << getOption("topological_sorting"));
-  }
-
-  // Resort the nodes in a more cache friendly order (Kahn 1962)
-  casadi_assert_message(breadth_first_search==false,"Breadth-first search currently not working for MX");
-  // resort_breadth_first(nodes); // FIXME
-  
   // Set the temporary variables to be the corresponding place in the sorted graph
   for(int i=0; i<nodes.size(); ++i)
     nodes[i]->temp = i;
@@ -189,17 +173,24 @@ void MXFunctionInternal::init(){
   work_.resize(0);
   work_.reserve(nodes.size());
   
-  // The sequence of instructions for the virtual machine
+  // Input instructions
+  vector<pair<pair<int,int>,MXNode*> > symb_loc;
+
+  // Get the sequence of instructions for the virtual machine
   algorithm_.resize(0);
   algorithm_.reserve(nodes.size());
-  
-  // Process nodes
   for(vector<MXNode*>::iterator it=nodes.begin(); it!=nodes.end(); ++it){
-    // Get pointer to node
+    // Current node
     MXNode* n = *it;
-    
+ 
+    // New element in the algorithm
+    AlgEl ae;
+        
     // Get the operation
-    int op = n==0 ? OP_OUTPUT : n->getOp();
+    ae.op = n==0 ? OP_OUTPUT : n->getOp();
+    
+    // In algorithm and work vector
+    bool in_work=true, in_algorithm=true;
     
     // Add an element to the algorithm
     if(n->isOutputNode()){
@@ -212,6 +203,7 @@ void MXFunctionInternal::init(){
       
       // Not in algorithm
       place_in_alg.push_back(-1);
+      in_algorithm = false;
       
       // Place in the work vector
       int& wplace = algorithm_[pind].res.at(oind);
@@ -222,7 +214,7 @@ void MXFunctionInternal::init(){
         place_in_work.push_back(wplace);
         
         // No work element needed
-        continue;
+        in_work=false;
       } else {
         // Save output to the parent node
         wplace = work_.size();
@@ -232,17 +224,19 @@ void MXFunctionInternal::init(){
       }
 
     } else {
+      // a parameter or input
+      if(ae.op==OP_PARAMETER){
+        symb_loc.push_back(make_pair(make_pair(algorithm_.size(),work_.size()),n));
+      }
       
       // Add an element to the algorithm
       place_in_alg.push_back(algorithm_.size());
-      algorithm_.resize(algorithm_.size()+1);
-      algorithm_.back().data.assignNode(n);
-      algorithm_.back().op = op;
-
+      ae.data.assignNode(n);
+      
       // Save the indices of the arguments
-      algorithm_.back().arg.resize(n->ndep());
+      ae.arg.resize(n->ndep());
       for(int i=0; i<n->ndep(); ++i){
-        algorithm_.back().arg[i] = n->dep(i).isNull() ? -1 : place_in_work[n->dep(i)->temp];
+        ae.arg[i] = n->dep(i).isNull() ? -1 : place_in_work[n->dep(i)->temp];
       }
       
       if(n->isMultipleOutput()){
@@ -251,27 +245,31 @@ void MXFunctionInternal::init(){
         place_in_work.push_back(-1);
        
         // Allocate space for outputs indices
-        algorithm_.back().res.resize(n->getNumOutputs(),-1);
+        ae.res.resize(n->getNumOutputs(),-1);
         
-        // No element in the work vector needed, thus continue
-        continue;
+        // No element in the work vector needed
+        in_work=false;
       } else {
         
         // Save place in work vector
         place_in_work.push_back(work_.size());
 
         // Allocate space for the outputs index
-        algorithm_.back().res.resize(1,work_.size());
+        ae.res.resize(1,work_.size());
       }
     }
     
+    // Add to algorithm
+    if(in_algorithm){
+      algorithm_.push_back(ae);
+    }
+
     // Allocate memory for an element in the work vector
-    work_.resize(work_.size()+1);
-    work_.back().data = Matrix<double>(n->sparsity(),0);
+    if(in_work){
+      work_.resize(work_.size()+1);
+      work_.back().data = Matrix<double>(n->sparsity(),0);
+    }
   }
-  
-  // Allocate memory for directional derivatives
-  MXFunctionInternal::updateNumSens(false);
 
   // Indices corresponding to the inputs
   input_ind_.resize(inputv_.size());
@@ -290,10 +288,51 @@ void MXFunctionInternal::init(){
     nodes[i]->temp = 0;
   }
   
-  // Get the free variables
-  collectFree();
+  // Now mark each input's place in the algorithm
+  for(vector<pair<pair<int,int>,MXNode*> >::const_iterator it=symb_loc.begin(); it!=symb_loc.end(); ++it){
+    it->second->temp = it->first.first+1;
+  }
+  
+  // Add input instructions
+  for(int ind=0; ind<inputv_.size(); ++ind){
+    int i = inputv_[ind].getTemp()-1;
+    if(i>=0){
+      // Element in the algorithm
+      AlgEl& ae = algorithm_[i];
+      
+      // Mark as input
+      //ae.op = OP_INPUT;
+      
+      // Location of the input
+      //ae.arg = vector<int>(1,ind);
+      
+      // Mark input as read
+      inputv_[ind].setTemp(0);
+    }
+  }
+  
+  // Locate free variables
+  free_vars_.clear();
+  free_vars_ind_.clear();
+  for(vector<pair<pair<int,int>,MXNode*> >::const_iterator it=symb_loc.begin(); it!=symb_loc.end(); ++it){
+    int i = it->second->temp-1;
+    if(i>=0){
+      // Free varables
+      MX par = MX::create(it->second);
+      
+      // Save to list of free parameters
+      free_vars_.push_back(par);
+      free_vars_ind_.push_back(it->first.second);
+      
+      // Remove marker
+      it->second->temp=0;
+    }
+  }
+  
+  // Allocate memory for directional derivatives
+  MXFunctionInternal::updateNumSens(false);
 
-log("MXFunctionInternal::init end");
+  log("MXFunctionInternal::init end");
 }
 
 void MXFunctionInternal::updateNumSens(bool recursive){
@@ -371,7 +410,8 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
   
   // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
   for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
-    
+    if(it->op==OP_PARAMETER || it->op==OP_INPUT) continue;
+
     // Point pointers to the data corresponding to the element
     updatePointers(*it,nfdir,0);
 
@@ -419,6 +459,7 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
 
     // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
     for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); it++){
+      if(it->op==OP_PARAMETER || it->op==OP_INPUT) continue;
       
       // Point pointers to the data corresponding to the element
       updatePointers(*it,0,nadir);
@@ -502,7 +543,7 @@ void MXFunctionInternal::spEvaluate(bool fwd){
     
     // Propagate sparsity forward
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
-      if(it->op==OP_PARAMETER) continue;
+      if(it->op==OP_PARAMETER || it->op==OP_INPUT) continue;
       
       // Point pointers to the data corresponding to the element
       updatePointers(*it,0,0);
@@ -535,7 +576,7 @@ void MXFunctionInternal::spEvaluate(bool fwd){
 
     // Propagate sparsity backwards
     for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); it++){
-      if(it->op==OP_PARAMETER) continue;
+      if(it->op==OP_PARAMETER || it->op==OP_INPUT) continue;
       
       // Point pointers to the data corresponding to the element
       updatePointers(*it,0,0);
@@ -659,7 +700,7 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
     }
     
     // Skip node if it is given
-    if(it->op==OP_PARAMETER){
+    if(it->op==OP_PARAMETER || it->op==OP_INPUT){
       continue;
     }
 
@@ -865,29 +906,6 @@ SXFunction MXFunctionInternal::expand(const std::vector<SXMatrix>& inputvsx ){
   // Create function
   SXFunction f(arg,res);
   return f;
-}
-
-void MXFunctionInternal::collectFree(){
-  
-  // Mark all the inputs
-  for(vector<MX>::iterator i=inputv_.begin(); i!=inputv_.end(); ++i){
-    i->setTemp(1);
-  }
-  
-  // Collect free varables
-  free_vars_.clear();
-  free_vars_ind_.clear();
-  for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
-    if(it->op==OP_PARAMETER && it->data.getTemp()!=1){
-      free_vars_.push_back(it->data);
-      free_vars_ind_.push_back(it->res.front());
-    }
-  }
-
-  // Unmark inputs
-  for(vector<MX>::iterator i=inputv_.begin(); i!=inputv_.end(); ++i){
-    i->setTemp(0);
-  }
 }
 
 } // namespace CasADi

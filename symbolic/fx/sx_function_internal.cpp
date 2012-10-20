@@ -337,11 +337,6 @@ void SXFunctionInternal::printVector(std::ostream &cfile, const std::string& nam
 
 void SXFunctionInternal::generateCode(const string& src_name){
   assertInit();
-
-  // Bug #391
-  if(bool(getOption("live_variables"))){
-    casadi_assert_warning(getOption("topological_sorting")=="depth-first", "The combination \"breadth_first_search\" and \"live_variables\" appears not to be working properly for SXFunctionInternal::generateCode. CasADi ticket #391.");
-  }
   
   // Make sure that there are no free variables
   if (!free_vars_.empty()) {
@@ -556,10 +551,10 @@ void SXFunctionInternal::init(){
   // Count the number of times each node is used
   vector<int> refcount(nodes.size(),0);
   
-  // Add the binary operations
-  algorithm_.clear();
+  // Get the sequence of instructions for the virtual machine
+  algorithm_.resize(0);
   algorithm_.reserve(nodes.size());
-  for(vector<SXNode*>::iterator it = nodes.begin(); it != nodes.end(); ++it){
+  for(vector<SXNode*>::iterator it=nodes.begin(); it!=nodes.end(); ++it){
     // Current node
     SXNode* n = *it;
  
