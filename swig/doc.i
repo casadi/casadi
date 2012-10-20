@@ -51,7 +51,7 @@ Joel Andersson
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -62,8 +62,6 @@ Joel Andersson
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
-+----------------+--------------------------------------------------------+
-| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -914,7 +912,7 @@ thus x := [xd,xa]
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -925,8 +923,6 @@ thus x := [xd,xa]
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
-+----------------+--------------------------------------------------------+
-| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -1536,14 +1532,6 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::AcadoIntegratorInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
-
-%feature("docstring")  CasADi::AcadoIntegratorInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::AcadoIntegratorInternal::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::AcadoIntegratorInternal::getCount "
 
@@ -2830,14 +2818,6 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
-%feature("docstring")  CasADi::AcadoOCPInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::AcadoOCPInternal::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::AcadoOCPInternal::deepCopyMembers "
 
 Deep copy data members. ";
@@ -3137,14 +3117,6 @@ Get size. ";
 
 Get size. ";
 
-%feature("docstring")  CasADi::BinaryMX::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::BinaryMX::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::BinaryMX::getCount "
 
 Get the reference count. ";
@@ -3392,155 +3364,6 @@ print ";
 %feature("docstring")  CasADi::BinarySX::marked "";
 
 %feature("docstring")  CasADi::BinarySX::mark "";
-
-
-// File: classCasADi_1_1CachedObject.xml
-%feature("docstring") CasADi::CachedObject "
-
-A cached reference counted object.
-
-Joel Andersson
-
-C++ includes: cached_object.hpp ";
-
-%feature("docstring")  CasADi::CachedObject::makeUnique "
-
-If there are other references to the object, then make a deep copy of it and
-point to this new object. ";
-
-%feature("docstring")  CasADi::CachedObject::makeUnique "";
-
-%feature("docstring")  CasADi::CachedObject::CachedObject "
-
-Default constructor. ";
-
-%feature("docstring")  CasADi::CachedObject::~CachedObject "
-
-Destructor. ";
-
-%feature("docstring")  CasADi::CachedObject::checkNode "
-
-Assert that the node is pointing to the right type of object. ";
-
-%feature("docstring")  CasADi::CachedObject::clone "
-
-Deep copy. ";
-
-%feature("docstring")  CasADi::CachedObject::assignNode "
-
-Assign the node to a node class pointer (or null) ";
-
-%feature("docstring")  CasADi::CachedObject::assignNodeNoCount "
-
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks! ";
-
-%feature("docstring")  CasADi::CachedObject::get "
-
-Get a const pointer to the node. ";
-
-%feature("docstring")  CasADi::CachedObject::get "
-
-Get a pointer to the node. ";
-
-%feature("docstring")  CasADi::CachedObject::getCount "
-
-Get the reference count. ";
-
-%feature("docstring")  CasADi::CachedObject::swap "
-
-Swap content with another instance. ";
-
-%feature("docstring")  CasADi::CachedObject::repr "
-
-Print a representation of the object. ";
-
-%feature("docstring")  CasADi::CachedObject::print "
-
-Print a destription of the object. ";
-
-%feature("docstring")  CasADi::CachedObject::init "
-
-Initialize the object: more documentation in the node class (
-SharedObjectNode and derived classes) ";
-
-%feature("docstring")  CasADi::CachedObject::isInit "
-
-Is initialized? ";
-
-%feature("docstring")  CasADi::CachedObject::assertInit "
-
-Assert that it is initialized. ";
-
-%feature("docstring")  CasADi::CachedObject::isNull "
-
-Is a null pointer? ";
-
-%feature("docstring")  CasADi::CachedObject::getRepresentation "
-
-Return a string with a representation (for SWIG) ";
-
-%feature("docstring")  CasADi::CachedObject::getDescription "
-
-Return a string with a destription (for SWIG) ";
-
-
-// File: classCasADi_1_1CachedObjectNode.xml
-%feature("docstring") CasADi::CachedObjectNode "
-
-Internal class.
-
-Joel Andersson
-
-C++ includes: cached_object.hpp ";
-
-%feature("docstring")  CasADi::CachedObjectNode::CachedObjectNode "
-
-Constructor. ";
-
-%feature("docstring")  CasADi::CachedObjectNode::~CachedObjectNode "
-
-Destructor (marks the element as deleted in any lingering references) ";
-
-%feature("docstring")  CasADi::CachedObjectNode::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::CachedObjectNode::unregRef "
-
-Unregister a weak reference. ";
-
-%feature("docstring")  CasADi::CachedObjectNode::clone "
-
-Make a deep copy of the instance. ";
-
-%feature("docstring")  CasADi::CachedObjectNode::deepCopyMembers "
-
-Deep copy data members. ";
-
-%feature("docstring")  CasADi::CachedObjectNode::getCount "
-
-Get the reference count. ";
-
-%feature("docstring")  CasADi::CachedObjectNode::init "
-
-Initialize the object. ";
-
-%feature("docstring")  CasADi::CachedObjectNode::isInit "
-
-Check if the object has been initialized. ";
-
-%feature("docstring")  CasADi::CachedObjectNode::assertInit "
-
-Assert that the object has been initialized. ";
-
-%feature("docstring")  CasADi::CachedObjectNode::repr "
-
-Print a representation of the object. ";
-
-%feature("docstring")  CasADi::CachedObjectNode::print "
-
-Print a destription of the object. ";
 
 
 // File: classCasADi_1_1casadi__limits.xml
@@ -4781,14 +4604,6 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
-%feature("docstring")  CasADi::CFunctionInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::CFunctionInternal::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::CFunctionInternal::deepCopyMembers "
 
 Deep copy data members. ";
@@ -5645,7 +5460,7 @@ Joel Andersson
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -5656,8 +5471,6 @@ Joel Andersson
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
-+----------------+--------------------------------------------------------+
-| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -6518,7 +6331,7 @@ Return a string with a destription (for SWIG) ";
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -6529,8 +6342,6 @@ Return a string with a destription (for SWIG) ";
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
-+----------------+--------------------------------------------------------+
-| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -7199,14 +7010,6 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
-%feature("docstring")  CasADi::CollocationIntegratorInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::CollocationIntegratorInternal::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::CollocationIntegratorInternal::getCount "
 
 Get the reference count. ";
@@ -7809,14 +7612,6 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
-%feature("docstring")  CasADi::CollocationInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::CollocationInternal::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::CollocationInternal::deepCopyMembers "
 
 Deep copy data members. ";
@@ -8077,14 +7872,6 @@ Get size. ";
 %feature("docstring")  CasADi::ConstantMX::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::ConstantMX::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::ConstantMX::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::ConstantMX::getCount "
 
@@ -9652,14 +9439,6 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
-%feature("docstring")  CasADi::ControlSimulatorInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::ControlSimulatorInternal::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::ControlSimulatorInternal::deepCopyMembers "
 
 Deep copy data members. ";
@@ -10250,14 +10029,6 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::CplexInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
-
-%feature("docstring")  CasADi::CplexInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::CplexInternal::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::CplexInternal::deepCopyMembers "
 
@@ -11069,7 +10840,7 @@ If the matrix is dense, i.e. length(col) == size1()*size2(), the format
 reduces to standard dense row major format, which allows access to an
 arbitrary element in constant time.
 
-Since the object is reference counted (it inherits from CachedObject),
+Since the object is reference counted (it inherits from SharedObject),
 several matrices are allowed to share the same sparsity pattern.
 
 The implementations of some methods of this class has been taken from the
@@ -11728,14 +11499,6 @@ Permute rows and/or columns. ";
 
 Generate a script for Matlab or Octave which visualizes the sparsity using
 the spy command. ";
-
-%feature("docstring")  CasADi::CRSSparsityInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::CRSSparsityInternal::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::CRSSparsityInternal::deepCopyMembers "
 
@@ -12974,14 +12737,6 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
-%feature("docstring")  CasADi::CSparseInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::CSparseInternal::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::CSparseInternal::deepCopyMembers "
 
 Deep copy data members. ";
@@ -13055,7 +12810,7 @@ times t_i.
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -13066,8 +12821,6 @@ times t_i.
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
-+----------------+--------------------------------------------------------+
-| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -14133,7 +13886,7 @@ quadrature state at the initial time (INTEGRATOR_RQF=3)
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -14144,8 +13897,6 @@ quadrature state at the initial time (INTEGRATOR_RQF=3)
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
-+----------------+--------------------------------------------------------+
-| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -14962,14 +14713,6 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
-%feature("docstring")  CasADi::CVodesInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::CVodesInternal::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::CVodesInternal::getCount "
 
 Get the reference count. ";
@@ -15181,14 +14924,6 @@ Get size. ";
 %feature("docstring")  CasADi::Densification::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::Densification::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::Densification::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::Densification::getCount "
 
@@ -16384,14 +16119,6 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
-%feature("docstring")  CasADi::DerivativeInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::DerivativeInternal::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::DerivativeInternal::getCount "
 
 Get the reference count. ";
@@ -16601,14 +16328,6 @@ Get size. ";
 %feature("docstring")  CasADi::EvaluationMX::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::EvaluationMX::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::EvaluationMX::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::EvaluationMX::getCount "
 
@@ -17789,14 +17508,6 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::ExternalFunctionInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
-
-%feature("docstring")  CasADi::ExternalFunctionInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::ExternalFunctionInternal::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::ExternalFunctionInternal::deepCopyMembers "
 
@@ -19376,14 +19087,6 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
-%feature("docstring")  CasADi::FXInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::FXInternal::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::FXInternal::clone "
 
 Make a deep copy of the instance. ";
@@ -19847,7 +19550,7 @@ Joel Andersson
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -19858,8 +19561,6 @@ Joel Andersson
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
-+----------------+--------------------------------------------------------+
-| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -20979,7 +20680,7 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -20990,8 +20691,6 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
-+----------------+--------------------------------------------------------+
-| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -21904,14 +21603,6 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::IdasInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
-
-%feature("docstring")  CasADi::IdasInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::IdasInternal::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::IdasInternal::getCount "
 
@@ -23104,14 +22795,6 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
-%feature("docstring")  CasADi::ImplicitFunctionInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::ImplicitFunctionInternal::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::ImplicitFunctionInternal::clone "
 
 Make a deep copy of the instance. ";
@@ -23418,7 +23101,7 @@ Joel Andersson
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -23429,8 +23112,6 @@ Joel Andersson
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
-+----------------+--------------------------------------------------------+
-| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -24223,7 +23904,7 @@ Joel Andersson
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -24234,8 +23915,6 @@ Joel Andersson
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
-+----------------+--------------------------------------------------------+
-| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -24794,14 +24473,6 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::IntegratorInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
-
-%feature("docstring")  CasADi::IntegratorInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::IntegratorInternal::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::IntegratorInternal::getCount "
 
@@ -25455,14 +25126,6 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::IPInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
-
-%feature("docstring")  CasADi::IPInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::IPInternal::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::IPInternal::deepCopyMembers "
 
@@ -29676,14 +29339,6 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::IpoptInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
-
-%feature("docstring")  CasADi::IpoptInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::IpoptInternal::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::IpoptInternal::deepCopyMembers "
 
@@ -33937,14 +33592,6 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
-%feature("docstring")  CasADi::KinsolInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::KinsolInternal::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::KinsolInternal::deepCopyMembers "
 
 Deep copy data members. ";
@@ -35636,14 +35283,6 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::KnitroInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
-
-%feature("docstring")  CasADi::KnitroInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::KnitroInternal::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::KnitroInternal::deepCopyMembers "
 
@@ -37880,14 +37519,6 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
-%feature("docstring")  CasADi::LapackLUDenseInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::LapackLUDenseInternal::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::LapackLUDenseInternal::deepCopyMembers "
 
 Deep copy data members. ";
@@ -39123,14 +38754,6 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::LapackQRDenseInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
-
-%feature("docstring")  CasADi::LapackQRDenseInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::LapackQRDenseInternal::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::LapackQRDenseInternal::deepCopyMembers "
 
@@ -40808,14 +40431,6 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
-%feature("docstring")  CasADi::LiftedSQPInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::LiftedSQPInternal::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::LiftedSQPInternal::deepCopyMembers "
 
 Deep copy data members. ";
@@ -41472,14 +41087,6 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::LiftoptInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
-
-%feature("docstring")  CasADi::LiftoptInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::LiftoptInternal::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::LiftoptInternal::deepCopyMembers "
 
@@ -43540,14 +43147,6 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
-%feature("docstring")  CasADi::LinearSolverInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::LinearSolverInternal::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::LinearSolverInternal::clone "
 
 Make a deep copy of the instance. ";
@@ -43805,14 +43404,6 @@ Get size. ";
 %feature("docstring")  CasADi::Mapping::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::Mapping::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::Mapping::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::Mapping::getCount "
 
@@ -44942,14 +44533,6 @@ Get size. ";
 %feature("docstring")  CasADi::MultipleOutput::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::MultipleOutput::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::MultipleOutput::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::MultipleOutput::getCount "
 
@@ -46450,14 +46033,6 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
-%feature("docstring")  CasADi::MultipleShootingInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::MultipleShootingInternal::deepCopyMembers "
 
 Deep copy data members. ";
@@ -46674,14 +46249,6 @@ Get size. ";
 %feature("docstring")  CasADi::Multiplication::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::Multiplication::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::Multiplication::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::Multiplication::getCount "
 
@@ -47154,14 +46721,6 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::MuscodInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
-
-%feature("docstring")  CasADi::MuscodInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::MuscodInternal::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::MuscodInternal::deepCopyMembers "
 
@@ -47754,10 +47313,6 @@ Check if the matrix expression is dense. ";
 
 Check if the matrix expression is scalar. ";
 
-%feature("docstring")  CasADi::MX::checkNode "
-
-Assert that the node is pointing to the right type of object. ";
-
 %feature("docstring")  CasADi::MX::clone "
 
 Deep copy. ";
@@ -47811,6 +47366,10 @@ Assert that it is initialized. ";
 %feature("docstring")  CasADi::MX::isNull "
 
 Is a null pointer? ";
+
+%feature("docstring")  CasADi::MX::checkNode "
+
+Assert that the node is pointing to the right type of object. ";
 
 %feature("docstring")  CasADi::MX::getRepresentation "
 
@@ -49100,14 +48659,6 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
-%feature("docstring")  CasADi::MXFunctionInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::MXFunctionInternal::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::MXFunctionInternal::getCount "
 
 Get the reference count. ";
@@ -49319,14 +48870,6 @@ Get size. ";
 %feature("docstring")  CasADi::MXNode::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::MXNode::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::MXNode::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::MXNode::getCount "
 
@@ -49983,14 +49526,6 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::NLPQPInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
-
-%feature("docstring")  CasADi::NLPQPInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::NLPQPInternal::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::NLPQPInternal::deepCopyMembers "
 
@@ -52220,14 +51755,6 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
-%feature("docstring")  CasADi::NLPSolverInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::NLPSolverInternal::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::NLPSolverInternal::clone "
 
 Make a deep copy of the instance. ";
@@ -52480,14 +52007,6 @@ Get size. ";
 
 Get size. ";
 
-%feature("docstring")  CasADi::NonzerosNonzerosOp::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::NonzerosNonzerosOp::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::NonzerosNonzerosOp::getCount "
 
 Get the reference count. ";
@@ -52707,14 +52226,6 @@ Get size. ";
 
 Get size. ";
 
-%feature("docstring")  CasADi::NonzerosScalarOp::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::NonzerosScalarOp::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::NonzerosScalarOp::getCount "
 
 Get the reference count. ";
@@ -52932,14 +52443,6 @@ Get size. ";
 
 Get size. ";
 
-%feature("docstring")  CasADi::Norm::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::Norm::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::Norm::getCount "
 
 Get the reference count. ";
@@ -53155,14 +52658,6 @@ Get size. ";
 %feature("docstring")  CasADi::Norm1::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::Norm1::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::Norm1::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::Norm1::getCount "
 
@@ -53380,14 +52875,6 @@ Get size. ";
 
 Get size. ";
 
-%feature("docstring")  CasADi::Norm2::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::Norm2::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::Norm2::getCount "
 
 Get the reference count. ";
@@ -53604,14 +53091,6 @@ Get size. ";
 
 Get size. ";
 
-%feature("docstring")  CasADi::NormF::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::NormF::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::NormF::getCount "
 
 Get the reference count. ";
@@ -53827,14 +53306,6 @@ Get size. ";
 %feature("docstring")  CasADi::NormInf::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::NormInf::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::NormInf::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::NormInf::getCount "
 
@@ -55202,14 +54673,6 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
-%feature("docstring")  CasADi::OCPSolverInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::OCPSolverInternal::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::OCPSolverInternal::clone "
 
 Make a deep copy of the instance. ";
@@ -55886,14 +55349,6 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::OOQPInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
-
-%feature("docstring")  CasADi::OOQPInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::OOQPInternal::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::OOQPInternal::deepCopyMembers "
 
@@ -56935,14 +56390,6 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
-%feature("docstring")  CasADi::OptionsFunctionalityNode::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::OptionsFunctionalityNode::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::OptionsFunctionalityNode::clone "
 
 Make a deep copy of the instance. ";
@@ -57161,14 +56608,6 @@ Get size. ";
 %feature("docstring")  CasADi::OutputNode::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::OutputNode::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::OutputNode::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::OutputNode::getCount "
 
@@ -58422,14 +57861,6 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
-%feature("docstring")  CasADi::ParallelizerInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::ParallelizerInternal::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::ParallelizerInternal::getCount "
 
 Get the reference count. ";
@@ -59033,14 +58464,6 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::QPOasesInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
-
-%feature("docstring")  CasADi::QPOasesInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::QPOasesInternal::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::QPOasesInternal::deepCopyMembers "
 
@@ -61057,14 +60480,6 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
-%feature("docstring")  CasADi::QPSolverInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::QPSolverInternal::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::QPSolverInternal::clone "
 
 Make a deep copy of the instance. ";
@@ -61198,7 +60613,7 @@ Joel Andersson
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -61209,8 +60624,6 @@ Joel Andersson
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
-+----------------+--------------------------------------------------------+
-| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -62021,7 +61434,7 @@ Return a string with a destription (for SWIG) ";
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -62032,8 +61445,6 @@ Return a string with a destription (for SWIG) ";
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
-+----------------+--------------------------------------------------------+
-| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -62619,14 +62030,6 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
-%feature("docstring")  CasADi::RKIntegratorInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::RKIntegratorInternal::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::RKIntegratorInternal::getCount "
 
 Get the reference count. ";
@@ -62841,14 +62244,6 @@ Get size. ";
 %feature("docstring")  CasADi::ScalarNonzerosOp::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::ScalarNonzerosOp::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::ScalarNonzerosOp::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::ScalarNonzerosOp::getCount "
 
@@ -64295,14 +63690,6 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
-%feature("docstring")  CasADi::SimulatorInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::SimulatorInternal::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::SimulatorInternal::deepCopyMembers "
 
 Deep copy data members. ";
@@ -64603,14 +63990,6 @@ Get size. ";
 %feature("docstring")  CasADi::SparseSparseOp::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::SparseSparseOp::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::SparseSparseOp::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::SparseSparseOp::getCount "
 
@@ -65098,6 +64477,10 @@ Access forward sensitivity. ";
 
 %feature("docstring")  CasADi::SQPInternal::adjSensNoCheck "";
 
+%feature("docstring")  CasADi::SQPInternal::getQPSolver "
+
+Access QPSolver. ";
+
 %feature("docstring")  CasADi::SQPInternal::SQPInternal "";
 
 %feature("docstring")  CasADi::SQPInternal::~SQPInternal "";
@@ -65354,14 +64737,6 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::SQPInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
-
-%feature("docstring")  CasADi::SQPInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::SQPInternal::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::SQPInternal::deepCopyMembers "
 
@@ -65902,6 +65277,10 @@ approximation. ";
 
 Check if the node is pointing to the right type of object. ";
 
+%feature("docstring")  CasADi::SQPMethod::getQPSolver "
+
+Access the QPSolver used internally. ";
+
 %feature("docstring")  CasADi::SQPMethod::reportConstraints "
 
 Prints out a human readable report about possible constraint violations,
@@ -66364,7 +65743,7 @@ Constructor. ";
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -66375,8 +65754,6 @@ Constructor. ";
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
-+----------------+--------------------------------------------------------+
-| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -67335,7 +66712,7 @@ Return a string with a destription (for SWIG) ";
 | INTEGRATOR_RP  | Backward parameter vector [rp].                      |
 +----------------+------------------------------------------------------+
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -67346,8 +66723,6 @@ Return a string with a destription (for SWIG) ";
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
-+----------------+--------------------------------------------------------+
-| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 
 >List of available options
@@ -68108,14 +67483,6 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::SundialsInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
-
-%feature("docstring")  CasADi::SundialsInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::SundialsInternal::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::SundialsInternal::getCount "
 
@@ -69808,14 +69175,6 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
-%feature("docstring")  CasADi::SXFunctionInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::SXFunctionInternal::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::SXFunctionInternal::deepCopyMembers "
 
 Deep copy data members. ";
@@ -70128,14 +69487,6 @@ Get size. ";
 %feature("docstring")  CasADi::SymbolicMX::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::SymbolicMX::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::SymbolicMX::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::SymbolicMX::getCount "
 
@@ -70670,14 +70021,6 @@ Get size. ";
 %feature("docstring")  CasADi::UnaryMX::size2 "
 
 Get size. ";
-
-%feature("docstring")  CasADi::UnaryMX::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::UnaryMX::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::UnaryMX::getCount "
 
@@ -71341,56 +70684,6 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::VariableInternal::assertInit "
 
 Assert that the object has been initialized. ";
-
-
-// File: classCasADi_1_1WeakRef.xml
-%feature("docstring") CasADi::WeakRef "
-
-A weak reference to a cached object.
-
-Joel Andersson
-
-C++ includes: cached_object.hpp ";
-
-%feature("docstring")  CasADi::WeakRef::WeakRef "
-
-Default constructor. ";
-
-%feature("docstring")  CasADi::WeakRef::~WeakRef "
-
-Destructor. ";
-
-%feature("docstring")  CasADi::WeakRef::WeakRef "
-
-Copy constructor. ";
-
-%feature("docstring")  CasADi::WeakRef::WeakRef "
-
-Construct weak reference from shared object. ";
-
-%feature("docstring")  CasADi::WeakRef::isNull "
-
-Check if the weak object is null. ";
-
-%feature("docstring")  CasADi::WeakRef::clear "
-
-Clear the weak pointer by setting the owner to null. ";
-
-%feature("docstring")  CasADi::WeakRef::repr "
-
-Print a representation of the object. ";
-
-%feature("docstring")  CasADi::WeakRef::print "
-
-Print a destription of the object. ";
-
-%feature("docstring")  CasADi::WeakRef::getRepresentation "
-
-Return a string with a representation (for SWIG) ";
-
-%feature("docstring")  CasADi::WeakRef::getDescription "
-
-Return a string with a destription (for SWIG) ";
 
 
 // File: classCasADi_1_1WorhpInternal.xml
@@ -72786,14 +72079,6 @@ Get the dictionary. ";
 %feature("docstring")  CasADi::WorhpInternal::getBestMatches "
 
 Get th ebest suggestions of option names. ";
-
-%feature("docstring")  CasADi::WorhpInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::WorhpInternal::unregRef "
-
-Unregister a weak reference. ";
 
 %feature("docstring")  CasADi::WorhpInternal::deepCopyMembers "
 
@@ -74919,14 +74204,6 @@ Get the dictionary. ";
 
 Get th ebest suggestions of option names. ";
 
-%feature("docstring")  CasADi::XFunctionInternal::regRef "
-
-Register a weak reference. ";
-
-%feature("docstring")  CasADi::XFunctionInternal::unregRef "
-
-Unregister a weak reference. ";
-
 %feature("docstring")  CasADi::XFunctionInternal::clone "
 
 Make a deep copy of the instance. ";
@@ -75636,7 +74913,7 @@ Helper function for 'IntegratorInput' Input arguments of an integrator
 
 Helper function for 'IntegratorOutput' Output arguments of an integrator
 
->Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 5)
+>Output scheme: CasADi::IntegratorOutput (INTEGRATOR_NUM_OUT = 4)
 +----------------+--------------------------------------------------------+
 |      Name      |                      Description                       |
 +================+========================================================+
@@ -75647,8 +74924,6 @@ Helper function for 'IntegratorOutput' Output arguments of an integrator
 | INTEGRATOR_RXF | Backward differential state at the initial time [rxf]. |
 +----------------+--------------------------------------------------------+
 | INTEGRATOR_RQF | Backward quadrature state at the initial time [rqf].   |
-+----------------+--------------------------------------------------------+
-| INTEGRATOR_ZF  | Algebraic state at the final time [zf].                |
 +----------------+--------------------------------------------------------+
 ";
 
@@ -76776,6 +76051,10 @@ makeVector<ClassName>(LENGTH, ENTRY_INDEX_1, ENTRY_VALUE_1, ENTRY_INDEX_2,
 ENTRY_VALUE_2, ...) Usage Python: makeVector(ClassName,(LENGTH,
 ENTRY_INDEX_1, ENTRY_VALUE_1, ENTRY_INDEX_2, ENTRY_VALUE_2 ...) ";
 
+%feature("docstring")  CasADi::isRegular "
+
+Checks if vector does not contain NaN or Inf. ";
+
 %feature("docstring")  CasADi::if_else "";
 
 %feature("docstring")  CasADi::__nonzero__< SX > " ";
@@ -77652,12 +76931,6 @@ h:  internal expressions which the user may wish to inspect ";
 
 
 // File: c__function__internal_8hpp.xml
-
-
-// File: cached__object_8cpp.xml
-
-
-// File: cached__object_8hpp.xml
 
 
 // File: callback_8hpp.xml

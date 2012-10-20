@@ -468,20 +468,6 @@
 <br/>
 @copydoc scheme_QPOutput
 */
-/** \class CasADi::MultipleShootingInternal
-\n
-\par
-@copydoc scheme_OCPInput
-<br/>
-@copydoc scheme_OCPOutput
-*/
-/** \class CasADi::MultipleShooting
-\n
-\par
-@copydoc scheme_OCPInput
-<br/>
-@copydoc scheme_OCPOutput
-*/
 /** \class CasADi::LiftedSQPInternal
 \n
 \par
@@ -523,6 +509,20 @@
 @copydoc scheme_NLPInput
 <br/>
 @copydoc scheme_NLPOutput
+*/
+/** \class CasADi::MultipleShootingInternal
+\n
+\par
+@copydoc scheme_OCPInput
+<br/>
+@copydoc scheme_OCPOutput
+*/
+/** \class CasADi::MultipleShooting
+\n
+\par
+@copydoc scheme_OCPInput
+<br/>
+@copydoc scheme_OCPOutput
 */
 /** \class CasADi::IdasInternal
 \n
