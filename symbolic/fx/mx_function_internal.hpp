@@ -82,9 +82,6 @@ class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInterna
     /** \brief  Working vector for numeric calculation */
     std::vector<FunctionIO> work_;
     
-    /** \brief  Dependent expressions */
-    std::vector<int> input_ind_;
-
     /** \brief  Matrix expressions that are to be evaluated */
     std::vector<int> output_ind_;
 

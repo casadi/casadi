@@ -566,6 +566,8 @@ void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, bool rev
 }
 
 void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, std::vector<MX>& ex, bool reverse){
+  casadi_error("Not supported in the current version of CasADi awaiting completion of #480. Please contact the developers for enabling this feature.");
+#if 0
   casadi_assert_message(v.size()==vdef.size(),"Mismatch in the number of expression to substitute.");
   for(int k=0; k<v.size(); ++k){
     casadi_assert_message(isSymbolic(v[k]),"Variable " << k << " is not symbolic");
@@ -581,7 +583,6 @@ void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, std::vec
   
   // Write the mapping function
   MXFunction f(v,f_out);
-  f.setOption("topological_sorting","depth-first");
   f.init();
 
   // Get references to the internal data structures
@@ -632,6 +633,7 @@ void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& vdef, std::vec
   for(vector<MX>::iterator it=ex.begin(); it!=ex.end(); ++it){
     *it = *outputv_it++;
   }
+#endif
 }
 
 std::vector<MX> msym(const std::string& name, const CRSSparsity& sp, int p){
