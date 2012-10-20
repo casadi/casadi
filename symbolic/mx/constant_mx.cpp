@@ -44,9 +44,9 @@ void ConstantMX::printPart(std::ostream &stream, int part) const{
 
 void ConstantMX::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, const DMatrixPtrVV& fwdSeed, DMatrixPtrVV& fwdSens, const DMatrixPtrVV& adjSeed, DMatrixPtrVV& adjSens){
   int nfwd = fwdSens.size();
-  copy(x_.begin(),x_.end(),&output[0]->front());
+  output[0]->set(x_);
   for(int d=0; d<nfwd; ++d){
-    fill_n(&fwdSens[d][0]->front(),size(),0);
+    fwdSens[d][0]->setZero();
   }
 }
 
