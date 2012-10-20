@@ -29,6 +29,7 @@
 #include <vector>
 #include <string>
 #include "../options_functionality.hpp"
+#include "../shared_object.hpp"
 
 namespace CasADi{
 
@@ -101,7 +102,7 @@ class FXInternal;
   \author Joel Andersson 
   \date 2010
 */
-class FX : public OptionsFunctionality{
+class FX : public OptionsFunctionality, public SharedObject{
 
   public:
   /** \brief  default constructor */
@@ -539,7 +540,12 @@ void getAdjSens(T val, int ind=0, int dir=0) const;
   
   /** \brief Remove modules to be monitored */
   void removeMonitor(const std::string& mon);
-
+  
+  /// @{
+  /** \brief Access a options data structure */
+  virtual OptionsFunctionalityInternal& options();
+  virtual const OptionsFunctionalityInternal& options() const;
+  /// @}
 };
 } // namespace CasADi
 

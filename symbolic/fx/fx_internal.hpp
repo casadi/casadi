@@ -39,7 +39,7 @@ namespace CasADi{
   \date 2010
  A regular user should never work with any Node class. Use FX directly.
 */
-class FXInternal : public OptionsFunctionalityNode{
+class FXInternal : public OptionsFunctionalityInternal, public SharedObjectNode{
   friend class FX;
 
   protected:

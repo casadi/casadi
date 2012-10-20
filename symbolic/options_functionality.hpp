@@ -24,7 +24,6 @@
 #define OPTIONS_FUNCTIONALITY_HPP
 
 #include "generic_type.hpp"
-#include "shared_object.hpp"
 #include <map>
 
 namespace CasADi{
@@ -33,7 +32,7 @@ namespace CasADi{
   typedef GenericType::Dictionary Dictionary;
     
   // Forward declaration
-  class OptionsFunctionalityNode;
+  class OptionsFunctionalityInternal;
   
 /** \brief Provides options setting/getting functionality
   Gives a derived class the ability to set and retrieve options in a convenient way.
@@ -43,24 +42,22 @@ namespace CasADi{
   
 
   \author Joel Andersson 
-  \date 2010
+  \date 2010-2012
   Joel Andersson, K.U. Leuven 2010
   joel.andersson@esat.kuleuven.be
 */
-class OptionsFunctionality : public SharedObject{
+class OptionsFunctionality{
   public:
-    /// Default constructor
-    OptionsFunctionality();
-    
-    /// Destructor
-    ~OptionsFunctionality();
-    
-    /// Access a member function or object
-    OptionsFunctionalityNode* operator->();
-    
-    /// Const access a member function or object
-    const OptionsFunctionalityNode* operator->() const;
 
+    /** \brief Destructor */
+    virtual ~OptionsFunctionality();
+
+    /// @{
+    /** \brief Access a options data structure */
+    virtual OptionsFunctionalityInternal& options() = 0;
+    virtual const OptionsFunctionalityInternal& options() const = 0;
+    /// @}
+    
 /// \name Option Functionality
 /// @{
    
@@ -99,10 +96,6 @@ class OptionsFunctionality : public SharedObject{
     const Dictionary& dictionary() const;
         
 /// @}
-
-    /// Assert that the node is pointing to the right type of object
-    virtual bool checkNode() const;
-    
     
     /** \brief Get a list of all option names */
     std::vector<std::string> getOptionNames() const;
@@ -130,13 +123,13 @@ class OptionsFunctionality : public SharedObject{
   \author Joel Andersson 
   \date 2010
 */
-class OptionsFunctionalityNode : public SharedObjectNode{
+class OptionsFunctionalityInternal{
   friend class OptionsFunctionality;
   public:
-  
-/// Constructor, destructor
-OptionsFunctionalityNode();
-virtual ~OptionsFunctionalityNode();
+    
+    /// Constructor, destructor
+    OptionsFunctionalityInternal();
+    virtual ~OptionsFunctionalityInternal(){}
  
   /** \brief  set an option.
   The setOptions are in general only considered before the init function, if any.
