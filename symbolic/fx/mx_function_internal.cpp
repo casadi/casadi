@@ -839,29 +839,28 @@ void MXFunctionInternal::evalSX(const std::vector<SXMatrix>& input_s, std::vecto
     }
   }
   
-  // Pass the inputs
-  for(int ind=0; ind<input_.size(); ++ind){
-    swork[input_ind_[ind]].set(input_s[ind]);
-  }
-
   // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
   vector<SXMatrix*> sxarg;
   vector<SXMatrix*> sxres;
   for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
     if(it->op==OP_PARAMETER) continue;
-    if(it->op==OP_INPUT) continue;
-    
-    sxarg.resize(it->arg.size());
-    for(int c=0; c<sxarg.size(); ++c){
-      int ind = it->arg[c];
-      sxarg[c] = ind<0 ? 0 : &swork[ind];
+    if(it->op==OP_INPUT){
+      // Pass the input
+      swork[it->res.front()].set(input_s[it->arg.front()]);
+      
+    } else {
+      sxarg.resize(it->arg.size());
+      for(int c=0; c<sxarg.size(); ++c){
+        int ind = it->arg[c];
+        sxarg[c] = ind<0 ? 0 : &swork[ind];
+      }
+      sxres.resize(it->res.size());
+      for(int c=0; c<sxres.size(); ++c){
+        int ind = it->res[c];
+        sxres[c] = ind<0 ? 0 : &swork[ind];
+      }
+      it->data->evaluateSX(sxarg,sxres);
     }
-    sxres.resize(it->res.size());
-    for(int c=0; c<sxres.size(); ++c){
-      int ind = it->res[c];
-      sxres[c] = ind<0 ? 0 : &swork[ind];
-    }
-    it->data->evaluateSX(sxarg,sxres);
   }
   
   // Get the outputs
