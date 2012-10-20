@@ -489,20 +489,24 @@ void MXFunctionInternal::print(ostream &stream) const{
     for(int i=0; i<it->res.size(); ++i){
       if(i!=0) stream << ",";
       if(it->res[i]>=0){
-        stream << "i_" << it->res[i];
+        stream << "@" << it->res[i];
       } else {
         stream << "NULL";
       }
     }
     stream << "} = ";
-    it->data->printPart(stream,0);
-    for(int i=0; i<it->arg.size(); ++i){
-      if(it->arg[i]>=0){
-        stream << "i_" << it->arg[i];
-      } else {
-        stream << "NULL";
+    if(it->op==OP_INPUT){
+      stream << "input[" << it->arg.front() << "]";
+    } else {
+      it->data->printPart(stream,0);
+      for(int i=0; i<it->arg.size(); ++i){
+        if(it->arg[i]>=0){
+          stream << "@" << it->arg[i];
+        } else {
+          stream << "NULL";
+        }
+        it->data->printPart(stream,i+1);
       }
-      it->data->printPart(stream,i+1);
     }
     stream << endl;
   }
@@ -670,7 +674,7 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
   for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
     
     // Pointers to the arguments of the evaluation
-    input_p.resize(it->arg.size());
+    input_p.resize(it->op == OP_INPUT ? 0 : it->arg.size());
     for(int i=0; i<input_p.size(); ++i){
       int el = it->arg[i]; // index of the argument
       input_p[i] = el<0 ? 0 : &swork[el];
@@ -772,7 +776,7 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
     for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it){
       
       // Get the arguments of the evaluation
-      input_p.resize(it->arg.size());
+      input_p.resize(it->op == OP_INPUT ? 0 : it->arg.size());
       for(int i=0; i<input_p.size(); ++i){
         int el = it->arg[i]; // index of the argument
         input_p[i] = el<0 ? 0 : &swork[el];
@@ -798,7 +802,7 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
           }
         }
 
-        asens_p[d].resize(it->arg.size());
+        asens_p[d].resize(it->op == OP_INPUT ? 0 : it->arg.size());
         for(int iind=0; iind<it->arg.size(); ++iind){
           int el = it->arg[iind];
           asens_p[d][iind] = el<0 ? 0 : &dwork[el][d];
@@ -853,6 +857,9 @@ void MXFunctionInternal::evalSX(const std::vector<SXMatrix>& input_s, std::vecto
   vector<SXMatrix*> sxarg;
   vector<SXMatrix*> sxres;
   for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
+    if(it->op==OP_PARAMETER) continue;
+    if(it->op==OP_INPUT) continue;
+    
     sxarg.resize(it->arg.size());
     for(int c=0; c<sxarg.size(); ++c){
       int ind = it->arg[c];
