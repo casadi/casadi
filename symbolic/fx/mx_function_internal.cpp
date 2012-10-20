@@ -301,10 +301,10 @@ void MXFunctionInternal::init(){
       AlgEl& ae = algorithm_[i];
       
       // Mark as input
-      //ae.op = OP_INPUT;
+      ae.op = OP_INPUT;
       
       // Location of the input
-      //ae.arg = vector<int>(1,ind);
+      ae.arg = vector<int>(1,ind);
       
       // Mark input as read
       inputv_[ind].setTemp(0);
@@ -397,31 +397,30 @@ void MXFunctionInternal::updatePointers(const AlgEl& el, int nfwd, int nadj){
 void MXFunctionInternal::evaluate(int nfdir, int nadir){
   log("MXFunctionInternal::evaluate begin");
 
-  // Pass the inputs
-  for(int ind=0; ind<input_.size(); ++ind){
-    work_[input_ind_[ind]].data.set(input(ind));
-  }
-
-  // Pass the forward seeds
-  for(int dir=0; dir<nfdir; ++dir)
-    for(int ind=0; ind<input_.size(); ++ind){
-      work_[input_ind_[ind]].dataF.at(dir).set(fwdSeed(ind,dir));
-    }
-  
   // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
   for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
-    if(it->op==OP_PARAMETER || it->op==OP_INPUT) continue;
+    //casadi_assert(it->op!=OP_PARAMETER); // FIXME
+    if(it->op==OP_PARAMETER) continue; // FIXME
 
-    // Point pointers to the data corresponding to the element
-    updatePointers(*it,nfdir,0);
+    if(it->op==OP_INPUT){
+      // Pass the input and forward seeeds
+      work_[it->res.front()].data.set(input(it->arg.front()));
+      for(int dir=0; dir<nfdir; ++dir){
+        work_[it->res.front()].dataF.at(dir).set(fwdSeed(it->arg.front(),dir));
+      }
+    } else {
 
-    // Evaluate
-    it->data->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_);
+      // Point pointers to the data corresponding to the element
+      updatePointers(*it,nfdir,0);
+
+      // Evaluate
+      it->data->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_);
   
-    // Lifting
-    if(liftfun_ && it->data->isNonLinear()){
-      for(int i=0; i<it->res.size(); ++i){
-        liftfun_(&mx_output_[i]->front(),mx_output_[i]->size(),liftfun_ud_);
+      // Lifting
+      if(liftfun_ && it->data->isNonLinear()){
+        for(int i=0; i<it->res.size(); ++i){
+          liftfun_(&mx_output_[i]->front(),mx_output_[i]->size(),liftfun_ud_);
+        }
       }
     }
   }
@@ -459,20 +458,24 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
 
     // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
     for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); it++){
-      if(it->op==OP_PARAMETER || it->op==OP_INPUT) continue;
-      
-      // Point pointers to the data corresponding to the element
-      updatePointers(*it,0,nadir);
-      
-      // Evaluate
-      it->data->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_);
-    }
+      //casadi_assert(it->op!=OP_PARAMETER); // FIXME
+      if(it->op==OP_PARAMETER) continue; // FIXME
 
-    // Get the adjoint sensitivities
-    for(int ind=0; ind<input_.size(); ++ind)
-      for(int dir=0; dir<nadir; ++dir){
-        work_[input_ind_[ind]].dataA.at(dir).get(adjSens(ind,dir));
+      if(it->op==OP_INPUT){
+        // Get the adjoint sensitivity
+        for(int dir=0; dir<nadir; ++dir){
+          work_[it->res.front()].dataA.at(dir).get(adjSens(it->arg.front(),dir));
+        }
+        
+      } else {
+      
+        // Point pointers to the data corresponding to the element
+        updatePointers(*it,0,nadir);
+        
+        // Evaluate
+        it->data->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_);
       }
+    }
     
     log("MXFunctionInternal::evaluate evaluated adjoint");
   }
