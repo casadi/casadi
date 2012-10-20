@@ -45,11 +45,11 @@ FX FX::create(FXInternal* node){
 }
 
 const FXInternal* FX::operator->() const{
-  return static_cast<const FXInternal*>(SharedObject::operator->());
+  return (const FXInternal*)OptionsFunctionality::operator->();
 }
 
 FXInternal* FX::operator->(){
-  return static_cast<FXInternal*>(SharedObject::operator->());
+  return (FXInternal*)OptionsFunctionality::operator->();
 }
 
 vector<MX> FX::call(const MX &arg){
@@ -369,14 +369,6 @@ void FX::spInit(bool fwd){
 
 FX FX::derivative(int nfwd, int nadj){
   return (*this)->derivative(nfwd,nadj);
-}
-
-OptionsFunctionalityInternal& FX::options(){
-  return *operator->();
-}
-
-const OptionsFunctionalityInternal& FX::options() const{
-  return *operator->();
 }
 
 
