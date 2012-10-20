@@ -655,85 +655,78 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
   // Work vector, forward derivatives
   std::vector<std::vector<MX> > dwork(work_.size());
   fill(dwork.begin(),dwork.end(),std::vector<MX>(nfwd));
-
-  // Pass the inputs
-  for(int iind=0; iind<arg.size(); ++iind){
-    swork[input_ind_[iind]] = arg[iind];
-  }
-  
-  // Pass the forward seeds
-  for(int iind=0; iind<input_.size(); ++iind){
-    for(int d=0; d<nfwd; ++d){
-      dwork[input_ind_[iind]][d] = fseed[d][iind];
-    }
-  }
     
   // Loop over computational nodes in forward order
   for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-    
-    // Pointers to the arguments of the evaluation
-    input_p.resize(it->op == OP_INPUT ? 0 : it->arg.size());
-    for(int i=0; i<input_p.size(); ++i){
-      int el = it->arg[i]; // index of the argument
-      input_p[i] = el<0 ? 0 : &swork[el];
-    }
-        
-    // Pointers to the result of the evaluation
-    output_p.resize(it->res.size());
-    for(int i=0; i<output_p.size(); ++i){
-      int el = it->res[i]; // index of the output
-      output_p[i] = el<0 ? 0 : &swork[el];
-    }
-
-    // Copy answer of the evaluation, if known
-    if(output_given){
-      if(it->data->isMultipleOutput()){
-        for(int oind=0; oind<output_p.size(); ++oind){
-          if(output_p[oind]){
-            *output_p[oind] = MX::create(new OutputNode(it->data,oind));
-          }
-        }
-      } else {
-        if(output_p[0]){
-          *output_p[0] = it->data;
-        }
+    // Pass the inputs and forward seeds
+    if(it->op == OP_INPUT){
+      swork[it->res.front()] = arg[it->arg.front()];
+      for(int d=0; d<nfwd; ++d){
+        dwork[it->res.front()][d] = fseed[d][it->arg.front()];
       }
-      
-      // Quick continue if no evaluation needed
-      if(nfwd==0) continue;
-    }
-    
-    // Skip node if it is given
-    if(it->op==OP_PARAMETER || it->op==OP_INPUT){
+    } else if(it->op==OP_PARAMETER){
       continue;
-    }
+    } else {
+    
+      // Pointers to the arguments of the evaluation
+      input_p.resize(it->arg.size());
+      for(int i=0; i<input_p.size(); ++i){
+        int el = it->arg[i]; // index of the argument
+        input_p[i] = el<0 ? 0 : &swork[el];
+      }
+          
+      // Pointers to the result of the evaluation
+      output_p.resize(it->res.size());
+      for(int i=0; i<output_p.size(); ++i){
+        int el = it->res[i]; // index of the output
+        output_p[i] = el<0 ? 0 : &swork[el];
+      }
 
-    // Forward seeds and sensitivities
-    for(int d=0; d<nfwd; ++d){
-      fseed_p[d].resize(it->arg.size());
-      for(int iind=0; iind<it->arg.size(); ++iind){
-        int el = it->arg[iind];
-        fseed_p[d][iind] = el<0 ? 0 : &dwork[el][d];
-        
-        // Give zero seed if null
-        if(el>=0 && dwork[el][d].isNull()){
-          if(d==0){
-            dwork[el][d] = MX::sparse(input_p[iind]->size1(),input_p[iind]->size2());
-          } else {
-            dwork[el][d] = dwork[el][0];
+      // Copy answer of the evaluation, if known
+      if(output_given){
+        if(it->data->isMultipleOutput()){
+          for(int oind=0; oind<output_p.size(); ++oind){
+            if(output_p[oind]){
+              *output_p[oind] = MX::create(new OutputNode(it->data,oind));
+            }
           }
+        } else {
+          if(output_p[0]){
+            *output_p[0] = it->data;
+          }
+        }
+        
+        // Quick continue if no evaluation needed
+        if(nfwd==0) continue;
+      }
+
+      // Forward seeds and sensitivities
+      for(int d=0; d<nfwd; ++d){
+        fseed_p[d].resize(it->arg.size());
+        for(int iind=0; iind<it->arg.size(); ++iind){
+          int el = it->arg[iind];
+          fseed_p[d][iind] = el<0 ? 0 : &dwork[el][d];
+          
+          // Give zero seed if null
+          if(el>=0 && dwork[el][d].isNull()){
+            if(d==0){
+              dwork[el][d] = MX::sparse(input_p[iind]->size1(),input_p[iind]->size2());
+            } else {
+              dwork[el][d] = dwork[el][0];
+            }
+          }
+        }
+
+        fsens_p[d].resize(it->res.size());
+        for(int oind=0; oind<it->res.size(); ++oind){
+          int el = it->res[oind];
+          fsens_p[d][oind] = el<0 ? 0 : &dwork[el][d];
         }
       }
 
-      fsens_p[d].resize(it->res.size());
-      for(int oind=0; oind<it->res.size(); ++oind){
-        int el = it->res[oind];
-        fsens_p[d][oind] = el<0 ? 0 : &dwork[el][d];
-      }
+      // Call the evaluation function
+      it->data->evaluateMX(input_p,output_p,fseed_p,fsens_p,dummy_p,dummy_p,output_given);
     }
-
-    // Call the evaluation function
-    it->data->evaluateMX(input_p,output_p,fseed_p,fsens_p,dummy_p,dummy_p,output_given);
   }
   
   // Collect the results
