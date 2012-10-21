@@ -115,7 +115,7 @@ class Mapping : public MXNode{
     bool isTranspose() const;
 
     /** \brief Get the operation */
-    virtual int getOp() const{ return OP_DENSIFY;}    
+    virtual int getOp() const{ return OP_MAPPING;}    
 };
 
 } // namespace CasADi
