@@ -61,6 +61,10 @@ class IpoptSolver : public NLPSolver {
 
     FX getGF()	const;
     
+    /** \brief Get the reduced Hessian. 
+     * Requires a patched sIPOPT installation, see CasADi documentation. */
+    DMatrix getReducedHessian();
+    
     /// Access functions of the node
     IpoptInternal* operator->();
     const IpoptInternal* operator->() const;
@@ -77,10 +81,6 @@ class IpoptSolver : public NLPSolver {
     %nocallback;
     #endif
 
-    /// @Joris: This would be an alternative
-    static NLPSolverCreator getCreator(){return creator;}
-
-    
 };
 
 } // namespace CasADi

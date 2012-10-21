@@ -49,6 +49,9 @@ public:
   
   virtual void setQPOptions();
 
+  // Get reduced Hessian
+  DMatrix getReducedHessian();
+  
 protected:
   
   /** NOTE:
@@ -114,6 +117,7 @@ protected:
   #ifdef WITH_SIPOPT
   bool run_sens_;
   bool compute_red_hessian_;
+  DMatrix red_hess_;
   #endif // WITH_SIPOPT
   
 };

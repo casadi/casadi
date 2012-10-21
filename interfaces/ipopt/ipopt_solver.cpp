@@ -49,4 +49,8 @@ FX IpoptSolver::getGF()	const {
   return isNull()? FX() : dynamic_cast<const IpoptInternal*>(get())->getGF();
 }
 
+DMatrix IpoptSolver::getReducedHessian(){
+  return (*this)->getReducedHessian();
+}
+
 } // namespace CasADi

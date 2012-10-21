@@ -34,6 +34,7 @@ using namespace std;
 #include <IpPDSearchDirCalc.hpp>
 #include <IpIpoptAlg.hpp>
 #include <SensRegOp.hpp>
+#include <SensReducedHessianCalculator.hpp>
 #endif // WITH_SIPOPT
 
 namespace CasADi{
@@ -290,6 +291,22 @@ void IpoptInternal::evaluate(int nfdir, int nadir){
     Ipopt::SmartPtr<Ipopt::SensApplication> *app_sens = static_cast<Ipopt::SmartPtr<Ipopt::SensApplication>*>(app_sens_);
     (*app_sens)->SetIpoptAlgorithmObjects(*app, status);
     (*app_sens)->Run();
+    
+    // Access the reduced Hessian calculator
+    #ifdef WITH_CASADI_PATCH
+    if(compute_red_hessian_){
+      // Get the reduced Hessian
+      std::vector<double> red_hess = (*app_sens)->ReducedHessian();
+      
+      // Get the dimensions
+      int N;
+      for(N=0; N*N<red_hess.size(); ++N);
+      casadi_assert(N*N==red_hess.size());
+      
+      // Store to statistics
+      red_hess_ = DMatrix(sp_dense(N,N),red_hess);
+    }
+    #endif // WITH_CASADI_PATCH
   }
   #endif // WITH_SIPOPT
   
@@ -924,5 +941,20 @@ void IpoptInternal::setQPOptions() {
   setOption("jac_d_constant","yes");
   setOption("hessian_constant","yes");
 }
+
+DMatrix IpoptInternal::getReducedHessian(){
+#ifndef WITH_SIPOPT
+casadi_error("This feature requires sIPOPT support. Please consult the CasADi documentation.");
+#else // WITH_SIPOPT
+#ifndef WITH_CASADI_PATCH
+casadi_error("Retrieving the Hessian requires the CasADi sIPOPT patch. Please consult the CasADi documentation.");
+#else // WITH_CASADI_PATCH
+return red_hess_;
+#endif // WITH_SIPOPT
+#endif // WITH_CASADI_PATCH
+
+}
+
+
 
 } // namespace CasADi

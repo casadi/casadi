@@ -86,3 +86,13 @@ print "Solution"
 print "x = " , solver.output(NLP_X_OPT).data() 
 print "----" 
 
+# Obtain the reduced Hessian
+try:
+        red_hess = NP.array(solver.getReducedHessian())
+        print "Reduced Hessian:"
+        print red_hess
+except:
+        print "Support for retrieving the reduced Hessian not enabled."
+
+
+

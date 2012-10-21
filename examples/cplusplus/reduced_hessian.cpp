@@ -98,6 +98,15 @@ int main(){
   cout << "x = " << solver.output(NLP_X_OPT).data() << endl;
   cout << "----" << endl;
   
+  // Get the reduced Hessian
+  try{
+    DMatrix red_hess = solver.getReducedHessian();
+    cout << "Reduced Hessian = " << endl;
+    red_hess.printDense();
+  } catch(...){
+    cout << "Support for retrieving the reduced Hessian not enabled." << endl;
+  }
+  
   return 0;
 }
 

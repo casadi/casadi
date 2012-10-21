@@ -1,5 +1,5 @@
 # my examples
-find_package(IPOPT QUIET)
+# find_package(IPOPT QUIET)
 
 IF(IPOPT_FOUND)
 include_directories(../cppocp)
