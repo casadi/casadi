@@ -693,11 +693,8 @@ void SXFunctionInternal::init(){
   free_vars_.clear();
   for(vector<pair<int,SXNode*> >::const_iterator it=symb_loc.begin(); it!=symb_loc.end(); ++it){
     if(it->second->temp!=0){
-      // Free varables
-      SX par = SX::create(it->second);
-      
       // Save to list of free parameters
-      free_vars_.push_back(par);
+      free_vars_.push_back(SX::create(it->second));
       
       // Remove marker
       it->second->temp=0;

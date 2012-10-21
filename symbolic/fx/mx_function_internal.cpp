@@ -316,11 +316,8 @@ void MXFunctionInternal::init(){
   for(vector<pair<int,MXNode*> >::const_iterator it=symb_loc.begin(); it!=symb_loc.end(); ++it){
     int i = it->second->temp-1;
     if(i>=0){
-      // Free varables
-      MX par = MX::create(it->second);
-      
       // Save to list of free parameters
-      free_vars_.push_back(par);
+      free_vars_.push_back(MX::create(it->second));
       
       // Remove marker
       it->second->temp=0;
@@ -550,7 +547,9 @@ void MXFunctionInternal::spEvaluate(bool fwd){
           swork[k] = iwork[k];
         }
       } else if(it->op==OP_PARAMETER){
-        continue; // FIXME
+        // Parameters are constant
+        vector<double> &w = work_[it->res.front()].data.data();
+        fill_n(get_bvec_t(w),w.size(),bvec_t(0));
       } else {
         // Point pointers to the data corresponding to the element
         updatePointers(*it,0,0);
@@ -582,7 +581,7 @@ void MXFunctionInternal::spEvaluate(bool fwd){
           iwork[k] = swork[k];
         }
       } else if(it->op==OP_PARAMETER){
-        continue; // FIXME
+        continue;
       } else {
       
         // Point pointers to the data corresponding to the element
