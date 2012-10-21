@@ -159,15 +159,13 @@ void MXFunctionInternal::init(){
     }
   }
   
-  // Reset the node markers
-  for(std::vector<MXNode*>::iterator it=nodes.begin(); it!=nodes.end(); ++it){
-    (*it)->temp = 0;
-  }
-  
   // Set the temporary variables to be the corresponding place in the sorted graph
-  for(int i=0; i<nodes.size(); ++i)
-    nodes[i]->temp = i;
-
+  for(int i=0; i<nodes.size(); ++i){
+    if(nodes[i]){
+      nodes[i]->temp = i;
+    }
+  }
+    
   // Place in the work vector for each node
   vector<int> place_in_work;
   place_in_work.reserve(nodes.size());
@@ -176,12 +174,15 @@ void MXFunctionInternal::init(){
   vector<int> place_in_alg;
   place_in_alg.reserve(nodes.size());
   
+  // Input instructions
+  vector<pair<int,MXNode*> > symb_loc;
+  
+  // Current output and nonzero, start with the first one
+  //int curr_oind=0;
+  
   // Work vector for the virtual machine
   work_.resize(0);
   work_.reserve(nodes.size());
-  
-  // Input instructions
-  vector<pair<int,MXNode*> > symb_loc;
 
   // Get the sequence of instructions for the virtual machine
   algorithm_.resize(0);
@@ -200,7 +201,7 @@ void MXFunctionInternal::init(){
     bool in_work=true, in_algorithm=true;
     
     // Add an element to the algorithm
-    if(n->isOutputNode()){
+    if(ae.op<0){ // Output node, not in algorithm
       
       // Get the output index
       int oind = n->getFunctionOutput();
@@ -229,7 +230,9 @@ void MXFunctionInternal::init(){
         // Save place in work vector
         place_in_work.push_back(wplace);
       }
-
+    } else if(ae.op == OP_OUTPUT){
+      in_work = false;
+      in_algorithm = false;
     } else {
       // a parameter or input
       if(ae.op==OP_PARAMETER){
@@ -286,7 +289,9 @@ void MXFunctionInternal::init(){
 
   // Reset the temporary variables
   for(int i=0; i<nodes.size(); ++i){
-    nodes[i]->temp = 0;
+    if(nodes[i]){
+      nodes[i]->temp = 0;
+    }
   }
   
   // Now mark each input's place in the algorithm
@@ -395,15 +400,16 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
 
   // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
   for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
-    //casadi_assert(it->op!=OP_PARAMETER); // FIXME
-    if(it->op==OP_PARAMETER) continue; // FIXME
-
     if(it->op==OP_INPUT){
       // Pass the input and forward seeeds
       work_[it->res.front()].data.set(input(it->arg.front()));
       for(int dir=0; dir<nfdir; ++dir){
         work_[it->res.front()].dataF.at(dir).set(fwdSeed(it->arg.front(),dir));
       }
+    } else if(it->op==OP_OUTPUT){
+      continue;
+    } else if(it->op==OP_PARAMETER){
+      //casadi_error("The algorithm contains free parameters"); // FIXME
     } else {
 
       // Point pointers to the data corresponding to the element
@@ -454,15 +460,15 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
 
     // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
     for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); it++){
-      //casadi_assert(it->op!=OP_PARAMETER); // FIXME
-      if(it->op==OP_PARAMETER) continue; // FIXME
-
       if(it->op==OP_INPUT){
         // Get the adjoint sensitivity
         for(int dir=0; dir<nadir; ++dir){
           work_[it->res.front()].dataA.at(dir).get(adjSens(it->arg.front(),dir));
         }
-        
+      } else if(it->op==OP_OUTPUT){
+        continue;
+      } else if(it->op==OP_PARAMETER){
+        //casadi_error("The algorithm contains free parameters"); // FIXME
       } else {
       
         // Point pointers to the data corresponding to the element
@@ -481,27 +487,31 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
 void MXFunctionInternal::print(ostream &stream) const{
   FXInternal::print(stream);
   for(vector<AlgEl>::const_iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-    stream << "{";
-    for(int i=0; i<it->res.size(); ++i){
-      if(i!=0) stream << ",";
-      if(it->res[i]>=0){
-        stream << "@" << it->res[i];
-      } else {
-        stream << "NULL";
-      }
-    }
-    stream << "} = ";
-    if(it->op==OP_INPUT){
-      stream << "input[" << it->arg.front() << "]";
+    if(it->op==OP_OUTPUT){
+      stream << "output[" << it->res.front() << "] = @" << it->arg.front();
     } else {
-      it->data->printPart(stream,0);
-      for(int i=0; i<it->arg.size(); ++i){
-        if(it->arg[i]>=0){
-          stream << "@" << it->arg[i];
+      stream << "{";
+      for(int i=0; i<it->res.size(); ++i){
+        if(i!=0) stream << ",";
+        if(it->res[i]>=0){
+          stream << "@" << it->res[i];
         } else {
           stream << "NULL";
         }
-        it->data->printPart(stream,i+1);
+      }
+      stream << "} = ";
+      if(it->op==OP_INPUT){
+        stream << "input[" << it->arg.front() << "]";
+      } else {
+        it->data->printPart(stream,0);
+        for(int i=0; i<it->arg.size(); ++i){
+          if(it->arg[i]>=0){
+            stream << "@" << it->arg[i];
+          } else {
+            stream << "NULL";
+          }
+          it->data->printPart(stream,i+1);
+        }
       }
     }
     stream << endl;
@@ -536,14 +546,16 @@ void MXFunctionInternal::spEvaluate(bool fwd){
 
     // Propagate sparsity forward
     for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
-      if(it->op==OP_PARAMETER) continue;
       if(it->op==OP_INPUT){
         // Pass input seeds
         vector<double> &w = work_[it->res.front()].data.data();
         bvec_t* iwork = get_bvec_t(w);
         bvec_t* swork = get_bvec_t(input(it->arg.front()).data());
         copy(swork,swork+w.size(),iwork);
-    
+      } else if(it->op==OP_OUTPUT){
+        continue;
+      } else if(it->op==OP_PARAMETER){
+        continue; // FIXME
       } else {
         // Point pointers to the data corresponding to the element
         updatePointers(*it,0,0);
@@ -577,7 +589,6 @@ void MXFunctionInternal::spEvaluate(bool fwd){
 
     // Propagate sparsity backwards
     for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); it++){
-      if(it->op==OP_PARAMETER) continue;
       if(it->op==OP_INPUT){
         // Get the input sensitivities and clear it from the work vector
         vector<double> &w = work_[it->res.front()].data.data();
@@ -587,7 +598,10 @@ void MXFunctionInternal::spEvaluate(bool fwd){
           swork[k] |= iwork[k];
           iwork[k] = 0;
         }
-        
+      } else if(it->op==OP_OUTPUT){
+        continue;
+      } else if(it->op==OP_PARAMETER){
+        continue; // FIXME
       } else {
       
         // Point pointers to the data corresponding to the element
@@ -661,6 +675,8 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
       for(int d=0; d<nfwd; ++d){
         dwork[it->res.front()][d] = fseed[d][it->arg.front()];
       }
+    } else if(it->op==OP_OUTPUT){
+      continue;
     } else if(it->op==OP_PARAMETER){
       swork[it->res.front()] = it->data;
       for(int d=0; d<nfwd; ++d){
@@ -770,6 +786,8 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
         for(int d=0; d<nadj; ++d){
           asens[d][it->arg.front()] = dwork[it->res.front()][d];
         }
+      } else if(it->op==OP_OUTPUT){
+        continue;
       } else {
         // Get the arguments of the evaluation
         input_p.resize(it->arg.size());
@@ -839,11 +857,14 @@ void MXFunctionInternal::evalSX(const std::vector<SXMatrix>& input_s, std::vecto
   vector<SXMatrix*> sxarg;
   vector<SXMatrix*> sxres;
   for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
-    if(it->op==OP_PARAMETER) continue;
     if(it->op==OP_INPUT){
       // Pass the input
       swork[it->res.front()].set(input_s[it->arg.front()]);
       
+    } else if(it->op==OP_OUTPUT){
+      continue;
+    } else if(it->op==OP_PARAMETER){
+      continue; // FIXME
     } else {
       sxarg.resize(it->arg.size());
       for(int c=0; c<sxarg.size(); ++c){

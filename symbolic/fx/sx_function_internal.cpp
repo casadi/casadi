@@ -290,36 +290,26 @@ void SXFunctionInternal::print(ostream &stream) const{
   
   // Normal, interpreted output
   for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
-    int op = it->op;
-    int ip = op/NUM_BUILT_IN_OPS;
-    op -= NUM_BUILT_IN_OPS*ip;
-    
-    if(op==OP_OUTPUT){
+    if(it->op==OP_OUTPUT){
       stream << "output[" << it->res << "][" << it->arg.i[1] << "] = @" << it->arg.i[0];
-    } else if(op==OP_INPUT){
-      stream << "@" << it->res << " = input[" << it->arg.i[0] << "][" << it->arg.i[1] << "]";
     } else {
-      stream << "@" << it->res;
-      switch(ip){
-        case 0:  stream << " = "; break;
-        case 1:  stream << " += "; break;
-        case 2:  stream << " -= "; break;
-        case 3:  stream << " *= "; break;
-        case 4:  stream << " /= "; break;
-      }
-
-      if(op==OP_CONST){
-        stream << it->arg.d;
-      } else if(op==OP_PARAMETER){
-        stream << *p_it++;
+      stream << "@" << it->res << " = ";
+      if(it->op==OP_INPUT){
+        stream << "input[" << it->arg.i[0] << "][" << it->arg.i[1] << "]";
       } else {
-        int ndep = casadi_math<double>::ndeps(op);
-        casadi_math<double>::printPre(op,stream);
-        for(int c=0; c<ndep; ++c){
-          if(c==1) casadi_math<double>::printSep(op,stream);
-          stream << "@" << it->arg.i[c];
+        if(it->op==OP_CONST){
+          stream << it->arg.d;
+        } else if(it->op==OP_PARAMETER){
+          stream << *p_it++;
+        } else {
+          int ndep = casadi_math<double>::ndeps(it->op);
+          casadi_math<double>::printPre(it->op,stream);
+          for(int c=0; c<ndep; ++c){
+            if(c==1) casadi_math<double>::printSep(it->op,stream);
+            stream << "@" << it->arg.i[c];
+          }
+          casadi_math<double>::printPost(it->op,stream);
         }
-        casadi_math<double>::printPost(op,stream);
       }
     }
     stream << ";" << endl;
