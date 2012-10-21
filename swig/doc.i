@@ -201,6 +201,13 @@ Joel Andersson
 |              |              |              | after        | al           |
 |              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -1062,6 +1069,13 @@ thus x := [xd,xa]
 |              |              |              | after        | al           |
 |              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -1698,6 +1712,13 @@ Assert that the object has been initialized. ";
 |              |              |              | \"medium\",    |              |
 |              |              |              | \"high\",      |              |
 |              |              |              | \"debug\"      |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | relaxation_p | OT_REAL      |              |              | CasADi::Acad |
 | arameter     |              |              |              | oOCPInternal |
@@ -2434,6 +2455,13 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | \"high\",      |              |
 |              |              |              | \"debug\"      |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | relaxation_p | OT_REAL      |              |              | CasADi::Acad |
 | arameter     |              |              |              | oOCPInternal |
 +--------------+--------------+--------------+--------------+--------------+
@@ -2939,9 +2967,9 @@ Destructor. ";
 
 Print a part of the expression. ";
 
-%feature("docstring")  CasADi::BinaryMX::isOperation "
+%feature("docstring")  CasADi::BinaryMX::getOp "
 
-Is it a certain operation. ";
+Get the operation. ";
 
 %feature("docstring")  CasADi::BinaryMX::evaluateMX "
 
@@ -2999,22 +3027,6 @@ Propagate sparsity. ";
 
 Get the name. ";
 
-%feature("docstring")  CasADi::BinaryMX::isSymbolic "
-
-Check if symbolic. ";
-
-%feature("docstring")  CasADi::BinaryMX::isConstant "
-
-Check if constant. ";
-
-%feature("docstring")  CasADi::BinaryMX::isMapping "
-
-Check if mapping. ";
-
-%feature("docstring")  CasADi::BinaryMX::isEvaluation "
-
-Check if evaluation. ";
-
 %feature("docstring")  CasADi::BinaryMX::isOutputNode "
 
 Check if evaluation output. ";
@@ -3022,10 +3034,6 @@ Check if evaluation output. ";
 %feature("docstring")  CasADi::BinaryMX::isMultipleOutput "
 
 Check if a multiple output node. ";
-
-%feature("docstring")  CasADi::BinaryMX::isMultiplication "
-
-Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::BinaryMX::getFunction "
 
@@ -3545,6 +3553,13 @@ Joel Andersson
 |              |              |              | with the     |              |
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
@@ -4226,6 +4241,13 @@ Joel Andersson
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -4829,6 +4851,13 @@ Joel Andersson
 | parallelizat | OT_STRING    | GenericType( | Passed on to | CasADi::Coll |
 | ion          |              | )            | CasADi::Para | ocationInter |
 |              |              |              | llelizer     | nal          |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
@@ -5646,6 +5675,13 @@ Joel Andersson
 | s            |              |              | the          | ratorInterna |
 |              |              |              | quadrature   | l            |
 |              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
@@ -6518,6 +6554,13 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | quadrature   | l            |
 |              |              |              | solver       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -7228,6 +7271,13 @@ Assert that the object has been initialized. ";
 | ion          |              | )            | CasADi::Para | ocationInter |
 |              |              |              | llelizer     | nal          |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -7711,9 +7761,9 @@ Evaluate the function symbolically ( MX) ";
 
 Propagate sparsity. ";
 
-%feature("docstring")  CasADi::ConstantMX::isConstant "
+%feature("docstring")  CasADi::ConstantMX::getOp "
 
-Indicate that the node is constant. ";
+Get the operation. ";
 
 %feature("docstring")  CasADi::ConstantMX::__nonzero__ "
 
@@ -7755,18 +7805,6 @@ Evaluate symbolically ( MX), no derivatives. ";
 
 Get the name. ";
 
-%feature("docstring")  CasADi::ConstantMX::isSymbolic "
-
-Check if symbolic. ";
-
-%feature("docstring")  CasADi::ConstantMX::isMapping "
-
-Check if mapping. ";
-
-%feature("docstring")  CasADi::ConstantMX::isEvaluation "
-
-Check if evaluation. ";
-
 %feature("docstring")  CasADi::ConstantMX::isOutputNode "
 
 Check if evaluation output. ";
@@ -7774,10 +7812,6 @@ Check if evaluation output. ";
 %feature("docstring")  CasADi::ConstantMX::isMultipleOutput "
 
 Check if a multiple output node. ";
-
-%feature("docstring")  CasADi::ConstantMX::isMultiplication "
-
-Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::ConstantMX::getFunction "
 
@@ -7852,10 +7886,6 @@ Assign nonzeros (mapping matrix) ";
 %feature("docstring")  CasADi::ConstantMX::assign "
 
 Assign nonzeros (mapping matrix), output indices sequential. ";
-
-%feature("docstring")  CasADi::ConstantMX::isOperation "
-
-Is it a certain operation. ";
 
 %feature("docstring")  CasADi::ConstantMX::numel "
 
@@ -8157,6 +8187,13 @@ Joris Gillis
 |              |              |              | with the     |              |
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | simulator_op | OT_DICTIONAR | GenericType( | Options to   | CasADi::Cont |
 | tions        | Y            | )            | be passed to | rolSimulator |
@@ -9041,6 +9078,13 @@ Joel Andersson
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | simulator_op | OT_DICTIONAR | GenericType( | Options to   | CasADi::Cont |
 | tions        | Y            | )            | be passed to | rolSimulator |
 |              |              |              | the          | Internal     |
@@ -9634,6 +9678,13 @@ If H is not positive-definite, the solver should throw an error.
 |              |              |              | with the     |              |
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | simplex_maxi | OT_INTEGER   | 2.100e+09    | Maximum      | CasADi::Cple |
 | ter          |              |              | number of    | xInternal    |
@@ -10229,6 +10280,13 @@ Attila Kozma, Joel Andersson
 |              |              |              | with the     |              |
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | simplex_maxi | OT_INTEGER   | 2.100e+09    | Maximum      | CasADi::Cple |
 | ter          |              |              | number of    | xInternal    |
@@ -11644,6 +11702,13 @@ therefore more expensive if A is invariant.
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -12337,6 +12402,13 @@ Solves the linear system A.x = b for x
 |              |              |              | with the     |              |
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
@@ -13133,6 +13205,13 @@ times t_i.
 |              |              |              | affect the   |              |
 |              |              |              | step size    |              |
 |              |              |              | control      |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | reltol       | OT_REAL      | 0.000        | Relative     | CasADi::Sund |
 |              |              |              | tolerence    | ialsInternal |
@@ -14210,6 +14289,13 @@ quadrature state at the initial time (INTEGRATOR_RQF=3)
 |              |              |              | step size    |              |
 |              |              |              | control      |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | reltol       | OT_REAL      | 0.000        | Relative     | CasADi::Sund |
 |              |              |              | tolerence    | ialsInternal |
 |              |              |              | for the IVP  |              |
@@ -14767,6 +14853,10 @@ Evaluate the function symbolically ( MX) ";
 
 Propagate sparsity. ";
 
+%feature("docstring")  CasADi::Densification::getOp "
+
+Get the operation. ";
+
 %feature("docstring")  CasADi::Densification::__nonzero__ "
 
 Check the truth value of this node. ";
@@ -14803,22 +14893,6 @@ Evaluate symbolically ( MX), no derivatives. ";
 
 Get the name. ";
 
-%feature("docstring")  CasADi::Densification::isSymbolic "
-
-Check if symbolic. ";
-
-%feature("docstring")  CasADi::Densification::isConstant "
-
-Check if constant. ";
-
-%feature("docstring")  CasADi::Densification::isMapping "
-
-Check if mapping. ";
-
-%feature("docstring")  CasADi::Densification::isEvaluation "
-
-Check if evaluation. ";
-
 %feature("docstring")  CasADi::Densification::isOutputNode "
 
 Check if evaluation output. ";
@@ -14826,10 +14900,6 @@ Check if evaluation output. ";
 %feature("docstring")  CasADi::Densification::isMultipleOutput "
 
 Check if a multiple output node. ";
-
-%feature("docstring")  CasADi::Densification::isMultiplication "
-
-Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::Densification::getFunction "
 
@@ -14904,10 +14974,6 @@ Assign nonzeros (mapping matrix) ";
 %feature("docstring")  CasADi::Densification::assign "
 
 Assign nonzeros (mapping matrix), output indices sequential. ";
-
-%feature("docstring")  CasADi::Densification::isOperation "
-
-Is it a certain operation. ";
 
 %feature("docstring")  CasADi::Densification::numel "
 
@@ -15060,6 +15126,13 @@ Joel Andersson
 |              |              |              | with the     |              |
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
@@ -15737,6 +15810,13 @@ Joel Andersson
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -16171,10 +16251,6 @@ Evaluate the function symbolically ( MX) ";
 
 Propagate sparsity. ";
 
-%feature("docstring")  CasADi::EvaluationMX::isEvaluation "
-
-Check if evaluation. ";
-
 %feature("docstring")  CasADi::EvaluationMX::getFunction "
 
 Get function reference. ";
@@ -16198,6 +16274,10 @@ Number of outputs. ";
 %feature("docstring")  CasADi::EvaluationMX::sparsity "
 
 Get the sparsity of output oind. ";
+
+%feature("docstring")  CasADi::EvaluationMX::getOp "
+
+Get the operation. ";
 
 %feature("docstring")  CasADi::EvaluationMX::sparsity "
 
@@ -16239,25 +16319,9 @@ Evaluate symbolically ( MX), no derivatives. ";
 
 Get the name. ";
 
-%feature("docstring")  CasADi::EvaluationMX::isSymbolic "
-
-Check if symbolic. ";
-
-%feature("docstring")  CasADi::EvaluationMX::isConstant "
-
-Check if constant. ";
-
-%feature("docstring")  CasADi::EvaluationMX::isMapping "
-
-Check if mapping. ";
-
 %feature("docstring")  CasADi::EvaluationMX::isOutputNode "
 
 Check if evaluation output. ";
-
-%feature("docstring")  CasADi::EvaluationMX::isMultiplication "
-
-Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::EvaluationMX::dep "
 
@@ -16308,10 +16372,6 @@ Assign nonzeros (mapping matrix) ";
 %feature("docstring")  CasADi::EvaluationMX::assign "
 
 Assign nonzeros (mapping matrix), output indices sequential. ";
-
-%feature("docstring")  CasADi::EvaluationMX::isOperation "
-
-Is it a certain operation. ";
 
 %feature("docstring")  CasADi::EvaluationMX::numel "
 
@@ -16450,6 +16510,13 @@ Joel Andersson
 |              |              |              | with the     |              |
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
@@ -17124,6 +17191,13 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | with the     |              |
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
@@ -17997,6 +18071,13 @@ Joel Andersson
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -18704,6 +18785,13 @@ Joel Andersson
 |              |              |              | with the     |              |
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
@@ -19936,6 +20024,13 @@ Joel Andersson
 |              |              |              | step size    |              |
 |              |              |              | control      |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | reltol       | OT_REAL      | 0.000        | Relative     | CasADi::Sund |
 |              |              |              | tolerence    | ialsInternal |
 |              |              |              | for the IVP  |              |
@@ -21066,6 +21161,13 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 |              |              |              | step size    |              |
 |              |              |              | control      |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | reltol       | OT_REAL      | 0.000        | Relative     | CasADi::Sund |
 |              |              |              | tolerence    | ialsInternal |
 |              |              |              | for the IVP  |              |
@@ -21740,6 +21842,13 @@ Joel Andersson
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -22409,6 +22518,13 @@ Internal class.
 |              |              |              | with the     |              |
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
@@ -23233,6 +23349,13 @@ Joel Andersson
 |              |              |              | after        | al           |
 |              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -24036,6 +24159,13 @@ Joel Andersson
 |              |              |              | after        | al           |
 |              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -24730,6 +24860,13 @@ Assert that the object has been initialized. ";
 |              |              |              | fixed        |              |
 |              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -25394,6 +25531,13 @@ Joel Andersson
 |              |              |              | denoting     |              |
 |              |              |              | fixed        |              |
 |              |              |              | parameters.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
@@ -28303,6 +28447,13 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | (see IPOPT d |              |
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | True         | Throw        | CasADi::Ipop |
+| heck         |              |              | exceptions   | tInternal    |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | replace_boun | OT_STRING    | no           | Indicates if | CasADi::Ipop |
 | ds           |              |              | all variable | tInternal    |
@@ -31679,6 +31830,13 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | True         | Throw        | CasADi::Ipop |
+| heck         |              |              | exceptions   | tInternal    |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | replace_boun | OT_STRING    | no           | Indicates if | CasADi::Ipop |
 | ds           |              |              | all variable | tInternal    |
 |              |              |              | bounds       |              |
@@ -33140,6 +33298,13 @@ Retrieve information about variables and constraints ";
 | pretype      | OT_STRING    | \"none\"       | (none|left|r | CasADi::Kins |
 |              |              |              | ight|both)   | olInternal   |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -33767,6 +33932,13 @@ See:   ImplicitFunction for more information
 +--------------+--------------+--------------+--------------+--------------+
 | pretype      | OT_STRING    | \"none\"       | (none|left|r | CasADi::Kins |
 |              |              |              | ight|both)   | olInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
@@ -34862,6 +35034,13 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | fixed        |              |
 |              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -35648,6 +35827,13 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | fixed        |              |
 |              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -36418,6 +36604,13 @@ therefore more expensive if A is invariant.
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -37120,6 +37313,13 @@ Internal class.
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -37661,6 +37861,13 @@ therefore more expensive if A is invariant.
 |              |              |              | with the     |              |
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
@@ -38355,6 +38562,13 @@ Internal class.
 |              |              |              | with the     |              |
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
@@ -39051,6 +39265,13 @@ Joel Andersson
 | tions        | Y            | )            | be passed to | edSQPInterna |
 |              |              |              | the QP       | l            |
 |              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | rho          | OT_REAL      | 0.500        | Linesearch   | CasADi::Lift |
 |              |              |              | parameter    | edSQPInterna |
@@ -39983,6 +40204,13 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | the QP       | l            |
 |              |              |              | solver       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | rho          | OT_REAL      | 0.500        | Linesearch   | CasADi::Lift |
 |              |              |              | parameter    | edSQPInterna |
 |              |              |              |              | l            |
@@ -40691,6 +40919,13 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | fixed        |              |
 |              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -41347,6 +41582,13 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | denoting     |              |
 |              |              |              | fixed        |              |
 |              |              |              | parameters.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
@@ -42068,6 +42310,13 @@ Joel Andersson
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -42754,6 +43003,13 @@ Internal class Solves the linear system A.x = b for x
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -43217,10 +43473,6 @@ Propagate sparsity. ";
 
 Print a part of the expression */. ";
 
-%feature("docstring")  CasADi::Mapping::isMapping "
-
-Is a mapping matrix. ";
-
 %feature("docstring")  CasADi::Mapping::assign "
 
 Assign/add nonzeros. ";
@@ -43256,6 +43508,10 @@ Check if the mapping is in fact an identity mapping. ";
 %feature("docstring")  CasADi::Mapping::isTranspose "
 
 Check if the mapping is in fact a transpose. ";
+
+%feature("docstring")  CasADi::Mapping::getOp "
+
+Get the operation. ";
 
 %feature("docstring")  CasADi::Mapping::evaluateBlock "";
 
@@ -43295,18 +43551,6 @@ Evaluate symbolically ( MX), no derivatives. ";
 
 Get the name. ";
 
-%feature("docstring")  CasADi::Mapping::isSymbolic "
-
-Check if symbolic. ";
-
-%feature("docstring")  CasADi::Mapping::isConstant "
-
-Check if constant. ";
-
-%feature("docstring")  CasADi::Mapping::isEvaluation "
-
-Check if evaluation. ";
-
 %feature("docstring")  CasADi::Mapping::isOutputNode "
 
 Check if evaluation output. ";
@@ -43314,10 +43558,6 @@ Check if evaluation output. ";
 %feature("docstring")  CasADi::Mapping::isMultipleOutput "
 
 Check if a multiple output node. ";
-
-%feature("docstring")  CasADi::Mapping::isMultiplication "
-
-Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::Mapping::getFunction "
 
@@ -43384,10 +43624,6 @@ Set multiple dependencies. ";
 %feature("docstring")  CasADi::Mapping::addDependency "
 
 Add a dependency. ";
-
-%feature("docstring")  CasADi::Mapping::isOperation "
-
-Is it a certain operation. ";
 
 %feature("docstring")  CasADi::Mapping::numel "
 
@@ -44424,29 +44660,9 @@ Propagate sparsity. ";
 
 Get the name. ";
 
-%feature("docstring")  CasADi::MultipleOutput::isSymbolic "
-
-Check if symbolic. ";
-
-%feature("docstring")  CasADi::MultipleOutput::isConstant "
-
-Check if constant. ";
-
-%feature("docstring")  CasADi::MultipleOutput::isMapping "
-
-Check if mapping. ";
-
-%feature("docstring")  CasADi::MultipleOutput::isEvaluation "
-
-Check if evaluation. ";
-
 %feature("docstring")  CasADi::MultipleOutput::isOutputNode "
 
 Check if evaluation output. ";
-
-%feature("docstring")  CasADi::MultipleOutput::isMultiplication "
-
-Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::MultipleOutput::getFunction "
 
@@ -44459,6 +44675,10 @@ Get function input. ";
 %feature("docstring")  CasADi::MultipleOutput::getFunctionOutput "
 
 Get function output. ";
+
+%feature("docstring")  CasADi::MultipleOutput::getOp "
+
+Get the operation. ";
 
 %feature("docstring")  CasADi::MultipleOutput::dep "
 
@@ -44513,10 +44733,6 @@ Assign nonzeros (mapping matrix) ";
 %feature("docstring")  CasADi::MultipleOutput::assign "
 
 Assign nonzeros (mapping matrix), output indices sequential. ";
-
-%feature("docstring")  CasADi::MultipleOutput::isOperation "
-
-Is it a certain operation. ";
 
 %feature("docstring")  CasADi::MultipleOutput::numel "
 
@@ -44766,6 +44982,13 @@ Joel Andersson
 | parallelizat | OT_STRING    | GenericType( | Passed on to | CasADi::Mult |
 | ion          |              | )            | CasADi::Para | ipleShooting |
 |              |              |              | llelizer     | Internal     |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
@@ -45641,6 +45864,13 @@ Return a string with a destription (for SWIG) ";
 | ion          |              | )            | CasADi::Para | ipleShooting |
 |              |              |              | llelizer     | Internal     |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -46092,9 +46322,9 @@ Evaluate the function symbolically ( MX) ";
 
 Propagate sparsity. ";
 
-%feature("docstring")  CasADi::Multiplication::isMultiplication "
+%feature("docstring")  CasADi::Multiplication::getOp "
 
-Check if matrix multiplication. ";
+Get the operation. ";
 
 %feature("docstring")  CasADi::Multiplication::__nonzero__ "
 
@@ -46131,22 +46361,6 @@ Evaluate symbolically ( MX), no derivatives. ";
 %feature("docstring")  CasADi::Multiplication::getName "
 
 Get the name. ";
-
-%feature("docstring")  CasADi::Multiplication::isSymbolic "
-
-Check if symbolic. ";
-
-%feature("docstring")  CasADi::Multiplication::isConstant "
-
-Check if constant. ";
-
-%feature("docstring")  CasADi::Multiplication::isMapping "
-
-Check if mapping. ";
-
-%feature("docstring")  CasADi::Multiplication::isEvaluation "
-
-Check if evaluation. ";
 
 %feature("docstring")  CasADi::Multiplication::isOutputNode "
 
@@ -46229,10 +46443,6 @@ Assign nonzeros (mapping matrix) ";
 %feature("docstring")  CasADi::Multiplication::assign "
 
 Assign nonzeros (mapping matrix), output indices sequential. ";
-
-%feature("docstring")  CasADi::Multiplication::isOperation "
-
-Is it a certain operation. ";
 
 %feature("docstring")  CasADi::Multiplication::numel "
 
@@ -47493,6 +47703,13 @@ Joel Andersson
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -48245,6 +48462,13 @@ Joel Andersson
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -48413,10 +48637,6 @@ Set the lifting function. ";
 
 Generate a function that calculates a Jacobian function by operator
 overloading. ";
-
-%feature("docstring")  CasADi::MXFunctionInternal::collectFree "
-
-Collect the free variables. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::evalSX "
 
@@ -48749,22 +48969,6 @@ Propagate sparsity. ";
 
 Get the name. ";
 
-%feature("docstring")  CasADi::MXNode::isSymbolic "
-
-Check if symbolic. ";
-
-%feature("docstring")  CasADi::MXNode::isConstant "
-
-Check if constant. ";
-
-%feature("docstring")  CasADi::MXNode::isMapping "
-
-Check if mapping. ";
-
-%feature("docstring")  CasADi::MXNode::isEvaluation "
-
-Check if evaluation. ";
-
 %feature("docstring")  CasADi::MXNode::isOutputNode "
 
 Check if evaluation output. ";
@@ -48772,10 +48976,6 @@ Check if evaluation output. ";
 %feature("docstring")  CasADi::MXNode::isMultipleOutput "
 
 Check if a multiple output node. ";
-
-%feature("docstring")  CasADi::MXNode::isMultiplication "
-
-Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::MXNode::getFunction "
 
@@ -48788,6 +48988,10 @@ Get function input. ";
 %feature("docstring")  CasADi::MXNode::getFunctionOutput "
 
 Get function output. ";
+
+%feature("docstring")  CasADi::MXNode::getOp "
+
+Get the operation. ";
 
 %feature("docstring")  CasADi::MXNode::dep "
 
@@ -48850,10 +49054,6 @@ Assign nonzeros (mapping matrix) ";
 %feature("docstring")  CasADi::MXNode::assign "
 
 Assign nonzeros (mapping matrix), output indices sequential. ";
-
-%feature("docstring")  CasADi::MXNode::isOperation "
-
-Is it a certain operation. ";
 
 %feature("docstring")  CasADi::MXNode::numel "
 
@@ -49142,6 +49342,13 @@ If H is not positive-definite, the solver should throw an error.
 |              |              |              | with the     |              |
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
@@ -49710,6 +49917,13 @@ Joris Gillis
 |              |              |              | with the     |              |
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
@@ -50520,6 +50734,13 @@ Joel Andersson
 |              |              |              | denoting     |              |
 |              |              |              | fixed        |              |
 |              |              |              | parameters.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
@@ -51362,6 +51583,13 @@ Joel Andersson
 |              |              |              | fixed        |              |
 |              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -51845,9 +52073,9 @@ Evaluate the function (template) ";
 
 Print a part of the expression. ";
 
-%feature("docstring")  CasADi::NonzerosNonzerosOp::isOperation "
+%feature("docstring")  CasADi::NonzerosNonzerosOp::getOp "
 
-Is it a certain operation. ";
+Get the operation. ";
 
 %feature("docstring")  CasADi::NonzerosNonzerosOp::evaluateMX "
 
@@ -51889,22 +52117,6 @@ Evaluate symbolically ( SX), no derivatives. ";
 
 Get the name. ";
 
-%feature("docstring")  CasADi::NonzerosNonzerosOp::isSymbolic "
-
-Check if symbolic. ";
-
-%feature("docstring")  CasADi::NonzerosNonzerosOp::isConstant "
-
-Check if constant. ";
-
-%feature("docstring")  CasADi::NonzerosNonzerosOp::isMapping "
-
-Check if mapping. ";
-
-%feature("docstring")  CasADi::NonzerosNonzerosOp::isEvaluation "
-
-Check if evaluation. ";
-
 %feature("docstring")  CasADi::NonzerosNonzerosOp::isOutputNode "
 
 Check if evaluation output. ";
@@ -51912,10 +52124,6 @@ Check if evaluation output. ";
 %feature("docstring")  CasADi::NonzerosNonzerosOp::isMultipleOutput "
 
 Check if a multiple output node. ";
-
-%feature("docstring")  CasADi::NonzerosNonzerosOp::isMultiplication "
-
-Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::NonzerosNonzerosOp::getFunction "
 
@@ -52064,9 +52272,9 @@ Evaluate the function (template) ";
 
 Print a part of the expression. ";
 
-%feature("docstring")  CasADi::NonzerosScalarOp::isOperation "
+%feature("docstring")  CasADi::NonzerosScalarOp::getOp "
 
-Is it a certain operation. ";
+Get the operation. ";
 
 %feature("docstring")  CasADi::NonzerosScalarOp::evaluateMX "
 
@@ -52108,22 +52316,6 @@ Evaluate symbolically ( SX), no derivatives. ";
 
 Get the name. ";
 
-%feature("docstring")  CasADi::NonzerosScalarOp::isSymbolic "
-
-Check if symbolic. ";
-
-%feature("docstring")  CasADi::NonzerosScalarOp::isConstant "
-
-Check if constant. ";
-
-%feature("docstring")  CasADi::NonzerosScalarOp::isMapping "
-
-Check if mapping. ";
-
-%feature("docstring")  CasADi::NonzerosScalarOp::isEvaluation "
-
-Check if evaluation. ";
-
 %feature("docstring")  CasADi::NonzerosScalarOp::isOutputNode "
 
 Check if evaluation output. ";
@@ -52131,10 +52323,6 @@ Check if evaluation output. ";
 %feature("docstring")  CasADi::NonzerosScalarOp::isMultipleOutput "
 
 Check if a multiple output node. ";
-
-%feature("docstring")  CasADi::NonzerosScalarOp::isMultiplication "
-
-Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::NonzerosScalarOp::getFunction "
 
@@ -52321,22 +52509,6 @@ Evaluate symbolically ( MX), no derivatives. ";
 
 Get the name. ";
 
-%feature("docstring")  CasADi::Norm::isSymbolic "
-
-Check if symbolic. ";
-
-%feature("docstring")  CasADi::Norm::isConstant "
-
-Check if constant. ";
-
-%feature("docstring")  CasADi::Norm::isMapping "
-
-Check if mapping. ";
-
-%feature("docstring")  CasADi::Norm::isEvaluation "
-
-Check if evaluation. ";
-
 %feature("docstring")  CasADi::Norm::isOutputNode "
 
 Check if evaluation output. ";
@@ -52344,10 +52516,6 @@ Check if evaluation output. ";
 %feature("docstring")  CasADi::Norm::isMultipleOutput "
 
 Check if a multiple output node. ";
-
-%feature("docstring")  CasADi::Norm::isMultiplication "
-
-Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::Norm::getFunction "
 
@@ -52360,6 +52528,10 @@ Get function input. ";
 %feature("docstring")  CasADi::Norm::getFunctionOutput "
 
 Get function output. ";
+
+%feature("docstring")  CasADi::Norm::getOp "
+
+Get the operation. ";
 
 %feature("docstring")  CasADi::Norm::dep "
 
@@ -52423,10 +52595,6 @@ Assign nonzeros (mapping matrix) ";
 
 Assign nonzeros (mapping matrix), output indices sequential. ";
 
-%feature("docstring")  CasADi::Norm::isOperation "
-
-Is it a certain operation. ";
-
 %feature("docstring")  CasADi::Norm::numel "
 
 Number of elements. ";
@@ -52485,6 +52653,10 @@ Clone function. ";
 
 Print a part of the expression. ";
 
+%feature("docstring")  CasADi::Norm1::getOp "
+
+Get the operation. ";
+
 %feature("docstring")  CasADi::Norm1::evaluateD "
 
 Evaluate the function numerically. ";
@@ -52537,22 +52709,6 @@ Print expression (make sure number of calls is not exceeded) ";
 
 Get the name. ";
 
-%feature("docstring")  CasADi::Norm1::isSymbolic "
-
-Check if symbolic. ";
-
-%feature("docstring")  CasADi::Norm1::isConstant "
-
-Check if constant. ";
-
-%feature("docstring")  CasADi::Norm1::isMapping "
-
-Check if mapping. ";
-
-%feature("docstring")  CasADi::Norm1::isEvaluation "
-
-Check if evaluation. ";
-
 %feature("docstring")  CasADi::Norm1::isOutputNode "
 
 Check if evaluation output. ";
@@ -52560,10 +52716,6 @@ Check if evaluation output. ";
 %feature("docstring")  CasADi::Norm1::isMultipleOutput "
 
 Check if a multiple output node. ";
-
-%feature("docstring")  CasADi::Norm1::isMultiplication "
-
-Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::Norm1::getFunction "
 
@@ -52639,10 +52791,6 @@ Assign nonzeros (mapping matrix) ";
 
 Assign nonzeros (mapping matrix), output indices sequential. ";
 
-%feature("docstring")  CasADi::Norm1::isOperation "
-
-Is it a certain operation. ";
-
 %feature("docstring")  CasADi::Norm1::numel "
 
 Number of elements. ";
@@ -52701,6 +52849,10 @@ Clone function. ";
 
 Print a part of the expression. ";
 
+%feature("docstring")  CasADi::Norm2::getOp "
+
+Get the operation. ";
+
 %feature("docstring")  CasADi::Norm2::evaluateD "
 
 Evaluate the function numerically. ";
@@ -52753,22 +52905,6 @@ Print expression (make sure number of calls is not exceeded) ";
 
 Get the name. ";
 
-%feature("docstring")  CasADi::Norm2::isSymbolic "
-
-Check if symbolic. ";
-
-%feature("docstring")  CasADi::Norm2::isConstant "
-
-Check if constant. ";
-
-%feature("docstring")  CasADi::Norm2::isMapping "
-
-Check if mapping. ";
-
-%feature("docstring")  CasADi::Norm2::isEvaluation "
-
-Check if evaluation. ";
-
 %feature("docstring")  CasADi::Norm2::isOutputNode "
 
 Check if evaluation output. ";
@@ -52776,10 +52912,6 @@ Check if evaluation output. ";
 %feature("docstring")  CasADi::Norm2::isMultipleOutput "
 
 Check if a multiple output node. ";
-
-%feature("docstring")  CasADi::Norm2::isMultiplication "
-
-Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::Norm2::getFunction "
 
@@ -52855,10 +52987,6 @@ Assign nonzeros (mapping matrix) ";
 
 Assign nonzeros (mapping matrix), output indices sequential. ";
 
-%feature("docstring")  CasADi::Norm2::isOperation "
-
-Is it a certain operation. ";
-
 %feature("docstring")  CasADi::Norm2::numel "
 
 Number of elements. ";
@@ -52917,6 +53045,10 @@ Clone function. ";
 
 Print a part of the expression. ";
 
+%feature("docstring")  CasADi::NormF::getOp "
+
+Get the operation. ";
+
 %feature("docstring")  CasADi::NormF::evaluateD "
 
 Evaluate the function numerically. ";
@@ -52969,22 +53101,6 @@ Print expression (make sure number of calls is not exceeded) ";
 
 Get the name. ";
 
-%feature("docstring")  CasADi::NormF::isSymbolic "
-
-Check if symbolic. ";
-
-%feature("docstring")  CasADi::NormF::isConstant "
-
-Check if constant. ";
-
-%feature("docstring")  CasADi::NormF::isMapping "
-
-Check if mapping. ";
-
-%feature("docstring")  CasADi::NormF::isEvaluation "
-
-Check if evaluation. ";
-
 %feature("docstring")  CasADi::NormF::isOutputNode "
 
 Check if evaluation output. ";
@@ -52992,10 +53108,6 @@ Check if evaluation output. ";
 %feature("docstring")  CasADi::NormF::isMultipleOutput "
 
 Check if a multiple output node. ";
-
-%feature("docstring")  CasADi::NormF::isMultiplication "
-
-Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::NormF::getFunction "
 
@@ -53071,10 +53183,6 @@ Assign nonzeros (mapping matrix) ";
 
 Assign nonzeros (mapping matrix), output indices sequential. ";
 
-%feature("docstring")  CasADi::NormF::isOperation "
-
-Is it a certain operation. ";
-
 %feature("docstring")  CasADi::NormF::numel "
 
 Number of elements. ";
@@ -53133,6 +53241,10 @@ Clone function. ";
 
 Print a part of the expression. ";
 
+%feature("docstring")  CasADi::NormInf::getOp "
+
+Get the operation. ";
+
 %feature("docstring")  CasADi::NormInf::evaluateD "
 
 Evaluate the function numerically. ";
@@ -53185,22 +53297,6 @@ Print expression (make sure number of calls is not exceeded) ";
 
 Get the name. ";
 
-%feature("docstring")  CasADi::NormInf::isSymbolic "
-
-Check if symbolic. ";
-
-%feature("docstring")  CasADi::NormInf::isConstant "
-
-Check if constant. ";
-
-%feature("docstring")  CasADi::NormInf::isMapping "
-
-Check if mapping. ";
-
-%feature("docstring")  CasADi::NormInf::isEvaluation "
-
-Check if evaluation. ";
-
 %feature("docstring")  CasADi::NormInf::isOutputNode "
 
 Check if evaluation output. ";
@@ -53208,10 +53304,6 @@ Check if evaluation output. ";
 %feature("docstring")  CasADi::NormInf::isMultipleOutput "
 
 Check if a multiple output node. ";
-
-%feature("docstring")  CasADi::NormInf::isMultiplication "
-
-Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::NormInf::getFunction "
 
@@ -53286,10 +53378,6 @@ Assign nonzeros (mapping matrix) ";
 %feature("docstring")  CasADi::NormInf::assign "
 
 Assign nonzeros (mapping matrix), output indices sequential. ";
-
-%feature("docstring")  CasADi::NormInf::isOperation "
-
-Is it a certain operation. ";
 
 %feature("docstring")  CasADi::NormInf::numel "
 
@@ -53514,6 +53602,13 @@ Joel Andersson
 |              |              |              | with the     |              |
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
@@ -54276,6 +54371,13 @@ Joel Andersson
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -54950,6 +55052,13 @@ If H is not positive-definite, the solver should throw an error.
 |              |              |              | 0, 10 and    |              |
 |              |              |              | 100          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -55545,6 +55654,13 @@ reInit();
 |              |              |              | print_level  |              |
 |              |              |              | 0, 10 and    |              |
 |              |              |              | 100          |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
@@ -56467,6 +56583,10 @@ Get function input. ";
 
 Get function output. ";
 
+%feature("docstring")  CasADi::OutputNode::getOp "
+
+Get the operation. ";
+
 %feature("docstring")  CasADi::OutputNode::__nonzero__ "
 
 Check the truth value of this node. ";
@@ -56503,29 +56623,9 @@ Evaluate symbolically ( MX), no derivatives. ";
 
 Get the name. ";
 
-%feature("docstring")  CasADi::OutputNode::isSymbolic "
-
-Check if symbolic. ";
-
-%feature("docstring")  CasADi::OutputNode::isConstant "
-
-Check if constant. ";
-
-%feature("docstring")  CasADi::OutputNode::isMapping "
-
-Check if mapping. ";
-
-%feature("docstring")  CasADi::OutputNode::isEvaluation "
-
-Check if evaluation. ";
-
 %feature("docstring")  CasADi::OutputNode::isMultipleOutput "
 
 Check if a multiple output node. ";
-
-%feature("docstring")  CasADi::OutputNode::isMultiplication "
-
-Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::OutputNode::getFunction "
 
@@ -56588,10 +56688,6 @@ Assign nonzeros (mapping matrix) ";
 %feature("docstring")  CasADi::OutputNode::assign "
 
 Assign nonzeros (mapping matrix), output indices sequential. ";
-
-%feature("docstring")  CasADi::OutputNode::isOperation "
-
-Is it a certain operation. ";
 
 %feature("docstring")  CasADi::OutputNode::numel "
 
@@ -56742,6 +56838,13 @@ Joel Andersson
 | parallelizat | OT_STRING    | \"serial\"     | (serial|open | CasADi::Para |
 | ion          |              |              | mp|mpi)      | llelizerInte |
 |              |              |              |              | rnal         |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | save_correct | OT_BOOLEAN   | false        |              | CasADi::Para |
 | ed_input     |              |              |              | llelizerInte |
@@ -57446,6 +57549,13 @@ Joel Andersson
 | ion          |              |              | mp|mpi)      | llelizerInte |
 |              |              |              |              | rnal         |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | save_correct | OT_BOOLEAN   | false        |              | CasADi::Para |
 | ed_input     |              |              |              | llelizerInte |
 |              |              |              |              | rnal         |
@@ -58081,6 +58191,13 @@ If H is not positive-definite, the solver should throw an error.
 |              |              |              | see Section  |              |
 |              |              |              | 5.7          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | True         | Throw        | CasADi::QPOa |
+| heck         |              |              | exceptions   | sesInternal  |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | True         | function is  | CasADi::QPOa |
 |              |              |              | sparse       | sesInternal  |
 +--------------+--------------+--------------+--------------+--------------+
@@ -58664,6 +58781,13 @@ Joris Gillis, Joel Andersson
 |              |              |              | solution,    |              |
 |              |              |              | see Section  |              |
 |              |              |              | 5.7          |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | True         | Throw        | CasADi::QPOa |
+| heck         |              |              | exceptions   | sesInternal  |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | True         | function is  | CasADi::QPOa |
 |              |              |              | sparse       | sesInternal  |
@@ -59390,6 +59514,13 @@ Joel Andersson
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -60103,6 +60234,13 @@ Internal class.
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -60764,6 +60902,13 @@ Joel Andersson
 |              |              |              | statistics   | gratorIntern |
 |              |              |              | after        | al           |
 |              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
@@ -61586,6 +61731,13 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | after        | al           |
 |              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -62083,9 +62235,9 @@ Evaluate the function (template) ";
 
 Print a part of the expression. ";
 
-%feature("docstring")  CasADi::ScalarNonzerosOp::isOperation "
+%feature("docstring")  CasADi::ScalarNonzerosOp::getOp "
 
-Is it a certain operation. ";
+Get the operation. ";
 
 %feature("docstring")  CasADi::ScalarNonzerosOp::evaluateMX "
 
@@ -62127,22 +62279,6 @@ Evaluate symbolically ( SX), no derivatives. ";
 
 Get the name. ";
 
-%feature("docstring")  CasADi::ScalarNonzerosOp::isSymbolic "
-
-Check if symbolic. ";
-
-%feature("docstring")  CasADi::ScalarNonzerosOp::isConstant "
-
-Check if constant. ";
-
-%feature("docstring")  CasADi::ScalarNonzerosOp::isMapping "
-
-Check if mapping. ";
-
-%feature("docstring")  CasADi::ScalarNonzerosOp::isEvaluation "
-
-Check if evaluation. ";
-
 %feature("docstring")  CasADi::ScalarNonzerosOp::isOutputNode "
 
 Check if evaluation output. ";
@@ -62150,10 +62286,6 @@ Check if evaluation output. ";
 %feature("docstring")  CasADi::ScalarNonzerosOp::isMultipleOutput "
 
 Check if a multiple output node. ";
-
-%feature("docstring")  CasADi::ScalarNonzerosOp::isMultiplication "
-
-Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::ScalarNonzerosOp::getFunction "
 
@@ -62568,6 +62700,13 @@ Joel Andersson
 |              |              |              | with the     |              |
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
@@ -63299,6 +63438,13 @@ Joel Andersson
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -63829,9 +63975,9 @@ Propagate sparsity. ";
 
 Print a part of the expression. ";
 
-%feature("docstring")  CasADi::SparseSparseOp::isOperation "
+%feature("docstring")  CasADi::SparseSparseOp::getOp "
 
-Is it a certain operation. ";
+Get the operation. ";
 
 %feature("docstring")  CasADi::SparseSparseOp::evaluateMX "
 
@@ -63873,22 +64019,6 @@ Evaluate symbolically ( SX), no derivatives. ";
 
 Get the name. ";
 
-%feature("docstring")  CasADi::SparseSparseOp::isSymbolic "
-
-Check if symbolic. ";
-
-%feature("docstring")  CasADi::SparseSparseOp::isConstant "
-
-Check if constant. ";
-
-%feature("docstring")  CasADi::SparseSparseOp::isMapping "
-
-Check if mapping. ";
-
-%feature("docstring")  CasADi::SparseSparseOp::isEvaluation "
-
-Check if evaluation. ";
-
 %feature("docstring")  CasADi::SparseSparseOp::isOutputNode "
 
 Check if evaluation output. ";
@@ -63896,10 +64026,6 @@ Check if evaluation output. ";
 %feature("docstring")  CasADi::SparseSparseOp::isMultipleOutput "
 
 Check if a multiple output node. ";
-
-%feature("docstring")  CasADi::SparseSparseOp::isMultiplication "
-
-Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::SparseSparseOp::getFunction "
 
@@ -64291,6 +64417,13 @@ Assert that the object has been initialized. ";
 | tions        | Y            | )            | be passed to | nternal      |
 |              |              |              | the QP       |              |
 |              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | regularize   | OT_BOOLEAN   | 0            | Automatic re | CasADi::SQPI |
 |              |              |              | gularization | nternal      |
@@ -65056,6 +65189,13 @@ Joel Andersson and Attila Kozma
 | tions        | Y            | )            | be passed to | nternal      |
 |              |              |              | the QP       |              |
 |              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | regularize   | OT_BOOLEAN   | 0            | Automatic re | CasADi::SQPI |
 |              |              |              | gularization | nternal      |
@@ -66043,6 +66183,13 @@ Constructor. ";
 |              |              |              | step size    |              |
 |              |              |              | control      |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | reltol       | OT_REAL      | 0.000        | Relative     | CasADi::Sund |
 |              |              |              | tolerence    | ialsInternal |
 |              |              |              | for the IVP  |              |
@@ -67012,6 +67159,13 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | step size    |              |
 |              |              |              | control      |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | reltol       | OT_REAL      | 0.000        | Relative     | CasADi::Sund |
 |              |              |              | tolerence    | ialsInternal |
 |              |              |              | for the IVP  |              |
@@ -67945,6 +68099,13 @@ Joel Andersson
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -68762,6 +68923,13 @@ Joel Andersson
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
 +--------------+--------------+--------------+--------------+--------------+
@@ -69241,7 +69409,7 @@ destructor ";
 
 %feature("docstring")  CasADi::SXNode::getOp "
 
-get the operation only for binary nodes ";
+get the operation ";
 
 %feature("docstring")  CasADi::SXNode::isEqual "
 
@@ -69322,13 +69490,13 @@ Evaluate the function symbolically ( MX) ";
 
 Propagate sparsity. ";
 
-%feature("docstring")  CasADi::SymbolicMX::isSymbolic "
-
-Is symbolic. ";
-
 %feature("docstring")  CasADi::SymbolicMX::getName "
 
 Get the name. ";
+
+%feature("docstring")  CasADi::SymbolicMX::getOp "
+
+Get the operation. ";
 
 %feature("docstring")  CasADi::SymbolicMX::eval "
 
@@ -69370,18 +69538,6 @@ Evaluate symbolically ( SX), no derivatives. ";
 
 Evaluate symbolically ( MX), no derivatives. ";
 
-%feature("docstring")  CasADi::SymbolicMX::isConstant "
-
-Check if constant. ";
-
-%feature("docstring")  CasADi::SymbolicMX::isMapping "
-
-Check if mapping. ";
-
-%feature("docstring")  CasADi::SymbolicMX::isEvaluation "
-
-Check if evaluation. ";
-
 %feature("docstring")  CasADi::SymbolicMX::isOutputNode "
 
 Check if evaluation output. ";
@@ -69389,10 +69545,6 @@ Check if evaluation output. ";
 %feature("docstring")  CasADi::SymbolicMX::isMultipleOutput "
 
 Check if a multiple output node. ";
-
-%feature("docstring")  CasADi::SymbolicMX::isMultiplication "
-
-Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::SymbolicMX::getFunction "
 
@@ -69467,10 +69619,6 @@ Assign nonzeros (mapping matrix) ";
 %feature("docstring")  CasADi::SymbolicMX::assign "
 
 Assign nonzeros (mapping matrix), output indices sequential. ";
-
-%feature("docstring")  CasADi::SymbolicMX::isOperation "
-
-Is it a certain operation. ";
 
 %feature("docstring")  CasADi::SymbolicMX::numel "
 
@@ -69864,9 +70012,9 @@ Evaluate the function symbolically ( MX) ";
 
 Propagate sparsity. ";
 
-%feature("docstring")  CasADi::UnaryMX::isOperation "
+%feature("docstring")  CasADi::UnaryMX::getOp "
 
-Is it a certain operation. ";
+Get the operation. ";
 
 %feature("docstring")  CasADi::UnaryMX::__nonzero__ "
 
@@ -69904,22 +70052,6 @@ Evaluate symbolically ( MX), no derivatives. ";
 
 Get the name. ";
 
-%feature("docstring")  CasADi::UnaryMX::isSymbolic "
-
-Check if symbolic. ";
-
-%feature("docstring")  CasADi::UnaryMX::isConstant "
-
-Check if constant. ";
-
-%feature("docstring")  CasADi::UnaryMX::isMapping "
-
-Check if mapping. ";
-
-%feature("docstring")  CasADi::UnaryMX::isEvaluation "
-
-Check if evaluation. ";
-
 %feature("docstring")  CasADi::UnaryMX::isOutputNode "
 
 Check if evaluation output. ";
@@ -69927,10 +70059,6 @@ Check if evaluation output. ";
 %feature("docstring")  CasADi::UnaryMX::isMultipleOutput "
 
 Check if a multiple output node. ";
-
-%feature("docstring")  CasADi::UnaryMX::isMultiplication "
-
-Check if matrix multiplication. ";
 
 %feature("docstring")  CasADi::UnaryMX::getFunction "
 
@@ -71634,6 +71762,13 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | execution    |              |
 |              |              |              | time         |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | True         | Throw        | CasADi::Worh |
+| heck         |              |              | exceptions   | pInternal    |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | True         | function is  | CasADi::Worh |
 |              |              |              | sparse       | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
@@ -73047,6 +73182,13 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | execution    |              |
 |              |              |              | time         |              |
 +--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | True         | Throw        | CasADi::Worh |
+| heck         |              |              | exceptions   | pInternal    |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | True         | function is  | CasADi::Worh |
 |              |              |              | sparse       | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
@@ -73802,6 +73944,13 @@ Joel Andersson
 |              |              |              | with the     |              |
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
 |              |              |              | sparse       | ternal       |
