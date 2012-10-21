@@ -149,7 +149,7 @@ void MXFunctionInternal::init(){
     sort_depth_first(s,nodes);
     
     // A null pointer means an output instruction
-    //nodes.push_back(static_cast<MXNode*>(0));
+    nodes.push_back(static_cast<MXNode*>(0));
   }
   
   // Make sure that all inputs have been added also // TODO REMOVE THIS
@@ -201,7 +201,7 @@ void MXFunctionInternal::init(){
     bool in_work=true, in_algorithm=true;
     
     // Add an element to the algorithm
-    if(ae.op<0){ // Output node, not in algorithm
+    if(ae.op<0){ // Function output node, not in algorithm
       
       // Get the output index
       int oind = n->getFunctionOutput();
@@ -210,7 +210,6 @@ void MXFunctionInternal::init(){
       int pind = place_in_alg[n->dep(0)->temp];
       
       // Not in algorithm
-      place_in_alg.push_back(-1);
       in_algorithm = false;
       
       // Place in the work vector
@@ -233,6 +232,7 @@ void MXFunctionInternal::init(){
     } else if(ae.op == OP_OUTPUT){
       in_work = false;
       in_algorithm = false;
+      place_in_work.push_back(-1);
     } else {
       // a parameter or input
       if(ae.op==OP_PARAMETER){
@@ -272,6 +272,8 @@ void MXFunctionInternal::init(){
     // Add to algorithm
     if(in_algorithm){
       algorithm_.push_back(ae);
+    } else {
+      place_in_alg.push_back(-1);
     }
 
     // Allocate memory for an element in the work vector
