@@ -581,7 +581,8 @@ void MXFunctionInternal::spEvaluate(bool fwd){
           iwork[k] = swork[k];
         }
       } else if(it->op==OP_PARAMETER){
-        continue;
+        vector<double> &w = work_[it->res.front()].data.data();
+        fill_n(get_bvec_t(w),w.size(),bvec_t(0));
       } else {
       
         // Point pointers to the data corresponding to the element
