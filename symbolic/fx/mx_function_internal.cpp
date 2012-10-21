@@ -754,17 +754,6 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
   // Work vector, adjoint derivatives
   fill(dwork.begin(),dwork.end(),std::vector<MX>(nadj));
   
-  // Pass the adjoint seeds
-  for(int oind=0; oind<output_.size(); ++oind){
-    int el = output_ind_[oind];
-    for(int d=0; d<nadj; ++d){
-      if(dwork[el][d].isNull())
-        dwork[el][d] = aseed[d][oind];
-      else
-        dwork[el][d] += aseed[d][oind];
-    }
-  }
-  
   // Loop over computational nodes in reverse order
   if(nadj>0){
     for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it){
@@ -774,7 +763,13 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
           asens[d][it->arg.front()] = dwork[it->res.front()][d];
         }
       } else if(it->op==OP_OUTPUT){
-        continue;
+        // Pass the adjoint seeds
+        for(int d=0; d<nadj; ++d){
+          if(dwork[it->arg.front()][d].isNull())
+            dwork[it->arg.front()][d] = aseed[d][it->res.front()];
+          else
+            dwork[it->arg.front()][d] += aseed[d][it->res.front()];
+        }
       } else {
         // Get the arguments of the evaluation
         input_p.resize(it->arg.size());
