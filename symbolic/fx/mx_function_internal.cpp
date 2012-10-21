@@ -639,6 +639,17 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
   const int nfwd = fseed.size();
   const int nadj = aseed.size();
 
+  // Allocate outputs
+  if(!output_given){
+    res.resize(outputv_.size());
+  }
+  
+  // Allocate forward sensitivities
+  fsens.resize(nfwd);
+  for(int d=0; d<nfwd; ++d){
+    fsens[d].resize(outputv_.size());
+  }
+  
   // Allocate adjoint sensitivities
   asens.resize(nadj);
   for(int d=0; d<nadj; ++d){
@@ -663,7 +674,15 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
         dwork[it->res.front()][d] = fseed[d][it->arg.front()];
       }
     } else if(it->op==OP_OUTPUT){
-      continue;
+      // Collect the results
+      if(!output_given){
+        res[it->res.front()] = swork[it->arg.front()];
+      }
+
+      // Collect the forward sensitivities
+      for(int d=0; d<nfwd; ++d){
+        fsens[d][it->res.front()] = dwork[it->arg.front()][d];
+      }
     } else if(it->op==OP_PARAMETER){
       swork[it->res.front()] = it->data;
       for(int d=0; d<nfwd; ++d){
@@ -729,25 +748,6 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
 
       // Call the evaluation function
       it->data->evaluateMX(input_p,output_p,fseed_p,fsens_p,dummy_p,dummy_p,output_given);
-    }
-  }
-  
-  // Collect the results
-  if(!output_given){
-    res.resize(outputv_.size());
-    for(int oind=0; oind<res.size(); ++oind){
-      int el = output_ind_[oind];
-      res[oind] = swork[el];
-    }
-  }
-
-  // Collect the symbolic forward sensitivities
-  fsens.resize(nfwd);
-  for(int d=0; d<nfwd; ++d){
-    fsens[d].resize(outputv_.size());
-    for(int oind=0; oind<outputv_.size(); ++oind){
-      int el = output_ind_[oind];
-      fsens[d][oind] = dwork[el][d];
     }
   }
   
