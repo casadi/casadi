@@ -174,7 +174,7 @@ void MXFunctionInternal::init(){
   work_.reserve(nodes.size());
   
   // Input instructions
-  vector<pair<pair<int,int>,MXNode*> > symb_loc;
+  vector<pair<int,MXNode*> > symb_loc;
 
   // Get the sequence of instructions for the virtual machine
   algorithm_.resize(0);
@@ -226,7 +226,7 @@ void MXFunctionInternal::init(){
     } else {
       // a parameter or input
       if(ae.op==OP_PARAMETER){
-        symb_loc.push_back(make_pair(make_pair(algorithm_.size(),work_.size()),n));
+        symb_loc.push_back(make_pair(algorithm_.size(),n));
       }
       
       // Add an element to the algorithm
@@ -283,22 +283,19 @@ void MXFunctionInternal::init(){
   }
   
   // Now mark each input's place in the algorithm
-  for(vector<pair<pair<int,int>,MXNode*> >::const_iterator it=symb_loc.begin(); it!=symb_loc.end(); ++it){
-    it->second->temp = it->first.first+1;
+  for(vector<pair<int,MXNode*> >::const_iterator it=symb_loc.begin(); it!=symb_loc.end(); ++it){
+    it->second->temp = it->first+1;
   }
   
   // Add input instructions
   for(int ind=0; ind<inputv_.size(); ++ind){
     int i = inputv_[ind].getTemp()-1;
     if(i>=0){
-      // Element in the algorithm
-      AlgEl& ae = algorithm_[i];
-      
       // Mark as input
-      ae.op = OP_INPUT;
+      algorithm_[i].op = OP_INPUT;
       
       // Location of the input
-      ae.arg = vector<int>(1,ind);
+      algorithm_[i].arg = vector<int>(1,ind);
       
       // Mark input as read
       inputv_[ind].setTemp(0);
@@ -307,8 +304,7 @@ void MXFunctionInternal::init(){
   
   // Locate free variables
   free_vars_.clear();
-  free_vars_ind_.clear();
-  for(vector<pair<pair<int,int>,MXNode*> >::const_iterator it=symb_loc.begin(); it!=symb_loc.end(); ++it){
+  for(vector<pair<int,MXNode*> >::const_iterator it=symb_loc.begin(); it!=symb_loc.end(); ++it){
     int i = it->second->temp-1;
     if(i>=0){
       // Free varables
@@ -316,7 +312,6 @@ void MXFunctionInternal::init(){
       
       // Save to list of free parameters
       free_vars_.push_back(par);
-      free_vars_ind_.push_back(it->first.second);
       
       // Remove marker
       it->second->temp=0;
@@ -632,11 +627,6 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
   // Symbolic work, non-differentiated
   std::vector<MX> swork(work_.size());
   
-  // Pass free variables
-  for(int k=0; k<free_vars_.size(); ++k){
-    swork[free_vars_ind_[k]] = free_vars_[k];
-  }
-
   // Get the number of directions
   const int nfwd = fseed.size();
   const int nadj = aseed.size();
@@ -665,7 +655,10 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
         dwork[it->res.front()][d] = fseed[d][it->arg.front()];
       }
     } else if(it->op==OP_PARAMETER){
-      continue;
+      swork[it->res.front()] = it->data;
+      for(int d=0; d<nfwd; ++d){
+        dwork[it->res.front()][d] = MX();
+      }
     } else {
     
       // Pointers to the arguments of the evaluation
