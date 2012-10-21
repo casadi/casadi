@@ -560,7 +560,13 @@ void MXFunctionInternal::spEvaluate(bool fwd){
         bvec_t* swork = get_bvec_t(input(it->arg.front()).data());
         copy(swork,swork+w.size(),iwork);
       } else if(it->op==OP_OUTPUT){
-        continue;
+        // Get the output sensitivities
+        vector<double> &w = work_[it->arg.front()].data.data();
+        bvec_t* iwork = get_bvec_t(w);
+        bvec_t* swork = get_bvec_t(output(it->res.front()).data());
+        for(int k=0; k<w.size(); ++k){
+          swork[k] = iwork[k];
+        }
       } else if(it->op==OP_PARAMETER){
         continue; // FIXME
       } else {
@@ -572,27 +578,7 @@ void MXFunctionInternal::spEvaluate(bool fwd){
       }
     }
     
-    // Get the output sensitivities
-    for(int ind=0; ind<output_ind_.size(); ++ind){
-      vector<double> &w = work_[output_ind_[ind]].data.data();
-      bvec_t* iwork = get_bvec_t(w);
-      bvec_t* swork = get_bvec_t(output(ind).data());
-      for(int k=0; k<w.size(); ++k){
-	swork[k] = iwork[k];
-      }
-    }
-    
   } else { // Backward propagation
-
-    // Pass output seeds
-    for(int ind=0; ind<output_ind_.size(); ++ind){
-      vector<double> &w = work_[output_ind_[ind]].data.data();
-      bvec_t* iwork = get_bvec_t(w);
-      bvec_t* swork = get_bvec_t(output(ind).data());
-      for(int k=0; k<w.size(); ++k){
-	iwork[k] = swork[k];
-      }
-    }
 
     // Propagate sparsity backwards
     for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); it++){
@@ -606,7 +592,13 @@ void MXFunctionInternal::spEvaluate(bool fwd){
           iwork[k] = 0;
         }
       } else if(it->op==OP_OUTPUT){
-        continue;
+        // Pass output seeds
+        vector<double> &w = work_[it->arg.front()].data.data();
+        bvec_t* iwork = get_bvec_t(w);
+        bvec_t* swork = get_bvec_t(output(it->res.front()).data());
+        for(int k=0; k<w.size(); ++k){
+          iwork[k] = swork[k];
+        }
       } else if(it->op==OP_PARAMETER){
         continue; // FIXME
       } else {
