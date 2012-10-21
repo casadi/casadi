@@ -284,12 +284,6 @@ void MXFunctionInternal::init(){
     }
   }
 
-  // Indices corresponding to the outputs
-  output_ind_.resize(outputv_.size());
-  for(int i=0; i<output_ind_.size(); ++i){
-    output_ind_[i] = place_in_work[outputv_[i]->temp];
-  }
-
   // Reset the temporary variables
   for(int i=0; i<nodes.size(); ++i){
     if(nodes[i]){
@@ -843,9 +837,9 @@ void MXFunctionInternal::evalSX(const std::vector<SXMatrix>& input_s, std::vecto
     if(it->op==OP_INPUT){
       // Pass the input
       swork[it->res.front()].set(input_s[it->arg.front()]);
-      
     } else if(it->op==OP_OUTPUT){
-      continue;
+      // Get the outputs
+      swork[it->arg.front()].get(output_s[it->res.front()]);
     } else if(it->op==OP_PARAMETER){
       continue; // FIXME
     } else {
@@ -862,10 +856,6 @@ void MXFunctionInternal::evalSX(const std::vector<SXMatrix>& input_s, std::vecto
       it->data->evaluateSX(sxarg,sxres);
     }
   }
-  
-  // Get the outputs
-  for(int ind=0; ind<outputv_.size(); ++ind)
-    swork[output_ind_[ind]].get(output_s[ind]);
 }
 
 SXFunction MXFunctionInternal::expand(const std::vector<SXMatrix>& inputvsx ){
