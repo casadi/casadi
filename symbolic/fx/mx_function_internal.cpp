@@ -178,7 +178,7 @@ void MXFunctionInternal::init(){
   vector<pair<int,MXNode*> > symb_loc;
   
   // Current output and nonzero, start with the first one
-  //int curr_oind=0;
+  int curr_oind=0;
   
   // Work vector for the virtual machine
   work_.resize(0);
@@ -231,16 +231,16 @@ void MXFunctionInternal::init(){
       }
     } else if(ae.op == OP_OUTPUT){
       in_work = false;
-      in_algorithm = false;
       place_in_work.push_back(-1);
+      ae.arg = vector<int>(1,place_in_work.at(outputv_.at(curr_oind)->temp));
+      ae.res = vector<int>(1,curr_oind++);
     } else {
       // a parameter or input
       if(ae.op==OP_PARAMETER){
         symb_loc.push_back(make_pair(algorithm_.size(),n));
       }
       
-      // Add an element to the algorithm
-      place_in_alg.push_back(algorithm_.size());
+      // Save the node to the algorithm
       ae.data.assignNode(n);
       
       // Save the indices of the arguments
@@ -271,6 +271,7 @@ void MXFunctionInternal::init(){
     
     // Add to algorithm
     if(in_algorithm){
+      place_in_alg.push_back(algorithm_.size());
       algorithm_.push_back(ae);
     } else {
       place_in_alg.push_back(-1);
@@ -492,16 +493,20 @@ void MXFunctionInternal::print(ostream &stream) const{
     if(it->op==OP_OUTPUT){
       stream << "output[" << it->res.front() << "] = @" << it->arg.front();
     } else {
-      stream << "{";
-      for(int i=0; i<it->res.size(); ++i){
-        if(i!=0) stream << ",";
-        if(it->res[i]>=0){
-          stream << "@" << it->res[i];
-        } else {
-          stream << "NULL";
+      if(it->res.size()==1){
+        stream << "@" << it->res.front() << " = ";
+      } else {
+        stream << "{";
+        for(int i=0; i<it->res.size(); ++i){
+          if(i!=0) stream << ",";
+          if(it->res[i]>=0){
+            stream << "@" << it->res[i];
+          } else {
+            stream << "NULL";
+          }
         }
+        stream << "} = ";
       }
-      stream << "} = ";
       if(it->op==OP_INPUT){
         stream << "input[" << it->arg.front() << "]";
       } else {
@@ -849,6 +854,7 @@ void MXFunctionInternal::evalSX(const std::vector<SXMatrix>& input_s, std::vecto
   // Create a work array
   vector<SXMatrix> swork(work_.size());
   for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
+    if(it->op==OP_OUTPUT) continue;
     for(int i=0; i<it->res.size(); ++i){
       if (it->res[i]>=0)
         swork[it->res[i]] = SXMatrix(it->data->sparsity(i));
