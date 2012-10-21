@@ -493,9 +493,9 @@ void SXFunctionInternal::init(){
 
   // Add the list of nodes
   int ind=0;
-  for(vector<SXMatrix >::const_iterator it = outputv_.begin(); it != outputv_.end(); ++it, ++ind){
+  for(vector<SXMatrix >::iterator it = outputv_.begin(); it != outputv_.end(); ++it, ++ind){
     int nz=0;
-    for(vector<SX>::const_iterator itc = it->begin(); itc != it->end(); ++itc, ++nz){
+    for(vector<SX>::iterator itc = it->begin(); itc != it->end(); ++itc, ++nz){
       // Add outputs to the list
       s.push(itc->get());
       sort_depth_first(s,nodes);
@@ -506,8 +506,8 @@ void SXFunctionInternal::init(){
   }
   
   // Make sure that all inputs have been added also // TODO REMOVE THIS
-  for(vector<SXMatrix >::const_iterator it = inputv_.begin(); it != inputv_.end(); ++it){
-    for(vector<SX>::const_iterator itc = it->begin(); itc != it->end(); ++itc){
+  for(vector<SXMatrix >::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
+    for(vector<SX>::iterator itc = it->begin(); itc != it->end(); ++itc){
       if(!itc->getTemp()){
         nodes.push_back(itc->get());
       }
@@ -686,15 +686,12 @@ void SXFunctionInternal::init(){
     for(vector<SX>::iterator itc = inputv_[ind].begin(); itc != inputv_[ind].end(); ++itc, ++nz){
       int i = itc->getTemp()-1;
       if(i>=0){
-        // Element in the algorithm
-        AlgEl& ae = algorithm_[i];
-        
         // Mark as input
-        ae.op = OP_INPUT;
+        algorithm_[i].op = OP_INPUT;
         
         // Location of the input
-        ae.arg.i[0] = ind;
-        ae.arg.i[1] = nz;
+        algorithm_[i].arg.i[0] = ind;
+        algorithm_[i].arg.i[1] = nz;
         
         // Mark input as read
         itc->setTemp(0);

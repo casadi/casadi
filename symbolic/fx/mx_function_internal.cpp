@@ -135,23 +135,30 @@ void MXFunctionInternal::init(){
   // Call the init function of the base class
   XFunctionInternal<MXFunction,MXFunctionInternal,MX,MXNode>::init();    
 
-  // Stack for nodes to be added to the list of nodes
+  // Stack used to sort the computational graph
   stack<MXNode*> s;
 
-  // Add the inputs to the stack
-  for(vector<MX>::reverse_iterator it = inputv_.rbegin(); it!=inputv_.rend(); ++it)
-    if(it->get()) s.push(static_cast<MXNode*>(it->get()));
-
-  // Add the outputs to the stack
-  for(vector<MX>::reverse_iterator it = outputv_.rbegin(); it!=outputv_.rend(); ++it)
-    if(it->get()) s.push(static_cast<MXNode*>(it->get()));
-
-  // All evaluation nodes in the order of evaluation
+  // All nodes
   vector<MXNode*> nodes;
-
-  // Order the nodes in the order of dependencies using a depth-first topological sorting
-  sort_depth_first(s,nodes);
-
+  
+  // Add the list of nodes
+  int ind=0;
+  for(vector<MX>::iterator it = outputv_.begin(); it != outputv_.end(); ++it, ++ind){
+    // Add outputs to the list
+    s.push(static_cast<MXNode*>(it->get()));
+    sort_depth_first(s,nodes);
+    
+    // A null pointer means an output instruction
+    //nodes.push_back(static_cast<MXNode*>(0));
+  }
+  
+  // Make sure that all inputs have been added also // TODO REMOVE THIS
+  for(vector<MX>::iterator it = inputv_.begin(); it != inputv_.end(); ++it){
+    if(!it->getTemp()){
+      nodes.push_back(static_cast<MXNode*>(it->get()));
+    }
+  }
+  
   // Reset the node markers
   for(std::vector<MXNode*>::iterator it=nodes.begin(); it!=nodes.end(); ++it){
     (*it)->temp = 0;
