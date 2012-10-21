@@ -51,8 +51,8 @@ f = MXFunction([z,y],[z+x[0],x-y])
 f.setOption("name","magic")
 f.init()
 
-[z,z2] = f.call([vertcat([x,y]),zz.T])
+#[z,z2] = f.call([vertcat([x,y]),zz.T])
 
-z = z[:2,:] +x + cos(x) - sin(x) / tan(z2)
+#z = z[:2,:] +x + cos(x) - sin(x) / tan(z2)
 
-dotdraw(z)
+#dotdraw(z)
