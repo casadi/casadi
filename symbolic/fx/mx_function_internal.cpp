@@ -410,7 +410,11 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
         work_[it->res.front()].dataF.at(dir).set(fwdSeed(it->arg.front(),dir));
       }
     } else if(it->op==OP_OUTPUT){
-      continue;
+      // Get the outputs and forward sensitivities
+      work_[it->arg.front()].data.get(output(it->res.front()));
+      for(int dir=0; dir<nfdir; ++dir){
+        work_[it->arg.front()].dataF.at(dir).get(fwdSens(it->res.front(),dir));
+      }
     } else if(it->op==OP_PARAMETER){
       //casadi_error("The algorithm contains free parameters"); // FIXME
     } else {
@@ -431,18 +435,6 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
   }
   
   log("MXFunctionInternal::evaluate evaluated forward");
-  
-  // Get the outputs
-  for(int ind=0; ind<outputv_.size(); ++ind){
-    work_[output_ind_[ind]].data.get(output(ind));
-  }
-
-  // Get the forward sensitivities
-  for(int dir=0; dir<nfdir; ++dir){
-    for(int ind=0; ind<outputv_.size(); ++ind){
-      work_[output_ind_[ind]].dataF.at(dir).get(fwdSens(ind,dir));
-    }
-  }
           
   if(nadir>0){
     log("MXFunctionInternal::evaluate evaluating adjoint");
@@ -454,13 +446,6 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
       }
     }
 
-    // Pass the adjoint seeds
-    for(int ind=0; ind<outputv_.size(); ++ind){
-      for(int dir=0; dir<nadir; ++dir){
-        work_[output_ind_[ind]].dataA.at(dir).set(adjSeed(ind,dir));
-      }
-    }
-
     // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
     for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); it++){
       if(it->op==OP_INPUT){
@@ -469,7 +454,10 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
           work_[it->res.front()].dataA.at(dir).get(adjSens(it->arg.front(),dir));
         }
       } else if(it->op==OP_OUTPUT){
-        continue;
+        // Pass the adjoint seeds
+        for(int dir=0; dir<nadir; ++dir){
+          work_[it->arg.front()].dataA.at(dir).set(adjSeed(it->res.front(),dir));
+        }
       } else if(it->op==OP_PARAMETER){
         //casadi_error("The algorithm contains free parameters"); // FIXME
       } else {
