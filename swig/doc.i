@@ -29257,6 +29257,8 @@ Evaluate. ";
 
 Set options that make the NLP solver more suitable for solving QPs. ";
 
+%feature("docstring")  CasADi::IpoptInternal::getReducedHessian "";
+
 %feature("docstring")  CasADi::IpoptInternal::reportConstraints "
 
 Prints out a human readable report about possible constraint violations -
@@ -32644,6 +32646,11 @@ Constuct an NLP with non-linear constraints and provided hessian
 approximation. ";
 
 %feature("docstring")  CasADi::IpoptSolver::getGF "";
+
+%feature("docstring")  CasADi::IpoptSolver::getReducedHessian "
+
+Get the reduced Hessian. Requires a patched sIPOPT installation, see CasADi
+documentation. ";
 
 %feature("docstring")  CasADi::IpoptSolver::checkNode "
 
