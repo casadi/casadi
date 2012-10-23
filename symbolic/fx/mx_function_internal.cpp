@@ -32,6 +32,17 @@
 #include <stack>
 #include <typeinfo>
 
+// To reuse variables we need to be able to sort by sparsity pattern (preferably using a hash map)
+#ifdef USE_CXX11
+// Using C++11 unordered_map (hash map)
+#include <unordered_map>
+#define SPARSITY_MAP std::unordered_map
+#else // USE_CXX11
+// Falling back to std::map (binary search tree)
+#include <map>
+#define SPARSITY_MAP std::map
+#endif // USE_CXX11
+
 using namespace std;
 
 namespace CasADi{
@@ -166,17 +177,14 @@ void MXFunctionInternal::init(){
       nodes[i]->temp = i;
     }
   }
-    
-  // Place in the work vector for each node
-  vector<int> place_in_work;
-  place_in_work.reserve(nodes.size());
-  
+
   // Place in the algorithm for each node
   vector<int> place_in_alg;
   place_in_alg.reserve(nodes.size());
   
   // Use live variables?
   bool live_variables = getOption("live_variables");
+  casadi_assert_warning(!live_variables, "Live variables not yet fully implemented, option ignored.");
   
   // Input instructions
   vector<pair<int,MXNode*> > symb_loc;
@@ -184,10 +192,6 @@ void MXFunctionInternal::init(){
   // Current output and nonzero, start with the first one
   int curr_oind=0;
   
-  // Work vector for the virtual machine
-  work_.resize(0);
-  work_.reserve(nodes.size());
-
   // Get the sequence of instructions for the virtual machine
   algorithm_.resize(0);
   algorithm_.reserve(nodes.size());
@@ -205,7 +209,6 @@ void MXFunctionInternal::init(){
     
     // If a new element in the algorithm needs to be added
     if(op>=0){
-      // New element in the algorithm
       AlgEl ae;
       ae.op = op;
       ae.data.assignNode(n);
@@ -213,64 +216,114 @@ void MXFunctionInternal::init(){
       // Add input and output argument
       if(op==OP_OUTPUT){
         ae.arg.resize(1);
-        ae.arg[0] = place_in_work.at(outputv_.at(curr_oind)->temp);
+        ae.arg[0] = outputv_.at(curr_oind)->temp;
         ae.res.resize(1);
         ae.res[0] = curr_oind++;
       } else {
         ae.arg.resize(n->ndep());
         for(int i=0; i<n->ndep(); ++i){
-          ae.arg[i] = n->dep(i).isNull() ? -1 : place_in_work[n->dep(i)->temp];
+          ae.arg[i] = n->dep(i).isNull() ? -1 : n->dep(i)->temp;
         }
         ae.res.resize(n->getNumOutputs());
         if(n->isMultipleOutput()){
           fill(ae.res.begin(),ae.res.end(),-1);
         } else {
-          ae.res[0] = work_.size();
+          ae.res[0] = n->temp;
         }
       }
       place_in_alg.push_back(algorithm_.size());
       algorithm_.push_back(ae);
-    } else {
-      place_in_alg.push_back(-1);
-    }
-    
-    // Outputs and and multiple output nodes do not need any work vector element
-    if(op==OP_OUTPUT || n->isMultipleOutput()){
-      place_in_work.push_back(-1);
-    } else {
-      if(op>=0){
-        place_in_work.push_back(work_.size());
-      } else { // Function output node
-        // Get the output index
-        int oind = n->getFunctionOutput();
+      
+    } else { // Function output node
+      // Get the output index
+      int oind = n->getFunctionOutput();
 
-        // Get the index of the parent node
-        int pind = place_in_alg[n->dep(0)->temp];
-        
-        // Place in the work vector
-        int& wplace = algorithm_[pind].res.at(oind);
-        
-        // Check if the node already has been added
-        if(wplace>=0){
-          // Save place in work vector
-          place_in_work.push_back(wplace);
-          continue;
-        } else {
-          // Save output to the parent node
-          wplace = work_.size();
-
-          // Save place in work vector
-          place_in_work.push_back(wplace);
-        }
+      // Get the index of the parent node
+      int pind = place_in_alg[n->dep(0)->temp];
+      
+      // Save location in the algorithm element corresponding to the parent node
+      int& otmp = algorithm_[pind].res.at(oind);
+      if(otmp<0){
+        otmp = n->temp; // First time this function output is encountered, save to algorithm
+      } else {
+        n->temp = otmp; // Function output is a duplicate, use the node encountered first
       }
       
-      // New element in the work vector
-      FunctionIO w;
-      w.data = Matrix<double>(n->sparsity(),0);
-      work_.push_back(w);
+      // Not in the algorithm
+      place_in_alg.push_back(-1);
     }
   }
 
+  // Place in the work vector for each of the nodes in the tree (overwrites the reference counter)
+  vector<int>& place = place_in_alg; // Reuse memory as it is no longer needed
+  place.resize(nodes.size());
+  
+  // Stack with unused elements in the work vector, sorted by sparsity pattern
+  //SPARSITY_MAP<void*,stack<int> > unused;
+  
+  // Work vector size
+  int worksize = 0;
+  
+  // Find a place in the work vector for the operation
+  for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
+    
+    // Number of dependencies
+//     int ndeps = casadi_math<double>::ndeps(it->op);
+  
+    // decrease reference count of children
+//     for(int c=ndeps-1; c>=0; --c){ // reverse order so that the first argument will end up at the top of the stack
+//       int ch_ind = it->arg.i[c];
+//       int remaining = --refcount[ch_ind];
+//       if(remaining==0) unused.push(place[ch_ind]);
+//     }
+    
+    // Save the location of the results
+    if(it->op!=OP_OUTPUT){
+//       if(live_variables && !unused.empty()){
+//         // Try to reuse a variable from the stack if possible (last in, first out)
+//         it->res = place[it->res] = unused.top();
+//         unused.pop();
+//       } else {
+        // Allocate new variables
+        for(int c=0; c<it->res.size(); ++c){
+          if(it->res[c]>=0){
+            it->res[c] = place[it->res[c]] = worksize++;
+          }
+        }
+      //}
+    }
+    
+    // Save the location of the arguments
+    if(it->op!=OP_INPUT){
+      for(int c=0; c<it->arg.size(); ++c){
+        if(it->arg[c]>=0){
+          it->arg[c] = place[it->arg[c]];
+        }
+      }
+    }
+  }
+  
+  if(verbose()){
+    if(live_variables){
+      cout << "Using live variables: work array is " <<  worksize << " instead of " << nodes.size() << endl;
+    } else {
+      cout << "Live variables disabled." << endl;
+    }
+  }
+  
+  // Allocate work vectors (numeric)
+  work_.resize(0);
+  work_.resize(worksize);
+  for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
+    if(it->op!=OP_OUTPUT){
+      for(int c=0; c<it->res.size(); ++c){
+        if(it->res[c]>=0 && work_[it->res[c]].data.empty()){
+          work_[it->res[c]].data = Matrix<double>(it->data->sparsity(c),0);
+        }
+      }
+    }
+  }
+  
   // Reset the temporary variables
   for(int i=0; i<nodes.size(); ++i){
     if(nodes[i]){
