@@ -184,14 +184,16 @@ void MXFunctionInternal::init(){
   
   // Use live variables?
   bool live_variables = getOption("live_variables");
-  casadi_assert_warning(!live_variables, "Live variables not yet fully implemented, option ignored.");
   
   // Input instructions
   vector<pair<int,MXNode*> > symb_loc;
 
   // Current output and nonzero, start with the first one
   int curr_oind=0;
-  
+
+  // Count the number of times each node is used
+  vector<int> refcount(nodes.size(),0);
+
   // Get the sequence of instructions for the virtual machine
   algorithm_.resize(0);
   algorithm_.reserve(nodes.size());
@@ -231,6 +233,15 @@ void MXFunctionInternal::init(){
           ae.res[0] = n->temp;
         }
       }
+      
+      // Increase the reference count of the dependencies
+      for(int c=0; c<ae.arg.size(); ++c){
+        if(ae.arg[c]>=0){
+          refcount[ae.arg[c]]++;
+        }
+      }
+       
+      // Save to algorithm
       place_in_alg.push_back(algorithm_.size());
       algorithm_.push_back(ae);
       
@@ -259,7 +270,7 @@ void MXFunctionInternal::init(){
   place.resize(nodes.size());
   
   // Stack with unused elements in the work vector, sorted by sparsity pattern
-  //SPARSITY_MAP<void*,stack<int> > unused;
+  SPARSITY_MAP<const void*,stack<int> > unused_all;
   
   // Work vector size
   int worksize = 0;
@@ -267,38 +278,56 @@ void MXFunctionInternal::init(){
   // Find a place in the work vector for the operation
   for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
     
-    // Number of dependencies
-//     int ndeps = casadi_math<double>::ndeps(it->op);
-  
-    // decrease reference count of children
-//     for(int c=ndeps-1; c>=0; --c){ // reverse order so that the first argument will end up at the top of the stack
-//       int ch_ind = it->arg.i[c];
-//       int remaining = --refcount[ch_ind];
-//       if(remaining==0) unused.push(place[ch_ind]);
-//     }
-    
-    // Save the location of the results
+    // Allocate/reuse memory for the results of the operation
     if(it->op!=OP_OUTPUT){
-//       if(live_variables && !unused.empty()){
-//         // Try to reuse a variable from the stack if possible (last in, first out)
-//         it->res = place[it->res] = unused.top();
-//         unused.pop();
-//       } else {
-        // Allocate new variables
-        for(int c=0; c<it->res.size(); ++c){
-          if(it->res[c]>=0){
-            it->res[c] = place[it->res[c]] = worksize++;
+      // Allocate new variables
+      for(int c=0; c<it->res.size(); ++c){
+        if(it->res[c]>=0){
+          
+          // Are reuse of variables (live variables) enabled?
+          if(live_variables){
+            // Get a pointer to the sparsity pattern node
+            const void* sp = it->data->sparsity(c).get();
+            
+            // Get a reference to the stack for the current sparsity
+            stack<int>& unused = unused_all[sp];
+            
+            // Try to reuse a variable from the stack if possible (last in, first out)
+            if(!unused.empty()){
+              it->res[c] = place[it->res[c]] = unused.top();
+              unused.pop();
+              continue; // Success, no new element needed in the work vector
+            }
           }
+      
+          // Allocate a new element in the work vector
+          it->res[c] = place[it->res[c]] = worksize++;
         }
-      //}
+      }
     }
     
-    // Save the location of the arguments
-    if(it->op!=OP_INPUT){
-      for(int c=0; c<it->arg.size(); ++c){
-        if(it->arg[c]>=0){
-          it->arg[c] = place[it->arg[c]];
+    // Dereference or free the memory of the arguments
+    for(int c=it->arg.size()-1; c>=0; --c){ // reverse order so that the first argument will end up at the top of the stack
+
+      // Index of the argument
+      int& ch_ind = it->arg[c];
+      if(ch_ind>=0){
+        
+        // Decrease reference count and add to the stack of unused variables if the count hits zero
+        int remaining = --refcount[ch_ind];
+        
+        // Free variable for reuse
+        if(live_variables && remaining==0){
+          
+          // Get a pointer to the sparsity pattern of the argument that can be freed
+          const void* sp = nodes[ch_ind]->sparsity().get();
+          
+          // Add to the stack of unused work vector elements for the current sparsity
+          unused_all[sp].push(place[ch_ind]);
         }
+        
+        // Point to the place in the work vector instead of to the place in the list of nodes
+        ch_ind = place[ch_ind];
       }
     }
   }
