@@ -41,7 +41,8 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv, const std:
   
   setOption("name", "unnamed_mx_function");
   setOption("numeric_jacobian", true);
-  setOption("numeric_hessian",  true);
+  setOption("numeric_hessian", true);
+  setOption("live_variables", false);
   
   // Check if any inputs is a mapping
   bool has_mapping_inputs = false;
@@ -174,9 +175,12 @@ void MXFunctionInternal::init(){
   vector<int> place_in_alg;
   place_in_alg.reserve(nodes.size());
   
+  // Use live variables?
+  bool live_variables = getOption("live_variables");
+  
   // Input instructions
   vector<pair<int,MXNode*> > symb_loc;
-  
+
   // Current output and nonzero, start with the first one
   int curr_oind=0;
   
@@ -191,96 +195,79 @@ void MXFunctionInternal::init(){
     // Current node
     MXNode* n = *it;
  
-    // New element in the algorithm
-    AlgEl ae;
-        
     // Get the operation
-    ae.op = n==0 ? OP_OUTPUT : n->getOp();
+    int op = n==0 ? OP_OUTPUT : n->getOp();
     
-    // In algorithm and work vector
-    bool in_work=true, in_algorithm=true;
-    
-    // Add an element to the algorithm
-    if(ae.op<0){ // Function output node, not in algorithm
-      
-      // Get the output index
-      int oind = n->getFunctionOutput();
-
-      // Get the index of the parent node
-      int pind = place_in_alg[n->dep(0)->temp];
-      
-      // Not in algorithm
-      in_algorithm = false;
-      
-      // Place in the work vector
-      int& wplace = algorithm_[pind].res.at(oind);
-      
-      // Check if the node already has been added
-      if(wplace>=0){
-        // Save place in work vector
-        place_in_work.push_back(wplace);
-        
-        // No work element needed
-        in_work=false;
-      } else {
-        // Save output to the parent node
-        wplace = work_.size();
-
-        // Save place in work vector
-        place_in_work.push_back(wplace);
-      }
-    } else if(ae.op == OP_OUTPUT){
-      in_work = false;
-      place_in_work.push_back(-1);
-      ae.arg = vector<int>(1,place_in_work.at(outputv_.at(curr_oind)->temp));
-      ae.res = vector<int>(1,curr_oind++);
-    } else {
-      // a parameter or input
-      if(ae.op==OP_PARAMETER){
-        symb_loc.push_back(make_pair(algorithm_.size(),n));
-      }
-      
-      // Save the node to the algorithm
-      ae.data.assignNode(n);
-      
-      // Save the indices of the arguments
-      ae.arg.resize(n->ndep());
-      for(int i=0; i<n->ndep(); ++i){
-        ae.arg[i] = n->dep(i).isNull() ? -1 : place_in_work[n->dep(i)->temp];
-      }
-      
-      if(n->isMultipleOutput()){
-
-        // Not in work vector
-        place_in_work.push_back(-1);
-       
-        // Allocate space for outputs indices
-        ae.res.resize(n->getNumOutputs(),-1);
-        
-        // No element in the work vector needed
-        in_work=false;
-      } else {
-        
-        // Save place in work vector
-        place_in_work.push_back(work_.size());
-
-        // Allocate space for the outputs index
-        ae.res.resize(1,work_.size());
-      }
+    // Store location if parameter (or input)
+    if(op==OP_PARAMETER){
+      symb_loc.push_back(make_pair(algorithm_.size(),n));
     }
     
-    // Add to algorithm
-    if(in_algorithm){
+    // If a new element in the algorithm needs to be added
+    if(op>=0){
+      // New element in the algorithm
+      AlgEl ae;
+      ae.op = op;
+      ae.data.assignNode(n);
+    
+      // Add input and output argument
+      if(op==OP_OUTPUT){
+        ae.arg.resize(1);
+        ae.arg[0] = place_in_work.at(outputv_.at(curr_oind)->temp);
+        ae.res.resize(1);
+        ae.res[0] = curr_oind++;
+      } else {
+        ae.arg.resize(n->ndep());
+        for(int i=0; i<n->ndep(); ++i){
+          ae.arg[i] = n->dep(i).isNull() ? -1 : place_in_work[n->dep(i)->temp];
+        }
+        ae.res.resize(n->getNumOutputs());
+        if(n->isMultipleOutput()){
+          fill(ae.res.begin(),ae.res.end(),-1);
+        } else {
+          ae.res[0] = work_.size();
+        }
+      }
       place_in_alg.push_back(algorithm_.size());
       algorithm_.push_back(ae);
     } else {
       place_in_alg.push_back(-1);
     }
+    
+    // Outputs and and multiple output nodes do not need any work vector element
+    if(op==OP_OUTPUT || n->isMultipleOutput()){
+      place_in_work.push_back(-1);
+    } else {
+      if(op>=0){
+        place_in_work.push_back(work_.size());
+      } else { // Function output node
+        // Get the output index
+        int oind = n->getFunctionOutput();
 
-    // Allocate memory for an element in the work vector
-    if(in_work){
-      work_.resize(work_.size()+1);
-      work_.back().data = Matrix<double>(n->sparsity(),0);
+        // Get the index of the parent node
+        int pind = place_in_alg[n->dep(0)->temp];
+        
+        // Place in the work vector
+        int& wplace = algorithm_[pind].res.at(oind);
+        
+        // Check if the node already has been added
+        if(wplace>=0){
+          // Save place in work vector
+          place_in_work.push_back(wplace);
+          continue;
+        } else {
+          // Save output to the parent node
+          wplace = work_.size();
+
+          // Save place in work vector
+          place_in_work.push_back(wplace);
+        }
+      }
+      
+      // New element in the work vector
+      FunctionIO w;
+      w.data = Matrix<double>(n->sparsity(),0);
+      work_.push_back(w);
     }
   }
 

@@ -57,7 +57,6 @@ using namespace std;
 SXFunctionInternal::SXFunctionInternal(const vector<SXMatrix >& inputv, const vector<SXMatrix >& outputv) : 
   XFunctionInternal<SXFunction,SXFunctionInternal,SXMatrix,SXNode>(inputv,outputv) {
   setOption("name","unnamed_sx_function");
-  addOption("live_variables",OT_BOOLEAN,true,"Reuse variables in the work vector");
   addOption("just_in_time",OT_BOOLEAN,false,"Just-in-time compilation for numeric evaluation (experimental)");
 
   // Check for duplicate entries among the input expressions
