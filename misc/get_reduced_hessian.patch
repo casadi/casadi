@@ -12,19 +12,6 @@ Index: Ipopt/contrib/sIPOPT/src/SensApplication.cpp
      if (run_sens_ && n_sens_steps_>0 && !sens_internal_abort) {
 Index: Ipopt/contrib/sIPOPT/src/SensSchurDriver.hpp
 ===================================================================
---- Ipopt/contrib/sIPOPT/src/SensSchurDriver.hpp	(revision 2114)
-+++ Ipopt/contrib/sIPOPT/src/SensSchurDriver.hpp	(working copy)
-@@ -23,7 +23,7 @@
-      *  treatment of adding rows/cols (like QPSchur).
-      *
-      *  The computations done by this class are
--     *  1. Solve $S \Delta\nu = r_s
-+     *  1. Solve $S \De lta\nu = r_s
-      *  2. Solve $K\Delta s = ... - \Delta nu (really?)*/
- 
-   public:
-Index: Ipopt/contrib/sIPOPT/src/SensApplication.hpp
-===================================================================
 --- Ipopt/contrib/sIPOPT/src/SensApplication.hpp	(revision 2114)
 +++ Ipopt/contrib/sIPOPT/src/SensApplication.hpp	(working copy)
 @@ -14,6 +14,9 @@
