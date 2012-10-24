@@ -520,9 +520,10 @@ void WorhpInternal::checkinit() {
   // Create modified F that does not contain the non-free X
   if (!F_.isNull()) {
     std::vector< MX > Fmod_in = F_.symbolicInput();
-    std::vector< MX > F_in = Fmod_in;
+    std::vector< MX > F_in = Fmod_in;;
     Fmod_in[0] = freeX;
     Fmod_in.push_back(nonfreeX);
+    F_in.at(0) = MX(F_in.at(0).sparsity(),0);
     F_in.at(0)[nonfreeX_] = nonfreeX;
     F_in.at(0)[freeX_] = freeX;
     Fmod_ = MXFunction(Fmod_in,F_.call(F_in));
@@ -535,6 +536,7 @@ void WorhpInternal::checkinit() {
     std::vector< MX > G_in = Gmod_in;
     Gmod_in.at(0) = freeX;
     Gmod_in.push_back(nonfreeX);
+    G_in.at(0) = MX(G_in.at(0).sparsity(),0);
     G_in.at(0)[nonfreeX_] = nonfreeX;
     G_in.at(0)[freeX_] = freeX;
     Gmod_ = MXFunction(Gmod_in,G_.call(G_in).at(0)[nonfreeG_]);
@@ -545,6 +547,7 @@ void WorhpInternal::checkinit() {
   if (!H_.isNull()) {
     std::vector< MX > Hmod_in = H_.symbolicInput();
     std::vector< MX > H_in = Hmod_in;
+    
     Hmod_in.at(0) = freeX;
     if (Hmod_in.size() > (parametric_? 2 : 1) && !Hmod_in.at(1).isNull()) Hmod_in.at(1) = nonfreeG;
     Hmod_in.push_back(nonfreeX);
@@ -552,10 +555,11 @@ void WorhpInternal::checkinit() {
     H_in.at(0)[nonfreeX_] = nonfreeX;
     H_in.at(0)[freeX_] =  freeX;
     if (H_in.size() > (parametric_? 2 : 1) && !H_in.at(1).isNull()) {
+      H_in.at(1) = MX(H_in.at(1).sparsity(),0);
       H_in.at(1)[nonfreeG_] = nonfreeG;
       H_in.at(1)[freeG_] = 0;
     }
-
+    
     Hmod_ = MXFunction(Hmod_in,H_.call(H_in).at(0)(freeX_,freeX_));
     Hmod_.init(); 
     
@@ -567,6 +571,7 @@ void WorhpInternal::checkinit() {
     std::vector< MX > J_in = Jmod_in;
     Jmod_in.at(0) = freeX;
     Jmod_in.push_back(nonfreeX);
+    J_in.at(0) = MX(J_in.at(0).sparsity(),0);
     J_in.at(0)[nonfreeX_] = nonfreeX;
     J_in.at(0)[freeX_] = freeX;
     MX J_call = J_.call(J_in).at(0);
@@ -584,6 +589,7 @@ void WorhpInternal::checkinit() {
     std::vector< MX > GF_in = GFmod_in;
     GFmod_in.at(0) = freeX;
     GFmod_in.push_back(nonfreeX);
+    GF_in.at(0) = MX(GF_in.at(0).sparsity(),0);
     GF_in.at(0)[nonfreeX_] = nonfreeX;
     GF_in.at(0)[freeX_] = freeX;
     GFmod_ = MXFunction(GFmod_in,GF_.call(GF_in).at(0)(0,freeX_));
