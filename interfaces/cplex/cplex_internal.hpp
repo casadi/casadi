@@ -44,7 +44,11 @@ public:
   /// Constructor using sparsity patterns
   explicit CplexInternal(const CRSSparsity& H, const CRSSparsity& A);
 
-  ~CplexInternal();
+  /// Destructor
+  virtual ~CplexInternal();
+  
+  /// Free Cplex memory
+  void freeCplex();
 
   virtual void init();
 
@@ -117,6 +121,10 @@ private:
   /// CPLEX-environment
   CPXENVptr env_;
   CPXLPptr lp_;
+
+  /// Transposed sparsity pattern of A and a mapping from A to AT
+  CRSSparsity AT_sparsity_;
+  std::vector<int> AT_nonzero_mapping_;
 };
 } // end namespace CasADi
 

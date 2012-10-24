@@ -68,8 +68,17 @@ CplexInternal::CplexInternal(const CRSSparsity& H, const CRSSparsity& A) : QPSol
   NUMROWS_ = A.size1();
   // Setting warm-start flag
   is_warm_ = false;
+
+  // Set pointer to zero to avoid deleting a nonexisting instance
+  env_ = 0;
 }
 void CplexInternal::init(){
+  // Free any existing Cplex instance
+  freeCplex();
+
+  // Call the init method of the base class
+  QPSolverInternal::init();
+  
   qp_method_     = getOption("qp_method");
   if (qp_method_ < 0 || qp_method_ > 7){
     casadi_error("Invalid QP method given.");
@@ -77,12 +86,10 @@ void CplexInternal::init(){
   dump_to_file_  = getOption("dump_to_file");
   debug_ = getOption("debug");
   tol_ = getOption("tol");
-//  dump_filename_ = getOption("dump_filename");
+  //  dump_filename_ = getOption("dump_filename");
   debug_ = getOption("debug");
-
+  
   int status;
-  env_ = 0;
-  QPSolverInternal::init();
   env_ = CPXopenCPLEX (&status);
   if (!env_){
     cout << "CPLEX: Cannot initialize CPLEX environment. STATUS: " << status << "\n";
@@ -182,6 +189,9 @@ void CplexInternal::init(){
   }
 
   lp_ = CPXcreateprob(env_, &status, "QP from CasADi");
+
+  // Get the sparsity pattern of the constraint matrix and a mapping of the nonzeros
+  AT_sparsity_ = input(QP_A).sparsity().transpose(AT_nonzero_mapping_);
 }
 
 void CplexInternal::evaluate(int nfdir, int nadir){
@@ -287,33 +297,33 @@ void CplexInternal::evaluate(int nfdir, int nadir){
   for (int k=0;k<output(QP_LAMBDA_X).size();++k) output(QP_LAMBDA_X).data()[k]= - output(QP_LAMBDA_X).data()[k];
   
   int solnstat = CPXgetstat (env_, lp_);
-  string errormsg;
+  stringstream errormsg;
   if(debug_){
     if      (solnstat == CPX_STAT_OPTIMAL){
-      errormsg = string("CPLEX: solution status: Optimal solution found.\n");
+      errormsg << "CPLEX: solution status: Optimal solution found.\n";
     }
     else if (solnstat == CPX_STAT_UNBOUNDED) {
-      errormsg = string("CPLEX: solution status: Model is unbounded\n");
+      errormsg << "CPLEX: solution status: Model is unbounded\n";
     }
     else if (solnstat == CPX_STAT_INFEASIBLE) {
-      errormsg = string("CPLEX: solution status: Model is infeasible\n");
+      errormsg << "CPLEX: solution status: Model is infeasible\n";
     }
     else if (solnstat == CPX_STAT_INForUNBD) {
-      errormsg = string("CPLEX: solution status: Model is infeasible or unbounded\n");
+      errormsg << "CPLEX: solution status: Model is infeasible or unbounded\n";
     }
     else if (solnstat == CPX_STAT_OPTIMAL_INFEAS){
-      errormsg = string("CPLEX: solution status: Optimal solution is available but with infeasibilities\n");
+      errormsg << "CPLEX: solution status: Optimal solution is available but with infeasibilities\n";
     }
     else if (solnstat == CPX_STAT_NUM_BEST){
-      errormsg = string("CPLEX: solution status: Solution available, but not proved optimal due to numeric difficulties.\n");
+      errormsg << "CPLEX: solution status: Solution available, but not proved optimal due to numeric difficulties.\n";
     }
     else if (solnstat == CPX_STAT_FIRSTORDER){
-      errormsg = string("CPLEX: solution status: Solution satisfies first-order optimality conditions, but is not necessarily globally optimal.\n");
+      errormsg << "CPLEX: solution status: Solution satisfies first-order optimality conditions, but is not necessarily globally optimal.\n";
     }
     else{
-      errormsg = string("CPLEX: solution status: ") + to_string(solnstat) + string("\n");
+      errormsg << "CPLEX: solution status: " <<  solnstat << "\n";
     }
-    cout << errormsg;
+    cout << errormsg.str();
 
     // Printing basis condition number
     //double cn;
@@ -339,15 +349,24 @@ CplexInternal* CplexInternal::clone() const{
   return node;
 }
 
-/// Destructor
 CplexInternal::~CplexInternal(){
-  int status; 
-  status = CPXfreeprob (env_, &lp_);
-  if ( status ) {
-     std::cout << "CPXfreeprob failed, error code " << status << ".\n";
+  freeCplex();
+}
+
+void CplexInternal::freeCplex(){
+  // Only free if Cplex memory block has been allocated!
+  if(env_){
+    int status; 
+    status = CPXfreeprob (env_, &lp_);
+    if ( status ) {
+      std::cout << "CPXfreeprob failed, error code " << status << ".\n";
+    }
+    // Closing down license
+    status = CPXcloseCPLEX (&env_);
+
+    // Pointer to null to marked as deleted
+    env_ = 0;
   }
-  // Closing down license
-  status = CPXcloseCPLEX (&env_);
 }
 void CplexInternal::dmatrixToCplex(DMatrix& M, int* matbeg, int* matcnt, int* matind, double* matval){
   std::vector<int> rowind,col;
