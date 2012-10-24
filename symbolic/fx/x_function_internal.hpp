@@ -88,7 +88,7 @@ XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::XFunctionInternal(
   
   // Make sure that inputs are symbolic
   for(int i=0; i<inputv.size(); ++i){
-    if (inputv[i].isNull() || inputv[i].empty()) {
+    if (inputv[i].isNull()) {
       inputv_[i] = MatType::sym("empty",0,0);
     } else if(!isSymbolicSparse(inputv[i])){
       casadi_error("XFunctionInternal::XFunctionInternal: Xfunction input arguments must be purely symbolic." << std::endl << "Argument #" << i << " is not symbolic.");

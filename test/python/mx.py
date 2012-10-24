@@ -906,7 +906,7 @@ class MXtests(casadiTestCase):
      numpy.random.seed(42)
      xn = numpy.random.random((3,4))
      r = numpy.zeros((7,8))
-     y=MX("Y",7,8)
+     y=MX.zeros(7,8)
      y[1:4,[2,4,6,7]]=x
      r[1:4,[2,4,6,7]]=xn
      fy = MXFunction([x],[y])
@@ -1457,8 +1457,8 @@ class MXtests(casadiTestCase):
     t = MX(t_)
     mu = MX(mu_)
     
-    ins = [a,b,x,y,A,B,X,Y]
-    ins_ = [a_,b_,x_,y_,A_,B_,X_,Y_]
+    ins = [a,b,x,y,A,B,C,X,Y]
+    ins_ = [a_,b_,x_,y_,A_,B_,C_,X_,Y_]
     
     def grad(y,x):
       f = MXFunction(ins,[x])
