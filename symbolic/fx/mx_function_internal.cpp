@@ -525,15 +525,24 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
         for(int dir=0; dir<nadir; ++dir){
           work_[it->arg.front()].dataA.at(dir).set(adjSeed(it->res.front(),dir));
         }
-      } else if(it->op==OP_PARAMETER){
-        //casadi_error("The algorithm contains free parameters"); // FIXME
-      } else {
-      
+      } else if(it->op!=OP_PARAMETER){
         // Point pointers to the data corresponding to the element
         updatePointers(*it,0,nadir);
         
         // Evaluate
         it->data->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_);
+      }
+      
+      // Free memory for reuse
+      if(it->op!=OP_OUTPUT){
+        for(int oind=0; oind<it->res.size(); ++oind){
+          int el = it->res[oind];
+          if(el>=0){
+            for(int d=0; d<nadir; ++d){
+              work_[el].dataA.at(d).setZero();
+            }
+          }
+        }
       }
     }
     
@@ -646,7 +655,6 @@ void MXFunctionInternal::spEvaluate(bool fwd){
         bvec_t* swork = get_bvec_t(input(it->arg.front()).data());
         for(int k=0; k<w.size(); ++k){
           swork[k] |= iwork[k];
-          iwork[k] = 0;
         }
       } else if(it->op==OP_OUTPUT){
         // Pass output seeds
@@ -656,23 +664,21 @@ void MXFunctionInternal::spEvaluate(bool fwd){
         for(int k=0; k<w.size(); ++k){
           iwork[k] = swork[k];
         }
-      } else if(it->op==OP_PARAMETER){
-        vector<double> &w = work_[it->res.front()].data.data();
-        fill_n(get_bvec_t(w),w.size(),bvec_t(0));
-      } else {
-      
+      } else if(it->op!=OP_PARAMETER){
         // Point pointers to the data corresponding to the element
         updatePointers(*it,0,0);
         
         // Propagate sparsity backwards
         it->data->propagateSparsity(mx_input_, mx_output_,false);
-        
-        // Clear the seeds for the next sweep
-        for(DMatrixPtrV::iterator it=mx_output_.begin(); it!=mx_output_.end(); ++it){
-          DMatrix* seed = *it;
-          if(seed){
-            bvec_t *iseed = get_bvec_t(seed->data());
-            fill_n(iseed,seed->size(),0);
+      }
+      
+      // Clear the seeds for the next sweep
+      if(it->op!=OP_OUTPUT){
+        for(int oind=0; oind<it->res.size(); ++oind){
+          int el = it->res[oind];
+          if(el>=0){
+            vector<double> &w = work_[el].data.data();
+            fill_n(get_bvec_t(w),w.size(),bvec_t(0));
           }
         }
       }
@@ -840,7 +846,7 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
           else
             dwork[it->arg.front()][d] += aseed[d][it->res.front()];
         }
-      } else {
+      } else if(it->op!=OP_PARAMETER){
         // Get the arguments of the evaluation
         input_p.resize(it->arg.size());
         for(int i=0; i<input_p.size(); ++i){
@@ -883,6 +889,18 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
         // Call the evaluation function
         it->data->evaluateMX(input_p,output_p,dummy_p,dummy_p,aseed_p,asens_p,true);
       }
+      
+      // Free memory for reuse
+      if(it->op!=OP_OUTPUT){
+        for(int oind=0; oind<it->res.size(); ++oind){
+          int el = it->res[oind];
+          if(el>=0){
+            for(int d=0; d<nadj; ++d){
+              dwork[el][d] = MX();
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -899,10 +917,11 @@ void MXFunctionInternal::evalSX(const std::vector<SXMatrix>& input_s, std::vecto
   // Create a work array
   vector<SXMatrix> swork(work_.size());
   for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
-    if(it->op==OP_OUTPUT) continue;
-    for(int i=0; i<it->res.size(); ++i){
-      if (it->res[i]>=0)
-        swork[it->res[i]] = SXMatrix(it->data->sparsity(i));
+    if(it->op!=OP_OUTPUT){
+      for(int i=0; i<it->res.size(); ++i){
+        if (it->res[i]>=0)
+          swork[it->res[i]] = SXMatrix(it->data->sparsity(i));
+      }
     }
   }
   
