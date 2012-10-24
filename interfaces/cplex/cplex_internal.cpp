@@ -165,11 +165,9 @@ void CplexInternal::init(){
   matcnt_.resize(NUMCOLS_);
   matind_.resize(input(QP_A).size());
   matval_.resize(input(QP_A).size());
+
   // Matrix H
-  qmatbeg_.resize(NUMCOLS_);
-  qmatcnt_.resize(NUMCOLS_);
-  qmatind_.resize(input(QP_H).size());
-  qmatval_.resize(input(QP_H).size());
+  toCplexSparsity(input(QP_H).sparsity(),qmatbeg_,qmatcnt_,qmatind_);
   
   // Linear term
   if (!isDense(input(QP_G))){
@@ -242,14 +240,14 @@ void CplexInternal::evaluate(int nfdir, int nadir){
 
   // Preparing coefficient matrix A
   dmatrixToCplex(input(QP_A), matbeg_.data(), matcnt_.data(), matind_.data(), matval_.data());
+
   // Copying objective, constraints, and bounds.
   status = CPXcopylp (env_, lp_, NUMCOLS_, NUMROWS_, objsen_, obj_, rhs_.data(),
        sense_.data(), matbeg_.data(), matcnt_.data(), matind_.data(), matval_.data(), lb_, ub_, rngval_.data()); 
 
   // Preparing coefficient matrix Q
-  dmatrixToCplex(input(QP_H), qmatbeg_.data(), qmatcnt_.data(), qmatind_.data(), qmatval_.data());
-  // Copying quadratic term
-  status = CPXcopyquad(env_, lp_, qmatbeg_.data(), qmatcnt_.data(), qmatind_.data(), qmatval_.data());
+  const double* qmatval = input(QP_H).ptr();
+  status = CPXcopyquad(env_, lp_, qmatbeg_.data(), qmatcnt_.data(), qmatind_.data(), qmatval);
 
   if (dump_to_file_){
     const char* fn = string(getOption("dump_filename")).c_str();
@@ -368,7 +366,29 @@ void CplexInternal::freeCplex(){
     env_ = 0;
   }
 }
-void CplexInternal::dmatrixToCplex(DMatrix& M, int* matbeg, int* matcnt, int* matind, double* matval){
+
+void CplexInternal::toCplexSparsity(const CRSSparsity& sp_trans, vector<int> &matbeg, vector<int>& matcnt, vector<int>& matind){
+  // Get sparsity
+  int ncol = sp_trans.size1();
+  int nrow = sp_trans.size2();
+  const std::vector<int>& colind = sp_trans.rowind();
+  const std::vector<int>& row = sp_trans.col();
+
+  // The row for each nonzero
+  matind.resize(row.size());
+  copy(row.begin(),row.end(),matind.begin());
+  
+  // The beginning of each column
+  matbeg.resize(ncol);
+  copy(colind.begin(),colind.begin()+ncol,matbeg.begin());
+  
+  // The number of elements in each column
+  matcnt.resize(ncol);
+  transform(colind.begin()+1,colind.end(),colind.begin(),matcnt.begin(),minus<int>());
+}
+
+
+  void CplexInternal::dmatrixToCplex(DMatrix& M, int* matbeg, int* matcnt, int* matind, double* matval){
   std::vector<int> rowind,col;
 
   DMatrix MT = M.trans();

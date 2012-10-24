@@ -50,12 +50,17 @@ public:
   /// Free Cplex memory
   void freeCplex();
 
+  // Initialize the solver
   virtual void init();
 
+  // Solve the QP
   virtual void evaluate(int nfdir, int nadir);
 
 private:
-
+  
+  /// Converts CasADi sparsity to Cplex sparsity
+  static void toCplexSparsity(const CRSSparsity& sp_trans, std::vector<int> &matbeg, std::vector<int>& matcnt, std::vector<int>& matind);
+  
   /// Converts DMatrix to CPLEX matrix types
   void dmatrixToCplex(DMatrix&, int* matbeg, int* matcnt, int* matind, double* matval);
   // OPTIONS 
@@ -111,7 +116,6 @@ private:
   std::vector<int> qmatbeg_;
   std::vector<int> qmatcnt_;
   std::vector<int> qmatind_;
-  std::vector<double> qmatval_;
   
   /// Storage for basis info of primal variables
   std::vector<int> cstat_;
