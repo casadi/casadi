@@ -56,13 +56,11 @@ public:
   // Solve the QP
   virtual void evaluate(int nfdir, int nadir);
 
-private:
-  
   /// Converts CasADi sparsity to Cplex sparsity
   static void toCplexSparsity(const CRSSparsity& sp_trans, std::vector<int> &matbeg, std::vector<int>& matcnt, std::vector<int>& matind);
   
-  /// Converts DMatrix to CPLEX matrix types
-  void dmatrixToCplex(DMatrix&, int* matbeg, int* matcnt, int* matind, double* matval);
+protected:
+  
   // OPTIONS 
   /** Which algorithm to use
    * 0 -> Automatic (default)
@@ -80,8 +78,6 @@ private:
   bool dump_to_file_;
   /// Indicates if we have to warm-start
   bool is_warm_;
-  /// Print debug messages
-  bool debug_;
   /// Accuracy
   double tol_;
   /// Number of variables
@@ -102,6 +98,9 @@ private:
   std::vector<int> matcnt_;
   std::vector<int> matind_;
   std::vector<double> matval_;
+
+  /// Transposed sparsity pattern mapping from A to AT
+  std::vector<int> AT_nonzero_mapping_;
 
   /// Right-hand side of constraints
   std::vector<double> rhs_;
@@ -126,9 +125,6 @@ private:
   CPXENVptr env_;
   CPXLPptr lp_;
 
-  /// Transposed sparsity pattern of A and a mapping from A to AT
-  CRSSparsity AT_sparsity_;
-  std::vector<int> AT_nonzero_mapping_;
 };
 } // end namespace CasADi
 

@@ -48,7 +48,6 @@ CplexInternal::CplexInternal(const CRSSparsity& H, const CRSSparsity& A) : QPSol
     Default: 0");
   addOption("dump_to_file",   OT_BOOLEAN,        false, "Dumps QP to file in CPLEX format. Default: false");
   addOption("dump_filename",   OT_STRING,     "qp.dat", "The filename to dump to. Default: qp.dat");
-  addOption("debug",          OT_BOOLEAN,        false, "Print debug information");
   addOption("tol",               OT_REAL,         1E-6, "Tolerance of solver");
   addOption("dep_check",      OT_INTEGER,            0, "Detect redundant constraints. \
     -1: automatic\
@@ -71,6 +70,7 @@ CplexInternal::CplexInternal(const CRSSparsity& H, const CRSSparsity& A) : QPSol
 
   // Set pointer to zero to avoid deleting a nonexisting instance
   env_ = 0;
+  lp_ = 0;
 }
 void CplexInternal::init(){
   // Free any existing Cplex instance
@@ -84,19 +84,16 @@ void CplexInternal::init(){
     casadi_error("Invalid QP method given.");
   }
   dump_to_file_  = getOption("dump_to_file");
-  debug_ = getOption("debug");
   tol_ = getOption("tol");
   //  dump_filename_ = getOption("dump_filename");
-  debug_ = getOption("debug");
   
   int status;
+  casadi_assert(env_==0);
   env_ = CPXopenCPLEX (&status);
-  if (!env_){
-    cout << "CPLEX: Cannot initialize CPLEX environment. STATUS: " << status << "\n";
-    throw CasadiException("Cannot initialize CPLEX environment.\n");
-  }
+  casadi_assert_message(env_!=0, "CPLEX: Cannot initialize CPLEX environment. STATUS: " << status);
+
   // Turn on some debug messages if requested
-  if (debug_){
+  if (verbose()){
     CPXsetintparam (env_, CPX_PARAM_SCRIND, CPX_ON);
   }
   else{
@@ -160,12 +157,11 @@ void CplexInternal::init(){
   cstat_.resize(NUMCOLS_);
   rstat_.resize(NUMROWS_);
 
-  // Matrix A
-  matbeg_.resize(NUMCOLS_);
-  matcnt_.resize(NUMCOLS_);
-  matind_.resize(input(QP_A).size());
+  // Matrix A (Cplex reqests its transpose)
+  CRSSparsity AT_sparsity = input(QP_A).sparsity().transpose(AT_nonzero_mapping_);
+  toCplexSparsity(AT_sparsity,matbeg_,matcnt_,matind_);
   matval_.resize(input(QP_A).size());
-
+  
   // Matrix H
   toCplexSparsity(input(QP_H).sparsity(),qmatbeg_,qmatcnt_,qmatind_);
   
@@ -185,11 +181,9 @@ void CplexInternal::init(){
   if (!isDense(input(QP_UBX))){
     casadi_error("input(QP_UBX) must be dense.");
   }
-
+  
+  casadi_assert(lp_==0);
   lp_ = CPXcreateprob(env_, &status, "QP from CasADi");
-
-  // Get the sparsity pattern of the constraint matrix and a mapping of the nonzeros
-  AT_sparsity_ = input(QP_A).sparsity().transpose(AT_nonzero_mapping_);
 }
 
 void CplexInternal::evaluate(int nfdir, int nadir){
@@ -238,9 +232,12 @@ void CplexInternal::evaluate(int nfdir, int nadir){
     }
   }
 
-  // Preparing coefficient matrix A
-  dmatrixToCplex(input(QP_A), matbeg_.data(), matcnt_.data(), matind_.data(), matval_.data());
-
+  // Map the nonzeros of A to its transpose
+  const vector<double>& A_data = input(QP_A).data();
+  for(int k=0; k<A_data.size(); ++k){
+    matval_[k] = A_data[AT_nonzero_mapping_[k]];
+  }
+  
   // Copying objective, constraints, and bounds.
   status = CPXcopylp (env_, lp_, NUMCOLS_, NUMROWS_, objsen_, obj_, rhs_.data(),
        sense_.data(), matbeg_.data(), matcnt_.data(), matind_.data(), matval_.data(), lb_, ub_, rngval_.data()); 
@@ -295,8 +292,8 @@ void CplexInternal::evaluate(int nfdir, int nadir){
   for (int k=0;k<output(QP_LAMBDA_X).size();++k) output(QP_LAMBDA_X).data()[k]= - output(QP_LAMBDA_X).data()[k];
   
   int solnstat = CPXgetstat (env_, lp_);
-  stringstream errormsg;
-  if(debug_){
+  stringstream errormsg; // NOTE: Why not print directly to cout and cerr?
+  if(verbose()){
     if      (solnstat == CPX_STAT_OPTIMAL){
       errormsg << "CPLEX: solution status: Optimal solution found.\n";
     }
@@ -352,17 +349,24 @@ CplexInternal::~CplexInternal(){
 }
 
 void CplexInternal::freeCplex(){
-  // Only free if Cplex memory block has been allocated!
-  if(env_){
-    int status; 
-    status = CPXfreeprob (env_, &lp_);
-    if ( status ) {
-      std::cout << "CPXfreeprob failed, error code " << status << ".\n";
-    }
-    // Closing down license
-    status = CPXcloseCPLEX (&env_);
+  // Return flag
+  int status;
 
-    // Pointer to null to marked as deleted
+  // Only free if Cplex problem if it has been allocated
+  if(lp_!=0){
+    status = CPXfreeprob (env_, &lp_);
+    if(status!=0){
+      std::cerr << "CPXfreeprob failed, error code " << status << ".\n";
+    }
+    lp_ = 0;
+  }
+  
+  // Closing down license
+  if(env_!=0){
+    status = CPXcloseCPLEX(&env_);
+    if(status!=0){
+      std::cerr << "CPXcloseCPLEX failed, error code " << status << ".\n";
+    }	
     env_ = 0;
   }
 }
@@ -387,33 +391,5 @@ void CplexInternal::toCplexSparsity(const CRSSparsity& sp_trans, vector<int> &ma
   transform(colind.begin()+1,colind.end(),colind.begin(),matcnt.begin(),minus<int>());
 }
 
-
-  void CplexInternal::dmatrixToCplex(DMatrix& M, int* matbeg, int* matcnt, int* matind, double* matval){
-  std::vector<int> rowind,col;
-
-  DMatrix MT = M.trans();
-//  DMatrix MT = M;
-  MT.sparsity().getSparsityCRS(rowind, col);
-  std::vector<double>& data = MT.data();
-//  int i, j;
-//  int j = 0;
-//  double val;
-  int nnz_counter = 0;
-  int nnz_col = 0;
-  for(int r=0; r<rowind.size()-1; ++r){
-    matbeg[r] = nnz_counter;
-    for(int el=rowind[r]; el<rowind[r+1]; ++el){
-//      i = r;
-//      j = col[el];
-//      val = data[el];
-      matind[nnz_counter] = col[el];
-      matval[nnz_counter] = data[el];
-      ++nnz_counter;
-      ++nnz_col;
-    }
-    matcnt[r] = nnz_col;
-    nnz_col = 0;
-  }
-};
 } // end namespace CasADi
 
