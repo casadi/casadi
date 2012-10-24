@@ -608,7 +608,7 @@ void MXFunctionInternal::spInit(bool fwd){
   for(vector<FunctionIO>::iterator it=work_.begin(); it!=work_.end(); ++it){
     //Get a pointer to the int array
     bvec_t *iwork = get_bvec_t(it->data.data());
-    fill_n(iwork,it->data.size(),0);
+    fill_n(iwork,it->data.size(),bvec_t(0));
   }
 }
 
@@ -628,9 +628,7 @@ void MXFunctionInternal::spEvaluate(bool fwd){
         vector<double> &w = work_[it->arg.front()].data.data();
         bvec_t* iwork = get_bvec_t(w);
         bvec_t* swork = get_bvec_t(output(it->res.front()).data());
-        for(int k=0; k<w.size(); ++k){
-          swork[k] = iwork[k];
-        }
+        copy(iwork,iwork+w.size(),swork);
       } else if(it->op==OP_PARAMETER){
         // Parameters are constant
         vector<double> &w = work_[it->res.front()].data.data();

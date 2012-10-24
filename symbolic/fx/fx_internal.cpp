@@ -38,8 +38,8 @@ FXInternal::FXInternal(){
   addOption("sparse",                   OT_BOOLEAN,             true,           "function is sparse");
   addOption("number_of_fwd_dir",        OT_INTEGER,             1,              "number of forward derivatives to be calculated simultanously");
   addOption("number_of_adj_dir",        OT_INTEGER,             1,              "number of adjoint derivatives to be calculated simultanously");
-  addOption("max_number_of_fwd_dir",    OT_INTEGER,             100,            "Allow \"number_of_fwd_dir\" to grow until it reaches this number");
-  addOption("max_number_of_adj_dir",    OT_INTEGER,             100,            "Allow \"number_of_adj_dir\" to grow until it reaches this number");
+  addOption("max_number_of_fwd_dir",    OT_INTEGER,             optimized_num_dir,  "Allow \"number_of_fwd_dir\" to grow until it reaches this number");
+  addOption("max_number_of_adj_dir",    OT_INTEGER,             optimized_num_dir,  "Allow \"number_of_adj_dir\" to grow until it reaches this number");
   addOption("verbose",                  OT_BOOLEAN,             false,          "verbose evaluation -- for debugging");
   addOption("store_jacobians",          OT_BOOLEAN,             false,          "keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times");
   addOption("numeric_jacobian",         OT_BOOLEAN,             false,          "Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method");
