@@ -44,12 +44,13 @@ CplexInternal::CplexInternal(const CRSSparsity& H, const CRSSparsity& A) : QPSol
     4: Barrier, \
     5: Sifting, \
     6: Concurent. \
+    7: Crossover (start with barrier and use simplex later on with warm-start)\
     Default: 0");
   addOption("dump_to_file",   OT_BOOLEAN,        false, "Dumps QP to file in CPLEX format. Default: false");
-  addOption("dump_filename",   OT_STRING, "qp.dat", "The filename to dump to. Default: qp.dat");
+  addOption("dump_filename",   OT_STRING,     "qp.dat", "The filename to dump to. Default: qp.dat");
   addOption("debug",          OT_BOOLEAN,        false, "Print debug information");
-  addOption("tol",               OT_REAL,     1E-6, "Tolerance of solver");
-  addOption("dep_check",      OT_INTEGER,        0, "Detect redundant constraints. \
+  addOption("tol",               OT_REAL,         1E-6, "Tolerance of solver");
+  addOption("dep_check",      OT_INTEGER,            0, "Detect redundant constraints. \
     -1: automatic\
      0: off\
      1: at the beginning of preprocessing\
@@ -57,15 +58,22 @@ CplexInternal::CplexInternal(const CRSSparsity& H, const CRSSparsity& A) : QPSol
      3: at the begining and at the end of preprocessing");
   addOption("simplex_maxiter", OT_INTEGER,       2100000000, "Maximum number of simplex iterations.");
   addOption("barrier_maxiter", OT_INTEGER,       2100000000, "Maximum number of barrier iterations.");
+  addOption("warm_start",      OT_BOOLEAN,            false, "Use warm start with simplex methods (affects only the simplex methods).");
+  addOption("convex",          OT_BOOLEAN,             true, "Indicates if the QP is convex or not (affects only the barrier method).");
   
   // Initializing members
   // Number of vars
   NUMCOLS_ = H.size1();
   // Number of constraints
   NUMROWS_ = A.size1();
+  // Setting warm-start flag
+  is_warm_ = false;
 }
 void CplexInternal::init(){
   qp_method_     = getOption("qp_method");
+  if (qp_method_ < 0 || qp_method_ > 7){
+    casadi_error("Invalid QP method given.");
+  }
   dump_to_file_  = getOption("dump_to_file");
   debug_ = getOption("debug");
   tol_ = getOption("tol");
@@ -75,7 +83,6 @@ void CplexInternal::init(){
   int status;
   env_ = 0;
   QPSolverInternal::init();
-//  CPXsetintparam (env_, CPX_PARAM_SCRIND, CPX_OFF);
   env_ = CPXopenCPLEX (&status);
   if (!env_){
     cout << "CPLEX: Cannot initialize CPLEX environment. STATUS: " << status << "\n";
@@ -92,19 +99,59 @@ void CplexInternal::init(){
     std::cout << "CPLEX: Problem with setting parameter... ERROR: " << status << std::endl;
   }
 
-
+  /* SETTING OPTIONS */
   // Optimality tolerance
-  CPXsetdblparam(env_, CPX_PARAM_EPOPT, tol_);
+  status = CPXsetdblparam(env_, CPX_PARAM_EPOPT, tol_);
   // Feasibility tolerance
-  CPXsetdblparam(env_, CPX_PARAM_EPRHS, tol_);
-  
+  status = CPXsetdblparam(env_, CPX_PARAM_EPRHS, tol_);
+  // We start with barrier if crossover was chosen.
+  if (qp_method_ == 7){
+    status = CPXsetintparam(env_, CPX_PARAM_QPMETHOD, 4);
+    // Warm-start is default with this algorithm
+    setOption("warm_start", true);
+  }
+  // Otherwise we just chose the algorithm
+  else{
+    status = CPXsetintparam(env_, CPX_PARAM_QPMETHOD, qp_method_);
+  }
+  // Setting dependency check option
+  status = CPXsetintparam(env_, CPX_PARAM_DEPIND, getOption("dep_check"));
+  // Setting barrier iteration limit
+  status = CPXsetintparam(env_, CPX_PARAM_BARITLIM, getOption("barrier_maxiter"));
+  // Setting simplex iteration limit
+  status = CPXsetintparam(env_, CPX_PARAM_ITLIM, getOption("simplex_maxiter"));
+  if (qp_method_ == 7){
+    // Setting crossover algorithm
+    status = CPXsetintparam(env_, CPX_PARAM_BARCROSSALG, 1);
+  }
+  if(!bool(getOption("convex"))){
+    // Enabling non-convex QPs
+    status = CPXsetintparam(env_, CPX_PARAM_SOLUTIONTARGET, CPX_SOLUTIONTARGET_FIRSTORDER);
+  }
+
+  // Exotic parameters, once they might become options...
+
+  // Do careful numerics with numerically unstable problem
+  //status = CPXsetintparam(env_, CPX_PARAM_NUMERICALEMPHASIS, 1);
+  // Set scaling approach
+  //status = CPXsetintparam(env_, CPX_PARAM_SCAIND, 1);
+  // Set Markowitz tolerance
+  //status = CPXsetdblparam(env_, CPX_PARAM_EPMRK, 0.9);
+ 
   // Doing allocation of CPLEX data
   // Objective is to be minimized
   objsen_ = CPX_MIN;
+
   // Allocation of data
+  // Type of constraint
   sense_.resize(NUMROWS_);
+  // Right-hand side of constraints
   rhs_.resize(NUMROWS_);
+  // Range value for lower AND  upper bounded constraints
   rngval_.resize(NUMROWS_);
+  // Basis for primal variables
+  cstat_.resize(NUMCOLS_);
+  rstat_.resize(NUMROWS_);
 
   // Matrix A
   matbeg_.resize(NUMCOLS_);
@@ -134,13 +181,19 @@ void CplexInternal::init(){
     casadi_error("input(QP_UBX) must be dense.");
   }
 
+  lp_ = CPXcreateprob(env_, &status, "QP from CasADi");
 }
 
 void CplexInternal::evaluate(int nfdir, int nadir){
 
+  casadi_assert(nfdir == 0 && nadir == 0);
+
   int status;
 
-  casadi_assert(nfdir == 0 && nadir == 0);
+  // We change method in crossover
+  if ( is_warm_ && qp_method_ == 7){
+    status = CPXsetintparam(env_, CPX_PARAM_QPMETHOD, 1);
+  }
 
   obj_ = input(QP_G).ptr();
   lb_ = input(QP_LBX).ptr();
@@ -175,10 +228,8 @@ void CplexInternal::evaluate(int nfdir, int nadir){
       rhs_[i] = input(QP_LBA).elem(i);
       rngval_[i] = input(QP_UBA).elem(i) - input(QP_LBA).elem(i);
     }
-
-    lp_ = CPXcreateprob(env_, &status, "QP from CasADi");
   }
-  
+
   // Preparing coefficient matrix A
   dmatrixToCplex(input(QP_A), matbeg_.data(), matcnt_.data(), matind_.data(), matval_.data());
   // Copying objective, constraints, and bounds.
@@ -187,30 +238,21 @@ void CplexInternal::evaluate(int nfdir, int nadir){
 
   // Preparing coefficient matrix Q
   dmatrixToCplex(input(QP_H), qmatbeg_.data(), qmatcnt_.data(), qmatind_.data(), qmatval_.data());
-
+  // Copying quadratic term
   status = CPXcopyquad(env_, lp_, qmatbeg_.data(), qmatcnt_.data(), qmatind_.data(), qmatval_.data());
 
-  // Setting optimization method
-  status = CPXsetintparam(env_, CPX_PARAM_QPMETHOD, qp_method_);
-  // Setting dependency check option
-  status = CPXsetintparam(env_, CPX_PARAM_DEPIND, getOption("dep_check"));
-  // Setting barrier iteration limit
-  status = CPXsetintparam(env_, CPX_PARAM_BARITLIM, getOption("barrier_maxiter"));
-  // Setting simplex iteration limit
-  status = CPXsetintparam(env_, CPX_PARAM_ITLIM, getOption("simplex_maxiter"));
-
-  // Exotic parameters, once they might become options...
-
-  // Do careful numerics with numerically unstable problem
-  //status = CPXsetintparam(env_, CPX_PARAM_NUMERICALEMPHASIS, 1);
-  // Set scaling approach
-  //status = CPXsetintparam(env_, CPX_PARAM_SCAIND, 1);
-  // Set Markowitz tolerance
-  //status = CPXsetdblparam(env_, CPX_PARAM_EPMRK, 0.9);
-  
-
   if (dump_to_file_){
-    CPXwriteprob(env_, lp_, "qp.lp", NULL);
+    const char* fn = string(getOption("dump_filename")).c_str();
+    CPXwriteprob(env_, lp_, fn, "LP");
+  }
+
+  // Warm-starting if possible
+  if (qp_method_ != 0 && qp_method_ != 4 && is_warm_){
+    // TODO: Initialize slacks and dual variables of bound constraints
+    CPXcopystart(env_, lp_, cstat_.data(), rstat_.data(), input(QP_X_INIT).ptr(), NULL, NULL, input(QP_LAMBDA_INIT).ptr());
+  }
+  else{
+    status = CPXcopystart(env_, lp_, NULL, NULL, input(QP_X_INIT).ptr(), NULL, NULL, input(QP_LAMBDA_INIT).ptr());
   }
 
   // Optimize...
@@ -232,13 +274,18 @@ void CplexInternal::evaluate(int nfdir, int nadir){
    output(QP_LAMBDA_X).ptr()
   ); 
   
+  if(status){
+    cout << "CPLEX: Failed to get solution.\n";
+  } 
+  // Retrieving the basis
+  if (qp_method_ != 0 && qp_method_ != 4){
+    status = CPXgetbase(env_, lp_, cstat_.data(), rstat_.data());
+  }
+
   // Flip the sign of the multipliers
   for (int k=0;k<output(QP_LAMBDA_A).size();++k) output(QP_LAMBDA_A).data()[k]= - output(QP_LAMBDA_A).data()[k];
   for (int k=0;k<output(QP_LAMBDA_X).size();++k) output(QP_LAMBDA_X).data()[k]= - output(QP_LAMBDA_X).data()[k];
   
-  if(status){
-    cout << "CPLEX: Failed to get solution.\n";
-  } 
   int solnstat = CPXgetstat (env_, lp_);
   string errormsg;
   if(debug_){
@@ -260,6 +307,9 @@ void CplexInternal::evaluate(int nfdir, int nadir){
     else if (solnstat == CPX_STAT_NUM_BEST){
       errormsg = string("CPLEX: solution status: Solution available, but not proved optimal due to numeric difficulties.\n");
     }
+    else if (solnstat == CPX_STAT_FIRSTORDER){
+      errormsg = string("CPLEX: solution status: Solution satisfies first-order optimality conditions, but is not necessarily globally optimal.\n");
+    }
     else{
       errormsg = string("CPLEX: solution status: ") + to_string(solnstat) + string("\n");
     }
@@ -272,6 +322,11 @@ void CplexInternal::evaluate(int nfdir, int nadir){
   }
   if (solnstat != CPX_STAT_OPTIMAL){
 //    throw CasadiException(errormsg.c_str());
+  }
+
+  // Next time we warm start
+  if (bool(getOption("warm_start"))){
+    is_warm_ = true;
   }
 
 }

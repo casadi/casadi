@@ -63,44 +63,27 @@ private:
    * 4 -> Barrier 
    * 5 -> Sifting
    * 6 -> Concurent
+   * 7 -> Crossover
    */
+  /// Stores which QP algorithm to use
   int qp_method_;
   /// Print to file (for later use)
   bool dump_to_file_;
-  
-//  /// Filaname to use when printing
-//  char* dump_filename_;
-
+  /// Indicates if we have to warm-start
+  bool is_warm_;
   /// Print debug messages
   bool debug_;
-  
   /// Accuracy
   double tol_;
-//
-//  /// Dense storage for H
-//  std::vector<double> h_data_;
-//
-//  /// Dense storage for A
-//  std::vector<double> a_data_;
-//
-//  /// Storage for dual variables
-//  std::vector<double> dual_;
-//  
   /// Number of variables
   int NUMCOLS_;
-
   /// Number of constrains (altogether)
   int NUMROWS_;
-  
   /// Nature of problem (always minimization)
   int objsen_;
   
   /// Linear term of objective
   double* obj_;
-  /// Right-hand side of constraints
-  std::vector<double> rhs_;
-  /// Range of constraints
-  std::vector<double> rngval_;
 
   /// Determines relation >,<,= in the lin. constraints
   std::vector<char> sense_;
@@ -110,7 +93,12 @@ private:
   std::vector<int> matcnt_;
   std::vector<int> matind_;
   std::vector<double> matval_;
-//
+
+  /// Right-hand side of constraints
+  std::vector<double> rhs_;
+  /// Range of constraints
+  std::vector<double> rngval_;
+
   /// Simple bounds on x
   double  *lb_;
   double  *ub_;
@@ -121,25 +109,15 @@ private:
   std::vector<int> qmatind_;
   std::vector<double> qmatval_;
   
-  /// Storage for optimal solution
-//  std::vector<double> xopt_;
-//  std::vector<double> lambA_;
+  /// Storage for basis info of primal variables
+  std::vector<int> cstat_;
+  /// Storage for basis info of slack variables
+  std::vector<int> rstat_;
 
-//
-//  /// Other things I do not know
-//  double* dj;
-//  double* slack;
-//
-//  // CPLEX-specific things
+  /// CPLEX-environment
   CPXENVptr env_;
   CPXLPptr lp_;
-
-  // Data for vectors
-  //std::vector<double> g;
-
-
 };
-
 } // end namespace CasADi
 
 #endif //CPLEX_INTERNAL_HPP
