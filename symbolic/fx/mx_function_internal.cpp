@@ -461,14 +461,12 @@ void MXFunctionInternal::updatePointers(const AlgEl& el, int nfwd, int nadj){
 void MXFunctionInternal::evaluate(int nfdir, int nadir){
   log("MXFunctionInternal::evaluate begin");
 
-#if 0
   // Make sure that there are no free variables
   if (!free_vars_.empty()) {
     std::stringstream ss;
     repr(ss);
     casadi_error("Cannot evaluate \"" << ss.str() << "\" since variables " << free_vars_ << " are free.");
   }
-#endif
   
   // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
   for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
