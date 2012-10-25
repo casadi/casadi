@@ -9844,6 +9844,10 @@ Constructor using sparsity patterns. ";
 
 Destructor. ";
 
+%feature("docstring")  CasADi::CplexInternal::freeCplex "
+
+Free Cplex memory. ";
+
 %feature("docstring")  CasADi::CplexInternal::init "
 
 Initialize Initialize and make the object ready for setting arguments and
@@ -68042,11 +68046,6 @@ Joel Andersson
 |              |              |              | experimental |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| live_variabl | OT_BOOLEAN   | true         | Reuse        | CasADi::SXFu |
-| es           |              |              | variables in | nctionIntern |
-|              |              |              | the work     | al           |
-|              |              |              | vector       |              |
-+--------------+--------------+--------------+--------------+--------------+
 | max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
 | f_adj_dir    |              |              | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
@@ -68865,11 +68864,6 @@ Joel Andersson
 |              |              |              | evaluation ( |              |
 |              |              |              | experimental |              |
 |              |              |              | )            |              |
-+--------------+--------------+--------------+--------------+--------------+
-| live_variabl | OT_BOOLEAN   | true         | Reuse        | CasADi::SXFu |
-| es           |              |              | variables in | nctionIntern |
-|              |              |              | the work     | al           |
-|              |              |              | vector       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
 | f_adj_dir    |              |              | r_of_adj_dir | ternal       |
