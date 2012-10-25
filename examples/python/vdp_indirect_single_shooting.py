@@ -108,7 +108,6 @@ F = MXFunction([l_init],[inner_prod(l_init,l_init)])
 
 # Allocate NLP solver
 solver = IpoptSolver(F,G)
-solver.setOption("generate_hessian",True)
 
 # Initialize the NLP solver
 solver.init()
