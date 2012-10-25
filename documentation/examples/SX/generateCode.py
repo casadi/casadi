@@ -44,3 +44,6 @@ print f
 #! The generateCode method will insert this node-by-node evaluation in exported C code
 f.generateCode("generateCode.txt")
 
+#! This is how the exported code looks like:
+print file('generateCode.txt').read()
+
