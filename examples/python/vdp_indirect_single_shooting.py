@@ -95,7 +95,7 @@ l_init = msym("l_init",2)
 X = vertcat((x_init,l_init))
 
 # Call the integrator
-X,_,_,_ = I.call([X])
+X,_,_,_ = I.call(integratorIn(x0=X))
 
 # Costate at the final time
 lam_f = X[2:4]
