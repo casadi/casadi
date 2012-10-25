@@ -74,34 +74,45 @@ rhs_in = list(daeIn(x=vertcat((x,lam))))
 rhs_in[DAE_T] = t
 rhs = SXFunction(rhs_in,daeOut(ode=f))
 
+# Augmented DAE state dimension
+nX = 4
+
+# End time
+tf = 10.0
+
+# Number of shooting nodes
+num_nodes = 20
+
 # Create an integrator (CVodes)
 I = CVodesIntegrator(rhs)
 I.setOption("abstol",1e-8) # abs. tolerance
 I.setOption("reltol",1e-8) # rel. tolerance
 I.setOption("t0",0.0)
-I.setOption("tf",10.0)
+I.setOption("tf",tf/num_nodes)
 I.init()
 
-# The initial state
-x_init = NP.array([0.,1.])
+# Variables in the root finding problem
+NV = nX*(num_nodes+1)
+V = msym("V",NV)
 
-# The initial costate
-l_init = msym("l_init",2)
+# Get the state at each shooting node
+X = []
+v_offset = 0
+for k in range(num_nodes+1):
+  X.append(V[v_offset:v_offset+nX])
+  v_offset = v_offset+nX
 
-# The initial condition for the shooting
-X = vertcat((x_init,l_init))
-
-# Call the integrator
-X,_,_,_ = I.call(integratorIn(x0=X))
-
-# Costate at the final time
-lam_f = X[2:4]
+# Formulate the root finding problem
+G = []
+for k in range(num_nodes):
+  XF,_,_,_ = I.call(integratorIn(x0=X[k]))
+  G.append(XF-X[k+1])
 
 # Terminal constraints: lam = 0
-G = MXFunction([l_init],[lam_f])
+G = MXFunction([V],[vertcat(G)])
 
 # Dummy objective function (there are no degrees of freedom)
-F = MXFunction([l_init],[inner_prod(l_init,l_init)])
+F = MXFunction([V],[0])
 
 # Allocate NLP solver
 solver = IpoptSolver(F,G)
@@ -110,30 +121,31 @@ solver = IpoptSolver(F,G)
 solver.init()
 
 # Set bounds and initial guess
-solver.setInput([-inf,-inf], NLP_LBX)
-solver.setInput([ inf, inf], NLP_UBX)
-solver.setInput([   0,   0], NLP_X_INIT)
-solver.setInput([   0,   0], NLP_LBG)
-solver.setInput([   0,   0], NLP_UBG)
+solver.setInput([   0,   1,-inf,-inf] + (num_nodes-1)*[-inf,-inf,-inf,-inf] + [-inf,-inf,   0,   0], NLP_LBX)
+solver.setInput([   0,   1, inf, inf] + (num_nodes-1)*[ inf, inf, inf, inf] + [ inf, inf,   0,   0], NLP_UBX)
+solver.setInput([   0,   0,   0,   0] + (num_nodes-1)*[   0,   0,   0,   0] + [   0,   0,   0,   0], NLP_X_INIT)
+solver.setInput(num_nodes*[0,0,0,0], NLP_LBG)
+solver.setInput(num_nodes*[0,0,0,0], NLP_UBG)
 
 # Solve the problem
 solver.solve()
 
-# Retrieve the optimal solution
-l_init_opt = NP.array(solver.output(NLP_X_OPT).data())
-
 # Time grid for visualization
-tgrid = NP.linspace(0,10,100)
+tgrid = NP.linspace(0,tf,100)
 
 # Output functions
 output_fcn = SXFunction(rhs_in,[x0,x1,u_opt])
+
+# Increase the end time for the integrator
+I.setOption("tf",tf)
+I.init()
 
 # Simulator to get optimal state and control trajectories
 simulator = Simulator(I, output_fcn, tgrid)
 simulator.init()
 
 # Pass initial conditions to the simulator
-simulator.setInput(NP.concatenate((x_init,l_init_opt)),INTEGRATOR_X0)
+simulator.setInput(solver.output(NLP_X_OPT)[0:4],INTEGRATOR_X0)
 
 # Simulate to get the trajectories
 simulator.evaluate()
@@ -149,8 +161,15 @@ plt.clf()
 plt.plot(tgrid,x_opt,'--')
 plt.plot(tgrid,y_opt,'-')
 plt.plot(tgrid,u_opt,'-.')
-plt.title("Van der Pol optimization - indirect single shooting")
+plt.title("Van der Pol optimization - indirect multiple shooting")
 plt.xlabel('time')
 plt.legend(['x trajectory','y trajectory','u trajectory'])
 plt.grid()
 plt.show()
+
+
+
+
+
+
+
