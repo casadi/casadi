@@ -119,15 +119,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -987,15 +987,15 @@ thus x := [xd,xa]
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -1642,15 +1642,15 @@ Assert that the object has been initialized. ";
 | max_num_iter | OT_INTEGER   |              |              | CasADi::Acad |
 | ations       |              |              |              | oOCPInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -2384,15 +2384,15 @@ Return a string with a destription (for SWIG) ";
 | max_num_iter | OT_INTEGER   |              |              | CasADi::Acad |
 | ations       |              |              |              | oOCPInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -3495,15 +3495,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -4182,15 +4182,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -4772,15 +4772,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -5595,15 +5595,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -6473,15 +6473,15 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -7191,15 +7191,15 @@ Assert that the object has been initialized. ";
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -8100,15 +8100,15 @@ Joris Gillis
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -8990,15 +8990,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -9585,8 +9585,13 @@ If H is not positive-definite, the solver should throw an error.
 |              |              |              | barrier      |              |
 |              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| debug        | OT_BOOLEAN   | false        | Print debug  | CasADi::Cple |
-|              |              |              | information  | xInternal    |
+| convex       | OT_BOOLEAN   | true         | Indicates if | CasADi::Cple |
+|              |              |              | the QP is    | xInternal    |
+|              |              |              | convex or    |              |
+|              |              |              | not (affects |              |
+|              |              |              | only the     |              |
+|              |              |              | barrier      |              |
+|              |              |              | method).     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | dump_filenam | OT_STRING    | \"qp.dat\"     | The filename | CasADi::Cple |
 | e            |              |              | to dump to.  | xInternal    |
@@ -9620,15 +9625,15 @@ If H is not positive-definite, the solver should throw an error.
 |              |              |              | experimental |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -9734,6 +9739,15 @@ If H is not positive-definite, the solver should throw an error.
 |              |              |              | evaluation   | ternal       |
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+| warm_start   | OT_BOOLEAN   | false        | Use warm     | CasADi::Cple |
+|              |              |              | start with   | xInternal    |
+|              |              |              | simplex      |              |
+|              |              |              | methods      |              |
+|              |              |              | (affects     |              |
+|              |              |              | only the     |              |
+|              |              |              | simplex      |              |
+|              |              |              | methods).    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 C++ includes: cplex_internal.hpp ";
@@ -10191,8 +10205,13 @@ Attila Kozma, Joel Andersson
 |              |              |              | barrier      |              |
 |              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| debug        | OT_BOOLEAN   | false        | Print debug  | CasADi::Cple |
-|              |              |              | information  | xInternal    |
+| convex       | OT_BOOLEAN   | true         | Indicates if | CasADi::Cple |
+|              |              |              | the QP is    | xInternal    |
+|              |              |              | convex or    |              |
+|              |              |              | not (affects |              |
+|              |              |              | only the     |              |
+|              |              |              | barrier      |              |
+|              |              |              | method).     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | dump_filenam | OT_STRING    | \"qp.dat\"     | The filename | CasADi::Cple |
 | e            |              |              | to dump to.  | xInternal    |
@@ -10226,15 +10245,15 @@ Attila Kozma, Joel Andersson
 |              |              |              | experimental |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -10340,6 +10359,15 @@ Attila Kozma, Joel Andersson
 |              |              |              | evaluation   | ternal       |
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+| warm_start   | OT_BOOLEAN   | false        | Use warm     | CasADi::Cple |
+|              |              |              | start with   | xInternal    |
+|              |              |              | simplex      |              |
+|              |              |              | methods      |              |
+|              |              |              | (affects     |              |
+|              |              |              | only the     |              |
+|              |              |              | simplex      |              |
+|              |              |              | methods).    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
 C++ includes: cplex_solver.hpp ";
@@ -11647,15 +11675,15 @@ therefore more expensive if A is invariant.
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -12348,15 +12376,15 @@ Solves the linear system A.x = b for x
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -13131,15 +13159,15 @@ times t_i.
 |              |              |              | integrator   |              |
 |              |              |              | steps        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -14214,15 +14242,15 @@ quadrature state at the initial time (INTEGRATOR_RQF=3)
 |              |              |              | integrator   |              |
 |              |              |              | steps        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -15072,15 +15100,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -15755,15 +15783,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -16456,15 +16484,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -17137,15 +17165,15 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -18016,15 +18044,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -18731,15 +18759,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -19949,15 +19977,15 @@ Joel Andersson
 |              |              |              | integrator   |              |
 |              |              |              | steps        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -21086,15 +21114,15 @@ two parts, the differential states and the quadrature states, i.e. x = [y,q]
 |              |              |              | integrator   |              |
 |              |              |              | steps        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -21787,15 +21815,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -22464,15 +22492,15 @@ Internal class.
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -23289,15 +23317,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -24099,15 +24127,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -24793,15 +24821,15 @@ Assert that the object has been initialized. ";
 |              |              |              | the linear   |              |
 |              |              |              | solver       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -25465,15 +25493,15 @@ Joel Andersson
 |              |              |              | the linear   |              |
 |              |              |              | solver       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -27554,14 +27582,14 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::Ipop |
+| max_number_o | OT_INTEGER   | 64           | Allow \"numbe | CasADi::Ipop |
 | f_adj_dir    |              |              | r_of_adj_dir | tInternal    |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::Ipop |
+| max_number_o | OT_INTEGER   | 64           | Allow \"numbe | CasADi::Ipop |
 | f_fwd_dir    |              |              | r_of_fwd_dir | tInternal    |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
@@ -30938,14 +30966,14 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::Ipop |
+| max_number_o | OT_INTEGER   | 64           | Allow \"numbe | CasADi::Ipop |
 | f_adj_dir    |              |              | r_of_adj_dir | tInternal    |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::Ipop |
+| max_number_o | OT_INTEGER   | 64           | Allow \"numbe | CasADi::Ipop |
 | f_fwd_dir    |              |              | r_of_fwd_dir | tInternal    |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
@@ -33246,15 +33274,15 @@ Retrieve information about variables and constraints ";
 | max_krylov   | OT_INTEGER   | 0            |              | CasADi::Kins |
 |              |              |              |              | olInternal   |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -33881,15 +33909,15 @@ See:   ImplicitFunction for more information
 | max_krylov   | OT_INTEGER   | 0            |              | CasADi::Kins |
 |              |              |              |              | olInternal   |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -34970,15 +34998,15 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -35763,15 +35791,15 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -36556,15 +36584,15 @@ therefore more expensive if A is invariant.
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -37265,15 +37293,15 @@ Internal class.
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -37814,15 +37842,15 @@ therefore more expensive if A is invariant.
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -38515,15 +38543,15 @@ Internal class.
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -39173,15 +39201,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -40111,15 +40139,15 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -40856,15 +40884,15 @@ n: number of decision variables (x)     m: number of constraints (A)
 | lifted       | OT_BOOLEAN   | true         |              | CasADi::Lift |
 |              |              |              |              | optInternal  |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -41520,15 +41548,15 @@ n: number of decision variables (x)     m: number of constraints (A)
 | lifted       | OT_BOOLEAN   | true         |              | CasADi::Lift |
 |              |              |              |              | optInternal  |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -42262,15 +42290,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -42955,15 +42983,15 @@ Internal class Solves the linear system A.x = b for x
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -44914,15 +44942,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -45795,15 +45823,15 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -47655,15 +47683,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -48414,15 +48442,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -49284,15 +49312,15 @@ If H is not positive-definite, the solver should throw an error.
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -49859,15 +49887,15 @@ Joris Gillis
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -50675,15 +50703,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -51523,15 +51551,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -53547,15 +53575,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -54315,15 +54343,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -54991,15 +55019,15 @@ If H is not positive-definite, the solver should throw an error.
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -55594,15 +55622,15 @@ reInit();
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -56787,15 +56815,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -57497,15 +57525,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -58126,14 +58154,14 @@ If H is not positive-definite, the solver should throw an error.
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::QPOa |
+| max_number_o | OT_INTEGER   | 64           | Allow \"numbe | CasADi::QPOa |
 | f_adj_dir    |              |              | r_of_adj_dir | sesInternal  |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::QPOa |
+| max_number_o | OT_INTEGER   | 64           | Allow \"numbe | CasADi::QPOa |
 | f_fwd_dir    |              |              | r_of_fwd_dir | sesInternal  |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
@@ -58717,14 +58745,14 @@ Joris Gillis, Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::QPOa |
+| max_number_o | OT_INTEGER   | 64           | Allow \"numbe | CasADi::QPOa |
 | f_adj_dir    |              |              | r_of_adj_dir | sesInternal  |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::QPOa |
+| max_number_o | OT_INTEGER   | 64           | Allow \"numbe | CasADi::QPOa |
 | f_fwd_dir    |              |              | r_of_fwd_dir | sesInternal  |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
@@ -59466,15 +59494,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -60186,15 +60214,15 @@ Internal class.
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -60846,15 +60874,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -61674,15 +61702,15 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -62652,15 +62680,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -63389,15 +63417,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -64326,15 +64354,15 @@ Assert that the object has been initialized. ";
 |              |              |              | L-BFGS       | nternal      |
 |              |              |              | memory.      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -65098,15 +65126,15 @@ Joel Andersson and Attila Kozma
 |              |              |              | L-BFGS       | nternal      |
 |              |              |              | memory.      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -66121,15 +66149,15 @@ Constructor. ";
 |              |              |              | integrator   |              |
 |              |              |              | steps        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -67097,15 +67125,15 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | integrator   |              |
 |              |              |              | steps        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -68046,15 +68074,15 @@ Joel Andersson
 |              |              |              | experimental |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -68865,15 +68893,15 @@ Joel Andersson
 |              |              |              | experimental |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
@@ -71689,14 +71717,14 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::Worh |
+| max_number_o | OT_INTEGER   | 64           | Allow \"numbe | CasADi::Worh |
 | f_adj_dir    |              |              | r_of_adj_dir | pInternal    |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::Worh |
+| max_number_o | OT_INTEGER   | 64           | Allow \"numbe | CasADi::Worh |
 | f_fwd_dir    |              |              | r_of_fwd_dir | pInternal    |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
@@ -73109,14 +73137,14 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::Worh |
+| max_number_o | OT_INTEGER   | 64           | Allow \"numbe | CasADi::Worh |
 | f_adj_dir    |              |              | r_of_adj_dir | pInternal    |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::Worh |
+| max_number_o | OT_INTEGER   | 64           | Allow \"numbe | CasADi::Worh |
 | f_fwd_dir    |              |              | r_of_fwd_dir | pInternal    |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
@@ -73887,15 +73915,15 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_adj_dir    |              |              | r_of_adj_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_number_o | OT_INTEGER   | 100          | Allow \"numbe | CasADi::FXIn |
-| f_fwd_dir    |              |              | r_of_fwd_dir | ternal       |
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
 |              |              |              | \" to grow    |              |
 |              |              |              | until it     |              |
 |              |              |              | reaches this |              |
