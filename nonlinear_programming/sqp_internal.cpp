@@ -209,20 +209,18 @@ void SQPInternal::evaluate(int nfdir, int nadir){
         const vector<int>& col = Bk.col();
         const vector<double>& data = Bk.data();
         double reg_param = 0;
-        double mineig;
         for(int i=0; i<rowind.size()-1; ++i){
-          double radius = 0;
+          double mineig = 0;
           for(int el=rowind[i]; el<rowind[i+1]; ++el){
             int j = col[el];
-            if(i != j){
-              radius += fabs(data[el]);
+            if(i == j){
+              mineig += data[el];
+            } else {
+              mineig -= fabs(data[el]);
             }
   //          cout << "(" << r << "," << col[el] << "): " << data[el] << endl; 
           }
-          mineig = Bk(i, i).elem(0) - radius;
-          if (mineig < reg_param){
-            reg_param = mineig;
-          }
+          reg_param = fmin(reg_param,mineig);
         }
   //      cout << "Regularization parameter: " << -reg_param << endl;
         if ( reg_param < 0.){
