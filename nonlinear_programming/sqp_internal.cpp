@@ -106,13 +106,29 @@ void SQPInternal::init(){
   
   // Lagrange gradient in the next iterate
   gLag_.resize(n_);
+
+  // Current linearization point, default: initial guess
+  x_.resize(n_);
+
+  // Previous linearization point
+  x_old_.resize(n_);
+
+  // Candidate
+  x_cand_.resize(n_);
 }
 
 void SQPInternal::evaluate(int nfdir, int nadir){
   casadi_assert(nfdir==0 && nadir==0);
   
   checkInitialBounds();
-    
+  
+  // Get problem data
+  const vector<double>& x_init = input(NLP_X_INIT).data();
+  const vector<double>& lbx = input(NLP_LBX).data();
+  const vector<double>& ubx = input(NLP_UBX).data();
+  const vector<double>& lbg = input(NLP_LBG).data();
+  const vector<double>& ubg = input(NLP_UBG).data();
+  
   // Set the static parameter
   if (parametric_) {
     if (!F_.isNull()) F_.setInput(input(NLP_P),F_.getNumInputs()-1);
@@ -120,11 +136,10 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     if (!H_.isNull()) H_.setInput(input(NLP_P),H_.getNumInputs()-1);
     if (!J_.isNull()) J_.setInput(input(NLP_P),J_.getNumInputs()-1);
   }
+    
+  // Current linearization point, default: initial guess
+  copy(x_init.begin(),x_init.end(),x_.begin());
   
-  // Actual linearization point, default: initial guess
-  DMatrix x = input(NLP_X_INIT);
-  // Previous linearization point
-  DMatrix x_old;
   // Actual correction
   DMatrix p;
   // Initial guess for Lagrange Hessian
@@ -184,7 +199,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     // Evaluating Hessian if needed
     if (getOption("hessian_approximation") == "exact") {
       int n_hess_in = H_.getNumInputs() - (parametric_ ? 1 : 0);
-      H_.setInput(x);
+      H_.setInput(x_);
       if(n_hess_in>1){
         H_.setInput(mu_, n_hess_in == 4 ? 2 : 1);
         H_.setInput(1, n_hess_in == 4 ? 3 : 2);
@@ -231,30 +246,30 @@ void SQPInternal::evaluate(int nfdir, int nadir){
 
     if(m_>0){
       // Evaluate the constraint function
-      G_.setInput(x);
+      G_.setInput(x_);
       G_.evaluate();
       gk = G_.output();
       
       if (monitored("eval_g")) {
-        cout << "(main loop) x = " << G_.input().data() << endl;
+        cout << "(main loop) x = " << x_ << endl;
         cout << "(main loop) G = " << endl;
         G_.output().printSparse();
       }
       
       // Evaluate the constraint Jacobian
-      J_.setInput(x);
+      J_.setInput(x_);
       J_.evaluate();
       Jgk = J_.output();
 
       if (monitored("eval_jac_g")) {
-        cout << "(main loop) x = " << J_.input().data() << endl;
+        cout << "(main loop) x = " << x_ << endl;
         cout << "(main loop) J = " << endl;
         J_.output().printSparse();
       }
     }
     
     // Evaluate the gradient of the objective function
-    F_.setInput(x);
+    F_.setInput(x_);
     F_.setAdjSeed(1.0);
     F_.evaluate(0,1);
     F_.getOutput(fk);
@@ -262,14 +277,14 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     // Gradient of objective
     const DMatrix& gfk = F_.adjSens();
     
-    if (monitored("eval_f")) {
-      cout << "(main loop) x = " << F_.input().data() << endl;
+    if (monitored("eval_f")){
+      cout << "(main loop) x = " << x_ << endl;
       cout << "(main loop) F = " << endl;
       F_.output().printSparse();
     }
     
     if (monitored("eval_grad_f")) {
-      cout << "(main loop) x = " << F_.input().data() << endl;
+      cout << "(main loop) x = " << x_ << endl;
       cout << "(main loop) gradF = " << endl;
       gfk.printSparse();
     }
@@ -290,8 +305,8 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       qp_solver_.setInput(input(NLP_UBG)-gk,QP_UBA);
     }
 
-    qp_solver_.setInput(input(NLP_LBX)-x,QP_LBX);
-    qp_solver_.setInput(input(NLP_UBX)-x,QP_UBX);
+    transform(lbx.begin(),lbx.end(),x_.begin(),qp_solver_.input(QP_LBX).begin(),minus<double>());
+    transform(ubx.begin(),ubx.end(),x_.begin(),qp_solver_.input(QP_UBX).begin(),minus<double>());
     
     if (monitored("qp")) {
       cout << "(main loop) QP_H = " << endl;
@@ -349,11 +364,11 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     double l1_infeas = 0.;
     for(int j=0; j<m_; ++j){
       // Left-hand side violated
-      if (input(NLP_LBG).elem(j) - gk.elem(j) > 0.){
-        l1_infeas += input(NLP_LBG).elem(j) - gk.elem(j);
+      if(lbg[j] - gk.elem(j) > 0.){
+        l1_infeas += lbg[j] - gk.elem(j);
       }
-      else if (gk.elem(j) - input(NLP_UBG).elem(j) > 0.){
-        l1_infeas += gk.elem(j) - input(NLP_UBG).elem(j);
+      else if (gk.elem(j) - ubg[j] > 0.){
+        l1_infeas += gk.elem(j) - ubg[j];
       }
     }
 
@@ -372,8 +387,6 @@ void SQPInternal::evaluate(int nfdir, int nadir){
 
     // Default stepsize
     double t = 1.0;   
-    // Candidate 
-    DMatrix x_cand;
     DMatrix gk_cand;
     double fk_cand;
     // Merit function value in candidate
@@ -382,25 +395,25 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     // Line-search loop
     int ls_counter = 1;
     while (true){
-      x_cand = x + t * p; 
+      for(int i=0; i<n_; ++i) x_cand_[i] = x_[i] + t * p.at(i); 
       // Evaluating objective and constraints
-      F_.setInput(x_cand);
+      F_.setInput(x_cand_);
       F_.evaluate();
-      fk_cand = F_.output().elem(0);
+      F_.getOutput(fk_cand);
       l1_infeas = 0.;
       if (!G_.isNull()){
-        G_.setInput(x_cand);
+        G_.setInput(x_cand_);
         G_.evaluate();  
         gk_cand = G_.output();
 
         // Calculating merit-function in candidate
         for(int j=0; j<m_; ++j){
           // Left-hand side violated
-          if (input(NLP_LBG).elem(j) - gk_cand.elem(j) > 0.){
-            l1_infeas += input(NLP_LBG).elem(j) - gk_cand.elem(j);
+          if (lbg[j] - gk_cand.elem(j) > 0.){
+            l1_infeas += lbg[j] - gk_cand.elem(j);
           }
-          else if (gk_cand.elem(j) - input(NLP_UBG).elem(j) > 0.){
-            l1_infeas += gk_cand.elem(j) - input(NLP_UBG).elem(j);
+          else if (gk_cand.elem(j) - ubg[j] > 0.){
+            l1_infeas += gk_cand.elem(j) - ubg[j];
           }
         }
       }
@@ -428,21 +441,21 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       ++ls_counter;
     }
     // Candidate accepted
-    x_old = x;
-    x = x_cand;
+    copy(x_.begin(),x_.end(),x_old_.begin());
+    copy(x_cand_.begin(),x_cand_.end(),x_.begin());
     fk = fk_cand;
     gk = gk_cand;
     for(int i=0; i<m_; ++i) mu_[i] = t * mu_qp[i] + (1 - t) * mu_[i];
     for(int i=0; i<n_; ++i) mu_x_[i] = t * mu_x_qp[i] + (1 - t) * mu_x_[i];
 
     // Evaluating objective gradient
-    F_.setInput(x);
+    F_.setInput(x_);
     F_.setAdjSeed(1.0);
     F_.evaluate(0, 1);
     F_.getAdjSens(gLag_); 
 
     // Adjoint derivative of constraint function
-    if (!G_.isNull()){
+    if(m_>0){
       G_.setAdjSeed(mu_);
       G_.evaluate(0, 1);
       transform(gLag_.begin(),gLag_.end(),G_.adjSens().begin(),gLag_.begin(),plus<double>()); // gLag_ += G_.adjSens()
@@ -450,12 +463,12 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     transform(gLag_.begin(),gLag_.end(),mu_x_.begin(),gLag_.begin(),plus<double>()); // gLag_ += mu_x_;
 
     DMatrix gLag_old_bfgs;
-    F_.setInput(x_old);
+    F_.setInput(x_old_);
     F_.setAdjSeed(1.0);
     F_.evaluate(0, 1);
     gLag_old_bfgs = F_.adjSens();
     if (!G_.isNull()){
-      G_.setInput(x_old);
+      G_.setInput(x_old_);
       G_.setAdjSeed(mu_);
       G_.evaluate(0, 1);
       gLag_old_bfgs += G_.adjSens();
@@ -467,7 +480,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       if (it_counter % lbfgs_memory_ == 0){
         Bk = diag(diag(Bk));
       }
-      DMatrix sk = x - x_old;
+      DMatrix sk = DMatrix(x_) - DMatrix(x_old_);
       DMatrix yk = gLag_ - gLag_old_bfgs;
       DMatrix qk = mul(Bk, sk);
       // Calculating theta
@@ -491,32 +504,32 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       // Nonlinear constraints
       for(int j=0; j<m_; ++j){
         // Equality
-        if (input(NLP_UBG).elem(j) - input(NLP_LBG).elem(j) < 1E-20){
-          pr_infG += fabs(gk_cand.elem(j) - input(NLP_LBG).elem(j));
+        if (ubg[j] - lbg[j] < 1E-20){
+          pr_infG += fabs(gk_cand.elem(j) - lbg[j]);
         }
         // Inequality, left-hand side violated
-        else if(input(NLP_LBG).elem(j) - gk_cand.elem(j) > 0.){
-          pr_infG += input(NLP_LBG).elem(j) - gk_cand.elem(j);
+        else if(lbg[j] - gk_cand.elem(j) > 0.){
+          pr_infG += lbg[j] - gk_cand.elem(j);
         }
         // Inequality, right-hand side violated
-        else if(gk_cand.elem(j) - input(NLP_UBG).elem(j) > 0.){
-          pr_infG += gk_cand.elem(j) - input(NLP_UBG).elem(j);
+        else if(gk_cand.elem(j) - ubg[j] > 0.){
+          pr_infG += gk_cand.elem(j) - ubg[j];
           //cout << color << "SQP: " << mu.elem(j) << defcol << endl;
         }
       }
       // Bound constraints
       for(int j=0; j<n_; ++j){
         // Equality
-        if (input(NLP_UBX).elem(j) - input(NLP_LBX).elem(j) < 1E-20){
-          pr_infx += fabs(x.elem(j) - input(NLP_LBX).elem(j));
+        if (ubx[j] - lbx[j] < 1E-20){
+          pr_infx += fabs(x_[j] - lbx[j]);
         }
         // Inequality, left-hand side violated
-        else if ( input(NLP_LBX).elem(j) - x.elem(j) > 0.){
-          pr_infx += input(NLP_LBX).elem(j) - x.elem(j);
+        else if ( lbx[j] - x_[j] > 0.){
+          pr_infx += lbx[j] - x_[j];
         }
         // Inequality, right-hand side violated
-        else if ( x.elem(j) - input(NLP_UBX).elem(j) > 0.){
-          pr_infx += x.elem(j) - input(NLP_UBX).elem(j);
+        else if ( x_[j] - ubx[j] > 0.){
+          pr_infx += x_[j] - ubx[j];
         }
       }
     }
@@ -546,7 +559,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     if (!callback_.isNull()) {
       callback_.input(NLP_X_OPT).set(fk);
       callback_.input(NLP_COST).set(fk);
-      callback_.input(NLP_X_OPT).set(x);
+      callback_.input(NLP_X_OPT).set(x_);
       callback_.input(NLP_LAMBDA_G).set(mu_);
       callback_.input(NLP_LAMBDA_X).set(mu_x_);
       callback_.input(NLP_G).set(gk);
@@ -572,7 +585,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   }
   
   output(NLP_COST).set(fk);
-  output(NLP_X_OPT).set(x);
+  output(NLP_X_OPT).set(x_);
   output(NLP_LAMBDA_G).set(mu_);
   output(NLP_LAMBDA_X).set(mu_x_);
   output(NLP_G).set(gk);

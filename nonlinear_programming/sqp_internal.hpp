@@ -59,6 +59,7 @@ public:
   double beta_;
   int maxiter_ls_;
   int merit_memsize_;
+  //@}
 
   /// Access QPSolver
   const QPSolver getQPSolver() const { return qp_solver_;}
@@ -68,7 +69,15 @@ public:
   
   /// Lagrange gradient in the next iterate
   std::vector<double> gLag_;
-  //@}
+  
+  /// Current linearization point
+  std::vector<double> x_;
+  
+  /// Previous linearization point
+  std::vector<double> x_old_;
+  
+  /// Candidate 
+  std::vector<double> x_cand_;
 };
 
 } // namespace CasADi
