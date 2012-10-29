@@ -107,14 +107,14 @@ void SQPInternal::init(){
   // Lagrange gradient in the next iterate
   gLag_.resize(n_);
 
-  // Current linearization point, default: initial guess
+  // Current linearization point
   x_.resize(n_);
-
-  // Previous linearization point
+  x_cand_.resize(n_);
   x_old_.resize(n_);
 
-  // Candidate
-  x_cand_.resize(n_);
+  // Constraint function value
+  gk_.resize(m_);
+  gk_cand_.resize(m_);
 }
 
 void SQPInternal::evaluate(int nfdir, int nadir){
@@ -124,7 +124,6 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   
   // Get problem data
   const vector<double>& x_init = input(NLP_X_INIT).data();
-  const vector<double>& p = input(NLP_P).data();
   const vector<double>& lbx = input(NLP_LBX).data();
   const vector<double>& ubx = input(NLP_UBX).data();
   const vector<double>& lbg = input(NLP_LBG).data();
@@ -132,26 +131,25 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   
   // Set the static parameter
   if (parametric_) {
+    const vector<double>& p = input(NLP_P).data();
     if (!F_.isNull()) F_.setInput(p,F_.getNumInputs()-1);
     if (!G_.isNull()) G_.setInput(p,G_.getNumInputs()-1);
     if (!H_.isNull()) H_.setInput(p,H_.getNumInputs()-1);
     if (!J_.isNull()) J_.setInput(p,J_.getNumInputs()-1);
   }
     
-  // Current linearization point, default: initial guess
+  // Set linearization point to initial guess
   copy(x_init.begin(),x_init.end(),x_.begin());
   
   // Initial guess for Lagrange Hessian
   DMatrix B0 = DMatrix::eye(n_);
+
   // Storage for Lagrange Hessian
   DMatrix Bk;
 
   // Cost function value
   double fk;
-  // Constraint function value
-  DMatrix gk;
-  // Constraint Jacobian
-  DMatrix Jgk;
+  
   // Lagrange multipliers of the NLP
   fill(mu_.begin(),mu_.end(),0);
   fill(mu_x_.begin(),mu_x_.end(),0);
@@ -245,7 +243,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       // Evaluate the constraint function
       G_.setInput(x_);
       G_.evaluate();
-      gk = G_.output();
+      G_.getOutput(gk_);
       
       if (monitored("eval_g")) {
         cout << "(main loop) x = " << x_ << endl;
@@ -256,7 +254,6 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       // Evaluate the constraint Jacobian
       J_.setInput(x_);
       J_.evaluate();
-      Jgk = J_.output();
 
       if (monitored("eval_jac_g")) {
         cout << "(main loop) x = " << x_ << endl;
@@ -295,9 +292,9 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     //qp_solver_.setInput(mu_qp, QP_LAMBDA_INIT);
       
     if(m_>0){
-      qp_solver_.setInput(Jgk,QP_A);
-      qp_solver_.setInput(input(NLP_LBG)-gk,QP_LBA);
-      qp_solver_.setInput(input(NLP_UBG)-gk,QP_UBA);
+      qp_solver_.setInput(J_.output(),QP_A);
+      transform(lbg.begin(),lbg.end(),gk_.begin(),qp_solver_.input(QP_LBA).begin(),minus<double>());
+      transform(ubg.begin(),ubg.end(),gk_.begin(),qp_solver_.input(QP_UBA).begin(),minus<double>());
     }
 
     transform(lbx.begin(),lbx.end(),x_.begin(),qp_solver_.input(QP_LBX).begin(),minus<double>());
@@ -358,19 +355,21 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     double l1_infeas = 0.;
     for(int j=0; j<m_; ++j){
       // Left-hand side violated
-      if(lbg[j] - gk.elem(j) > 0.){
-        l1_infeas += lbg[j] - gk.elem(j);
+      if(lbg[j] - gk_[j] > 0.){
+        l1_infeas += lbg[j] - gk_[j];
       }
-      else if (gk.elem(j) - ubg[j] > 0.){
-        l1_infeas += gk.elem(j) - ubg[j];
+      else if (gk_[j] - ubg[j] > 0.){
+        l1_infeas += gk_[j] - ubg[j];
       }
     }
 
     // Right-hand side of Armijo condition
     F_.setFwdSeed(dx);
     F_.evaluate(1, 0);
-
-    double L1dir = F_.fwdSens().elem(0) - sigma_ * l1_infeas;
+    double F_sens;
+    F_.getFwdSens(F_sens);
+    
+    double L1dir = F_sens - sigma_ * l1_infeas;
     double L1merit = fk + sigma_ * l1_infeas;
 
     // Storing the actual merit function value in a list
@@ -381,7 +380,6 @@ void SQPInternal::evaluate(int nfdir, int nadir){
 
     // Default stepsize
     double t = 1.0;   
-    DMatrix gk_cand;
     double fk_cand;
     // Merit function value in candidate
     double L1merit_cand = 0.;
@@ -397,17 +395,17 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       l1_infeas = 0.;
       if (!G_.isNull()){
         G_.setInput(x_cand_);
-        G_.evaluate();  
-        gk_cand = G_.output();
+        G_.evaluate();
+        G_.getOutput(gk_cand_);
 
         // Calculating merit-function in candidate
         for(int j=0; j<m_; ++j){
           // Left-hand side violated
-          if (lbg[j] - gk_cand.elem(j) > 0.){
-            l1_infeas += lbg[j] - gk_cand.elem(j);
+          if (lbg[j] - gk_cand_[j] > 0.){
+            l1_infeas += lbg[j] - gk_cand_[j];
           }
-          else if (gk_cand.elem(j) - ubg[j] > 0.){
-            l1_infeas += gk_cand.elem(j) - ubg[j];
+          else if (gk_cand_[j] - ubg[j] > 0.){
+            l1_infeas += gk_cand_[j] - ubg[j];
           }
         }
       }
@@ -438,7 +436,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     copy(x_.begin(),x_.end(),x_old_.begin());
     copy(x_cand_.begin(),x_cand_.end(),x_.begin());
     fk = fk_cand;
-    gk = gk_cand;
+    copy(gk_cand_.begin(),gk_cand_.end(),gk_.begin());
     for(int i=0; i<m_; ++i) mu_[i] = t * mu_qp[i] + (1 - t) * mu_[i];
     for(int i=0; i<n_; ++i) mu_x_[i] = t * mu_x_qp[i] + (1 - t) * mu_x_[i];
 
@@ -499,15 +497,15 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       for(int j=0; j<m_; ++j){
         // Equality
         if (ubg[j] - lbg[j] < 1E-20){
-          pr_infG += fabs(gk_cand.elem(j) - lbg[j]);
+          pr_infG += fabs(gk_cand_[j] - lbg[j]);
         }
         // Inequality, left-hand side violated
-        else if(lbg[j] - gk_cand.elem(j) > 0.){
-          pr_infG += lbg[j] - gk_cand.elem(j);
+        else if(lbg[j] - gk_cand_[j] > 0.){
+          pr_infG += lbg[j] - gk_cand_[j];
         }
         // Inequality, right-hand side violated
-        else if(gk_cand.elem(j) - ubg[j] > 0.){
-          pr_infG += gk_cand.elem(j) - ubg[j];
+        else if(gk_cand_[j] - ubg[j] > 0.){
+          pr_infG += gk_cand_[j] - ubg[j];
           //cout << color << "SQP: " << mu.elem(j) << defcol << endl;
         }
       }
@@ -560,7 +558,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       callback_.input(NLP_X_OPT).set(x_);
       callback_.input(NLP_LAMBDA_G).set(mu_);
       callback_.input(NLP_LAMBDA_X).set(mu_x_);
-      callback_.input(NLP_G).set(gk);
+      callback_.input(NLP_G).set(gk_);
       callback_.evaluate();
       
       if (callback_.output(0).at(0)) {
@@ -586,7 +584,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   output(NLP_X_OPT).set(x_);
   output(NLP_LAMBDA_G).set(mu_);
   output(NLP_LAMBDA_X).set(mu_x_);
-  output(NLP_G).set(gk);
+  output(NLP_G).set(gk_);
   
   // Save statistics
   stats_["iter_count"] = it_counter;

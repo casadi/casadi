@@ -76,8 +76,11 @@ public:
   /// Previous linearization point
   std::vector<double> x_old_;
   
-  /// Candidate 
+  /// x candidate 
   std::vector<double> x_cand_;
+
+  /// Constraint function value
+  std::vector<double> gk_, gk_cand_;
 };
 
 } // namespace CasADi
