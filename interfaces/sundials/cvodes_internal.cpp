@@ -494,12 +494,6 @@ void CVodesInternal::integrate(double t_out){
   // tolerance
   double ttol = 1e-9;
   if(fabs(t_-t_out)<ttol){
-    copy(input(INTEGRATOR_X0).begin(),input(INTEGRATOR_X0).end(),output(INTEGRATOR_XF).begin());
-    if(nsens_>0){
-      for(int i=0; i<nfdir_; ++i){
-        copy(fwdSeed(INTEGRATOR_X0,i).begin(),fwdSeed(INTEGRATOR_X0,i).end(),fwdSens(INTEGRATOR_XF,i).begin());
-      }
-    }
     return;
   }
   if(nrx_>0){
