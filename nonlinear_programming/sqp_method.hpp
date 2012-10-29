@@ -51,9 +51,9 @@ class SQPInternal;
   
   Nonlinear equalities can be introduced by setting LBG and UBG equal at the correct positions.
   
-  The method is still under development and should be used with cared
+  The method is still under development and should be used with care
   
-  \author Joel Andersson and Attila Kozma
+  \author Attila Kozma, Joel Andersson and Joris Gillis
   \date 2012
 */
 class SQPMethod : public NLPSolver {
