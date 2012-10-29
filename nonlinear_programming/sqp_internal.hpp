@@ -66,6 +66,8 @@ public:
   /// Lagrange multipliers of the NLP
   std::vector<double> mu_, mu_x_;
   
+  /// Lagrange gradient in the next iterate
+  std::vector<double> gLag_;
   //@}
 };
 

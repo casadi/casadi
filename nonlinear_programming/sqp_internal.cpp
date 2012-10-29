@@ -103,6 +103,9 @@ void SQPInternal::init(){
   // Lagrange multipliers of the NLP
   mu_.resize(m_);
   mu_x_.resize(n_);
+  
+  // Lagrange gradient in the next iterate
+  gLag_.resize(n_);
 }
 
 void SQPInternal::evaluate(int nfdir, int nadir){
@@ -140,9 +143,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   fill(mu_x_.begin(),mu_x_.end(),0);
 
   // Lagrange gradient in the next iterate
-  DMatrix gLag(n_, 1, 0.);
-  // Lagrange gradient in the actual iterate
-  DMatrix gLag_old;
+  fill(gLag_.begin(),gLag_.end(),0);
 
   // Initial Hessian approximation of BFGS
   if ( getOption("hessian_approximation") == "limited-memory") {
@@ -228,7 +229,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     // Use identity Hessian
     //Bk = DMatrix::eye(Bk.size1());
 
-    if (!G_.isNull()) {
+    if(m_>0){
       // Evaluate the constraint function
       G_.setInput(x);
       G_.evaluate();
@@ -256,7 +257,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     F_.setInput(x);
     F_.setAdjSeed(1.0);
     F_.evaluate(0,1);
-    fk = F_.output().at(0);
+    F_.getOutput(fk);
     
     // Gradient of objective
     const DMatrix& gfk = F_.adjSens();
@@ -283,14 +284,14 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       //qp_solver_.setInput(mu_qp, QP_LAMBDA_INIT);
     }
       
-    if (!G_.isNull()) {
+    if(m_>0){
       qp_solver_.setInput(Jgk,QP_A);
-      qp_solver_.setInput(-gk+input(NLP_LBG),QP_LBA);
-      qp_solver_.setInput(-gk+input(NLP_UBG),QP_UBA);
+      qp_solver_.setInput(input(NLP_LBG)-gk,QP_LBA);
+      qp_solver_.setInput(input(NLP_UBG)-gk,QP_UBA);
     }
 
-    qp_solver_.setInput(-x+input(NLP_LBX),QP_LBX);
-    qp_solver_.setInput(-x+input(NLP_UBX),QP_UBX);
+    qp_solver_.setInput(input(NLP_LBX)-x,QP_LBX);
+    qp_solver_.setInput(input(NLP_UBX)-x,QP_UBX);
     
     if (monitored("qp")) {
       cout << "(main loop) QP_H = " << endl;
@@ -434,21 +435,19 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     for(int i=0; i<m_; ++i) mu_[i] = t * mu_qp[i] + (1 - t) * mu_[i];
     for(int i=0; i<n_; ++i) mu_x_[i] = t * mu_x_qp[i] + (1 - t) * mu_x_[i];
 
-    // Calculating Lagrange gradient in the new iterate.
-    gLag_old = gLag;
     // Evaluating objective gradient
     F_.setInput(x);
     F_.setAdjSeed(1.0);
     F_.evaluate(0, 1);
-    gLag = F_.adjSens(); 
+    F_.getAdjSens(gLag_); 
 
     // Adjoint derivative of constraint function
     if (!G_.isNull()){
       G_.setAdjSeed(mu_);
       G_.evaluate(0, 1);
-      gLag += G_.adjSens();
+      transform(gLag_.begin(),gLag_.end(),G_.adjSens().begin(),gLag_.begin(),plus<double>()); // gLag_ += G_.adjSens()
     }
-    gLag += mu_x_;
+    transform(gLag_.begin(),gLag_.end(),mu_x_.begin(),gLag_.begin(),plus<double>()); // gLag_ += mu_x_;
 
     DMatrix gLag_old_bfgs;
     F_.setInput(x_old);
@@ -469,7 +468,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
         Bk = diag(diag(Bk));
       }
       DMatrix sk = x - x_old;
-      DMatrix yk = gLag - gLag_old_bfgs;
+      DMatrix yk = gLag_ - gLag_old_bfgs;
       DMatrix qk = mul(Bk, sk);
       // Calculating theta
       double omega = 1.;
@@ -523,6 +522,10 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     }
     double pr_inf = pr_infG + pr_infx;
     
+    // 1-norm of lagrange gradient
+    double gLag_norm1 = 0;
+    for(vector<double>::const_iterator it=gLag_.begin(); it!=gLag_.end(); ++it) gLag_norm1 += fabs(*it);
+    
     // Printing information about the actual iterate
     cout << setprecision(3);
     cout << "  ";
@@ -531,7 +534,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     cout << scientific;
     cout << fk_cand               << "     ";
     cout << pr_inf                << "     ";
-    cout << norm_1(gLag).elem(0)  << "     ";
+    cout << gLag_norm1            << "     ";
     cout << norm_1(p).elem(0)     << "     ";
     cout << t                     << "     ";
     char ls_success = (ls_counter == maxiter_ls_) ? 'F' :  ' ';
@@ -556,7 +559,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     }
 
     // Checking convergence criteria
-    if (pr_inf < tol_pr_ && norm_1(gLag).elem(0) < tol_du_){
+    if (pr_inf < tol_pr_ && gLag_norm1 < tol_du_){
       cout << "SQP: Convergence achieved after " << it_counter << " iterations.\n";
       break;
     }
