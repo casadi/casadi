@@ -100,10 +100,6 @@ void NLPImplicitInternal::init(){
 
   MXFunction NLP_g(args,f_.call(args_call)); NLP_g.init();
   
-  std::cout << args << std::endl;
-  std::cout << f_.call(args_call) << std::endl;
-  
-  
   // Create an nlpsolver instance
   NLPSolverCreator nlp_solvercreator = getOption("nlp_solver");
   nlp_solver_ = nlp_solvercreator(NLP_f,NLP_g,FX(),FX());
