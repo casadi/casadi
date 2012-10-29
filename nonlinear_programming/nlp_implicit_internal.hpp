@@ -53,7 +53,7 @@ public:
   virtual void evaluate(int nfdir, int nadir);
 
   protected:
-    NLPSolver nlpsolver_;
+    NLPSolver nlp_solver_;
 };
 
 } // namespace CasADi

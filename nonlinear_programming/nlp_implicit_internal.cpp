@@ -41,21 +41,84 @@ NLPImplicitInternal::NLPImplicitInternal(const FX& f, int nrhs) : ImplicitFuncti
   addOption("nlp_solver",       OT_NLPSOLVER, GenericType(), "The NLPSolver used to solve the implicit system.");
   addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLPSolver");
   
+
 }
 
 NLPImplicitInternal::~NLPImplicitInternal(){ 
 }
 
 void NLPImplicitInternal::evaluate(int nfdir, int nadir) {
-  throw CasadiException("NLPImplicitInternal::evaluate() not implemented yet");
+  if (nfdir!=0 || nadir!=0) throw CasadiException("NLPImplicitInternal::evaluate() not implemented for forward or backward mode");
+  
+  // Obtain initial guess
+  std::copy(output(0).begin(),output(0).end(),nlp_solver_.input(NLP_X_INIT).begin());
+  
+  // Add other arguments
+  int k = 0;
+  
+  for (int i=1;i<f_.getNumInputs();++i) {
+    std::copy(input(i-1).data().begin(),input(i-1).data().end(),nlp_solver_.input(NLP_P).data().begin()+k); k+= input(i-1).size();
+  }
+  
+  // Solve NLP
+  nlp_solver_.evaluate();
+
+  // Copy the outputs
+  std::copy(nlp_solver_.output(NLP_X_OPT).begin(),nlp_solver_.output(NLP_X_OPT).end(),output(0).begin());
+  
 }
 
 void NLPImplicitInternal::init(){
 
-  
   ImplicitFunctionInternal::init();
 
- 
+  casadi_assert_message(f_.getNumInputs()>0,"NLPImplicitInternal: the supplied f must have at least one input.");
+  
+  MX V = msym("V",f_.input().sparsity());
+  
+  std::vector< CRSSparsity > sps;
+  for (int k=1;k<f_.getNumInputs();++k)
+    sps.push_back(f_.input(k).sparsity());
+  
+  // So that we can pass it on to createParent
+  std::pair< MX, std::vector< MX > > mypair = createParent(sps);
+
+  // V groups all parameters in an MX
+  MX P(mypair.first);
+  std::vector< MX > inputs(mypair.second);
+  
+  // We're going to use two-argument objective and constraints to allow the use of parameters
+  std::vector< MX > args;
+  args.push_back(V);
+  args.push_back(P);
+    
+  MXFunction NLP_f(args,0); NLP_f.init();
+  
+  std::vector< MX > args_call;
+  args_call.push_back(V);
+  args_call.insert(args_call.end(),mypair.second.begin(),mypair.second.end());
+
+  MXFunction NLP_g(args,f_.call(args_call)); NLP_g.init();
+  
+  std::cout << args << std::endl;
+  std::cout << f_.call(args_call) << std::endl;
+  
+  
+  // Create an nlpsolver instance
+  NLPSolverCreator nlp_solvercreator = getOption("nlp_solver");
+  nlp_solver_ = nlp_solvercreator(NLP_f,NLP_g,FX(),FX());
+  if(hasSetOption("nlp_solver_options")){
+    nlp_solver_.setOption(getOption("nlp_solver_options"));
+  }
+  nlp_solver_.setOption("parametric",true);
+  
+  // Initialize the NLP solver
+  nlp_solver_.init();
+  
+  
+  nlp_solver_.input(NLP_LBG).setAll(0);
+  nlp_solver_.input(NLP_UBG).setAll(0);
+  
 }
 
 } // namespace CasADi
