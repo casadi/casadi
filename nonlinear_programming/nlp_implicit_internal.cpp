@@ -51,7 +51,7 @@ void NLPImplicitInternal::evaluate(int nfdir, int nadir) {
   if (nfdir!=0 || nadir!=0) throw CasadiException("NLPImplicitInternal::evaluate() not implemented for forward or backward mode");
   
   // Obtain initial guess
-  std::copy(output(0).begin(),output(0).end(),nlp_solver_.input(NLP_X_INIT).begin());
+  nlp_solver_.input(NLP_X_INIT).set(output(0));
   
   // Add other arguments
   int k = 0;
@@ -64,7 +64,12 @@ void NLPImplicitInternal::evaluate(int nfdir, int nadir) {
   nlp_solver_.evaluate();
 
   // Copy the outputs
-  std::copy(nlp_solver_.output(NLP_X_OPT).begin(),nlp_solver_.output(NLP_X_OPT).end(),output(0).begin());
+  output(0).set(nlp_solver_.output(NLP_X_OPT));
+  
+  // Save auxillary outputs
+  for(int i=1; i<getNumOutputs(); ++i){
+    output(i).set(f_.output(i));
+  }
   
 }
 
