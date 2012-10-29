@@ -63,6 +63,9 @@ public:
   /// Access QPSolver
   const QPSolver getQPSolver() const { return qp_solver_;}
   
+  /// Lagrange multipliers of the NLP
+  std::vector<double> mu_, mu_x_;
+  
   //@}
 };
 

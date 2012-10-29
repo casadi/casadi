@@ -99,6 +99,10 @@ void SQPInternal::init(){
     qp_solver_.setOption(qp_solver_options);
   }
   qp_solver_.init();
+  
+  // Lagrange multipliers of the NLP
+  mu_.resize(m_);
+  mu_x_.resize(n_);
 }
 
 void SQPInternal::evaluate(int nfdir, int nadir){
@@ -132,11 +136,8 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   // Constraint Jacobian
   DMatrix Jgk;
   // Lagrange multipliers of the NLP
-  DMatrix mu(m_, 1, 0.); 
-  DMatrix mu_x(n_, 1, 0.);
-  // Lagrange multiplers of the QP
-  DMatrix mu_qp(m_, 1, 0.);
-  DMatrix mu_x_qp(n_, 1, 0.);
+  fill(mu_.begin(),mu_.end(),0);
+  fill(mu_x_.begin(),mu_x_.end(),0);
 
   // Lagrange gradient in the next iterate
   DMatrix gLag(n_, 1, 0.);
@@ -184,7 +185,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       int n_hess_in = H_.getNumInputs() - (parametric_ ? 1 : 0);
       H_.setInput(x);
       if(n_hess_in>1){
-        H_.setInput(mu, n_hess_in == 4 ? 2 : 1);
+        H_.setInput(mu_, n_hess_in == 4 ? 2 : 1);
         H_.setInput(1, n_hess_in == 4 ? 3 : 2);
       }
       H_.evaluate();
@@ -194,21 +195,19 @@ void SQPInternal::evaluate(int nfdir, int nadir){
         vector<int> rowind,col;
         Bk.sparsity().getSparsityCRS(rowind, col);
         std::vector<double>& data = Bk.data();
-        int i, j;
         double radius;
         double reg_param = 0;
         double mineig;
-        for(int r=0; r<rowind.size()-1; ++r){
+        for(int i=0; i<rowind.size()-1; ++i){
           radius = 0;
-          for(int el=rowind[r]; el<rowind[r+1]; ++el){
-            i = r;
-            j = col[el];
-            if (i != j){
+          for(int el=rowind[i]; el<rowind[i+1]; ++el){
+            int j = col[el];
+            if(i != j){
               radius += fabs(data[el]);
             }
   //          cout << "(" << r << "," << col[el] << "): " << data[el] << endl; 
           }
-          mineig = Bk(r, r).elem(0) - radius;
+          mineig = Bk(i, i).elem(0) - radius;
           if (mineig < reg_param){
             reg_param = mineig;
           }
@@ -330,18 +329,18 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     
     
     // Get the dual solution for the inequalities
-    mu_qp = qp_solver_.output(QP_LAMBDA_A);
-    mu_x_qp = qp_solver_.output(QP_LAMBDA_X);
+    const vector<double>& mu_qp = qp_solver_.output(QP_LAMBDA_A).data();
+    const vector<double>& mu_x_qp = qp_solver_.output(QP_LAMBDA_X).data();
 
     // Calculate penalty parameter of merit function
-    for(int j = 0; j < m_; ++j){
-      if( fabs(mu_qp.elem(j)) > sigma_){
-        sigma_ = fabs(mu_qp.elem(j)) * 1.01;
+    for(int j=0; j<m_; ++j){
+      if( fabs(mu_qp[j]) > sigma_){
+        sigma_ = fabs(mu_qp[j]) * 1.01;
       }
     }
 //    for(int j = 0; j < n; ++j){
-//      if( fabs(mu_x_qp.elem(j)) > sigma_){
-//        sigma_ = fabs(mu_x_qp.elem(j)) * 1.01;
+//      if( fabs(mu_x_qp[j]) > sigma_){
+//        sigma_ = fabs(mu_x_qp[j]) * 1.01;
 //      }
 //    }
 
@@ -432,8 +431,8 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     x = x_cand;
     fk = fk_cand;
     gk = gk_cand;
-    mu = t * mu_qp + (1 - t) * mu;
-    mu_x = t * mu_x_qp + (1 - t) * mu_x;
+    for(int i=0; i<m_; ++i) mu_[i] = t * mu_qp[i] + (1 - t) * mu_[i];
+    for(int i=0; i<n_; ++i) mu_x_[i] = t * mu_x_qp[i] + (1 - t) * mu_x_[i];
 
     // Calculating Lagrange gradient in the new iterate.
     gLag_old = gLag;
@@ -445,11 +444,11 @@ void SQPInternal::evaluate(int nfdir, int nadir){
 
     // Adjoint derivative of constraint function
     if (!G_.isNull()){
-      G_.setAdjSeed(mu);
+      G_.setAdjSeed(mu_);
       G_.evaluate(0, 1);
       gLag += G_.adjSens();
     }
-    gLag += mu_x;
+    gLag += mu_x_;
 
     DMatrix gLag_old_bfgs;
     F_.setInput(x_old);
@@ -458,11 +457,11 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     gLag_old_bfgs = F_.adjSens();
     if (!G_.isNull()){
       G_.setInput(x_old);
-      G_.setAdjSeed(mu);
+      G_.setAdjSeed(mu_);
       G_.evaluate(0, 1);
       gLag_old_bfgs += G_.adjSens();
     }
-    gLag_old_bfgs += mu_x;
+    gLag_old_bfgs += mu_x_;
 
     // Updating Lagrange Hessian if needed. (BFGS with careful updates and restarts)
     if (getOption("hessian_approximation") == "limited-memory") { 
@@ -545,8 +544,8 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       callback_.input(NLP_X_OPT).set(fk);
       callback_.input(NLP_COST).set(fk);
       callback_.input(NLP_X_OPT).set(x);
-      callback_.input(NLP_LAMBDA_G).set(mu);
-      callback_.input(NLP_LAMBDA_X).set(mu_x);
+      callback_.input(NLP_LAMBDA_G).set(mu_);
+      callback_.input(NLP_LAMBDA_X).set(mu_x_);
       callback_.input(NLP_G).set(gk);
       callback_.evaluate();
       
@@ -571,8 +570,8 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   
   output(NLP_COST).set(fk);
   output(NLP_X_OPT).set(x);
-  output(NLP_LAMBDA_G).set(mu);
-  output(NLP_LAMBDA_X).set(mu_x);
+  output(NLP_LAMBDA_G).set(mu_);
+  output(NLP_LAMBDA_X).set(mu_x_);
   output(NLP_G).set(gk);
   
   // Save statistics
