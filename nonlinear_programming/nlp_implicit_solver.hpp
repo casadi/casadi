@@ -20,52 +20,52 @@
  *
  */
 
-#ifndef IMPLICIT_FUNCTION_HPP
-#define IMPLICIT_FUNCTION_HPP
+#ifndef NLP_IMPLICIT_SOLVER_HPP
+#define NLP_IMPLICIT_SOLVER_HPP
 
-#include "fx.hpp"
+#include "symbolic/fx/implicit_function.hpp"
 
-namespace CasADi{
-// Forward declaration of internal class
-class ImplicitFunctionInternal;
+namespace CasADi {
+  
+  
+// Forward declaration of internal class 
+class NLPImplicitInternal;
 
-/** Abstract base class for the implicit function classes
- \defgroup ImplicitFunction_doc
+  /** \brief Use an NLPSolver as ImplicitFunction solver 
 
-  The equation:
-  
-  F(z, x1, x2, ..., xn) == 0
-  
-  where d_F/dz is invertable, implicitly defines the equation:
-  
-  z := G(x1, x2, ..., xn)
-  
-  
-  
-  F should be an FX mapping from (n+1) inputs to 1 output.
-  ImplicitFunction (G) is an FX mapping from n inputs to 1 output. 
-  
-  n may be zero.
-  
-  You can provide an initial guess for z by setting output(0) of ImplicitFunction.
-  
-\author Joel Andersson
-\date 2011
-*/
-class ImplicitFunction : public FX{
+   @copydoc ImplicitFunction_doc
+      
+   \author Joris Gillis
+   \date 2012
+  */
+class NLPImplicitSolver : public ImplicitFunction {
 public:
-  
-  /// Access functions of the node
-  ImplicitFunctionInternal* operator->();
 
-  /// Const access functions of the node
-  const ImplicitFunctionInternal* operator->() const;
+  /** \brief  Default constructor */
+  NLPImplicitSolver();
+  
+  explicit NLPImplicitSolver(const FX& f, int nrhs=1);
+  
+  /** \brief  Access functions of the node */
+  NLPImplicitInternal* operator->();
+  const NLPImplicitInternal* operator->() const;
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
+  
+  /// Static creator function
+  #ifdef SWIG
+  %callback("%s_cb");
+  #endif
+  static ImplicitFunction creator(const FX& f, int nrhs=1){ return NLPImplicitSolver(f,nrhs);}
+  #ifdef SWIG
+  %nocallback;
+  #endif
+
 };
+
 
 } // namespace CasADi
 
-#endif //IMPLICIT_FUNCTION_HPP
+#endif //NLP_IMPLICIT_SOLVER_HPP
 

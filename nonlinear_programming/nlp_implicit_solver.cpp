@@ -20,18 +20,31 @@
  *
  */
 
-%{
-#include "nonlinear_programming/symbolic_nlp.hpp"
-#include "nonlinear_programming/sqp_method.hpp"
-#include "nonlinear_programming/ip_method.hpp"
-#include "nonlinear_programming/lifted_sqp.hpp"
-#include "nonlinear_programming/nlp_qp_solver.hpp"
-#include "nonlinear_programming/nlp_implicit_solver.hpp"
-%}
+#include "nlp_implicit_internal.hpp"
+#include "nlp_implicit_solver.hpp"
 
-%include "nonlinear_programming/symbolic_nlp.hpp"
-%include "nonlinear_programming/sqp_method.hpp"
-%include "nonlinear_programming/ip_method.hpp"
-%include "nonlinear_programming/lifted_sqp.hpp"
-%include "nonlinear_programming/nlp_qp_solver.hpp"
-%include "nonlinear_programming/nlp_implicit_solver.hpp"
+using namespace std;
+namespace CasADi{
+
+NLPImplicitSolver::NLPImplicitSolver(){ 
+}
+
+
+NLPImplicitSolver::NLPImplicitSolver(const FX& f, int nrhs)  {
+  assignNode(new NLPImplicitInternal(f,nrhs));
+}
+
+NLPImplicitInternal* NLPImplicitSolver::operator->(){
+  return (NLPImplicitInternal*)(FX::operator->());
+}
+
+const NLPImplicitInternal* NLPImplicitSolver::operator->() const{
+  return (const NLPImplicitInternal*)(FX::operator->());
+
+}
+
+bool NLPImplicitSolver::checkNode() const{
+  return dynamic_cast<const NLPImplicitInternal*>(get());
+}
+
+} // namespace CasADi

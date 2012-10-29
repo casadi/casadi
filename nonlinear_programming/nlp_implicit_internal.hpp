@@ -20,52 +20,43 @@
  *
  */
 
-#ifndef IMPLICIT_FUNCTION_HPP
-#define IMPLICIT_FUNCTION_HPP
+#ifndef NLP_IMPLICIT_INTERNAL_HPP
+#define NLP_IMPLICIT_INTERNAL_HPP
 
-#include "fx.hpp"
+#include "symbolic/fx/implicit_function_internal.hpp"
+#include "symbolic/fx/nlp_solver.hpp"
 
 namespace CasADi{
-// Forward declaration of internal class
-class ImplicitFunctionInternal;
 
-/** Abstract base class for the implicit function classes
- \defgroup ImplicitFunction_doc
-
-  The equation:
-  
-  F(z, x1, x2, ..., xn) == 0
-  
-  where d_F/dz is invertable, implicitly defines the equation:
-  
-  z := G(x1, x2, ..., xn)
-  
-  
-  
-  F should be an FX mapping from (n+1) inputs to 1 output.
-  ImplicitFunction (G) is an FX mapping from n inputs to 1 output. 
-  
-  n may be zero.
-  
-  You can provide an initial guess for z by setting output(0) of ImplicitFunction.
-  
-\author Joel Andersson
-\date 2011
-*/
-class ImplicitFunction : public FX{
+  /** \brief Internal class for NLPImplicitInternal
+   * 
+      @copydoc ImplicitFunction_doc
+   * */
+class NLPImplicitInternal : public ImplicitFunctionInternal {
+  friend class NLPImplicitSolver;
 public:
+  /** \brief  Constructor */
+  explicit NLPImplicitInternal();
+
+  /** \brief  Clone */
+  virtual NLPImplicitInternal* clone() const;
   
-  /// Access functions of the node
-  ImplicitFunctionInternal* operator->();
+  /** \brief  Create a new Solver */
+  explicit NLPImplicitInternal(const FX& f, int nrhs=1);
 
-  /// Const access functions of the node
-  const ImplicitFunctionInternal* operator->() const;
+  /** \brief  Destructor */
+  virtual ~NLPImplicitInternal();
 
-  /// Check if the node is pointing to the right type of object
-  virtual bool checkNode() const;
+  /** \brief  Initialize */
+  virtual void init();
+  
+  virtual void evaluate(int nfdir, int nadir);
+
+  protected:
+    NLPSolver nlpsolver_;
 };
 
 } // namespace CasADi
 
-#endif //IMPLICIT_FUNCTION_HPP
+#endif //NLP_IMPLICIT_INTERNAL_HPP
 

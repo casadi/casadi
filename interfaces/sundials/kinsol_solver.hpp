@@ -33,6 +33,8 @@ class KinsolInternal;
 
 /** \brief Kinsol solver class
 *
+*
+* @copydoc ImplicitFunction_doc
 * You can provide an initial guess by setting output(0).\n
 * A good initial guess may be needed to avoid errors like "The linear solver's setup function failed in an unrecoverable manner."
 *
