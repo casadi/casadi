@@ -81,6 +81,11 @@ public:
 
   /// Constraint function value
   std::vector<double> gk_, gk_cand_;
+  
+  /// BFGS update function
+  enum{ BFGS_BK, BFGS_X, BFGS_X_OLD, BFGS_GLAG, BFGS_GLAG_OLD, BFGS_NUM_IN}; 
+  FX bfgs_;
+  
 };
 
 } // namespace CasADi

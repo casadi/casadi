@@ -115,6 +115,40 @@ void SQPInternal::init(){
   // Constraint function value
   gk_.resize(m_);
   gk_cand_.resize(m_);
+  
+  // Create Hessian update function
+  if(getOption("hessian_approximation") == "limited-memory"){
+    // Create expressions corresponding to Bk, x, x_old, gLag and gLag_old
+    SXMatrix Bk = ssym("Bk",H_sparsity);
+    SXMatrix x = ssym("x",input(NLP_X_INIT).sparsity());
+    SXMatrix x_old = ssym("x",x.sparsity());
+    SXMatrix gLag = ssym("gLag",x.sparsity());
+    SXMatrix gLag_old = ssym("gLag_old",x.sparsity());
+    
+    SXMatrix sk = x - x_old;
+    SXMatrix yk = gLag - gLag_old;
+    SXMatrix qk = mul(Bk, sk);
+    
+    // Calculating theta
+    SXMatrix skBksk = inner_prod(sk, qk);
+    SXMatrix omega = if_else(inner_prod(yk, sk) < 0.2 * inner_prod(sk, qk),
+                             0.8 * skBksk / (skBksk - inner_prod(sk, yk)),
+                             1);
+    yk = omega * yk + (1 - omega) * qk;
+    SXMatrix theta = 1. / inner_prod(sk, yk);
+    SXMatrix phi = 1. / inner_prod(qk, sk);
+    SXMatrix Bk_new = Bk + theta * mul(yk, trans(yk)) - phi * mul(qk, trans(qk));
+    
+    // Inputs of the BFGS update function
+    vector<SXMatrix> bfgs_in(BFGS_NUM_IN);
+    bfgs_in[BFGS_BK] = Bk;
+    bfgs_in[BFGS_X] = x;
+    bfgs_in[BFGS_X_OLD] = x_old;
+    bfgs_in[BFGS_GLAG] = gLag;
+    bfgs_in[BFGS_GLAG_OLD] = gLag_old;
+    bfgs_ = SXFunction(bfgs_in,Bk_new);
+    bfgs_.init();
+  }
 }
 
 void SQPInternal::evaluate(int nfdir, int nadir){
@@ -468,23 +502,32 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     // Updating Lagrange Hessian if needed. (BFGS with careful updates and restarts)
     if (getOption("hessian_approximation") == "limited-memory") { 
       if (it_counter % lbfgs_memory_ == 0){
-        Bk = diag(diag(Bk));
+        // Remove off-diagonal entries
+        const vector<int>& rowind = Bk.rowind();
+        const vector<int>& col = Bk.col();
+        vector<double>& data = Bk.data();
+        for(int i=0; i<rowind.size()-1; ++i){
+          for(int el=rowind[i]; el<rowind[i+1]; ++el){
+            int j = col[el];
+            if(i!=j){
+              data[el] = 0;
+            }
+          }
+        }
       }
-      DMatrix sk = DMatrix(x_) - DMatrix(x_old_);
-      DMatrix yk = gLag_ - gLag_old_bfgs;
-      DMatrix qk = mul(Bk, sk);
-      // Calculating theta
-      double omega = 1.;
-      if (inner_prod(yk, sk).at(0) < 0.2 * inner_prod(sk, qk).at(0) ){
-        double skBksk = inner_prod(sk, qk).at(0);
-        omega = 0.8 * skBksk / (skBksk - inner_prod(sk, yk).at(0)); 
-      }
-      yk = omega * yk + (1 - omega) * qk;
-
-      double theta = 1. / inner_prod(sk, yk).at(0);
-      double phi = 1. / inner_prod(qk, sk).at(0);
-      Bk = Bk + theta * mul(yk, yk.trans()) - phi * mul(qk, qk.trans());
-
+      
+      // Pass to BFGS update function
+      bfgs_.setInput(Bk,BFGS_BK);
+      bfgs_.setInput(x_,BFGS_X);
+      bfgs_.setInput(x_old_,BFGS_X_OLD);
+      bfgs_.setInput(gLag_,BFGS_GLAG);
+      bfgs_.setInput(gLag_old_bfgs,BFGS_GLAG_OLD);
+      
+      // Update the Hessian approximation
+      bfgs_.evaluate();
+      
+      // Get the updated Hessian
+      bfgs_.getOutput(Bk);
     }
     // Calculating optimality criterion
     // Primal infeasability
