@@ -67,18 +67,15 @@ public:
   /// Lagrange multipliers of the NLP
   std::vector<double> mu_, mu_x_;
   
+  /// Current cost function value
+  double fk_;
+  
+  /// Current and previous linearization point and candidate
+  std::vector<double> x_, x_old_, x_cand_;
+  
   /// Lagrange gradient in the next iterate
-  std::vector<double> gLag_;
+  std::vector<double> gLag_, gLag_old_;
   
-  /// Current linearization point
-  std::vector<double> x_;
-  
-  /// Previous linearization point
-  std::vector<double> x_old_;
-  
-  /// x candidate 
-  std::vector<double> x_cand_;
-
   /// Constraint function value
   std::vector<double> gk_, gk_cand_;
   
@@ -86,6 +83,8 @@ public:
   enum{ BFGS_BK, BFGS_X, BFGS_X_OLD, BFGS_GLAG, BFGS_GLAG_OLD, BFGS_NUM_IN}; 
   FX bfgs_;
   
+  /// Current Hessian approximation
+  DMatrix Bk_;
 };
 
 } // namespace CasADi

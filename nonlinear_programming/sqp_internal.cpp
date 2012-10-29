@@ -106,6 +106,7 @@ void SQPInternal::init(){
   
   // Lagrange gradient in the next iterate
   gLag_.resize(n_);
+  gLag_old_.resize(n_);
 
   // Current linearization point
   x_.resize(n_);
@@ -115,6 +116,9 @@ void SQPInternal::init(){
   // Constraint function value
   gk_.resize(m_);
   gk_cand_.resize(m_);
+  
+  // Hessian approximation
+  Bk_ = DMatrix(H_sparsity);
   
   // Create Hessian update function
   if(getOption("hessian_approximation") == "limited-memory"){
@@ -147,6 +151,8 @@ void SQPInternal::init(){
     bfgs_in[BFGS_GLAG] = gLag;
     bfgs_in[BFGS_GLAG_OLD] = gLag_old;
     bfgs_ = SXFunction(bfgs_in,Bk_new);
+    bfgs_.setOption("number_of_fwd_dir",0);
+    bfgs_.setOption("number_of_adj_dir",0);
     bfgs_.init();
   }
 }
@@ -175,15 +181,6 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   // Set linearization point to initial guess
   copy(x_init.begin(),x_init.end(),x_.begin());
   
-  // Initial guess for Lagrange Hessian
-  DMatrix B0 = DMatrix::eye(n_);
-
-  // Storage for Lagrange Hessian
-  DMatrix Bk;
-
-  // Cost function value
-  double fk;
-  
   // Lagrange multipliers of the NLP
   fill(mu_.begin(),mu_.end(),0);
   fill(mu_x_.begin(),mu_x_.end(),0);
@@ -193,13 +190,12 @@ void SQPInternal::evaluate(int nfdir, int nadir){
 
   // Initial Hessian approximation of BFGS
   if ( getOption("hessian_approximation") == "limited-memory") {
-    Bk = DMatrix::eye(n_);
-    makeDense(Bk);
+    Bk_.set(DMatrix::eye(n_));
   }
 
   if (monitored("eval_h")) {
     cout << "(pre) B = " << endl;
-    Bk.printSparse();
+    Bk_.printSparse();
   }
     
   double inf = numeric_limits<double>::infinity();
@@ -236,12 +232,12 @@ void SQPInternal::evaluate(int nfdir, int nadir){
         H_.setInput(1, n_hess_in == 4 ? 3 : 2);
       }
       H_.evaluate();
-      Bk = H_.output();
+      H_.getOutput(Bk_);
       // Determing regularization parameter with Gershgorin theorem
       if (bool(getOption("regularize"))){
-        const vector<int>& rowind = Bk.rowind();
-        const vector<int>& col = Bk.col();
-        const vector<double>& data = Bk.data();
+        const vector<int>& rowind = Bk_.rowind();
+        const vector<int>& col = Bk_.col();
+        vector<double>& data = Bk_.data();
         double reg_param = 0;
         for(int i=0; i<rowind.size()-1; ++i){
           double mineig = 0;
@@ -258,15 +254,20 @@ void SQPInternal::evaluate(int nfdir, int nadir){
         }
   //      cout << "Regularization parameter: " << -reg_param << endl;
         if ( reg_param < 0.){
-          Bk += -reg_param * DMatrix::eye(Bk.size1());
-        } else{
-          Bk += 0. * DMatrix::eye(Bk.size1());
+          for(int i=0; i<rowind.size()-1; ++i){
+            for(int el=rowind[i]; el<rowind[i+1]; ++el){
+              int j = col[el];
+              if(i==j){
+                data[el] += -reg_param;
+              }
+            }
+          }
         }
       }
     }
     if (monitored("eval_h")) {
       cout << "(main loop) B = " << endl;
-      Bk.printSparse();
+      Bk_.printSparse();
     }
     // Use identity Hessian
     //Bk = DMatrix::eye(Bk.size1());
@@ -298,7 +299,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     F_.setInput(x_);
     F_.setAdjSeed(1.0);
     F_.evaluate(0,1);
-    F_.getOutput(fk);
+    F_.getOutput(fk_);
     
     // Gradient of objective
     const DMatrix& gfk = F_.adjSens();
@@ -316,7 +317,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     }
     
     // Pass data to QP solver
-    qp_solver_.setInput(Bk, QP_H);
+    qp_solver_.setInput(Bk_, QP_H);
     qp_solver_.setInput(gfk,QP_G);
     // Hot-starting if possible
     qp_solver_.setInput(qp_solver_.output(QP_PRIMAL), QP_X_INIT);
@@ -362,7 +363,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
 //    if ((norm_2(p) / norm_2(x)).at(0) > 500.){
 //      casadi_warning("Search direction has very large values, indefinite Hessian might have ouccured.");
 //    }
-    double gain = inner_prod(DMatrix(dx), mul(Bk, DMatrix(dx))).at(0);
+    double gain = inner_prod(DMatrix(dx), mul(Bk_, DMatrix(dx))).at(0); // FIXME
     if (gain < 0){
       casadi_warning("Indefinite Hessian detected...");
     }
@@ -402,7 +403,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     F_.getFwdSens(F_sens);
     
     double L1dir = F_sens - sigma_ * l1_infeas;
-    double L1merit = fk + sigma_ * l1_infeas;
+    double L1merit = fk_ + sigma_ * l1_infeas;
 
     // Storing the actual merit function value in a list
     merit_mem.push_back(L1merit);
@@ -467,7 +468,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     // Candidate accepted
     copy(x_.begin(),x_.end(),x_old_.begin());
     copy(x_cand_.begin(),x_cand_.end(),x_.begin());
-    fk = fk_cand;
+    fk_ = fk_cand;
     copy(gk_cand_.begin(),gk_cand_.end(),gk_.begin());
     for(int i=0; i<m_; ++i) mu_[i] = t * mu_qp[i] + (1 - t) * mu_[i];
     for(int i=0; i<n_; ++i) mu_x_[i] = t * mu_x_qp[i] + (1 - t) * mu_x_[i];
@@ -486,26 +487,25 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     }
     transform(gLag_.begin(),gLag_.end(),mu_x_.begin(),gLag_.begin(),plus<double>()); // gLag_ += mu_x_;
 
-    DMatrix gLag_old_bfgs;
     F_.setInput(x_old_);
     F_.setAdjSeed(1.0);
     F_.evaluate(0, 1);
-    gLag_old_bfgs = F_.adjSens();
-    if (!G_.isNull()){
+    F_.getAdjSens(gLag_old_);
+    if(m_>0){
       G_.setInput(x_old_);
       G_.setAdjSeed(mu_);
       G_.evaluate(0, 1);
-      gLag_old_bfgs += G_.adjSens();
+      transform(gLag_old_.begin(),gLag_old_.end(),G_.adjSens().begin(),gLag_old_.begin(),plus<double>()); // gLag_old_ += G_.adjSens();
     }
-    gLag_old_bfgs += mu_x_;
+    transform(gLag_old_.begin(),gLag_old_.end(),mu_x_.begin(),gLag_old_.begin(),plus<double>()); // gLag_old += mu_x_;
 
     // Updating Lagrange Hessian if needed. (BFGS with careful updates and restarts)
     if (getOption("hessian_approximation") == "limited-memory") { 
       if (it_counter % lbfgs_memory_ == 0){
         // Remove off-diagonal entries
-        const vector<int>& rowind = Bk.rowind();
-        const vector<int>& col = Bk.col();
-        vector<double>& data = Bk.data();
+        const vector<int>& rowind = Bk_.rowind();
+        const vector<int>& col = Bk_.col();
+        vector<double>& data = Bk_.data();
         for(int i=0; i<rowind.size()-1; ++i){
           for(int el=rowind[i]; el<rowind[i+1]; ++el){
             int j = col[el];
@@ -517,17 +517,17 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       }
       
       // Pass to BFGS update function
-      bfgs_.setInput(Bk,BFGS_BK);
+      bfgs_.setInput(Bk_,BFGS_BK);
       bfgs_.setInput(x_,BFGS_X);
       bfgs_.setInput(x_old_,BFGS_X_OLD);
       bfgs_.setInput(gLag_,BFGS_GLAG);
-      bfgs_.setInput(gLag_old_bfgs,BFGS_GLAG_OLD);
+      bfgs_.setInput(gLag_old_,BFGS_GLAG_OLD);
       
       // Update the Hessian approximation
       bfgs_.evaluate();
       
       // Get the updated Hessian
-      bfgs_.getOutput(Bk);
+      bfgs_.getOutput(Bk_);
     }
     // Calculating optimality criterion
     // Primal infeasability
@@ -594,8 +594,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     
     // Call callback function if present
     if (!callback_.isNull()) {
-      callback_.input(NLP_X_OPT).set(fk);
-      callback_.input(NLP_COST).set(fk);
+      callback_.input(NLP_COST).set(fk_);
       callback_.input(NLP_X_OPT).set(x_);
       callback_.input(NLP_LAMBDA_G).set(mu_);
       callback_.input(NLP_LAMBDA_X).set(mu_x_);
@@ -621,7 +620,8 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     ++it_counter;
   }
   
-  output(NLP_COST).set(fk);
+  // Save results to outputs
+  output(NLP_COST).set(fk_);
   output(NLP_X_OPT).set(x_);
   output(NLP_LAMBDA_G).set(mu_);
   output(NLP_LAMBDA_X).set(mu_x_);
