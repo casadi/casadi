@@ -74,8 +74,6 @@ void SQPInternal::init(){
   tol_pr_ = getOption("tol_pr");
   tol_du_ = getOption("tol_du");
   
-  int n = input(NLP_X_INIT).size();
-  
   if (getOption("hessian_approximation")=="exact" && H_.isNull()) {
     if (!getOption("generate_hessian")){
       casadi_error("SQPInternal::evaluate: you set option 'hessian_approximation' to 'exact', but no hessian was supplied. Try with option \"generate_hessian\".");
@@ -88,9 +86,9 @@ void SQPInternal::init(){
   }
   
   // Allocate a QP solver
-  CRSSparsity H_sparsity = getOption("hessian_approximation")=="exact"? H_.output().sparsity() : sp_dense(n,n);
-  H_sparsity = H_sparsity + DMatrix::eye(n).sparsity();
-  CRSSparsity A_sparsity = J_.isNull() ? CRSSparsity(0,n,false) : J_.output().sparsity();
+  CRSSparsity H_sparsity = getOption("hessian_approximation")=="exact"? H_.output().sparsity() : sp_dense(n_,n_);
+  H_sparsity = H_sparsity + DMatrix::eye(n_).sparsity();
+  CRSSparsity A_sparsity = J_.isNull() ? CRSSparsity(0,n_,false) : J_.output().sparsity();
 
   QPSolverCreator qp_solver_creator = getOption("qp_solver");
   qp_solver_ = qp_solver_creator(H_sparsity,A_sparsity);
@@ -116,10 +114,6 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     if (!J_.isNull()) J_.setInput(input(NLP_P),J_.getNumInputs()-1);
   }
   
-  // Get dimensions
-  int m = G_.isNull() ? 0 : G_.output().size(); // Number of equality constraints
-  int n = input(NLP_X_INIT).size();  // Number of variables
-
   // Actual linearization point, default: initial guess
   DMatrix x = input(NLP_X_INIT);
   // Previous linearization point
@@ -127,33 +121,31 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   // Actual correction
   DMatrix p;
   // Initial guess for Lagrange Hessian
-  DMatrix B0 = DMatrix::eye(n);
+  DMatrix B0 = DMatrix::eye(n_);
   // Storage for Lagrange Hessian
   DMatrix Bk;
 
   // Cost function value
   double fk;
-  // Gradient of objective
-  DMatrix gfk;
   // Constraint function value
   DMatrix gk;
   // Constraint Jacobian
   DMatrix Jgk;
   // Lagrange multipliers of the NLP
-  DMatrix mu(m, 1, 0.); 
-  DMatrix mu_x(n, 1, 0.);
+  DMatrix mu(m_, 1, 0.); 
+  DMatrix mu_x(n_, 1, 0.);
   // Lagrange multiplers of the QP
-  DMatrix mu_qp(m, 1, 0.);
-  DMatrix mu_x_qp(n, 1, 0.);
+  DMatrix mu_qp(m_, 1, 0.);
+  DMatrix mu_x_qp(n_, 1, 0.);
 
   // Lagrange gradient in the next iterate
-  DMatrix gLag(n, 1, 0.);
+  DMatrix gLag(n_, 1, 0.);
   // Lagrange gradient in the actual iterate
   DMatrix gLag_old;
 
   // Initial Hessian approximation of BFGS
   if ( getOption("hessian_approximation") == "limited-memory") {
-    Bk = DMatrix::eye(n);
+    Bk = DMatrix::eye(n_);
     makeDense(Bk);
   }
 
@@ -266,7 +258,9 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     F_.setAdjSeed(1.0);
     F_.evaluate(0,1);
     fk = F_.output().at(0);
-    gfk = F_.adjSens();
+    
+    // Gradient of objective
+    const DMatrix& gfk = F_.adjSens();
     
     if (monitored("eval_f")) {
       cout << "(main loop) x = " << F_.input().data() << endl;
@@ -340,7 +334,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     mu_x_qp = qp_solver_.output(QP_LAMBDA_X);
 
     // Calculate penalty parameter of merit function
-    for(int j = 0; j < m; ++j){
+    for(int j = 0; j < m_; ++j){
       if( fabs(mu_qp.elem(j)) > sigma_){
         sigma_ = fabs(mu_qp.elem(j)) * 1.01;
       }
@@ -353,7 +347,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
 
     // Calculate L1-merit function in the actual iterate
     double l1_infeas = 0.;
-    for(int j = 0; j < m; ++j){
+    for(int j=0; j<m_; ++j){
       // Left-hand side violated
       if (input(NLP_LBG).elem(j) - gk.elem(j) > 0.){
         l1_infeas += input(NLP_LBG).elem(j) - gk.elem(j);
@@ -400,7 +394,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
         gk_cand = G_.output();
 
         // Calculating merit-function in candidate
-        for(int j = 0; j < m; ++j){
+        for(int j=0; j<m_; ++j){
           // Left-hand side violated
           if (input(NLP_LBG).elem(j) - gk_cand.elem(j) > 0.){
             l1_infeas += input(NLP_LBG).elem(j) - gk_cand.elem(j);
@@ -497,7 +491,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     double pr_infx = 0.;
     if (!G_.isNull()){
       // Nonlinear constraints
-      for(int j = 0; j < m; ++j){
+      for(int j=0; j<m_; ++j){
         // Equality
         if (input(NLP_UBG).elem(j) - input(NLP_LBG).elem(j) < 1E-20){
           pr_infG += fabs(gk_cand.elem(j) - input(NLP_LBG).elem(j));
@@ -513,7 +507,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
         }
       }
       // Bound constraints
-      for(int j = 0; j < n; ++j){
+      for(int j=0; j<n_; ++j){
         // Equality
         if (input(NLP_UBX).elem(j) - input(NLP_LBX).elem(j) < 1E-20){
           pr_infx += fabs(x.elem(j) - input(NLP_LBX).elem(j));
