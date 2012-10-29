@@ -196,7 +196,7 @@ class QPSolverTests(casadiTestCase):
     options = { "mutol": 1e-12, "artol": 1e-12, "tol":1e-12}
       
     for qpsolver, qp_options in qpsolvers:
-      self.message("general_convex: " + str(qpsolver))
+      self.message("general_nonconvex: " + str(qpsolver))
       if not("Cplex" in str(qpsolver)):
         continue
       solver = qpsolver(H.sparsity(),A.sparsity())
