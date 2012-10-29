@@ -124,6 +124,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   
   // Get problem data
   const vector<double>& x_init = input(NLP_X_INIT).data();
+  const vector<double>& p = input(NLP_P).data();
   const vector<double>& lbx = input(NLP_LBX).data();
   const vector<double>& ubx = input(NLP_UBX).data();
   const vector<double>& lbg = input(NLP_LBG).data();
@@ -131,17 +132,15 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   
   // Set the static parameter
   if (parametric_) {
-    if (!F_.isNull()) F_.setInput(input(NLP_P),F_.getNumInputs()-1);
-    if (!G_.isNull()) G_.setInput(input(NLP_P),G_.getNumInputs()-1);
-    if (!H_.isNull()) H_.setInput(input(NLP_P),H_.getNumInputs()-1);
-    if (!J_.isNull()) J_.setInput(input(NLP_P),J_.getNumInputs()-1);
+    if (!F_.isNull()) F_.setInput(p,F_.getNumInputs()-1);
+    if (!G_.isNull()) G_.setInput(p,G_.getNumInputs()-1);
+    if (!H_.isNull()) H_.setInput(p,H_.getNumInputs()-1);
+    if (!J_.isNull()) J_.setInput(p,J_.getNumInputs()-1);
   }
     
   // Current linearization point, default: initial guess
   copy(x_init.begin(),x_init.end(),x_.begin());
   
-  // Actual correction
-  DMatrix p;
   // Initial guess for Lagrange Hessian
   DMatrix B0 = DMatrix::eye(n_);
   // Storage for Lagrange Hessian
@@ -208,14 +207,13 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       Bk = H_.output();
       // Determing regularization parameter with Gershgorin theorem
       if (bool(getOption("regularize"))){
-        vector<int> rowind,col;
-        Bk.sparsity().getSparsityCRS(rowind, col);
-        std::vector<double>& data = Bk.data();
-        double radius;
+        const vector<int>& rowind = Bk.rowind();
+        const vector<int>& col = Bk.col();
+        const vector<double>& data = Bk.data();
         double reg_param = 0;
         double mineig;
         for(int i=0; i<rowind.size()-1; ++i){
-          radius = 0;
+          double radius = 0;
           for(int el=rowind[i]; el<rowind[i+1]; ++el){
             int j = col[el];
             if(i != j){
@@ -231,8 +229,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   //      cout << "Regularization parameter: " << -reg_param << endl;
         if ( reg_param < 0.){
           Bk += -reg_param * DMatrix::eye(Bk.size1());
-        }
-        else{
+        } else{
           Bk += 0. * DMatrix::eye(Bk.size1());
         }
       }
@@ -293,11 +290,9 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     qp_solver_.setInput(Bk, QP_H);
     qp_solver_.setInput(gfk,QP_G);
     // Hot-starting if possible
-    if (p.size1()){
-      qp_solver_.setInput(p, QP_X_INIT);
-      //TODO: Fix hot-starting of dual variables
-      //qp_solver_.setInput(mu_qp, QP_LAMBDA_INIT);
-    }
+    qp_solver_.setInput(qp_solver_.output(QP_PRIMAL), QP_X_INIT);
+    //TODO: Fix hot-starting of dual variables
+    //qp_solver_.setInput(mu_qp, QP_LAMBDA_INIT);
       
     if(m_>0){
       qp_solver_.setInput(Jgk,QP_A);
@@ -329,21 +324,20 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     qp_solver_.evaluate();
 
     // Get the optimal solution
-    p = qp_solver_.output(QP_PRIMAL);
+    const vector<double>& dx = qp_solver_.output(QP_PRIMAL).data();
     if (monitored("dx")){
       cout << "(main loop) dx = " << endl;
-      cout << p << endl;
+      cout << dx << endl;
     }
     // Detecting indefiniteness
 //    if ((norm_2(p) / norm_2(x)).at(0) > 500.){
 //      casadi_warning("Search direction has very large values, indefinite Hessian might have ouccured.");
 //    }
-    double gain = inner_prod(p, mul(Bk, p)).at(0);
+    double gain = inner_prod(DMatrix(dx), mul(Bk, DMatrix(dx))).at(0);
     if (gain < 0){
       casadi_warning("Indefinite Hessian detected...");
     }
-    
-    
+        
     // Get the dual solution for the inequalities
     const vector<double>& mu_qp = qp_solver_.output(QP_LAMBDA_A).data();
     const vector<double>& mu_x_qp = qp_solver_.output(QP_LAMBDA_X).data();
@@ -373,7 +367,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     }
 
     // Right-hand side of Armijo condition
-    F_.setFwdSeed(p);
+    F_.setFwdSeed(dx);
     F_.evaluate(1, 0);
 
     double L1dir = F_.fwdSens().elem(0) - sigma_ * l1_infeas;
@@ -395,7 +389,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     // Line-search loop
     int ls_counter = 1;
     while (true){
-      for(int i=0; i<n_; ++i) x_cand_[i] = x_[i] + t * p.at(i); 
+      for(int i=0; i<n_; ++i) x_cand_[i] = x_[i] + t * dx[i]; 
       // Evaluating objective and constraints
       F_.setInput(x_cand_);
       F_.evaluate();
@@ -538,6 +532,10 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     // 1-norm of lagrange gradient
     double gLag_norm1 = 0;
     for(vector<double>::const_iterator it=gLag_.begin(); it!=gLag_.end(); ++it) gLag_norm1 += fabs(*it);
+
+    // 1-norm of step
+    double dx_norm1 = 0;
+    for(vector<double>::const_iterator it=dx.begin(); it!=dx.end(); ++it) dx_norm1 += fabs(*it);
     
     // Printing information about the actual iterate
     cout << setprecision(3);
@@ -548,7 +546,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     cout << fk_cand               << "     ";
     cout << pr_inf                << "     ";
     cout << gLag_norm1            << "     ";
-    cout << norm_1(p).elem(0)     << "     ";
+    cout << dx_norm1              << "     ";
     cout << t                     << "     ";
     char ls_success = (ls_counter == maxiter_ls_) ? 'F' :  ' ';
        
