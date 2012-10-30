@@ -21754,24 +21754,6 @@ Assert that the object has been initialized. ";
 // File: classCasADi_1_1ImplicitFunction.xml
 %feature("docstring") CasADi::ImplicitFunction "
 
-Abstract base class for the implicit function classes The equation:
-
-F(z, x1, x2, ..., xn) == 0
-
-where d_F/dz is invertable, implicitly defines the equation:
-
-z := G(x1, x2, ..., xn)
-
-F should be an FX mapping from (n+1) inputs to 1 output. ImplicitFunction
-(G) is an FX mapping from n inputs to 1 output.
-
-n may be zero.
-
-You can provide an initial guess for z by setting output(0) of
-ImplicitFunction.
-
-Joel Andersson
-
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
@@ -33817,6 +33799,26 @@ Assert that the object has been initialized. ";
 %feature("docstring") CasADi::KinsolSolver "
 
 Kinsol solver class.
+
+Abstract base class for the implicit function classes
+
+The equation:
+
+F(z, x1, x2, ..., xn) == 0
+
+where d_F/dz is invertable, implicitly defines the equation:
+
+z := G(x1, x2, ..., xn)
+
+F should be an FX mapping from (n+1) inputs to 1 output. ImplicitFunction
+(G) is an FX mapping from n inputs to 1 output.
+
+n may be zero.
+
+You can provide an initial guess for z by setting output(0) of
+ImplicitFunction.
+
+Joel Andersson
 
 You can provide an initial guess by setting output(0).  A good initial guess
 may be needed to avoid errors like \"The linear solver's setup function
@@ -49215,6 +49217,942 @@ Check if smooth. ";
 %feature("docstring")  CasADi::NanSX::marked "";
 
 %feature("docstring")  CasADi::NanSX::mark "";
+
+
+// File: classCasADi_1_1NLPImplicitInternal.xml
+%feature("docstring") CasADi::NLPImplicitInternal "
+
+Internal class for NLPImplicitInternal.
+
+Abstract base class for the implicit function classes
+
+The equation:
+
+F(z, x1, x2, ..., xn) == 0
+
+where d_F/dz is invertable, implicitly defines the equation:
+
+z := G(x1, x2, ..., xn)
+
+F should be an FX mapping from (n+1) inputs to 1 output. ImplicitFunction
+(G) is an FX mapping from n inputs to 1 output.
+
+n may be zero.
+
+You can provide an initial guess for z by setting output(0) of
+ImplicitFunction.
+
+Joel Andersson
+
+C++ includes: nlp_implicit_internal.hpp ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getHessian "";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getGradient "";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getJacobian "";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::derivative "
+
+Return function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getDerivative "";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::input "";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::input "";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::input "";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::inputNoCheck "";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::inputNoCheck "";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::output "
+
+Access output argument. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::output "";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::outputNoCheck "";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::outputNoCheck "";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::fwdSeed "";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::fwdSeedNoCheck "";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::fwdSeedNoCheck "";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::fwdSens "";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::fwdSensNoCheck "";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::fwdSensNoCheck "";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::adjSeed "";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::adjSeedNoCheck "";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::adjSeedNoCheck "";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::adjSens "";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::adjSensNoCheck "";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::adjSensNoCheck "";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::NLPImplicitInternal "
+
+Constructor. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::clone "
+
+Clone. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::NLPImplicitInternal "
+
+Create a new Solver. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::~NLPImplicitInternal "
+
+Destructor. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::init "
+
+Initialize. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::evaluate "
+
+Solve the system of equations. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::requestNumSens "
+
+Request a number of forward/adjoint derivative directions. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::spInit "
+
+Reset the sparsity propagation. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::evalSX "
+
+Evaluate symbolically, SX type. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::evalMX "
+
+Evaluate symbolically, MX type. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::call "
+
+Call a function, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::call "
+
+Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::iStruct "
+
+Access an input. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::iStruct "
+
+Const access an input. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::oStruct "
+
+Access an output. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::oStruct "
+
+Const access an output. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::print "
+
+Print. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::repr "
+
+Print. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getPartition "
+
+Get the unidirectional or bidirectional partition. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::verbose "
+
+Verbose mode? ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::monitored "
+
+Is function fcn being monitored. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::setNumInputs "
+
+Set the number of function inputs. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::setNumOutputs "
+
+Set the number of function outputs. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getNumInputs "
+
+Get the number of function inputs. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getNumOutputs "
+
+Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getStat "
+
+Get single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::log "
+
+Log the status of the solver. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::log "
+
+Log the status of the solver, function given. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::setOption "
+
+set an option. The setOptions are in general only considered before the init
+function, if any. If properties changes, the init function should be called
+again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::setOption "
+
+set a set of options. The setOptions are in general only considered before
+the init function, if any. If properties changes, the init function should
+be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::deepCopyMembers "
+
+Deep copy data members. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::assertInit "
+
+Assert that the object has been initialized. ";
+
+
+// File: classCasADi_1_1NLPImplicitSolver.xml
+%feature("docstring") CasADi::NLPImplicitSolver "
+
+Use an NLPSolver as ImplicitFunction solver.
+
+Abstract base class for the implicit function classes
+
+The equation:
+
+F(z, x1, x2, ..., xn) == 0
+
+where d_F/dz is invertable, implicitly defines the equation:
+
+z := G(x1, x2, ..., xn)
+
+F should be an FX mapping from (n+1) inputs to 1 output. ImplicitFunction
+(G) is an FX mapping from n inputs to 1 output.
+
+n may be zero.
+
+You can provide an initial guess for z by setting output(0) of
+ImplicitFunction.
+
+Joel Andersson
+
+Joris Gillis
+
+C++ includes: nlp_implicit_solver.hpp ";
+
+/*  Setters  */
+
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
+
+*/
+
+%feature("docstring")  CasADi::NLPImplicitSolver::setInput "
+
+Reads in the input argument from val. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::setOutput "
+
+Reads in the output argument from val. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::setFwdSeed "
+
+Reads in the forward seed from val. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::setFwdSens "
+
+Reads in the forward sensitivity from val. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::setAdjSeed "
+
+Reads in the adjoint seed from val. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::setAdjSens "
+
+Reads in the adjoint sensitivity from val. ";
+
+/*  Getters  */
+
+/* A group of accessor for numerical data that operate on preallocated data.
+get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
+
+*/
+
+%feature("docstring")  CasADi::NLPImplicitSolver::getInput "
+
+Writes out the input argument into val. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::getOutput "
+
+Writes out the output argument into val. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::getFwdSeed "
+
+Writes out the forward seed into val. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::getFwdSens "
+
+Writes out the forward sensitivity into val. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::getAdjSeed "
+
+Writes out the adjoint seed into val. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::getAdjSens "
+
+Writes out the adjoint sensitivity into val. ";
+
+/*  Option Functionality  */
+
+%feature("docstring")  CasADi::NLPImplicitSolver::setOption "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::setOption "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::makeUnique "
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::makeUnique "";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::NLPImplicitSolver "
+
+Default constructor. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::NLPImplicitSolver "";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::checkNode "
+
+Check if the node is pointing to the right type of object. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::getNumInputs "
+
+Get number of inputs. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::getNumOutputs "
+
+Get number of outputs. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::setNumInputs "
+
+Set number of inputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::setNumOutputs "
+
+Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::solve "
+
+the same as evaluate(0,0) ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::jacobian "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::hessian "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::call "
+
+Create a function call (single input) ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::call "
+
+Create a function call ( MX graph) ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::call "
+
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::call "
+
+Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
+be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::eval "
+
+evaluate symbolically, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::eval "
+
+evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::eval "
+
+Evaluate symbolically with with directional derivatives, SX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::eval "
+
+Evaluate symbolically with with directional derivatives, MX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::eval "
+
+evaluate symbolically, single input, single output ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::evalMX "
+
+evaluate symbolically, MX type (unambiguous) ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::evalMX "
+
+Evaluate symbolically with with directional derivatives, MX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::evalSX "
+
+evaluate symbolically, SX type (unambiguous) ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::evalSX "
+
+Evaluate symbolically with with directional derivatives, SX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::indexed_one_based "";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::indexed_zero_based "";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::output "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::output "
+
+Access output argument Note that copies in Python are shallow by default and
+fx.output() gives a reference/pointer to an internal data structure. So if
+you want save fx.output(), you need to make a deep copy using for example
+DMatrix(fx.output()). ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::fwdSeed "
+
+Const access forward seed. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::fwdSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::adjSeed "
+
+Const access adjoint seed. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::adjSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::getStat "
+
+Get a single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::addMonitor "
+
+Add modules to be monitored. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::removeMonitor "
+
+Remove modules to be monitored. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::clone "
+
+Deep copy. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::assignNode "
+
+Assign the node to a node class pointer (or null) ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::assignNodeNoCount "
+
+Assign the node to a node class pointer without reference counting: inproper
+use will cause memory leaks! ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::get "
+
+Get a const pointer to the node. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::get "
+
+Get a pointer to the node. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::swap "
+
+Swap content with another instance. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::repr "
+
+Print a representation of the object. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::print "
+
+Print a destription of the object. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::init "
+
+Initialize the object: more documentation in the node class (
+SharedObjectNode and derived classes) ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::isInit "
+
+Is initialized? ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::assertInit "
+
+Assert that it is initialized. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::isNull "
+
+Is a null pointer? ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::getRepresentation "
+
+Return a string with a representation (for SWIG) ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::getDescription "
+
+Return a string with a destription (for SWIG) ";
 
 
 // File: classCasADi_1_1NLPQPInternal.xml
@@ -64649,10 +65587,6 @@ Access forward sensitivity. ";
 
 %feature("docstring")  CasADi::SQPInternal::adjSensNoCheck "";
 
-%feature("docstring")  CasADi::SQPInternal::getQPSolver "
-
-Access QPSolver. ";
-
 %feature("docstring")  CasADi::SQPInternal::SQPInternal "";
 
 %feature("docstring")  CasADi::SQPInternal::~SQPInternal "";
@@ -64671,6 +65605,10 @@ should invoke this function when initialized. ";
 %feature("docstring")  CasADi::SQPInternal::evaluate "
 
 Evaluate. ";
+
+%feature("docstring")  CasADi::SQPInternal::getQPSolver "
+
+Access QPSolver. ";
 
 %feature("docstring")  CasADi::SQPInternal::reportConstraints "
 
@@ -64944,9 +65882,9 @@ LBG <= G(x) <= UBG LBX <=   x  <= UBX
 Nonlinear equalities can be introduced by setting LBG and UBG equal at the
 correct positions.
 
-The method is still under development and should be used with cared
+The method is still under development and should be used with care
 
-Joel Andersson and Attila Kozma
+Attila Kozma, Joel Andersson and Joris Gillis
 
 >Input scheme: CasADi::NLPInput (NLP_NUM_IN = 7)
 +------------------------------------+------------------------------------+
@@ -77670,6 +78608,18 @@ This file does absolutely nothing but including all headers ";
 // File: mx__tools_8hpp.xml
 
 
+// File: nlp__implicit__internal_8cpp.xml
+
+
+// File: nlp__implicit__internal_8hpp.xml
+
+
+// File: nlp__implicit__solver_8cpp.xml
+
+
+// File: nlp__implicit__solver_8hpp.xml
+
+
 // File: nlp__qp__internal_8cpp.xml
 
 
@@ -78020,6 +78970,9 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: xml__node_8hpp.xml
+
+
+// File: group__ImplicitFunction__doc.xml
 
 
 // File: group__DAE__doc.xml
