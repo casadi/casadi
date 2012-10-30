@@ -258,7 +258,6 @@ void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, std::vector<Matrix
     int next_el = output_indices[nz]+1;
     
     // Evaluate the corresponding part of the algorithm
-    cout << "[" << el << "," << next_el << ")" << endl;
     f->evalSX(inputv, outputv, dummy, dummy, dummy, dummy, false, el, next_el);
     
     // Assign the corresponding variable
