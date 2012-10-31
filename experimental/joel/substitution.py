@@ -32,5 +32,6 @@ dd = SXMatrix([5,sin(x),x+y])
 print var
 print dd
 
-dd_rep = substituteInPlace(var,dd,True)
-print dd_rep
+substituteInPlace(var,dd,True)
+
+print dd
