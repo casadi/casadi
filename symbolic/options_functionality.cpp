@@ -32,11 +32,11 @@
 
 using namespace std;
 
-namespace CasADi
+namespace CasADi {
 
 
 
-double OptionsFunctionalityNode::wordDistance(const std::string &a,const std::string &b) 
+double OptionsFunctionalityNode::wordDistance(const std::string &a,const std::string &b) {
   /// Levenshtein edit distance
   
   int m = a.size();
