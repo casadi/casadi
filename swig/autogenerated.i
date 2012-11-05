@@ -820,7 +820,7 @@ def qpIn(*dummy,**kwargs):
   
   Keyword arguments:
     h           -- The square matrix H: sparse, (nx x nx). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [QP_H]
-    g           -- The column vector G: dense,  (nx x 1) [QP_G]
+    g           -- The vector G: dense,  (nx x 1) [QP_G]
     a           -- The matrix A: sparse, (nc x nx) - product with x must be dense. [QP_A]
     lba         -- dense, (nc x 1) [QP_LBA]
     uba         -- dense, (nc x 1) [QP_UBA]
