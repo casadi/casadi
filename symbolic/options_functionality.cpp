@@ -32,7 +32,7 @@
 
 using namespace std;
 
-namespace CasADi{
+namespace CasADi
 
 
 
