@@ -55,7 +55,7 @@ namespace CasADi{
 enum QPInput{
   /// The square matrix H: sparse, (nx x nx). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [h]
   QP_H,
-  /// The column vector G: dense,  (nx x 1) [g]
+  /// The vector G: dense,  (nx x 1) [g]
   QP_G,
   /// The matrix A: sparse, (nc x nx) - product with x must be dense. [a]
   QP_A,
