@@ -399,7 +399,7 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       break;
     case SCHEME_QPInput: 
       if(i==0) return "The square matrix H: sparse, (nx x nx). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.";
-      if(i==1) return "The column vector G: dense,  (nx x 1)";
+      if(i==1) return "The vector G: dense,  (nx x 1)";
       if(i==2) return "The matrix A: sparse, (nc x nx) - product with x must be dense.";
       if(i==3) return "dense, (nc x 1)";
       if(i==4) return "dense, (nc x 1)";
