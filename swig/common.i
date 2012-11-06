@@ -178,8 +178,10 @@ _object = _copyableObject
 
 %{
 #include "symbolic/casadi_options.hpp" 
+#include "symbolic/casadi_meta.hpp" 
 %}
 %include "symbolic/casadi_options.hpp"
+%include "symbolic/casadi_meta.hpp"
 
 %{
 #define START \

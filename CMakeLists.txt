@@ -67,7 +67,7 @@ endif(CMAKE_BUILD_TYPE)
 # Necessary for Visual C++
 add_definitions(-D_USE_MATH_DEFINES)
 add_definitions(-D_SCL_SECURE_NO_WARNINGS)
-add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+add_definitions(-DCASADIVERSION=${PACKAGE_VERSION})
 
 if(WITH_DL)
   add_definitions(-DWITH_DL)
