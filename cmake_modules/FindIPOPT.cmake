@@ -23,7 +23,7 @@ if(IPOPT_INCLUDEDIR)
   if(EXISTS ${IPOPT_INCLUDEDIR}/IpIpoptData.hpp AND EXISTS ${IPOPT_INCLUDEDIR}/IpOrigIpoptNLP.hpp AND EXISTS ${IPOPT_INCLUDEDIR}/IpTNLPAdapter.hpp  AND EXISTS ${IPOPT_INCLUDEDIR}/IpDenseVector.hpp AND EXISTS ${IPOPT_INCLUDEDIR}/IpExpansionMatrix.hpp)
     set(WITH_IPOPT_CALLBACK TRUE)
   else ()
-    message(STATUS "Detected an IPOPT configuration without development headers. Build will proceed, but without callback functionality. To enable it, see https://sourceforge.net/apps/trac/casadi/wiki/enableIpoptCallback")
+    message(STATUS "Detected an IPOPT configuration without development headers. Build will proceed, but without callback functionality. To enable it, see https://github.com/casadi/casadi/wiki/enableIpoptCallback")
   endif ()
 endif(IPOPT_INCLUDEDIR)
 

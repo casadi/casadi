@@ -152,11 +152,11 @@ CasADi for python & SWIG \\
 \end{tabular}
 \end{center}
 \section{Compilation}
-First, you have to get CasADi from \htmladdnormallink{here}{http://www.casadi.org/} or check out the svn repository from SourceForge.
+First, you have to get CasADi from \htmladdnormallink{here}{http://www.casadi.org/} or check out the git repository from GitHub.
 \par
 \codebegin
 \begin{verbatim}
-svn co https://casadi.svn.sourceforge.net/svnroot/casadi/trunk casadi
+git clone https://github.com/casadi/casadi.git -b tested casadi
 \end{verbatim}
 \codeend
 Set the \texttt{CMAKE\_PREFIX\_PATH} to inform CMake where the dependecies are. 
@@ -948,7 +948,7 @@ CasADi contains a facility to import dynamic system models formulated in the Mod
 For instructions on how to install and use JModelica.org, we refer to their \htmladdnormallink{website}{http://www.jmodelica.org/}. CasADi currently comes bundled with JModelica.org and the JModelica.org trunk is synchronized with CasADi's trunk, simplifying the installation procedure. Pre-built JModelica.org binaries that include CasADi are available for Windows users.
 
 \section{Compiling the Modelica code} \label{sec:modelica_compilation}
-To see how to use the Modelica import, look at \htmladdnormallink{thermodynamics\_example.py}{http://sourceforge.net/apps/trac/casadi/browser/trunk/examples/python/modelica/fritzson_application_examples/thermodynamics_example.py} and \htmladdnormallink{cstr.cpp}{http://sourceforge.net/apps/trac/casadi/browser/trunk/examples/cplusplus/cstr.cpp} in CasADi's example collection. 
+To see how to use the Modelica import, look at \htmladdnormallink{thermodynamics\_example.py}{https://github.com/casadi/casadi/blob/tested/examples/python/modelica/fritzson_application_examples/thermodynamics_example.py} and \htmladdnormallink{cstr.cpp}{https://github.com/casadi/casadi/blob/tested/examples/cplusplus/cstr.cpp} in CasADi's example collection. 
 
 Assuming that the Modelica/Optimica model \texttt{ModelicaClass.ModelicaModel} is defined in the files \texttt{file1.mo} and \texttt{file2.mop}, the compile command is:
 \begin{verbatim}

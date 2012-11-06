@@ -25,7 +25,7 @@ from casadi import *
 from numpy import *
 
 #! In this example, we will demonstrate callback functionality for Ipopt.
-#! Note that you need the fix https://sourceforge.net/apps/trac/casadi/wiki/enableIpoptCallback  before this works
+#! Note that you need the fix https://github.com/casadi/casadi/wiki/enableIpoptCallback before this works
 #!
 #! We start with constructing the rosenbrock problem
 x=SX("x")

@@ -385,7 +385,7 @@ bool IpoptInternal::intermediate_callback(const double* x, const double* z_L, co
 
 #ifndef WITH_IPOPT_CALLBACK 
    if (iter==0) {
-      cerr << "Warning: intermediate_callback is disfunctional in your installation. You will only be able to use getStats(). See https://sourceforge.net/apps/trac/symbolic/wiki/enableIpoptCallback to enable it." << endl;
+      cerr << "Warning: intermediate_callback is disfunctional in your installation. You will only be able to use getStats(). See https://github.com/casadi/casadi/wiki/enableIpoptCallback to enable it." << endl;
    }
 #endif // WITH_IPOPT_CALLBACK 
       callback_.input(NLP_COST).at(0) = obj_value;
