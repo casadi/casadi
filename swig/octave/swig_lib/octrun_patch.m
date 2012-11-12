@@ -33,7 +33,9 @@ result_name = "octrun.swg";    % The file of the patched result. Should not be e
 
 flags  = {
 {"{ return ptr->dims(); }", "dimref"};
-{"return dim_vector(1,1);", "dimtype"}
+{"member_value_pair *m = nc_this->find_member(""__dims__"", false)", "gooddimtype"};
+{"return dim_vector(1,1);", "dimtype"};
+{"virtual bool is_object()","object"}
 };
 
 % Serial stack of patches to be applied in (match_string_i, filename_i, [include_matched_i=1], [flag_matcher_i=always_true]) style.
@@ -45,15 +47,20 @@ flags  = {
 isdimtype = @(flags) isfield(flags,'dimtype');
 isndimtype = @(flags) ~isfield(flags,'dimtype');
 
+dimrep = @(flags) isdimtype(flags) & ~isfield(flags,'gooddimtype');
+
 isdimref = @(flags) isfield(flags,'dimref');
 isndimref = @(flags) ~isfield(flags,'dimref');
 
+isobject = @(flags) isfield(flags,'object');
+isnobject = @(flags) ~isfield(flags,'object');
+
 patches = {
-{"return dim_vector(1,1);", "octave_swig_type_dimrep.snippet",0,isdimtype}; 
-{"virtual bool is_string() const", "octave_swig_type.snippet",1,isndimtype}; 
-{"virtual bool is_string() const", "octave_swig_type_nodim.snippet",1,isdimtype}; 
-{"virtual bool is_string() const", "octave_swig_ref.snippet",1,isndimref}; 
-{"virtual bool is_string() const", "octave_swig_ref_nodim.snippet",1,isdimref}; 
+{"return dim_vector(1,1);", "octave_swig_type_dimrep.snippet",0,dimrep}; 
+{"virtual bool is_string() const", "octave_swig_type_dim.snippet",1,isndimtype}; 
+{"virtual bool is_string() const", "octave_swig_type_object.snippet",1,isnobject}; 
+{"virtual bool is_string() const", "octave_swig_ref_object.snippet",1,isnobject}; 
+{"virtual bool is_string() const", "octave_swig_ref_dim.snippet",1,isndimref}; 
 };
 % === End Setup ====
 
