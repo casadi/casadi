@@ -133,6 +133,9 @@ class CRSSparsity : public SharedObject{
         \see size()  */
     int numel() const;
     
+    /// Check if the sparsity is empty. 
+    bool empty() const;
+    
     /** \brief Get the number of (structural) non-zeros
         \see numel() */
     int size() const;
@@ -389,6 +392,12 @@ void CRSSparsity::set(T* data, const T* val_data, CRSSparsity val_sp) const{
   // Check if sparsity matches
   if(val_sp==*this){
     std::copy(val_data,val_data+sz,data);
+  } else if (this->empty()) {
+    // Quick return
+    return;
+  } else if (val_sp.empty()) {
+    // Quick return
+    return;
   } else if(val_nel==1){ // if scalar
     std::fill(data,data+sz,val_sz==0 ? T(0) : val_data[0]);
   } else {
@@ -459,7 +468,13 @@ void CRSSparsity::add(T* data, const T* val_data, CRSSparsity val_sp) const{
     for(int k=0; k<sz; ++k){
       data[k] += val_data[k];
     }
-  } else if(val_nel==1){ // if scalar
+  } else if (this->empty()) {
+    // Quick return
+    return;
+  } else if (val_sp.empty()) {
+    // Quick return
+    return;
+  }  else if(val_nel==1){ // if scalar
     if(val_sz!=0){
       for(int k=0; k<sz; ++k){
 	data[k] += val_data[0];
@@ -470,7 +485,7 @@ void CRSSparsity::add(T* data, const T* val_data, CRSSparsity val_sp) const{
     if(nel==0 && val_nel==0) return;
     
     // Make sure that dimension matches
-    casadi_assert_message(sz1==val_sz1 && sz2==val_sz2,"CRSSparsity::set<T>: shape mismatch. lhs is matrix of shape " << dimString() << ", while rhs is shape " << val_sp.dimString() << ".");
+    casadi_assert_message(sz1==val_sz1 && sz2==val_sz2,"CRSSparsity::add<T>: shape mismatch. lhs is matrix of shape " << dimString() << ", while rhs is shape " << val_sp.dimString() << ".");
     
     // Sparsity
     const std::vector<int>& c = col();

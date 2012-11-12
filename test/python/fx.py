@@ -26,7 +26,45 @@ import unittest
 from types import *
 from helpers import *
 
+#CasadiOptions.setCatchErrorsPython(False)
+
+
 class FXtests(casadiTestCase):
+
+  def test_call_empty(self):
+    x = ssym("x",2)
+    fsx = SXFunction([x,[]],[x])
+    x = msym("x",2)
+    fmx1 = MXFunction([x,MX()],[x])
+    fmx2 = MXFunction([x,[]],[x])
+    
+    for f in [fsx,fmx1,fmx2]:
+      f.init()
+      f.evaluate(1,1)
+
+      X = msym("X",2)
+      F = f.call([X,X])[0]
+      g = MXFunction([X],[F])
+      g.init()
+
+      g.evaluate(1,1)
+    
+    x = ssym("x",2)
+    fsx = SXFunction([x],[x,[]])
+    x = msym("x",2)
+    fmx1 = MXFunction([x],[x,MX()])
+    fmx2 = MXFunction([x],[x,[]])
+    
+    for f in [fsx,fmx1,]:
+      f.init()
+      f.evaluate(1,1)
+
+      X = msym("X",2)
+      F = f.call([X])[0]
+      g = MXFunction([X],[F])
+      g.init()
+
+      g.evaluate(1,1)
   
   def test_Parallelizer(self):
     self.message("Parallelizer")

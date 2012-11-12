@@ -76,6 +76,10 @@ int CRSSparsity::size2() const{
 int CRSSparsity::numel() const{
   return (*this)->numel();
 }
+
+bool CRSSparsity::empty() const{
+  return numel()==0;
+}
     
 int CRSSparsity::size() const{
   return (*this)->size();

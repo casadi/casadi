@@ -741,7 +741,7 @@ void FXInternal::call(const MXVector& arg, MXVector& res,  const MXVectorVector&
 
     // Assumes initialised
     for(int i=0; i<arg.size(); ++i){
-      if(arg[i].isNull() || arg[i].empty()) continue;
+      if(arg[i].isNull() || arg[i].empty() || input(i).isNull() || input(i).empty()) continue;
       casadi_assert_message(arg[i].size1()==input(i).size1() && arg[i].size2()==input(i).size2(),
                             "Evaluation::shapes of passed-in dependencies should match shapes of inputs of function." << 
                             std::endl << "Input argument " << i << " has shape (" << input(i).size1() << 
