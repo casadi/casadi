@@ -99,6 +99,7 @@ void CVodesInternal::init(){
   
   // Try to generate a jacobian if none provided
   if(!linsol_.isNull() && jac_.isNull()){
+    log("CVodesInternal::init","generate jacobian");
     SXFunction f = shared_cast<SXFunction>(f_);
     if(!f.isNull()){
       // Get the Jacobian in the Newton iteration

@@ -212,6 +212,12 @@ void IntegratorInternal::init(){
   // Call the base class method
   FXInternal::init();
 
+  {
+   std::stringstream ss;
+   ss << "Integrator dimensions: nx=" << nx_ << ", nz="<< nz_ << ", nq=" << nq_ << ", np=" << np_;
+   log("IntegratorInternal::init",ss.str());
+  }
+  
   // read options
   t0_ = getOption("t0");
   tf_ = getOption("tf");
@@ -226,6 +232,7 @@ void IntegratorInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject
 }
 
 std::pair<FX,FX> IntegratorInternal::getAugmented(int nfwd, int nadj){
+  log("IntegratorInternal::getAugmented","call");
   if(is_a<SXFunction>(f_)){
     casadi_assert_message(g_.isNull() || is_a<SXFunction>(g_), "Currently, g_ must be of the same type as f_");
     return getAugmentedGen<SXMatrix,SXFunction>(nfwd,nadj);
@@ -239,7 +246,9 @@ std::pair<FX,FX> IntegratorInternal::getAugmented(int nfwd, int nadj){
   
 template<class Mat,class XFunc>
 std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
-    
+  
+  log("IntegratorInternal::getAugmentedGen","begin");
+  
   // Get derivatived type
   XFunc f = shared_cast<XFunc>(f_);
   XFunc g = shared_cast<XFunc>(g_);
@@ -468,10 +477,13 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
   // Workaround, delete g_aug if its empty
   if(g.isNull() && nadj==0) g_aug = XFunc();
   
+  log("IntegratorInternal::getAugmentedGen","end");
+    
   return pair<FX,FX>(f_aug,g_aug);
 }
 
 void IntegratorInternal::spEvaluate(bool fwd){
+  log("IntegratorInternal::spEvaluate","begin");
   /**  This is a bit better than the FXInternal implementation: XF and QF never depend on RX0 and RP, 
    *   i.e. the worst-case structure of the Jacobian is:
    *        x0  p rx0 rp
@@ -572,9 +584,11 @@ void IntegratorInternal::spEvaluate(bool fwd){
       }
     }
   }
+  log("IntegratorInternal::spEvaluate","end");
 }
 
 FX IntegratorInternal::getDerivative(int nfwd, int nadj){
+  log("IntegratorInternal::getDerivative","begin");
   // Generate augmented DAE
   std::pair<FX,FX> aug_dae = getAugmented(nfwd,nadj);
   
@@ -715,6 +729,7 @@ FX IntegratorInternal::getDerivative(int nfwd, int nadj){
     if( nrp_>0){ dd[INTEGRATOR_RP]  =  qf_aug[Slice(qf_offset,   qf_offset + nrp_)];  qf_offset += nrp_; }
     ret_out.insert(ret_out.end(),dd.begin(),dd.end());
   }
+  log("IntegratorInternal::getDerivative","end");
   
   // Create derivative function and return
   return MXFunction(ret_in,ret_out);
@@ -731,6 +746,7 @@ FX IntegratorInternal::getJacobian(int iind, int oind, bool compact, bool symmet
 }
 
 void IntegratorInternal::reset(int nsens, int nsensB, int nsensB_store){
+  log("IntegratorInternal::reset","begin");
   // Make sure that the numbers are consistent
   casadi_assert_message(nsens<=nfdir_,"Too many sensitivities going forward");
   casadi_assert_message(nsensB<=nfdir_,"Too many sensitivities going backward");
@@ -745,6 +761,7 @@ void IntegratorInternal::reset(int nsens, int nsensB, int nsensB_store){
   copy(input(INTEGRATOR_X0).begin(),input(INTEGRATOR_X0).end(),output(INTEGRATOR_XF).begin());
   for(int i=0; i<nfdir_; ++i)
     copy(fwdSeed(INTEGRATOR_X0,i).begin(),fwdSeed(INTEGRATOR_X0,i).end(),fwdSens(INTEGRATOR_XF,i).begin());
+  log("IntegratorInternal::reset","end");
 }
 
 
