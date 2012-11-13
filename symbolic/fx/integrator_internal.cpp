@@ -45,6 +45,7 @@ IntegratorInternal::IntegratorInternal(const FX& f, const FX& g) : f_(f), g_(g){
   addOption("tf",                       OT_REAL,        1.0, "End of the time horizon");
   addOption("fwd_via_sct",              OT_BOOLEAN,     true, "Generate new functions for calculating forward directional derivatives");
   addOption("adj_via_sct",              OT_BOOLEAN,     true, "Generate new functions for calculating forward directional derivatives");
+  addOption("augmented_options",        OT_DICTIONARY,  GenericType(), "Options to be passed down to the augmented integrator, if one is constructed.");
   
   // Negative number of parameters for consistancy checking
   np_ = -1;
@@ -583,6 +584,10 @@ FX IntegratorInternal::getDerivative(int nfwd, int nadj){
   
   // Copy options
   integrator.setOption(dictionary());
+  
+  // Pass down specific options if provided
+  if (hasSetOption("augmented_options"))
+    integrator.setOption(getOption("augmented_options"));
   
   // Initialize the integrator since we will call it below
   integrator.init();
