@@ -27,20 +27,9 @@
 
 /**
 * \defgroup IdasIntegrator_doc
-  Solves an initial value problem in differential-algebraic equations of the form:
   
+  @copydoc DAE_doc
   
-  Creates an integrator instance which solves initial value problems in differential-algebraic equations
-  of the form:
-  
-  \verbatim
-  f(t,y,der(y),z,p) == 0
-  der(q) = g(t,y,z,p)
-  \endverbatim
-  
-  The DAE thus consists of a fully implicit part (f) and an explicit quadrature part (g). In the same way,
-  the state vector is also composed of two parts, the differential states and the quadrature states,
-  i.e. x = [y,q]
 */
 
 namespace CasADi{

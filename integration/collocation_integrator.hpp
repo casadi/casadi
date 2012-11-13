@@ -35,6 +35,8 @@ class CollocationIntegratorInternal;
   
   The method is still under development
   
+  @copydoc DAE_doc
+  
   \author Joel Andersson
   \date 2011
 */
