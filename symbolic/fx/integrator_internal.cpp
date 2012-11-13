@@ -193,20 +193,20 @@ void IntegratorInternal::init(){
   
   // Allocate space for inputs
   input_.resize(INTEGRATOR_NUM_IN);
-  input(INTEGRATOR_X0)  = f_.input(DAE_X);
-  input(INTEGRATOR_P)   = f_.input(DAE_P);
+  input(INTEGRATOR_X0)  = DMatrix(f_.input(DAE_X).sparsity(),0);
+  input(INTEGRATOR_P)   = DMatrix(f_.input(DAE_P).sparsity(),0);
   if(!g_.isNull()){
-    input(INTEGRATOR_RX0)  = g_.input(RDAE_RX);
-    input(INTEGRATOR_RP)  = g_.input(RDAE_RP);
+    input(INTEGRATOR_RX0)  = DMatrix(g_.input(RDAE_RX).sparsity(),0);
+    input(INTEGRATOR_RP)  = DMatrix(g_.input(RDAE_RP).sparsity(),0);
   }
   
   // Allocate space for outputs
   output_.resize(INTEGRATOR_NUM_OUT);
-  output(INTEGRATOR_XF) = f_.output(DAE_ODE);
-  output(INTEGRATOR_QF) = f_.output(DAE_QUAD);
+  output(INTEGRATOR_XF) = DMatrix(f_.output(DAE_ODE).sparsity(),0);
+  output(INTEGRATOR_QF) = DMatrix(f_.output(DAE_QUAD).sparsity(),0);
   if(!g_.isNull()){
-    output(INTEGRATOR_RXF)  = g_.output(RDAE_ODE);
-    output(INTEGRATOR_RQF)  = g_.output(RDAE_QUAD);
+    output(INTEGRATOR_RXF)  = DMatrix(g_.output(RDAE_ODE).sparsity(),0);
+    output(INTEGRATOR_RQF)  = DMatrix(g_.output(RDAE_QUAD).sparsity(),0);
   }
   
   // Call the base class method
