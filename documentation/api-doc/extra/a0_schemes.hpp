@@ -33,7 +33,7 @@
 <caption>Input scheme: CasADi::QPInput  (QP_NUM_IN = 9) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>QP_H</td><td>The square matrix H: sparse, (nx x nx). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical. [h].</td></tr>
-<tr><td>QP_G</td><td>The column vector G: dense, (nx x 1) [g].</td></tr>
+<tr><td>QP_G</td><td>The vector G: dense, (nx x 1) [g].</td></tr>
 <tr><td>QP_A</td><td>The matrix A: sparse, (nc x nx) - product with x must be dense. [a].</td></tr>
 <tr><td>QP_LBA</td><td>dense, (nc x 1) [lba]</td></tr>
 <tr><td>QP_UBA</td><td>dense, (nc x 1) [uba]</td></tr>
