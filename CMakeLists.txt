@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.0)
 project(casadi C CXX)
 set(PACKAGE_NAME "CasADi")
-set(PACKAGE_VERSION "1.4.1")
+set(PACKAGE_VERSION "latest")
 
 # find the macports python libs if they exist
 if(APPLE)
