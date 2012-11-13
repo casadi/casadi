@@ -65,19 +65,7 @@
   This form allows the same ODE/DAE to be used for both explicit and implicit
   integrators. Explicit integrators will simply pass zeros as the state derivatives,
   recovering the explicit formulation. This also applies to the backward integration.
-  
-  Solving the DAE defines a mapping from the four inputs:
-  x0:    The differential state at the initial time (INTEGRATOR_X0=0)
-  p:     Parameters (INTEGRATOR_P=1)
-  rx0:   Backward differential state at the final time (INTEGRATOR_RX0=2)
-  rp:    Backward parameter vector (INTEGRATOR_RP=3)
-  
-  ... and four outputs:
-  xf:    Differential state at the final time (INTEGRATOR_XF=0)
-  qf:    Quadrature state at the final time (INTEGRATOR_QF=1)
-  rxf:   Backward differential state at the initial time (INTEGRATOR_RXF=2)
-  rqf:   Backward quadrature state at the initial time (INTEGRATOR_RQF=3)
-  
+
   \endverbatim 
 */
 namespace CasADi{

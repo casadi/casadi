@@ -47,7 +47,9 @@ class CollocationIntegrator : public Integrator {
     *   \param f dynamical system
     * \copydoc scheme_DAEInput
     * \copydoc scheme_DAEOutput
-    *
+    *   \param g backwards system
+    * \copydoc scheme_RDAEInput
+    * \copydoc scheme_RDAEOutput
     */
     explicit CollocationIntegrator(const FX& f, const FX& g=FX());
 
