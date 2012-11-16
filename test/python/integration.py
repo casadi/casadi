@@ -60,7 +60,7 @@ class Integrationtests(casadiTestCase):
     
     num=self.num
     tend=num['tend']
-    x0=num['x0']
+    x0=num['q0']
     p_=num['p']
     t=SX("t")
     x=SX("x")
