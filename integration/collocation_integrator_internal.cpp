@@ -209,7 +209,7 @@ void CollocationIntegratorInternal::init(){
       offset += nrx_;
       
       // Get the local time
-      coll_time_[k][j] = h*(k + tau_root[j]);
+      coll_time_[k][j] = t0_ + h*(k + tau_root[j]);
       
       // Get expressions for the algebraic variables
       if(j>0){
