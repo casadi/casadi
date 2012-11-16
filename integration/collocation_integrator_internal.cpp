@@ -107,9 +107,15 @@ void CollocationIntegratorInternal::init(){
     
   // Coefficients of the collocation equation
   vector<vector<MX> > C(deg+1,vector<MX>(deg+1));
+  
+  // Coefficients of the collocation equation as DMatrix
+  DMatrix C_num = DMatrix(deg+1,deg+1,0);
 
   // Coefficients of the continuity equation
   vector<MX> D(deg+1);
+  
+  // Coefficients of the collocation equation as DMatrix
+  DMatrix D_num = DMatrix(deg+1,1,0);
 
   // Collocation point
   SXMatrix tau = ssym("tau");
@@ -131,6 +137,7 @@ void CollocationIntegratorInternal::init(){
     lfcn.setInput(1.0);
     lfcn.evaluate();
     D[j] = lfcn.output();
+    D_num(j) = lfcn.output();
 
     // Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
     for(int j2=0; j2<deg+1; ++j2){
@@ -138,8 +145,19 @@ void CollocationIntegratorInternal::init(){
       lfcn.setFwdSeed(1.0);
       lfcn.evaluate(1,0);
       C[j][j2] = lfcn.fwdSens();
+      C_num(j,j2) = lfcn.fwdSens();
     }
   }
+
+
+  C_num(std::vector<int>(1,0),ALL) = 0;
+  C_num(0,0)   = 1;
+  
+  // Coefficients of the quadrature
+  DMatrix Q = solve(C_num,D_num);
+  
+  casadi_assert_message(fabs(sumAll(Q)-1)<1e-9,"Check on quadrature coefficients");
+  casadi_assert_message(fabs(sumAll(D_num)-1)<1e-9,"Check on collocation coefficients");
   
   // Initial state
   MX X0("X0",nx_);
@@ -260,7 +278,7 @@ void CollocationIntegratorInternal::init(){
       
       // Add the quadrature
       if(nq_>0){
-        QF += D[j]*h_mx*f_out[DAE_QUAD];
+        QF += Q[j]*h_mx*f_out[DAE_QUAD];
       }
       
       // Now for the backward problem
@@ -302,7 +320,7 @@ void CollocationIntegratorInternal::init(){
         
         // Add the backward quadrature
         if(nrq_>0){
-          RQF += D[j]*h_mx*g_out[RDAE_QUAD];
+          RQF += Q[j]*h_mx*g_out[RDAE_QUAD];
         }
       }
     }
