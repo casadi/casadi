@@ -77,7 +77,7 @@ class casadiTestCase(unittest.TestCase):
       sys.stdout.flush()
 
   def assertAlmostEqual(self,first, second, places=7, msg=""):
-      msg+= "%.16e <-> %.16e"  % (first, second)
+      msg+= " %.16e <-> %.16e"  % (first, second)
       unittest.TestCase.assertAlmostEqual(self,first,second,places=places,msg=msg)
 
   def checkarray(self,zr,zt,name,failmessage="",digits=10):
@@ -114,7 +114,7 @@ class casadiTestCase(unittest.TestCase):
             continue
           if (isnan(zt[i,j]) or isinf(zt[i,j])) and  (isinf(zt[i,j]) or isnan(zt[i,j])):
             continue
-          self.assertAlmostEqual(zt[i,j],zr[i,j],digits,"In %s: %s evaluation error.\n %s <->\n %s" % (name,failmessage, str(zt),str(zr)))
+          self.assertAlmostEqual(zt[i,j],zr[i,j],digits,"In %s: %s evaluation error.\n %s <->\n %s\n at elem(%d,%d): " % (name,failmessage,str(zt),str(zr), i,j, ))
 
   def evaluationCheck(self,yt,yr,x,x0,name="",failmessage="",fmod=None,setx0=None):
     """ General unit test for checking casadi evaluation against a reference solution.
@@ -190,3 +190,73 @@ class casadiTestCase(unittest.TestCase):
     for i in range(len(pool.numpyoperators)):
       self.numpyEvaluationCheck(pool.casadioperators[i],pool.numpyoperators[i],x,x0,"%s:%s" % (name,pool.names[i]),"\n I tried to apply %s (%s) from test case '%s' to numerical value %s. But the result returned: " % (str(pool.casadioperators[i]),pool.names[i],name, str(x0)),fmod=fmod,setx0=setx0)
 
+  def checkfx(self,trial,solution,fwd=True,adj=True,digits=9,failmessage="",allow_empty=True,verbose=True):
+    
+    try:
+      trial.evaluate(fwd,adj)
+      solution.evaluate(fwd,adj)
+    except e as Exception:
+      raise Exception(e.str() + "\nThis occured for simple evaluate(%d,%d)" % (fwd,adj) )
+      
+    self.assertEqual(trial.getNumOutputs(),solution.getNumOutputs(),failmessage+": trial has %d number of outputs while solution has %d." % (trial.getNumOutputs(),solution.getNumOutputs()) )
+    self.assertEqual(trial.getNumInputs(),solution.getNumInputs(),failmessage+": trial has %d number of outputs while solution has %d." % (trial.getNumInputs(),solution.getNumInputs()) )
+
+    for i in range(trial.getNumInputs()):
+      if (allow_empty and (trial.input(i).empty() or solution.input(i).empty() )): continue
+      message = "input(%d)" % i
+      if verbose: print message + ": " + str(trial.input(i))
+      self.checkarray(trial.input(i),solution.input(i),"",digits=digits,failmessage=failmessage+": "+ message)
+    
+    for i in range(trial.getNumOutputs()):
+      message = "output(%d)" % i
+      if verbose: print message + ": " + str(trial.output(i))
+      if (allow_empty and (trial.output(i).empty() or solution.output(i).empty() )): continue
+      self.checkarray(trial.output(i),solution.output(i),"",digits=digits,failmessage=failmessage+": "+message)
+    
+    if fwd:
+      fsm = 1.7
+      for i in range(trial.getNumInputs()):
+        for j in range(min(trial.input(i).size(),solution.input(i).size())):
+          trial.fwdSeed(i).setAll(0)
+          solution.fwdSeed(i).setAll(0)
+          trial.fwdSeed(i)[j]=fsm
+          solution.fwdSeed(i)[j]=fsm
+          
+          try:
+            trial.evaluate(fwd,adj)
+            solution.evaluate(fwd,adj)
+          except e as Exception:
+            raise Exception(e.str() + "\nThis occured for simple evaluate(%d,%d) for fwdSeed(%d)[%d]=1" % (fwd,adj,i,j) )
+          
+          for k in range(trial.getNumOutputs()):
+            if (allow_empty and (trial.output(k).empty() or solution.output(k).empty() )): continue
+            message="fwdSeed(%d)[%d]=1 => fwdSens(%d)" % (i,j,k)
+            if verbose: print message + ": " + str(trial.fwdSens(k))
+            self.checkarray(trial.fwdSens(k),solution.fwdSens(k),"",digits=digits,failmessage=failmessage+": "+message)
+            
+          trial.fwdSeed(i).setAll(0)
+          solution.fwdSeed(i).setAll(0)
+        
+    if adj:
+      asm = 1.7
+      for i in range(trial.getNumOutputs()):
+        for j in range(min(trial.output(i).size(),solution.output(i).size())):
+          trial.adjSeed(i).setAll(0)
+          solution.adjSeed(i).setAll(0)
+          trial.adjSeed(i)[j]=asm
+          solution.adjSeed(i)[j]=asm
+          
+          try:
+            trial.evaluate(fwd,adj)
+            solution.evaluate(fwd,adj)
+          except e as Exception:
+            raise Exception(e.str() + "\nThis occured for simple evaluate(%d,%d) for adjSeed(%d)[%d]=1" % (fwd,adj,i,j) )
+
+          for k in range(trial.getNumInputs()):
+            if (allow_empty and (trial.input(k).empty() or solution.input(k).empty() )): continue
+            message="adjSeed(%d)[%d]=1 => adjSens(%d)" % (i,j,k)
+            if verbose: print message + ": " + str(trial.fwdSens(k))
+            self.checkarray(trial.adjSens(k),solution.adjSens(k),"",digits=digits,failmessage=failmessage+": "+message)
+            
+          trial.adjSeed(i).setAll(0)
+          solution.adjSeed(i).setAll(0)

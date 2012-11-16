@@ -347,7 +347,7 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
     aseed[dir][DAE_NUM_OUT+RDAE_QUAD] = adj_rquad[dir];
     
     if(implicit_ode){
-      aseed[nadj+dir][DAE_ODE] = -adj_odedot[dir];
+      aseed[nadj+dir][DAE_ODE] = adj_odedot[dir];
       aseed[nadj+dir][DAE_ALG] = Mat(alg.sparsity());
       aseed[nadj+dir][DAE_QUAD] = Mat(quad.sparsity());
 
@@ -360,7 +360,7 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
         aseed[2*nadj+dir][DAE_ALG] = Mat(alg.sparsity());
         aseed[2*nadj+dir][DAE_QUAD] = Mat(quad.sparsity());
       
-        aseed[2*nadj+dir][DAE_NUM_OUT+RDAE_ODE] = -adj_rodedot[dir];
+        aseed[2*nadj+dir][DAE_NUM_OUT+RDAE_ODE] = adj_rodedot[dir];
         aseed[2*nadj+dir][DAE_NUM_OUT+RDAE_ALG] = Mat(ralg.sparsity());
         aseed[2*nadj+dir][DAE_NUM_OUT+RDAE_QUAD] = Mat(rquad.sparsity());
       }

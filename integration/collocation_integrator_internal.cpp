@@ -304,11 +304,11 @@ void CollocationIntegratorInternal::init(){
         if(explicit_ode){
           // Assume equation of the form xdot = f(t,x,p)
           g_out = g_.call(g_in);
-          g.push_back(h_mx*g_out[RDAE_ODE] - rxp_jk);
+          g.push_back(h_mx*g_out[RDAE_ODE] + rxp_jk);
         } else {
           // Assume equation of the form 0 = f(t,x,xdot,p)
           g_in[RDAE_XDOT] = xp_jk/h_mx;
-          g_in[RDAE_RXDOT] = rxp_jk/h_mx;
+          g_in[RDAE_RXDOT] = -rxp_jk/h_mx;
           g_out = g_.call(g_in);
           g.push_back(g_out[RDAE_ODE]);
         }

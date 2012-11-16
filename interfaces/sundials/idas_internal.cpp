@@ -1089,17 +1089,17 @@ void IdasInternal::resB(double t, const double* xz, const double* xzdot, const d
   g_.setInput(xzA,RDAE_RX);
   g_.setInput(xzA+nx_,RDAE_RZ);
   g_.setInput(xzdotA,RDAE_RXDOT);
-  
+
+  // Negate as we are integrating backwards in time
+  for(int i=0; i<g_.input(RDAE_RXDOT).size(); ++i)
+    g_.input(RDAE_RXDOT).at(i) *= -1;
+    
   // Evaluate
   g_.evaluate();
 
   // Save to output
   g_.getOutput(rrA,RDAE_ODE);
   g_.getOutput(rrA+nx_,RDAE_ALG);
-  
-  // Negate as we are integrating backwards in time
-  for(int i=0; i<nx_+nz_; ++i)
-    rrA[i] *= -1;
 
   log("IdasInternal::resB","end");
 }
