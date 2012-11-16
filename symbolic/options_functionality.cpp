@@ -125,7 +125,7 @@ void OptionsFunctionalityNode::setOption(const string &name, const GenericType &
   }
 
   // Some typechecking
-  if (!op.can_cast_to(allowed_options[name])) {
+  if (!op.can_cast_to(allowed_options[name]) && !op.isNull()) {
     stringstream ss;
     ss << "Option '" << name << "' expects a '" << GenericType::get_type_description(allowed_options[name]) << "' type." << endl;
     if (op.getType() == OT_BOOLEAN) {
