@@ -97,10 +97,18 @@ class IdasInternal : public SundialsInternal{
   virtual void printStats(std::ostream &stream) const;
   
   /** \brief  Get the integrator Jacobian for the forward problem */
-  virtual FX getJacobian();
+  FX getJacobian();
+  
+  /** \brief  Get the integrator Jacobian for the forward problem (generic) */
+  template<typename FunctionType>
+  FunctionType getJacobianGen();
   
   /** \brief  Get the integrator Jacobian for the backward problem */
-  virtual FX getJacobianB();
+  FX getJacobianB();
+  
+  /** \brief  Get the integrator Jacobian for the backward problem (generic) */
+  template<typename FunctionType>
+  FunctionType getJacobianGenB();
   
   /// Get the Linear solver
   virtual LinearSolver getLinearSolver();
@@ -227,6 +235,10 @@ class IdasInternal : public SundialsInternal{
   
   // Jacobian of the DAE with respect to the state and state derivatives
   FX jac_, jacB_;
+  
+  // Function that calculates z
+  FX zfcn_;
+  
 };
 
 } // namespace CasADi

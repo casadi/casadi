@@ -114,7 +114,7 @@ void IdasInternal::init(){
   
   if(hasSetOption("linear_solver_creator")){
     // Make sure that a Jacobian has been provided
-    if(jac_.isNull()) getJacobian();
+    if(jac_.isNull()) jac_ = getJacobian();
     if(!jac_.isInit()) jac_.init();
     
     // Create a linear solver
@@ -872,7 +872,7 @@ void IdasInternal::resetB(){
     // Initialize the adjoint integration
     initAdj();
   }
-
+  
   // Correct initial values for the integration if necessary
   int calc_icB = getOption("calc_icB");
   if(calc_icB){
@@ -882,10 +882,61 @@ void IdasInternal::resetB(){
     // Retrieve the initial values
     flag = IDAGetConsistentICB(mem_, whichB_, rxz_, rxzdot_);
     if(flag != IDA_SUCCESS) idas_error("IDAGetConsistentICB",flag);
-    
   } else {
     
-    
+    // Quickfix to get consistent initial conditions for the backward integration //FIXME!
+    if(nrz_>0){
+      // Write rz as an explicit function of the other variables
+      if(zfcn_.isNull()){
+        SXFunction g = shared_cast<SXFunction>(g_);
+        if(!g.isNull()){
+          SXMatrix ralg = g.outputExpr(RDAE_ALG);
+          SXMatrix rz = g.inputExpr(RDAE_RZ);
+          
+          // Linearize
+          SXMatrix J = CasADi::jacobian(ralg,rz);
+          SXMatrix r = substitute(ralg,rz,SXMatrix(rz.sparsity(),0));
+          
+          // Solve for z
+          SXMatrix z = solve(J,-r);
+        
+          // Function to calculate z
+          zfcn_ = SXFunction(g.inputExpr(),z);
+          zfcn_.init();
+        }
+      }
+
+      if(!zfcn_.isNull()){
+        zfcn_.setInput(&tf_,RDAE_T);
+        zfcn_.setInput(NV_DATA_S(xz_),RDAE_X);
+        zfcn_.setInput(NV_DATA_S(xz_)+nx_,RDAE_Z);
+        zfcn_.setInput(NV_DATA_S(xzdot_),RDAE_XDOT);
+        zfcn_.setInput(input(INTEGRATOR_P),RDAE_P);
+        zfcn_.setInput(input(INTEGRATOR_RP),RDAE_RP);
+        zfcn_.setInput(NV_DATA_S(rxz_),RDAE_RX);
+        zfcn_.setInput(NV_DATA_S(rxz_)+nrx_,RDAE_RZ);
+        zfcn_.setInput(NV_DATA_S(rxzdot_),RDAE_RXDOT);
+      
+        // Negate as we are integrating backwards in time
+        for(int i=0; i<zfcn_.input(RDAE_RXDOT).size(); ++i)
+          zfcn_.input(RDAE_RXDOT).at(i) *= -1;
+
+        // Get rz
+        for(int k=0; k<RDAE_NUM_IN; ++k){
+          zfcn_.setInput(g_.input(k),k);
+        }
+        zfcn_.evaluate();
+        zfcn_.getOutput(NV_DATA_S(rxz_)+nrx_);
+        zfcn_.setInput(zfcn_.output(),RDAE_RZ);
+      
+        flag = IDACalcICB(mem_, whichB_, t0_, rxz_, rxzdot_);
+        if(flag != IDA_SUCCESS) idas_error("IDACalcICB",flag);
+
+        // Retrieve the initial values
+        flag = IDAGetConsistentICB(mem_, whichB_, rxz_, rxzdot_);
+        if(flag != IDA_SUCCESS) idas_error("IDAGetConsistentICB",flag);
+      }
+    }
   }
 }
 
@@ -1089,7 +1140,7 @@ void IdasInternal::resB(double t, const double* xz, const double* xzdot, const d
   g_.setInput(input(INTEGRATOR_P),RDAE_P);
   g_.setInput(input(INTEGRATOR_RP),RDAE_RP);
   g_.setInput(xzA,RDAE_RX);
-  g_.setInput(xzA+nx_,RDAE_RZ);
+  g_.setInput(xzA+nrx_,RDAE_RZ);
   g_.setInput(xzdotA,RDAE_RXDOT);
 
   // Negate as we are integrating backwards in time
@@ -1101,7 +1152,7 @@ void IdasInternal::resB(double t, const double* xz, const double* xzdot, const d
 
   // Save to output
   g_.getOutput(rrA,RDAE_ODE);
-  g_.getOutput(rrA+nx_,RDAE_ALG);
+  g_.getOutput(rrA+nrx_,RDAE_ALG);
 
   log("IdasInternal::resB","end");
 }
@@ -1128,7 +1179,7 @@ void IdasInternal::rhsQB(double t, const double* xz, const double* xzdot, const 
   g_.setInput(input(INTEGRATOR_P),RDAE_P);
   g_.setInput(input(INTEGRATOR_RP),RDAE_RP);
   g_.setInput(xzA,RDAE_RX);
-  g_.setInput(xzA+nx_,RDAE_RZ);
+  g_.setInput(xzA+nrx_,RDAE_RZ);
   g_.setInput(xzdotA,RDAE_RXDOT);
   
   // Evaluate
@@ -1416,10 +1467,8 @@ void IdasInternal::initDenseLinearSolver(){
   if(flag != IDA_SUCCESS) idas_error("IDADense",flag);
   if(exact_jacobian_){
     // Generate jacobians if not already provided
-    if(jac_.isNull()){
-      getJacobian();
-      jac_.init();
-    }
+    if(jac_.isNull()) jac_ = getJacobian();
+    if(!jac_.isInit()) jac_.init();
     
     // Pass to IDA
     flag = IDADlsSetDenseJacFn(mem_, djac_wrapper);
@@ -1533,104 +1582,70 @@ void IdasInternal::setLinearSolver(const LinearSolver& linsol, const FX& jac){
   jac_ = jac;
 
   // Try to generate a jacobian of none provided
-  if(jac_.isNull())
-    getJacobian();
+  if(jac_.isNull()){
+    jac_ = getJacobian();
+  }
 }
 
-FX IdasInternal::getJacobian(){
-  // Quick return if already created
-  if(!jac_.isNull())
-    return jac_;
-
-  // If SXFunction
-  SXFunction f_sx = shared_cast<SXFunction>(f_);
-  if(!f_sx.isNull()){
-    // Get the Jacobian in the Newton iteration
-    SX cj("cj");
-    SXMatrix jac = f_sx.jac(DAE_X,DAE_ODE) + cj*f_sx.jac(DAE_XDOT,DAE_ODE);
-    if(nz_>0){
-      jac = horzcat(vertcat(jac,f_sx.jac(DAE_X,DAE_ALG)),vertcat(f_sx.jac(DAE_Z,DAE_ODE),f_sx.jac(DAE_Z,DAE_ALG)));
-    }
-    
-    // Jacobian function
-    vector<SXMatrix> jac_in = f_sx.inputExpr();
-    jac_in.push_back(cj);
-    SXFunction J(jac_in,jac);
-    
-    // Save function
-    jac_ = J;
-    return J;
-  }
-
-  // If SXFunction
-  MXFunction f_mx = shared_cast<MXFunction>(f_);
-  if(!f_mx.isNull()){
-    // Get the Jacobian in the Newton iteration
-    MX cj("cj");
-    MX jac = f_mx.jac(DAE_X,DAE_ODE) + cj*f_mx.jac(DAE_XDOT,DAE_ODE);
-    if(nz_>0){
-      jac = horzcat(vertcat(jac,f_mx.jac(DAE_X,DAE_ALG)),vertcat(f_mx.jac(DAE_Z,DAE_ODE),f_mx.jac(DAE_Z,DAE_ALG)));
-    }
-    
-    // Jacobian function
-    vector<MX> jac_in = f_mx.inputExpr();
-    jac_in.push_back(cj);
-    MXFunction J(jac_in,jac);
-    
-    // Save function
-    jac_ = J;
-    return J;
+template<typename FunctionType>
+FunctionType IdasInternal::getJacobianGen(){
+  FunctionType f = shared_cast<FunctionType>(f_);
+  casadi_assert(!f.isNull());
+  
+  // Get the Jacobian in the Newton iteration
+  typename FunctionType::MatType cj = FunctionType::MatType::sym("cj");
+  typename FunctionType::MatType jac = f.jac(DAE_X,DAE_ODE) + cj*f.jac(DAE_XDOT,DAE_ODE);
+  if(nz_>0){
+    jac = horzcat(vertcat(jac,f.jac(DAE_X,DAE_ALG)),vertcat(f.jac(DAE_Z,DAE_ODE),f.jac(DAE_Z,DAE_ALG)));
   }
   
-  throw CasadiException("IdasInternal::getJacobian(): Not an SXFunction or MXFunction");
+  // Jacobian function
+  std::vector<typename FunctionType::MatType> jac_in = f.inputExpr();
+  jac_in.push_back(cj);
+  
+  // Return generated function
+  return FunctionType(jac_in,jac);
+}
+
+
+FX IdasInternal::getJacobian(){
+  if(is_a<SXFunction>(f_)){
+    return getJacobianGen<SXFunction>();
+  } else if(is_a<MXFunction>(f_)){
+    return getJacobianGen<MXFunction>();
+  } else {
+    throw CasadiException("IdasInternal::getJacobian(): Not an SXFunction or MXFunction");
+  }
+}
+
+template<typename FunctionType>
+FunctionType IdasInternal::getJacobianGenB(){
+  FunctionType g = shared_cast<FunctionType>(g_);
+  casadi_assert(!g.isNull());
+  
+  // Get the Jacobian in the Newton iteration
+  typename FunctionType::MatType cj = FunctionType::MatType::sym("cj");
+  typename FunctionType::MatType jac = g.jac(RDAE_RX,RDAE_ODE) + cj*g.jac(RDAE_RXDOT,RDAE_ODE);
+    if(nrz_>0){
+      jac = horzcat(vertcat(jac,g.jac(RDAE_RX,RDAE_ALG)),vertcat(g.jac(RDAE_RZ,RDAE_ODE),g.jac(RDAE_RZ,RDAE_ALG)));
+    }
+    
+  // Jacobian function
+  std::vector<typename FunctionType::MatType> jac_in = g.inputExpr();
+  jac_in.push_back(cj);
+  
+  // return generated function
+  return FunctionType(jac_in,jac);
 }
 
 FX IdasInternal::getJacobianB(){
-  // Quick return if already created
-  if(!jacB_.isNull())
-    return jacB_;
-
-  // If SXFunction
-  SXFunction g_sx = shared_cast<SXFunction>(g_);
-  if(!g_sx.isNull()){
-    // Get the Jacobian in the Newton iteration
-    SX cj("cj");
-    SXMatrix jac = g_sx.jac(RDAE_RX,RDAE_ODE) + cj*g_sx.jac(RDAE_RXDOT,RDAE_ODE);
-    if(nrz_>0){
-      jac = horzcat(vertcat(jac,g_sx.jac(RDAE_RX,RDAE_ALG)),vertcat(g_sx.jac(RDAE_RZ,RDAE_ODE),g_sx.jac(RDAE_RZ,RDAE_ALG)));
-    }
-    
-    // Jacobian function
-    vector<SXMatrix> jac_in = g_sx.inputExpr();
-    jac_in.push_back(cj);
-    SXFunction J(jac_in,jac);
-    
-    // Save function
-    jacB_ = J;
-    return J;
+  if(is_a<SXFunction>(g_)){
+    return getJacobianGenB<SXFunction>();
+  } else if(is_a<MXFunction>(g_)){
+    return getJacobianGenB<MXFunction>();
+  } else {
+    throw CasadiException("IdasInternal::getJacobianB(): Not an SXFunction or MXFunction");
   }
-
-  // If SXFunction
-  MXFunction g_mx = shared_cast<MXFunction>(g_);
-  if(!g_mx.isNull()){
-    // Get the Jacobian in the Newton iteration
-    MX cj("cj");
-    MX jac = g_mx.jac(RDAE_RX,RDAE_ODE) + cj*g_mx.jac(RDAE_RXDOT,RDAE_ODE);
-    if(nrz_>0){
-      jac = horzcat(vertcat(jac,g_mx.jac(RDAE_RX,RDAE_ALG)),vertcat(g_mx.jac(RDAE_RZ,RDAE_ODE),g_mx.jac(RDAE_RZ,RDAE_ALG)));
-    }
-    
-    // Jacobian function
-    vector<MX> jac_in = g_mx.inputExpr();
-    jac_in.push_back(cj);
-    MXFunction J(jac_in,jac);
-    
-    // Save function
-    jacB_ = J;
-    return J;
-  }
-  
-  throw CasadiException("IdasInternal::getJacobian(): Not an SXFunction or MXFunction");
 }
 
   

@@ -165,6 +165,9 @@ public:
  
   /** \brief Get all the free variables of the function */
   std::vector<SX> getFree() const;
+
+  /** \brief Get the corresponding matrix type */
+  typedef SXMatrix MatType;  
   
 #ifndef SWIG 
   /// Construct a function that has only the k'th output

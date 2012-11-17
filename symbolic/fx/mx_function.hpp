@@ -137,6 +137,9 @@ public:
   
   /** \brief Get all the free variables of the function */
   std::vector<MX> getFree() const;
+  
+  /** \brief Get the corresponding matrix type */
+  typedef MX MatType;  
 };
 
 } // namespace CasADi
