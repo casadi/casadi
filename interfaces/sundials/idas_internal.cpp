@@ -877,15 +877,10 @@ void IdasInternal::resetB(){
     flag = IDACalcICB(mem_, whichB_, t0_, rxz_, rxzdot_);
     if(flag != IDA_SUCCESS) idas_error("IDACalcICB",flag);
 
-    N_VPrint_Serial(rxz_);
-    N_VPrint_Serial(rxzdot_);
-
     // Retrieve the initial values
     flag = IDAGetConsistentICB(mem_, whichB_, rxz_, rxzdot_);
     if(flag != IDA_SUCCESS) idas_error("IDAGetConsistentICB",flag);
     
-    N_VPrint_Serial(rxz_);
-    N_VPrint_Serial(rxzdot_);
   }
 }
 
