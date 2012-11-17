@@ -118,8 +118,16 @@ public:
   /** \brief get function outputs */
   const std::vector<MX> & outputExpr() const;
   
-  /** \brief Access the algorithm */
+#ifndef SWIG
+  /** \brief Access the algorithm directly */
   const std::vector<MXAlgEl>& algorithm() const;
+#endif // SWIG
+  
+  /** \brief Get the number of atomic operations */
+  int getAlgorithmSize() const{ return algorithm().size();}
+
+  /** \brief Get the length of the work vector */
+  int getWorkSize() const;
   
   /** \brief Number of nodes in the algorithm */
   int countNodes() const;

@@ -364,19 +364,14 @@ std::string getOperatorRepresentation(const SX& x, const std::vector<std::string
   /** \brief Get all the free variables in an expression */
   SXMatrix getFree(const SXMatrix& ex);
 
-  /** \brief Extract all subexpressions from an expression */
-  #ifndef SWIG
-  void extractSubexpressions(SXMatrix& ex, SXMatrix& v, SXMatrix& vdef);
-  #else // SWIG
-  void extractSubexpressions(SXMatrix& INOUT, SXMatrix& OUTPUT, SXMatrix& OUTPUT);
-  #endif // SWIG
-
-  /** \brief Extract all subexpressions from an set of expressions */
-  #ifndef SWIG
-  void extractSubexpressions(std::vector<SXMatrix>& ex, SXMatrix& v, SXMatrix& vdef);
-  #else // SWIG
-  void extractSubexpressions(std::vector<SXMatrix>& INOUT, SXMatrix& OUTPUT, SXMatrix& OUTPUT);
-  #endif // SWIG
+  /** \brief Extract shared subexpressions from an set of expressions */
+  void extractShared(std::vector<SX>& ex, 
+                     std::vector<SX>& v, std::vector<SX>& vdef, 
+                     const std::string& v_prefix="v_", const std::string& v_suffix="");
+  
+  /** \brief Print compact, introducing new variables for shared subexpressions */
+  void printCompact(const SXMatrix& ex, std::ostream &stream=std::cout);
+  
   
 } // namespace CasADi
 

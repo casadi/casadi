@@ -139,5 +139,9 @@ std::vector<MX> MXFunction::getFree() const{
   return (*this)->free_vars_;
 }
 
+int MXFunction::getWorkSize() const{
+  return (*this)->work_.size();
+}
+
 } // namespace CasADi
 

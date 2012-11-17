@@ -1015,22 +1015,16 @@ Matrix<SX> jacobianTimesVector(const Matrix<SX> &ex, const Matrix<SX> &arg, cons
   return horzcat(dirder);
 }
 
-void extractSubexpressions(SXMatrix& ex, SXMatrix& v, SXMatrix& vdef){
-  std::vector<SXMatrix> exv(1,ex);
-  extractSubexpressions(exv,v,vdef);
-  ex = exv.front();
-}
-
-void extractSubexpressions(std::vector<SXMatrix>& ex, SXMatrix& v, SXMatrix& vdef){
+void extractShared(std::vector<SX>& ex, std::vector<SX>& v, std::vector<SX>& vdef, const std::string& v_prefix, const std::string& v_suffix){
   
   // Sort the expression
-  SXFunction f(vector<SXMatrix>(),ex);
+  SXFunction f(vector<SXMatrix>(),vector<SXMatrix>(1,ex));
   f.init();
 
   // Get references to the internal data structures
-  vector<SXAlgEl>& algorithm = f->algorithm_;
-  vector<SX>& s_work = f->s_work_;
-  vector<SX> s_work2 = s_work;
+  const vector<SXAlgEl>& algorithm = f.algorithm();
+  vector<SX> work(f.getWorkSize());
+  vector<SX> work2 = work;
   
   // Iterator to the binary operations
   vector<SX>::const_iterator b_it=f->operations_.begin();
@@ -1042,10 +1036,11 @@ void extractSubexpressions(std::vector<SXMatrix>& ex, SXMatrix& v, SXMatrix& vde
   vector<SX>::const_iterator p_it = f->free_vars_.begin();
 
   // Count how many times an expression has been used
-  vector<int> usecount(s_work.size(),0);
+  vector<int> usecount(work.size(),0);
   
-  // Definition of new variables
-  vector<SX> vvdef;
+  // New variables and definitions
+  v.clear();
+  vdef.clear();
   
   // Evaluate the algorithm
   for(vector<SXAlgEl>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it){
@@ -1058,7 +1053,8 @@ void extractSubexpressions(std::vector<SXMatrix>& ex, SXMatrix& v, SXMatrix& vde
         if(usecount[it->arg.i[1]]==0){
           usecount[it->arg.i[1]]=1;
         } else if(usecount[it->arg.i[1]]==1){
-          vvdef.push_back(s_work[it->arg.i[1]]);
+          // Get a suitable name
+          vdef.push_back(work[it->arg.i[1]]);
           usecount[it->arg.i[1]]=-1; // Extracted, do not extract again
         }
         // fall-through
@@ -1067,7 +1063,7 @@ void extractSubexpressions(std::vector<SXMatrix>& ex, SXMatrix& v, SXMatrix& vde
         if(usecount[it->arg.i[0]]==0){
           usecount[it->arg.i[0]]=1;
         } else if(usecount[it->arg.i[0]]==1){
-          vvdef.push_back(s_work[it->arg.i[0]]);
+          vdef.push_back(work[it->arg.i[0]]);
           usecount[it->arg.i[0]]=-1; // Extracted, do not extract again
         }
     }
@@ -1081,19 +1077,23 @@ void extractSubexpressions(std::vector<SXMatrix>& ex, SXMatrix& v, SXMatrix& vde
         usecount[it->res] = -1; // Never extract since it is a primitive type
         break;
       default:
-        s_work[it->res] = *b_it++; 
+        work[it->res] = *b_it++; 
         usecount[it->res] = 0; // Not (yet) extracted
         break;
     }
   }
   
   // Create intermediate variables
-  vdef = vvdef;
-  v = ssym("v",vdef.sparsity());
+  stringstream v_name;
+  for(int i=0; i<vdef.size(); ++i){
+    v_name.str(string());
+    v_name << v_prefix << i << v_suffix;
+    v.push_back(SX(v_name.str()));
+  }
   
   // Mark the above expressions
-  for(int i=0; i<vvdef.size(); ++i){
-    vvdef[i].setTemp(i+1);
+  for(int i=0; i<vdef.size(); ++i){
+    vdef[i].setTemp(i+1);
   }
   
   // Reset iterator
@@ -1102,29 +1102,47 @@ void extractSubexpressions(std::vector<SXMatrix>& ex, SXMatrix& v, SXMatrix& vde
   // Evaluate the algorithm
   for(vector<SXAlgEl>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it){
     switch(it->op){
-      case OP_OUTPUT: ex[it->res].data()[it->arg.i[1]] = s_work[it->arg.i[0]]; break;
-      case OP_CONST:      s_work2[it->res] = s_work[it->res] = *c_it++; break;
-      case OP_PARAMETER:  s_work2[it->res] = s_work[it->res] = *p_it++; break;
+      case OP_OUTPUT:     ex[it->arg.i[1]] = work[it->arg.i[0]];      break;
+      case OP_CONST:      work2[it->res] = work[it->res] = *c_it++; break;
+      case OP_PARAMETER:  work2[it->res] = work[it->res] = *p_it++; break;
       default:
       {
         switch(it->op){
-          CASADI_MATH_FUN_BUILTIN(s_work[it->arg.i[0]],s_work[it->arg.i[1]],s_work[it->res])
+          CASADI_MATH_FUN_BUILTIN(work[it->arg.i[0]],work[it->arg.i[1]],work[it->res])
         }
-        s_work2[it->res] = *b_it++; 
+        work2[it->res] = *b_it++; 
         
         // Replace with intermediate variables
-        int ind = s_work2[it->res].getTemp()-1;
+        int ind = work2[it->res].getTemp()-1;
         if(ind>=0){
-          vdef.at(ind) = s_work[it->res];
-          s_work[it->res] = v.at(ind);
+          vdef.at(ind) = work[it->res];
+          work[it->res] = v.at(ind);
         }
       }
     }
   }
 
   // Unmark the expressions
-  for(int i=0; i<vvdef.size(); ++i){
-    vvdef[i].setTemp(0);
+  for(int i=0; i<vdef.size(); ++i){
+    vdef[i].setTemp(0);
+  }
+}
+
+void printCompact(const SXMatrix& ex, std::ostream &stream){
+  // Extract shared subexpressions from ex
+  vector<SX> v,vdef;
+  SXMatrix ex_extracted = ex;
+  extractShared(ex_extracted.data(),v,vdef,"@","");
+  
+  // Print the expression without shared subexpressions
+  ex_extracted.print(stream);
+  
+  // Print the shared subexpressions
+  if(!v.empty()){
+    stream << endl << "where:" << endl;
+    for(int i=0; i<v.size(); ++i){
+      stream << v[i] << " := " << vdef[i] << endl;
+    }
   }
 }
 

@@ -49,6 +49,9 @@ class MultipleOutput : public MXNode{
     /** \brief  Number of outputs */
     virtual int getNumOutputs() const=0;
     
+    /** \brief  Get an output */
+    virtual MX getOutput(int oind) const;
+    
     /** \brief  Get the sparsity of output oind */
     virtual const CRSSparsity& sparsity(int oind)=0;
 

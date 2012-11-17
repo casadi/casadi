@@ -1017,5 +1017,12 @@ void MX::setTemp(int t){
   (*this)->temp = t;
 }
 
+int MX::getNumOutputs() const{
+  return (*this)->getNumOutputs();
+}
+  
+MX MX::getOutput(int oind) const{
+  return (*this)->getOutput(oind);
+}
  	  
 } // namespace CasADi

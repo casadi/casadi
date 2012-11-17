@@ -309,6 +309,14 @@ void substituteInPlace(const std::vector<MX>& v, std::vector<MX>& INOUT, std::ve
 template<> inline
 MX GenericMatrix<MX>::sym(const std::string& name, const CRSSparsity& sp){ return msym(name,sp);}
 
+/** \brief Extract shared subexpressions from an set of expressions */
+void extractShared(std::vector<MX>& ex, 
+                    std::vector<MX>& v, std::vector<MX>& vdef, 
+                    const std::string& v_prefix="v_", const std::string& v_suffix="");
+
+/** \brief Print compact, introducing new variables for shared subexpressions */
+void printCompact(const MX& ex, std::ostream &stream=std::cout);
+
 } // namespace CasADi
 
 #ifdef SWIG

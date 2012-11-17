@@ -164,6 +164,9 @@ class MXNode : public SharedObjectNode{
     
     /** \brief  Number of outputs */
     virtual int getNumOutputs() const{ return 1;}
+    
+    /** \brief  Get an output */
+    virtual MX getOutput(int oind) const;
 
     /// Get the sparsity
     const CRSSparsity& sparsity() const;

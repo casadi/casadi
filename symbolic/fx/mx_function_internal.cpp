@@ -780,15 +780,9 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
 
       // Copy answer of the evaluation, if known
       if(output_given){
-        if(it->data->isMultipleOutput()){
-          for(int oind=0; oind<output_p.size(); ++oind){
-            if(output_p[oind]){
-              *output_p[oind] = MX::create(new OutputNode(it->data,oind));
-            }
-          }
-        } else {
-          if(output_p[0]){
-            *output_p[0] = it->data;
+        for(int oind=0; oind<output_p.size(); ++oind){
+          if(output_p[oind]){
+            *output_p[oind] = it->data.getOutput(oind);
           }
         }
         

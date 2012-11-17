@@ -218,6 +218,12 @@ class MX : public GenericExpression<MX>, public GenericMatrix<MX>, public Shared
   /** \brief Get the nth dependency as MX */
   MX getDep(int ch=0) const;
   
+  /** \brief  Number of outputs */
+  int getNumOutputs() const;
+  
+  /** \brief  Get an output */
+  MX getOutput(int oind=0) const;
+
   /** \brief Get the number of dependencies of a binary SX */
   int getNdeps() const;
     

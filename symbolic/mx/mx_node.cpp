@@ -246,7 +246,9 @@ void MXNode::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_c
   dep_ = deepcopy(dep_,already_copied);
 }
 
-
-
+MX MXNode::getOutput(int oind) const{
+  casadi_assert_message(oind==0,"Output index out of bounds");
+  return shared_from_this<MX>();
+}
 
 } // namespace CasADi
