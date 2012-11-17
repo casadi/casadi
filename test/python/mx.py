@@ -616,11 +616,11 @@ class MXtests(casadiTestCase):
     self.numpyEvaluationCheck(lambda x: x[0][1], lambda x: matrix(sx0[1]).T,[x],x0,name="x[1]",setx0=[sx0])
     self.numpyEvaluationCheck(lambda x: x[0][-1], lambda x: matrix(sx0[-1]).T,[x],x0,name="x[-1]",setx0=[sx0])
     
-  def test_getinputMX(self):
-    self.message("outputMX/inputMX")
+  def test_getinputExpr(self):
+    self.message("outputExpr/inputExpr")
     x=MX("x",2,3)
     f = MXFunction([x],[3*x]) 
-    g = MXFunction([f.inputMX()],[6*f.outputMX()]) 
+    g = MXFunction([f.inputExpr(0)],[6*f.outputExpr(0)]) 
     
     f.init()
     g.init()
