@@ -1380,6 +1380,7 @@ LinearSolver CVodesInternal::getLinearSolver(){
 
 void CVodesInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
   SundialsInternal::deepCopyMembers(already_copied);
+  jac_ = deepcopy(jac_,already_copied);
   jac_f_ = deepcopy(jac_f_,already_copied);
 }
 

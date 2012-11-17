@@ -41,6 +41,8 @@ IdasInternal* IdasInternal::clone() const{
 
 void IdasInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
   SundialsInternal::deepCopyMembers(already_copied);
+  jac_ = deepcopy(jac_,already_copied);
+  jacB_ = deepcopy(jacB_,already_copied);
 }
 
 IdasInternal::IdasInternal(const FX& f, const FX& g) : SundialsInternal(f,g){
@@ -881,6 +883,9 @@ void IdasInternal::resetB(){
     flag = IDAGetConsistentICB(mem_, whichB_, rxz_, rxzdot_);
     if(flag != IDA_SUCCESS) idas_error("IDAGetConsistentICB",flag);
     
+  } else {
+    
+    
   }
 }
 
@@ -1157,12 +1162,12 @@ void IdasInternal::djac(long Neq, double t, double cj, N_Vector xz, N_Vector xzd
   time1 = clock();
   
   // Pass input to the Jacobian function
-  jac_.setInput(&t,JAC_T);
-  jac_.setInput(NV_DATA_S(xz),JAC_X);
-  jac_.setInput(NV_DATA_S(xz)+nx_,JAC_Z);
-  jac_.setInput(NV_DATA_S(xzdot),JAC_XDOT);
-  jac_.setInput(input(INTEGRATOR_P),JAC_P);
-  jac_.setInput(cj,JAC_CJ);
+  jac_.setInput(&t,DAE_T);
+  jac_.setInput(NV_DATA_S(xz),DAE_X);
+  jac_.setInput(NV_DATA_S(xz)+nx_,DAE_Z);
+  jac_.setInput(NV_DATA_S(xzdot),DAE_XDOT);
+  jac_.setInput(input(INTEGRATOR_P),DAE_P);
+  jac_.setInput(cj,DAE_NUM_IN);
     
   // Evaluate Jacobian
   jac_.evaluate();
@@ -1211,12 +1216,12 @@ void IdasInternal::bjac(long Neq, long mupper, long mlower, double t, double cj,
   time1 = clock();
 
   // Pass input to the jacobian function
-  jac_.setInput(&t,JAC_T);
-  jac_.setInput(NV_DATA_S(xz),JAC_X);
-  jac_.setInput(NV_DATA_S(xz)+nx_,JAC_Z);
-  jac_.setInput(NV_DATA_S(xzdot),JAC_XDOT);
-  jac_.setInput(input(INTEGRATOR_P),JAC_P);
-  jac_.setInput(cj,JAC_CJ);
+  jac_.setInput(&t,DAE_T);
+  jac_.setInput(NV_DATA_S(xz),DAE_X);
+  jac_.setInput(NV_DATA_S(xz)+nx_,DAE_Z);
+  jac_.setInput(NV_DATA_S(xzdot),DAE_XDOT);
+  jac_.setInput(input(INTEGRATOR_P),DAE_P);
+  jac_.setInput(cj,DAE_NUM_IN);
 
   // Evaluate jacobian
   jac_.evaluate();
@@ -1314,12 +1319,12 @@ void IdasInternal::psetup(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, do
   time1 = clock();
 
   // Pass input to the jacobian function
-  jac_.setInput(&t,JAC_T);
-  jac_.setInput(NV_DATA_S(xz),JAC_X);
-  jac_.setInput(NV_DATA_S(xz)+nx_,JAC_Z);
-  jac_.setInput(NV_DATA_S(xzdot),JAC_XDOT);
-  jac_.setInput(input(INTEGRATOR_P),JAC_P);
-  jac_.setInput(cj,JAC_CJ);
+  jac_.setInput(&t,DAE_T);
+  jac_.setInput(NV_DATA_S(xz),DAE_X);
+  jac_.setInput(NV_DATA_S(xz)+nx_,DAE_Z);
+  jac_.setInput(NV_DATA_S(xzdot),DAE_XDOT);
+  jac_.setInput(input(INTEGRATOR_P),DAE_P);
+  jac_.setInput(cj,DAE_NUM_IN);
 
   // Evaluate jacobian
   jac_.evaluate();
@@ -1542,24 +1547,14 @@ FX IdasInternal::getJacobian(){
   if(!f_sx.isNull()){
     // Get the Jacobian in the Newton iteration
     SX cj("cj");
-    SXMatrix jac_ode_x = f_sx.jac(DAE_X,DAE_ODE);
-    SXMatrix jac_ode_xdot = f_sx.jac(DAE_XDOT,DAE_ODE);
-    SXMatrix jac = jac_ode_x + cj*jac_ode_xdot;
+    SXMatrix jac = f_sx.jac(DAE_X,DAE_ODE) + cj*f_sx.jac(DAE_XDOT,DAE_ODE);
     if(nz_>0){
-      SXMatrix jac_alg_x = f_sx.jac(DAE_X,DAE_ALG);
-      SXMatrix jac_alg_z = f_sx.jac(DAE_Z,DAE_ALG);
-      SXMatrix jac_ode_z = f_sx.jac(DAE_Z,DAE_ODE);
-      jac = horzcat(vertcat(jac,jac_alg_x),vertcat(jac_ode_z,jac_alg_z));
+      jac = horzcat(vertcat(jac,f_sx.jac(DAE_X,DAE_ALG)),vertcat(f_sx.jac(DAE_Z,DAE_ODE),f_sx.jac(DAE_Z,DAE_ALG)));
     }
     
     // Jacobian function
-    vector<Matrix<SX> > jac_in(JAC_NUM_IN);
-    jac_in[JAC_T] = f_sx.inputSX(DAE_T);
-    jac_in[JAC_X] = f_sx.inputSX(DAE_X);
-    jac_in[JAC_Z] = f_sx.inputSX(DAE_Z);
-    jac_in[JAC_XDOT] = f_sx.inputSX(DAE_XDOT);
-    jac_in[JAC_P] = f_sx.inputSX(DAE_P);
-    jac_in[JAC_CJ] = cj;
+    vector<SXMatrix> jac_in = f_sx.inputExpr();
+    jac_in.push_back(cj);
     SXFunction J(jac_in,jac);
     
     // Save function
@@ -1578,17 +1573,60 @@ FX IdasInternal::getJacobian(){
     }
     
     // Jacobian function
-    vector<MX> jac_in(JAC_NUM_IN);
-    jac_in[JAC_T] = f_mx.inputMX(DAE_T);
-    jac_in[JAC_X] = f_mx.inputMX(DAE_X);
-    jac_in[JAC_Z] = f_mx.inputMX(DAE_Z);
-    jac_in[JAC_XDOT] = f_mx.inputMX(DAE_XDOT);
-    jac_in[JAC_P] = f_mx.inputMX(DAE_P);
-    jac_in[JAC_CJ] = cj;
+    vector<MX> jac_in = f_mx.inputExpr();
+    jac_in.push_back(cj);
     MXFunction J(jac_in,jac);
     
     // Save function
     jac_ = J;
+    return J;
+  }
+  
+  throw CasadiException("IdasInternal::getJacobian(): Not an SXFunction or MXFunction");
+}
+
+FX IdasInternal::getJacobianB(){
+  // Quick return if already created
+  if(!jacB_.isNull())
+    return jacB_;
+
+  // If SXFunction
+  SXFunction g_sx = shared_cast<SXFunction>(g_);
+  if(!g_sx.isNull()){
+    // Get the Jacobian in the Newton iteration
+    SX cj("cj");
+    SXMatrix jac = g_sx.jac(RDAE_RX,RDAE_ODE) + cj*g_sx.jac(RDAE_RXDOT,RDAE_ODE);
+    if(nrz_>0){
+      jac = horzcat(vertcat(jac,g_sx.jac(RDAE_RX,RDAE_ALG)),vertcat(g_sx.jac(RDAE_RZ,RDAE_ODE),g_sx.jac(RDAE_RZ,RDAE_ALG)));
+    }
+    
+    // Jacobian function
+    vector<SXMatrix> jac_in = g_sx.inputExpr();
+    jac_in.push_back(cj);
+    SXFunction J(jac_in,jac);
+    
+    // Save function
+    jacB_ = J;
+    return J;
+  }
+
+  // If SXFunction
+  MXFunction g_mx = shared_cast<MXFunction>(g_);
+  if(!g_mx.isNull()){
+    // Get the Jacobian in the Newton iteration
+    MX cj("cj");
+    MX jac = g_mx.jac(RDAE_RX,RDAE_ODE) + cj*g_mx.jac(RDAE_RXDOT,RDAE_ODE);
+    if(nrz_>0){
+      jac = horzcat(vertcat(jac,g_mx.jac(RDAE_RX,RDAE_ALG)),vertcat(g_mx.jac(RDAE_RZ,RDAE_ODE),g_mx.jac(RDAE_RZ,RDAE_ALG)));
+    }
+    
+    // Jacobian function
+    vector<MX> jac_in = g_mx.inputExpr();
+    jac_in.push_back(cj);
+    MXFunction J(jac_in,jac);
+    
+    // Save function
+    jacB_ = J;
     return J;
   }
   

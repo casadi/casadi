@@ -53,9 +53,6 @@ public:
   /** \brief  Set stop time for the integration */
   virtual void setStopTime(double tf) = 0;
   
-  /// Jacobian of the ODE/DAE with respect to the state and state derivatives (to be removed)
-  FX jac_;
-
   /// Linear solver
   LinearSolver linsol_;
   

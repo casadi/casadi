@@ -214,6 +214,8 @@ public:
   
   bool disable_internal_warnings_;
   
+  // Jacobian of the ODE with respect to the state and state derivatives
+  FX jac_;
 };
 
 } // namespace CasADi

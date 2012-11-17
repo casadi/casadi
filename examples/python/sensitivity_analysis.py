@@ -24,12 +24,12 @@
 from casadi import *
 from copy import deepcopy
 print "Testing sensitivity analysis in CasADi"
-CasadiOptions.setCatchErrorsPython(False)
+
 # All ODE and DAE integrators to be tested
 DAE_integrators = [CollocationIntegrator,IdasIntegrator]
 ODE_integrators = DAE_integrators + [CVodesIntegrator]
 
-for Integrators in (ODE_integrators,):    
+for Integrators in (ODE_integrators,DAE_integrators):    
   if Integrators==ODE_integrators: # rocket example
     print "******"
     print "Testing ODE example"
