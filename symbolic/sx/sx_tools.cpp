@@ -989,8 +989,8 @@ Matrix<SX> jacobianTimesVector(const Matrix<SX> &ex, const Matrix<SX> &arg, cons
   int nasens = transpose_jacobian ? v2 : 0;
   
   // Assemble arguments and directional derivatives
-  vector<SXMatrix> argv = f.inputsSX();
-  vector<SXMatrix> resv = f.outputsSX();
+  vector<SXMatrix> argv = f.inputExpr();
+  vector<SXMatrix> resv = f.outputExpr();
   vector<vector<SXMatrix> > fseed(nfsens,argv), fsens(nfsens,resv), aseed(nasens,resv), asens(nasens,argv);
   for(int dir=0; dir<v2; ++dir){
     if(transpose_jacobian){

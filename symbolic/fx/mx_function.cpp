@@ -86,14 +86,6 @@ const MX MXFunction::outputMX(int oind) const{
   return (*this)->outputv_.at(oind);
 }
 
-const std::vector<MX>& MXFunction::inputsMX() const {
-  return (*this)->inputv_;
-}
-  
-const std::vector<MX>& MXFunction::outputsMX() const {
-  return (*this)->outputv_;
-}
-
 const MX& MXFunction::inputExpr(int ind) const{
   return (*this)->inputv_.at(ind);
 }

@@ -100,22 +100,16 @@ public:
   /// get function output argument (to be deprecated)
   const MX outputMX(int oind=0) const;
   
-  /// get function inputs argument (to be deprecated)
-  const std::vector<MX> & inputsMX() const;
-  
-  /// get function outputs argument (to be deprecated)
-  const std::vector<MX> & outputsMX() const;
-  
-  /** \brief get function input */
+  /** \brief Get function input */
   const MX& inputExpr(int ind) const;
   
-  /** \brief get function output */
+  /** \brief Get function output */
   const MX& outputExpr(int ind) const;
   
-  /** \brief get function inputs */
+  /** \brief Get all function inputs */
   const std::vector<MX>& inputExpr() const;
   
-  /** \brief get function outputs */
+  /** \brief Get all function outputs */
   const std::vector<MX> & outputExpr() const;
   
 #ifndef SWIG

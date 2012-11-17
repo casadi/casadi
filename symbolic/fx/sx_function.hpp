@@ -124,23 +124,17 @@ public:
   
   /** \brief get function output (to be deprecated) */
   const SXMatrix& outputSX(int ind=0) const;
-  
-  /** \brief get function inputs (to be deprecated) */
-  const std::vector<SXMatrix>& inputsSX() const;
-  
-  /** \brief get function outputs (to be deprecated) */
-  const std::vector<SXMatrix> & outputsSX() const;
-  
-  /** \brief get function input */
+    
+  /** \brief Get function input */
   const SXMatrix& inputExpr(int ind) const;
   
-  /** \brief get function output */
+  /** \brief Get function output */
   const SXMatrix& outputExpr(int ind) const;
   
-  /** \brief get function inputs */
+  /** \brief Get all function inputs */
   const std::vector<SXMatrix>& inputExpr() const;
   
-  /** \brief get function outputs */
+  /** \brief Get all function outputs */
   const std::vector<SXMatrix> & outputExpr() const;
   
   /** \brief Export / Generate C code for the function */
