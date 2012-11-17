@@ -153,7 +153,7 @@ class Integrationtests(casadiTestCase):
                 if not ff.input(INTEGRATOR_RX0).empty():
                   ff.input(INTEGRATOR_RX0).set(0.13)
               
-              self.checkfx(integrator,fs,digits=7,failmessage="%s: %s => %s, %s => %s, explicit (%s) tstart = %f" % (Integrator.__name__,str(din),str(dout),str(rdin),str(rdout),str(solution),tstart))
+              self.checkfx(integrator,fs,digits=7,failmessage="%s: %s => %s, %s => %s, explicit (%s) tstart = %f" % (Integrator.__name__,str(din),str(dout),str(rdin),str(rdout),str(solution),tstart),verbose=False)
 
       
   def setUp(self):

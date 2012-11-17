@@ -860,7 +860,7 @@ void IdasInternal::resetB(){
     flag = IDAReInitB(mem_, whichB_, tf_, rxz_, rxzdot_);
     if(flag != IDA_SUCCESS) idas_error("IDAReInitB",flag);
     
-    if(np_>0){
+    if(nrq_>0){
       N_VConst(0.0,rq_);
       flag = IDAQuadReInit(IDAGetAdjIDABmem(mem_, whichB_),rq_);
       // flag = IDAQuadReInitB(mem_,whichB_[dir],rq_[dir]); // BUG in Sundials - do not use this!
@@ -891,16 +891,18 @@ void IdasInternal::integrateB(double t_out){
   if(flag<IDA_SUCCESS) idas_error("IDASolveB",flag);
 
   // Get the sensitivities
-  double tret;
+  double tret;  
   flag = IDAGetB(mem_, whichB_, &tret, rxz_, rxzdot_);
   if(flag!=IDA_SUCCESS) idas_error("IDAGetB",flag);
 
-  flag = IDAGetQuadB(mem_, whichB_, &tret, rq_);
-  if(flag!=IDA_SUCCESS) idas_error("IDAGetQuadB",flag);
+  if(nrq_>0){
+    flag = IDAGetQuadB(mem_, whichB_, &tret, rq_);
+    if(flag!=IDA_SUCCESS) idas_error("IDAGetQuadB",flag);
+  }
   
   // Save the adjoint sensitivities
-  const double *xz = NV_DATA_S(rxz_);
-  copy(xz,xz+nx_,output(INTEGRATOR_RXF).begin());
+  const double *rxz = NV_DATA_S(rxz_);
+  copy(rxz,rxz+nrx_,output(INTEGRATOR_RXF).begin());
 }
 
 void IdasInternal::printStats(std::ostream &stream) const{
@@ -1203,13 +1205,13 @@ int IdasInternal::djac_wrapper(long Neq, double t, double cj, N_Vector xz, N_Vec
   }
 }
 
-void IdasInternal::bjac(long Neq, long mupper, long mlower, double tt, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, N_Vector tmp1, N_Vector tmp2,N_Vector tmp3){
+void IdasInternal::bjac(long Neq, long mupper, long mlower, double t, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, N_Vector tmp1, N_Vector tmp2,N_Vector tmp3){
   log("IdasInternal::bjac","begin");
   // Get time
   time1 = clock();
 
   // Pass input to the jacobian function
-  jac_.setInput(tt,JAC_T);
+  jac_.setInput(&t,JAC_T);
   jac_.setInput(NV_DATA_S(xz),JAC_X);
   jac_.setInput(NV_DATA_S(xz)+nx_,JAC_Z);
   jac_.setInput(NV_DATA_S(xzdot),JAC_XDOT);
@@ -1312,7 +1314,7 @@ void IdasInternal::psetup(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, do
   time1 = clock();
 
   // Pass input to the jacobian function
-  jac_.setInput(t,JAC_T);
+  jac_.setInput(&t,JAC_T);
   jac_.setInput(NV_DATA_S(xz),JAC_X);
   jac_.setInput(NV_DATA_S(xz)+nx_,JAC_Z);
   jac_.setInput(NV_DATA_S(xzdot),JAC_XDOT);
