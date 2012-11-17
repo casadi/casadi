@@ -407,12 +407,12 @@ KinsolSolver KinsolInternal::jac(const std::vector<int> iind, int oind){
 
   // All variables
   vector<Matrix<SX> > f_in(f.getNumInputs());
-  f_in[0] = f.inputSX(0);
+  f_in[0] = f.inputExpr(0);
   for(int i=1; i<f.getNumInputs(); ++i)
-    f_in[i] = f.inputSX(i);
+    f_in[i] = f.inputExpr(i);
 
   // Augmented nonlinear equation
-  Matrix<SX> F_aug = f.outputSX();
+  Matrix<SX> F_aug = f.outputExpr(0);
 
   // Number of right hand sides
   int nrhs = 1;
@@ -491,7 +491,7 @@ void KinsolInternal::func(N_Vector u, N_Vector fval){
 		if(!f_sx.isNull()){
 		  f_sx.print(ss);
 		  ss << f_sx->work_ << endl;
-		  ss << "Equation " << k << " = " << f_sx.outputSX().at(k) << endl;
+		  ss << "Equation " << k << " = " << f_sx.outputExpr(0).at(k) << endl;
 		}
 	  }
 
@@ -708,14 +708,14 @@ void KinsolInternal::psetup(N_Vector u, N_Vector uscale, N_Vector fval, N_Vector
 		// Print the expression for f[Jrow] if f is an SXFunction instance
 		SXFunction f_sx = shared_cast<SXFunction>(f_);
 		if(!f_sx.isNull()){
-		  ss << "Variable " << Jcol << " = " << f_sx.inputSX().at(Jcol) << endl;
-		  ss << "Equation " << Jrow << " = " << f_sx.outputSX().at(Jrow) << endl;
+		  ss << "Variable " << Jcol << " = " << f_sx.inputExpr(0).at(Jcol) << endl;
+		  ss << "Equation " << Jrow << " = " << f_sx.outputExpr(0).at(Jrow) << endl;
 		}
 		
 		// Print the expression for J[k] if J is an SXFunction instance
 		SXFunction J_sx = shared_cast<SXFunction>(J_);
 		if(!J_sx.isNull()){
-		  ss << "J[" << Jrow << "," << Jcol << "] = " << J_sx.outputSX().at(k) << endl;
+		  ss << "J[" << Jrow << "," << Jcol << "] = " << J_sx.outputExpr(0).at(k) << endl;
 		}
 	  }
 

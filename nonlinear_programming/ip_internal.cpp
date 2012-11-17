@@ -51,9 +51,9 @@ void IPInternal::init(){
   SXFunction GG = shared_cast<SXFunction>(G_);
 
   // Split up the problem
-  SXMatrix x = FF.inputSX();
-  SXMatrix f = FF.outputSX();
-  SXMatrix g = GG.outputSX();
+  SXMatrix x = FF.inputExpr(0);
+  SXMatrix f = FF.outputExpr(0);
+  SXMatrix g = GG.outputExpr(0);
 //   cout << "x = " << x << endl;
 //   cout << "f = " << f << endl;
 //   cout << "g = " << g << endl;

@@ -141,10 +141,10 @@ for (i,x0) in enumerate([0.08]):
   max_iter = 30  # Maximum number of iterations
 
   # Extract the free variable and expressions for F and xdef
-  u = F1.inputSX()
-  f1 = F1.outputSX()
-  f2 = F2.outputSX()
-  xdef = ifcn.outputSX()
+  u = F1.inputExpr(0)
+  f1 = F1.outputExpr(0)
+  f2 = F2.outputExpr(0)
+  xdef = ifcn.outputExpr(0)
 
   ## Lifted variables
   x = ssym("x",xdef.size())

@@ -8,9 +8,8 @@
 * \sa
 * \code
 * CasADi::MXfunction::expand();
-* CasADi::MXfunction::outputMX();
-* CasADi::SXfunction::outputSX();
-* CasADi::Jacobian;
+* CasADi::MXfunction::outputExpr();
+* CasADi::SXfunction::outputExpr();
 * \endcode
 *
 */

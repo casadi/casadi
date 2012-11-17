@@ -219,7 +219,7 @@ class NLPtests(casadiTestCase):
     
     sigma=SX("sigma")
     lambd=SX("lambd")
-    h=SXFunction([vertcat([x,y]),lambd,sigma],[sigma*hessian(obj,vertcat([x,y]))+lambd*hessian(g.outputSX(0),vertcat([x,y]))])
+    h=SXFunction([vertcat([x,y]),lambd,sigma],[sigma*hessian(obj,vertcat([x,y]))+lambd*hessian(g.outputExpr(0),vertcat([x,y]))])
     h.init()
     h.input().set([0.5,0.5])
     h.input(1).set(-40)
@@ -329,7 +329,7 @@ class NLPtests(casadiTestCase):
     
     sigma=SX("sigma")
     lambd=SX("lambd")
-    h=SXFunction([vertcat([x,y]),lambd,sigma],[sigma*hessian(obj,vertcat([x,y]))+lambd*hessian(g.outputSX(0),vertcat([x,y]))])
+    h=SXFunction([vertcat([x,y]),lambd,sigma],[sigma*hessian(obj,vertcat([x,y]))+lambd*hessian(g.outputExpr(0),vertcat([x,y]))])
 
     for Solver in solvers:
       self.message(str(Solver))

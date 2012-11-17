@@ -35,12 +35,12 @@ f = MXFunction([x,y],[z])
 f.init()
 
 #! An MX graph is lazy in evaluation
-print "Expression = ", f.outputMX()
+print "Expression = ", f.outputExpr(0)
 
 #! We expand the MXFunction into an SXFunction
 fSX = f.expand()
 
-print "Expanded expression = ", fSX.outputSX()
+print "Expanded expression = ", fSX.outputExpr(0)
 
 
 #! Limitations

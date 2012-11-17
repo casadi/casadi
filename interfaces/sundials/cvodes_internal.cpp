@@ -108,9 +108,9 @@ void CVodesInternal::init(){
       
       // Jacobian function
       vector<SXMatrix> jac_in(M_NUM_IN);
-      jac_in[M_T] = f.inputSX(DAE_T);
-      jac_in[M_Y] = f.inputSX(DAE_X);
-      jac_in[M_P] = f.inputSX(DAE_P);
+      jac_in[M_T] = f.inputExpr(DAE_T);
+      jac_in[M_Y] = f.inputExpr(DAE_X);
+      jac_in[M_P] = f.inputExpr(DAE_P);
       jac_in[M_GAMMA] = gamma;
       SXFunction M(jac_in,jac);
       

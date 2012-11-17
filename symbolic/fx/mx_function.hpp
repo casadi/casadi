@@ -94,12 +94,6 @@ public:
   /** \brief  Const access functions of the node */
   const MXFunctionInternal* operator->() const;
 
-  /// get function input argument (to be deprecated)
-  const MX inputMX(int iind=0) const;
-  
-  /// get function output argument (to be deprecated)
-  const MX outputMX(int oind=0) const;
-  
   /** \brief Get function input */
   const MX& inputExpr(int ind) const;
   

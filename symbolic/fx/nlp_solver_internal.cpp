@@ -214,8 +214,8 @@ void NLPSolverInternal::init(){
       // Efficient if both functions are SXFunction
       if(!F_sx.isNull() && !G_sx.isNull()){
         // Expression for f and g
-        SXMatrix f = F_sx.outputSX();
-        SXMatrix g = G_sx.outputSX();
+        SXMatrix f = F_sx.outputExpr(0);
+        SXMatrix g = G_sx.outputExpr(0);
         
         // Numeric hessian
         bool f_num_hess = F_sx.getOption("numeric_hessian");
@@ -228,8 +228,8 @@ void NLPSolverInternal::init(){
         int g_num_adj = G_sx.getOption("number_of_adj_dir");
         
         // Substitute symbolic variables in f if different input variables from g
-        if(!isEqual(F_sx.inputSX(),G_sx.inputSX())){
-          f = substitute(f,F_sx.inputSX(),G_sx.inputSX());
+        if(!isEqual(F_sx.inputExpr(0),G_sx.inputExpr(0))){
+          f = substitute(f,F_sx.inputExpr(0),G_sx.inputExpr(0));
         }
         
         // Lagrange multipliers
@@ -240,10 +240,10 @@ void NLPSolverInternal::init(){
         
         // Lagrangian function
         vector<SXMatrix> lfcn_in(parametric_? 4: 3);
-        lfcn_in[0] = G_sx.inputSX();
+        lfcn_in[0] = G_sx.inputExpr(0);
         lfcn_in[1] = lam;
         lfcn_in[2] = sigma;
-        if (parametric_) lfcn_in[3] = G_sx.inputSX(1);
+        if (parametric_) lfcn_in[3] = G_sx.inputExpr(1);
         SXFunction lfcn(lfcn_in, sigma*f + inner_prod(lam,g));
         lfcn.setOption("verbose",getOption("verbose"));
         lfcn.setOption("numeric_hessian",f_num_hess || g_num_hess);
@@ -262,12 +262,12 @@ void NLPSolverInternal::init(){
         MXFunction G_mx = shared_cast<MXFunction>(G_);
         
         // If they are, check if the arguments are the same
-        if(!F_mx.isNull() && !G_mx.isNull() && isEqual(F_mx.inputMX(),G_mx.inputMX())){
+        if(!F_mx.isNull() && !G_mx.isNull() && isEqual(F_mx.inputExpr(0),G_mx.inputExpr(0))){
           casadi_warning("Exact Hessian calculation for MX is still experimental");
           
           // Expression for f and g
-          MX f = F_mx.outputMX();
-          MX g = G_mx.outputMX();
+          MX f = F_mx.outputExpr(0);
+          MX g = G_mx.outputExpr(0);
           
           // Lagrange multipliers
           MX lam("lam",g.size1());
@@ -277,17 +277,17 @@ void NLPSolverInternal::init(){
 
           // Inputs of the Lagrangian function
           vector<MX> lfcn_in(parametric_? 4:3);
-          lfcn_in[0] = G_mx.inputMX();
+          lfcn_in[0] = G_mx.inputExpr(0);
           lfcn_in[1] = lam;
           lfcn_in[2] = sigma;
-          if (parametric_) lfcn_in[3] = G_mx.inputMX(1);
+          if (parametric_) lfcn_in[3] = G_mx.inputExpr(1);
 
           // Lagrangian function
           MXFunction lfcn(lfcn_in,sigma*f+ inner_prod(lam,g));
           lfcn.init();
 	  log("SX Lagrangian function generated");
           
-/*          cout << "countNodes(lfcn.outputMX()) = " << countNodes(lfcn.outputMX()) << endl;*/
+/*          cout << "countNodes(lfcn.outputExpr(0)) = " << countNodes(lfcn.outputExpr(0)) << endl;*/
       
           bool adjoint_mode = true;
           if(adjoint_mode){
@@ -299,7 +299,7 @@ void NLPSolverInternal::init(){
             MXFunction glfcn(lfcn_in,gL);
             glfcn.init();
             log("MX Lagrangian gradient function initialized");
-//           cout << "countNodes(glfcn.outputMX()) = " << countNodes(glfcn.outputMX()) << endl;
+//           cout << "countNodes(glfcn.outputExpr(0)) = " << countNodes(glfcn.outputExpr(0)) << endl;
 
             // Get Hessian sparsity
             CRSSparsity H_sp = glfcn.jacSparsity();

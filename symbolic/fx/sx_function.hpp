@@ -118,12 +118,6 @@ public:
   
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
-
-  /** \brief get function input (to be deprecated) */
-  const SXMatrix& inputSX(int ind=0) const;
-  
-  /** \brief get function output (to be deprecated) */
-  const SXMatrix& outputSX(int ind=0) const;
     
   /** \brief Get function input */
   const SXMatrix& inputExpr(int ind) const;

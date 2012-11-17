@@ -78,14 +78,6 @@ MXFunctionInternal* MXFunction::operator->(){
   return (MXFunctionInternal*)FX::operator->();
 }
 
-const MX MXFunction::inputMX(int iind) const{
-  return (*this)->inputv_.at(iind);
-}
-
-const MX MXFunction::outputMX(int oind) const{
-  return (*this)->outputv_.at(oind);
-}
-
 const MX& MXFunction::inputExpr(int ind) const{
   return (*this)->inputv_.at(ind);
 }

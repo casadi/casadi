@@ -44,4 +44,4 @@ print f.getNumOutputs()
 #! automatic typecasting functionality
 
 for i in range(3):
-  print f.outputSX(i)
+  print f.outputExpr(i)

@@ -340,9 +340,9 @@ int main(){
     cout << "expanded lifted NLP (" << fg_expanded.getAlgorithmSize() << " nodes)" << endl;
     
     // Formulate the NLP
-    SXMatrix nlp_x = fg_expanded.inputSX();
-    SXMatrix nlp_f = fg_expanded.outputSX(0);
-    SXMatrix nlp_g = fg_expanded.outputSX(1);
+    SXMatrix nlp_x = fg_expanded.inputExpr(0);
+    SXMatrix nlp_f = fg_expanded.outputExpr(0);
+    SXMatrix nlp_g = fg_expanded.outputExpr(1);
     SXFunction ffcn(nlp_x,nlp_f);
     SXFunction gfcn(nlp_x,nlp_g);
 

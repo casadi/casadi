@@ -54,9 +54,9 @@ TOL = 1e-6     # Stopping tolerance
 max_iter = 100  # Maximum number of iterations
 
 # Extract the free variable and expressions for F and xdef
-u = ffcn.inputSX()
-f = ffcn.outputSX()
-xdef = ifcn.outputSX()
+u = ffcn.inputExpr(0)
+f = ffcn.outputExpr(0)
+xdef = ifcn.outputExpr(0)
 
 # Lifted variables
 x = ssym("x",xdef.size())

@@ -100,14 +100,6 @@ SXMatrix SXFunction::hess(int iind, int oind){
   return (*this)->hess(iind,oind);
 }
 
-const SXMatrix& SXFunction::inputSX(int ind) const{
-  return (*this)->inputv_.at(ind);
-}
-
-const SXMatrix& SXFunction::outputSX(int ind) const{
-  return (*this)->outputv_.at(ind);
-}
-
 const SXMatrix& SXFunction::inputExpr(int ind) const{
   return (*this)->inputv_.at(ind);
 }
