@@ -236,8 +236,8 @@ class IdasInternal : public SundialsInternal{
   // Jacobian of the DAE with respect to the state and state derivatives
   FX jac_, jacB_;
   
-  // Function that calculates z
-  FX zfcn_;
+  // Function that calculates xdot and z
+  FX odefcn_;
   
 };
 

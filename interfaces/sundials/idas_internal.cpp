@@ -857,7 +857,85 @@ void IdasInternal::resetB(){
   // Get the adjoint seeds
   const Matrix<double> &xf_aseed = input(INTEGRATOR_RX0);
   copy(xf_aseed.begin(),xf_aseed.end(),NV_DATA_S(rxz_));
+  
+  // Quickfix to get consistent initial conditions for the backward integration //FIXME!
+  if(nrz_>0){
+    // Write rz as an explicit function of the other variables
+    if(odefcn_.isNull()){
+      SXFunction g = shared_cast<SXFunction>(g_);
+      if(!g.isNull()){
+        // Get algebraic variable and equation
+        SXMatrix rz = g.inputExpr(RDAE_RZ);
+        SXMatrix ralg = g.outputExpr(RDAE_ALG);
+        
+        // Linearize
+        SXMatrix J = CasADi::jacobian(ralg,rz);
+        SXMatrix r = substitute(ralg,rz,SXMatrix(rz.sparsity(),0));
+        
+        // Solve for rz
+        SXMatrix ralg_explicit = solve(J,-r);
+      
+        // Get state derivative and differential equation
+        SXMatrix rxdot = g.inputExpr(RDAE_RXDOT);
+        SXMatrix rode = g.outputExpr(RDAE_ODE);
+
+        // Substitute in the expression for z
+        rode = substitute(rode,rz,ralg_explicit);
+        
+        // Linearize
+        J = CasADi::jacobian(rode,rxdot);
+        r = substitute(rode,rxdot,SXMatrix(rxdot.sparsity(),0));
+        
+        // Solve for rxdot
+        SXMatrix rode_explicit = solve(J,-r);
+        
+        // Function to calculate rxdot and rz
+        vector<SXMatrix> odefcn_out(2);
+        odefcn_out[0] = -rode_explicit;
+        odefcn_out[1] = ralg_explicit;
+        odefcn_ = SXFunction(g.inputExpr(),odefcn_out);
+        odefcn_.init();
+      }
+    }
+
+    if(!odefcn_.isNull()){
+      odefcn_.setInput(&tf_,RDAE_T);
+      odefcn_.setInput(NV_DATA_S(xz_),RDAE_X);
+      odefcn_.setInput(NV_DATA_S(xz_)+nx_,RDAE_Z);
+      odefcn_.setInput(NV_DATA_S(xzdot_),RDAE_XDOT);
+      odefcn_.setInput(input(INTEGRATOR_P),RDAE_P);
+      odefcn_.setInput(input(INTEGRATOR_RP),RDAE_RP);
+      odefcn_.setInput(NV_DATA_S(rxz_),RDAE_RX);
+      odefcn_.setInput(NV_DATA_S(rxz_)+nrx_,RDAE_RZ); // NOTE: odefcn_ should not depend on rz
+      odefcn_.setInput(NV_DATA_S(rxzdot_),RDAE_RXDOT); // NOTE: odefcn_ should not depend on rxdot
     
+      // Negate as we are integrating backwards in time
+      for(int i=0; i<odefcn_.input(RDAE_RXDOT).size(); ++i)
+        odefcn_.input(RDAE_RXDOT).at(i) *= -1;
+
+      odefcn_.evaluate();
+      odefcn_.getOutput(NV_DATA_S(rxzdot_),0);
+      odefcn_.getOutput(NV_DATA_S(rxz_)+nrx_,1);
+    
+//       // Evaluate g for consitency
+//       for(int k=0; k<RDAE_NUM_IN; ++k){
+//         g_.setInput(odefcn_.input(k),k);
+//       }
+//       g_.setInput(NV_DATA_S(rxz_)+nrx_,RDAE_RZ);
+//       g_.setInput(NV_DATA_S(rxzdot_),RDAE_RXDOT);
+//       
+//       // Negate as we are integrating backwards in time
+//       for(int i=0; i<g_.input(RDAE_RXDOT).size(); ++i)
+//         g_.input(RDAE_RXDOT).at(i) *= -1;
+//       
+//       g_.evaluate();
+//       
+//       // Save to output
+//       cout << "RODE "<< g_.output(RDAE_ODE) << endl;
+//       cout << "RALG "<< g_.output(RDAE_ALG) << endl;
+    }
+  }
+  
   if(isInitAdj_){
     flag = IDAReInitB(mem_, whichB_, tf_, rxz_, rxzdot_);
     if(flag != IDA_SUCCESS) idas_error("IDAReInitB",flag);
@@ -882,61 +960,6 @@ void IdasInternal::resetB(){
     // Retrieve the initial values
     flag = IDAGetConsistentICB(mem_, whichB_, rxz_, rxzdot_);
     if(flag != IDA_SUCCESS) idas_error("IDAGetConsistentICB",flag);
-  } else {
-    
-    // Quickfix to get consistent initial conditions for the backward integration //FIXME!
-    if(nrz_>0){
-      // Write rz as an explicit function of the other variables
-      if(zfcn_.isNull()){
-        SXFunction g = shared_cast<SXFunction>(g_);
-        if(!g.isNull()){
-          SXMatrix ralg = g.outputExpr(RDAE_ALG);
-          SXMatrix rz = g.inputExpr(RDAE_RZ);
-          
-          // Linearize
-          SXMatrix J = CasADi::jacobian(ralg,rz);
-          SXMatrix r = substitute(ralg,rz,SXMatrix(rz.sparsity(),0));
-          
-          // Solve for z
-          SXMatrix z = solve(J,-r);
-        
-          // Function to calculate z
-          zfcn_ = SXFunction(g.inputExpr(),z);
-          zfcn_.init();
-        }
-      }
-
-      if(!zfcn_.isNull()){
-        zfcn_.setInput(&tf_,RDAE_T);
-        zfcn_.setInput(NV_DATA_S(xz_),RDAE_X);
-        zfcn_.setInput(NV_DATA_S(xz_)+nx_,RDAE_Z);
-        zfcn_.setInput(NV_DATA_S(xzdot_),RDAE_XDOT);
-        zfcn_.setInput(input(INTEGRATOR_P),RDAE_P);
-        zfcn_.setInput(input(INTEGRATOR_RP),RDAE_RP);
-        zfcn_.setInput(NV_DATA_S(rxz_),RDAE_RX);
-        zfcn_.setInput(NV_DATA_S(rxz_)+nrx_,RDAE_RZ);
-        zfcn_.setInput(NV_DATA_S(rxzdot_),RDAE_RXDOT);
-      
-        // Negate as we are integrating backwards in time
-        for(int i=0; i<zfcn_.input(RDAE_RXDOT).size(); ++i)
-          zfcn_.input(RDAE_RXDOT).at(i) *= -1;
-
-        // Get rz
-        for(int k=0; k<RDAE_NUM_IN; ++k){
-          zfcn_.setInput(g_.input(k),k);
-        }
-        zfcn_.evaluate();
-        zfcn_.getOutput(NV_DATA_S(rxz_)+nrx_);
-        zfcn_.setInput(zfcn_.output(),RDAE_RZ);
-      
-        flag = IDACalcICB(mem_, whichB_, t0_, rxz_, rxzdot_);
-        if(flag != IDA_SUCCESS) idas_error("IDACalcICB",flag);
-
-        // Retrieve the initial values
-        flag = IDAGetConsistentICB(mem_, whichB_, rxz_, rxzdot_);
-        if(flag != IDA_SUCCESS) idas_error("IDAGetConsistentICB",flag);
-      }
-    }
   }
 }
 

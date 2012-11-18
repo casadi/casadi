@@ -278,6 +278,8 @@ SX SX::__div__(const SX& y) const{
     return 0;
   else if(y->isOne()) // term2 is one
     return *this;
+  else if(y->isMinusOne())
+    return -(*this);
   else if(isEquivalent(y)) // terms are equal
     return 1;
   else if(isDoubled() && y.isEqual(2))

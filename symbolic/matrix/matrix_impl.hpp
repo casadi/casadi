@@ -519,7 +519,7 @@ void Matrix<T>::printDense(std::ostream &stream) const{
 template<class T>
 void Matrix<T>::printSparse(std::ostream &stream) const {
   stream << className() << "(rows = " << size1() << ", cols = " << size2() << ", nnz = " << size() << ")";
-  if (size()>0) stream << ":";
+  if (size()>0) stream << ":" << std::endl;
   for(int i=0; i<size1(); ++i)
     for(int el=rowind(i); el<rowind(i+1); ++el){
       int j=col(el);
