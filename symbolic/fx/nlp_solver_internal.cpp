@@ -178,9 +178,8 @@ void NLPSolverInternal::init(){
     casadi_assert_message(!gauss_newton_,"Automatic generation of Gauss-Newton Hessian not yet supported");
     log("generating hessian");
     
-    // Simple if unconstrained
-    if(G_.isNull()){
-      // Create Hessian of the objective function
+    if(G_.isNull()){ // unconstrained
+      // Calculate Hessian and wrap to get required syntax
       FX HF = F_.hessian();
       HF.init();
       
@@ -205,31 +204,20 @@ void NLPSolverInternal::init(){
       H_ = MXFunction(H_in, sigma*hf);
       log("Unconstrained Hessian function generated");
       
-    } else { // G_.isNull()
+    } else { // Constrained
       
-      // Check if the functions are SXFunctions
-      SXFunction F_sx = shared_cast<SXFunction>(F_);
-      SXFunction G_sx = shared_cast<SXFunction>(G_);
-      
-      // Efficient if both functions are SXFunction
-      if(!F_sx.isNull() && !G_sx.isNull()){
+      // SXFunction if both functions are SXFunction
+      if(is_a<SXFunction>(F_) && is_a<SXFunction>(G_)){
+        SXFunction F = shared_cast<SXFunction>(F_);
+        SXFunction G = shared_cast<SXFunction>(G_);
+        
         // Expression for f and g
-        SXMatrix f = F_sx.outputExpr(0);
-        SXMatrix g = G_sx.outputExpr(0);
-        
-        // Numeric hessian
-        bool f_num_hess = F_sx.getOption("numeric_hessian");
-        bool g_num_hess = G_sx.getOption("numeric_hessian");
-        
-        // Number of derivative directions
-        int f_num_fwd = F_sx.getOption("number_of_fwd_dir");
-        int g_num_fwd = G_sx.getOption("number_of_fwd_dir");
-        int f_num_adj = F_sx.getOption("number_of_adj_dir");
-        int g_num_adj = G_sx.getOption("number_of_adj_dir");
+        SXMatrix f = F.outputExpr(0);
+        SXMatrix g = G.outputExpr(0);
         
         // Substitute symbolic variables in f if different input variables from g
-        if(!isEqual(F_sx.inputExpr(0),G_sx.inputExpr(0))){
-          f = substitute(f,F_sx.inputExpr(0),G_sx.inputExpr(0));
+        if(!isEqual(F.inputExpr(0),G.inputExpr(0))){
+          f = substitute(f,F.inputExpr(0),G.inputExpr(0));
         }
         
         // Lagrange multipliers
@@ -240,98 +228,72 @@ void NLPSolverInternal::init(){
         
         // Lagrangian function
         vector<SXMatrix> lfcn_in(parametric_? 4: 3);
-        lfcn_in[0] = G_sx.inputExpr(0);
+        lfcn_in[0] = G.inputExpr(0);
         lfcn_in[1] = lam;
         lfcn_in[2] = sigma;
-        if (parametric_) lfcn_in[3] = G_sx.inputExpr(1);
+        if (parametric_) lfcn_in[3] = G.inputExpr(1);
         SXFunction lfcn(lfcn_in, sigma*f + inner_prod(lam,g));
-        lfcn.setOption("verbose",getOption("verbose"));
-        lfcn.setOption("numeric_hessian",f_num_hess || g_num_hess);
-        lfcn.setOption("number_of_fwd_dir",std::min(f_num_fwd,g_num_fwd));
-        lfcn.setOption("number_of_adj_dir",std::min(f_num_adj,g_num_adj));
         lfcn.init();
         
         // Hessian of the Lagrangian
-        H_ = static_cast<FX&>(lfcn).hessian();
-        H_.setOption("verbose",getOption("verbose"));
+        H_ = lfcn.hessian();
         log("SX Hessian function generated");
         
-      } else { // !F_sx.isNull() && !G_sx.isNull()
-        // Check if the functions are SXFunctions
-        MXFunction F_mx = shared_cast<MXFunction>(F_);
-        MXFunction G_mx = shared_cast<MXFunction>(G_);
+      } else { // MXFunction otherwise
+
+        // Try to cast into MXFunction
+        MXFunction F = shared_cast<MXFunction>(F_);
+        MXFunction G = shared_cast<MXFunction>(G_);
+
+        // Expressions in F and G
+        vector<MX> FG_in;
+        MX f, g;
         
-        // If they are, check if the arguments are the same
-        if(!F_mx.isNull() && !G_mx.isNull() && isEqual(F_mx.inputExpr(0),G_mx.inputExpr(0))){
-          casadi_warning("Exact Hessian calculation for MX is still experimental");
-          
-          // Expression for f and g
-          MX f = F_mx.outputExpr(0);
-          MX g = G_mx.outputExpr(0);
-          
-          // Lagrange multipliers
-          MX lam("lam",g.size1());
-      
-          // Objective function scaling
-          MX sigma("sigma");
-
-          // Inputs of the Lagrangian function
-          vector<MX> lfcn_in(parametric_? 4:3);
-          lfcn_in[0] = G_mx.inputExpr(0);
-          lfcn_in[1] = lam;
-          lfcn_in[2] = sigma;
-          if (parametric_) lfcn_in[3] = G_mx.inputExpr(1);
-
-          // Lagrangian function
-          MXFunction lfcn(lfcn_in,sigma*f+ inner_prod(lam,g));
-          lfcn.init();
-	  log("SX Lagrangian function generated");
-          
-/*          cout << "countNodes(lfcn.outputExpr(0)) = " << countNodes(lfcn.outputExpr(0)) << endl;*/
-      
-          bool adjoint_mode = true;
-          if(adjoint_mode){
-          
-            // Gradient of the lagrangian
-            MX gL = lfcn.grad();
-            log("MX Lagrangian gradient generated");
-
-            MXFunction glfcn(lfcn_in,gL);
-            glfcn.init();
-            log("MX Lagrangian gradient function initialized");
-//           cout << "countNodes(glfcn.outputExpr(0)) = " << countNodes(glfcn.outputExpr(0)) << endl;
-
-            // Get Hessian sparsity
-            CRSSparsity H_sp = glfcn.jacSparsity();
-            log("MX Lagrangian Hessian sparsity determined");
-            
-            // Uni-directional coloring (note, the hessian is symmetric)
-            CRSSparsity coloring = H_sp.unidirectionalColoring(H_sp);
-            log("MX Lagrangian Hessian coloring determined");
-
-            // Number of colors needed is the number of rows
-            int nfwd_glfcn = coloring.size1();
-            log("MX Lagrangian gradient function number of sensitivity directions determined");
-
-            glfcn.setOption("number_of_fwd_dir",nfwd_glfcn);
-            glfcn.updateNumSens();
-            log("MX Lagrangian gradient function number of sensitivity directions updated");
-            
-            // Hessian of the Lagrangian
-            H_ = glfcn.jacobian();
-          } else {
-
-            // Hessian of the Lagrangian
-            H_ = lfcn.hessian();
-            
+        // Convert to MX if cast failed and make sure that they use the same expressions if cast was successful
+        if(!F.isNull()){
+          FG_in = F.inputExpr();
+          f = F.outputExpr(0);
+          if(!G.isNull()){ // Both are MXFunction, make sure they use the same variables
+            vector<MX> G_out =  G.outputExpr();
+            G_out = substitute(G_out,G.inputExpr(),FG_in); // Cheap if identical expressions
+            g = G_out.front();
+          } else { // F_ but not G_ MXFunction
+            g = G_.call(FG_in).front();
           }
-          log("MX Lagrangian Hessian function generated");
-          
         } else {
-          casadi_assert_message(0, "Automatic calculation of exact Hessian currently only for F and G both SXFunction or MXFunction ");
+          if(!G.isNull()){ // G_ but not F_ MXFunction
+            FG_in = G.inputExpr();
+            g = G.outputExpr(0);
+            f = F_.call(FG_in).front();
+          } else { // None of them MXFunction
+            FG_in = F_.symbolicInput();
+            f = F_.call(FG_in).front();
+            g = G_.call(FG_in).front();
+          }
         }
-      } // !F_sx.isNull() && !G_sx.isNull()
-    } // G_.isNull()
+         
+        // Lagrange multipliers
+        MX lam = msym("lam",g.size1());
+      
+        // Objective function scaling
+        MX sigma = msym("sigma");
+
+        // Lagrangian function
+        vector<MX> lfcn_in(parametric_? 4: 3);
+        lfcn_in[0] = FG_in.at(0);
+        lfcn_in[1] = lam;
+        lfcn_in[2] = sigma;
+        if (parametric_) lfcn_in[3] = FG_in.at(1);
+        MXFunction lfcn(lfcn_in,sigma*f + inner_prod(lam,g));
+        lfcn.init();
+        log("SX Lagrangian function generated");
+          
+        // Hessian of the Lagrangian
+        H_ = lfcn.hessian();
+        log("MX Lagrangian Hessian function generated");
+          
+      } // SXFunction/MXFunction
+    } // constrained/unconstrained
   } // generate_hessian && H_.isNull()
   if(!H_.isNull() && !H_.isInit()) {
     H_.init();
@@ -343,11 +305,6 @@ void NLPSolverInternal::init(){
   if(generate_jacobian && !G_.isNull() && J_.isNull()){
     log("Generating Jacobian");
     J_ = G_.jacobian();
-    
-    // Use live variables if SXFunction
-    if(!shared_cast<SXFunction>(J_).isNull()){
-      J_.setOption("live_variables",true);
-    }
     log("Jacobian function generated");
   }
     
