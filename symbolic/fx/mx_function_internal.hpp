@@ -126,6 +126,10 @@ class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInterna
 
     /// Reset the sparsity propagation
     virtual void spInit(bool fwd);
+    
+    /// Print work vector
+    void printWork(int nfwd=0, int nadj=0, std::ostream &stream=std::cout);
+    
 };
 
 } // namespace CasADi

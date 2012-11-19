@@ -984,5 +984,23 @@ SXFunction MXFunctionInternal::expand(const std::vector<SXMatrix>& inputvsx ){
   return f;
 }
 
+void MXFunctionInternal::printWork(int nfwd, int nadj, ostream &stream){
+  for(int k=0; k<work_.size(); ++k){
+    stream << "work[" << k << "] = " << work_[k].data.data() << endl;
+  }
+  
+  for(int d=0; d<nfwd; ++d){
+    for(int k=0; k<work_.size(); ++k){
+      stream << "fwork[" << d << "][" << k << "] = " << work_[k].dataF[d].data() << endl;
+    }
+  }
+  
+  for(int d=0; d<nadj; ++d){
+    for(int k=0; k<work_.size(); ++k){
+      stream << "awork[" << d << "][" << k << "] = " << work_[k].dataA[d].data() << endl;
+    }
+  }
+}
+
 } // namespace CasADi
 
