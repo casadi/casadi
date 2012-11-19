@@ -355,6 +355,7 @@ endif()
 # begin Patch swig to get concat functionality
 find_package(OCTAVE)
 if(OCTAVE_FOUND)
+include_directories (${OCTAVE_INCLUDE_DIR})
 EXECUTE_PROCESS(COMMAND ${SWIG_EXECUTABLE} -swiglib OUTPUT_VARIABLE ORIG_SWIGDIR OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 ADD_CUSTOM_COMMAND(
