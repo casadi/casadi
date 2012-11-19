@@ -664,6 +664,10 @@ std::vector<std::vector<MX> > msym(const std::string& name, int n, int m, int p,
   return msym(name,sp_dense(n,m),p,r);
 }
 
+MX substitute(const MX &ex, const MX& v, const MX& vdef){
+  return substitute(vector<MX>(1,ex),vector<MX>(1,v),vector<MX>(1,vdef)).front();
+}
+
 std::vector<MX> substitute(const std::vector<MX> &ex, const std::vector<MX> &v, const std::vector<MX> &vdef){
   MXFunction F(v,ex);
   F.init();

@@ -286,7 +286,10 @@ bool isEqual(const MX& ex1,const MX &ex2);
 /** \brief Get a string representation for a binary MX, using custom arguments */
 std::string getOperatorRepresentation(const MX& x, const std::vector<std::string>& args);
 
-/** \brief Substitute variable var with expression expr in multiple expressions */
+/** \brief  Substitute variable v with expression vdef in an expression ex */
+MX substitute(const MX &ex, const MX& v, const MX& vdef);
+
+/** \brief  Substitute variable var with expression expr in multiple expressions */
 std::vector<MX> substitute(const std::vector<MX> &ex, const std::vector<MX> &v, const std::vector<MX> &vdef);
 
 /** \brief Inplace substitution
