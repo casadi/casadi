@@ -669,6 +669,20 @@ MX substitute(const MX &ex, const MX& v, const MX& vdef){
 }
 
 std::vector<MX> substitute(const std::vector<MX> &ex, const std::vector<MX> &v, const std::vector<MX> &vdef){
+  // Assert consistent dimensions
+  casadi_assert(v.size()==vdef.size());
+  
+  // Quick return if all equal
+  bool all_equal = true;
+  for(int k=0; k<v.size(); ++k){
+    if(!isEqual(v[k],vdef[k])){
+      all_equal = false;
+      break;
+    }
+  }
+  if(all_equal) return ex;
+  
+  // Otherwise, evaluate symbolically     
   MXFunction F(v,ex);
   F.init();
   return F.evalMX(vdef);
