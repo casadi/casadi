@@ -226,6 +226,8 @@ class QPSolverTests(casadiTestCase):
       
     for qpsolver, qp_options in qpsolvers:
       self.message("equality: " + str(qpsolver))
+      if "OOQP" in str(qpsolver):
+        continue
       solver = qpsolver(H.sparsity(),sp_dense(3,2))
       for key, val in options.iteritems():
         if solver.hasOption(key):
