@@ -132,14 +132,6 @@ Matrix<SX> triangle(const Matrix<SX>& a){
   return rectangle(a.toScalar()/2)*(1-abs(a.toScalar()));
 }
 
-bool contains(const Matrix<SX> &list, const SX &e) {
-  for (int i=0;i<nnz(list);i++) {
-    if (list(i).toScalar().isEqual(e)) return true;
-  }
-  return false;
-}
-
-
 void simplify(Matrix<SX> &ex){
   // simplify all non-zero elements
   for(int el=0; el<ex.size(); ++el)

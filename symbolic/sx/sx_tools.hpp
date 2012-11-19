@@ -50,33 +50,33 @@ The SX expression graph has much less overhead, but is also more restricted than
 //@{
 
   /** \brief Create an n-by-m matrix with symbolic variables */
-  Matrix<SX> ssym(const std::string& name, int n=1, int m=1);
+  SXMatrix ssym(const std::string& name, int n=1, int m=1);
 
   /** \brief Create an n-by-m matrix with symbolic variables */
-  Matrix<SX> ssym(const std::string& name, const std::pair<int,int> & nm); 
+  SXMatrix ssym(const std::string& name, const std::pair<int,int> & nm); 
 
   /** \brief Create a vector of length p with with matrices with symbolic variables of given sparsity */
-  std::vector<Matrix<SX> > ssym(const std::string& name, const CRSSparsity& sp, int p);
+  std::vector<SXMatrix> ssym(const std::string& name, const CRSSparsity& sp, int p);
 
   /** \brief Create a vector of length p with n-by-m matrices with symbolic variables */
-  std::vector<Matrix<SX> > ssym(const std::string& name, int n, int m, int p);
+  std::vector<SXMatrix> ssym(const std::string& name, int n, int m, int p);
 
   /** \brief Create a vector of length r of vectors of length p with matrices with symbolic variables with given sparsity */
-  std::vector<std::vector<Matrix<SX> > > ssym(const std::string& name, const CRSSparsity& sp, int p, int r);
+  std::vector<std::vector<SXMatrix> > ssym(const std::string& name, const CRSSparsity& sp, int p, int r);
   
   /** \brief Create a vector of length r of vectors of length p with n-by-m matrices with symbolic variables */
-  std::vector<std::vector<Matrix<SX> > > ssym(const std::string& name, int n, int m, int p, int r);
+  std::vector<std::vector<SXMatrix> > ssym(const std::string& name, int n, int m, int p, int r);
 
   /** \brief Create an matrix with symbolic variables, given a sparsity pattern */
-  Matrix<SX> ssym(const std::string& name, const CRSSparsity& sp);
+  SXMatrix ssym(const std::string& name, const CRSSparsity& sp);
 
   /** \brief Create a symbolic matrix out of a numeric one */
-  Matrix<SX> ssym(const Matrix<double>& x);
+  SXMatrix ssym(const Matrix<double>& x);
 
 //@}
 
 /** \brief  Expand the expression as a weighted sum (with constant weights)  */
-void expand(const Matrix<SX>& ex, Matrix<SX> &weights, Matrix<SX>& terms);
+void expand(const SXMatrix& ex, SXMatrix &weights, SXMatrix& terms);
 
 /** \brief  Simplify the expression: formulates the expression as and eliminates terms */
 void simplify(SX& ex);
@@ -89,7 +89,7 @@ void simplify(SX& ex);
   \param tval vector with the discrete values of t at the interval transitions (length n-1)
   \param val vector with the value of the function for each interval (length n)
 */
-Matrix<SX> pw_const(const Matrix<SX> &t, const Matrix<SX> &tval, const Matrix<SX> &val);
+SXMatrix pw_const(const SXMatrix &t, const SXMatrix &tval, const SXMatrix &val);
 
 /** Create a piecewise linear function 
   Create a piecewise linear function:
@@ -99,9 +99,9 @@ Matrix<SX> pw_const(const Matrix<SX> &t, const Matrix<SX> &tval, const Matrix<SX
   \brief tval vector with the the discrete values of t (monotonically increasing)
   \brief val vector with the corresponding function values (same length as tval)
 */
-Matrix<SX> pw_lin(const SX &t, const Matrix<SX> &tval, const Matrix<SX> &val);
+SXMatrix pw_lin(const SX &t, const SXMatrix &tval, const SXMatrix &val);
 
-Matrix<SX> if_else(const Matrix<SX> &cond, const Matrix<SX> &if_true, const Matrix<SX> &if_false);
+SXMatrix if_else(const SXMatrix &cond, const SXMatrix &if_true, const SXMatrix &if_false);
 /**  \brief Heaviside function
 *
 * \f[
@@ -112,7 +112,7 @@ Matrix<SX> if_else(const Matrix<SX> &cond, const Matrix<SX> &if_true, const Matr
 * \end{cases}
 * \f]
 */
-Matrix<SX> heaviside(const Matrix<SX> &x);
+SXMatrix heaviside(const SXMatrix &x);
 
 /** 
 * \brief rectangle function
@@ -127,7 +127,7 @@ Matrix<SX> heaviside(const Matrix<SX> &x);
 *
 * Also called: gate function, block function, band function, pulse function, window function
 */
-Matrix<SX> rectangle(const Matrix<SX> &x);
+SXMatrix rectangle(const SXMatrix &x);
 
 /** 
 * \brief triangle function
@@ -140,7 +140,7 @@ Matrix<SX> rectangle(const Matrix<SX> &x);
 * \f]
 *
 */
-Matrix<SX> triangle(const Matrix<SX> &x);
+SXMatrix triangle(const SXMatrix &x);
 
 /** 
 * \brief ramp function
@@ -155,54 +155,45 @@ Matrix<SX> triangle(const Matrix<SX> &x);
 *
 * Also called: slope function
 */
-Matrix<SX> ramp(const Matrix<SX> &x);
+SXMatrix ramp(const SXMatrix &x);
 
 /** \brief  Integrate f from a to b using Gaussian quadrature with n points */
-Matrix<SX> gauss_quadrature(Matrix<SX> f, const Matrix<SX> &x, const Matrix<SX> &a, const Matrix<SX> &b, int order=5, const Matrix<SX>& w=Matrix<SX>());
-
-#ifndef SWIG
-/**
-Returns true if at least one element in list contains the scalar e.
-*/
-bool contains(const Matrix<SX> &list, const Matrix<SX> &e);
-#endif
+SXMatrix gauss_quadrature(SXMatrix f, const SXMatrix &x, const SXMatrix &a, const SXMatrix &b, int order=5, const SXMatrix& w=SXMatrix());
 
 /** \brief  Simplify an expression */
-void simplify(Matrix<SX> &ex);
+void simplify(SXMatrix &ex);
 
-/// Remove identical calculations
-void compress(Matrix<SX> &ex, int level=5); 
+/** \brief  Remove identical calculations */
+void compress(SXMatrix &ex, int level=5); 
 
-/// Substitute variable v with expression vdef in an expression ex
-Matrix<SX> substitute(const Matrix<SX> &ex, const Matrix<SX> &v, const Matrix<SX> &vdef);
+/** \brief  Substitute variable v with expression vdef in an expression ex */
+SXMatrix substitute(const SXMatrix& ex, const SXMatrix& v, const SXMatrix& vdef);
 
-/// Evaluate an SX graph numerically
-/**
+/** \brief  Substitute variable var with expression expr in multiple expressions */
+std::vector<SXMatrix> substitute(const std::vector<SXMatrix>& ex, const SXMatrix& v, const SXMatrix& vdef);
+
+/** \brief Substitute variable var out of or into an expression expr */
+void substituteInPlace(const SXMatrix& v, SXMatrix &vdef, bool reverse=false);
+
+/** \brief Substitute variable var out of or into an expression expr, with an arbitrary number of other expressions piggyback */
+void substituteInPlace(const SXMatrix& v, SXMatrix &vdef, std::vector<SXMatrix>& ex, bool reverse=false);
+
+/** \brief Evaluate an SX graph numerically
 * Note: this is not efficient. For critical parts (loops) of your code, always use SXFunction.
 */
-Matrix<double> evalf(const Matrix<SX> &ex);
+Matrix<double> evalf(const SXMatrix &ex);
 
-/// Substitute variable v with value vdef in an expression ex, and evaluate numerically
-/**
+/** \brief Substitute variable v with value vdef in an expression ex, and evaluate numerically
 * Note: this is not efficient. For critical parts (loops) of your code, always use SXFunction.
 * @see numSample1D
 */
-Matrix<double> evalf(const Matrix<SX> &ex, const Matrix<SX> &v, const Matrix<double> &vdef);
-
-/// Substitute variable var with expression expr in multiple expressions
-std::vector<Matrix<SX> > substitute(const std::vector<Matrix<SX> > &ex, const Matrix<SX> &var, const Matrix<SX> &expr);
-
-/// Substitute variable var out of or into an expression expr
-void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, bool reverse=false);
-
-/// Substitute variable var out of or into an expression expr, with an arbitrary number of other expressions piggyback
-void substituteInPlace(const Matrix<SX> &v, Matrix<SX> &vdef, std::vector<Matrix<SX> >& ex, bool reverse=false);
+Matrix<double> evalf(const SXMatrix &ex, const SXMatrix &v, const Matrix<double> &vdef);
 
 // /** \brief  Make the expression smooth by replacing non-smooth nodes with binary variables */
-//void makeSmooth(Matrix<SX> &ex, Matrix<SX> &bvar, Matrix<SX> &bexpr);
+//void makeSmooth(SXMatrix &ex, SXMatrix &bvar, SXMatrix &bexpr);
 
 /** \brief  Substitute derivatives with variables */
-/** \brief void replaceDerivatives(Matrix<SX> &ex, const Matrix<SX> &var, const Matrix<SX> &dvar); */
+/** \brief void replaceDerivatives(SXMatrix &ex, const SXMatrix &var, const SXMatrix &dvar); */
 
 #ifndef SWIG
 // "operator?:" can not be overloaded
@@ -213,19 +204,19 @@ T if_else(const SX& cond, const T& if_true, const T &if_false){
 #endif
 
 /** \brief  Get the sparsity pattern of a matrix */
-Matrix<SX> spy(const Matrix<SX>& A);
+SXMatrix spy(const SXMatrix& A);
 
 #ifndef SWIG
 /** \brief  Create a block matrix */
 template<int n, int m>
-Matrix<SX> blockmatrix(Matrix<SX> array[n][m]){
+SXMatrix blockmatrix(SXMatrix array[n][m]){
 /** \brief  Return matrix */
-  Matrix<SX> ret;
+  SXMatrix ret;
 
 /** \brief  loop over rows */
   for(int i=0; i<n; ++i){
 /** \brief  Create a row */
-    Matrix<SX> row;
+    SXMatrix row;
     
 /** \brief  append components to the row */
     for(int j=0; j<m; ++j){
@@ -241,9 +232,9 @@ Matrix<SX> blockmatrix(Matrix<SX> array[n][m]){
 
 /** \brief  Create a block matrix (vector) */
 template<int n>
-Matrix<SX> blockmatrix(Matrix<SX> array[n]){
+SXMatrix blockmatrix(SXMatrix array[n]){
 /** \brief  Return matrix */
-  Matrix<SX> ret;
+  SXMatrix ret;
 
 /** \brief  loop over rows */
   for(int i=0; i<n; ++i){
@@ -255,37 +246,37 @@ Matrix<SX> blockmatrix(Matrix<SX> array[n]){
 }
 
 template<> inline
-Matrix<SX> GenericMatrix<Matrix<SX> >::sym(const std::string& name, const CRSSparsity& sp){ return ssym(name,sp);}
+SXMatrix GenericMatrix<SXMatrix>::sym(const std::string& name, const CRSSparsity& sp){ return ssym(name,sp);}
 
 #endif
 
 /// Check dependency: very inefficient algorithm
-bool dependsOn(const Matrix<SX>& f, const Matrix<SX> &arg);
+bool dependsOn(const SXMatrix& f, const SXMatrix &arg);
 
 /** \brief  check if smooth */
-bool isSmooth(const Matrix<SX>& ex);
+bool isSmooth(const SXMatrix& ex);
 
 /** \brief  check if symbolic (Dense)
 
  Sparse matrices invariable return false 
   */
-bool isSymbolic(const Matrix<SX>& ex);
+bool isSymbolic(const SXMatrix& ex);
 
 /** \brief  check if symbolic
 
  Sparse matrices can return true if all non-zero elements are symbolic
  */
-bool isSymbolicSparse(const Matrix<SX>& ex);
+bool isSymbolicSparse(const SXMatrix& ex);
 
 //@{
 /** \brief Calculate jacobian via source code transformation
 
 Uses CasADi::SXFunction::jac
  */
-Matrix<SX> jacobian(const Matrix<SX> &ex, const Matrix<SX> &arg);
-Matrix<SX> gradient(const Matrix<SX> &ex, const Matrix<SX> &arg);
-Matrix<SX> hessian(const Matrix<SX> &ex, const Matrix<SX> &arg);
-void hessian(const Matrix<SX> &ex, const Matrix<SX> &arg, Matrix<SX> &H, Matrix<SX> &g); // hessian and gradient
+SXMatrix jacobian(const SXMatrix &ex, const SXMatrix &arg);
+SXMatrix gradient(const SXMatrix &ex, const SXMatrix &arg);
+SXMatrix hessian(const SXMatrix &ex, const SXMatrix &arg);
+void hessian(const SXMatrix &ex, const SXMatrix &arg, SXMatrix &H, SXMatrix &g); // hessian and gradient
 //@}
 
 /** \brief Calculate the Jacobian and multiply by a vector from the left
@@ -293,17 +284,17 @@ void hessian(const Matrix<SX> &ex, const Matrix<SX> &arg, Matrix<SX> &H, Matrix<
     true respectively. If contrast to these expressions, it will use directional derivatives which is typically (but
     not necessarily) more efficient if the complete Jacobian is not needed and v has few columns.
  */
-Matrix<SX> jacobianTimesVector(const Matrix<SX> &ex, const Matrix<SX> &arg, const Matrix<SX> &v, bool transpose_jacobian=false);
+SXMatrix jacobianTimesVector(const SXMatrix &ex, const SXMatrix &arg, const SXMatrix &v, bool transpose_jacobian=false);
 
 /** \brief  Obtain the values of a constant expression */
-double getValue(const Matrix<SX> &ex, int i=0, int j=0);          // for constant expressions only
-int getIntValue(const Matrix<SX> &ex, int i=0, int j=0);          // integer version
-void getValue(const Matrix<SX> &ex, double *res); // for all constant expressions
-void getIntValue(const Matrix<SX> &ex, int *res); // integer version
-const std::string& getName(const Matrix<SX> &ex); // get the name (only for scalar variables)
+double getValue(const SXMatrix &ex, int i=0, int j=0);          // for constant expressions only
+int getIntValue(const SXMatrix &ex, int i=0, int j=0);          // integer version
+void getValue(const SXMatrix &ex, double *res); // for all constant expressions
+void getIntValue(const SXMatrix &ex, int *res); // integer version
+const std::string& getName(const SXMatrix &ex); // get the name (only for scalar variables)
 
 /** \brief  Fill the matrix with the value val, make empty sparse if zero */
-void fill(Matrix<SX>& mat, const SX& val);
+void fill(SXMatrix& mat, const SX& val);
 
 /** 
 * \brief univariate taylor series expansion
@@ -318,7 +309,7 @@ void fill(Matrix<SX>& mat, const SX& val);
 * \endcode
 * \verbatim >>   x \endverbatim
 */
-Matrix<SX> taylor(const Matrix<SX>& ex,const SX& x, const SX& a=casadi_limits<SX>::zero,int order=1);
+SXMatrix taylor(const SXMatrix& ex,const SX& x, const SX& a=casadi_limits<SX>::zero,int order=1);
 
 /**
 * \brief multivariate taylor series expansion
@@ -327,7 +318,7 @@ Matrix<SX> taylor(const Matrix<SX>& ex,const SX& x, const SX& a=casadi_limits<SX
 * The aggregated order of \f$x^n y^m\f$ equals \f$n+m\f$.
 *
 */
-Matrix<SX> mtaylor(const Matrix<SX>& ex,const Matrix<SX>& x, const Matrix<SX>& a,int order=1);
+SXMatrix mtaylor(const SXMatrix& ex,const SXMatrix& x, const SXMatrix& a,int order=1);
 /** 
 * \brief multivariate taylor series expansion
 *
@@ -353,10 +344,10 @@ Matrix<SX> mtaylor(const Matrix<SX>& ex,const Matrix<SX>& x, const Matrix<SX>& a
 * \f$  (-3 x^2 y-x^3)/6+y+x \f$
 *
 */
-Matrix<SX> mtaylor(const Matrix<SX>& ex,const Matrix<SX>& x, const Matrix<SX>& a,int order,const std::vector<int>&order_contributions);
+SXMatrix mtaylor(const SXMatrix& ex,const SXMatrix& x, const SXMatrix& a,int order,const std::vector<int>&order_contributions);
 
 /** \brief Count number of nodes */
-int countNodes(const Matrix<SX>& A);
+int countNodes(const SXMatrix& A);
 
 /** \brief Get a string representation for a binary SX, using custom arguments */
 std::string getOperatorRepresentation(const SX& x, const std::vector<std::string>& args);
