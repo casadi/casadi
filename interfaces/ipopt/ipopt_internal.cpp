@@ -646,6 +646,7 @@ bool IpoptInternal::eval_grad_f(int n, const double* x, bool new_x, double* grad
 
       // Printing
       if(monitored("eval_grad_f")){
+        cout << "x = " << F_.input() << endl;
         cout << "grad_f = " << F_.adjSens() << endl;
       }
       
@@ -664,6 +665,7 @@ bool IpoptInternal::eval_grad_f(int n, const double* x, bool new_x, double* grad
       
       // Printing
       if(monitored("eval_grad_f")){
+        cout << "x = " << GF_.input() << endl;
         cout << "grad_f = " << GF_.output() << endl;
       }
 
