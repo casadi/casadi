@@ -642,10 +642,11 @@ bool IpoptInternal::eval_grad_f(int n, const double* x, bool new_x, double* grad
       F_.evaluate(0,1);
 
       // Get the result
-      F_.getAdjSens(grad_f);
+      F_.adjSens().getArray(grad_f,n,DENSE);
 
       // Printing
       if(monitored("eval_grad_f")){
+        cout << "x = " << F_.input() << endl;
         cout << "grad_f = " << F_.adjSens() << endl;
       }
       
@@ -660,10 +661,11 @@ bool IpoptInternal::eval_grad_f(int n, const double* x, bool new_x, double* grad
       GF_.evaluate();
 
       // Get the result
-      GF_.getOutput(grad_f);
+      GF_.output().getArray(grad_f,n,DENSE);
       
       // Printing
       if(monitored("eval_grad_f")){
+        cout << "x = " << GF_.input() << endl;
         cout << "grad_f = " << GF_.output() << endl;
       }
 
