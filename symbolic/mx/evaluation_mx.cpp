@@ -84,7 +84,11 @@ void EvaluationMX::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res,
   // Pass the inputs to the function
   for (int i = 0; i < num_in; ++i) {
     DMatrix *a = arg[i];
-    if(a != 0) fcn_.setInput(*a, i);
+    if(a != 0){
+      fcn_.setInput(*a, i);
+    } else {
+      fcn_.setInput(0., i);
+    }
   }
   
   // Evaluate until everything has been determinated
@@ -98,7 +102,11 @@ void EvaluationMX::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res,
     for(int d = 0; d < nfwd_f_batch; ++d){
       for(int i = 0; i < num_in; ++i){
         DMatrix *a = fseed[offset_fwd + d][i];
-        if(a != 0) fcn_.setFwdSeed(*a, i, d);
+        if(a != 0){
+          fcn_.setFwdSeed(*a, i, d);
+        } else {
+          fcn_.setFwdSeed(0., i, d);
+        }
       }
     }
 
@@ -106,7 +114,11 @@ void EvaluationMX::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res,
     for(int d = 0; d < nadj_f_batch; ++d){
       for(int i = 0; i < num_out; ++i) {
         DMatrix *a = aseed[offset_adj + d][i];
-        if(a != 0) fcn_.setAdjSeed(*a, i, d);
+        if(a != 0){
+          fcn_.setAdjSeed(*a, i, d);
+        } else {
+          fcn_.setAdjSeed(0., i, d);
+        }
       }
     }
 
