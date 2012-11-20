@@ -342,7 +342,8 @@ disp("sparsity ref #147")
 
 
 X = DMatrix(sp_tril(4),5)
-s = (X*X).sparsity()
+Y = (X*X)
+s = Y.sparsity()
 
 
 disp("string confusion")
