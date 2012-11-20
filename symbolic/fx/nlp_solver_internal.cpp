@@ -212,8 +212,8 @@ void NLPSolverInternal::init(){
         SXFunction G = shared_cast<SXFunction>(G_);
         
         // Expression for f and g
-        SXMatrix f = F.outputExpr(0);
-        SXMatrix g = substitute(G.outputExpr(),G.inputExpr(),F.inputExpr()).front();
+        SXMatrix g = G.outputExpr(0);
+        SXMatrix f = substitute(F.outputExpr(),F.inputExpr(),G.inputExpr()).front();
         
         // Lagrange multipliers
         SXMatrix lam = ssym("lambda",g.size1());
@@ -245,23 +245,23 @@ void NLPSolverInternal::init(){
         MX f, g;
         
         // Convert to MX if cast failed and make sure that they use the same expressions if cast was successful
-        if(!F.isNull()){
-          FG_in = F.inputExpr();
-          f = F.outputExpr(0);
-          if(!G.isNull()){ // Both are MXFunction, make sure they use the same variables
-            g = substitute(G.outputExpr(),G.inputExpr(),FG_in).front();
-          } else { // F_ but not G_ MXFunction
-            g = G_.call(FG_in).front();
+        if(!G.isNull()){
+          FG_in = G.inputExpr();
+          g = G.outputExpr(0);
+          if(!F.isNull()){ // Both are MXFunction, make sure they use the same variables
+            f = substitute(F.outputExpr(),F.inputExpr(),FG_in).front();
+          } else { // G_ but not F_ MXFunction
+            f = F_.call(FG_in).front();
           }
         } else {
-          if(!G.isNull()){ // G_ but not F_ MXFunction
-            FG_in = G.inputExpr();
-            g = G.outputExpr(0);
-            f = F_.call(FG_in).front();
-          } else { // None of them MXFunction
-            FG_in = F_.symbolicInput();
-            f = F_.call(FG_in).front();
+          if(!F.isNull()){ // F_ but not G_ MXFunction
+            FG_in = F.inputExpr();
+            f = F.outputExpr(0);
             g = G_.call(FG_in).front();
+          } else { // None of them MXFunction
+            FG_in = G_.symbolicInput();
+            g = G_.call(FG_in).front();
+            f = F_.call(FG_in).front();
           }
         }
          
