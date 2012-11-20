@@ -170,7 +170,7 @@ void compress(SXMatrix &ex, int level=5);
 SXMatrix substitute(const SXMatrix& ex, const SXMatrix& v, const SXMatrix& vdef);
 
 /** \brief  Substitute variable var with expression expr in multiple expressions */
-std::vector<SXMatrix> substitute(const std::vector<SXMatrix>& ex, const SXMatrix& v, const SXMatrix& vdef);
+std::vector<SXMatrix> substitute(const std::vector<SXMatrix>& ex, const std::vector<SXMatrix>& v, const std::vector<SXMatrix>& vdef);
 
 /** \brief Substitute variable var out of or into an expression expr */
 void substituteInPlace(const SXMatrix& v, SXMatrix &vdef, bool reverse=false);

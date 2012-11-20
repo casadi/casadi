@@ -146,10 +146,10 @@ void compress(SXMatrix &ex, int level){
     compress(ex,level-1);
 }
 
-std::vector<SXMatrix> substitute(const std::vector<SXMatrix> &ex, const SXMatrix &v, const SXMatrix &vdef){
+std::vector<SXMatrix> substitute(const std::vector<SXMatrix> &ex, const std::vector<SXMatrix> &v, const std::vector<SXMatrix> &vdef){
   // Assert consistent dimensions
   casadi_assert(v.size()==vdef.size());
-  
+    
   // Quick return if all equal
   bool all_equal = true;
   for(int k=0; k<v.size(); ++k){
@@ -163,7 +163,11 @@ std::vector<SXMatrix> substitute(const std::vector<SXMatrix> &ex, const SXMatrix
   // Otherwise, evaluate symbolically     
   SXFunction F(v,ex);
   F.init();
-  return F.eval(vector<SXMatrix>(1,vdef));
+  return F.eval(vdef);
+}
+
+SXMatrix substitute(const SXMatrix &ex, const SXMatrix &v, const SXMatrix &vdef){
+  return substitute(vector<SXMatrix>(1,ex),vector<SXMatrix>(1,v),vector<SXMatrix>(1,vdef)).front();
 }
 
 Matrix<double> evalf(const SXMatrix &ex, const SXMatrix &v, const Matrix<double> &vdef) {
@@ -179,26 +183,6 @@ Matrix<double> evalf(const SXMatrix &ex) {
   fcn.init();
   fcn.evaluate();
   return fcn.output();
-}
-
-
-SXMatrix substitute(const SXMatrix &ex, const SXMatrix &v, const SXMatrix &vdef){
-  if(v.empty()) return ex; // quick return if empty
-  casadi_assert_message(isSymbolic(v),"the variable is not symbolic");
-  // Treat scalar vdef as special case
-  if (vdef.scalar() && !v.scalar()){
-    if (vdef.empty()) {
-      return substitute(ex,v,SXMatrix(v.sparsity(),0));
-    } else {
-      return substitute(ex,v,SXMatrix(v.sparsity(),vdef.at(0)));
-    }
-  }
-  casadi_assert_message(v.size1() == vdef.size1() && v.size2() == vdef.size2(),"substitute: the dimensions " << v.dimString() << " and " << vdef.dimString() << " do not match.");
-
-  // evaluate with var == expr
-  SXFunction fcn(v,ex);
-  fcn.init();
-  return fcn.eval(vdef);
 }
 
 void substituteInPlace(const SXMatrix &v, SXMatrix &vdef, bool reverse){

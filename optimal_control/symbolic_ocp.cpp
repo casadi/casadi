@@ -680,7 +680,7 @@ void SymbolicOCP::eliminateInterdependencies(){
 }
 
 vector<SXMatrix> SymbolicOCP::substituteDependents(const vector<SXMatrix>& x) const{
-  return substitute(x,var(y),dep);
+  return substitute(x,vector<SXMatrix>(1,var(y)),vector<SXMatrix>(1,dep));
 }
 
 void SymbolicOCP::eliminateDependent(bool eliminate_dependents_with_bounds){
