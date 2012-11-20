@@ -213,12 +213,7 @@ void NLPSolverInternal::init(){
         
         // Expression for f and g
         SXMatrix f = F.outputExpr(0);
-        SXMatrix g = G.outputExpr(0);
-        
-        // Substitute symbolic variables in f if different input variables from g
-        if(!isEqual(F.inputExpr(0),G.inputExpr(0))){
-          f = substitute(f,F.inputExpr(0),G.inputExpr(0));
-        }
+        SXMatrix g = substitute(G.outputExpr(),G.inputExpr(),F.inputExpr()).front();
         
         // Lagrange multipliers
         SXMatrix lam = ssym("lambda",g.size1());
@@ -254,9 +249,7 @@ void NLPSolverInternal::init(){
           FG_in = F.inputExpr();
           f = F.outputExpr(0);
           if(!G.isNull()){ // Both are MXFunction, make sure they use the same variables
-            vector<MX> G_out =  G.outputExpr();
-            G_out = substitute(G_out,G.inputExpr(),FG_in); // Cheap if identical expressions
-            g = G_out.front();
+            g = substitute(G.outputExpr(),G.inputExpr(),FG_in).front();
           } else { // F_ but not G_ MXFunction
             g = G_.call(FG_in).front();
           }
