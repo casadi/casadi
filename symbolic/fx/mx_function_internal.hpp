@@ -133,6 +133,9 @@ class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInterna
     /// Print work vector
     void printWork(int nfdir=0, int nadir=0, std::ostream &stream=std::cout);
     
+    /// Print tape
+    void printTape(std::ostream &stream=std::cout);
+    
     /// Allocate tape
     void allocTape();
     

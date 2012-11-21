@@ -1053,6 +1053,12 @@ SXFunction MXFunctionInternal::expand(const std::vector<SXMatrix>& inputvsx ){
   return f;
 }
 
+void MXFunctionInternal::printTape(ostream &stream){
+  for(int k=0; k<tape_.size(); ++k){
+    stream << "tape( work index = " << tape_[k].first << ") = " << tape_[k].second.data() << endl;
+  }
+}
+
 void MXFunctionInternal::printWork(int nfdir, int nadir, ostream &stream){
   for(int k=0; k<work_.size(); ++k){
     stream << "work[" << k << "] = " << work_[k].data.data() << endl;
