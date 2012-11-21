@@ -135,5 +135,23 @@ void UnaryMX::propagateSparsity(DMatrixPtrV& input, DMatrixPtrV& output, bool fw
   }
 }
 
+MX UnaryMX::create(int op, const MX& x){
+  /*if(x.isConstant()){
+    // Constant folding
+    const DMatrix& x_val = x.getConstant();
+    DMatrix y_val; // Dummy argument
+    DMatrix r_val;
+    casadi_math<DMatrix>::fun(op,x_val,y_val,r_val);
+    return r_val;
+  } else*/ if(operation_checker<F0XChecker>(op) && isZero(x)){
+    // If identically zero
+    return MX::sparse(x.size1(),x.size2());
+  } else {
+    // Create a new node
+    return MX::create(new UnaryMX(Operation(op),x));
+  }
+}
+
+
 } // namespace CasADi
 

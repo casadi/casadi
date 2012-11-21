@@ -29,12 +29,17 @@ namespace CasADi{
 /** \brief Represents a general unary operation on an MX
   \author Joel Andersson 
   \date 2010
-*/	
+*/
 class UnaryMX : public MXNode{
-public:
+private:
+    
+    /** \brief  Constructor is private, use "create" below */
+    UnaryMX(Operation op, MX x);
 
-  /** \brief  Constructor */
-  UnaryMX(Operation op, MX x);
+public:
+  
+  /** \brief  Create a unary expression */
+  static MX create(int op, const MX& x);
 
   /** \brief  Destructor */
   virtual ~UnaryMX(){}
