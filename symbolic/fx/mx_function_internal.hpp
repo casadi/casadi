@@ -83,7 +83,7 @@ class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInterna
     std::vector<FunctionIO> work_;
     
     /** \brief  "Tape" with spilled variables */
-    std::vector<std::pair<int,DMatrix> > tape_;
+    std::vector<std::pair<std::pair<int,int>,DMatrix> > tape_;
     
     /// Free variables
     std::vector<MX> free_vars_;
