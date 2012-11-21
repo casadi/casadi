@@ -53,7 +53,6 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv, const std:
   setOption("name", "unnamed_mx_function");
   setOption("numeric_jacobian", true);
   setOption("numeric_hessian", true);
-  setOption("live_variables", false);
   
   // Check if any inputs is a mapping
   bool has_mapping_inputs = false;
