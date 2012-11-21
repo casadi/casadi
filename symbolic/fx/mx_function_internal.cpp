@@ -708,6 +708,7 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
   
   // Symbolic work, non-differentiated
   std::vector<MX> swork(work_.size());
+  log("MXFunctionInternal::evalMX allocated work vector");
   
   // Get the number of directions
   const int nfwd = fseed.size();
@@ -729,6 +730,7 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
   for(int d=0; d<nadj; ++d){
     asens[d].resize(inputv_.size());
   }
+  log("MXFunctionInternal::evalMX allocated return value");
   
   MXPtrV input_p, output_p;
   MXPtrVV fseed_p(nfwd), fsens_p(nfwd);
@@ -738,6 +740,7 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
   // Work vector, forward derivatives
   std::vector<std::vector<MX> > dwork(work_.size());
   fill(dwork.begin(),dwork.end(),std::vector<MX>(nfwd));
+  log("MXFunctionInternal::evalMX allocated derivative work vector (forward mode)");
     
   // Loop over computational nodes in forward order
   for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
@@ -819,12 +822,13 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
     }
   }
   
-  // Work vector, adjoint derivatives
-  fill(dwork.begin(),dwork.end(),std::vector<MX>(nadj));
-  
   // Loop over computational nodes in reverse order
   if(nadj>0){
-    for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it){
+    // Work vector, adjoint derivatives
+    fill(dwork.begin(),dwork.end(),std::vector<MX>(nadj));
+    log("MXFunctionInternal::evalMX allocated derivative work vector (adjoint mode)");
+    
+    for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it){      
       if(it->op == OP_INPUT){
         // Collect the symbolic adjoint sensitivities
         for(int d=0; d<nadj; ++d){
@@ -895,6 +899,7 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
       }
     }
   }
+  log("MXFunctionInternal::evalMX end");
 }
 
 void MXFunctionInternal::evalSX(const std::vector<SXMatrix>& input_s, std::vector<SXMatrix>& output_s, 
