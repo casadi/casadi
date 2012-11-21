@@ -536,28 +536,31 @@ void FXInternal::getPartition(int iind, int oind, CRSSparsity& D1, CRSSparsity& 
     if(test_ad_fwd){
       log("FXInternal::getPartition unidirectional coloring (forward mode)");
       D1 = AT.unidirectionalColoring(A);
+      if(verbose()){
+        cout << "Forward mode coloring completed: " << D1.size1() << " directional derivatives needed." << endl;
+      }
     }
       
     // Test unidirectional coloring using reverse mode
     if(test_ad_adj){
       log("FXInternal::getPartition unidirectional coloring (adjoint mode)");
       D2 = A.unidirectionalColoring(AT);
+      if(verbose()){
+        cout << "Adjoint mode coloring completed: " << D2.size1() << " directional derivatives needed." << endl;
+      }
     }
 
     // Use whatever required less colors if we tried both (with preference to forward mode)
     if(test_ad_fwd && test_ad_adj){
       if((D1.size1() <= D2.size1())){
         D2=CRSSparsity();
+        log("Forward mode chosen");
       } else {
         D1=CRSSparsity();
+        log("Adjoint mode chosen");
       }
     }
-    if(verbose()){
-      bool use_fwd = D2.isNull();
-      int ndir = use_fwd ? D1.size1() : D2.size1();
-      const char* mode = use_fwd ? "forward" : "adjoint";
-      cout << "FXInternal::getPartition end, " << ndir << " " << mode << " mode directional derivatives needed." << endl;
-    }
+    log("FXInternal::getPartition end");
   }
 }
 
