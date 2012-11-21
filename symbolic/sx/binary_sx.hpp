@@ -35,7 +35,7 @@ namespace CasADi{
 class BinarySX : public SXNode{
   private:
     
-    /** \brief  Constructor is private, use "create" below (binary version) */
+    /** \brief  Constructor is private, use "create" below */
     BinarySX(unsigned char op, const SX& dep0, const SX& dep1) : op_(op), dep0_(dep0), dep1_(dep1){}
     
   public:
