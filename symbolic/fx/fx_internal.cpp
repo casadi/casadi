@@ -534,7 +534,7 @@ void FXInternal::getPartition(int iind, int oind, CRSSparsity& D1, CRSSparsity& 
     
     // Test unidirectional coloring using forward mode
     if(test_ad_fwd){
-      log("FXInternal::getPartition unidirectional coloring (adjoint mode)");
+      log("FXInternal::getPartition unidirectional coloring (forward mode)");
       D1 = AT.unidirectionalColoring(A);
     }
       
