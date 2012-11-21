@@ -8,18 +8,6 @@
 <tr><td>INTEGRATOR_RQF</td><td>Backward quadrature state at the initial time [rqf].</td></tr>
 </table>
 */
-/** \defgroup scheme_JACInput
-<table>
-<caption>Input scheme: CasADi::JACInput  (JAC_NUM_IN = 6) </caption>
-<tr><th>Name</th><th>Description</th></tr>
-<tr><td>JAC_T</td><td></td></tr>
-<tr><td>JAC_X</td><td></td></tr>
-<tr><td>JAC_Z</td><td></td></tr>
-<tr><td>JAC_XDOT</td><td></td></tr>
-<tr><td>JAC_P</td><td></td></tr>
-<tr><td>JAC_CJ</td><td></td></tr>
-</table>
-*/
 /** \defgroup scheme_MUSCOD_FCN_Output
 <table>
 <caption>Output scheme: CasADi::MUSCOD_FCN_Output  (MUSCOD_FCN_NUM_OUT = 2) </caption>
@@ -120,13 +108,6 @@
 <tr><td>NLP_LAMBDA_G</td><td>Lagrange multipliers associated with G at the solution (m x 1) [lambda_g].</td></tr>
 <tr><td>NLP_LAMBDA_X</td><td>Lagrange multipliers associated with bounds on X at the solution (n x 1) [lambda_x].</td></tr>
 <tr><td>NLP_G</td><td>The constraints evaluated at the optimal solution (m x 1) [g].</td></tr>
-</table>
-*/
-/** \defgroup scheme_JACOutput
-<table>
-<caption>Output scheme: CasADi::JACOutput  (JAC_NUM_OUT = 1) </caption>
-<tr><th>Name</th><th>Description</th></tr>
-<tr><td>JAC_J</td><td></td></tr>
 </table>
 */
 /** \defgroup scheme_DAEInput

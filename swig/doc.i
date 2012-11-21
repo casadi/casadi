@@ -3065,6 +3065,10 @@ Does the node depend on other nodes. ";
 
 Number of outputs. ";
 
+%feature("docstring")  CasADi::BinaryMX::getOutput "
+
+Get an output. ";
+
 %feature("docstring")  CasADi::BinaryMX::sparsity "
 
 Get the sparsity. ";
@@ -5484,6 +5488,30 @@ Collocation integrator ODE/DAE integrator based on collocation.
 
 The method is still under development
 
+Solves an initial value problem (IVP) coupled to a terminal value problem
+with differential equation given as an implicit ODE coupled to an algebraic
+equation and a set of quadratures:Initial conditions at t=t0   x(t0)  = x0
+q(t0)  = 0  Forward integration from t=t0 to t=tf        0 =
+fx(x,z,p,t,der(x)) Forward ODE        0 = fz(x,z,p,t)
+Forward algebraic equations   der(q) = fq(x,z,p,t)                  Forward
+quadratures Terminal conditions at t=tf   rx(tf)  = rx0   rq(tf)  = 0
+Backward integration from t=tf to t=t0         0 =
+gx(rx,rz,rp,x,z,p,t,der(rx)) Backward ODE         0 = gz(rx,rz,rp,x,z,p,t)
+Backward algebraic equations   der(rq) = gq(rx,rz,rp,x,z,p,t) Backward
+quadratures  where we assume that both the forward and backwards
+integrations are index-1 (i.e. dfx/dxdot, dfz/dz, dgz/drz, dgx/drxdot are
+invertible) and furthermore that  gx, gz and gq have a linear dependency on
+rx, rz and rp and that f_x and g_x have a  linear dependence on xdot and
+rxdot respectively.  Note that not all integrators support this general
+form. In particular, an explicit integrator may requite that there are no
+algebraic states of equations and that the  ODE is given in explicit form:
+der(x)  = fx_explicit(x,z,p,t)  Integrators requite explicit ODEs also
+accept implict ODEs if they can be formally decomposed in the following way:
+0 = fx(x,z,p,t,der(x)) := fx_explicit(x,z,p,t) - der(x) This form allows the
+same ODE/DAE to be used for both explicit and implicit integrators. Explicit
+integrators will simply pass zeros as the state derivatives, recovering the
+explicit formulation. This also applies to the backward integration.
+
 Joel Andersson
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 4)
@@ -5908,6 +5936,40 @@ Time derivative of differential states [xdot]. |
 +----------+--------------------------------------------------+
 | DAE_QUAD | Right hand side of quadratures equations [quad]. |
 +----------+--------------------------------------------------+
+
+g:  backwards system >Input scheme: CasADi::RDAEInput (RDAE_NUM_IN = 9)
++------------+---------------------------------------------------------+ |
+Name    |                       Description                       |
++============+=========================================================+ |
+RDAE_RX    | Backward differential state [rx].                       |
++------------+---------------------------------------------------------+ |
+RDAE_RZ    | Backward algebraic state [rz].                          |
++------------+---------------------------------------------------------+ |
+RDAE_RP    | Backward parameter vector [rp].                         |
++------------+---------------------------------------------------------+ |
+RDAE_X     | Forward differential state [x].                         |
++------------+---------------------------------------------------------+ |
+RDAE_Z     | Forward algebraic state [z].                            |
++------------+---------------------------------------------------------+ |
+RDAE_P     | Parameter vector [p].                                   |
++------------+---------------------------------------------------------+ |
+RDAE_T     | Explicit time dependence [t].                           |
++------------+---------------------------------------------------------+ |
+RDAE_XDOT  | Time derivative of differential states [xdot].          |
++------------+---------------------------------------------------------+ |
+RDAE_RXDOT | Time derivative of backward differential state [rxdot]. |
++------------+---------------------------------------------------------+
+
+>Output scheme: CasADi::RDAEOutput (RDAE_NUM_OUT = 3)
++-----------+------------------------------------------------+
+|   Name    |                  Description                   |
++===========+================================================+
+| RDAE_ODE  | Right hand side of ODE. [ode].                 |
++-----------+------------------------------------------------+
+| RDAE_ALG  | Right hand side of algebraic equations. [alg]. |
++-----------+------------------------------------------------+
+| RDAE_QUAD | Right hand side of quadratures. [quad].        |
++-----------+------------------------------------------------+
 ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::checkNode "
@@ -7853,6 +7915,10 @@ Does the node depend on other nodes. ";
 
 Number of outputs. ";
 
+%feature("docstring")  CasADi::ConstantMX::getOutput "
+
+Get an output. ";
+
 %feature("docstring")  CasADi::ConstantMX::sparsity "
 
 Get the sparsity. ";
@@ -9530,8 +9596,7 @@ If H is not positive-definite, the solver should throw an error.
 |                                    | part is actually used. The matrix  |
 |                                    | is assumed to be symmetrical. [h]. |
 +------------------------------------+------------------------------------+
-| QP_G                               | The column vector G: dense, (nx x  |
-|                                    | 1) [g].                            |
+| QP_G                               | The vector G: dense, (nx x 1) [g]. |
 +------------------------------------+------------------------------------+
 | QP_A                               | The matrix A: sparse, (nc x nx) -  |
 |                                    | product with x must be dense. [a]. |
@@ -10150,8 +10215,7 @@ Attila Kozma, Joel Andersson
 |                                    | part is actually used. The matrix  |
 |                                    | is assumed to be symmetrical. [h]. |
 +------------------------------------+------------------------------------+
-| QP_G                               | The column vector G: dense, (nx x  |
-|                                    | 1) [g].                            |
+| QP_G                               | The vector G: dense, (nx x 1) [g]. |
 +------------------------------------+------------------------------------+
 | QP_A                               | The matrix A: sparse, (nc x nx) -  |
 |                                    | product with x must be dense. [a]. |
@@ -12900,14 +12964,6 @@ accept implict ODEs if they can be formally decomposed in the following way:
 same ODE/DAE to be used for both explicit and implicit integrators. Explicit
 integrators will simply pass zeros as the state derivatives, recovering the
 explicit formulation. This also applies to the backward integration.
-Solving the DAE defines a mapping from the four inputs: x0:    The
-differential state at the initial time (INTEGRATOR_X0=0) p:     Parameters
-(INTEGRATOR_P=1) rx0:   Backward differential state at the final time
-(INTEGRATOR_RX0=2) rp: Backward parameter vector (INTEGRATOR_RP=3)  ... and
-four outputs: xf: Differential state at the final time (INTEGRATOR_XF=0) qf:
-Quadrature state at the final time (INTEGRATOR_QF=1) rxf:   Backward
-differential state at the initial time (INTEGRATOR_RXF=2) rqf: Backward
-quadrature state at the initial time (INTEGRATOR_RQF=3)
 
 A call to evaluate will integrate to the end.
 
@@ -13506,6 +13562,40 @@ Time derivative of differential states [xdot]. |
 +----------+--------------------------------------------------+
 | DAE_QUAD | Right hand side of quadratures equations [quad]. |
 +----------+--------------------------------------------------+
+
+g:  backwards system >Input scheme: CasADi::RDAEInput (RDAE_NUM_IN = 9)
++------------+---------------------------------------------------------+ |
+Name    |                       Description                       |
++============+=========================================================+ |
+RDAE_RX    | Backward differential state [rx].                       |
++------------+---------------------------------------------------------+ |
+RDAE_RZ    | Backward algebraic state [rz].                          |
++------------+---------------------------------------------------------+ |
+RDAE_RP    | Backward parameter vector [rp].                         |
++------------+---------------------------------------------------------+ |
+RDAE_X     | Forward differential state [x].                         |
++------------+---------------------------------------------------------+ |
+RDAE_Z     | Forward algebraic state [z].                            |
++------------+---------------------------------------------------------+ |
+RDAE_P     | Parameter vector [p].                                   |
++------------+---------------------------------------------------------+ |
+RDAE_T     | Explicit time dependence [t].                           |
++------------+---------------------------------------------------------+ |
+RDAE_XDOT  | Time derivative of differential states [xdot].          |
++------------+---------------------------------------------------------+ |
+RDAE_RXDOT | Time derivative of backward differential state [rxdot]. |
++------------+---------------------------------------------------------+
+
+>Output scheme: CasADi::RDAEOutput (RDAE_NUM_OUT = 3)
++-----------+------------------------------------------------+
+|   Name    |                  Description                   |
++===========+================================================+
+| RDAE_ODE  | Right hand side of ODE. [ode].                 |
++-----------+------------------------------------------------+
+| RDAE_ALG  | Right hand side of algebraic equations. [alg]. |
++-----------+------------------------------------------------+
+| RDAE_QUAD | Right hand side of quadratures. [quad].        |
++-----------+------------------------------------------------+
 ";
 
 %feature("docstring")  CasADi::CVodesIntegrator::checkNode "
@@ -13989,14 +14079,6 @@ accept implict ODEs if they can be formally decomposed in the following way:
 same ODE/DAE to be used for both explicit and implicit integrators. Explicit
 integrators will simply pass zeros as the state derivatives, recovering the
 explicit formulation. This also applies to the backward integration.
-Solving the DAE defines a mapping from the four inputs: x0:    The
-differential state at the initial time (INTEGRATOR_X0=0) p:     Parameters
-(INTEGRATOR_P=1) rx0:   Backward differential state at the final time
-(INTEGRATOR_RX0=2) rp: Backward parameter vector (INTEGRATOR_RP=3)  ... and
-four outputs: xf: Differential state at the final time (INTEGRATOR_XF=0) qf:
-Quadrature state at the final time (INTEGRATOR_QF=1) rxf:   Backward
-differential state at the initial time (INTEGRATOR_RXF=2) rqf: Backward
-quadrature state at the initial time (INTEGRATOR_RQF=3)
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 4)
 +----------------+------------------------------------------------------+
@@ -14976,6 +15058,10 @@ Does the node depend on other nodes. ";
 %feature("docstring")  CasADi::Densification::getNumOutputs "
 
 Number of outputs. ";
+
+%feature("docstring")  CasADi::Densification::getOutput "
+
+Get an output. ";
 
 %feature("docstring")  CasADi::Densification::sparsity "
 
@@ -16324,6 +16410,10 @@ Get the sparsity of output oind. ";
 %feature("docstring")  CasADi::EvaluationMX::getOp "
 
 Get the operation. ";
+
+%feature("docstring")  CasADi::EvaluationMX::getOutput "
+
+Get an output. ";
 
 %feature("docstring")  CasADi::EvaluationMX::sparsity "
 
@@ -19657,17 +19747,29 @@ Print a representation of the object. ";
 
 Interface to IDAS from the Sundials suite.
 
-Solves an initial value problem in differential-algebraic equations of the
-form:
-
-Creates an integrator instance which solves initial value problems in
-differential-algebraic equations of the form:
-
-f(t,y,der(y),z,p) == 0 der(q) = g(t,y,z,p)
-
-The DAE thus consists of a fully implicit part (f) and an explicit
-quadrature part (g). In the same way, the state vector is also composed of
-two parts, the differential states and the quadrature states, i.e. x = [y,q]
+Solves an initial value problem (IVP) coupled to a terminal value problem
+with differential equation given as an implicit ODE coupled to an algebraic
+equation and a set of quadratures:Initial conditions at t=t0   x(t0)  = x0
+q(t0)  = 0  Forward integration from t=t0 to t=tf        0 =
+fx(x,z,p,t,der(x)) Forward ODE        0 = fz(x,z,p,t)
+Forward algebraic equations   der(q) = fq(x,z,p,t)                  Forward
+quadratures Terminal conditions at t=tf   rx(tf)  = rx0   rq(tf)  = 0
+Backward integration from t=tf to t=t0         0 =
+gx(rx,rz,rp,x,z,p,t,der(rx)) Backward ODE         0 = gz(rx,rz,rp,x,z,p,t)
+Backward algebraic equations   der(rq) = gq(rx,rz,rp,x,z,p,t) Backward
+quadratures  where we assume that both the forward and backwards
+integrations are index-1 (i.e. dfx/dxdot, dfz/dz, dgz/drz, dgx/drxdot are
+invertible) and furthermore that  gx, gz and gq have a linear dependency on
+rx, rz and rp and that f_x and g_x have a  linear dependence on xdot and
+rxdot respectively.  Note that not all integrators support this general
+form. In particular, an explicit integrator may requite that there are no
+algebraic states of equations and that the  ODE is given in explicit form:
+der(x)  = fx_explicit(x,z,p,t)  Integrators requite explicit ODEs also
+accept implict ODEs if they can be formally decomposed in the following way:
+0 = fx(x,z,p,t,der(x)) := fx_explicit(x,z,p,t) - der(x) This form allows the
+same ODE/DAE to be used for both explicit and implicit integrators. Explicit
+integrators will simply pass zeros as the state derivatives, recovering the
+explicit formulation. This also applies to the backward integration.
 
 Joel Andersson
 
@@ -20332,6 +20434,40 @@ Time derivative of differential states [xdot]. |
 +----------+--------------------------------------------------+
 | DAE_QUAD | Right hand side of quadratures equations [quad]. |
 +----------+--------------------------------------------------+
+
+g:  backwards system >Input scheme: CasADi::RDAEInput (RDAE_NUM_IN = 9)
++------------+---------------------------------------------------------+ |
+Name    |                       Description                       |
++============+=========================================================+ |
+RDAE_RX    | Backward differential state [rx].                       |
++------------+---------------------------------------------------------+ |
+RDAE_RZ    | Backward algebraic state [rz].                          |
++------------+---------------------------------------------------------+ |
+RDAE_RP    | Backward parameter vector [rp].                         |
++------------+---------------------------------------------------------+ |
+RDAE_X     | Forward differential state [x].                         |
++------------+---------------------------------------------------------+ |
+RDAE_Z     | Forward algebraic state [z].                            |
++------------+---------------------------------------------------------+ |
+RDAE_P     | Parameter vector [p].                                   |
++------------+---------------------------------------------------------+ |
+RDAE_T     | Explicit time dependence [t].                           |
++------------+---------------------------------------------------------+ |
+RDAE_XDOT  | Time derivative of differential states [xdot].          |
++------------+---------------------------------------------------------+ |
+RDAE_RXDOT | Time derivative of backward differential state [rxdot]. |
++------------+---------------------------------------------------------+
+
+>Output scheme: CasADi::RDAEOutput (RDAE_NUM_OUT = 3)
++-----------+------------------------------------------------+
+|   Name    |                  Description                   |
++===========+================================================+
+| RDAE_ODE  | Right hand side of ODE. [ode].                 |
++-----------+------------------------------------------------+
+| RDAE_ALG  | Right hand side of algebraic equations. [alg]. |
++-----------+------------------------------------------------+
+| RDAE_QUAD | Right hand side of quadratures. [quad].        |
++-----------+------------------------------------------------+
 ";
 
 %feature("docstring")  CasADi::IdasIntegrator::checkNode "
@@ -20796,17 +20932,29 @@ Return a string with a destription (for SWIG) ";
 // File: classCasADi_1_1IdasInternal.xml
 %feature("docstring") CasADi::IdasInternal "
 
-Solves an initial value problem in differential-algebraic equations of the
-form:
-
-Creates an integrator instance which solves initial value problems in
-differential-algebraic equations of the form:
-
-f(t,y,der(y),z,p) == 0 der(q) = g(t,y,z,p)
-
-The DAE thus consists of a fully implicit part (f) and an explicit
-quadrature part (g). In the same way, the state vector is also composed of
-two parts, the differential states and the quadrature states, i.e. x = [y,q]
+Solves an initial value problem (IVP) coupled to a terminal value problem
+with differential equation given as an implicit ODE coupled to an algebraic
+equation and a set of quadratures:Initial conditions at t=t0   x(t0)  = x0
+q(t0)  = 0  Forward integration from t=t0 to t=tf        0 =
+fx(x,z,p,t,der(x)) Forward ODE        0 = fz(x,z,p,t)
+Forward algebraic equations   der(q) = fq(x,z,p,t)                  Forward
+quadratures Terminal conditions at t=tf   rx(tf)  = rx0   rq(tf)  = 0
+Backward integration from t=tf to t=t0         0 =
+gx(rx,rz,rp,x,z,p,t,der(rx)) Backward ODE         0 = gz(rx,rz,rp,x,z,p,t)
+Backward algebraic equations   der(rq) = gq(rx,rz,rp,x,z,p,t) Backward
+quadratures  where we assume that both the forward and backwards
+integrations are index-1 (i.e. dfx/dxdot, dfz/dz, dgz/drz, dgx/drxdot are
+invertible) and furthermore that  gx, gz and gq have a linear dependency on
+rx, rz and rp and that f_x and g_x have a  linear dependence on xdot and
+rxdot respectively.  Note that not all integrators support this general
+form. In particular, an explicit integrator may requite that there are no
+algebraic states of equations and that the  ODE is given in explicit form:
+der(x)  = fx_explicit(x,z,p,t)  Integrators requite explicit ODEs also
+accept implict ODEs if they can be formally decomposed in the following way:
+0 = fx(x,z,p,t,der(x)) := fx_explicit(x,z,p,t) - der(x) This form allows the
+same ODE/DAE to be used for both explicit and implicit integrators. Explicit
+integrators will simply pass zeros as the state derivatives, recovering the
+explicit formulation. This also applies to the backward integration.
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 4)
 +----------------+------------------------------------------------------+
@@ -21444,7 +21592,7 @@ Initialize the taping. ";
 
 %feature("docstring")  CasADi::IdasInternal::initAdj "
 
-Initialize the adjoint problem (can only be called after the first
+Initialize the backward problem (can only be called after the first
 integration) ";
 
 %feature("docstring")  CasADi::IdasInternal::reset "
@@ -21473,7 +21621,19 @@ Print solver statistics. ";
 
 %feature("docstring")  CasADi::IdasInternal::getJacobian "
 
-Get the Jacobian. ";
+Get the integrator Jacobian for the forward problem. ";
+
+%feature("docstring")  CasADi::IdasInternal::getJacobianGen "
+
+Get the integrator Jacobian for the forward problem (generic) ";
+
+%feature("docstring")  CasADi::IdasInternal::getJacobianB "
+
+Get the integrator Jacobian for the backward problem. ";
+
+%feature("docstring")  CasADi::IdasInternal::getJacobianGenB "
+
+Get the integrator Jacobian for the backward problem (generic) ";
 
 %feature("docstring")  CasADi::IdasInternal::getLinearSolver "
 
@@ -23215,14 +23375,6 @@ accept implict ODEs if they can be formally decomposed in the following way:
 same ODE/DAE to be used for both explicit and implicit integrators. Explicit
 integrators will simply pass zeros as the state derivatives, recovering the
 explicit formulation. This also applies to the backward integration.
-Solving the DAE defines a mapping from the four inputs: x0:    The
-differential state at the initial time (INTEGRATOR_X0=0) p:     Parameters
-(INTEGRATOR_P=1) rx0:   Backward differential state at the final time
-(INTEGRATOR_RX0=2) rp: Backward parameter vector (INTEGRATOR_RP=3)  ... and
-four outputs: xf: Differential state at the final time (INTEGRATOR_XF=0) qf:
-Quadrature state at the final time (INTEGRATOR_QF=1) rxf:   Backward
-differential state at the initial time (INTEGRATOR_RXF=2) rqf: Backward
-quadrature state at the initial time (INTEGRATOR_RQF=3)
 
 The Integrator class provides some additional functionality, such as getting
 the value of the state and/or sensitivities at certain time points.
@@ -24031,14 +24183,6 @@ accept implict ODEs if they can be formally decomposed in the following way:
 same ODE/DAE to be used for both explicit and implicit integrators. Explicit
 integrators will simply pass zeros as the state derivatives, recovering the
 explicit formulation. This also applies to the backward integration.
-Solving the DAE defines a mapping from the four inputs: x0:    The
-differential state at the initial time (INTEGRATOR_X0=0) p:     Parameters
-(INTEGRATOR_P=1) rx0:   Backward differential state at the final time
-(INTEGRATOR_RX0=2) rp: Backward parameter vector (INTEGRATOR_RP=3)  ... and
-four outputs: xf: Differential state at the final time (INTEGRATOR_XF=0) qf:
-Quadrature state at the final time (INTEGRATOR_QF=1) rxf:   Backward
-differential state at the initial time (INTEGRATOR_RXF=2) rqf: Backward
-quadrature state at the initial time (INTEGRATOR_RQF=3)
 
 Joel Andersson
 
@@ -43644,6 +43788,10 @@ Does the node depend on other nodes. ";
 
 Number of outputs. ";
 
+%feature("docstring")  CasADi::Mapping::getOutput "
+
+Get an output. ";
+
 %feature("docstring")  CasADi::Mapping::sparsity "
 
 Get the sparsity. ";
@@ -44646,6 +44794,10 @@ Destructor. ";
 %feature("docstring")  CasADi::MultipleOutput::getNumOutputs "
 
 Number of outputs. ";
+
+%feature("docstring")  CasADi::MultipleOutput::getOutput "
+
+Get an output. ";
 
 %feature("docstring")  CasADi::MultipleOutput::sparsity "
 
@@ -46455,6 +46607,10 @@ Does the node depend on other nodes. ";
 
 Number of outputs. ";
 
+%feature("docstring")  CasADi::Multiplication::getOutput "
+
+Get an output. ";
+
 %feature("docstring")  CasADi::Multiplication::sparsity "
 
 Get the sparsity. ";
@@ -47267,6 +47423,14 @@ keeping the existing non-zeros. ";
 
 Get the nth dependency as MX. ";
 
+%feature("docstring")  CasADi::MX::getNumOutputs "
+
+Number of outputs. ";
+
+%feature("docstring")  CasADi::MX::getOutput "
+
+Get an output. ";
+
 %feature("docstring")  CasADi::MX::getNdeps "
 
 Get the number of dependencies of a binary SX. ";
@@ -47945,41 +48109,33 @@ Multiple input, single output. ";
 
 Multiple input, multiple output. ";
 
-%feature("docstring")  CasADi::MXFunction::inputMX "
-
-get function input argument (to be deprecated) ";
-
-%feature("docstring")  CasADi::MXFunction::outputMX "
-
-get function output argument (to be deprecated) ";
-
-%feature("docstring")  CasADi::MXFunction::inputsMX "
-
-get function inputs argument (to be deprecated) ";
-
-%feature("docstring")  CasADi::MXFunction::outputsMX "
-
-get function outputs argument (to be deprecated) ";
-
 %feature("docstring")  CasADi::MXFunction::inputExpr "
 
-get function input ";
+Get function input. ";
 
 %feature("docstring")  CasADi::MXFunction::outputExpr "
 
-get function output ";
+Get function output. ";
 
 %feature("docstring")  CasADi::MXFunction::inputExpr "
 
-get function inputs ";
+Get all function inputs. ";
 
 %feature("docstring")  CasADi::MXFunction::outputExpr "
 
-get function outputs ";
+Get all function outputs. ";
 
 %feature("docstring")  CasADi::MXFunction::algorithm "
 
-Access the algorithm. ";
+Access the algorithm directly. ";
+
+%feature("docstring")  CasADi::MXFunction::getAlgorithmSize "
+
+Get the number of atomic operations. ";
+
+%feature("docstring")  CasADi::MXFunction::getWorkSize "
+
+Get the length of the work vector. ";
 
 %feature("docstring")  CasADi::MXFunction::countNodes "
 
@@ -48724,6 +48880,10 @@ Is the class able to propate seeds through the algorithm? ";
 
 Reset the sparsity propagation. ";
 
+%feature("docstring")  CasADi::MXFunctionInternal::printWork "
+
+Print work vector. ";
+
 %feature("docstring")  CasADi::MXFunctionInternal::grad "
 
 Gradient via source code transformation. ";
@@ -49065,6 +49225,10 @@ Does the node depend on other nodes. ";
 %feature("docstring")  CasADi::MXNode::getNumOutputs "
 
 Number of outputs. ";
+
+%feature("docstring")  CasADi::MXNode::getOutput "
+
+Get an output. ";
 
 %feature("docstring")  CasADi::MXNode::sparsity "
 
@@ -50517,8 +50681,7 @@ If H is not positive-definite, the solver should throw an error.
 |                                    | part is actually used. The matrix  |
 |                                    | is assumed to be symmetrical. [h]. |
 +------------------------------------+------------------------------------+
-| QP_G                               | The column vector G: dense, (nx x  |
-|                                    | 1) [g].                            |
+| QP_G                               | The vector G: dense, (nx x 1) [g]. |
 +------------------------------------+------------------------------------+
 | QP_A                               | The matrix A: sparse, (nc x nx) -  |
 |                                    | product with x must be dense. [a]. |
@@ -51092,8 +51255,7 @@ Joris Gillis
 |                                    | part is actually used. The matrix  |
 |                                    | is assumed to be symmetrical. [h]. |
 +------------------------------------+------------------------------------+
-| QP_G                               | The column vector G: dense, (nx x  |
-|                                    | 1) [g].                            |
+| QP_G                               | The vector G: dense, (nx x 1) [g]. |
 +------------------------------------+------------------------------------+
 | QP_A                               | The matrix A: sparse, (nc x nx) -  |
 |                                    | product with x must be dense. [a]. |
@@ -53472,6 +53634,10 @@ Does the node depend on other nodes. ";
 
 Number of outputs. ";
 
+%feature("docstring")  CasADi::NonzerosNonzerosOp::getOutput "
+
+Get an output. ";
+
 %feature("docstring")  CasADi::NonzerosNonzerosOp::sparsity "
 
 Get the sparsity. ";
@@ -53671,6 +53837,10 @@ Does the node depend on other nodes. ";
 
 Number of outputs. ";
 
+%feature("docstring")  CasADi::NonzerosScalarOp::getOutput "
+
+Get an output. ";
+
 %feature("docstring")  CasADi::NonzerosScalarOp::sparsity "
 
 Get the sparsity. ";
@@ -53868,6 +54038,10 @@ Does the node depend on other nodes. ";
 
 Number of outputs. ";
 
+%feature("docstring")  CasADi::Norm::getOutput "
+
+Get an output. ";
+
 %feature("docstring")  CasADi::Norm::sparsity "
 
 Get the sparsity. ";
@@ -54063,6 +54237,10 @@ Does the node depend on other nodes. ";
 %feature("docstring")  CasADi::Norm1::getNumOutputs "
 
 Number of outputs. ";
+
+%feature("docstring")  CasADi::Norm1::getOutput "
+
+Get an output. ";
 
 %feature("docstring")  CasADi::Norm1::sparsity "
 
@@ -54260,6 +54438,10 @@ Does the node depend on other nodes. ";
 
 Number of outputs. ";
 
+%feature("docstring")  CasADi::Norm2::getOutput "
+
+Get an output. ";
+
 %feature("docstring")  CasADi::Norm2::sparsity "
 
 Get the sparsity. ";
@@ -54456,6 +54638,10 @@ Does the node depend on other nodes. ";
 
 Number of outputs. ";
 
+%feature("docstring")  CasADi::NormF::getOutput "
+
+Get an output. ";
+
 %feature("docstring")  CasADi::NormF::sparsity "
 
 Get the sparsity. ";
@@ -54651,6 +54837,10 @@ Does the node depend on other nodes. ";
 %feature("docstring")  CasADi::NormInf::getNumOutputs "
 
 Number of outputs. ";
+
+%feature("docstring")  CasADi::NormInf::getOutput "
+
+Get an output. ";
 
 %feature("docstring")  CasADi::NormInf::sparsity "
 
@@ -56218,8 +56408,7 @@ If H is not positive-definite, the solver should throw an error.
 |                                    | part is actually used. The matrix  |
 |                                    | is assumed to be symmetrical. [h]. |
 +------------------------------------+------------------------------------+
-| QP_G                               | The column vector G: dense, (nx x  |
-|                                    | 1) [g].                            |
+| QP_G                               | The vector G: dense, (nx x 1) [g]. |
 +------------------------------------+------------------------------------+
 | QP_A                               | The matrix A: sparse, (nc x nx) -  |
 |                                    | product with x must be dense. [a]. |
@@ -56821,8 +57010,7 @@ reInit();
 |                                    | part is actually used. The matrix  |
 |                                    | is assumed to be symmetrical. [h]. |
 +------------------------------------+------------------------------------+
-| QP_G                               | The column vector G: dense, (nx x  |
-|                                    | 1) [g].                            |
+| QP_G                               | The vector G: dense, (nx x 1) [g]. |
 +------------------------------------+------------------------------------+
 | QP_A                               | The matrix A: sparse, (nc x nx) -  |
 |                                    | product with x must be dense. [a]. |
@@ -57965,6 +58153,10 @@ Does the node depend on other nodes. ";
 %feature("docstring")  CasADi::OutputNode::getNumOutputs "
 
 Number of outputs. ";
+
+%feature("docstring")  CasADi::OutputNode::getOutput "
+
+Get an output. ";
 
 %feature("docstring")  CasADi::OutputNode::sparsity "
 
@@ -59349,8 +59541,7 @@ If H is not positive-definite, the solver should throw an error.
 |                                    | part is actually used. The matrix  |
 |                                    | is assumed to be symmetrical. [h]. |
 +------------------------------------+------------------------------------+
-| QP_G                               | The column vector G: dense, (nx x  |
-|                                    | 1) [g].                            |
+| QP_G                               | The vector G: dense, (nx x 1) [g]. |
 +------------------------------------+------------------------------------+
 | QP_A                               | The matrix A: sparse, (nc x nx) -  |
 |                                    | product with x must be dense. [a]. |
@@ -59940,8 +60131,7 @@ Joris Gillis, Joel Andersson
 |                                    | part is actually used. The matrix  |
 |                                    | is assumed to be symmetrical. [h]. |
 +------------------------------------+------------------------------------+
-| QP_G                               | The column vector G: dense, (nx x  |
-|                                    | 1) [g].                            |
+| QP_G                               | The vector G: dense, (nx x 1) [g]. |
 +------------------------------------+------------------------------------+
 | QP_A                               | The matrix A: sparse, (nc x nx) -  |
 |                                    | product with x must be dense. [a]. |
@@ -60699,8 +60889,7 @@ Joel Andersson
 |                                    | part is actually used. The matrix  |
 |                                    | is assumed to be symmetrical. [h]. |
 +------------------------------------+------------------------------------+
-| QP_G                               | The column vector G: dense, (nx x  |
-|                                    | 1) [g].                            |
+| QP_G                               | The vector G: dense, (nx x 1) [g]. |
 +------------------------------------+------------------------------------+
 | QP_A                               | The matrix A: sparse, (nc x nx) -  |
 |                                    | product with x must be dense. [a]. |
@@ -61419,8 +61608,7 @@ Internal class.
 |                                    | part is actually used. The matrix  |
 |                                    | is assumed to be symmetrical. [h]. |
 +------------------------------------+------------------------------------+
-| QP_G                               | The column vector G: dense, (nx x  |
-|                                    | 1) [g].                            |
+| QP_G                               | The vector G: dense, (nx x 1) [g]. |
 +------------------------------------+------------------------------------+
 | QP_A                               | The matrix A: sparse, (nc x nx) -  |
 |                                    | product with x must be dense. [a]. |
@@ -63634,6 +63822,10 @@ Does the node depend on other nodes. ";
 
 Number of outputs. ";
 
+%feature("docstring")  CasADi::ScalarNonzerosOp::getOutput "
+
+Get an output. ";
+
 %feature("docstring")  CasADi::ScalarNonzerosOp::sparsity "
 
 Get the sparsity. ";
@@ -65373,6 +65565,10 @@ Does the node depend on other nodes. ";
 %feature("docstring")  CasADi::SparseSparseOp::getNumOutputs "
 
 Number of outputs. ";
+
+%feature("docstring")  CasADi::SparseSparseOp::getOutput "
+
+Get an output. ";
 
 %feature("docstring")  CasADi::SparseSparseOp::sparsity "
 
@@ -69637,37 +69833,21 @@ Hessian (forward over adjoint) via source code transformation. ";
 
 Check if the node is pointing to the right type of object. ";
 
-%feature("docstring")  CasADi::SXFunction::inputSX "
-
-get function input (to be deprecated) ";
-
-%feature("docstring")  CasADi::SXFunction::outputSX "
-
-get function output (to be deprecated) ";
-
-%feature("docstring")  CasADi::SXFunction::inputsSX "
-
-get function inputs (to be deprecated) ";
-
-%feature("docstring")  CasADi::SXFunction::outputsSX "
-
-get function outputs (to be deprecated) ";
-
 %feature("docstring")  CasADi::SXFunction::inputExpr "
 
-get function input ";
+Get function input. ";
 
 %feature("docstring")  CasADi::SXFunction::outputExpr "
 
-get function output ";
+Get function output. ";
 
 %feature("docstring")  CasADi::SXFunction::inputExpr "
 
-get function inputs ";
+Get all function inputs. ";
 
 %feature("docstring")  CasADi::SXFunction::outputExpr "
 
-get function outputs ";
+Get all function outputs. ";
 
 %feature("docstring")  CasADi::SXFunction::generateCode "
 
@@ -70883,6 +71063,10 @@ Does the node depend on other nodes. ";
 
 Number of outputs. ";
 
+%feature("docstring")  CasADi::SymbolicMX::getOutput "
+
+Get an output. ";
+
 %feature("docstring")  CasADi::SymbolicMX::sparsity "
 
 Get the sparsity. ";
@@ -71396,6 +71580,10 @@ Does the node depend on other nodes. ";
 %feature("docstring")  CasADi::UnaryMX::getNumOutputs "
 
 Number of outputs. ";
+
+%feature("docstring")  CasADi::UnaryMX::getOutput "
+
+Get an output. ";
 
 %feature("docstring")  CasADi::UnaryMX::sparsity "
 
@@ -76068,18 +76256,6 @@ symbolic variables. ";
 
 Create a symbolic matrix out of a numeric one. ";
 
-%feature("docstring")  CasADi::gradient "";
-
-%feature("docstring")  CasADi::jacobian "
-
-Calculate jacobian via source code transformation.
-
-Uses CasADi::SXFunction::jac ";
-
-%feature("docstring")  CasADi::hessian "";
-
-%feature("docstring")  CasADi::hessian "";
-
 %feature("docstring")  CasADi::getSchemeName "";
 
 %feature("docstring")  CasADi::getSchemeEntryNames "";
@@ -76556,8 +76732,7 @@ Helper function for 'QPInput' Input arguments of a QP problem
 |                                    | part is actually used. The matrix  |
 |                                    | is assumed to be symmetrical. [h]. |
 +------------------------------------+------------------------------------+
-| QP_G                               | The column vector G: dense, (nx x  |
-|                                    | 1) [g].                            |
+| QP_G                               | The vector G: dense, (nx x 1) [g]. |
 +------------------------------------+------------------------------------+
 | QP_A                               | The matrix A: sparse, (nc x nx) -  |
 |                                    | product with x must be dense. [a]. |
@@ -77303,7 +77478,19 @@ expressions piggyback. ";
 
 %feature("docstring")  CasADi::substitute "
 
+Substitute variable v with expression vdef in an expression ex. ";
+
+%feature("docstring")  CasADi::substitute "
+
 Substitute variable var with expression expr in multiple expressions. ";
+
+%feature("docstring")  CasADi::extractShared "
+
+Extract shared subexpressions from an set of expressions. ";
+
+%feature("docstring")  CasADi::printCompact "
+
+Print compact, introducing new variables for shared subexpressions. ";
 
 %feature("docstring")  CasADi::vertcat "
 
@@ -77585,8 +77772,6 @@ triangle function
 \\\\[ \\\\begin{cases} \\\\Lambda(x) = 0 & |x| >= 1 \\\\\\\\ \\\\Lambda(x) =
 1-|x| & |x| < 1 \\\\end{cases} \\\\] ";
 
-%feature("docstring")  CasADi::contains "";
-
 %feature("docstring")  CasADi::simplify "
 
 Simplify an expression. ";
@@ -77599,24 +77784,22 @@ Remove identical calculations. ";
 
 Substitute variable var with expression expr in multiple expressions. ";
 
-%feature("docstring")  CasADi::evalf "
-
-Substitute variable v with value vdef in an expression ex, and evaluate
-numerically.
-
-Note: this is not efficient. For critical parts (loops) of your code, always
-use SXFunction. See:   numSample1D ";
-
-%feature("docstring")  CasADi::evalf "
-
-Evaluate an SX graph numerically.
-
-Note: this is not efficient. For critical parts (loops) of your code, always
-use SXFunction. ";
-
 %feature("docstring")  CasADi::substitute "
 
 Substitute variable v with expression vdef in an expression ex. ";
+
+%feature("docstring")  CasADi::evalf "
+
+Substitute variable v with value vdef in an expression ex, and evaluate
+numerically Note: this is not efficient. For critical parts (loops) of your
+code, always use SXFunction.
+
+See:   numSample1D ";
+
+%feature("docstring")  CasADi::evalf "
+
+Evaluate an SX graph numerically Note: this is not efficient. For critical
+parts (loops) of your code, always use SXFunction. ";
 
 %feature("docstring")  CasADi::substituteInPlace "
 
@@ -77650,6 +77833,18 @@ Sparse matrices invariable return false ";
 check if symbolic
 
 Sparse matrices can return true if all non-zero elements are symbolic ";
+
+%feature("docstring")  CasADi::gradient "";
+
+%feature("docstring")  CasADi::jacobian "
+
+Calculate jacobian via source code transformation.
+
+Uses CasADi::SXFunction::jac ";
+
+%feature("docstring")  CasADi::hessian "";
+
+%feature("docstring")  CasADi::hessian "";
 
 %feature("docstring")  CasADi::getValue "
 
@@ -77734,25 +77929,21 @@ expressions, it will use directional derivatives which is typically (but not
 necessarily) more efficient if the complete Jacobian is not needed and v has
 few columns. ";
 
-%feature("docstring")  CasADi::extractSubexpressions "
+%feature("docstring")  CasADi::extractShared "
 
-Extract all subexpressions from an expression. ";
+Extract shared subexpressions from an set of expressions. ";
 
-%feature("docstring")  CasADi::extractSubexpressions "
+%feature("docstring")  CasADi::printCompact "
 
-Extract all subexpressions from an set of expressions. ";
-
-%feature("docstring")  CasADi::contains "
-
-Returns true if at least one element in list contains the scalar e. ";
+Print compact, introducing new variables for shared subexpressions. ";
 
 %feature("docstring")  CasADi::if_else "
 
 Make the expression smooth by replacing non-smooth nodes with binary
 variables.
 
-Substitute derivatives with variables void replaceDerivatives(Matrix<SX>
-&ex, const Matrix<SX> &var, const Matrix<SX> &dvar); ";
+Substitute derivatives with variables void replaceDerivatives(SXMatrix &ex,
+const SXMatrix &var, const SXMatrix &dvar); ";
 
 %feature("docstring")  CasADi::blockmatrix "
 
