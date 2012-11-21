@@ -35,7 +35,7 @@ namespace CasADi{
 class UnarySX : public SXNode{
   private:
     
-    /** \brief  Constructor is private, use "create" below (unary version) */
+    /** \brief  Constructor is private, use "create" below */
     UnarySX(unsigned char op, const SX& dep) : op_(op), dep_(dep){}
     
   public:
