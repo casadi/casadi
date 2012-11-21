@@ -82,6 +82,9 @@ class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInterna
     /** \brief  Working vector for numeric calculation */
     std::vector<FunctionIO> work_;
     
+    /** \brief  "Tape" with spilled variables */
+    std::vector<std::pair<int,DMatrix> > tape_;
+    
     /// Free variables
     std::vector<MX> free_vars_;
     
@@ -105,7 +108,7 @@ class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInterna
     SXFunction expand(const std::vector<SXMatrix>& inputv );
     
     // Update pointers to a particular element
-    void updatePointers(const AlgEl& el, int nfwd, int nadj);
+    void updatePointers(const AlgEl& el, int nfdir, int nadir);
     
     // Vectors to hold pointers during evaluation
     DMatrixPtrV mx_input_;
@@ -128,7 +131,10 @@ class MXFunctionInternal : public XFunctionInternal<MXFunction,MXFunctionInterna
     virtual void spInit(bool fwd);
     
     /// Print work vector
-    void printWork(int nfwd=0, int nadj=0, std::ostream &stream=std::cout);
+    void printWork(int nfdir=0, int nadir=0, std::ostream &stream=std::cout);
+    
+    /// Allocate tape
+    void allocTape();
     
 };
 

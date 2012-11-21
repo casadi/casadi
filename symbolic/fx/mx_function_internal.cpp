@@ -141,7 +141,7 @@ MXFunctionInternal::~MXFunctionInternal(){
 }
 
 
-void MXFunctionInternal::init(){  
+void MXFunctionInternal::init(){
   log("MXFunctionInternal::init begin");
       
   // Call the init function of the base class
@@ -393,6 +393,10 @@ void MXFunctionInternal::init(){
     }
   }
   
+  // Allocate tape
+  allocTape();
+  
+  
   // Allocate memory for directional derivatives
   MXFunctionInternal::updateNumSens(false);
 
@@ -415,20 +419,20 @@ void MXFunctionInternal::setLiftingFunction(LiftingFunction liftfun, void* user_
   liftfun_ud_ = user_data;
 }
 
-void MXFunctionInternal::updatePointers(const AlgEl& el, int nfwd, int nadj){
+void MXFunctionInternal::updatePointers(const AlgEl& el, int nfdir, int nadir){
   mx_input_.resize(el.arg.size());
   mx_output_.resize(el.res.size());
 
-  mx_fwdSeed_.resize(nfwd);
-  mx_fwdSens_.resize(nfwd);
-  for(int d=0; d<nfwd; ++d){
+  mx_fwdSeed_.resize(nfdir);
+  mx_fwdSens_.resize(nfdir);
+  for(int d=0; d<nfdir; ++d){
     mx_fwdSeed_[d].resize(mx_input_.size());
     mx_fwdSens_[d].resize(mx_output_.size());
   }
 
-  mx_adjSens_.resize(nadj);
-  mx_adjSeed_.resize(nadj);
-  for(int d=0; d<nadj; ++d){
+  mx_adjSens_.resize(nadir);
+  mx_adjSeed_.resize(nadir);
+  for(int d=0; d<nadir; ++d){
     mx_adjSens_[d].resize(mx_input_.size());
     mx_adjSeed_[d].resize(mx_output_.size());
   }
@@ -436,24 +440,24 @@ void MXFunctionInternal::updatePointers(const AlgEl& el, int nfwd, int nadj){
   for(int i=0; i<mx_input_.size(); ++i){
     if(el.arg[i]>=0){
       mx_input_[i] = &work_[el.arg[i]].data;
-      for(int d=0; d<nfwd; ++d) mx_fwdSeed_[d][i] = &work_[el.arg[i]].dataF[d];
-      for(int d=0; d<nadj; ++d) mx_adjSens_[d][i] = &work_[el.arg[i]].dataA[d];
+      for(int d=0; d<nfdir; ++d) mx_fwdSeed_[d][i] = &work_[el.arg[i]].dataF[d];
+      for(int d=0; d<nadir; ++d) mx_adjSens_[d][i] = &work_[el.arg[i]].dataA[d];
     } else {
       mx_input_[i] = 0;
-      for(int d=0; d<nfwd; ++d) mx_fwdSeed_[d][i] = 0;
-      for(int d=0; d<nadj; ++d) mx_adjSens_[d][i] = 0;
+      for(int d=0; d<nfdir; ++d) mx_fwdSeed_[d][i] = 0;
+      for(int d=0; d<nadir; ++d) mx_adjSens_[d][i] = 0;
     }
   }
   
   for(int i=0; i<mx_output_.size(); ++i){
     if(el.res[i]>=0){
       mx_output_[i] = &work_[el.res[i]].data;
-      for(int d=0; d<nfwd; ++d) mx_fwdSens_[d][i] = &work_[el.res[i]].dataF[d];
-      for(int d=0; d<nadj; ++d) mx_adjSeed_[d][i] = &work_[el.res[i]].dataA[d];
+      for(int d=0; d<nfdir; ++d) mx_fwdSens_[d][i] = &work_[el.res[i]].dataF[d];
+      for(int d=0; d<nadir; ++d) mx_adjSeed_[d][i] = &work_[el.res[i]].dataA[d];
     } else {
       mx_output_[i] = 0;
-      for(int d=0; d<nfwd; ++d) mx_fwdSens_[d][i] = 0;
-      for(int d=0; d<nadj; ++d) mx_adjSeed_[d][i] = 0;
+      for(int d=0; d<nfdir; ++d) mx_fwdSens_[d][i] = 0;
+      for(int d=0; d<nadir; ++d) mx_adjSeed_[d][i] = 0;
     }
   }
 }
@@ -468,8 +472,21 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
     casadi_error("Cannot evaluate \"" << ss.str() << "\" since variables " << free_vars_ << " are free.");
   }
   
+  // Tape iterator
+  vector<pair<int,DMatrix> >::iterator tape_it = tape_.begin();
+  
   // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
   for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
+    // Spill existing work elements if needed
+    if(nadir>0 && it->op!=OP_OUTPUT){
+      for(vector<int>::const_iterator c=it->res.begin(); c!=it->res.end(); ++c){
+        if(*c >=0 && tape_it!=tape_.end() && tape_it->first == *c){
+          tape_it->second.set(work_[*c].data);
+          tape_it++;
+        }
+      }
+    }
+    
     if(it->op==OP_INPUT){
       // Pass the input and forward seeeds
       work_[it->res.front()].data.set(input(it->arg.front()));
@@ -506,6 +523,9 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
   if(nadir>0){
     log("MXFunctionInternal::evaluate evaluating adjoint");
 
+    // Tape iterator (reuse same name to prevent usage of the forward iterator)
+    vector<pair<int,DMatrix> >::const_reverse_iterator tape_it = tape_.rbegin();
+    
     // Clear the adjoint seeds
     for(vector<FunctionIO>::iterator it=work_.begin(); it!=work_.end(); it++){
       for(int dir=0; dir<nadir; ++dir){
@@ -525,7 +545,9 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
         for(int dir=0; dir<nadir; ++dir){
           work_[it->arg.front()].dataA.at(dir).set(adjSeed(it->res.front(),dir));
         }
-      } else if(it->op!=OP_PARAMETER){
+      } else if(it->op==OP_PARAMETER){
+        //casadi_error("The algorithm contains free parameters"); // FIXME
+      } else {
         // Point pointers to the data corresponding to the element
         updatePointers(*it,0,nadir);
         
@@ -533,8 +555,16 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
         it->data->evaluateD(mx_input_, mx_output_, mx_fwdSeed_, mx_fwdSens_, mx_adjSeed_, mx_adjSens_);
       }
       
-      // Free memory for reuse
       if(it->op!=OP_OUTPUT){
+        // Recover spilled work vector elements
+        for(vector<int>::const_reverse_iterator c=it->res.rbegin(); c!=it->res.rend(); ++c){
+          if(*c >=0 && tape_it!=tape_.rend() && tape_it->first == *c){
+            tape_it->second.get(work_[*c].data);
+            tape_it++;
+          }
+        }
+        
+        // Free memory for reuse
         for(int oind=0; oind<it->res.size(); ++oind){
           int el = it->res[oind];
           if(el>=0){
@@ -707,47 +737,69 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
   }
   
   // Symbolic work, non-differentiated
-  std::vector<MX> swork(work_.size());
+  vector<MX> swork(work_.size());
   log("MXFunctionInternal::evalMX allocated work vector");
   
   // Get the number of directions
-  const int nfwd = fseed.size();
-  const int nadj = aseed.size();
+  const int nfdir = fseed.size();
+  const int nadir = aseed.size();
 
+  // "Tape" with spilled variables
+  vector<pair<int,MX> > tape;
+  if(nadir>0){
+    tape.resize(tape_.size());
+    for(int k=0; k<tape.size(); ++k){
+      tape[k].first = tape_[k].first;
+    }
+  }
+
+  // Tape iterator
+  vector<pair<int,MX> >::iterator tape_it = tape.begin();
+  
   // Allocate outputs
   if(!output_given){
     res.resize(outputv_.size());
   }
   
   // Allocate forward sensitivities
-  fsens.resize(nfwd);
-  for(int d=0; d<nfwd; ++d){
+  fsens.resize(nfdir);
+  for(int d=0; d<nfdir; ++d){
     fsens[d].resize(outputv_.size());
   }
   
   // Allocate adjoint sensitivities
-  asens.resize(nadj);
-  for(int d=0; d<nadj; ++d){
+  asens.resize(nadir);
+  for(int d=0; d<nadir; ++d){
     asens[d].resize(inputv_.size());
   }
   log("MXFunctionInternal::evalMX allocated return value");
   
   MXPtrV input_p, output_p;
-  MXPtrVV fseed_p(nfwd), fsens_p(nfwd);
-  MXPtrVV aseed_p(nadj), asens_p(nadj);
+  MXPtrVV fseed_p(nfdir), fsens_p(nfdir);
+  MXPtrVV aseed_p(nadir), asens_p(nadir);
   MXPtrVV dummy_p;
 
   // Work vector, forward derivatives
   std::vector<std::vector<MX> > dwork(work_.size());
-  fill(dwork.begin(),dwork.end(),std::vector<MX>(nfwd));
+  fill(dwork.begin(),dwork.end(),std::vector<MX>(nfdir));
   log("MXFunctionInternal::evalMX allocated derivative work vector (forward mode)");
     
   // Loop over computational nodes in forward order
   for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
-    // Pass the inputs and forward seeds
+    // Spill existing work elements if needed
+    if(nadir>0 && it->op!=OP_OUTPUT){
+      for(vector<int>::const_iterator c=it->res.begin(); c!=it->res.end(); ++c){
+        if(*c >=0 && tape_it!=tape.end() && tape_it->first == *c){
+          tape_it->second = swork[*c];
+          tape_it++;
+        }
+      }
+    }
+    
     if(it->op == OP_INPUT){
+      // Fetch input
       swork[it->res.front()] = arg[it->arg.front()];
-      for(int d=0; d<nfwd; ++d){
+      for(int d=0; d<nfdir; ++d){
         dwork[it->res.front()][d] = fseed[d][it->arg.front()];
       }
     } else if(it->op==OP_OUTPUT){
@@ -757,12 +809,13 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
       }
 
       // Collect the forward sensitivities
-      for(int d=0; d<nfwd; ++d){
+      for(int d=0; d<nfdir; ++d){
         fsens[d][it->res.front()] = dwork[it->arg.front()][d];
       }
     } else if(it->op==OP_PARAMETER){
+      // Fetch parameter
       swork[it->res.front()] = it->data;
-      for(int d=0; d<nfwd; ++d){
+      for(int d=0; d<nfdir; ++d){
         dwork[it->res.front()][d] = MX();
       }
     } else {
@@ -790,11 +843,11 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
         }
         
         // Quick continue if no evaluation needed
-        if(nfwd==0) continue;
+        if(nfdir==0) continue;
       }
 
       // Forward seeds and sensitivities
-      for(int d=0; d<nfwd; ++d){
+      for(int d=0; d<nfdir; ++d){
         fseed_p[d].resize(it->arg.size());
         for(int iind=0; iind<it->arg.size(); ++iind){
           int el = it->arg[iind];
@@ -823,20 +876,23 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
   }
   
   // Loop over computational nodes in reverse order
-  if(nadj>0){
+  if(nadir>0){
     // Work vector, adjoint derivatives
-    fill(dwork.begin(),dwork.end(),std::vector<MX>(nadj));
+    fill(dwork.begin(),dwork.end(),std::vector<MX>(nadir));
     log("MXFunctionInternal::evalMX allocated derivative work vector (adjoint mode)");
+    
+    // Tape iterator (reuse same name to prevent usage of the forward iterator)
+    vector<pair<int,MX> >::const_reverse_iterator tape_it = tape.rbegin();
     
     for(vector<AlgEl>::reverse_iterator it=algorithm_.rbegin(); it!=algorithm_.rend(); ++it){      
       if(it->op == OP_INPUT){
         // Collect the symbolic adjoint sensitivities
-        for(int d=0; d<nadj; ++d){
+        for(int d=0; d<nadir; ++d){
           asens[d][it->arg.front()] = dwork[it->res.front()][d];
         }
       } else if(it->op==OP_OUTPUT){
         // Pass the adjoint seeds
-        for(int d=0; d<nadj; ++d){
+        for(int d=0; d<nadir; ++d){
           if(dwork[it->arg.front()][d].isNull())
             dwork[it->arg.front()][d] = aseed[d][it->res.front()];
           else
@@ -858,7 +914,7 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
         }
 
         // Sensitivity arguments
-        for(int d=0; d<nadj; ++d){
+        for(int d=0; d<nadir; ++d){
           aseed_p[d].resize(it->res.size());
           for(int oind=0; oind<it->res.size(); ++oind){
             int el = it->res[oind];
@@ -886,12 +942,20 @@ void MXFunctionInternal::evalMX(const std::vector<MX>& arg, std::vector<MX>& res
         it->data->evaluateMX(input_p,output_p,dummy_p,dummy_p,aseed_p,asens_p,true);
       }
       
-      // Free memory for reuse
       if(it->op!=OP_OUTPUT){
+        // Recover spilled work vector elements
+        for(vector<int>::const_reverse_iterator c=it->res.rbegin(); c!=it->res.rend(); ++c){
+          if(*c >=0 && tape_it!=tape.rend() && tape_it->first == *c){
+            swork[*c] = tape_it->second;
+            tape_it++;
+          }
+        }
+        
+        // Free memory for reuse
         for(int oind=0; oind<it->res.size(); ++oind){
           int el = it->res[oind];
           if(el>=0){
-            for(int d=0; d<nadj; ++d){
+            for(int d=0; d<nadir; ++d){
               dwork[el][d] = MX();
             }
           }
@@ -989,23 +1053,52 @@ SXFunction MXFunctionInternal::expand(const std::vector<SXMatrix>& inputvsx ){
   return f;
 }
 
-void MXFunctionInternal::printWork(int nfwd, int nadj, ostream &stream){
+void MXFunctionInternal::printWork(int nfdir, int nadir, ostream &stream){
   for(int k=0; k<work_.size(); ++k){
     stream << "work[" << k << "] = " << work_[k].data.data() << endl;
   }
   
-  for(int d=0; d<nfwd; ++d){
+  for(int d=0; d<nfdir; ++d){
     for(int k=0; k<work_.size(); ++k){
       stream << "fwork[" << d << "][" << k << "] = " << work_[k].dataF[d].data() << endl;
     }
   }
   
-  for(int d=0; d<nadj; ++d){
+  for(int d=0; d<nadir; ++d){
     for(int k=0; k<work_.size(); ++k){
       stream << "awork[" << d << "][" << k << "] = " << work_[k].dataA[d].data() << endl;
     }
   }
 }
+
+void MXFunctionInternal::allocTape(){
+  // Marker of elements in the work vector still in use when being overwritten
+  vector<bool> in_use(work_.size(),false);
+  
+  // Remove existing entries in the tape
+  tape_.clear();
+  
+  // Evaluate the algorithm, keeping track of variables that are in use
+  for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); it++){
+    if(it->op!=OP_OUTPUT){
+      // Loop over operation outputs, spill if necessary
+      for(int c=0; c<it->res.size(); ++c){
+        int ind = it->res[c];
+        if(ind>=0){
+          if(in_use[ind]){
+            // Spill
+            tape_.push_back(pair<int,DMatrix>(ind,DMatrix(it->data->sparsity(c))));
+          } else {
+            // Mark in use
+            in_use[ind] = true;
+          }
+        }
+      }
+    }
+  }
+}
+
+
 
 } // namespace CasADi
 
