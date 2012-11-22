@@ -537,7 +537,7 @@ void FXInternal::getPartition(int iind, int oind, CRSSparsity& D1, CRSSparsity& 
       log("FXInternal::getPartition unidirectional coloring (forward mode)");
       D1 = AT.unidirectionalColoring(A);
       if(verbose()){
-        cout << "Forward mode coloring completed: " << D1.size1() << " directional derivatives needed." << endl;
+        cout << "Forward mode coloring completed: " << D1.size1() << " directional derivatives needed (" << A.size2() << " without coloring)." << endl;
       }
     }
       
@@ -546,7 +546,7 @@ void FXInternal::getPartition(int iind, int oind, CRSSparsity& D1, CRSSparsity& 
       log("FXInternal::getPartition unidirectional coloring (adjoint mode)");
       D2 = A.unidirectionalColoring(AT);
       if(verbose()){
-        cout << "Adjoint mode coloring completed: " << D2.size1() << " directional derivatives needed." << endl;
+        cout << "Adjoint mode coloring completed: " << D2.size1() << " directional derivatives needed (" << A.size1() << " without coloring)." << endl;
       }
     }
 
