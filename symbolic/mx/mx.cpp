@@ -698,10 +698,7 @@ MX MX::inner_prod(const MX& y) const{
   casadi_assert_message(x.size2()==1,"inner_prod: first factor not a vector");
   casadi_assert_message(y.size2()==1, "inner_prod: second factor not a vector");
   casadi_assert_message(x.size1()==y.size1(),"inner_prod: dimension mismatch");
-  MX sum = 0;
-  for(int i=0; i<x.size1(); ++i)
-    sum += x(i)*y(i);
-  return sum;
+  return CasADi::mul(trans(x),y);
 }
 
 MX MX::outer_prod(const MX& y) const{
