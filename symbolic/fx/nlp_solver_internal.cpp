@@ -281,7 +281,7 @@ void NLPSolverInternal::init(){
         MXFunction lfcn(lfcn_in,sigma*f + inner_prod(lam,g));
         lfcn.setOption("verbose",verbose());
         lfcn.init();
-        log("SX Lagrangian function generated");
+        log("MX Lagrangian function generated");
           
         // Hessian of the Lagrangian
         H_ = lfcn.hessian();
