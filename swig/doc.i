@@ -98,6 +98,14 @@ Joel Andersson
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| augmented_op | OT_DICTIONAR | GenericType( | Options to   | CasADi::Inte |
+| tions        | Y            | )            | be passed    | gratorIntern |
+|              |              |              | down to the  | al           |
+|              |              |              | augmented    |              |
+|              |              |              | integrator,  |              |
+|              |              |              | if one is    |              |
+|              |              |              | constructed. |              |
++--------------+--------------+--------------+--------------+--------------+
 | fwd_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
 |              |              |              | functions    | gratorIntern |
 |              |              |              | for          | al           |
@@ -965,6 +973,14 @@ thus x := [xd,xa]
 |              |              |              | forward      |              |
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
+| augmented_op | OT_DICTIONAR | GenericType( | Options to   | CasADi::Inte |
+| tions        | Y            | )            | be passed    | gratorIntern |
+|              |              |              | down to the  | al           |
+|              |              |              | augmented    |              |
+|              |              |              | integrator,  |              |
+|              |              |              | if one is    |              |
+|              |              |              | constructed. |              |
 +--------------+--------------+--------------+--------------+--------------+
 | fwd_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
 |              |              |              | functions    | gratorIntern |
@@ -5574,6 +5590,14 @@ Joel Andersson
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| augmented_op | OT_DICTIONAR | GenericType( | Options to   | CasADi::Inte |
+| tions        | Y            | )            | be passed    | gratorIntern |
+|              |              |              | down to the  | al           |
+|              |              |              | augmented    |              |
+|              |              |              | integrator,  |              |
+|              |              |              | if one is    |              |
+|              |              |              | constructed. |              |
++--------------+--------------+--------------+--------------+--------------+
 | collocation_ | OT_STRING    | \"radau\"      | Collocation  | CasADi::Coll |
 | scheme       |              |              | scheme (rada | ocationInteg |
 |              |              |              | u|legendre)  | ratorInterna |
@@ -6485,6 +6509,14 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | forward      |              |
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
+| augmented_op | OT_DICTIONAR | GenericType( | Options to   | CasADi::Inte |
+| tions        | Y            | )            | be passed    | gratorIntern |
+|              |              |              | down to the  | al           |
+|              |              |              | augmented    |              |
+|              |              |              | integrator,  |              |
+|              |              |              | if one is    |              |
+|              |              |              | constructed. |              |
 +--------------+--------------+--------------+--------------+--------------+
 | collocation_ | OT_STRING    | \"radau\"      | Collocation  | CasADi::Coll |
 | scheme       |              |              | scheme (rada | ocationInteg |
@@ -13084,6 +13116,14 @@ times t_i.
 |              |              |              | for backward |              |
 |              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| augmented_op | OT_DICTIONAR | GenericType( | Options to   | CasADi::Inte |
+| tions        | Y            | )            | be passed    | gratorIntern |
+|              |              |              | down to the  | al           |
+|              |              |              | augmented    |              |
+|              |              |              | integrator,  |              |
+|              |              |              | if one is    |              |
+|              |              |              | constructed. |              |
++--------------+--------------+--------------+--------------+--------------+
 | disable_inte | OT_BOOLEAN   | false        | Disable      | CasADi::CVod |
 | rnal_warning |              |              | CVodes       | esInternal   |
 | s            |              |              | internal     |              |
@@ -14192,6 +14232,14 @@ explicit formulation. This also applies to the backward integration.
 |              |              |              | jacobians    |              |
 |              |              |              | for backward |              |
 |              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
+| augmented_op | OT_DICTIONAR | GenericType( | Options to   | CasADi::Inte |
+| tions        | Y            | )            | be passed    | gratorIntern |
+|              |              |              | down to the  | al           |
+|              |              |              | augmented    |              |
+|              |              |              | integrator,  |              |
+|              |              |              | if one is    |              |
+|              |              |              | constructed. |              |
 +--------------+--------------+--------------+--------------+--------------+
 | disable_inte | OT_BOOLEAN   | false        | Disable      | CasADi::CVod |
 | rnal_warning |              |              | CVodes       | esInternal   |
@@ -19889,6 +19937,14 @@ Joel Andersson
 |              |              |              | for backward |              |
 |              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| augmented_op | OT_DICTIONAR | GenericType( | Options to   | CasADi::Inte |
+| tions        | Y            | )            | be passed    | gratorIntern |
+|              |              |              | down to the  | al           |
+|              |              |              | augmented    |              |
+|              |              |              | integrator,  |              |
+|              |              |              | if one is    |              |
+|              |              |              | constructed. |              |
++--------------+--------------+--------------+--------------+--------------+
 | calc_ic      | OT_BOOLEAN   | true         | Use          | CasADi::Idas |
 |              |              |              | IDACalcIC to | Internal     |
 |              |              |              | get          |              |
@@ -21071,6 +21127,14 @@ explicit formulation. This also applies to the backward integration.
 |              |              |              | jacobians    |              |
 |              |              |              | for backward |              |
 |              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
+| augmented_op | OT_DICTIONAR | GenericType( | Options to   | CasADi::Inte |
+| tions        | Y            | )            | be passed    | gratorIntern |
+|              |              |              | down to the  | al           |
+|              |              |              | augmented    |              |
+|              |              |              | integrator,  |              |
+|              |              |              | if one is    |              |
+|              |              |              | constructed. |              |
 +--------------+--------------+--------------+--------------+--------------+
 | calc_ic      | OT_BOOLEAN   | true         | Use          | CasADi::Idas |
 |              |              |              | IDACalcIC to | Internal     |
@@ -23444,6 +23508,14 @@ Joel Andersson
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| augmented_op | OT_DICTIONAR | GenericType( | Options to   | CasADi::Inte |
+| tions        | Y            | )            | be passed    | gratorIntern |
+|              |              |              | down to the  | al           |
+|              |              |              | augmented    |              |
+|              |              |              | integrator,  |              |
+|              |              |              | if one is    |              |
+|              |              |              | constructed. |              |
++--------------+--------------+--------------+--------------+--------------+
 | fwd_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
 |              |              |              | functions    | gratorIntern |
 |              |              |              | for          | al           |
@@ -24245,6 +24317,14 @@ Joel Andersson
 |              |              |              | forward      |              |
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
+| augmented_op | OT_DICTIONAR | GenericType( | Options to   | CasADi::Inte |
+| tions        | Y            | )            | be passed    | gratorIntern |
+|              |              |              | down to the  | al           |
+|              |              |              | augmented    |              |
+|              |              |              | integrator,  |              |
+|              |              |              | if one is    |              |
+|              |              |              | constructed. |              |
 +--------------+--------------+--------------+--------------+--------------+
 | fwd_via_sct  | OT_BOOLEAN   | true         | Generate new | CasADi::Inte |
 |              |              |              | functions    | gratorIntern |
@@ -48884,6 +48964,14 @@ Reset the sparsity propagation. ";
 
 Print work vector. ";
 
+%feature("docstring")  CasADi::MXFunctionInternal::printTape "
+
+Print tape. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::allocTape "
+
+Allocate tape. ";
+
 %feature("docstring")  CasADi::MXFunctionInternal::grad "
 
 Gradient via source code transformation. ";
@@ -62303,6 +62391,14 @@ Joel Andersson
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| augmented_op | OT_DICTIONAR | GenericType( | Options to   | CasADi::Inte |
+| tions        | Y            | )            | be passed    | gratorIntern |
+|              |              |              | down to the  | al           |
+|              |              |              | augmented    |              |
+|              |              |              | integrator,  |              |
+|              |              |              | if one is    |              |
+|              |              |              | constructed. |              |
++--------------+--------------+--------------+--------------+--------------+
 | expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::RKIn |
 |              |              |              | ODE/DAE      | tegratorInte |
 |              |              |              | residual     | rnal         |
@@ -63130,6 +63226,14 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | forward      |              |
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
+| augmented_op | OT_DICTIONAR | GenericType( | Options to   | CasADi::Inte |
+| tions        | Y            | )            | be passed    | gratorIntern |
+|              |              |              | down to the  | al           |
+|              |              |              | augmented    |              |
+|              |              |              | integrator,  |              |
+|              |              |              | if one is    |              |
+|              |              |              | constructed. |              |
 +--------------+--------------+--------------+--------------+--------------+
 | expand_f     | OT_BOOLEAN   | false        | Expand the   | CasADi::RKIn |
 |              |              |              | ODE/DAE      | tegratorInte |
@@ -67496,6 +67600,14 @@ Constructor. ";
 |              |              |              | for backward |              |
 |              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| augmented_op | OT_DICTIONAR | GenericType( | Options to   | CasADi::Inte |
+| tions        | Y            | )            | be passed    | gratorIntern |
+|              |              |              | down to the  | al           |
+|              |              |              | augmented    |              |
+|              |              |              | integrator,  |              |
+|              |              |              | if one is    |              |
+|              |              |              | constructed. |              |
++--------------+--------------+--------------+--------------+--------------+
 | exact_jacobi | OT_BOOLEAN   | true         | Use exact    | CasADi::Sund |
 | an           |              |              | Jacobian     | ialsInternal |
 |              |              |              | information  |              |
@@ -68471,6 +68583,14 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | jacobians    |              |
 |              |              |              | for backward |              |
 |              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
+| augmented_op | OT_DICTIONAR | GenericType( | Options to   | CasADi::Inte |
+| tions        | Y            | )            | be passed    | gratorIntern |
+|              |              |              | down to the  | al           |
+|              |              |              | augmented    |              |
+|              |              |              | integrator,  |              |
+|              |              |              | if one is    |              |
+|              |              |              | constructed. |              |
 +--------------+--------------+--------------+--------------+--------------+
 | exact_jacobi | OT_BOOLEAN   | true         | Use exact    | CasADi::Sund |
 | an           |              |              | Jacobian     | ialsInternal |
@@ -71470,10 +71590,6 @@ Represents a general unary operation on an MX.
 Joel Andersson
 
 C++ includes: unary_mx.hpp ";
-
-%feature("docstring")  CasADi::UnaryMX::UnaryMX "
-
-Constructor. ";
 
 %feature("docstring")  CasADi::UnaryMX::~UnaryMX "
 
@@ -79533,9 +79649,6 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__IntegratorOutput.xml
 
 
-// File: group__scheme__JACInput.xml
-
-
 // File: group__scheme__MUSCOD__FCN__Output.xml
 
 
@@ -79558,9 +79671,6 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: group__scheme__NLPOutput.xml
-
-
-// File: group__scheme__JACOutput.xml
 
 
 // File: group__scheme__DAEInput.xml
