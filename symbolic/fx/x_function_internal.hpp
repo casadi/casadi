@@ -66,8 +66,8 @@ class XFunctionInternal : public FXInternal{
     /** \brief Return Jacobian function  */
     virtual FX getJacobian(int iind, int oind, bool compact, bool symmetric);
 
-    /** \brief Generate a function that calculates nfwd forward derivatives and nadj adjoint derivatives */
-    virtual FX getDerivative(int nfwd, int nadj);
+    /** \brief Generate a function that calculates nfdir forward derivatives and nadir adjoint derivatives */
+    virtual FX getDerivative(int nfdir, int nadir);
     
     // Data members (all public)
     
@@ -498,12 +498,12 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
   if(verbose()) std::cout << "XFunctionInternal::jac graph coloring completed" << std::endl;
 
   // Get the number of forward and adjoint sweeps
-  int nfwd = D1.isNull() ? 0 : D1.size1();
-  int nadj = D2.isNull() ? 0 : D2.size1();
+  int nfdir = D1.isNull() ? 0 : D1.size1();
+  int nadir = D2.isNull() ? 0 : D2.size1();
   
   // Forward seeds
-  std::vector<std::vector<MatType> > fseed(nfwd);
-  for(int dir=0; dir<nfwd; ++dir){
+  std::vector<std::vector<MatType> > fseed(nfdir);
+  for(int dir=0; dir<nfdir; ++dir){
     // initialize to zero
     fseed[dir].resize(getNumInputs());
     for(int ind=0; ind<fseed[dir].size(); ++ind){
@@ -522,8 +522,8 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
   }
   
   // Adjoint seeds
-  std::vector<std::vector<MatType> > aseed(nadj);
-  for(int dir=0; dir<nadj; ++dir){
+  std::vector<std::vector<MatType> > aseed(nadir);
+  for(int dir=0; dir<nadir; ++dir){
     //initialize to zero
     aseed[dir].resize(getNumOutputs());
     for(int ind=0; ind<aseed[dir].size(); ++ind){
@@ -542,8 +542,8 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
   }
 
   // Forward sensitivities
-  std::vector<std::vector<MatType> > fsens(nfwd);
-  for(int dir=0; dir<nfwd; ++dir){
+  std::vector<std::vector<MatType> > fsens(nfdir);
+  for(int dir=0; dir<nfdir; ++dir){
     // initialize to zero
     fsens[dir].resize(getNumOutputs());
     for(int oind=0; oind<fsens[dir].size(); ++oind){
@@ -552,8 +552,8 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
   }
 
   // Adjoint sensitivities
-  std::vector<std::vector<MatType> > asens(nadj);
-  for(int dir=0; dir<nadj; ++dir){
+  std::vector<std::vector<MatType> > asens(nadir);
+  for(int dir=0; dir<nadir; ++dir){
     // initialize to zero
     asens[dir].resize(getNumInputs());
     for(int ind=0; ind<asens[dir].size(); ++ind){
@@ -569,7 +569,7 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
   if(verbose())   std::cout << "XFunctionInternal::jac transposes and mapping" << std::endl;
   std::vector<int> mapping;
   CRSSparsity sp_trans;
-  if(nfwd>0){
+  if(nfdir>0){
     sp_trans = jacSparsity(iind,oind,true).transpose(mapping);
   }
 
@@ -580,7 +580,7 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
   std::vector<int> hits;
   
   // Carry out the forward sweeps
-  for(int dir=0; dir<nfwd; ++dir){
+  for(int dir=0; dir<nfdir; ++dir){
     
     // If symmetric, see how many times each output appears
     if(symmetric){
@@ -653,7 +653,7 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
   }
       
   // Add elements to the Jacobian matrix
-  for(int dir=0; dir<nadj; ++dir){
+  for(int dir=0; dir<nadir; ++dir){
     
     // Locate the nonzeros of the adjoint sensitivity matrix
     input(iind).sparsity().getElements(nzmap,false);
@@ -714,18 +714,18 @@ FX XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::getJacobian(int i
 }
 
 template<typename PublicType, typename DerivedType, typename MatType, typename NodeType>
-FX XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::getDerivative(int nfwd, int nadj){
+FX XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::getDerivative(int nfdir, int nadir){
   
   // Forward seeds
-  std::vector<std::vector<MatType> > fseed(nfwd,inputv_);
-  for(int dir=0; dir<nfwd; ++dir){
+  std::vector<std::vector<MatType> > fseed(nfdir,inputv_);
+  for(int dir=0; dir<nfdir; ++dir){
     // Replace symbolic inputs
     int iind=0;
     for(typename std::vector<MatType>::iterator i=fseed[dir].begin(); i!=fseed[dir].end(); ++i, ++iind){
       // Name of the forward seed
       std::stringstream ss;
       ss << "f";
-      if(nfwd>1) ss << dir;
+      if(nfdir>1) ss << dir;
       ss << "_";
       ss << iind;
 
@@ -736,15 +736,15 @@ FX XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::getDerivative(int
   }
   
   // Adjoint seeds
-  std::vector<std::vector<MatType> > aseed(nadj,outputv_);
-  for(int dir=0; dir<nadj; ++dir){
+  std::vector<std::vector<MatType> > aseed(nadir,outputv_);
+  for(int dir=0; dir<nadir; ++dir){
     // Replace symbolic inputs
     int oind=0;
     for(typename std::vector<MatType>::iterator i=aseed[dir].begin(); i!=aseed[dir].end(); ++i, ++oind){
       // Name of the adjoint seed
       std::stringstream ss;
       ss << "a";
-      if(nadj>1) ss << dir << "_";
+      if(nadir>1) ss << dir << "_";
       ss << oind;
 
       // Save to matrix
@@ -754,25 +754,25 @@ FX XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::getDerivative(int
   }
   
   // Evaluate symbolically
-  std::vector<std::vector<MatType> > fsens(nfwd,outputv_), asens(nadj,inputv_);
+  std::vector<std::vector<MatType> > fsens(nfdir,outputv_), asens(nadir,inputv_);
   call(inputv_,outputv_,fseed,fsens,aseed,asens,true,true,false);
 
   // All inputs of the return function
   std::vector<MatType> ret_in;
-  ret_in.reserve(inputv_.size()*(1+nfwd) + outputv_.size()*nadj);
+  ret_in.reserve(inputv_.size()*(1+nfdir) + outputv_.size()*nadir);
   ret_in.insert(ret_in.end(),inputv_.begin(),inputv_.end());
-  for(int dir=0; dir<nfwd; ++dir)
+  for(int dir=0; dir<nfdir; ++dir)
     ret_in.insert(ret_in.end(),fseed[dir].begin(),fseed[dir].end());
-  for(int dir=0; dir<nadj; ++dir)
+  for(int dir=0; dir<nadir; ++dir)
     ret_in.insert(ret_in.end(),aseed[dir].begin(),aseed[dir].end());
 
   // All outputs of the return function
   std::vector<MatType> ret_out;
-  ret_out.reserve(outputv_.size()*(1+nfwd) + inputv_.size()*nadj);
+  ret_out.reserve(outputv_.size()*(1+nfdir) + inputv_.size()*nadir);
   ret_out.insert(ret_out.end(),outputv_.begin(),outputv_.end());
-  for(int dir=0; dir<nfwd; ++dir)
+  for(int dir=0; dir<nfdir; ++dir)
     ret_out.insert(ret_out.end(),fsens[dir].begin(),fsens[dir].end());
-  for(int dir=0; dir<nadj; ++dir)
+  for(int dir=0; dir<nadir; ++dir)
     ret_out.insert(ret_out.end(),asens[dir].begin(),asens[dir].end());
 
   // Assemble function and return
