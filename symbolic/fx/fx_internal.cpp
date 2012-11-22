@@ -190,6 +190,8 @@ FX FXInternal::gradient(int iind, int oind){
 }
   
 FX FXInternal::hessian(int iind, int oind){
+  log("FXInternal::hessian");
+  
   // Assert scalar
   casadi_assert_message(output(oind).scalar(),"Only hessians of scalar functions allowed.");
   
@@ -209,12 +211,17 @@ FX FXInternal::getGradient(int iind, int oind){
 }
   
 FX FXInternal::getHessian(int iind, int oind){
+  log("FXInternal::getHessian");
+
   // Create gradient function
+  log("FXInternal::getHessian generating gradient");
   FX g = gradient(iind,oind);
   g.setOption("numeric_jacobian",getOption("numeric_hessian"));
+  g.setOption("verbose",getOption("verbose"));
   g.init();
   
   // Return the Jacobian of the gradient, exploiting symmetry (the gradient has output index 0)
+  log("FXInternal::getHessian generating Jacobian of gradient");
   return g.jacobian(iind,0,false,true);
 }
   
