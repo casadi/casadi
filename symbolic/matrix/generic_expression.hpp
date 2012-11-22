@@ -104,7 +104,7 @@ class GenericExpression{
     /// Division (with __future__.division in effect)
     inline ExType __truediv__(const ExType& y) const {return static_cast<const ExType&>(*this)/y;};
 
-    /** @name Operations from the right
+    /** @name Operations from the left
      *  For Python
      */
     //@{
