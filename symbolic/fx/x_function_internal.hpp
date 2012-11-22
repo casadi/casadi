@@ -502,8 +502,8 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
   int nadir = D2.isNull() ? 0 : D2.size1();
   
   // Number of derivative directions supported by the function
-  int max_nfdir = optimized_num_dir;
-  int max_nadir = optimized_num_dir;
+  int max_nfdir = nfdir; // optimized_num_dir;
+  int max_nadir = nadir; // optimized_num_dir;
 
   // Current forward and adjoint direction
   int offset_nfdir = 0, offset_nadir = 0;
@@ -511,12 +511,17 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
   // Forward and adjoint seeds and sensitivities
   std::vector<std::vector<MatType> > fseed, aseed, fsens, asens;
   
+  // Get the sparsity of the Jacobian block
+  const CRSSparsity& jsp = jacSparsity(iind,oind,true);
+  const std::vector<int>& jsp_rowind = jsp.rowind();
+  const std::vector<int>& jsp_col = jsp.col();
+  
   // Get transposes and mappings for jacobian sparsity pattern if we are using forward mode
   if(verbose())   std::cout << "XFunctionInternal::jac transposes and mapping" << std::endl;
   std::vector<int> mapping;
-  CRSSparsity sp_trans;
+  CRSSparsity jsp_trans;
   if(nfdir>0){
-    sp_trans = jacSparsity(iind,oind,true).transpose(mapping);
+    jsp_trans = jsp.transpose(mapping);
   }
 
   // The nonzeros of the sensitivity matrix
@@ -529,66 +534,66 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
   while (offset_nfdir < nfdir || offset_nadir < nadir) {
       
     // Number of forward and adjoint directions in the current "batch"
-    int nfdir_f_batch = max_nfdir; // std::min(nfdir - offset_nfdir, max_nfdir);
-    int nadir_f_batch = max_nadir; // std::min(nadir - offset_nadir, max_nadir);
+    int nfdir_batch = std::min(nfdir - offset_nfdir, max_nfdir);
+    int nadir_batch = std::min(nadir - offset_nadir, max_nadir);
     
     // Forward seeds
-    fseed.resize(nfdir);
-    for(int dir=0; dir<nfdir; ++dir){
+    fseed.resize(nfdir_batch);
+    for(int d=0; d<nfdir; ++d){
       // initialize to zero
-      fseed[dir].resize(getNumInputs());
-      for(int ind=0; ind<fseed[dir].size(); ++ind){
-        fseed[dir][ind] = MatType(input(ind).sparsity(),0);
+      fseed[d].resize(getNumInputs());
+      for(int ind=0; ind<fseed[offset_nfdir+d].size(); ++ind){
+        fseed[d][ind] = MatType(input(ind).sparsity(),0);
       }
       
       // For all the directions
-      for(int el = D1.rowind(dir); el<D1.rowind(dir+1); ++el){
+      for(int el = D1.rowind(offset_nfdir+d); el<D1.rowind(offset_nfdir+d+1); ++el){
         
         // Get the direction
         int c = D1.col(el);
 
         // Give a seed in the direction
-        fseed[dir][iind].at(c) = 1;
+        fseed[d][iind].at(c) = 1;
       }
     }
     
     // Adjoint seeds
-    aseed.resize(nadir);
-    for(int dir=0; dir<nadir; ++dir){
+    aseed.resize(nadir_batch);
+    for(int d=0; d<nadir_batch; ++d){
       //initialize to zero
-      aseed[dir].resize(getNumOutputs());
-      for(int ind=0; ind<aseed[dir].size(); ++ind){
-        aseed[dir][ind] = MatType(output(ind).sparsity(),0);
+      aseed[d].resize(getNumOutputs());
+      for(int ind=0; ind<aseed[offset_nadir+d].size(); ++ind){
+        aseed[d][ind] = MatType(output(ind).sparsity(),0);
       }
       
       // For all the directions
-      for(int el = D2.rowind(dir); el<D2.rowind(dir+1); ++el){
+      for(int el = D2.rowind(offset_nadir+d); el<D2.rowind(offset_nadir+d+1); ++el){
         
         // Get the direction
         int c = D2.col(el);
 
         // Give a seed in the direction
-        aseed[dir][oind].at(c) = 1; // NOTE: should be +=, right?
+        aseed[d][oind].at(c) = 1; // NOTE: should be +=, right?
       }
     }
 
     // Forward sensitivities
-    fsens.resize(nfdir);
-    for(int dir=0; dir<nfdir; ++dir){
+    fsens.resize(nfdir_batch);
+    for(int d=0; d<nfdir_batch; ++d){
       // initialize to zero
-      fsens[dir].resize(getNumOutputs());
-      for(int oind=0; oind<fsens[dir].size(); ++oind){
-        fsens[dir][oind] = MatType(output(oind).sparsity(),0);
+      fsens[d].resize(getNumOutputs());
+      for(int oind=0; oind<fsens[offset_nfdir+d].size(); ++oind){
+        fsens[d][oind] = MatType(output(oind).sparsity(),0);
       }
     }
 
     // Adjoint sensitivities
-    asens.resize(nadir);
-    for(int dir=0; dir<nadir; ++dir){
+    asens.resize(nadir_batch);
+    for(int d=0; d<nadir_batch; ++d){
       // initialize to zero
-      asens[dir].resize(getNumInputs());
-      for(int ind=0; ind<asens[dir].size(); ++ind){
-        asens[dir][ind] = MatType(input(ind).sparsity(),0);
+      asens[d].resize(getNumInputs());
+      for(int ind=0; ind<asens[offset_nadir+d].size(); ++ind){
+        asens[d][ind] = MatType(input(ind).sparsity(),0);
       }
     }
     
@@ -597,21 +602,16 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
     call(inputv_,outputv_,fseed,fsens,aseed,asens,true,always_inline,never_inline);
     
     // Carry out the forward sweeps
-    for(int dir=0; dir<nfdir; ++dir){
+    for(int d=0; d<nfdir_batch; ++d){
       
       // If symmetric, see how many times each output appears
       if(symmetric){
         // Initialize to zero
         hits.resize(output(oind).sparsity().size());
         fill(hits.begin(),hits.end(),0);
-        
-        // Get the sparsity of the Jacobian block
-        const CRSSparsity& jsp = jacSparsity(iind,oind,true);
-        const std::vector<int>& jsp_rowind = jsp.rowind();
-        const std::vector<int>& jsp_col = jsp.col();
 
         // "Multiply" Jacobian sparsity by seed vector
-        for(int el = D1.rowind(dir); el<D1.rowind(dir+1); ++el){
+        for(int el = D1.rowind(offset_nfdir+d); el<D1.rowind(offset_nfdir+d+1); ++el){
           
           // Get the input nonzero
           int c = D1.col(el);
@@ -625,16 +625,16 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
 
       // Locate the nonzeros of the forward sensitivity matrix
       output(oind).sparsity().getElements(nzmap,false);
-      fsens[dir][oind].sparsity().getNZInplace(nzmap);
+      fsens[d][oind].sparsity().getNZInplace(nzmap);
 
       if(symmetric){
         input(iind).sparsity().getElements(nzmap2,false);
-        fsens[dir][oind].sparsity().getNZInplace(nzmap2);
+        fsens[d][oind].sparsity().getNZInplace(nzmap2);
       }
       
       
       // For all the input nonzeros treated in the sweep
-      for(int el = D1.rowind(dir); el<D1.rowind(dir+1); ++el){
+      for(int el = D1.rowind(offset_nfdir+d); el<D1.rowind(offset_nfdir+d+1); ++el){
 
         // Get the input nonzero
         int c = D1.col(el);
@@ -644,10 +644,10 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
         }
         
         // Loop over the output nonzeros corresponding to this input nonzero
-        for(int el_out = sp_trans.rowind(c); el_out<sp_trans.rowind(c+1); ++el_out){
+        for(int el_out = jsp_trans.rowind(c); el_out<jsp_trans.rowind(c+1); ++el_out){
           
           // Get the output nonzero
-          int r_out = sp_trans.col(el_out);
+          int r_out = jsp_trans.col(el_out);
           
           // Get the forward sensitivity nonzero
           int f_out = nzmap[r_out];
@@ -658,52 +658,49 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
           
           if(symmetric){
             if(hits[r_out]==1){
-              ret.at(el_out) = fsens[dir][oind].at(f_out);
-              ret.at(elJ) = fsens[dir][oind].at(f_out);
+              ret.at(el_out) = fsens[d][oind].at(f_out);
+              ret.at(elJ) = fsens[d][oind].at(f_out);
             }
           } else {
             // Get the output seed
-            ret.at(elJ) = fsens[dir][oind].at(f_out);
+            ret.at(elJ) = fsens[d][oind].at(f_out);
           }
         }
       }
     }
         
     // Add elements to the Jacobian matrix
-    for(int dir=0; dir<nadir; ++dir){
+    for(int d=0; d<nadir_batch; ++d){
       
       // Locate the nonzeros of the adjoint sensitivity matrix
       input(iind).sparsity().getElements(nzmap,false);
-      asens[dir][iind].sparsity().getNZInplace(nzmap);
+      asens[d][iind].sparsity().getNZInplace(nzmap);
       
-      // Get the (compact) Jacobian sparsity pattern
-      const CRSSparsity& sp = jacSparsity(iind,oind,true);
-
       // For all the output nonzeros treated in the sweep
-      for(int el = D2.rowind(dir); el<D2.rowind(dir+1); ++el){
+      for(int el = D2.rowind(offset_nadir+d); el<D2.rowind(offset_nadir+d+1); ++el){
 
         // Get the output nonzero
         int r = D2.col(el);
 
         // Loop over the input nonzeros that influences this output nonzero
-        for(int elJ = sp.rowind(r); elJ<sp.rowind(r+1); ++elJ){
+        for(int elJ = jsp.rowind(r); elJ<jsp.rowind(r+1); ++elJ){
           
           // Get the input nonzero
-          int inz = sp.col(elJ);
+          int inz = jsp.col(elJ);
           
           // Get the corresponding adjoint sensitivity nonzero
           int anz = nzmap[inz];
           if(anz<0) continue;
           
           // Get the input seed
-          ret.at(elJ) = asens[dir][iind].at(anz);
+          ret.at(elJ) = asens[d][iind].at(anz);
         }
       }
     }
     
     // Update direction offsets
-    offset_nfdir += nfdir_f_batch;
-    offset_nadir += nadir_f_batch;
+    offset_nfdir += nfdir_batch;
+    offset_nadir += nadir_batch;
   }
   
   // Return
