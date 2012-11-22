@@ -36,7 +36,7 @@ CollocationInternal::CollocationInternal(const FX& ffcn, const FX& mfcn, const F
   addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLP Solver");
   addOption("integrator",               OT_INTEGRATOR, GenericType(), "An integrator creator function");
   addOption("integrator_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the integrator");
-  casadi_warning("The collocation OCP solver is not yet ready");
+  casadi_error("The collocation OCP solver is not yet ready");
 }
 
 CollocationInternal::~CollocationInternal(){
