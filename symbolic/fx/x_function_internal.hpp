@@ -502,8 +502,8 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
   int nadir = D2.isNull() ? 0 : D2.size1();
   
   // Number of derivative directions supported by the function
-  int max_nfdir = nfdir; // optimized_num_dir;
-  int max_nadir = nadir; // optimized_num_dir;
+  int max_nfdir = optimized_num_dir;
+  int max_nadir = optimized_num_dir;
 
   // Current forward and adjoint direction
   int offset_nfdir = 0, offset_nadir = 0;
