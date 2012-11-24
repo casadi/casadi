@@ -402,7 +402,6 @@ solver.setOption("expand_g",True)
 solver.setOption("generate_hessian",True)
 solver.setOption("max_iter",1000)
 solver.setOption("tol",1e-4)
-solver.setOption("linear_solver","ma27")
 
 # initialize the solver
 solver.init()

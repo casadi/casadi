@@ -20,7 +20,7 @@
  *
  */
 
-/** Writing a multiple shooting code from scratch 
+/** \brief Writing a multiple shooting code from scratch 
 
   This example demonstrates how to write a simple, yet powerful multiple shooting code from 
   scratch using CasADi. For clarity, the code below uses a simple formulation with only states 
