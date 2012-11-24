@@ -19391,7 +19391,7 @@ Joel Andersson
 
 C++ includes: generic_expression.hpp ";
 
-/*  Operations from the right  */
+/*  Operations from the left  */
 
 /* For Python
 
@@ -43962,7 +43962,7 @@ Joel Andersson
 
 C++ includes: matrix.hpp ";
 
-/*  Operations from the right  */
+/*  Operations from the left  */
 
 /* For Python
 
@@ -47267,7 +47267,7 @@ Joel Andersson
 
 C++ includes: mx.hpp ";
 
-/*  Operations from the right  */
+/*  Operations from the left  */
 
 /* For Python
 
@@ -48990,7 +48990,7 @@ Return Jacobian function. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::getDerivative "
 
-Generate a function that calculates nfwd forward derivatives and nadj
+Generate a function that calculates nfdir forward derivatives and nadir
 adjoint derivatives. ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::requestNumSens "
@@ -69293,7 +69293,7 @@ Joel Andersson
 
 C++ includes: sx.hpp ";
 
-/*  Operations from the right  */
+/*  Operations from the left  */
 
 /* For Python
 
@@ -70749,7 +70749,7 @@ Return Jacobian function. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::getDerivative "
 
-Generate a function that calculates nfwd forward derivatives and nadj
+Generate a function that calculates nfdir forward derivatives and nadir
 adjoint derivatives. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::requestNumSens "
@@ -75726,7 +75726,7 @@ Return Jacobian function. ";
 
 %feature("docstring")  CasADi::XFunctionInternal::getDerivative "
 
-Generate a function that calculates nfwd forward derivatives and nadj
+Generate a function that calculates nfdir forward derivatives and nadir
 adjoint derivatives. ";
 
 %feature("docstring")  CasADi::XFunctionInternal::evaluate "
