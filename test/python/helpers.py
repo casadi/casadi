@@ -80,7 +80,7 @@ class casadiTestCase(unittest.TestCase):
       msg+= " %.16e <-> %.16e"  % (first, second)
       unittest.TestCase.assertAlmostEqual(self,first,second,places=places,msg=msg)
 
-  def checkarray(self,zr,zt,name,failmessage="",digits=10):
+  def checkarray(self,zr,zt,name="",failmessage="",digits=10):
       """
       Checks for equality of two numpy matrices.
       The check uses dense form.
@@ -95,6 +95,10 @@ class casadiTestCase(unittest.TestCase):
         zr=array([list(zr)])
       if isinstance(zt,tuple):
         zt=array([list(zt)])
+      if isinstance(zr,list):
+        zr=array([zr])
+      if isinstance(zt,list):
+        zt=array([zt])
       if not(hasattr(zt,'shape')) or len(zt.shape)==0:
         zt=array([[zt]])
       if not(hasattr(zr,'shape')) or len(zr.shape)==0:
@@ -110,6 +114,12 @@ class casadiTestCase(unittest.TestCase):
       self.assertEqual(zt.shape[1],zr.shape[1],"In %s: %s dimension error. Got %s, expected %s. %s <-> %s" % (name,failmessage,str(zt.shape),str(zr.shape),str(zt),str(zr)))
       for i in range(zr.shape[0]):
         for j in range(zr.shape[1]):
+          try:
+            float(zt[i,j])
+            float(zr[i,j])
+          except:
+            self.assertTrue(isEqual(zt[i,j],zr[i,j]),"Expressions (%s,%s) are not equal \n %s <-> \n %s at elem(%d,%d): %s <-> %s" % (type(zt),type(zr),str(zt),str(zr),i,j,str(zt[i,j]),str(zr[i,j])))
+            continue
           if zt[i,j]==zr[i,j]:
             continue
           if (isnan(zt[i,j]) or isinf(zt[i,j])) and  (isinf(zt[i,j]) or isnan(zt[i,j])):
@@ -195,8 +205,8 @@ class casadiTestCase(unittest.TestCase):
     try:
       trial.evaluate(fwd,adj)
       solution.evaluate(fwd,adj)
-    except e as Exception:
-      raise Exception(e.str() + "\nThis occured for simple evaluate(%d,%d)" % (fwd,adj) )
+    except Exception as e:
+      raise Exception(str(e) + "\nThis occured for simple evaluate(%d,%d) for: %s" % (fwd,adj,failmessage) )
       
     self.assertEqual(trial.getNumOutputs(),solution.getNumOutputs(),failmessage+": trial has %d number of outputs while solution has %d." % (trial.getNumOutputs(),solution.getNumOutputs()) )
     self.assertEqual(trial.getNumInputs(),solution.getNumInputs(),failmessage+": trial has %d number of outputs while solution has %d." % (trial.getNumInputs(),solution.getNumInputs()) )
@@ -225,8 +235,8 @@ class casadiTestCase(unittest.TestCase):
           try:
             trial.evaluate(fwd,adj)
             solution.evaluate(fwd,adj)
-          except e as Exception:
-            raise Exception(e.str() + "\nThis occured for simple evaluate(%d,%d) for fwdSeed(%d)[%d]=1" % (fwd,adj,i,j) )
+          except Exception as e:
+            raise Exception(e.str() + "\nThis occured for simple evaluate(%d,%d) for fwdSeed(%d)[%d]=1 for: %s" % (fwd,adj,i,j,failmessage) )
           
           for k in range(trial.getNumOutputs()):
             if (allow_empty and (trial.output(k).empty() or solution.output(k).empty() )): continue
@@ -249,8 +259,8 @@ class casadiTestCase(unittest.TestCase):
           try:
             trial.evaluate(fwd,adj)
             solution.evaluate(fwd,adj)
-          except e as Exception:
-            raise Exception(e.str() + "\nThis occured for simple evaluate(%d,%d) for adjSeed(%d)[%d]=1" % (fwd,adj,i,j) )
+          except Exception as e:
+            raise Exception(e.str() + "\nThis occured for simple evaluate(%d,%d) for adjSeed(%d)[%d]=1 for:" % (fwd,adj,i,j,failmessage) )
 
           for k in range(trial.getNumInputs()):
             if (allow_empty and (trial.input(k).empty() or solution.input(k).empty() )): continue
