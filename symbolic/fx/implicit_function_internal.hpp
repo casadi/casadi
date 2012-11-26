@@ -25,6 +25,7 @@
 
 #include "implicit_function.hpp"
 #include "fx_internal.hpp"
+#include "symbolic/fx/linear_solver.hpp"
 
 namespace CasADi{
   
@@ -63,6 +64,23 @@ class ImplicitFunctionInternal : public FXInternal{
     
     /// Number of adjoint derivative directions of the function
     int nadir_fcn_;
+
+    /** \brief  Create a new ImplicitFunctionInternal */
+    virtual ImplicitFunctionInternal* create(const FX& f, int nrhs=1) const = 0;
+    
+    /** \brief Generate a linear solver for the sensitivity equations */
+    ImplicitFunction jac(int iind, int oind=0);
+    
+    /** \brief Generate a linear solver for the sensitivity equations */
+    ImplicitFunction jac(const std::vector<int> iind, int oind=0);
+    
+    /// Jacobian
+    FX J_;
+    
+    // Linear solver
+    LinearSolver linsol_; 
+  protected:
+    void evaluate_sens(int nfdir, int nadir);
 };
 
 

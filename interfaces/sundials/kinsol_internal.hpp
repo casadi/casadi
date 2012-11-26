@@ -59,12 +59,6 @@ public:
   /** \brief  Evaluate */
   virtual void evaluate(int nfdir, int nadir);
 
-  /** \brief Generate a linear solver for the sensitivity equations */
-  KinsolSolver jac(int iind=0, int oind=0);
-
-  /** \brief Generate a linear solver for the sensitivity equations */
-  KinsolSolver jac(const std::vector<int> iind, int oind=0);
-
   /** \brief  Set Jacobian */
   virtual void setJacobian(const FX& jac);
   
@@ -102,9 +96,6 @@ public:
   /// KINSOL memory block
   void* mem_;
   
-  /// Jacobian
-  FX J_;
-  
   /// Variable
   N_Vector u_;
   
@@ -124,9 +115,6 @@ public:
   /// Globalization strategy
   int strategy_;
 
-  // Linear solver
-  LinearSolver linsol_;  
-
   // Should KINSOL internal warning messages be ignored
   bool disable_internal_warnings_;
   
@@ -139,6 +127,9 @@ public:
  
   // Raise an error specific to KinSol
   void kinsol_error(const std::string& module, int flag, bool fatal=true);
+
+  /** \brief  Create a new ImplicitFunctionInternal */
+  virtual ImplicitFunctionInternal* create(const FX& f, int nrhs=1) const { return new KinsolInternal(f,nrhs);}
   
 };
 
