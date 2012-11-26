@@ -24,6 +24,16 @@
 from casadi import *
 import types
 
+def frozen(b):
+  def frozen_dec(method):
+    def wrapper(self,*args,**kwargs):
+      if self._frozen!=b:
+        raise Exception("This operation can only be performed on %s instance." % ("a frozen" if b else "an unfrozen"))
+      else:
+        return method(self,*args,**kwargs)
+    return wrapper
+  return frozen_dec
+
 class xcollection():
   @property
   def shape(self):
@@ -342,13 +352,14 @@ class Mapper:
 
   def __getitem__(self, name):
     return self.structure.__getitem__(name)
-
+  
 class Collection(object):
     def __init__(self,keepZeros=True):
       self._frozen = False
       self._keepZeros = keepZeros
       self._mapping = Mapping()
 
+    @frozen(False)
     def freeze(self):
       self._frozen = True
       self._mapping = self._mapping.freeze()
@@ -405,20 +416,21 @@ class Collection(object):
           raise Exception("This Collection instance is frozen. You cannot add more members ('%s' in this case). This is for your own protection." % name)
         self[name] = value 
            
+    @frozen(True)
     def __getitem__(self, name):
       return self._d[name]
 
+    @frozen(False)
     def __setitem__(self, name, value):
-      if self._frozen:
-        raise Exception("This Collection instance is frozen. You cannot add more members ('%s' in this case). This is for your own protection." % name)
       self._mapping.add(name,value)
          
-        
     @property
+    @frozen(True)
     def shape(self):
        return (self._mapping.size,1)
 
     @property
+    @frozen(True)
     def size(self):
        return self._mapping.size
 
@@ -434,12 +446,15 @@ class Collection(object):
           s+= k + " = " +  str(self._mapping.data[k]) + "\n"
         return s
        
+    @frozen(False)
     def setOrder(self,order):
       self._mapping.setOrder(order)
       
+    @frozen(True)
     def numbers(self,init=0):
       return DMatrix(self.size,1,init)
       
+    @frozen(False)
     def cat(self):
       return self._d[...]
 
