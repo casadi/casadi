@@ -736,6 +736,23 @@ class MXtests(casadiTestCase):
     self.message("Check if non-symbolic inputs are caught")
     self.assertRaises(RuntimeError, lambda : SXFunction([MX(0)],[MX("x")]))
 
+  def test_inputmapping(self):
+    a = msym("a",2,1)
+    b = msym("b")
+    f = MXFunction([vertcat([a,b])],[a*b])
+    f.init()
+
+    V = msym("V",3)
+    a = V[:2,:]
+    b = V[2:,:]
+    g = MXFunction([V],[a*b])
+    g.init()
+
+    for k in [f,g]:
+      k.input(0).set([0.7,8.1,1.3])
+
+    self.checkfx(f,g)
+
 
   def test_unite(self):
     self.message("unite operation")
