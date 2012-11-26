@@ -76,7 +76,7 @@ class Toolstests(casadiTestCase):
       self.checkarray(p.i_y[1],[3,4],"")
       
       self.checkarray(p.i_y.__getitem__(0),[1,2],"")
-      self.checkarray(p.i_y.__getitem__((0,)),[1,2],"")
+      #self.checkarray(p.i_y.__getitem__((0,)),[1,2],"")
 
       self.checkarray(p.i_y,[[1,2],[3,4],[5,6]],"")
       
