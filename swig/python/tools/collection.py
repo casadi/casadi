@@ -33,6 +33,14 @@ class xcollection():
       catter = veccat if self._keepZeros else vecNZcat
       self.catted = self._postcatmodifier(catter([self._modifier(n) for n in self._tree.traverse()]))
     return self.catted 
+  
+  def enumerate(self):
+    for n in self._tree.traverse():
+      yield (n.h,self._modifier(n))
+      
+  def items(self):
+    for n in self._tree.traverse():
+      yield self._modifier(n)
 
 class xdict(dict,xcollection):
   def __getitem__(self,name):
