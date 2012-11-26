@@ -85,14 +85,16 @@ class Node:
     self.h = '.'
     self.children = []
     self.super = None
-    self.frozen = False
+    self._frozen = False
     self.i = 0
     self.exhausted = False
     self.labels = None
-    
+  
+  @frozen(True)
   def copy(self):
     return self
     
+  @frozen(False)
   def add(self,c):
     if isinstance(c,list):
       self.children+=c
@@ -109,7 +111,7 @@ class Node:
       return "(" + ",".join([str(c) for c in self.children]) + "|" + str(self.i) + ":" + ("X" if self.exhausted else "") + ("S" if self.super is not None else "")  +  ")"
   
   def freeze(self,h=[]):
-    self.frozen = True
+    self._frozen = True
     self.h = h
     for i,v in enumerate(self.children):
       h_ = h
@@ -159,9 +161,8 @@ class Node:
       v.i = 0
       v.exhausted = False
       
+  @frozen(True)
   def structure(self,modifier = lambda x:x,decorate = lambda t,x:x,postcatmodifier=lambda x:x):
-    if not self.frozen:
-      raise Exception("Tree must be frozen to allow traversal")
     if len(self.children)==0:
       return modifier(self)
     d = None
@@ -185,12 +186,11 @@ class Node:
       d = decorate(self,d)
     return d
     
+  @frozen(True)
   def traverse(self):
     """
       Does smart tree traversal
     """
-    if not self.frozen:
-      raise Exception("Tree must be frozen to allow traversal")
     # Reset all counters
     self.reset()
     
