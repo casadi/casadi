@@ -23,6 +23,7 @@
 #ifndef NLP_IMPLICIT_INTERNAL_HPP
 #define NLP_IMPLICIT_INTERNAL_HPP
 
+#include "nlp_implicit_solver.hpp"
 #include "symbolic/fx/implicit_function_internal.hpp"
 #include "symbolic/fx/nlp_solver.hpp"
 #include "symbolic/fx/linear_solver.hpp"
@@ -53,14 +54,12 @@ public:
   
   virtual void evaluate(int nfdir, int nadir);
 
+  /** \brief  Create a new ImplicitFunctionInternal */
+  virtual ImplicitFunctionInternal* create(const FX& f, int nrhs=1) const { return new NLPImplicitInternal(f,nrhs);}
+  
   protected:
-    NLPSolver nlp_solver_;
+    NLPSolver nlp_solver_; 
     
-    // Linear solver
-    LinearSolver linsol_;  
-    
-    /// Jacobian
-    FX J_;
 };
 
 } // namespace CasADi
