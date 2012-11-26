@@ -149,7 +149,7 @@ void compress(SXMatrix &ex, int level){
 std::vector<SXMatrix> substitute(const std::vector<SXMatrix> &ex, const std::vector<SXMatrix> &v, const std::vector<SXMatrix> &vdef){
   // Assert consistent dimensions
   casadi_assert(v.size()==vdef.size());
-    
+
   // Quick return if all equal
   bool all_equal = true;
   for(int k=0; k<v.size(); ++k){
@@ -160,6 +160,20 @@ std::vector<SXMatrix> substitute(const std::vector<SXMatrix> &ex, const std::vec
   }
   if(all_equal) return ex;
   
+  // Check sparsities
+  for(int k=0; k<v.size(); ++k){
+    if(v[k].sparsity()!=vdef[k].sparsity()) {
+      if (vdef[k].scalar() && vdef[k].size()==1) { // Expand vdef to sparsity of v if vdef is scalar
+        std::vector<SXMatrix> vdef_mod = vdef;
+        vdef_mod[k] = SXMatrix(v[k].sparsity(),vdef[k].at(0));
+        return substitute(ex,v,vdef_mod);
+      } else {
+        casadi_error("subsitute(ex,v,vdef): sparsities of v and vdef must match. Got v: " << v[k].dimString() << " and " << "vdef: " << vdef[k].dimString() << ".");
+      }
+    }
+  }
+  
+    
   // Otherwise, evaluate symbolically     
   SXFunction F(v,ex);
   F.init();
