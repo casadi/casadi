@@ -19,6 +19,7 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 # 
+import warnings
 from casadi import *
 import copy
 from types import *
@@ -108,6 +109,7 @@ class Variables(object):
     A simple to use Variables container class
     """
     def __init__(self):
+        warnings.warn("Variables class is deprecated. Use Collection instead", DeprecationWarning)
         self._d = dict()
         self._d_ = dict()
         self._orderflag = True

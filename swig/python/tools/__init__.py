@@ -23,4 +23,5 @@
 
 from graph import *
 from variables import *
+from collection import Collection 
 from bounds import *
