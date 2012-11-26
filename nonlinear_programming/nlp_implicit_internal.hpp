@@ -25,6 +25,7 @@
 
 #include "symbolic/fx/implicit_function_internal.hpp"
 #include "symbolic/fx/nlp_solver.hpp"
+#include "symbolic/fx/linear_solver.hpp"
 
 namespace CasADi{
 
@@ -54,6 +55,12 @@ public:
 
   protected:
     NLPSolver nlp_solver_;
+    
+    // Linear solver
+    LinearSolver linsol_;  
+    
+    /// Jacobian
+    FX J_;
 };
 
 } // namespace CasADi

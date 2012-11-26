@@ -725,11 +725,31 @@ class NLPtests(casadiTestCase):
     f=SXFunction([x],[sin(x)])
     f.init()
     solver=KinsolSolver(f,1)
+    solver.setOption("linear_solver_creator",CSparse)
     solver.init()
     solver.output().set(6)
     solver.solve()
-    self.assertAlmostEqual(solver.output()[0],2*pi,5)
+    
+    refsol = SXFunction([],[2*pi])
+    refsol.init()
+    self.checkfx(solver,refsol,digits=5)
 
+  def testImplicitSolver1(self):
+    self.message("Scalar implicit problem, n=0")
+    x=SX("x")
+    f=SXFunction([x],[sin(x)])
+    f.init()
+    solver = NLPImplicitSolver(f,1)
+    solver.setOption("linear_solver",CSparse)
+    solver.setOption("nlp_solver",IpoptSolver)
+    solver.init()
+    solver.output().set(6)
+    solver.solve()
+    
+    refsol = SXFunction([],[2*pi])
+    refsol.init()
+    self.checkfx(solver,refsol,digits=5)
+    
   def testKINSol2(self):
     self.message("Scalar KINSol problem, n=1")
     x=SX("x")
@@ -738,16 +758,39 @@ class NLPtests(casadiTestCase):
     f=SXFunction([y,x],[sin(x)-y])
     f.init()
     solver=KinsolSolver(f,1)
-    solver.setOption("linear_solver_creator",CSparse) # NOTE by Joel: Sensitivities of an implicit function requires a user-provided linear solver 
+    solver.setOption("linear_solver_creator",CSparse)
     solver.init()
     solver.fwdSeed().set(1)
     solver.adjSeed().set(1)
     solver.input().set(n)
     solver.evaluate(1,1)
-    self.assertAlmostEqual(solver.output()[0],sin(n),6)
-    self.assertAlmostEqual(solver.fwdSens()[0],cos(n),6)
-    self.assertAlmostEqual(solver.adjSens()[0],cos(n),6)
-
+    
+    refsol = SXFunction([x],[sin(x)])
+    refsol.init()
+    refsol.input().set(n)
+    self.checkfx(solver,refsol,digits=6)
+    
+  def testImplicitSolver2(self):
+    self.message("Scalar KIimplicit problem, n=1")
+    x=SX("x")
+    y=SX("y")
+    n=0.2
+    f=SXFunction([y,x],[sin(x)-y])
+    f.init()
+    solver=NLPImplicitSolver(f,1)
+    solver.setOption("linear_solver",CSparse)
+    solver.setOption("nlp_solver",IpoptSolver)
+    solver.init()
+    solver.fwdSeed().set(1)
+    solver.adjSeed().set(1)
+    solver.input().set(n)
+    solver.evaluate(1,1)
+    
+    refsol = SXFunction([x],[sin(x)])
+    refsol.init()
+    refsol.input().set(n)
+    self.checkfx(solver,refsol,digits=6)
+    
   def testKINSol1c(self):
     self.message("Scalar KINSol problem, n=0, constraint")
     x=SX("x")
