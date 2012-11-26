@@ -237,10 +237,12 @@ print "optimal cost: ", float(solver.output(NLP_COST))
 # Retrieve the solution
 v_opt = DMatrix(solver.output(NLP_X_OPT))
 
+
 # Get values at the beginning of each finite element
 x0_opt = v_opt[[k[0][0] for k in V.i_X]]
 x1_opt = v_opt[[k[0][1] for k in V.i_X]]
 x2_opt = v_opt[[k[0][2] for k in V.i_X]]
+
 u_opt = v_opt[V.i_U]
 tgrid = NP.linspace(0,tf,nk+1)
 tgrid_u = NP.linspace(0,tf,nk)
