@@ -46,6 +46,23 @@ class xdict(dict,xcollection):
   def __getitem__(self,name):
     if name is Ellipsis:
       return self._catted()
+    elif isinstance(name,tuple):
+      if len(name)==1:
+        return self.__getitem__(name[0])
+      else:
+        if isinstance(name[0],str):
+          return self.__getitem__(name[0]).__getitem__(name[1:])
+        elif isinstance(name[0],slice):
+          if name[0]==slice(None,None,None):
+            xd = xdict()
+            xd._modifier = self._modifier
+            xd._postcatmodifier = self._postcatmodifier
+            for k,v in self.iteritems():
+              xd.append(x.__getitem__(name[1:]))
+            return xd
+          else:
+            raise Exception("Unknown slice '%s'. You cna only slice dicts with ':'." % str(name[0]))
+
     else:
       if not name in self:
         raise Exception("Key '%s' not found. Only these are available: %s" % (name,str(self.keys())))
@@ -61,8 +78,24 @@ class xlist(list,xcollection):
   def __getitem__(self,name):
     if name is Ellipsis:
       return self._catted()
+    elif isinstance(name,tuple):
+      if len(name)==1:
+        return self.__getitem__(name[0])
+      else:
+        if isinstance(name[0],slice):
+          xl = xlist()
+          xl._modifier = self._modifier
+          xl._postcatmodifier = self._postcatmodifier
+
+          for x in self.__getitem__(name[0]):
+            xl.append(x.__getitem__(name[1:]))
+          return xl
+        else:
+          return self.__getitem__(name[0]).__getitem__(name[1:])
     else:
       return list.__getitem__(self,name)
+      
+      
 
 class Node:
   def __init__(self):
@@ -433,4 +466,7 @@ class Collection(object):
       
     def numbers(self,init=0):
       return DMatrix(self.size,1,init)
+      
+    def veccat(self):
+      return self._d[...]
 
