@@ -1839,7 +1839,11 @@ CRSSparsity CRSSparsityInternal::diag(std::vector<int>& mapping) const{
 
 std::string CRSSparsityInternal::dimString() const { 
   std::stringstream ss;
-  ss << "(" << nrow_ << "x" << ncol_ << "=" << numel() << "|" << size() << ")";
+  if (numel()==size()) {
+    ss << nrow_ << "-by-" << ncol_ << " (dense)";
+  } else {
+    ss << nrow_ << "-by-" << ncol_ << " (" << size() << "/" << numel() << " nz)";
+  }
   return ss.str();
 }
 

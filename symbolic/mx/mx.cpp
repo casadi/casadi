@@ -661,9 +661,7 @@ MX::MX(int nrow, int ncol, const MX& val){
 }
 
 std::string MX::dimString() const {
-  std::stringstream ss;
-  ss << "(" << size1() << "x" << size2() << "=" << numel() << "|" << size() << ")";
-  return ss.str();
+  return (*this)->sparsity_.dimString();
 }
 
 MX MX::mul(const MX& y) const{
