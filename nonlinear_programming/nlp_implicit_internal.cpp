@@ -40,7 +40,8 @@ NLPImplicitInternal::NLPImplicitInternal(const FX& f, int nrhs) : ImplicitFuncti
 
   addOption("nlp_solver",       OT_NLPSOLVER, GenericType(), "The NLPSolver used to solve the implicit system.");
   addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLPSolver");
-  
+  addOption("linear_solver",    OT_LINEARSOLVER, GenericType(), "User-defined linear solver class. Needed for sensitivities.");
+  addOption("linear_solver_options",    OT_DICTIONARY, GenericType(), "Options to be passed to the linear solver.");
 
 }
 
@@ -48,8 +49,6 @@ NLPImplicitInternal::~NLPImplicitInternal(){
 }
 
 void NLPImplicitInternal::evaluate(int nfdir, int nadir) {
-  if (nfdir!=0 || nadir!=0) throw CasadiException("NLPImplicitInternal::evaluate() not implemented for forward or backward mode");
-  
   // Obtain initial guess
   nlp_solver_.input(NLP_X_INIT).set(output(0));
   
@@ -71,12 +70,130 @@ void NLPImplicitInternal::evaluate(int nfdir, int nadir) {
     output(i).set(f_.output(i));
   }
   
+  // End of function if no sensitivities
+  if(nfdir==0 && nadir==0)
+    return;
+  
+  // Make sure that a linear solver has been provided
+  casadi_assert_message(!linsol_.isNull(),"Sensitivities of an implicit function requires a provided linear solver");
+  casadi_assert_message(!J_.isNull(),"Sensitivities of an implicit function requires an exact Jacobian");
+
+  // Pass inputs
+  J_.setInput(nlp_solver_.output(NLP_X_OPT),0);
+  for(int i=0; i<getNumInputs(); ++i)
+    J_.setInput(input(i),i+1);
+
+  // Evaluate jacobian
+  J_.evaluate();
+
+  // Pass non-zero elements, scaled by -gamma, to the linear solver
+  linsol_.setInput(J_.output(),0);
+
+  // Prepare the solution of the linear system (e.g. factorize)
+  linsol_.prepare();
+  
+  // Pass inputs to function
+  f_.setInput(output(0),0);
+  for(int i=0; i<getNumInputs(); ++i)
+    f_.input(i+1).set(input(i));
+
+  // Pass input seeds to function
+  for(int dir=0; dir<nfdir; ++dir){
+    f_.fwdSeed(0,dir).setZero();
+    for(int i=0; i<getNumInputs(); ++i){
+      f_.fwdSeed(i+1,dir).set(fwdSeed(i,dir));
+    }
+  }
+  
+  // Solve for the adjoint seeds
+  for(int dir=0; dir<nadir; ++dir){
+    // Negate adjoint seed and pass to function
+    Matrix<double>& faseed = f_.adjSeed(0,dir);
+    faseed.set(adjSeed(0,dir));
+    for(vector<double>::iterator it=faseed.begin(); it!=faseed.end(); ++it){
+      *it = -*it;
+    }
+    
+    // Solve the transposed linear system
+    linsol_.solve(&faseed.front(),1,true);
+
+    // Set auxillary adjoint seeds
+    for(int oind=1; oind<getNumOutputs(); ++oind){
+      f_.adjSeed(oind,dir).set(adjSeed(oind,dir));
+    }
+  }
+  
+  // Evaluate
+  f_.evaluate(nfdir,nadir);
+  
+  // Get the forward sensitivities
+  for(int dir=0; dir<nfdir; ++dir){
+    // Negate intermediate result and copy to output
+    Matrix<double>& fsens = fwdSens(0,dir);
+    fsens.set(f_.fwdSens(0,dir));
+    for(vector<double>::iterator it=fsens.begin(); it!=fsens.end(); ++it){
+      *it = -*it;
+    }
+    
+    // Solve the linear system
+    linsol_.solve(&fsens.front());
+  }
+  
+  // Get auxillary forward sensitivities
+  if(getNumOutputs()>1){
+    // Pass the seeds to the implicitly defined variables
+    for(int dir=0; dir<nfdir; ++dir){
+      f_.fwdSeed(0,dir).set(fwdSens(0,dir));
+    }
+    
+    // Evaluate
+    f_.evaluate(nfdir);
+  
+    // Get the sensitivities
+    for(int dir=0; dir<nfdir; ++dir){
+      for(int oind=1; oind<getNumOutputs(); ++oind){
+        fwdSens(oind,dir).set(f_.fwdSens(oind,dir));
+      }
+    }
+  }
+  
+  // Get the adjoint sensitivities
+  for(int dir=0; dir<nadir; ++dir){
+    for(int i=0; i<getNumInputs(); ++i){
+      f_.adjSens(i+1,dir).get(adjSens(i,dir));
+    }
+  }
+  
 }
 
 void NLPImplicitInternal::init(){
 
   ImplicitFunctionInternal::init();
 
+  // Get the linear solver creator function
+  if(linsol_.isNull() && hasSetOption("linear_solver")){
+    linearSolverCreator linear_solver_creator = getOption("linear_solver");
+  
+    // Allocate an NLP solver
+    linsol_ = linear_solver_creator(CRSSparsity());
+  
+    // Pass options
+    if(hasSetOption("linear_solver_options")){
+      const Dictionary& linear_solver_options = getOption("linear_solver_options");
+      linsol_.setOption(linear_solver_options);
+    }
+  }
+  
+  // Generate Jacobian if not provided
+  if(J_.isNull()) J_ = f_.jacobian(0,0);
+  J_.init();
+  
+  // Initialize the linear solver, if provided
+  if(!linsol_.isNull()){
+    linsol_.setSparsity(J_.output().sparsity());
+    linsol_.init();
+  }
+    
   casadi_assert_message(f_.getNumInputs()>0,"NLPImplicitInternal: the supplied f must have at least one input.");
   
   MX V = msym("V",f_.input().sparsity());
