@@ -75,6 +75,20 @@ class Toolstests(casadiTestCase):
       self.checkarray(p.i_y[0],[1,2],"")
       self.checkarray(p.i_y[1],[3,4],"")
       
+      self.checkarray(p.i_y.__getitem__(0),[1,2],"")
+      self.checkarray(p.i_y.__getitem__((0,)),[1,2],"")
+
+      self.checkarray(p.i_y,[[1,2],[3,4],[5,6]],"")
+      
+      self.checkarray(p.i_y[:,0],[1,3,5],"")
+      self.checkarray(p.i_y[:,1],[2,4,6],"")
+      
+      self.checkarray(p.i_y[0,:],[1,2],"")
+      self.checkarray(p.i_y[1,:],[3,4],"")
+      
+      self.checkarray(p._i["y",0],[1,2],"")
+      self.checkarray(p._i["y",:,0],[1,3,5],"")
+      
       p = Collection()
       p.x = [ssym("x")]
       p.z = [ssym("z%d" % i) for i in range(2)]
@@ -128,6 +142,7 @@ class Toolstests(casadiTestCase):
       self.checkarray(g.i_e,3)
       
       self.checkarray(g.d[...],vertcat([p.a,p.b]),"")
+      
 
   def test_variables(self):
       self.message("Variables")
