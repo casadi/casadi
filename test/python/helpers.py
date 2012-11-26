@@ -208,8 +208,8 @@ class casadiTestCase(unittest.TestCase):
     except Exception as e:
       raise Exception(str(e) + "\nThis occured for simple evaluate(%d,%d) for: %s" % (fwd,adj,failmessage) )
       
-    self.assertEqual(trial.getNumOutputs(),solution.getNumOutputs(),failmessage+": trial has %d number of outputs while solution has %d." % (trial.getNumOutputs(),solution.getNumOutputs()) )
-    self.assertEqual(trial.getNumInputs(),solution.getNumInputs(),failmessage+": trial has %d number of outputs while solution has %d." % (trial.getNumInputs(),solution.getNumInputs()) )
+    self.assertEqual(trial.getNumOutputs(),solution.getNumOutputs(),failmessage+": trial has %d outputs while solution has %d." % (trial.getNumOutputs(),solution.getNumOutputs()) )
+    self.assertEqual(trial.getNumInputs(),solution.getNumInputs(),failmessage+": trial has %d inputs while solution has %d." % (trial.getNumInputs(),solution.getNumInputs()) )
 
     for i in range(trial.getNumInputs()):
       if (allow_empty and (trial.input(i).empty() or solution.input(i).empty() )): continue
