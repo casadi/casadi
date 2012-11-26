@@ -1168,8 +1168,8 @@ void addMultiple(const Matrix<T>& A, const std::vector<T>& v, std::vector<T>& re
     // Check dimensions
     if(!(A.empty() && sparsity.numel()==0)){
       casadi_assert_message(A.size1()==sparsity.size1() && A.size2()==sparsity.size2(),
-			    "Shape mismatch. Expecting " << A.size1() << "-by-" << A.size2() << ", but got " << 
-			    sparsity.size1() << "-by-" << sparsity.size2() << " instead.");
+			    "Shape mismatch. Expecting " << A.dimString() << ", but got " << 
+			    sparsity.dimString() << " instead.");
     }
     
     // Return value

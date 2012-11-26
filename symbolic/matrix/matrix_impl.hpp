@@ -1138,16 +1138,7 @@ void Matrix<T>::enlarge(int nrow, int ncol, const std::vector<int>& ii, const st
 
 template<class T>
 std::string Matrix<T>::dimString() const {
-  std::stringstream ss;
-  ss << "(" << size1() << " x " << size2();
-  if (size1()!=1 && size2()!=1)  ss << " = " << numel();
-  if (numel()==size()) {
-    ss << " dense";
-  } else {
-    ss << " | " << size();
-  }
-  ss << ")";
-  return ss.str();
+  return sparsity_.dimString();
 }
 
 template<class T>
