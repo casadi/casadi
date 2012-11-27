@@ -22936,6 +22936,18 @@ Initialize. ";
 
 Solve the system of equations. ";
 
+%feature("docstring")  CasADi::ImplicitFunctionInternal::create "
+
+Create a new ImplicitFunctionInternal. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::jac "
+
+Generate a linear solver for the sensitivity equations. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::jac "
+
+Generate a linear solver for the sensitivity equations. ";
+
 %feature("docstring")  CasADi::ImplicitFunctionInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -33746,14 +33758,6 @@ Initialize stage. ";
 
 Evaluate. ";
 
-%feature("docstring")  CasADi::KinsolInternal::jac "
-
-Generate a linear solver for the sensitivity equations. ";
-
-%feature("docstring")  CasADi::KinsolInternal::jac "
-
-Generate a linear solver for the sensitivity equations. ";
-
 %feature("docstring")  CasADi::KinsolInternal::setJacobian "
 
 Set Jacobian. ";
@@ -33791,6 +33795,18 @@ Residual. ";
 %feature("docstring")  CasADi::KinsolInternal::ehfun "";
 
 %feature("docstring")  CasADi::KinsolInternal::kinsol_error "";
+
+%feature("docstring")  CasADi::KinsolInternal::create "
+
+Create a new ImplicitFunctionInternal. ";
+
+%feature("docstring")  CasADi::KinsolInternal::jac "
+
+Generate a linear solver for the sensitivity equations. ";
+
+%feature("docstring")  CasADi::KinsolInternal::jac "
+
+Generate a linear solver for the sensitivity equations. ";
 
 %feature("docstring")  CasADi::KinsolInternal::updateNumSens "
 
@@ -34419,10 +34435,6 @@ f:   SXFunction mapping from (n+1) inputs to 1 output ";
 %feature("docstring")  CasADi::KinsolSolver::checkNode "
 
 Check if the node is pointing to the right type of object. ";
-
-%feature("docstring")  CasADi::KinsolSolver::jac "
-
-Generate a linear solver for the sensitivity equations. ";
 
 %feature("docstring")  CasADi::KinsolSolver::setLinearSolver "
 
@@ -49788,6 +49800,18 @@ Initialize. ";
 %feature("docstring")  CasADi::NLPImplicitInternal::evaluate "
 
 Solve the system of equations. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::create "
+
+Create a new ImplicitFunctionInternal. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::jac "
+
+Generate a linear solver for the sensitivity equations. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::jac "
+
+Generate a linear solver for the sensitivity equations. ";
 
 %feature("docstring")  CasADi::NLPImplicitInternal::updateNumSens "
 
