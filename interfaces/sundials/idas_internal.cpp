@@ -56,7 +56,7 @@ IdasInternal::IdasInternal(const FX& f, const FX& g) : SundialsInternal(f,g){
   addOption("cj_scaling",                  OT_BOOLEAN,          false,          "IDAS scaling on cj for the user-defined linear solver module");
   addOption("extra_fsens_calc_ic",         OT_BOOLEAN,          false,          "Call calc ic an extra time, with fsens=0");
   addOption("disable_internal_warnings",   OT_BOOLEAN,          false,          "Disable IDAS internal warning messages");
-  addOption("monitor",                     OT_STRINGVECTOR,     GenericType(),  "", "correctInitialConditions|res|resS", true);
+  addOption("monitor",                     OT_STRINGVECTOR,     GenericType(),  "", "correctInitialConditions|res|resS|rhsQB", true);
   addOption("init_xdot",                   OT_REALVECTOR,       GenericType(),  "Initial values for the state derivatives");
   addOption("init_z",                      OT_REALVECTOR,       GenericType(),  "Initial values for the algebraic states");
   
@@ -1211,6 +1211,19 @@ void IdasInternal::rhsQB(double t, const double* xz, const double* xzdot, const 
   // Save to output
   g_.getOutput(qdotA,RDAE_QUAD);
   
+  if(monitored("rhsQB")){
+    cout << "RDAE_T    = " << t << endl;
+    cout << "RDAE_X    = " << g_.input(RDAE_X) << endl;
+    cout << "RDAE_Z    = " << g_.input(RDAE_Z) << endl;
+    cout << "RDAE_XDOT = " << g_.input(RDAE_XDOT) << endl;
+    cout << "RDAE_P    = " << g_.input(RDAE_P) << endl;
+    cout << "RDAE_RX    = " << g_.input(RDAE_RX) << endl;
+    cout << "RDAE_RZ    = " << g_.input(RDAE_RZ) << endl;
+    cout << "RDAE_RXDOT = " << g_.input(RDAE_RXDOT) << endl;
+    cout << "RDAE_RP    = " << g_.input(RDAE_RP) << endl;
+    cout << "rhs = " << g_.output(RDAE_QUAD) << endl;
+  }
+  
   // Negate as we are integrating backwards in time
   for(int i=0; i<nrq_; ++i)
     qdotA[i] *= -1;
@@ -1224,7 +1237,7 @@ int IdasInternal::rhsQB_wrapper(double t, N_Vector y, N_Vector xzdot, N_Vector x
     this_->rhsQB(t,NV_DATA_S(y),NV_DATA_S(xzdot),NV_DATA_S(xzA),NV_DATA_S(xzdotA),NV_DATA_S(qdotA));
     return 0;
   } catch(exception& e){
-    cerr << "resQB failed: " << e.what() << endl;
+    cerr << "rhsQB failed: " << e.what() << endl;
     return 1;
   }
 }
