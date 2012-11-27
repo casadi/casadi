@@ -52,11 +52,11 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
     case SCHEME_ACADO_Input: return "x_guess, u_guess, p_guess, lbx, ubx, lbx0, ubx0, lbxf, ubxf, lbu, ubu, lbp, ubp, lbc, ubc, lbr, ubr";
     case SCHEME_ACADO_Output: return "x_opt, u_opt, p_opt, cost";
     case SCHEME_ACADO_FCN_Input: return "t, xd, xa, u, p, xdot";
-    case SCHEME_ControlledDAEInput: return "t, x, z, p, u, u_interp, xdot, x_major, t0, tf";
+    case SCHEME_ControlledDAEInput: return "t, x, z, p, u, u_interp, x_major, t0, tf";
     case SCHEME_ControlSimulatorInput: return "x0, p, u";
-    case SCHEME_DAEInput: return "x, z, p, t, xdot";
+    case SCHEME_DAEInput: return "x, z, p, t";
     case SCHEME_DAEOutput: return "ode, alg, quad";
-    case SCHEME_RDAEInput: return "rx, rz, rp, x, z, p, t, xdot, rxdot";
+    case SCHEME_RDAEInput: return "rx, rz, rp, x, z, p, t";
     case SCHEME_RDAEOutput: return "ode, alg, quad";
     case SCHEME_IntegratorInput: return "x0, p, rx0, rp";
     case SCHEME_IntegratorOutput: return "xf, qf, rxf, rqf";
@@ -115,11 +115,10 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==3) return "p";
       if(i==4) return "u";
       if(i==5) return "u_interp";
-      if(i==6) return "xdot";
-      if(i==7) return "x_major";
-      if(i==8) return "t0";
-      if(i==9) return "tf";
-      casadi_error("getSchemeEntryName: supplied number is out of range. ControlledDAEInput has only 10 entries: ('ControlledDAEInput', 't, x, z, p, u, u_interp, xdot, x_major, t0, tf')");
+      if(i==6) return "x_major";
+      if(i==7) return "t0";
+      if(i==8) return "tf";
+      casadi_error("getSchemeEntryName: supplied number is out of range. ControlledDAEInput has only 9 entries: ('ControlledDAEInput', 't, x, z, p, u, u_interp, x_major, t0, tf')");
       break;
     case SCHEME_ControlSimulatorInput: 
       if(i==0) return "x0";
@@ -132,8 +131,7 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==1) return "z";
       if(i==2) return "p";
       if(i==3) return "t";
-      if(i==4) return "xdot";
-      casadi_error("getSchemeEntryName: supplied number is out of range. DAEInput has only 5 entries: ('DAEInput', 'x, z, p, t, xdot')");
+      casadi_error("getSchemeEntryName: supplied number is out of range. DAEInput has only 4 entries: ('DAEInput', 'x, z, p, t')");
       break;
     case SCHEME_DAEOutput: 
       if(i==0) return "ode";
@@ -149,9 +147,7 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==4) return "z";
       if(i==5) return "p";
       if(i==6) return "t";
-      if(i==7) return "xdot";
-      if(i==8) return "rxdot";
-      casadi_error("getSchemeEntryName: supplied number is out of range. RDAEInput has only 9 entries: ('RDAEInput', 'rx, rz, rp, x, z, p, t, xdot, rxdot')");
+      casadi_error("getSchemeEntryName: supplied number is out of range. RDAEInput has only 7 entries: ('RDAEInput', 'rx, rz, rp, x, z, p, t')");
       break;
     case SCHEME_RDAEOutput: 
       if(i==0) return "ode";
@@ -289,11 +285,10 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==3) return "Parameter vector (dimension np-by-1).";
       if(i==4) return "Control vector (dimension nu-by-1).";
       if(i==5) return "Control vector, linearly interpolated (dimension nu-by-1).";
-      if(i==6) return "State derivative vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES";
-      if(i==7) return "State vector (dimension nx-by-1) at the last major time-step";
-      if(i==8) return "Time at start of control interval (1-by-1)";
-      if(i==9) return "Time at end of control interval (1-by-1)";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. ControlledDAEInput has only 10 entries: ('ControlledDAEInput', 't, x, z, p, u, u_interp, xdot, x_major, t0, tf')");
+      if(i==6) return "State vector (dimension nx-by-1) at the last major time-step";
+      if(i==7) return "Time at start of control interval (1-by-1)";
+      if(i==8) return "Time at end of control interval (1-by-1)";
+      casadi_error("getSchemeEntryDoc: supplied number is out of range. ControlledDAEInput has only 9 entries: ('ControlledDAEInput', 't, x, z, p, u, u_interp, x_major, t0, tf')");
       break;
     case SCHEME_ControlSimulatorInput: 
       if(i==0) return "Differential or algebraic state at t0  (dimension nx-by-1)";
@@ -306,8 +301,7 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==1) return "Algebraic state";
       if(i==2) return "Parameter";
       if(i==3) return "Explicit time dependence";
-      if(i==4) return "Time derivative of differential states";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. DAEInput has only 5 entries: ('DAEInput', 'x, z, p, t, xdot')");
+      casadi_error("getSchemeEntryDoc: supplied number is out of range. DAEInput has only 4 entries: ('DAEInput', 'x, z, p, t')");
       break;
     case SCHEME_DAEOutput: 
       if(i==0) return "Right hand side of the implicit ODE";
@@ -323,9 +317,7 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==4) return "Forward algebraic state";
       if(i==5) return "Parameter vector";
       if(i==6) return "Explicit time dependence";
-      if(i==7) return "Time derivative of differential states";
-      if(i==8) return "Time derivative of backward differential state";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. RDAEInput has only 9 entries: ('RDAEInput', 'rx, rz, rp, x, z, p, t, xdot, rxdot')");
+      casadi_error("getSchemeEntryDoc: supplied number is out of range. RDAEInput has only 7 entries: ('RDAEInput', 'rx, rz, rp, x, z, p, t')");
       break;
     case SCHEME_RDAEOutput: 
       if(i==0) return "Right hand side of ODE.";
@@ -464,11 +456,10 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==3) return "CONTROL_DAE_P";
       if(i==4) return "CONTROL_DAE_U";
       if(i==5) return "CONTROL_DAE_U_INTERP";
-      if(i==6) return "CONTROL_DAE_XDOT";
-      if(i==7) return "CONTROL_DAE_X_MAJOR";
-      if(i==8) return "CONTROL_DAE_T0";
-      if(i==9) return "CONTROL_DAE_TF";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. ControlledDAEInput has only 10 entries: ('ControlledDAEInput', 't, x, z, p, u, u_interp, xdot, x_major, t0, tf')");
+      if(i==6) return "CONTROL_DAE_X_MAJOR";
+      if(i==7) return "CONTROL_DAE_T0";
+      if(i==8) return "CONTROL_DAE_TF";
+      casadi_error("getSchemeEntryEnumName: supplied number is out of range. ControlledDAEInput has only 9 entries: ('ControlledDAEInput', 't, x, z, p, u, u_interp, x_major, t0, tf')");
       break;
     case SCHEME_ControlSimulatorInput: 
       if(i==0) return "CONTROLSIMULATOR_X0";
@@ -481,8 +472,7 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==1) return "DAE_Z";
       if(i==2) return "DAE_P";
       if(i==3) return "DAE_T";
-      if(i==4) return "DAE_XDOT";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. DAEInput has only 5 entries: ('DAEInput', 'x, z, p, t, xdot')");
+      casadi_error("getSchemeEntryEnumName: supplied number is out of range. DAEInput has only 4 entries: ('DAEInput', 'x, z, p, t')");
       break;
     case SCHEME_DAEOutput: 
       if(i==0) return "DAE_ODE";
@@ -498,9 +488,7 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==4) return "RDAE_Z";
       if(i==5) return "RDAE_P";
       if(i==6) return "RDAE_T";
-      if(i==7) return "RDAE_XDOT";
-      if(i==8) return "RDAE_RXDOT";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. RDAEInput has only 9 entries: ('RDAEInput', 'rx, rz, rp, x, z, p, t, xdot, rxdot')");
+      casadi_error("getSchemeEntryEnumName: supplied number is out of range. RDAEInput has only 7 entries: ('RDAEInput', 'rx, rz, rp, x, z, p, t')");
       break;
     case SCHEME_RDAEOutput: 
       if(i==0) return "RDAE_ODE";
@@ -636,10 +624,9 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if(name=="p") return 3;
       if(name=="u") return 4;
       if(name=="u_interp") return 5;
-      if(name=="xdot") return 6;
-      if(name=="x_major") return 7;
-      if(name=="t0") return 8;
-      if(name=="tf") return 9;
+      if(name=="x_major") return 6;
+      if(name=="t0") return 7;
+      if(name=="tf") return 8;
       break;
     case SCHEME_ControlSimulatorInput: 
       if(name=="x0") return 0;
@@ -651,7 +638,6 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if(name=="z") return 1;
       if(name=="p") return 2;
       if(name=="t") return 3;
-      if(name=="xdot") return 4;
       break;
     case SCHEME_DAEOutput: 
       if(name=="ode") return 0;
@@ -666,8 +652,6 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if(name=="z") return 4;
       if(name=="p") return 5;
       if(name=="t") return 6;
-      if(name=="xdot") return 7;
-      if(name=="rxdot") return 8;
       break;
     case SCHEME_RDAEOutput: 
       if(name=="ode") return 0;

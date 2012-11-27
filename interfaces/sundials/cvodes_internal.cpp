@@ -128,22 +128,6 @@ void CVodesInternal::init(){
   // Get the number of forward and adjoint directions
   nfdir_f_ = f_.getOption("number_of_fwd_dir");
 
-  // Set state derivative and its derivatives to zero (explicit integrator)
-  f_.input(DAE_XDOT).setAll(0);
-  for(int i=0; i<nfdir_f_; ++i){
-    f_.fwdSeed(DAE_XDOT,i).setAll(0);
-  }
-  if(!g_.isNull()){
-    nfdir_g_ = g_.getOption("number_of_fwd_dir");
-    g_.input(RDAE_XDOT).setAll(0);
-    g_.input(RDAE_RXDOT).setAll(0);
-    for(int i=0; i<nfdir_g_; ++i){
-      g_.fwdSeed(RDAE_XDOT,i).setAll(0);
-      g_.fwdSeed(RDAE_RXDOT,i).setAll(0);
-    }
-  }
-  
-  
   // Sundials return flag
   int flag;
 

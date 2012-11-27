@@ -93,9 +93,6 @@ void CollocationIntegratorInternal::init(){
   // Interpolation order
   int deg = getOption("interpolation_order");
 
-  // Assume explicit ODE
-  bool explicit_ode = f_.input(DAE_XDOT).size()==0;
-  
   // All collocation time points
   double* tau_root = use_radau ? radau_points[deg] : legendre_points[deg];
 
@@ -260,16 +257,8 @@ void CollocationIntegratorInternal::init(){
       f_in[DAE_Z] = Z[k][j-1];
       
       vector<MX> f_out;
-      if(explicit_ode){
-        // Assume equation of the form ydot = f(t,y,p)
-        f_out = f_.call(f_in);
-        g.push_back(h_mx*f_out[DAE_ODE] - xp_jk);
-      } else {
-        // Assume equation of the form 0 = f(t,y,ydot,p)
-        f_in[DAE_XDOT] = xp_jk/h_mx;
-        f_out = f_.call(f_in);
-        g.push_back(f_out[DAE_ODE]);
-      }
+      f_out = f_.call(f_in);
+      g.push_back(h_mx*f_out[DAE_ODE] - xp_jk);
       
       // Add the algebraic conditions
       if(nz_>0){
@@ -301,17 +290,8 @@ void CollocationIntegratorInternal::init(){
         g_in[RDAE_RZ] = RZ[k][j-1];
         
         vector<MX> g_out;
-        if(explicit_ode){
-          // Assume equation of the form xdot = f(t,x,p)
-          g_out = g_.call(g_in);
-          g.push_back(h_mx*g_out[RDAE_ODE] + rxp_jk);
-        } else {
-          // Assume equation of the form 0 = f(t,x,xdot,p)
-          g_in[RDAE_XDOT] = xp_jk/h_mx;
-          g_in[RDAE_RXDOT] = -rxp_jk/h_mx;
-          g_out = g_.call(g_in);
-          g.push_back(g_out[RDAE_ODE]);
-        }
+        g_out = g_.call(g_in);
+        g.push_back(h_mx*g_out[RDAE_ODE] + rxp_jk);
         
         // Add the algebraic conditions
         if(nrz_>0){

@@ -49,8 +49,7 @@ f=SXFunction(daeIn(x=x,p=params),daeOut(ode=rhs))
 f.init()
 
 t = SX("t")
-dx  = ssym("dx",2)
-cf=SXFunction(controldaeIn(t=t, x=x, p=vertcat([w0,a3,a5,mu1,mu3]), xdot=dx, u=ff),[rhs])
+cf=SXFunction(controldaeIn(t=t, x=x, p=vertcat([w0,a3,a5,mu1,mu3]), u=ff),[rhs])
 cf.init()
 
 integrator = CVodesIntegrator(f)

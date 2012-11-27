@@ -31,13 +31,12 @@ coll = False # Use collocation integrator
 t  = ssym("t")    # time
 u  = ssym("u")    # control
 x  = ssym("x",3)  # state
-xp = ssym("xd",3) # state derivative
 
-# ODE/DAE residual function
-res = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, \
+# ODE rhs function
+ode = vertcat([(1 - x[1]*x[1])*x[0] - x[1] + u, \
        x[0], \
-       x[0]*x[0] + x[1]*x[1] + u*u]) - xp
-f = SXFunction(daeIn(x=x,p=u,t=t,xdot=xp),daeOut(ode=res))
+       x[0]*x[0] + x[1]*x[1] + u*u])
+f = SXFunction(daeIn(x=x,p=u,t=t),daeOut(ode=ode))
 
 # Create an integrator
 if coll:
