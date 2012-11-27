@@ -72,7 +72,6 @@ assert(rank==ns)
 # -----------------------------------
 
 y  = ssym("y",ns)
-dy  = ssym("dy",ns)
 u  = ssym("u",nu)
 
 x0 = DMatrix([1,0,0])
@@ -82,7 +81,7 @@ u_ = DMatrix([[ -1, 1 ],[1,-1]]*((N-1)/2))
 p = SX("p")
 
 tn = np.linspace(0,te,N)
-cdae = SXFunction(controldaeIn(x=y,xdot=dy,u=u),[mul(A,y)+mul(B,u)])
+cdae = SXFunction(controldaeIn(x=y,u=u),[mul(A,y)+mul(B,u)])
 cdae.init()
 
 
@@ -247,11 +246,11 @@ rhs.y   = mul(A,y)+mul(B,u)
 rhs.eAt = -mul(A,eAt)
 rhs.freeze()
 
-cdae = SXFunction(controldaeIn(x=states[...], xdot=ssym("dy",states.shape)),[rhs[...]])
+cdae = SXFunction(controldaeIn(x=states[...]),[rhs[...]])
 cdae.init()
 
 # Output function
-out = SXFunction(controldaeIn(x=states[...], xdot=ssym("dy",states.shape)),[states[...],u])
+out = SXFunction(controldaeIn(x=states[...]),[states[...],u])
 out.init()
 
 sim = ControlSimulator(cdae,out,tn)
@@ -378,7 +377,6 @@ print "Forward riccati eigenvalues = ", D
 x0 = DMatrix([1,0,0])
 
 y  = ssym("y",ns)
-dy  = ssym("dy",ns)
 
 C = DMatrix([[1,0,0],[0,1,0]])
 D = DMatrix([[0,0],[0,0]])
@@ -395,10 +393,10 @@ figure(6)
 for k,yref in enumerate([ vertcat([-1,sqrt(t)]) , vertcat([-1,-0.5]), vertcat([-1,sin(t)])]):
   u = -mul(K,y) + mul(mul(K,F)+Nm,yref)
   rhs = mul(A,y)+mul(B,u)
-  cdae = SXFunction(controldaeIn(t=t, x=y, xdot=dy),[rhs])
+  cdae = SXFunction(controldaeIn(t=t, x=y),[rhs])
 
   # Output function
-  out = SXFunction(controldaeIn(t=t, x=y, xdot=dy),[y,mul(C,y),u,yref])
+  out = SXFunction(controldaeIn(t=t, x=y),[y,mul(C,y),u,yref])
   out.init()
 
   sim = ControlSimulator(cdae,out,tn)
@@ -459,11 +457,11 @@ rhs.yref   =  mul(A,states.yref)+mul(B,uref)
 rhs.eAt    = -mul(A,eAt)
 rhs.freeze()
 
-cdae = SXFunction(controldaeIn(x=states[...], xdot=ssym("dy",states.shape), p=param[...]),[rhs[...]])
+cdae = SXFunction(controldaeIn(x=states[...], p=param[...]),[rhs[...]])
 cdae.init()
 
 # Output function
-out = SXFunction(controldaeIn(x=states[...], xdot=ssym("dy",states.shape), p=param[...]),[states[...],u,uref,states.yref])
+out = SXFunction(controldaeIn(x=states[...], p=param[...]),[states[...],u,uref,states.yref])
 out.init()
 
 sim = ControlSimulator(cdae,out,tn)
@@ -539,10 +537,10 @@ dy    = ssym("dy",ns)
 u     = controls.uref-mul(param.K,y-controls.yref)
 rhs   = mul(A,y)+mul(B,u)
 
-cdae = SXFunction(controldaeIn(x=y, xdot=dy, u=controls[...], p=param[...]),[rhs])
+cdae = SXFunction(controldaeIn(x=y, u=controls[...], p=param[...]),[rhs])
 
 # Output function
-out = SXFunction(controldaeIn(x=y, xdot=dy, u=controls[...], p=param[...]),[y,u,controls.uref,controls.yref])
+out = SXFunction(controldaeIn(x=y, u=controls[...], p=param[...]),[y,u,controls.uref,controls.yref])
 out.init()
 
 sim = ControlSimulator(cdae,out,tn)
@@ -594,10 +592,10 @@ y0     = ssym("y0",ns)
 u     = controls.uref-mul(param.K,y0-controls.yref)
 rhs   = mul(A,y)+mul(B,u)
 
-cdae = SXFunction(controldaeIn(x=y, xdot=dy, x_major=y0, u=controls[...], p=param[...]),[rhs])
+cdae = SXFunction(controldaeIn(x=y, x_major=y0, u=controls[...], p=param[...]),[rhs])
 
 # Output function
-out = SXFunction(controldaeIn(x=y, xdot=dy, x_major=y0, u=controls[...], p=param[...]),[y,u,controls.uref,controls.yref])
+out = SXFunction(controldaeIn(x=y, x_major=y0, u=controls[...], p=param[...]),[y,u,controls.uref,controls.yref])
 out.init()
 
 sim = ControlSimulator(cdae,out,tn)

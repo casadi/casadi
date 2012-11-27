@@ -36,7 +36,7 @@
     q(t0)  = 0
   
   Forward integration from t=t0 to t=tf
-         0 = fx(x,z,p,t,der(x))           Forward ODE
+    der(x) = fx(x,z,p,t)                  Forward ODE
          0 = fz(x,z,p,t)                  Forward algebraic equations
     der(q) = fq(x,z,p,t)                  Forward quadratures
   
@@ -45,27 +45,14 @@
     rq(tf)  = 0
   
   Backward integration from t=tf to t=t0
-          0 = gx(rx,rz,rp,x,z,p,t,der(rx))   Backward ODE
-          0 = gz(rx,rz,rp,x,z,p,t)           Backward algebraic equations
-    der(rq) = gq(rx,rz,rp,x,z,p,t)           Backward quadratures
+    der(rx) = gx(rx,rz,rp,x,z,p,t)        Backward ODE
+          0 = gz(rx,rz,rp,x,z,p,t)        Backward algebraic equations
+    der(rq) = gq(rx,rz,rp,x,z,p,t)        Backward quadratures
 
   where we assume that both the forward and backwards integrations are index-1
-  (i.e. dfx/dxdot, dfz/dz, dgz/drz, dgx/drxdot are invertible) and furthermore that 
-  gx, gz and gq have a linear dependency on rx, rz and rp and that f_x and g_x have a 
-  linear dependence on xdot and rxdot respectively.
+  (i.e. dfz/dz, dgz/drz are invertible) and furthermore that 
+  gx, gz and gq have a linear dependency on rx, rz and rp.
   
-  Note that not all integrators support this general form. In particular, an explicit 
-  integrator may requite that there are no algebraic states of equations and that the 
-  ODE is given in explicit form:
-    der(x)  = fx_explicit(x,z,p,t)
-  
-  Integrators requite explicit ODEs also accept implict ODEs if they can be formally
-  decomposed in the following way:
-    0 = fx(x,z,p,t,der(x)) := fx_explicit(x,z,p,t) - der(x)
-  This form allows the same ODE/DAE to be used for both explicit and implicit
-  integrators. Explicit integrators will simply pass zeros as the state derivatives,
-  recovering the explicit formulation. This also applies to the backward integration.
-
   \endverbatim 
 */
 namespace CasADi{
@@ -80,8 +67,6 @@ enum DAEInput{
   DAE_P,
   /// Explicit time dependence [t]
   DAE_T,
-  /// Time derivative of differential states [xdot]
-  DAE_XDOT,
   /// Number of arguments.
   DAE_NUM_IN
 };
@@ -114,10 +99,6 @@ enum RDAEInput{
   RDAE_P,
   /// Explicit time dependence [t]
   RDAE_T,
-  /// Time derivative of differential states [xdot]
-  RDAE_XDOT,
-  /// Time derivative of backward differential state [rxdot]
-  RDAE_RXDOT,
   /// Number of arguments.
   RDAE_NUM_IN
 };

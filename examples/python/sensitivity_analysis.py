@@ -44,25 +44,21 @@ for Integrators in (ODE_integrators,DAE_integrators):
     s = ssym("s"); v = ssym("v"); m = ssym("m")
     x = vertcat([s,v,m])
 
-    # State derivatives
-    sdot = ssym("sdot"); vdot = ssym("vdot"); mdot = ssym("mdot")
-    xdot = vertcat([sdot,vdot,mdot])
-
     # Constants
     alpha = 0.05 # friction
     beta = 0.1   # fuel consumption rate
       
     # Differential equation
     ode = vertcat([
-      v-sdot,
-      (u-alpha*v*v)/m - vdot,
-      -beta*u*u       - mdot])
+      v,
+      (u-alpha*v*v)/m,
+      -beta*u*u])
       
     # Quadrature
     quad = v**3 + ((3-sin(t)) - u)**2
 
     # DAE callback function
-    ffcn = SXFunction(daeIn(t=t,x=x,xdot=xdot,p=u),daeOut(ode=ode,quad=quad))
+    ffcn = SXFunction(daeIn(t=t,x=x,p=u),daeOut(ode=ode,quad=quad))
 
     # Time length
     tf = 0.5
@@ -79,12 +75,11 @@ for Integrators in (ODE_integrators,DAE_integrators):
     
     t = ssym("t")
     x = ssym("x")
-    xdot = ssym("xdot")
     z = ssym("z")
     u = ssym("u")
     
     # Differential equation
-    ode = -x + 0.5*x*x + u + 0.5*z - xdot
+    ode = -x + 0.5*x*x + u + 0.5*z
     
     # Algebraic constraint
     alg = z + exp(z) - 1.0 + x
@@ -93,7 +88,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
     quad = x*x + 3.0*u*u
 
     # DAE callback function
-    ffcn = SXFunction(daeIn(t=t,x=x,z=z,xdot=xdot,p=u),daeOut(ode=ode,alg=alg,quad=quad))
+    ffcn = SXFunction(daeIn(t=t,x=x,z=z,p=u),daeOut(ode=ode,alg=alg,quad=quad))
     
     # End time
     tf = 5.

@@ -65,13 +65,6 @@ int main(){
   x[1] = v;
   x[2] = m;
 
-  // State derivative
-  SX sdot("sdot"), vdot("vdot"), mdot("mdot");
-  vector<SX> xdot(3); 
-  xdot[0] = sdot;
-  xdot[1] = vdot;
-  xdot[2] = mdot;
-
   // Control
   SX u("u");
 
@@ -79,10 +72,10 @@ int main(){
   SX beta = 0.1; // fuel consumption rate
   
   // Differential equation
-  vector<SX> res(3);
-  res[0] = v               - sdot;
-  res[1] = (u-alpha*v*v)/m - vdot;
-  res[2] = -beta*u*u       - mdot;
+  vector<SX> rhs(3);
+  rhs[0] = v;
+  rhs[1] = (u-alpha*v*v)/m;
+  rhs[2] = -beta*u*u;
 
   // Initial conditions
   vector<double> x0(3);
@@ -91,7 +84,7 @@ int main(){
   x0[2] = 1;
 
   // DAE residual function
-  SXFunction daefcn(daeIn<SXMatrix>("x",x, "p",u, "t",t, "xdot",xdot),daeOut<SXMatrix>("ode",res));
+  SXFunction daefcn(daeIn<SXMatrix>("x",x, "p",u, "t",t),daeOut<SXMatrix>("ode",rhs));
   daefcn.setOption("name","DAE residual");
 
   // Integrator

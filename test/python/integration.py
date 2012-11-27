@@ -67,25 +67,23 @@ class Integrationtests(casadiTestCase):
     rq=SX("rq")
     p=SX("p")
     dp=SX("dp")
-    xdot = ssym("xdot")
-    rxdot = ssym("rxdot") 
     
     def impl_expl(din, dout, rdin, rdout):
-      dout_ = dict(dout)
-      dout_['ode'] -=xdot
-      din_ = dict(din)
-      din_.update({'xdot': xdot})
+      #dout_ = dict(dout)
+      #dout_['ode'] -=xdot
+      #din_ = dict(din)
+      #din_.update({'xdot': xdot})
       
-      rdin_ = dict(rdin)
-      rdout_ = dict(rdout)
-      if len(rdin)>1:
-        rdin_.update({'rxdot': rxdot,'xdot': xdot})
-        rdout_['ode']-=rxdot
+      #rdin_ = dict(rdin)
+      #rdout_ = dict(rdout)
+      #if len(rdin)>1:
+        #rdin_.update({'rxdot': rxdot,'xdot': xdot})
+        #rdout_['ode']-=rxdot
         
       yield "expl", din,  dout,  rdin,  rdout
       #yield "simpl",din_, dout_, rdin,  rdout
       #yield "simpl",din,  dout,  rdin_, rdout_ 
-      yield "impl", din_, dout_, rdin_, rdout_  
+      #yield "impl", din_, dout_, rdin_, rdout_  
        
     for tstart in [0.2]:
       for Integrator, features, options in integrators:
@@ -161,8 +159,7 @@ class Integrationtests(casadiTestCase):
     t=ssym("t")
     x=ssym("x")
     p=ssym("p")
-    dp=ssym("dp")
-    f=SXFunction(daeIn(t=t, x=x, p=p, xdot=dp),daeOut(ode=x/p*t**2-dp))
+    f=SXFunction(daeIn(t=t, x=x, p=p),daeOut(ode=x/p*t**2))
     f.init()
     integrator = CVodesIntegrator(f)
     integrator.setOption("reltol",1e-15)

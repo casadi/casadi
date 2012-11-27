@@ -48,17 +48,11 @@ y=ssym("y")
 u=ssym("u")
 v=ssym("v")
 
-dx=ssym("dx")
-dy=ssym("dy")
-du=ssym("du")
-dv=ssym("dv")
-
 #! algebraic states
 lambd=ssym("lambda")
 
 #! All states and parameters
 x_all = vertcat([x,u,y,v])
-dx_all = vertcat([dx,du,dy,dv])
 z_all = lambd
 p_all = vertcat([L,g])
 
@@ -69,18 +63,17 @@ XDOT_ = [-1.0/3,1147.0/240,1.0/4,-653.0/180] # state derivatives
 Z_ = [1147.0/720] # algebraic state
 
 #! We construct the DAE system
-ode = vertcat([dx-u,du-lambd*x,dy-v,dv-lambd*y+g])
+ode = vertcat([u,lambd*x,v,lambd*y+g])
 alg = x**2+y**2-L**2
-f = SXFunction(daeIn(x=x_all,z=z_all,p=p_all,t=t,xdot=dx_all),daeOut(ode=ode,alg=alg))
+f = SXFunction(daeIn(x=x_all,z=z_all,p=p_all,t=t),daeOut(ode=ode,alg=alg))
 f.init()
 
 #! Let's check we have consistent initial conditions:
 f.input(DAE_P).set(P_)
 f.input(DAE_X).set(X_)
 f.input(DAE_Z).set(Z_)
-f.input(DAE_XDOT).set(XDOT_)
 f.evaluate()
-print f.output(DAE_ODE) # This should be all zeros
+print f.output(DAE_ODE) # This should be same as XDOT_
 print f.output(DAE_ALG) # This should be all zeros
 
 
@@ -112,12 +105,11 @@ except Exception as e:
   print e
   
 #! We construct a reworked version od the DAE (index reduced), now it is DAE-index 1
-ode = vertcat([dx-u,du-lambd*x])
+ode = vertcat([u,lambd*x])
 alg = vertcat([x**2+y**2-L**2, u*x+v*y,u**2-g*y+v**2+L**2*lambd])
 x_all = vertcat([x,u])
-dx_all = vertcat([dx,du])
 z_all = vertcat([y,v,lambd])
-f = SXFunction(daeIn(x=x_all,z=z_all,p=p_all,t=t,xdot=dx_all),daeOut(ode=ode,alg=alg))
+f = SXFunction(daeIn(x=x_all,z=z_all,p=p_all,t=t),daeOut(ode=ode,alg=alg))
 f.init()
 
 #! the initial state of the pendulum
@@ -130,9 +122,8 @@ Z_ = [4,1.0/4,1147.0/720] # algebraic state
 f.input(DAE_P).set(P_)
 f.input(DAE_X).set(X_)
 f.input(DAE_Z).set(Z_)
-f.input(DAE_XDOT).set(XDOT_)
 f.evaluate()
-print f.output(DAE_ODE) # This should be all zeros
+print f.output(DAE_ODE) # This should be the same as XDOT_
 print f.output(DAE_ALG) # This should be all zeros
 
 #! Let's check our jacobian:
@@ -142,7 +133,6 @@ j.init()
 j.input(DAE_P).set(P_)
 j.input(DAE_X).set(X_)
 j.input(DAE_Z).set(Z_)
-j.input(DAE_XDOT).set(XDOT_)
 j.evaluate()
 print array(j.output())
 #! $\frac{dg}{dy}$ is invertible this time.

@@ -68,18 +68,17 @@ const bool sparse_direct = true;
 const bool second_order = true;
 
 // The DAE residual in plain c (for IDAS)
-void dae_res_c(double t, const double *x, const double* xdot, const double* p, double* ode, double* quad){
+void dae_res_c(double t, const double *x, const double* p, double* ode, double* quad){
   // Get the arguments
   //double s = x[0];
   double v = x[1];
   double m = x[2];
   double u = p[0];
-  double sdot = xdot[0], vdot = xdot[1], mdot = xdot[2];
 
   // Calculate the DAE residual
-  ode[0] = sdot - v;
-  ode[1] = vdot - (u-0.02*v*v)/m;
-  ode[2] = mdot - (-0.01*u*u);
+  ode[0] = v;
+  ode[1] = (u-0.02*v*v)/m;
+  ode[2] = (-0.01*u*u);
   
   double u_ref = 3-sin(t);
   double u_dev = u-u_dev;
@@ -89,7 +88,7 @@ void dae_res_c(double t, const double *x, const double* xdot, const double* p, d
 // Wrap the function to allow creating an CasADi function
 void dae_res_c_wrapper(CFunction &f, int nfwd, int nadj, void* user_data){
   casadi_assert(nfwd==0 && nadj==0);
-  dae_res_c(f.input(DAE_T).front(), &f.input(DAE_X).front(), &f.input(DAE_XDOT).front(), &f.input(DAE_P).front(), &f.output(DAE_ODE).front(), &f.output(DAE_QUAD).front());
+  dae_res_c(f.input(DAE_T).front(), &f.input(DAE_X).front(), &f.input(DAE_P).front(), &f.output(DAE_ODE).front(), &f.output(DAE_QUAD).front());
 }
 
 // Create an IDAS instance (fully implicit integrator)
@@ -104,13 +103,6 @@ Integrator create_Sundials(){
   x[1] = v;
   x[2] = m;
   
-  // State derivatives
-  SX sdot("sdot"), vdot("vdot"), mdot("mdot");
-  vector<SX> xdot(3); 
-  xdot[0] = sdot;
-  xdot[1] = vdot;
-  xdot[2] = mdot;
-
   // Control
   SX u("u");
   
@@ -121,15 +113,15 @@ Integrator create_Sundials(){
   SX u_dev = u-u_ref;
   u_dev *= u_dev;
   
-  // Differential equation (fully implicit form)
-  vector<SX> res(3);
-  res[0] = v - sdot;
-  res[1] = (u-0.02*v*v)/m - vdot;
-  res[2] = -0.01*u*u - mdot;
+  // Differential equation
+  vector<SX> ode(3);
+  ode[0] = v;
+  ode[1] = (u-0.02*v*v)/m;
+  ode[2] = -0.01*u*u;
 
   // Input/output of the DAE residual function
-  vector<SXMatrix> ffcn_in = daeIn<SXMatrix>("x",x, "p",u, "t",t, "xdot",xdot);
-  vector<SXMatrix> ffcn_out = daeOut<SXMatrix>("ode",res, "quad",u_dev);
+  vector<SXMatrix> ffcn_in = daeIn<SXMatrix>("x",x, "p",u, "t",t);
+  vector<SXMatrix> ffcn_out = daeOut<SXMatrix>("ode",ode, "quad",u_dev);
 
   // DAE residual function
   FX ffcn = SXFunction(ffcn_in,ffcn_out);
@@ -146,7 +138,6 @@ Integrator create_Sundials(){
     // Specify dimensions of inputs and outputs
     ffcn.input(DAE_T)    = DMatrix(1,1,0);
     ffcn.input(DAE_X)    = DMatrix(3,1,0);
-    ffcn.input(DAE_XDOT) = DMatrix(3,1,0);
     ffcn.input(DAE_P)    = DMatrix(1,1,0);
     ffcn.output(DAE_ODE) = DMatrix(3,1,0);
     ffcn.output(DAE_QUAD) = DMatrix(1,1,0);

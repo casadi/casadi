@@ -33,9 +33,7 @@ t = SX("t")
 
 #! states 
 x  = SX("x") 
-dx = SX("dx") 
 v  = SX("v") 
-dv = SX("dv") 
  
  
 x0 = SX("x0")
@@ -50,10 +48,9 @@ m = SX("m")
 u = SX("u") 
 
 #! Create the dae
-rhs = vertcat([v - dx, (u -  c*v - k*x)/m - dv ])
+rhs = vertcat([v, (u -  c*v - k*x)/m ])
 fin = controldaeIn(
     t = t,
-    xdot = vertcat([dx,dv]),
     x = vertcat([x,v]),
     p = vertcat([k,c,m]),
     u = u,
@@ -99,7 +96,6 @@ show()
 
 fin = controldaeIn(
     t = t,
-    xdot = vertcat([dx,dv]),
     x = vertcat([x,v]),
     p = vertcat([k,c,m]),
     u = u,
@@ -132,7 +128,6 @@ show()
 
 fin = controldaeIn(
     t = t,
-    xdot = vertcat([dx,dv]),
     x = vertcat([x,v]),
     p = vertcat([k,c,m]),
     u = u,
@@ -146,7 +141,6 @@ ui = ssym("ui")
 
 fin = controldaeIn(
     t = t,
-    xdot = vertcat([dx,dv]),
     x = vertcat([x,v]),
     p = vertcat([k,c,m]),
     u = ui,

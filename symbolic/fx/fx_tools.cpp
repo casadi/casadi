@@ -140,15 +140,11 @@ FX parameterizeTime(FX dae) {
    
    dae_in[DAE_P]    = reshape(P[range(2,2+dae.input(DAE_P).size())],dae.input(DAE_P).sparsity());
    dae_in[DAE_X]    = dae_input[DAE_X];
-   if (dae.input(DAE_XDOT).size()>0) {
-     dae_in[DAE_XDOT] = dae_input[DAE_XDOT]/(tf-t0);
-   }
 
    std::vector<MX> ret_in(DAE_NUM_IN);
    ret_in[DAE_T]    = tau;
    ret_in[DAE_P]    = P;
    ret_in[DAE_X]    = dae_input[DAE_X];
-   ret_in[DAE_XDOT] = dae_input[DAE_XDOT];
 
    std::vector<MX> ret_out(DAE_NUM_OUT);
    ret_out[DAE_ODE] = (tf-t0)*dae.call(dae_in)[0];
@@ -185,15 +181,11 @@ FX parameterizeTimeOutput(FX f) {
    
    f_in[DAE_P]    = reshape(P[range(2,2+f.input(DAE_P).size())],f.input(DAE_P).sparsity());
    f_in[DAE_X]    = f_input[DAE_X];
-   if (f.input(DAE_XDOT).size()>0) {
-     f_in[DAE_XDOT] = f_input[DAE_XDOT]/(tf-t0);
-   }
 
    std::vector<MX> ret_in(DAE_NUM_IN);
    ret_in[DAE_T]    = tau;
    ret_in[DAE_P]    = P;
    ret_in[DAE_X]    = f_input[DAE_X];
-   ret_in[DAE_XDOT] = f_input[DAE_XDOT];
 
    MXFunction ret(ret_in,f.call(f_in));
    

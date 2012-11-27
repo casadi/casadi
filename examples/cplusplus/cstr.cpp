@@ -42,8 +42,6 @@ using namespace std;
 
 int main(){
 
-  bool use_kinsol = false;
-
   // Allocate an OCP object
   SymbolicOCP ocp;
 
@@ -52,10 +50,8 @@ int main(){
   parse_options["scale_variables"] = true;
   parse_options["eliminate_dependent"] = true;
   parse_options["scale_equations"] = false;
+  parse_options["make_explicit"] = true;
   ocp.parseFMI("../examples/xml_files/cstr.xml",parse_options);
-  
-  // To explicit form
-//   ocp.makeExplicit();
   
   // Print the ocp to screen
   ocp.print();
@@ -71,7 +67,6 @@ int main(){
   // Variables
   SXMatrix t = ocp.t;
   SXMatrix x = var(ocp.x);
-  SXMatrix xdot = der(ocp.x);
   SXMatrix u = var(ocp.u);
     
   // Initial guess and bounds for the state
@@ -102,32 +97,13 @@ int main(){
   SXMatrix xf = ssym("xf",x.size(),1);
   SXFunction mterm(xf, xf[0]);
   
+  // DAE residual function
+  SXFunction dae(daeIn("x",x, "p",u, "t",t),daeOut("ode",ocp.ode));
+
   // Create a multiple shooting discretization
   MultipleShooting ocp_solver;
-  if(use_kinsol){
-    // Create an implicit function residual
-    vector<SXMatrix > impres_in(DAE_NUM_IN+1);
-    impres_in[0] = xdot;
-    impres_in[1+DAE_T] = t;
-    impres_in[1+DAE_X] = x;
-    impres_in[1+DAE_P] = u;
-    SXFunction impres(impres_in,ocp.ode);
-
-    // Create an implicit function (KINSOL)
-    KinsolSolver ode(impres);
-    ode.setOption("linear_solver_creator",CSparse::creator);
-    ode.init();
-    
-    // Create OCP solver
-    ocp_solver = MultipleShooting(ode,mterm);
-    ocp_solver.setOption("integrator",CVodesIntegrator::creator);
-  } else {
-    // DAE residual function
-    SXFunction dae(daeIn("x",x, "p",u, "t",t, "xdot",xdot),daeOut("ode",ocp.ode));
-    
-    ocp_solver = MultipleShooting(dae,mterm);
-    ocp_solver.setOption("integrator",IdasIntegrator::creator);
-  }
+  ocp_solver = MultipleShooting(dae,mterm);
+  ocp_solver.setOption("integrator",IdasIntegrator::creator);
   ocp_solver.setOption("integrator_options",integrator_options);
   ocp_solver.setOption("number_of_grid_points",num_nodes);
   ocp_solver.setOption("final_time",ocp.tf);

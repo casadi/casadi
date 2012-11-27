@@ -214,12 +214,11 @@ def controldaeIn(*dummy,**kwargs):
     p        -- Parameter vector (dimension np-by-1). [CONTROL_DAE_P]
     u        -- Control vector (dimension nu-by-1). [CONTROL_DAE_U]
     u_interp -- Control vector, linearly interpolated (dimension nu-by-1). [CONTROL_DAE_U_INTERP]
-    xdot     -- State derivative vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES [CONTROL_DAE_XDOT]
     x_major  -- State vector (dimension nx-by-1) at the last major time-step [CONTROL_DAE_X_MAJOR]
     t0       -- Time at start of control interval (1-by-1) [CONTROL_DAE_T0]
     tf       -- Time at end of control interval (1-by-1) [CONTROL_DAE_TF]
   """
-  if(len(dummy)>0): raise Exception("Error in controldaeIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n controldaeIn(my_t, my_x, my_z, my_p, my_u, my_u_interp, my_xdot, my_x_major, my_t0, my_tf)\nmust be written\n controldaeIn(t=my_t, x=my_x, z=my_z, p=my_p, u=my_u, u_interp=my_u_interp, xdot=my_xdot, x_major=my_x_major, t0=my_t0, tf=my_tf)\nwhere any keyword is optional.")
+  if(len(dummy)>0): raise Exception("Error in controldaeIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n controldaeIn(my_t, my_x, my_z, my_p, my_u, my_u_interp, my_x_major, my_t0, my_tf)\nmust be written\n controldaeIn(t=my_t, x=my_x, z=my_z, p=my_p, u=my_u, u_interp=my_u_interp, x_major=my_x_major, t0=my_t0, tf=my_tf)\nwhere any keyword is optional.")
   t = []
   if 't' in kwargs:
     t = kwargs['t']
@@ -238,9 +237,6 @@ def controldaeIn(*dummy,**kwargs):
   u_interp = []
   if 'u_interp' in kwargs:
     u_interp = kwargs['u_interp']
-  xdot = []
-  if 'xdot' in kwargs:
-    xdot = kwargs['xdot']
   x_major = []
   if 'x_major' in kwargs:
     x_major = kwargs['x_major']
@@ -251,9 +247,9 @@ def controldaeIn(*dummy,**kwargs):
   if 'tf' in kwargs:
     tf = kwargs['tf']
   for k in kwargs.keys():
-    if not(k in ['t','x','z','p','u','u_interp','xdot','x_major','t0','tf']):
-      raise Exception("Keyword error in controldaeIn: '%s' is not recognized. Available keywords are: t, x, z, p, u, u_interp, xdot, x_major, t0, tf" % k )
-  return [t,x,z,p,u,u_interp,xdot,x_major,t0,tf]
+    if not(k in ['t','x','z','p','u','u_interp','x_major','t0','tf']):
+      raise Exception("Keyword error in controldaeIn: '%s' is not recognized. Available keywords are: t, x, z, p, u, u_interp, x_major, t0, tf" % k )
+  return [t,x,z,p,u,u_interp,x_major,t0,tf]
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -306,13 +302,12 @@ def daeIn(*dummy,**kwargs):
   Input arguments of an ODE/DAE function
   
   Keyword arguments:
-    x    -- Differential state [DAE_X]
-    z    -- Algebraic state [DAE_Z]
-    p    -- Parameter [DAE_P]
-    t    -- Explicit time dependence [DAE_T]
-    xdot -- Time derivative of differential states [DAE_XDOT]
+    x -- Differential state [DAE_X]
+    z -- Algebraic state [DAE_Z]
+    p -- Parameter [DAE_P]
+    t -- Explicit time dependence [DAE_T]
   """
-  if(len(dummy)>0): raise Exception("Error in daeIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n daeIn(my_x, my_z, my_p, my_t, my_xdot)\nmust be written\n daeIn(x=my_x, z=my_z, p=my_p, t=my_t, xdot=my_xdot)\nwhere any keyword is optional.")
+  if(len(dummy)>0): raise Exception("Error in daeIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n daeIn(my_x, my_z, my_p, my_t)\nmust be written\n daeIn(x=my_x, z=my_z, p=my_p, t=my_t)\nwhere any keyword is optional.")
   x = []
   if 'x' in kwargs:
     x = kwargs['x']
@@ -325,13 +320,10 @@ def daeIn(*dummy,**kwargs):
   t = []
   if 't' in kwargs:
     t = kwargs['t']
-  xdot = []
-  if 'xdot' in kwargs:
-    xdot = kwargs['xdot']
   for k in kwargs.keys():
-    if not(k in ['x','z','p','t','xdot']):
-      raise Exception("Keyword error in daeIn: '%s' is not recognized. Available keywords are: x, z, p, t, xdot" % k )
-  return [x,z,p,t,xdot]
+    if not(k in ['x','z','p','t']):
+      raise Exception("Keyword error in daeIn: '%s' is not recognized. Available keywords are: x, z, p, t" % k )
+  return [x,z,p,t]
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -384,17 +376,15 @@ def rdaeIn(*dummy,**kwargs):
   Input arguments of an ODE/DAE backward integration function
   
   Keyword arguments:
-    rx    -- Backward differential state [RDAE_RX]
-    rz    -- Backward algebraic state [RDAE_RZ]
-    rp    -- Backward  parameter vector [RDAE_RP]
-    x     -- Forward differential state [RDAE_X]
-    z     -- Forward algebraic state [RDAE_Z]
-    p     -- Parameter vector [RDAE_P]
-    t     -- Explicit time dependence [RDAE_T]
-    xdot  -- Time derivative of differential states [RDAE_XDOT]
-    rxdot -- Time derivative of backward differential state [RDAE_RXDOT]
+    rx -- Backward differential state [RDAE_RX]
+    rz -- Backward algebraic state [RDAE_RZ]
+    rp -- Backward  parameter vector [RDAE_RP]
+    x  -- Forward differential state [RDAE_X]
+    z  -- Forward algebraic state [RDAE_Z]
+    p  -- Parameter vector [RDAE_P]
+    t  -- Explicit time dependence [RDAE_T]
   """
-  if(len(dummy)>0): raise Exception("Error in rdaeIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n rdaeIn(my_rx, my_rz, my_rp, my_x, my_z, my_p, my_t, my_xdot, my_rxdot)\nmust be written\n rdaeIn(rx=my_rx, rz=my_rz, rp=my_rp, x=my_x, z=my_z, p=my_p, t=my_t, xdot=my_xdot, rxdot=my_rxdot)\nwhere any keyword is optional.")
+  if(len(dummy)>0): raise Exception("Error in rdaeIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n rdaeIn(my_rx, my_rz, my_rp, my_x, my_z, my_p, my_t)\nmust be written\n rdaeIn(rx=my_rx, rz=my_rz, rp=my_rp, x=my_x, z=my_z, p=my_p, t=my_t)\nwhere any keyword is optional.")
   rx = []
   if 'rx' in kwargs:
     rx = kwargs['rx']
@@ -416,16 +406,10 @@ def rdaeIn(*dummy,**kwargs):
   t = []
   if 't' in kwargs:
     t = kwargs['t']
-  xdot = []
-  if 'xdot' in kwargs:
-    xdot = kwargs['xdot']
-  rxdot = []
-  if 'rxdot' in kwargs:
-    rxdot = kwargs['rxdot']
   for k in kwargs.keys():
-    if not(k in ['rx','rz','rp','x','z','p','t','xdot','rxdot']):
-      raise Exception("Keyword error in rdaeIn: '%s' is not recognized. Available keywords are: rx, rz, rp, x, z, p, t, xdot, rxdot" % k )
-  return [rx,rz,rp,x,z,p,t,xdot,rxdot]
+    if not(k in ['rx','rz','rp','x','z','p','t']):
+      raise Exception("Keyword error in rdaeIn: '%s' is not recognized. Available keywords are: rx, rz, rp, x, z, p, t" % k )
+  return [rx,rz,rp,x,z,p,t]
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON

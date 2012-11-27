@@ -119,8 +119,8 @@ std::vector<M> acadofcnIn(const std::string arg_s0="",M arg_m0=M(),const std::st
 /// 
 /// \copydoc scheme_ControlledDAEInput
 template<class M>
-std::vector<M> controldaeIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M(),const std::string arg_s8="",M arg_m8=M(),const std::string arg_s9="",M arg_m9=M()){
-  std::vector<M> ret(10);
+std::vector<M> controldaeIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M(),const std::string arg_s8="",M arg_m8=M()){
+  std::vector<M> ret(9);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
   if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
@@ -131,12 +131,11 @@ std::vector<M> controldaeIn(const std::string arg_s0="",M arg_m0=M(),const std::
   if (arg_s6!="") arg.insert(make_pair(arg_s6,arg_m6));
   if (arg_s7!="") arg.insert(make_pair(arg_s7,arg_m7));
   if (arg_s8!="") arg.insert(make_pair(arg_s8,arg_m8));
-  if (arg_s9!="") arg.insert(make_pair(arg_s9,arg_m9));
   typedef typename std::map<std::string,M>::const_iterator it_type;
   for(it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_ControlledDAEInput,it->first);
     if (n==-1)
-      casadi_error("Keyword error in ControlledDAEInput: '" << it->first << "' is not recognized. Available keywords are: t, x, z, p, u, u_interp, xdot, x_major, t0, tf");
+      casadi_error("Keyword error in ControlledDAEInput: '" << it->first << "' is not recognized. Available keywords are: t, x, z, p, u, u_interp, x_major, t0, tf");
     ret[n] = it->second;
   }
   return ret;
@@ -166,19 +165,18 @@ std::vector<M> controlsimulatorIn(const std::string arg_s0="",M arg_m0=M(),const
 /// 
 /// \copydoc scheme_DAEInput
 template<class M>
-std::vector<M> daeIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M()){
-  std::vector<M> ret(5);
+std::vector<M> daeIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
+  std::vector<M> ret(4);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
   if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
   if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
   if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
-  if (arg_s4!="") arg.insert(make_pair(arg_s4,arg_m4));
   typedef typename std::map<std::string,M>::const_iterator it_type;
   for(it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_DAEInput,it->first);
     if (n==-1)
-      casadi_error("Keyword error in DAEInput: '" << it->first << "' is not recognized. Available keywords are: x, z, p, t, xdot");
+      casadi_error("Keyword error in DAEInput: '" << it->first << "' is not recognized. Available keywords are: x, z, p, t");
     ret[n] = it->second;
   }
   return ret;
@@ -208,8 +206,8 @@ std::vector<M> daeOut(const std::string arg_s0="",M arg_m0=M(),const std::string
 /// 
 /// \copydoc scheme_RDAEInput
 template<class M>
-std::vector<M> rdaeIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M(),const std::string arg_s8="",M arg_m8=M()){
-  std::vector<M> ret(9);
+std::vector<M> rdaeIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M()){
+  std::vector<M> ret(7);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
   if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
@@ -218,13 +216,11 @@ std::vector<M> rdaeIn(const std::string arg_s0="",M arg_m0=M(),const std::string
   if (arg_s4!="") arg.insert(make_pair(arg_s4,arg_m4));
   if (arg_s5!="") arg.insert(make_pair(arg_s5,arg_m5));
   if (arg_s6!="") arg.insert(make_pair(arg_s6,arg_m6));
-  if (arg_s7!="") arg.insert(make_pair(arg_s7,arg_m7));
-  if (arg_s8!="") arg.insert(make_pair(arg_s8,arg_m8));
   typedef typename std::map<std::string,M>::const_iterator it_type;
   for(it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_RDAEInput,it->first);
     if (n==-1)
-      casadi_error("Keyword error in RDAEInput: '" << it->first << "' is not recognized. Available keywords are: rx, rz, rp, x, z, p, t, xdot, rxdot");
+      casadi_error("Keyword error in RDAEInput: '" << it->first << "' is not recognized. Available keywords are: rx, rz, rp, x, z, p, t");
     ret[n] = it->second;
   }
   return ret;

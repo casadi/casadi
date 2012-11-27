@@ -72,12 +72,6 @@ def create_IDAS():
   m = ssym("m")
   y = vertcat([s,v,m])
   
-  # State derivatives
-  sdot = ssym("sdot")
-  vdot = ssym("vdot")
-  mdot = ssym("mdot")
-  xdot = vertcat([sdot,vdot,mdot])
-
   # Control
   u = ssym("u")
   
@@ -89,10 +83,10 @@ def create_IDAS():
   u_dev *= u_dev
   
   # Differential equation (fully implicit form)
-  ode_res = vertcat([v - sdot,  (u-0.02*v*v)/m - vdot, -0.01*u*u - mdot])
+  ode_res = vertcat([v,  (u-0.02*v*v)/m, -0.01*u*u])
 
   # DAE residual function
-  ffcn = SXFunction(daeIn(t=t,x=y,xdot=xdot,p=u),daeOut(ode=ode_res,quad=u_dev))
+  ffcn = SXFunction(daeIn(t=t,x=y,p=u),daeOut(ode=ode_res,quad=u_dev))
   
   if collocation_integrator:
     # Create a collocation integrator
@@ -127,12 +121,6 @@ def create_CVODES():
   m = ssym("m")
   x = vertcat([s,v,m])
   
-  # State derivatives
-  sdot = ssym("sdot")
-  vdot = ssym("vdot")
-  mdot = ssym("mdot")
-  xdot = vertcat([sdot,vdot,mdot])
-  
   # Control
   u = ssym("u")
   
@@ -143,10 +131,10 @@ def create_CVODES():
   quad = (u-u_ref)**2
   
   # Differential equation (fully implicit form)
-  ode = vertcat([v, (u-0.02*v*v)/m, -0.01*u*u])-xdot
+  ode = vertcat([v, (u-0.02*v*v)/m, -0.01*u*u])
 
   # DAE residual function
-  ffcn = SXFunction(daeIn(t=t,x=x,p=u,xdot=xdot),daeOut(ode=ode,quad=quad))
+  ffcn = SXFunction(daeIn(t=t,x=x,p=u),daeOut(ode=ode,quad=quad))
   
   if collocation_integrator:
     # Create a collocation integrator

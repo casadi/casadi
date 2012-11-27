@@ -495,7 +495,6 @@ void IdasInternal::res(double t, const double* xz, const double* xzdot, double* 
   f_.setInput(&t,DAE_T);
   f_.setInput(xz,DAE_X);
   f_.setInput(xz+nx_,DAE_Z);
-  f_.setInput(xzdot,DAE_XDOT);
   f_.setInput(input(INTEGRATOR_P),DAE_P);
 
   // Evaluate
@@ -505,13 +504,16 @@ void IdasInternal::res(double t, const double* xz, const double* xzdot, double* 
   f_.getOutput(r,DAE_ODE);
   f_.getOutput(r+nx_,DAE_ALG);
   
+  // Subtract state derivative to get residual
+  for(int i=0; i<nx_; ++i){
+    r[i] -= xzdot[i];
+  }
+  
   if(monitored("res")){
     cout << "DAE_T    = " << t << endl;
     cout << "DAE_X    = " << f_.input(DAE_X) << endl;
     cout << "DAE_Z    = " << f_.input(DAE_Z) << endl;
-    cout << "DAE_XDOT = " << f_.input(DAE_XDOT) << endl;
     cout << "DAE_P    = " << f_.input(DAE_P) << endl;
-    cout << "residual = " << f_.output() << endl;
   }
 
   // Check the result for consistency
@@ -525,10 +527,9 @@ void IdasInternal::res(double t, const double* xz, const double* xzdot, double* 
           cout << "DAE_T    = " << t << endl;
           cout << "DAE_X    = " << f_.input(DAE_X) << endl;
           cout << "DAE_Z    = " << f_.input(DAE_Z) << endl;
-          cout << "DAE_XDOT = " << f_.input(DAE_XDOT) << endl;
           cout << "DAE_P    = " << f_.input(DAE_P) << endl;
-          cout << "ODE residual = " << f_.output(DAE_ODE) << endl;
-          cout << "ALG residual = " << f_.output(DAE_ALG) << endl;
+          cout << "ODE rhs  = " << f_.output(DAE_ODE) << endl;
+          cout << "ALG rhs  = " << f_.output(DAE_ALG) << endl;
         }
       }
       throw 1;
@@ -572,27 +573,28 @@ void IdasInternal::jtimes(double t, const double *xz, const double *xzdot, const
   // Get time
   time1 = clock();
   
-   // Pass input
-   f_.setInput(&t,DAE_T);
-   f_.setInput(xz,DAE_X);
-   f_.setInput(xz+nx_,DAE_Z);
-   f_.setInput(xzdot,DAE_XDOT);
-   f_.setInput(input(INTEGRATOR_P),DAE_P);
-     
-   // Pass seeds of the state vectors
-   f_.setFwdSeed(v,DAE_X);
-   f_.setFwdSeed(v+nx_,DAE_Z);
-   
-   // Pass seeds of the state derivative
-   for(int i=0; i<nx_; ++i) tmp1[i] = cj*v[i];
-   f_.setFwdSeed(tmp1,DAE_XDOT);
-   
-   // Evaluate the AD forward algorithm
-   f_.evaluate(1,0);
-   
-   // Get the output seeds
-   f_.getFwdSens(Jv);
+  // Pass input
+  f_.setInput(&t,DAE_T);
+  f_.setInput(xz,DAE_X);
+  f_.setInput(xz+nx_,DAE_Z);
+  f_.setInput(input(INTEGRATOR_P),DAE_P);
+    
+  // Pass seeds of the state vectors
+  f_.setFwdSeed(v,DAE_X);
+  f_.setFwdSeed(v+nx_,DAE_Z);
+  
+  // Evaluate the AD forward algorithm
+  f_.evaluate(1,0);
+  
+  // Get the output seeds
+  f_.getFwdSens(Jv,DAE_ODE);
+  f_.getFwdSens(Jv+nx_,DAE_ALG);
 
+  // Subtract state derivative to get residual
+  for(int i=0; i<nx_; ++i){
+    Jv[i] -= cj*v[i];
+  }
+  
   // Log time duration
   time2 = clock();
   t_jac += double(time2-time1)/CLOCKS_PER_SEC;
@@ -621,7 +623,6 @@ void IdasInternal::resS(int Ns, double t, const double* xz, const double* xzdot,
   f_.setInput(&t,DAE_T);
   f_.setInput(xz,DAE_X);
   f_.setInput(xz+nx_,DAE_Z);
-  f_.setInput(xzdot,DAE_XDOT);
   f_.setInput(input(INTEGRATOR_P),DAE_P);
   
   // Calculate the forward sensitivities, nfdir_f_ directions at a time
@@ -633,7 +634,6 @@ void IdasInternal::resS(int Ns, double t, const double* xz, const double* xzdot,
       f_.fwdSeed(DAE_T,dir).setZero();
       f_.setFwdSeed(NV_DATA_S(xzF[offset+dir]),DAE_X,dir);
       f_.setFwdSeed(NV_DATA_S(xzF[offset+dir])+nx_,DAE_Z,dir);
-      f_.setFwdSeed(NV_DATA_S(xzdotF[offset+dir]),DAE_XDOT,dir);
       f_.setFwdSeed(fwdSeed(INTEGRATOR_P,offset+dir),DAE_P,dir);
     }
     
@@ -644,6 +644,11 @@ void IdasInternal::resS(int Ns, double t, const double* xz, const double* xzdot,
     for(int dir=0; dir<nfdir_batch; ++dir){
       f_.getFwdSens(NV_DATA_S(rrF[offset+dir]),DAE_ODE,dir);
       f_.getFwdSens(NV_DATA_S(rrF[offset+dir])+nx_,DAE_ALG,dir);
+      
+      // Subtract state derivative to get residual
+      for(int i=0; i<nx_; ++i){
+        NV_DATA_S(rrF[offset+dir])[i] -= NV_DATA_S(xzdotF[offset+dir])[i];
+      }
     }
   }
   
@@ -876,22 +881,14 @@ void IdasInternal::resetB(){
         SXMatrix ralg_explicit = solve(J,-r);
       
         // Get state derivative and differential equation
-        SXMatrix rxdot = g.inputExpr(RDAE_RXDOT);
         SXMatrix rode = g.outputExpr(RDAE_ODE);
 
         // Substitute in the expression for z
         rode = substitute(rode,rz,ralg_explicit);
-        
-        // Linearize
-        J = CasADi::jacobian(rode,rxdot);
-        r = substitute(rode,rxdot,SXMatrix(rxdot.sparsity(),0));
-        
-        // Solve for rxdot
-        SXMatrix rode_explicit = solve(J,-r);
-        
+                
         // Function to calculate rxdot and rz
         vector<SXMatrix> odefcn_out(2);
-        odefcn_out[0] = -rode_explicit;
+        odefcn_out[0] = -rode;
         odefcn_out[1] = ralg_explicit;
         odefcn_ = SXFunction(g.inputExpr(),odefcn_out);
         odefcn_.init();
@@ -902,37 +899,14 @@ void IdasInternal::resetB(){
       odefcn_.setInput(&tf_,RDAE_T);
       odefcn_.setInput(NV_DATA_S(xz_),RDAE_X);
       odefcn_.setInput(NV_DATA_S(xz_)+nx_,RDAE_Z);
-      odefcn_.setInput(NV_DATA_S(xzdot_),RDAE_XDOT);
       odefcn_.setInput(input(INTEGRATOR_P),RDAE_P);
       odefcn_.setInput(input(INTEGRATOR_RP),RDAE_RP);
       odefcn_.setInput(NV_DATA_S(rxz_),RDAE_RX);
       odefcn_.setInput(NV_DATA_S(rxz_)+nrx_,RDAE_RZ); // NOTE: odefcn_ should not depend on rz
-      odefcn_.setInput(NV_DATA_S(rxzdot_),RDAE_RXDOT); // NOTE: odefcn_ should not depend on rxdot
     
-      // Negate as we are integrating backwards in time
-      for(int i=0; i<odefcn_.input(RDAE_RXDOT).size(); ++i)
-        odefcn_.input(RDAE_RXDOT).at(i) *= -1;
-
       odefcn_.evaluate();
       odefcn_.getOutput(NV_DATA_S(rxzdot_),0);
       odefcn_.getOutput(NV_DATA_S(rxz_)+nrx_,1);
-    
-//       // Evaluate g for consitency
-//       for(int k=0; k<RDAE_NUM_IN; ++k){
-//         g_.setInput(odefcn_.input(k),k);
-//       }
-//       g_.setInput(NV_DATA_S(rxz_)+nrx_,RDAE_RZ);
-//       g_.setInput(NV_DATA_S(rxzdot_),RDAE_RXDOT);
-//       
-//       // Negate as we are integrating backwards in time
-//       for(int i=0; i<g_.input(RDAE_RXDOT).size(); ++i)
-//         g_.input(RDAE_RXDOT).at(i) *= -1;
-//       
-//       g_.evaluate();
-//       
-//       // Save to output
-//       cout << "RODE "<< g_.output(RDAE_ODE) << endl;
-//       cout << "RALG "<< g_.output(RDAE_ALG) << endl;
     }
   }
   
@@ -1099,7 +1073,6 @@ void IdasInternal::rhsQ(double t, const double* xz, const double* xzdot, double*
    f_.setInput(&t,DAE_T);
    f_.setInput(xz,DAE_X);
    f_.setInput(xz+nx_,DAE_Z);
-   f_.setInput(xzdot,DAE_XDOT);
    f_.setInput(input(INTEGRATOR_P),DAE_P);
 
     // Evaluate
@@ -1119,7 +1092,6 @@ void IdasInternal::rhsQS(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector
    f_.setInput(&t,DAE_T);
    f_.setInput(NV_DATA_S(xz),DAE_X);
    f_.setInput(NV_DATA_S(xz)+nx_,DAE_Z);
-   f_.setInput(NV_DATA_S(xzdot),DAE_XDOT);
    f_.setInput(input(INTEGRATOR_P),DAE_P);
      
    // Pass forward seeds
@@ -1127,7 +1099,6 @@ void IdasInternal::rhsQS(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector
     f_.fwdSeed(DAE_T).setZero();
     f_.setFwdSeed(NV_DATA_S(xzF[i]),DAE_X);
     f_.setFwdSeed(NV_DATA_S(xzF[i])+nx_,DAE_Z);
-    f_.setFwdSeed(NV_DATA_S(xzdotF[i]),DAE_XDOT);
     f_.setFwdSeed(fwdSeed(INTEGRATOR_P,i),DAE_P);
    
     // Evaluate the AD forward algorithm
@@ -1159,17 +1130,11 @@ void IdasInternal::resB(double t, const double* xz, const double* xzdot, const d
   g_.setInput(&t,RDAE_T);
   g_.setInput(xz,RDAE_X);
   g_.setInput(xz+nx_,RDAE_Z);
-  g_.setInput(xzdot,RDAE_XDOT);
   g_.setInput(input(INTEGRATOR_P),RDAE_P);
   g_.setInput(input(INTEGRATOR_RP),RDAE_RP);
   g_.setInput(xzA,RDAE_RX);
   g_.setInput(xzA+nrx_,RDAE_RZ);
-  g_.setInput(xzdotA,RDAE_RXDOT);
 
-  // Negate as we are integrating backwards in time
-  for(int i=0; i<g_.input(RDAE_RXDOT).size(); ++i)
-    g_.input(RDAE_RXDOT).at(i) *= -1;
-    
   // Evaluate
   g_.evaluate();
 
@@ -1177,6 +1142,11 @@ void IdasInternal::resB(double t, const double* xz, const double* xzdot, const d
   g_.getOutput(rrA,RDAE_ODE);
   g_.getOutput(rrA+nrx_,RDAE_ALG);
 
+  // Subtract state derivative to get residual
+  for(int i=0; i<nrx_; ++i){
+    rrA[i] += xzdotA[i]; // BUG?
+  }
+  
   log("IdasInternal::resB","end");
 }
 
@@ -1198,12 +1168,10 @@ void IdasInternal::rhsQB(double t, const double* xz, const double* xzdot, const 
   g_.setInput(&t,RDAE_T);
   g_.setInput(xz,RDAE_X);
   g_.setInput(xz+nx_,RDAE_Z);
-  g_.setInput(xzdot,RDAE_XDOT);
   g_.setInput(input(INTEGRATOR_P),RDAE_P);
   g_.setInput(input(INTEGRATOR_RP),RDAE_RP);
   g_.setInput(xzA,RDAE_RX);
   g_.setInput(xzA+nrx_,RDAE_RZ);
-  g_.setInput(xzdotA,RDAE_RXDOT);
   
   // Evaluate
   g_.evaluate();
@@ -1215,11 +1183,9 @@ void IdasInternal::rhsQB(double t, const double* xz, const double* xzdot, const 
     cout << "RDAE_T    = " << t << endl;
     cout << "RDAE_X    = " << g_.input(RDAE_X) << endl;
     cout << "RDAE_Z    = " << g_.input(RDAE_Z) << endl;
-    cout << "RDAE_XDOT = " << g_.input(RDAE_XDOT) << endl;
     cout << "RDAE_P    = " << g_.input(RDAE_P) << endl;
     cout << "RDAE_RX    = " << g_.input(RDAE_RX) << endl;
     cout << "RDAE_RZ    = " << g_.input(RDAE_RZ) << endl;
-    cout << "RDAE_RXDOT = " << g_.input(RDAE_RXDOT) << endl;
     cout << "RDAE_RP    = " << g_.input(RDAE_RP) << endl;
     cout << "rhs = " << g_.output(RDAE_QUAD) << endl;
   }
@@ -1252,7 +1218,6 @@ void IdasInternal::djac(long Neq, double t, double cj, N_Vector xz, N_Vector xzd
   jac_.setInput(&t,DAE_T);
   jac_.setInput(NV_DATA_S(xz),DAE_X);
   jac_.setInput(NV_DATA_S(xz)+nx_,DAE_Z);
-  jac_.setInput(NV_DATA_S(xzdot),DAE_XDOT);
   jac_.setInput(input(INTEGRATOR_P),DAE_P);
   jac_.setInput(cj,DAE_NUM_IN);
     
@@ -1306,7 +1271,6 @@ void IdasInternal::bjac(long Neq, long mupper, long mlower, double t, double cj,
   jac_.setInput(&t,DAE_T);
   jac_.setInput(NV_DATA_S(xz),DAE_X);
   jac_.setInput(NV_DATA_S(xz)+nx_,DAE_Z);
-  jac_.setInput(NV_DATA_S(xzdot),DAE_XDOT);
   jac_.setInput(input(INTEGRATOR_P),DAE_P);
   jac_.setInput(cj,DAE_NUM_IN);
 
@@ -1409,7 +1373,6 @@ void IdasInternal::psetup(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, do
   jac_.setInput(&t,DAE_T);
   jac_.setInput(NV_DATA_S(xz),DAE_X);
   jac_.setInput(NV_DATA_S(xz)+nx_,DAE_Z);
-  jac_.setInput(NV_DATA_S(xzdot),DAE_XDOT);
   jac_.setInput(input(INTEGRATOR_P),DAE_P);
   jac_.setInput(cj,DAE_NUM_IN);
 
@@ -1630,7 +1593,7 @@ FunctionType IdasInternal::getJacobianGen(){
   
   // Get the Jacobian in the Newton iteration
   typename FunctionType::MatType cj = FunctionType::MatType::sym("cj");
-  typename FunctionType::MatType jac = f.jac(DAE_X,DAE_ODE) + cj*f.jac(DAE_XDOT,DAE_ODE);
+  typename FunctionType::MatType jac = f.jac(DAE_X,DAE_ODE) - cj*FunctionType::MatType::eye(nx_);
   if(nz_>0){
     jac = horzcat(vertcat(jac,f.jac(DAE_X,DAE_ALG)),vertcat(f.jac(DAE_Z,DAE_ODE),f.jac(DAE_Z,DAE_ALG)));
   }
@@ -1661,10 +1624,10 @@ FunctionType IdasInternal::getJacobianGenB(){
   
   // Get the Jacobian in the Newton iteration
   typename FunctionType::MatType cj = FunctionType::MatType::sym("cj");
-  typename FunctionType::MatType jac = g.jac(RDAE_RX,RDAE_ODE) + cj*g.jac(RDAE_RXDOT,RDAE_ODE);
-    if(nrz_>0){
-      jac = horzcat(vertcat(jac,g.jac(RDAE_RX,RDAE_ALG)),vertcat(g.jac(RDAE_RZ,RDAE_ODE),g.jac(RDAE_RZ,RDAE_ALG)));
-    }
+  typename FunctionType::MatType jac = g.jac(RDAE_RX,RDAE_ODE) + cj*FunctionType::MatType::eye(nrx_);
+  if(nrz_>0){
+    jac = horzcat(vertcat(jac,g.jac(RDAE_RX,RDAE_ALG)),vertcat(g.jac(RDAE_RZ,RDAE_ODE),g.jac(RDAE_RZ,RDAE_ALG)));
+  }
     
   // Jacobian function
   std::vector<typename FunctionType::MatType> jac_in = g.inputExpr();

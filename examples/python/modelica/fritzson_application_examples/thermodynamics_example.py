@@ -75,7 +75,6 @@ ocp.eliminateAlgebraic()
 dae_fcn_in = daeIn(
   t = ocp.t,
   x = vertcat(var(ocp.x)),
-  xdot = vertcat(der(ocp.x)),
   p = vertcat(var(ocp.pi)+var(ocp.pf))
 )
 
@@ -91,7 +90,6 @@ output_fcn_in = daeIn(
   t=ocp.t,
   x = vertcat(var(ocp.x)),
   z = vertcat(var(ocp.z)),
-  xdot = vertcat(der(ocp.x)),
   p = vertcat(var(ocp.pi)+var(ocp.pf)+var(ocp.u))
 )
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
@@ -141,7 +139,6 @@ ocp.eliminateAlgebraic()
 dae_fcn_in = daeIn(
   t = ocp.t,
   x = vertcat(var(ocp.x)),
-  xdot = vertcat(der(ocp.x)),
   p = vertcat(var(ocp.pi)+var(ocp.pf))
 )
 
@@ -156,7 +153,6 @@ output_fcn_in = daeIn(
   t=ocp.t,
   x = vertcat(var(ocp.x)),
   z = vertcat(var(ocp.z)),
-  xdot = vertcat(der(ocp.x)),
   p = vertcat(var(ocp.pi)+var(ocp.pf)+var(ocp.u))
 )
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)
@@ -199,7 +195,6 @@ ocp.eliminateAlgebraic()
 dae_fcn_in = daeIn(
   t = ocp.t,
   x = vertcat(var(ocp.x)),
-  xdot = vertcat(der(ocp.x)),
   p = vertcat(var(ocp.pi)+var(ocp.pf))
 )
 
@@ -216,7 +211,6 @@ output_fcn_in = daeIn(
   t=ocp.t,
   x = vertcat(var(ocp.x)),
   z = vertcat(var(ocp.z)),
-  xdot = vertcat(der(ocp.x)),
   p = vertcat(var(ocp.pi)+var(ocp.pf)+var(ocp.u))
 )
 output_fcn = SXFunction(output_fcn_in,output_fcn_out)

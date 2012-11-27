@@ -262,7 +262,6 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
   Mat z = dae_in[DAE_Z];
   Mat p = dae_in[DAE_P];
   Mat t = dae_in[DAE_T];
-  Mat xdot = dae_in[DAE_XDOT];
   Mat ode = dae_out[DAE_ODE];
   Mat alg = dae_out[DAE_ALG];
   Mat quad = dae_out[DAE_QUAD];
@@ -272,18 +271,16 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
   if(!g.isNull()){
     rdae_in = g.inputExpr();
     rdae_out = g.outputExpr();
-    // TODO: Assert that rdae_in[RDAE_X]==x, rdae_in[RDAE_Z]==z, rdae_in[RDAE_P]==p, rdae_in[RDAE_XDOT]==xdot
+    // TODO: Assert that rdae_in[RDAE_X]==x, rdae_in[RDAE_Z]==z, rdae_in[RDAE_P]==p
   } else {
     rdae_in[RDAE_X]=x;
     rdae_in[RDAE_Z]=z;
     rdae_in[RDAE_P]=p;
-    rdae_in[RDAE_XDOT]=xdot;
     rdae_in[RDAE_T]=t;
   }
   Mat rx = rdae_in[RDAE_RX];
   Mat rz = rdae_in[RDAE_RZ];
   Mat rp = rdae_in[RDAE_RP];
-  Mat rxdot = rdae_in[RDAE_RXDOT];
   Mat rode = rdae_out[RDAE_ODE];
   Mat ralg = rdae_out[RDAE_ALG];
   Mat rquad = rdae_out[RDAE_QUAD];
@@ -299,28 +296,18 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
   vector<Mat> fwd_x = Mat::sym("fwd_x",x.sparsity(),nfwd);
   vector<Mat> fwd_z = Mat::sym("fwd_z",z.sparsity(),nfwd);
   vector<Mat> fwd_p = Mat::sym("fwd_p",p.sparsity(),nfwd);
-  vector<Mat> fwd_xdot = Mat::sym("fwd_xdot",xdot.sparsity(),nfwd);
   vector<Mat> fwd_rx = Mat::sym("fwd_rx",rx.sparsity(),nfwd);
   vector<Mat> fwd_rz = Mat::sym("fwd_rz",rz.sparsity(),nfwd);
   vector<Mat> fwd_rp = Mat::sym("fwd_rp",rp.sparsity(),nfwd);
-  vector<Mat> fwd_rxdot = Mat::sym("fwd_rxdot",rxdot.sparsity(),nfwd);
 
   // Allocate adjoint sensitivities
   vector<Mat> adj_ode = Mat::sym("adj_ode",ode.sparsity(),nadj);
   vector<Mat> adj_alg = Mat::sym("adj_alg",alg.sparsity(),nadj);
-  vector<Mat> adj_odedot = Mat::sym("adj_odedot",xdot.sparsity(),nadj);
   vector<Mat> adj_quad = Mat::sym("adj_quad",quad.sparsity(),nadj);
   vector<Mat> adj_rode = Mat::sym("adj_rode",rode.sparsity(),nadj);
   vector<Mat> adj_ralg = Mat::sym("adj_ralg",ralg.sparsity(),nadj);
-  vector<Mat> adj_rodedot = Mat::sym("adj_rodedot",rxdot.sparsity(),nadj);
   vector<Mat> adj_rquad = Mat::sym("adj_rquad",rquad.sparsity(),nadj);
-  
-  // Are there backward states
-  bool has_rxdot = !rxdot.empty();
-  
-  // Is the ODE part explicit?
-  bool implicit_ode = has_rxdot || !xdot.empty();
-  
+    
   // Forward seeds
   vector<vector<Mat> > fseed(nfwd,vector<Mat>(RDAE_NUM_IN));
   for(int dir=0; dir<nfwd; ++dir){
@@ -328,15 +315,13 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
     fseed[dir][RDAE_Z] = fwd_z[dir];
     fseed[dir][RDAE_P] = fwd_p[dir];
     if(!t.isNull()) fseed[dir][RDAE_T] = Mat(t.sparsity());
-    fseed[dir][RDAE_XDOT] = fwd_xdot[dir];
     fseed[dir][RDAE_RX] = fwd_rx[dir];
     fseed[dir][RDAE_RZ] = fwd_rz[dir];
     fseed[dir][RDAE_RP] = fwd_rp[dir];
-    fseed[dir][RDAE_RXDOT] = fwd_rxdot[dir];
   }
 
   // Adjoint seeds
-  vector<vector<Mat> > aseed(nadj*(implicit_ode ? has_rxdot ? 3 : 2 : 1),vector<Mat>(DAE_NUM_OUT+RDAE_NUM_OUT));
+  vector<vector<Mat> > aseed(nadj,vector<Mat>(DAE_NUM_OUT+RDAE_NUM_OUT));
   for(int dir=0; dir<nadj; ++dir){
     aseed[dir][DAE_ODE] = adj_ode[dir];
     aseed[dir][DAE_ALG] = adj_alg[dir];
@@ -345,26 +330,6 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
     aseed[dir][DAE_NUM_OUT+RDAE_ODE] = adj_rode[dir];
     aseed[dir][DAE_NUM_OUT+RDAE_ALG] = adj_ralg[dir];
     aseed[dir][DAE_NUM_OUT+RDAE_QUAD] = adj_rquad[dir];
-    
-    if(implicit_ode){
-      aseed[nadj+dir][DAE_ODE] = adj_odedot[dir];
-      aseed[nadj+dir][DAE_ALG] = Mat(alg.sparsity());
-      aseed[nadj+dir][DAE_QUAD] = Mat(quad.sparsity());
-
-      aseed[nadj+dir][DAE_NUM_OUT+RDAE_ODE] = Mat(rode.sparsity());
-      aseed[nadj+dir][DAE_NUM_OUT+RDAE_ALG] = Mat(ralg.sparsity());
-      aseed[nadj+dir][DAE_NUM_OUT+RDAE_QUAD] = Mat(rquad.sparsity());
-      
-      if(has_rxdot){
-        aseed[2*nadj+dir][DAE_ODE] = Mat(ode.sparsity());
-        aseed[2*nadj+dir][DAE_ALG] = Mat(alg.sparsity());
-        aseed[2*nadj+dir][DAE_QUAD] = Mat(quad.sparsity());
-      
-        aseed[2*nadj+dir][DAE_NUM_OUT+RDAE_ODE] = adj_rodedot[dir];
-        aseed[2*nadj+dir][DAE_NUM_OUT+RDAE_ALG] = Mat(ralg.sparsity());
-        aseed[2*nadj+dir][DAE_NUM_OUT+RDAE_QUAD] = Mat(rquad.sparsity());
-      }
-    }
   }
   
   // Calculate forward and adjoint sensitivities
@@ -380,17 +345,13 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
   z.append(vertcat(fwd_z));
   z.append(vertcat(adj_ralg));
   
-  // Augment state derivative
-  xdot.append(vertcat(fwd_xdot));
-  xdot.append(vertcat(adj_rodedot));
-  
   // Augment parameter vector
   p.append(vertcat(fwd_p));
   p.append(vertcat(adj_rquad));
   
   // Augment backward differential state
   rx.append(vertcat(fwd_rx));
-  rx.append(vertcat(adj_ode)); // BUG! This is only correct if ODE is explicit, see #521
+  rx.append(vertcat(adj_ode));
   
   // Augment backward algebraic state
   rz.append(vertcat(fwd_rz));
@@ -399,10 +360,6 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
   // Augment backwards parameter vector
   rp.append(vertcat(fwd_rp));
   rp.append(vertcat(adj_quad));
-  
-  // Augment backward state derivative
-  rxdot.append(vertcat(fwd_rxdot));
-  rxdot.append(vertcat(adj_odedot));
   
   // Augment forward sensitivity equations to the DAE
   for(int dir=0; dir<nfwd; ++dir){
@@ -417,19 +374,10 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
   
   // Augment backward sensitivity equations to the DAE
   for(int dir=0; dir<nadj; ++dir){
-    if(implicit_ode){
-      rode.append(asens[dir][RDAE_X] + asens[nadj+dir][RDAE_XDOT]);
-    } else {
-      rode.append(asens[dir][RDAE_X]);
-    }
+    rode.append(asens[dir][RDAE_X]);
     ralg.append(asens[dir][RDAE_Z]);
     rquad.append(asens[dir][RDAE_P]);
-    
-    if(has_rxdot){
-      ode.append(asens[dir][RDAE_RX] + asens[2*nadj+dir][RDAE_RXDOT]);
-    } else {
-      ode.append(asens[dir][RDAE_RX]);
-    }
+    ode.append(asens[dir][RDAE_RX]);
     alg.append(asens[dir][RDAE_RZ]);
     quad.append(asens[dir][RDAE_RP]);
   }
@@ -447,7 +395,6 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
   dae_in[DAE_Z] = z;
   dae_in[DAE_P] = p;
   dae_in[DAE_T] = t;
-  dae_in[DAE_XDOT] = xdot;
 
   // ... and outputs
   dae_out[DAE_ODE] = ode;
@@ -462,8 +409,6 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
   rdae_in[RDAE_Z] = z;
   rdae_in[RDAE_P] = p;
   rdae_in[RDAE_T] = t;
-  rdae_in[RDAE_XDOT] = xdot;
-  rdae_in[RDAE_RXDOT] = rxdot;
   
   // ... and outputs
   rdae_out[RDAE_ODE] = rode;
