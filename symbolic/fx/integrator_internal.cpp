@@ -390,7 +390,7 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
   
   // Augment backward differential state
   rx.append(vertcat(fwd_rx));
-  rx.append(vertcat(adj_ode));
+  rx.append(vertcat(adj_ode)); // BUG! This is only correct if ODE is explicit, see #521
   
   // Augment backward algebraic state
   rz.append(vertcat(fwd_rz));
