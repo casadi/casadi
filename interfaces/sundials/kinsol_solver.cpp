@@ -45,10 +45,6 @@ bool KinsolSolver::checkNode() const{
   return dynamic_cast<const KinsolInternal*>(get());
 }
 
-KinsolSolver KinsolSolver::jac(int iind, int oind){
-  return (*this)->jac(iind,oind);  
-}
-
 void KinsolSolver::setLinearSolver(const LinearSolver& linsol){
   casadi_warning(
     "Depreciated function \"KinsolSolver::setLinearSolver\",\n"

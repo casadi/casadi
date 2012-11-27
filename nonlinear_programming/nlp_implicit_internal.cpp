@@ -38,18 +38,12 @@ NLPImplicitInternal* NLPImplicitInternal::clone() const{
   
 NLPImplicitInternal::NLPImplicitInternal(const FX& f, int nrhs) : ImplicitFunctionInternal(f,nrhs) {
 
-  addOption("nlp_solver",       OT_NLPSOLVER, GenericType(), "The NLPSolver used to solve the implicit system.");
-  addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLPSolver");
-  
-
 }
 
 NLPImplicitInternal::~NLPImplicitInternal(){ 
 }
 
 void NLPImplicitInternal::evaluate(int nfdir, int nadir) {
-  if (nfdir!=0 || nadir!=0) throw CasadiException("NLPImplicitInternal::evaluate() not implemented for forward or backward mode");
-  
   // Obtain initial guess
   nlp_solver_.input(NLP_X_INIT).set(output(0));
   
@@ -70,6 +64,12 @@ void NLPImplicitInternal::evaluate(int nfdir, int nadir) {
   for(int i=1; i<getNumOutputs(); ++i){
     output(i).set(f_.output(i));
   }
+    
+  // End of function if no sensitivities
+  if(nfdir==0 && nadir==0)
+    return;
+  
+  evaluate_sens(nfdir,nadir);
   
 }
 

@@ -72,9 +72,6 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
   
-  /** \brief Generate a linear solver for the sensitivity equations */
-  KinsolSolver jac(int iind=0, int oind=0);
- 
   /** \brief  Set linear solver */
   void setLinearSolver(const LinearSolver& linsol);
 

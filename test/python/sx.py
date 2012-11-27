@@ -578,6 +578,10 @@ class SXtests(casadiTestCase):
     self.assertTrue(isZero(r))
     self.assertEqual(getIntValue(r),0)
     self.assertEqual(getValue(r),0)
+    y = ssym("y",2)
+    y = substitute(y+6,y,0)
+    self.assertEqual(getIntValue(y[0]),6)
+    self.assertEqual(getIntValue(y[1]),6)
    
   def test_primitivefunctions(self):
     self.message("Primitive functions")
