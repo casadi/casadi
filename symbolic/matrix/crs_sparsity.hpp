@@ -214,7 +214,11 @@ class CRSSparsity : public SharedObject{
     /// Get the sparsity in sparse triplet format
     void getSparsity(std::vector<int>& row, std::vector<int> &col) const;
     
-    /// Get a submatrix
+    /** \brief Get a submatrix
+    *
+    * Returns the sparsity of the submatrix, with a mapping such that
+    *   submatrix[k] = originalmatrix[mapping[k]]
+    */
     CRSSparsity getSub(const std::vector<int>& ii, const std::vector<int>& jj, std::vector<int>& mapping) const;
     
     /// Transpose the matrix and get the reordering of the non-zero entries, i.e. the non-zeros of the original matrix for each non-zero of the new matrix
