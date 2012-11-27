@@ -20,17 +20,13 @@
  *
  */
 
-#include <symbolic/stl_vector_tools.hpp>
+#include <symbolic/casadi.hpp>
+
 #include <interfaces/ipopt/ipopt_solver.hpp>
 #include <interfaces/sundials/idas_integrator.hpp>
 #include <interfaces/sundials/cvodes_integrator.hpp>
 #include <interfaces/sundials/kinsol_solver.hpp>
 #include <interfaces/csparse/csparse.hpp>
-
-#include <symbolic/fx/fx_tools.hpp>
-#include <symbolic/mx/mx_tools.hpp>
-#include <symbolic/sx/sx_tools.hpp>
-#include <symbolic/matrix/matrix_tools.hpp>
 
 #include <optimal_control/symbolic_ocp.hpp>
 #include <optimal_control/ocp_tools.hpp>
@@ -84,11 +80,6 @@ int main(){
 
   // Set integrator options
   Dictionary integrator_options;
-  integrator_options["number_of_fwd_dir"]=1;
-  integrator_options["number_of_adj_dir"]=0;
-  integrator_options["exact_jacobian"]=true;
-  integrator_options["fsens_err_con"]=true;
-  integrator_options["quad_err_con"]=true;
   integrator_options["abstol"]=1e-8;
   integrator_options["reltol"]=1e-8;
   integrator_options["tf"]=ocp.tf/num_nodes;
