@@ -310,7 +310,7 @@ void EvaluationMX::propagateSparsity(DMatrixPtrV& arg, DMatrixPtrV& res,bool use
     } else {
       for (int iind = 0; iind < arg.size(); ++iind) {
         if (arg[iind] != 0) {
-          arg[iind]->sparsity().set(
+          arg[iind]->sparsity().bor(
               get_bvec_t(arg[iind]->data()),
               get_bvec_t(fcn_.input(iind).data()),
               fcn_.input(iind).sparsity());

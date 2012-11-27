@@ -685,7 +685,7 @@ void MXFunctionInternal::spEvaluate(bool fwd){
         bvec_t* iwork = get_bvec_t(w);
         bvec_t* swork = get_bvec_t(input(it->arg.front()).data());
         for(int k=0; k<w.size(); ++k){
-          swork[k] |= iwork[k];
+          swork[k] = iwork[k];
         }
       } else if(it->op==OP_OUTPUT){
         // Pass output seeds

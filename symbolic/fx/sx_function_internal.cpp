@@ -1225,7 +1225,7 @@ void SXFunctionInternal::spEvaluate(bool fwd){
           iwork[it->res] = 0;
           break;
         case OP_INPUT:
-          reinterpret_cast<bvec_t*>(&inputNoCheck(it->arg.i[0]).front())[it->arg.i[1]] |= iwork[it->res];
+          reinterpret_cast<bvec_t*>(&inputNoCheck(it->arg.i[0]).front())[it->arg.i[1]] = iwork[it->res];
           iwork[it->res] = 0;
           break;
         case OP_OUTPUT:

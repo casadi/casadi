@@ -367,13 +367,17 @@ class CRSSparsity : public SharedObject{
     void spyMatlab(const std::string& mfile) const;
 
     #ifndef SWIG
-    /* \brief Assign the nonzero entries of one sparsity pattern to the nonzero entries of another sparsity pattern */
+    /** \brief Assign the nonzero entries of one sparsity pattern to the nonzero entries of another sparsity pattern */
     template<typename T>
     void set(T* data, const T* val_data, CRSSparsity val_sp) const;
 
-    /* \brief Add the nonzero entries of one sparsity pattern to the nonzero entries of another sparsity pattern */
+    /** \brief Add the nonzero entries of one sparsity pattern to the nonzero entries of another sparsity pattern */
     template<typename T>
     void add(T* data, const T* val_data, CRSSparsity val_sp) const;
+
+    /** \brief Bitwise or of the nonzero entries of one sparsity pattern and the nonzero entries of another sparsity pattern */
+    template<typename T>
+    void bor(T* data, const T* val_data, CRSSparsity val_sp) const;
     #endif //SWIG
 };
 
@@ -530,6 +534,85 @@ void CRSSparsity::add(T* data, const T* val_data, CRSSparsity val_sp) const{
     }
   }
 }
+
+template<typename T>
+void CRSSparsity::bor(T* data, const T* val_data, CRSSparsity val_sp) const{
+  // Get dimensions of this
+  const int sz = size();
+  const int sz1 = size1();
+  const int sz2 = size2();
+  const int nel = sz1*sz2;
+
+  // Get dimensions of assigning matrix
+  const int val_sz = val_sp.size();
+  const int val_sz1 = val_sp.size1();
+  const int val_sz2 = val_sp.size2();
+  const int val_nel = val_sz1*val_sz2;
+
+  // Check if sparsity matches
+  if(val_sp==*this){
+    for(int k=0; k<sz; ++k){
+      data[k] |= val_data[k];
+    }
+  } else if (this->empty()) {
+    // Quick return
+    return;
+  } else if (val_sp.empty()) {
+    // Quick return
+    return;
+  }  else if(val_nel==1){ // if scalar
+    if(val_sz!=0){
+      for(int k=0; k<sz; ++k){
+        data[k] |= val_data[0];
+      }
+    }
+  } else {
+    // Quick return if empty
+    if(nel==0 && val_nel==0) return;
+    
+    // Make sure that dimension matches
+    casadi_assert_message(sz1==val_sz1 && sz2==val_sz2,"CRSSparsity::add<T>: shape mismatch. lhs is matrix of shape " << dimString() << ", while rhs is shape " << val_sp.dimString() << ".");
+    
+    // Sparsity
+    const std::vector<int>& c = col();
+    const std::vector<int>& rind = rowind();
+    const std::vector<int>& v_c = val_sp.col();
+    const std::vector<int>& v_rind = val_sp.rowind();
+    
+    // For all rows
+    for(int i=0; i<sz1; ++i){
+      
+      // Nonzero of the assigning matrix
+      int v_el = v_rind[i];
+      
+      // First nonzero of the following row
+      int v_el_end = v_rind[i+1];
+      
+      // Next column of the assigning matrix
+      int v_j = v_el<v_el_end ? v_c[v_el] : sz2;
+      
+      // Assign all nonzeros
+      for(int el=rind[i]; el!=rind[i+1]; ++el){
+        
+        //  Get column
+        int j=c[el];
+        
+        // Forward the assigning nonzero
+        while(v_j<j){
+          v_el++;
+          v_j = v_el<v_el_end ? v_c[v_el] : sz2;
+        }
+
+        // Assign nonzero
+        if(v_j==j){
+          data[el] |= val_data[v_el++];
+          v_j = v_el<v_el_end ? v_c[v_el] : sz2;
+        }
+      }
+    }
+  }
+}
+
 #endif //SWIG
 
 
