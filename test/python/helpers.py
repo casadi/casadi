@@ -200,7 +200,7 @@ class casadiTestCase(unittest.TestCase):
     for i in range(len(pool.numpyoperators)):
       self.numpyEvaluationCheck(pool.casadioperators[i],pool.numpyoperators[i],x,x0,"%s:%s" % (name,pool.names[i]),"\n I tried to apply %s (%s) from test case '%s' to numerical value %s. But the result returned: " % (str(pool.casadioperators[i]),pool.names[i],name, str(x0)),fmod=fmod,setx0=setx0)
 
-  def checkfx(self,trial,solution,fwd=True,adj=True,jac=True,digits=9,failmessage="",allow_empty=True,verbose=True):
+  def checkfx(self,trial,solution,fwd=True,adj=True,jacobian=True,gradient=True,hessian=True,sens_der=True,digits=9,failmessage="",allow_empty=True,verbose=True):
 
      
     for i in range(trial.getNumInputs()):
@@ -274,7 +274,7 @@ class casadiTestCase(unittest.TestCase):
           for k in range(trial.getNumInputs()):
             if (allow_empty and (trial.input(k).empty() or solution.input(k).empty() )): continue
             message="adjSeed(%d)[%d]=1 => adjSens(%d)" % (i,j,k)
-            if verbose: print message + ": " + str(trial.fwdSens(k))
+            if verbose: print message + ": " + str(trial.adjSens(k))
             self.checkarray(trial.adjSens(k),solution.adjSens(k),"",digits=digits,failmessage=failmessage+": "+message)
             
           trial.adjSeed(i).setAll(0)
@@ -285,16 +285,54 @@ class casadiTestCase(unittest.TestCase):
       self.checkarray(trial.input(i),trial_inputs[i],"",digits=digits,failmessage=failmessage+": "+ message)
       self.checkarray(solution.input(i),solution_inputs[i],"",digits=digits,failmessage=failmessage+": "+ message)
     
-    return # disable jac for now
-    if jac:
+    if jacobian:
       for i in range(trial.getNumInputs()):
         if (allow_empty and (trial.input(i).empty() or solution.input(i).empty() )): continue
         for j in range(trial.getNumOutputs()):
           trialjac = trial.jacobian(i,j)
           trialjac.init()
+          self.assertEqual(trialjac.getNumInputs(),trial.getNumInputs())
+          self.assertEqual(trialjac.getNumOutputs(),trial.getNumOutputs()+1)
           for k in range(trial.getNumInputs()): trialjac.input(k).set(trial_inputs[k])
           solutionjac = solution.jacobian(i,j)
           solutionjac.init()
+          self.assertEqual(solutionjac.getNumInputs(),solution.getNumInputs())
+          self.assertEqual(solutionjac.getNumOutputs(),solution.getNumOutputs()+1)
           for k in range(solution.getNumInputs()): solutionjac.input(k).set(solution_inputs[k])
           
-          self.checkfx(trialjac,solutionjac,fwd=False,adj=False,jac=False,digits=digits,failmessage="(%s).jacobian(%d,%d)" % (failmessage,i,j),allow_empty=verbose,verbose=verbose)
+          self.checkfx(trialjac,solutionjac,fwd=fwd if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,digits=digits,failmessage="(%s).jacobian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)
+
+    if gradient:
+      for i in range(trial.getNumInputs()):
+        if (allow_empty and (trial.input(i).empty() or solution.input(i).empty() )): continue
+        for j in range(trial.getNumOutputs()):
+          if trial.output(j).scalar() and solution.output(j).scalar():
+            trialgrad = trial.gradient(i,j)
+            trialgrad.init()
+            self.assertEqual(trialgrad.getNumInputs(),trial.getNumInputs())
+            self.assertEqual(trialgrad.getNumOutputs(),trial.getNumOutputs()+1)
+            for k in range(trial.getNumInputs()): trialgrad.input(k).set(trial_inputs[k])
+            solutiongrad = solution.gradient(i,j)
+            solutiongrad.init()
+            self.assertEqual(solutiongrad.getNumInputs(),solution.getNumInputs())
+            self.assertEqual(solutiongrad.getNumOutputs(),solution.getNumOutputs()+1)
+            for k in range(solution.getNumInputs()): solutiongrad.input(k).set(solution_inputs[k])
+            self.checkfx(trialgrad,solutiongrad,fwd=fwd  if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,digits=digits,failmessage="(%s).gradient(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)
+
+    if hessian:
+      for i in range(trial.getNumInputs()):
+        if (allow_empty and (trial.input(i).empty() or solution.input(i).empty() )): continue
+        for j in range(trial.getNumOutputs()):
+          if trial.output(j).scalar() and solution.output(j).scalar():
+            trialhess = trial.hessian(i,j)
+            trialhess.init()
+            self.assertEqual(trialhess.getNumInputs(),trial.getNumInputs())
+            self.assertEqual(trialhess.getNumOutputs(),trial.getNumOutputs()+2)
+            for k in range(trial.getNumInputs()): trialhess.input(k).set(trial_inputs[k])
+            solutionhess = solution.hessian(i,j)
+            solutionhess.init()
+            self.assertEqual(solutionhess.getNumInputs(),solution.getNumInputs())
+            self.assertEqual(solutionhess.getNumOutputs(),solution.getNumOutputs()+2)
+            for k in range(solution.getNumInputs()): solutionhess.input(k).set(solution_inputs[k])
+            self.checkfx(trialhess,solutionhess,fwd=fwd  if sens_der else False,adj=adj  if sens_der else False,jacobian=False,gradient=False,hessian=False,digits=digits,failmessage="(%s).hessian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)     
+          

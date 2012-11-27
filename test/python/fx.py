@@ -281,7 +281,39 @@ class FXtests(casadiTestCase):
     g.init()
 
     g.expand([x])
+  
+  def test_jacobian(self):
+    x = ssym("x",3,1)
+    y = ssym("y",2,1)
 
+    f = SXFunction([x,y],[x**2,y,x*y[0]])
+    f.init()
+
+    g = f.jacobian(0,0)
+
+    self.assertEqual(g.getNumInputs(),f.getNumInputs())
+    self.assertEqual(g.getNumOutputs(),f.getNumOutputs()+1)
+
+  def test_xfunction(self):
+    x = ssym("x",3,1)
+    y = ssym("y",2,1)
+    
+    f = SXFunction([x,y],[x**2,y,x*y[0]])
+    f.init()
+    
+    f.input(0).set([0.1,0.7,1.3])
+    f.input(1).set([7.1,2.9])
+    
+    X = msym("x",3,1)
+    Y = msym("y",2,1)
+    
+    F = MXFunction([X,Y],[X**2,Y,X*Y[0]])
+    F.init()
+    
+    F.input(0).set([0.1,0.7,1.3])
+    F.input(1).set([7.1,2.9])
+    
+    self.checkfx(f,F,sens_der=False)
 
       
 if __name__ == '__main__':

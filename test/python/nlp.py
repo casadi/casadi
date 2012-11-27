@@ -732,7 +732,7 @@ class NLPtests(casadiTestCase):
     
     refsol = SXFunction([],[2*pi])
     refsol.init()
-    self.checkfx(solver,refsol,digits=5)
+    self.checkfx(solver,refsol,digits=5,gradient=False,hessian=False,sens_der=False)
 
   def testImplicitSolver1(self):
     self.message("Scalar implicit problem, n=0")
@@ -748,7 +748,7 @@ class NLPtests(casadiTestCase):
     
     refsol = SXFunction([],[2*pi])
     refsol.init()
-    self.checkfx(solver,refsol,digits=5)
+    self.checkfx(solver,refsol,digits=5,gradient=False,hessian=False,sens_der=False)
     
   def testKINSol2(self):
     self.message("Scalar KINSol problem, n=1")
@@ -768,7 +768,7 @@ class NLPtests(casadiTestCase):
     refsol = SXFunction([x],[sin(x)])
     refsol.init()
     refsol.input().set(n)
-    self.checkfx(solver,refsol,digits=6)
+    self.checkfx(solver,refsol,digits=6,gradient=False,hessian=False,sens_der=False)
     
   def testImplicitSolver2(self):
     self.message("Scalar KIimplicit problem, n=1")
@@ -789,7 +789,7 @@ class NLPtests(casadiTestCase):
     refsol = SXFunction([x],[sin(x)])
     refsol.init()
     refsol.input().set(n)
-    self.checkfx(solver,refsol,digits=6)
+    self.checkfx(solver,refsol,digits=6,gradient=False,hessian=False,sens_der=False)
     
   def testKINSol1c(self):
     self.message("Scalar KINSol problem, n=0, constraint")
