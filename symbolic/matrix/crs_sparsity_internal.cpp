@@ -2184,8 +2184,8 @@ CRSSparsity CRSSparsityInternal::getSub2(const vector<int>& ii, const vector<int
   std::vector<int> ii_sorted;
   std::vector<int> ii_sorted_index;
 
-  sort(jj, jj_sorted, jj_sorted_index, true);
-  sort(ii, ii_sorted, ii_sorted_index, true);
+  sort(jj, jj_sorted, jj_sorted_index, false);
+  sort(ii, ii_sorted, ii_sorted_index, false);
 
   std::vector<int> jjlookup = lookupvector(jj_sorted,ncol_);
   
@@ -2197,10 +2197,14 @@ CRSSparsity CRSSparsityInternal::getSub2(const vector<int>& ii, const vector<int
     int it = ii_sorted[i];
     for(int el=rowind_[it]; el<rowind_[it+1]; ++el){ // loop over the non-zeros of the matrix
       int j = col_[el];
-      if (jjlookup[j]!=-1) nnz++;
+      int ji = jjlookup[j];
+      if (ji!=-1) {
+        int jv = jj_sorted[ji];
+        while (ji>=0 && jv == jj_sorted[ji--]) nnz++; 
+      }
     }
   }
-
+  
   mapping.resize(nnz);
   
   vector<int> rows(nnz);
@@ -2212,15 +2216,20 @@ CRSSparsity CRSSparsityInternal::getSub2(const vector<int>& ii, const vector<int
     int it = ii_sorted[i];
     for(int el=rowind_[it]; el<rowind_[it+1]; ++el){ // loop over the non-zeros of the matrix
       int jt = col_[el];
-      if (jjlookup[jt]!=-1) {
-        cols[k] = jj_sorted_index[jjlookup[jt]];
-        rows[k] = ii_sorted_index[i];
-        mapping[k] = el;
-        k++;
+      int ji = jjlookup[jt];
+      if (ji!=-1) {
+        int jv = jj_sorted[ji];
+        while (ji>=0 && jv == jj_sorted[ji]) {
+          cols[k] = jj_sorted_index[ji];
+          rows[k] = ii_sorted_index[i];
+          mapping[k] = el;
+          k++;
+          ji--;
+        }
       }
     }
   }
-
+  
   std::vector<int> sp_mapping;
   std::vector<int> mapping_ = mapping;
   CRSSparsity ret = sp_triplet(ii.size(),jj.size(),rows,cols,sp_mapping);
@@ -2241,8 +2250,8 @@ CRSSparsity CRSSparsityInternal::getSub1(const vector<int>& ii, const vector<int
   std::vector<int> ii_sorted;
   std::vector<int> ii_sorted_index;
 
-  sort(jj, jj_sorted, jj_sorted_index, true);
-  sort(ii, ii_sorted, ii_sorted_index, true);
+  sort(jj, jj_sorted, jj_sorted_index, false);
+  sort(ii, ii_sorted, ii_sorted_index, false);
   
   // count the number of non-zeros
   int nnz = 0;

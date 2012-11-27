@@ -26,6 +26,7 @@ import unittest
 from types import *
 from helpers import *
 import numpy
+from itertools import *
 
 class Matrixtests(casadiTestCase):
   def test_constructorlol(self):
@@ -644,7 +645,51 @@ class Matrixtests(casadiTestCase):
     self.assertTrue(bool(DMatrix([-0.2])))
     self.assertRaises(Exception, lambda : bool(DMatrix([2.0,3])))
     self.assertRaises(Exception, lambda : bool(DMatrix()))
+    
+  def test_listslice(self):
+    def check(d,rowbase,colbase):
+      for col in permutations(colbase):
+        for row in permutations(rowbase):
+          r = IMatrix.zeros(len(row),len(col))
+          for i,ii in enumerate(row):
+            for j,jj in enumerate(col):
+              r[i,j] = d[ii,jj]
+          self.checkarray(d[row,col],r,"%s[%s,%s]" % (repr(d),str(row),str(col)))
+          
+    
+    # getSub1
+    check(IMatrix(sp_dense(3,3),range(3*3)),[0,1,2],[0,1,2])
+    check(IMatrix(sp_dense(4,4),range(4*4)),[0,1,3],[0,2,3])
+    check(IMatrix(sp_dense(3,3),range(3*3)),[0,0,1],[0,0,1])
+    check(IMatrix(sp_dense(3,3),range(3*3)),[0,0,2],[0,0,2])
+    check(IMatrix(sp_dense(3,3),range(3*3)),[1,1,2],[1,1,2])
 
+    sp = sp_tril(4)
+    d = IMatrix(sp,range(sp.size()))
+    check(d,[0,1,3],[0,2,3])
+    check(d.T,[0,1,3],[0,2,3])
+
+    sp = sp_rowcol([0,1,2],[0,1],4,4)
+    d = IMatrix(sp,range(sp.size()))
+    check(d,[0,3],[0,2])
+    
+    # getSub2
+    check(IMatrix(sp_dense(2,2),range(2*2)),[0,0,0],[0,0,0])
+    check(IMatrix(sp_dense(2,2),range(2*2)),[0,0,1],[0,0,1])
+    check(IMatrix(sp_dense(2,2),range(2*2)),[1,1,0],[1,1,0])
+    check(IMatrix(sp_dense(2,2),range(2*2)),[1,1,1],[1,1,1])
+
+    sp = sp_tril(3)
+    d = IMatrix(sp,range(sp.size()))
+    check(d,[0,1,2],[0,1,2])
+    check(d.T,[0,1,2],[0,1,2])
+    
+    sp = sp_rowcol([0,2],[0,1],4,4)
+    d = IMatrix(sp,range(sp.size()))
+    check(d,[0,1,3],[0,2,3])
+
+    
+    
 if __name__ == '__main__':
     unittest.main()
 

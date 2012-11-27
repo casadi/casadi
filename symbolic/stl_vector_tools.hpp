@@ -113,6 +113,7 @@ namespace CasADi{
   *  lookupvector[i]!=-1     <=>  v contains i
   *  v[lookupvector[i]] == i <=>  v contains i
   *
+  *  Duplicates are treated by looking up last occurence
   */
   std::vector<int> lookupvector(const std::vector<int> &v, int size);
   
