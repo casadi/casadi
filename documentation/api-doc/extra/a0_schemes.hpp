@@ -68,7 +68,7 @@
 */
 /** \defgroup scheme_RDAEInput
 <table>
-<caption>Input scheme: CasADi::RDAEInput  (RDAE_NUM_IN = 9) </caption>
+<caption>Input scheme: CasADi::RDAEInput  (RDAE_NUM_IN = 7) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>RDAE_RX</td><td>Backward differential state [rx].</td></tr>
 <tr><td>RDAE_RZ</td><td>Backward algebraic state [rz].</td></tr>
@@ -77,8 +77,6 @@
 <tr><td>RDAE_Z</td><td>Forward algebraic state [z].</td></tr>
 <tr><td>RDAE_P</td><td>Parameter vector [p].</td></tr>
 <tr><td>RDAE_T</td><td>Explicit time dependence [t].</td></tr>
-<tr><td>RDAE_XDOT</td><td>Time derivative of differential states [xdot].</td></tr>
-<tr><td>RDAE_RXDOT</td><td>Time derivative of backward differential state [rxdot].</td></tr>
 </table>
 */
 /** \defgroup scheme_LOFunInputs
@@ -112,13 +110,12 @@
 */
 /** \defgroup scheme_DAEInput
 <table>
-<caption>Input scheme: CasADi::DAEInput  (DAE_NUM_IN = 5) </caption>
+<caption>Input scheme: CasADi::DAEInput  (DAE_NUM_IN = 4) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>DAE_X</td><td>Differential state [x].</td></tr>
 <tr><td>DAE_Z</td><td>Algebraic state [z].</td></tr>
 <tr><td>DAE_P</td><td>Parameter [p].</td></tr>
 <tr><td>DAE_T</td><td>Explicit time dependence [t].</td></tr>
-<tr><td>DAE_XDOT</td><td>Time derivative of differential states [xdot].</td></tr>
 </table>
 */
 /** \defgroup scheme_ACADO_Output
@@ -207,7 +204,7 @@
 */
 /** \defgroup scheme_ControlledDAEInput
 <table>
-<caption>Input scheme: CasADi::ControlledDAEInput  (CONTROL_DAE_NUM_IN = 10) </caption>
+<caption>Input scheme: CasADi::ControlledDAEInput  (CONTROL_DAE_NUM_IN = 9) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>CONTROL_DAE_T</td><td>Global physical time. (1-by-1) [t].</td></tr>
 <tr><td>CONTROL_DAE_X</td><td>State vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES [x].</td></tr>
@@ -215,7 +212,6 @@
 <tr><td>CONTROL_DAE_P</td><td>Parameter vector (dimension np-by-1). [p].</td></tr>
 <tr><td>CONTROL_DAE_U</td><td>Control vector (dimension nu-by-1). [u].</td></tr>
 <tr><td>CONTROL_DAE_U_INTERP</td><td>Control vector, linearly interpolated (dimension nu-by-1). [u_interp].</td></tr>
-<tr><td>CONTROL_DAE_XDOT</td><td>State derivative vector (dimension nx-by-1). Should have same amount of non-zeros as DAEOutput:DAE_RES [xdot].</td></tr>
 <tr><td>CONTROL_DAE_X_MAJOR</td><td>State vector (dimension nx-by-1) at the last major time-step [x_major].</td></tr>
 <tr><td>CONTROL_DAE_T0</td><td>Time at start of control interval (1-by-1) [t0].</td></tr>
 <tr><td>CONTROL_DAE_TF</td><td>Time at end of control interval (1-by-1) [tf].</td></tr>

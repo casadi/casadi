@@ -5507,26 +5507,16 @@ The method is still under development
 Solves an initial value problem (IVP) coupled to a terminal value problem
 with differential equation given as an implicit ODE coupled to an algebraic
 equation and a set of quadratures:Initial conditions at t=t0   x(t0)  = x0
-q(t0)  = 0  Forward integration from t=t0 to t=tf        0 =
-fx(x,z,p,t,der(x)) Forward ODE        0 = fz(x,z,p,t)
-Forward algebraic equations   der(q) = fq(x,z,p,t)                  Forward
-quadratures Terminal conditions at t=tf   rx(tf)  = rx0   rq(tf)  = 0
-Backward integration from t=tf to t=t0         0 =
-gx(rx,rz,rp,x,z,p,t,der(rx)) Backward ODE         0 = gz(rx,rz,rp,x,z,p,t)
-Backward algebraic equations   der(rq) = gq(rx,rz,rp,x,z,p,t) Backward
-quadratures  where we assume that both the forward and backwards
-integrations are index-1 (i.e. dfx/dxdot, dfz/dz, dgz/drz, dgx/drxdot are
+q(t0)  = 0  Forward integration from t=t0 to t=tf   der(x) = fx(x,z,p,t)
+Forward ODE        0 = fz(x,z,p,t)                  Forward algebraic
+equations   der(q) = fq(x,z,p,t)                  Forward quadratures
+Terminal conditions at t=tf   rx(tf)  = rx0   rq(tf)  = 0  Backward
+integration from t=tf to t=t0   der(rx) = gx(rx,rz,rp,x,z,p,t) Backward ODE
+0 = gz(rx,rz,rp,x,z,p,t)        Backward algebraic equations   der(rq) =
+gq(rx,rz,rp,x,z,p,t)        Backward quadratures  where we assume that both
+the forward and backwards integrations are index-1 (i.e. dfz/dz, dgz/drz are
 invertible) and furthermore that  gx, gz and gq have a linear dependency on
-rx, rz and rp and that f_x and g_x have a  linear dependence on xdot and
-rxdot respectively.  Note that not all integrators support this general
-form. In particular, an explicit integrator may requite that there are no
-algebraic states of equations and that the  ODE is given in explicit form:
-der(x)  = fx_explicit(x,z,p,t)  Integrators requite explicit ODEs also
-accept implict ODEs if they can be formally decomposed in the following way:
-0 = fx(x,z,p,t,der(x)) := fx_explicit(x,z,p,t) - der(x) This form allows the
-same ODE/DAE to be used for both explicit and implicit integrators. Explicit
-integrators will simply pass zeros as the state derivatives, recovering the
-explicit formulation. This also applies to the backward integration.
+rx, rz and rp.
 
 Joel Andersson
 
@@ -11208,7 +11198,10 @@ Get the sparsity in sparse triplet format. ";
 
 %feature("docstring")  CasADi::CRSSparsity::getSub "
 
-Get a submatrix. ";
+Get a submatrix.
+
+Returns the sparsity of the submatrix, with a mapping such that submatrix[k]
+= originalmatrix[mapping[k]] ";
 
 %feature("docstring")  CasADi::CRSSparsity::transpose "
 
@@ -11373,9 +11366,20 @@ Print a textual representation of sparsity. ";
 Generate a script for Matlab or Octave which visualizes the sparsity using
 the spy command. ";
 
-%feature("docstring")  CasADi::CRSSparsity::set "";
+%feature("docstring")  CasADi::CRSSparsity::set "
 
-%feature("docstring")  CasADi::CRSSparsity::add "";
+Assign the nonzero entries of one sparsity pattern to the nonzero entries of
+another sparsity pattern. ";
+
+%feature("docstring")  CasADi::CRSSparsity::add "
+
+Add the nonzero entries of one sparsity pattern to the nonzero entries of
+another sparsity pattern. ";
+
+%feature("docstring")  CasADi::CRSSparsity::bor "
+
+Bitwise or of the nonzero entries of one sparsity pattern and the nonzero
+entries of another sparsity pattern. ";
 
 %feature("docstring")  CasADi::CRSSparsity::clone "
 
@@ -12976,26 +12980,16 @@ Function that integrates the ODE:
 Solves an initial value problem (IVP) coupled to a terminal value problem
 with differential equation given as an implicit ODE coupled to an algebraic
 equation and a set of quadratures:Initial conditions at t=t0   x(t0)  = x0
-q(t0)  = 0  Forward integration from t=t0 to t=tf        0 =
-fx(x,z,p,t,der(x)) Forward ODE        0 = fz(x,z,p,t)
-Forward algebraic equations   der(q) = fq(x,z,p,t)                  Forward
-quadratures Terminal conditions at t=tf   rx(tf)  = rx0   rq(tf)  = 0
-Backward integration from t=tf to t=t0         0 =
-gx(rx,rz,rp,x,z,p,t,der(rx)) Backward ODE         0 = gz(rx,rz,rp,x,z,p,t)
-Backward algebraic equations   der(rq) = gq(rx,rz,rp,x,z,p,t) Backward
-quadratures  where we assume that both the forward and backwards
-integrations are index-1 (i.e. dfx/dxdot, dfz/dz, dgz/drz, dgx/drxdot are
+q(t0)  = 0  Forward integration from t=t0 to t=tf   der(x) = fx(x,z,p,t)
+Forward ODE        0 = fz(x,z,p,t)                  Forward algebraic
+equations   der(q) = fq(x,z,p,t)                  Forward quadratures
+Terminal conditions at t=tf   rx(tf)  = rx0   rq(tf)  = 0  Backward
+integration from t=tf to t=t0   der(rx) = gx(rx,rz,rp,x,z,p,t) Backward ODE
+0 = gz(rx,rz,rp,x,z,p,t)        Backward algebraic equations   der(rq) =
+gq(rx,rz,rp,x,z,p,t)        Backward quadratures  where we assume that both
+the forward and backwards integrations are index-1 (i.e. dfz/dz, dgz/drz are
 invertible) and furthermore that  gx, gz and gq have a linear dependency on
-rx, rz and rp and that f_x and g_x have a  linear dependence on xdot and
-rxdot respectively.  Note that not all integrators support this general
-form. In particular, an explicit integrator may requite that there are no
-algebraic states of equations and that the  ODE is given in explicit form:
-der(x)  = fx_explicit(x,z,p,t)  Integrators requite explicit ODEs also
-accept implict ODEs if they can be formally decomposed in the following way:
-0 = fx(x,z,p,t,der(x)) := fx_explicit(x,z,p,t) - der(x) This form allows the
-same ODE/DAE to be used for both explicit and implicit integrators. Explicit
-integrators will simply pass zeros as the state derivatives, recovering the
-explicit formulation. This also applies to the backward integration.
+rx, rz and rp.
 
 A call to evaluate will integrate to the end.
 
@@ -14099,26 +14093,16 @@ Return a string with a destription (for SWIG) ";
 Solves an initial value problem (IVP) coupled to a terminal value problem
 with differential equation given as an implicit ODE coupled to an algebraic
 equation and a set of quadratures:Initial conditions at t=t0   x(t0)  = x0
-q(t0)  = 0  Forward integration from t=t0 to t=tf        0 =
-fx(x,z,p,t,der(x)) Forward ODE        0 = fz(x,z,p,t)
-Forward algebraic equations   der(q) = fq(x,z,p,t)                  Forward
-quadratures Terminal conditions at t=tf   rx(tf)  = rx0   rq(tf)  = 0
-Backward integration from t=tf to t=t0         0 =
-gx(rx,rz,rp,x,z,p,t,der(rx)) Backward ODE         0 = gz(rx,rz,rp,x,z,p,t)
-Backward algebraic equations   der(rq) = gq(rx,rz,rp,x,z,p,t) Backward
-quadratures  where we assume that both the forward and backwards
-integrations are index-1 (i.e. dfx/dxdot, dfz/dz, dgz/drz, dgx/drxdot are
+q(t0)  = 0  Forward integration from t=t0 to t=tf   der(x) = fx(x,z,p,t)
+Forward ODE        0 = fz(x,z,p,t)                  Forward algebraic
+equations   der(q) = fq(x,z,p,t)                  Forward quadratures
+Terminal conditions at t=tf   rx(tf)  = rx0   rq(tf)  = 0  Backward
+integration from t=tf to t=t0   der(rx) = gx(rx,rz,rp,x,z,p,t) Backward ODE
+0 = gz(rx,rz,rp,x,z,p,t)        Backward algebraic equations   der(rq) =
+gq(rx,rz,rp,x,z,p,t)        Backward quadratures  where we assume that both
+the forward and backwards integrations are index-1 (i.e. dfz/dz, dgz/drz are
 invertible) and furthermore that  gx, gz and gq have a linear dependency on
-rx, rz and rp and that f_x and g_x have a  linear dependence on xdot and
-rxdot respectively.  Note that not all integrators support this general
-form. In particular, an explicit integrator may requite that there are no
-algebraic states of equations and that the  ODE is given in explicit form:
-der(x)  = fx_explicit(x,z,p,t)  Integrators requite explicit ODEs also
-accept implict ODEs if they can be formally decomposed in the following way:
-0 = fx(x,z,p,t,der(x)) := fx_explicit(x,z,p,t) - der(x) This form allows the
-same ODE/DAE to be used for both explicit and implicit integrators. Explicit
-integrators will simply pass zeros as the state derivatives, recovering the
-explicit formulation. This also applies to the backward integration.
+rx, rz and rp.
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 4)
 +----------------+------------------------------------------------------+
@@ -19798,26 +19782,16 @@ Interface to IDAS from the Sundials suite.
 Solves an initial value problem (IVP) coupled to a terminal value problem
 with differential equation given as an implicit ODE coupled to an algebraic
 equation and a set of quadratures:Initial conditions at t=t0   x(t0)  = x0
-q(t0)  = 0  Forward integration from t=t0 to t=tf        0 =
-fx(x,z,p,t,der(x)) Forward ODE        0 = fz(x,z,p,t)
-Forward algebraic equations   der(q) = fq(x,z,p,t)                  Forward
-quadratures Terminal conditions at t=tf   rx(tf)  = rx0   rq(tf)  = 0
-Backward integration from t=tf to t=t0         0 =
-gx(rx,rz,rp,x,z,p,t,der(rx)) Backward ODE         0 = gz(rx,rz,rp,x,z,p,t)
-Backward algebraic equations   der(rq) = gq(rx,rz,rp,x,z,p,t) Backward
-quadratures  where we assume that both the forward and backwards
-integrations are index-1 (i.e. dfx/dxdot, dfz/dz, dgz/drz, dgx/drxdot are
+q(t0)  = 0  Forward integration from t=t0 to t=tf   der(x) = fx(x,z,p,t)
+Forward ODE        0 = fz(x,z,p,t)                  Forward algebraic
+equations   der(q) = fq(x,z,p,t)                  Forward quadratures
+Terminal conditions at t=tf   rx(tf)  = rx0   rq(tf)  = 0  Backward
+integration from t=tf to t=t0   der(rx) = gx(rx,rz,rp,x,z,p,t) Backward ODE
+0 = gz(rx,rz,rp,x,z,p,t)        Backward algebraic equations   der(rq) =
+gq(rx,rz,rp,x,z,p,t)        Backward quadratures  where we assume that both
+the forward and backwards integrations are index-1 (i.e. dfz/dz, dgz/drz are
 invertible) and furthermore that  gx, gz and gq have a linear dependency on
-rx, rz and rp and that f_x and g_x have a  linear dependence on xdot and
-rxdot respectively.  Note that not all integrators support this general
-form. In particular, an explicit integrator may requite that there are no
-algebraic states of equations and that the  ODE is given in explicit form:
-der(x)  = fx_explicit(x,z,p,t)  Integrators requite explicit ODEs also
-accept implict ODEs if they can be formally decomposed in the following way:
-0 = fx(x,z,p,t,der(x)) := fx_explicit(x,z,p,t) - der(x) This form allows the
-same ODE/DAE to be used for both explicit and implicit integrators. Explicit
-integrators will simply pass zeros as the state derivatives, recovering the
-explicit formulation. This also applies to the backward integration.
+rx, rz and rp.
 
 Joel Andersson
 
@@ -20991,26 +20965,16 @@ Return a string with a destription (for SWIG) ";
 Solves an initial value problem (IVP) coupled to a terminal value problem
 with differential equation given as an implicit ODE coupled to an algebraic
 equation and a set of quadratures:Initial conditions at t=t0   x(t0)  = x0
-q(t0)  = 0  Forward integration from t=t0 to t=tf        0 =
-fx(x,z,p,t,der(x)) Forward ODE        0 = fz(x,z,p,t)
-Forward algebraic equations   der(q) = fq(x,z,p,t)                  Forward
-quadratures Terminal conditions at t=tf   rx(tf)  = rx0   rq(tf)  = 0
-Backward integration from t=tf to t=t0         0 =
-gx(rx,rz,rp,x,z,p,t,der(rx)) Backward ODE         0 = gz(rx,rz,rp,x,z,p,t)
-Backward algebraic equations   der(rq) = gq(rx,rz,rp,x,z,p,t) Backward
-quadratures  where we assume that both the forward and backwards
-integrations are index-1 (i.e. dfx/dxdot, dfz/dz, dgz/drz, dgx/drxdot are
+q(t0)  = 0  Forward integration from t=t0 to t=tf   der(x) = fx(x,z,p,t)
+Forward ODE        0 = fz(x,z,p,t)                  Forward algebraic
+equations   der(q) = fq(x,z,p,t)                  Forward quadratures
+Terminal conditions at t=tf   rx(tf)  = rx0   rq(tf)  = 0  Backward
+integration from t=tf to t=t0   der(rx) = gx(rx,rz,rp,x,z,p,t) Backward ODE
+0 = gz(rx,rz,rp,x,z,p,t)        Backward algebraic equations   der(rq) =
+gq(rx,rz,rp,x,z,p,t)        Backward quadratures  where we assume that both
+the forward and backwards integrations are index-1 (i.e. dfz/dz, dgz/drz are
 invertible) and furthermore that  gx, gz and gq have a linear dependency on
-rx, rz and rp and that f_x and g_x have a  linear dependence on xdot and
-rxdot respectively.  Note that not all integrators support this general
-form. In particular, an explicit integrator may requite that there are no
-algebraic states of equations and that the  ODE is given in explicit form:
-der(x)  = fx_explicit(x,z,p,t)  Integrators requite explicit ODEs also
-accept implict ODEs if they can be formally decomposed in the following way:
-0 = fx(x,z,p,t,der(x)) := fx_explicit(x,z,p,t) - der(x) This form allows the
-same ODE/DAE to be used for both explicit and implicit integrators. Explicit
-integrators will simply pass zeros as the state derivatives, recovering the
-explicit formulation. This also applies to the backward integration.
+rx, rz and rp.
 
 >Input scheme: CasADi::IntegratorInput (INTEGRATOR_NUM_IN = 4)
 +----------------+------------------------------------------------------+
@@ -22035,6 +21999,19 @@ Assert that the object has been initialized. ";
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | User-defined | CasADi::Impl |
+| r_creator    | VER          | )            | linear       | icitFunction |
+|              |              |              | solver       | Internal     |
+|              |              |              | class.       |              |
+|              |              |              | Needed for s |              |
+|              |              |              | ensitivities |              |
+|              |              |              | .            |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Impl |
+| r_options    | Y            | )            | be passed to | icitFunction |
+|              |              |              | the linear   | Internal     |
+|              |              |              | solver.      |              |
++--------------+--------------+--------------+--------------+--------------+
 | max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
 | f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
@@ -22057,6 +22034,18 @@ Assert that the object has been initialized. ";
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_solver   | OT_NLPSOLVER | GenericType( | The          | CasADi::Impl |
+|              |              | )            | NLPSolver    | icitFunction |
+|              |              |              | used to      | Internal     |
+|              |              |              | solve the    |              |
+|              |              |              | implicit     |              |
+|              |              |              | system.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_solver_o | OT_DICTIONAR | GenericType( | Options to   | CasADi::Impl |
+| ptions       | Y            | )            | be passed to | icitFunction |
+|              |              |              | the          | Internal     |
+|              |              |              | NLPSolver    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
 | j_dir        |              |              | adjoint      | ternal       |
@@ -22712,6 +22701,19 @@ Internal class.
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | User-defined | CasADi::Impl |
+| r_creator    | VER          | )            | linear       | icitFunction |
+|              |              |              | solver       | Internal     |
+|              |              |              | class.       |              |
+|              |              |              | Needed for s |              |
+|              |              |              | ensitivities |              |
+|              |              |              | .            |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Impl |
+| r_options    | Y            | )            | be passed to | icitFunction |
+|              |              |              | the linear   | Internal     |
+|              |              |              | solver.      |              |
++--------------+--------------+--------------+--------------+--------------+
 | max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
 | f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
@@ -22734,6 +22736,18 @@ Internal class.
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_solver   | OT_NLPSOLVER | GenericType( | The          | CasADi::Impl |
+|              |              | )            | NLPSolver    | icitFunction |
+|              |              |              | used to      | Internal     |
+|              |              |              | solve the    |              |
+|              |              |              | implicit     |              |
+|              |              |              | system.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_solver_o | OT_DICTIONAR | GenericType( | Options to   | CasADi::Impl |
+| ptions       | Y            | )            | be passed to | icitFunction |
+|              |              |              | the          | Internal     |
+|              |              |              | NLPSolver    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
 | j_dir        |              |              | adjoint      | ternal       |
@@ -23432,25 +23446,15 @@ Integrator abstract base class Solves an initial value problem (IVP) coupled
 to a terminal value problem with differential equation given as an implicit
 ODE coupled to an algebraic equation and a set of quadratures:Initial
 conditions at t=t0   x(t0)  = x0   q(t0)  = 0  Forward integration from t=t0
-to t=tf        0 = fx(x,z,p,t,der(x)) Forward ODE        0 = fz(x,z,p,t)
+to t=tf   der(x) = fx(x,z,p,t) Forward ODE        0 = fz(x,z,p,t)
 Forward algebraic equations   der(q) = fq(x,z,p,t)                  Forward
 quadratures Terminal conditions at t=tf   rx(tf)  = rx0   rq(tf)  = 0
-Backward integration from t=tf to t=t0         0 =
-gx(rx,rz,rp,x,z,p,t,der(rx)) Backward ODE         0 = gz(rx,rz,rp,x,z,p,t)
-Backward algebraic equations   der(rq) = gq(rx,rz,rp,x,z,p,t) Backward
-quadratures  where we assume that both the forward and backwards
-integrations are index-1 (i.e. dfx/dxdot, dfz/dz, dgz/drz, dgx/drxdot are
-invertible) and furthermore that  gx, gz and gq have a linear dependency on
-rx, rz and rp and that f_x and g_x have a  linear dependence on xdot and
-rxdot respectively.  Note that not all integrators support this general
-form. In particular, an explicit integrator may requite that there are no
-algebraic states of equations and that the  ODE is given in explicit form:
-der(x)  = fx_explicit(x,z,p,t)  Integrators requite explicit ODEs also
-accept implict ODEs if they can be formally decomposed in the following way:
-0 = fx(x,z,p,t,der(x)) := fx_explicit(x,z,p,t) - der(x) This form allows the
-same ODE/DAE to be used for both explicit and implicit integrators. Explicit
-integrators will simply pass zeros as the state derivatives, recovering the
-explicit formulation. This also applies to the backward integration.
+Backward integration from t=tf to t=t0   der(rx) = gx(rx,rz,rp,x,z,p,t)
+Backward ODE         0 = gz(rx,rz,rp,x,z,p,t)        Backward algebraic
+equations   der(rq) = gq(rx,rz,rp,x,z,p,t)        Backward quadratures
+where we assume that both the forward and backwards integrations are index-1
+(i.e. dfz/dz, dgz/drz are invertible) and furthermore that  gx, gz and gq
+have a linear dependency on rx, rz and rp.
 
 The Integrator class provides some additional functionality, such as getting
 the value of the state and/or sensitivities at certain time points.
@@ -24247,26 +24251,16 @@ Internal storage for integrator related data.
 Solves an initial value problem (IVP) coupled to a terminal value problem
 with differential equation given as an implicit ODE coupled to an algebraic
 equation and a set of quadratures:Initial conditions at t=t0   x(t0)  = x0
-q(t0)  = 0  Forward integration from t=t0 to t=tf        0 =
-fx(x,z,p,t,der(x)) Forward ODE        0 = fz(x,z,p,t)
-Forward algebraic equations   der(q) = fq(x,z,p,t)                  Forward
-quadratures Terminal conditions at t=tf   rx(tf)  = rx0   rq(tf)  = 0
-Backward integration from t=tf to t=t0         0 =
-gx(rx,rz,rp,x,z,p,t,der(rx)) Backward ODE         0 = gz(rx,rz,rp,x,z,p,t)
-Backward algebraic equations   der(rq) = gq(rx,rz,rp,x,z,p,t) Backward
-quadratures  where we assume that both the forward and backwards
-integrations are index-1 (i.e. dfx/dxdot, dfz/dz, dgz/drz, dgx/drxdot are
+q(t0)  = 0  Forward integration from t=t0 to t=tf   der(x) = fx(x,z,p,t)
+Forward ODE        0 = fz(x,z,p,t)                  Forward algebraic
+equations   der(q) = fq(x,z,p,t)                  Forward quadratures
+Terminal conditions at t=tf   rx(tf)  = rx0   rq(tf)  = 0  Backward
+integration from t=tf to t=t0   der(rx) = gx(rx,rz,rp,x,z,p,t) Backward ODE
+0 = gz(rx,rz,rp,x,z,p,t)        Backward algebraic equations   der(rq) =
+gq(rx,rz,rp,x,z,p,t)        Backward quadratures  where we assume that both
+the forward and backwards integrations are index-1 (i.e. dfz/dz, dgz/drz are
 invertible) and furthermore that  gx, gz and gq have a linear dependency on
-rx, rz and rp and that f_x and g_x have a  linear dependence on xdot and
-rxdot respectively.  Note that not all integrators support this general
-form. In particular, an explicit integrator may requite that there are no
-algebraic states of equations and that the  ODE is given in explicit form:
-der(x)  = fx_explicit(x,z,p,t)  Integrators requite explicit ODEs also
-accept implict ODEs if they can be formally decomposed in the following way:
-0 = fx(x,z,p,t,der(x)) := fx_explicit(x,z,p,t) - der(x) This form allows the
-same ODE/DAE to be used for both explicit and implicit integrators. Explicit
-integrators will simply pass zeros as the state derivatives, recovering the
-explicit formulation. This also applies to the backward integration.
+rx, rz and rp.
 
 Joel Andersson
 
@@ -33491,14 +33485,18 @@ Retrieve information about variables and constraints ";
 | linear_solve | OT_STRING    | \"dense\"      |              | CasADi::Kins |
 | r            |              |              |              | olInternal   |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_LINEARSOL | GenericType( | User-defined | CasADi::Kins |
-| r_creator    | VER          | )            | linear       | olInternal   |
-|              |              |              | solver class |              |
+| linear_solve | OT_LINEARSOL | GenericType( | User-defined | CasADi::Impl |
+| r_creator    | VER          | )            | linear       | icitFunction |
+|              |              |              | solver       | Internal     |
+|              |              |              | class.       |              |
+|              |              |              | Needed for s |              |
+|              |              |              | ensitivities |              |
+|              |              |              | .            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Kins |
-| r_options    | Y            | )            | be passed to | olInternal   |
-|              |              |              | the linear   |              |
-|              |              |              | solver       |              |
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Impl |
+| r_options    | Y            | )            | be passed to | icitFunction |
+|              |              |              | the linear   | Internal     |
+|              |              |              | solver.      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | lower_bandwi | OT_INTEGER   |              |              | CasADi::Kins |
 | dth          |              |              |              | olInternal   |
@@ -33529,6 +33527,18 @@ Retrieve information about variables and constraints ";
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_solver   | OT_NLPSOLVER | GenericType( | The          | CasADi::Impl |
+|              |              | )            | NLPSolver    | icitFunction |
+|              |              |              | used to      | Internal     |
+|              |              |              | solve the    |              |
+|              |              |              | implicit     |              |
+|              |              |              | system.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_solver_o | OT_DICTIONAR | GenericType( | Options to   | CasADi::Impl |
+| ptions       | Y            | )            | be passed to | icitFunction |
+|              |              |              | the          | Internal     |
+|              |              |              | NLPSolver    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
 | j_dir        |              |              | adjoint      | ternal       |
@@ -34150,14 +34160,18 @@ See:   ImplicitFunction for more information
 | linear_solve | OT_STRING    | \"dense\"      |              | CasADi::Kins |
 | r            |              |              |              | olInternal   |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_LINEARSOL | GenericType( | User-defined | CasADi::Kins |
-| r_creator    | VER          | )            | linear       | olInternal   |
-|              |              |              | solver class |              |
+| linear_solve | OT_LINEARSOL | GenericType( | User-defined | CasADi::Impl |
+| r_creator    | VER          | )            | linear       | icitFunction |
+|              |              |              | solver       | Internal     |
+|              |              |              | class.       |              |
+|              |              |              | Needed for s |              |
+|              |              |              | ensitivities |              |
+|              |              |              | .            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Kins |
-| r_options    | Y            | )            | be passed to | olInternal   |
-|              |              |              | the linear   |              |
-|              |              |              | solver       |              |
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Impl |
+| r_options    | Y            | )            | be passed to | icitFunction |
+|              |              |              | the linear   | Internal     |
+|              |              |              | solver.      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | lower_bandwi | OT_INTEGER   |              |              | CasADi::Kins |
 | dth          |              |              |              | olInternal   |
@@ -34188,6 +34202,18 @@ See:   ImplicitFunction for more information
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_solver   | OT_NLPSOLVER | GenericType( | The          | CasADi::Impl |
+|              |              | )            | NLPSolver    | icitFunction |
+|              |              |              | used to      | Internal     |
+|              |              |              | solve the    |              |
+|              |              |              | implicit     |              |
+|              |              |              | system.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| nlp_solver_o | OT_DICTIONAR | GenericType( | Options to   | CasADi::Impl |
+| ptions       | Y            | )            | be passed to | icitFunction |
+|              |              |              | the          | Internal     |
+|              |              |              | NLPSolver    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
 | j_dir        |              |              | adjoint      | ternal       |
@@ -49565,6 +49591,19 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | User-defined | CasADi::Impl |
+| r_creator    | VER          | )            | linear       | icitFunction |
+|              |              |              | solver       | Internal     |
+|              |              |              | class.       |              |
+|              |              |              | Needed for s |              |
+|              |              |              | ensitivities |              |
+|              |              |              | .            |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Impl |
+| r_options    | Y            | )            | be passed to | icitFunction |
+|              |              |              | the linear   | Internal     |
+|              |              |              | solver.      |              |
++--------------+--------------+--------------+--------------+--------------+
 | max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
 | f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
@@ -49588,16 +49627,16 @@ Joel Andersson
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| nlp_solver   | OT_NLPSOLVER | GenericType( | The          | CasADi::NLPI |
-|              |              | )            | NLPSolver    | mplicitInter |
-|              |              |              | used to      | nal          |
+| nlp_solver   | OT_NLPSOLVER | GenericType( | The          | CasADi::Impl |
+|              |              | )            | NLPSolver    | icitFunction |
+|              |              |              | used to      | Internal     |
 |              |              |              | solve the    |              |
 |              |              |              | implicit     |              |
 |              |              |              | system.      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| nlp_solver_o | OT_DICTIONAR | GenericType( | Options to   | CasADi::NLPI |
-| ptions       | Y            | )            | be passed to | mplicitInter |
-|              |              |              | the          | nal          |
+| nlp_solver_o | OT_DICTIONAR | GenericType( | Options to   | CasADi::Impl |
+| ptions       | Y            | )            | be passed to | icitFunction |
+|              |              |              | the          | Internal     |
 |              |              |              | NLPSolver    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
@@ -50124,6 +50163,19 @@ Joris Gillis
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | User-defined | CasADi::Impl |
+| r_creator    | VER          | )            | linear       | icitFunction |
+|              |              |              | solver       | Internal     |
+|              |              |              | class.       |              |
+|              |              |              | Needed for s |              |
+|              |              |              | ensitivities |              |
+|              |              |              | .            |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Impl |
+| r_options    | Y            | )            | be passed to | icitFunction |
+|              |              |              | the linear   | Internal     |
+|              |              |              | solver.      |              |
++--------------+--------------+--------------+--------------+--------------+
 | max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
 | f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
 |              |              |              | \" to grow    |              |
@@ -50147,16 +50199,16 @@ Joris Gillis
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| nlp_solver   | OT_NLPSOLVER | GenericType( | The          | CasADi::NLPI |
-|              |              | )            | NLPSolver    | mplicitInter |
-|              |              |              | used to      | nal          |
+| nlp_solver   | OT_NLPSOLVER | GenericType( | The          | CasADi::Impl |
+|              |              | )            | NLPSolver    | icitFunction |
+|              |              |              | used to      | Internal     |
 |              |              |              | solve the    |              |
 |              |              |              | implicit     |              |
 |              |              |              | system.      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| nlp_solver_o | OT_DICTIONAR | GenericType( | Options to   | CasADi::NLPI |
-| ptions       | Y            | )            | be passed to | mplicitInter |
-|              |              |              | the          | nal          |
+| nlp_solver_o | OT_DICTIONAR | GenericType( | Options to   | CasADi::Impl |
+| ptions       | Y            | )            | be passed to | icitFunction |
+|              |              |              | the          | Internal     |
 |              |              |              | NLPSolver    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
@@ -77718,7 +77770,9 @@ to be monotonously increasing ";
 Returns a vector for quickly looking up entries of supplied list.
 
 lookupvector[i]!=-1 <=> v contains i v[lookupvector[i]] == i <=> v contains
-i ";
+i
+
+Duplicates are treated by looking up last occurence ";
 
 %feature("docstring")  CasADi::get_bvec_t "
 

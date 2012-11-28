@@ -145,6 +145,7 @@
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
 <tr><td>res</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>resS</td><td>CasADi::IdasInternal</td></tr>
+<tr><td>rhsQB</td><td>CasADi::IdasInternal</td></tr>
 </table>
 */
 /** \class CasADi::IdasIntegrator
@@ -158,6 +159,7 @@
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
 <tr><td>res</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>resS</td><td>CasADi::IdasInternal</td></tr>
+<tr><td>rhsQB</td><td>CasADi::IdasInternal</td></tr>
 </table>
 */
 /** \class CasADi::KnitroInternal

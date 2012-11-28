@@ -1977,7 +1977,7 @@
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_fwd_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_step_size</td><td>OT_REAL</td><td>0</td><td>Maximim step size</td><td>CasADi::IdasInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(correctInitialConditions|res|resS)</td><td>CasADi::FXInternal<br />CasADi::IdasInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(correctInitialConditions|res|resS|rhsQB)</td><td>CasADi::FXInternal<br />CasADi::IdasInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
@@ -2052,7 +2052,7 @@
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_fwd_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_step_size</td><td>OT_REAL</td><td>0</td><td>Maximim step size</td><td>CasADi::IdasInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(correctInitialConditions|res|resS)</td><td>CasADi::FXInternal<br />CasADi::IdasInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(correctInitialConditions|res|resS|rhsQB)</td><td>CasADi::FXInternal<br />CasADi::IdasInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
