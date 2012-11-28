@@ -161,7 +161,7 @@ class FX : public OptionsFunctionality{
   * If symmetric is set to true, the Jacobian being calculated is known to be symmetric (usually a Hessian),
   * which can be exploited by the algorithm.
   * 
-  * The generated Jacobian has one more output than the calling function corresponding to the Jacobian.
+  * The generated Jacobian has one more output than the calling function corresponding to the Jacobian and the same number of inputs.
   * 
   */
   FX jacobian(int iind=0, int oind=0, bool compact=false, bool symmetric=false);
