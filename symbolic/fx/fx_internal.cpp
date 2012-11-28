@@ -556,10 +556,13 @@ void FXInternal::getPartition(int iind, int oind, CRSSparsity& D1, CRSSparsity& 
         cout << "Adjoint mode coloring completed: " << D2.size1() << " directional derivatives needed (" << A.size1() << " without coloring)." << endl;
       }
     }
+    
+    // Adjoint mode penalty factor (adjoint mode is usually more expensive to calculate)
+    int adj_penalty = 2;
 
     // Use whatever required less colors if we tried both (with preference to forward mode)
     if(test_ad_fwd && test_ad_adj){
-      if((D1.size1() <= D2.size1())){
+      if((D1.size1() <= adj_penalty*D2.size1())){
         D2=CRSSparsity();
         log("Forward mode chosen");
       } else {
