@@ -320,13 +320,11 @@ size(x)
 disp("Issue 145")
 t = SX("t")
 T = SX("T")
-T_dot = SX("T_dot")
 
 
 ffcn_in = cell(1,DAE_NUM_IN);
 ffcn_in{1+DAE_T} = t;
 ffcn_in{1+DAE_X} = T;
-ffcn_in{1+DAE_XDOT} = T_dot;
 
 ffcn_in
 
