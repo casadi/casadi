@@ -37,16 +37,17 @@ except:
 integrators = []
 
 try:
-  integrators.append((CVodesIntegrator,["ode","expl","impl","simpl"],{"abstol": 1e-15,"reltol":1e-15,"fsens_err_con": True,"quad_err_con": False}))
+  integrators.append((CVodesIntegrator,["ode"],{"abstol": 1e-15,"reltol":1e-15,"fsens_err_con": True,"quad_err_con": False}))
 except:
   pass
   
 try:
-  integrators.append((IdasIntegrator,["dae","impl"],{"abstol": 1e-15,"reltol":1e-15,"fsens_err_con": True,"calc_icB":True}))
+  integrators.append((IdasIntegrator,["dae","ode"],{"abstol": 1e-15,"reltol":1e-15,"fsens_err_con": True,"calc_icB":True}))
 except:
   pass
 
-integrators.append((CollocationIntegrator,["dae","ode", "expl","impl","simpl"],{"implicit_solver":KinsolSolver,"number_of_finite_elements": 100,"startup_integrator":CVodesIntegrator}))
+integrators.append((CollocationIntegrator,["dae","ode"],{"implicit_solver":KinsolSolver,"number_of_finite_elements": 100,"startup_integrator":CVodesIntegrator}))
+#integrators.append((CollocationIntegrator,["dae","ode"],{"implicit_solver":NLPImplicitSolver,"number_of_finite_elements": 100,"startup_integrator":CVodesIntegrator,"implicit_solver_options": {"nlp_solver": IpoptSolver,"linear_solver_creator": CSparse}}))
 #integrators.append((RKIntegrator,["ode"],{"number_of_finite_elements": 1000}))
 
 print "Will test these integrators:"
@@ -67,31 +68,14 @@ class Integrationtests(casadiTestCase):
     rq=SX("rq")
     p=SX("p")
     dp=SX("dp")
+
+    z=SX("z")
     
-    def impl_expl(din, dout, rdin, rdout):
-      #dout_ = dict(dout)
-      #dout_['ode'] -=xdot
-      #din_ = dict(din)
-      #din_.update({'xdot': xdot})
-      
-      #rdin_ = dict(rdin)
-      #rdout_ = dict(rdout)
-      #if len(rdin)>1:
-        #rdin_.update({'rxdot': rxdot,'xdot': xdot})
-        #rdout_['ode']-=rxdot
-        
-      yield "expl", din,  dout,  rdin,  rdout
-      #yield "simpl",din_, dout_, rdin,  rdout
-      #yield "simpl",din,  dout,  rdin_, rdout_ 
-      #yield "impl", din_, dout_, rdin_, rdout_  
-       
     for tstart in [0.2]:
       for Integrator, features, options in integrators:
         self.message(Integrator.__name__)
-        if 'Idas' in Integrator.__name__:
-          pass #continue
-
-        def getIntegrator(f,g=FX()):
+          
+        def getIntegrator(f,g=FX(),p_features=[]):
           integrator = Integrator(f,g)
           integrator.setOption(options)
           integrator.setOption("t0",tstart)
@@ -100,58 +84,60 @@ class Integrationtests(casadiTestCase):
             integrator.setOption("init_xdot",[x0])
             integrator.setOption("calc_icB",True)
             integrator.setOption("augmented_options", {"init_xdot":GenericType()})
+          #if "dae" in p_features and integrator.hasOption("init_z"):
+          #  integrator.setOption("init_z",[0.1])
+          #  integrator.setOption("augmented_options", {"init_z":GenericType(),"init_xdot":GenericType()})
           integrator.init()
           return integrator
 
         
-        for din_, dout_, rdin_, rdout_, solution in [
-             ({'x':x},{'ode':x},{'x':x,'rx':rq},{'ode':0},{'rxf': rq}),
-             ({'x':x},{'ode': 0},{},{},{'xf':x}),
-             ({'x':x},{'ode': 1},{},{},{'xf':x+(tend-tstart)}),
-             ({'x':x},{'ode': x},{},{},{'xf':x*exp(tend-tstart)}),
-             ({'x':x,'t':t},{'ode': t},{},{},{'xf':x+(tend**2/2-tstart**2/2)}),
-             ({'x':x,'t':t},{'ode': x*t},{},{},{'xf':x*exp(tend**2/2-tstart**2/2)}),
-             ({'x':x,'p':p},{'ode': x/p},{},{},{'xf':x*exp((tend-tstart)/p)}),
-             ({'x':x},{'ode': x,'quad':0},{},{},{'qf':0}),
-             ({'x':x},{'ode': x,'quad':1},{},{},{'qf':(tend-tstart)}),
-             ({'x':x},{'ode': 0,'quad':x},{},{},{'qf':x*(tend-tstart)}),
+        for p_features, din, dout, rdin, rdout, solution in [
+             (["ode"],{'x':x},{'ode': 0},{},{},{'xf':x}),
+             (["ode"],{'x':x},{'ode': 1},{},{},{'xf':x+(tend-tstart)}),
+             (["ode"],{'x':x},{'ode': x},{},{},{'xf':x*exp(tend-tstart)}),
+             (["ode"],{'x':x,'t':t},{'ode': t},{},{},{'xf':x+(tend**2/2-tstart**2/2)}),
+             (["ode"],{'x':x,'t':t},{'ode': x*t},{},{},{'xf':x*exp(tend**2/2-tstart**2/2)}),
+             (["ode"],{'x':x,'p':p},{'ode': x/p},{},{},{'xf':x*exp((tend-tstart)/p)}),
+             (["ode"],{'x':x},{'ode': x,'quad':0},{},{},{'qf':0}),
+             (["ode"],{'x':x},{'ode': x,'quad':1},{},{},{'qf':(tend-tstart)}),
+             (["ode"],{'x':x},{'ode': 0,'quad':x},{},{},{'qf':x*(tend-tstart)}),
              #({'x':x},{'ode': 1,'quad':x},{'qf':(x-tstart)*(tend-tstart)+(tend**2/2-tstart**2/2)}), # bug in cvodes quad_err_con
-             ({'x':x},{'ode': x,'quad':x},{},{},{'qf':x*(exp(tend-tstart)-1)}),
-             ({'x':x,'t':t},{'ode': x,'quad':t},{},{},{'qf':(tend**2/2-tstart**2/2)}),
-             ({'x':x,'t':t},{'ode': x,'quad':x*t},{},{},{'qf':x*(exp(tend-tstart)*(tend-1)-(tstart-1))}),
-             ({'x':x,'p':p},{'ode': x,'quad':x/p},{},{},{'qf':x*(exp((tend-tstart))-1)/p}),
-             ({'x':x},{'ode':x},{'x':x,'rx':rq},{'ode':0},{'rxf': rq}),
-             ({'x':x},{'ode':x},{'x':x,'rx':rq},{'ode':1},{'rxf': rq+tend-tstart}),
-             ({'x':x,'t':t},{'ode':x},{'x':x,'rx':rq,'t':t},{'ode':t},{'rxf': rq+tend**2/2-tstart**2/2}),
-             ({'x':x},{'ode':x},{'x':x,'rx':rq},{'ode':rq},{'rxf': rq*exp(tend-tstart)}),
-             ({'x':x},{'ode':x},{'x':x,'rx':rq},{'ode':x},{'rxf': rq+x*(exp(tend-tstart)-1)}),
-             ({'x':x,'t':t},{'ode':x},{'x':x,'rx':rq,'t':t},{'ode':rq*t},{'rxf': rq*exp(tend**2/2-tstart**2/2)}),
-             ({'x':x,'t':t},{'ode':x},{'x':x,'rx':rq,'t':t},{'ode':x*t},{'rxf': rq+x*(exp(tend-tstart)*(tend-1)-(tstart-1))})
+             (["ode"],{'x':x},{'ode': x,'quad':x},{},{},{'qf':x*(exp(tend-tstart)-1)}),
+             (["ode"],{'x':x,'t':t},{'ode': x,'quad':t},{},{},{'qf':(tend**2/2-tstart**2/2)}),
+             (["ode"],{'x':x,'t':t},{'ode': x,'quad':x*t},{},{},{'qf':x*(exp(tend-tstart)*(tend-1)-(tstart-1))}),
+             (["ode"],{'x':x,'p':p},{'ode': x,'quad':x/p},{},{},{'qf':x*(exp((tend-tstart))-1)/p}),
+             (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rq},{'ode':0},{'rxf': rq}),
+             (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rq},{'ode':1},{'rxf': rq+tend-tstart}),
+             (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rq,'t':t},{'ode':t},{'rxf': rq+tend**2/2-tstart**2/2}),
+             (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rq},{'ode':rq},{'rxf': rq*exp(tend-tstart)}),
+             (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rq},{'ode':x},{'rxf': rq+x*(exp(tend-tstart)-1)}),
+             (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rq,'t':t},{'ode':rq*t},{'rxf': rq*exp(tend**2/2-tstart**2/2)}),
+             (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rq,'t':t},{'ode':x*t},{'rxf': rq+x*(exp(tend-tstart)*(tend-1)-(tstart-1))}),
+             #(["dae"],{'x':x,'z':z},{'ode': z, 'alg': z},{},{},{'xf':x}),
+             #(["dae"],{'x':x,'p':p,'z':z},{'ode': z/p,'alg':z-x},{},{},{'xf':x*exp((tend-tstart)/p)}),
              ] :
-             
-          for feature,din,dout,rdin,rdout in impl_expl(din_,dout_,rdin_,rdout_):
-          
-            if feature in features:
-              g = FX()
-              if len(rdin)>1:
-                g = SXFunction(rdaeIn(**rdin),rdaeOut(**rdout))
-                g.init()
-                 
-              f = SXFunction(daeIn(**din),daeOut(**dout))
-              f.init()
-              
-              fs = SXFunction(integratorIn(x0=x,p=p,rx0=rq),integratorOut(**solution))
-              fs.init()
-              integrator = getIntegrator(f,g)
-              
-              for ff in [fs,integrator]:
-                ff.input(INTEGRATOR_X0).set(x0)
-                if not ff.input(INTEGRATOR_P).empty():
-                  ff.input(INTEGRATOR_P).set(p_)
-                if not ff.input(INTEGRATOR_RX0).empty():
-                  ff.input(INTEGRATOR_RX0).set(0.13)
-              
-              self.checkfx(integrator,fs,gradient=False,hessian=False,sens_der=False,digits=7,failmessage="%s: %s => %s, %s => %s, explicit (%s) tstart = %f" % (Integrator.__name__,str(din),str(dout),str(rdin),str(rdout),str(solution),tstart),verbose=False)
+           
+          if p_features[0] in features:
+            g = FX()
+            if len(rdin)>1:
+              g = SXFunction(rdaeIn(**rdin),rdaeOut(**rdout))
+              g.init()
+               
+            f = SXFunction(daeIn(**din),daeOut(**dout))
+            f.init()
+            
+            fs = SXFunction(integratorIn(x0=x,p=p,rx0=rq),integratorOut(**solution))
+            fs.init()
+            integrator = getIntegrator(f,g,p_features=features)
+            
+            for ff in [fs,integrator]:
+              ff.input(INTEGRATOR_X0).set(x0)
+              if not ff.input(INTEGRATOR_P).empty():
+                ff.input(INTEGRATOR_P).set(p_)
+              if not ff.input(INTEGRATOR_RX0).empty():
+                ff.input(INTEGRATOR_RX0).set(0.13)
+            
+            self.checkfx(integrator,fs,gradient=False,hessian=False,sens_der=False,digits=7,failmessage="%s: %s => %s, %s => %s, explicit (%s) tstart = %f" % (Integrator.__name__,str(din),str(dout),str(rdin),str(rdout),str(solution),tstart),verbose=False)
 
       
   def setUp(self):
