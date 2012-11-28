@@ -176,7 +176,12 @@ void EvaluationMX::evaluateSX(const SXMatrixPtrV& arg, SXMatrixPtrV& res,
     const SXMatrixPtrVV& aseed, SXMatrixPtrVV& asens) {
   
   // Create input arguments
-  vector<SXMatrix> argv = getVector(arg);
+  vector<SXMatrix> argv(arg.size());
+  for(int i=0; i<arg.size(); ++i){
+    argv[i] = SXMatrix(fcn_.input(i).sparsity(),0.);
+    if(arg[i] != 0)
+      argv[i].set(*arg[i]);
+  }
 
   // Evaluate symbolically
   vector<SXMatrix> resv = fcn_.eval(argv);
