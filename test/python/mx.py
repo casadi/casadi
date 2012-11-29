@@ -751,7 +751,7 @@ class MXtests(casadiTestCase):
     for k in [f,g]:
       k.input(0).set([0.7,8.1,1.3])
 
-    self.checkfx(f,g)
+    self.checkfx(f,g,sens_der=False)
 
 
   def test_unite(self):
