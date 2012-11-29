@@ -219,7 +219,9 @@ template<> char meta< CasADi::GenericType >::expected_message[] = "Expecting any
 template <>
 int meta< CasADi::GenericType >::as(PyObject * p,CasADi::GenericType &s) {
   NATIVERETURN(CasADi::GenericType, s)
-  if (PyBool_Check(p)) {
+  if (p==Py_None) {
+    s=CasADi::GenericType();
+  } else if (PyBool_Check(p)) {
     s=CasADi::GenericType((bool) PyInt_AsLong(p));
   } else if (PyInt_Check(p)) {
     s=CasADi::GenericType((int) PyInt_AsLong(p));
@@ -312,6 +314,8 @@ bool meta< CasADi::GenericType >::toPython(const CasADi::GenericType &a, PyObjec
     p = swig::from(a.toStringVector());
   } else if (a.isDictionary()) {
     meta< CasADi::GenericType::Dictionary >::toPython(a.toDictionary(),p);
+  } else if (a.isNull()) {
+    p = Py_None;
   } else {
     return false;
   }
