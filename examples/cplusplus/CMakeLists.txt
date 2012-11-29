@@ -89,15 +89,6 @@ if(WITH_CSPARSE)
   )
 endif()
 
-# Sundials - just integrate
-if(WITH_SUNDIALS AND LAPACK_FOUND AND BLAS_FOUND AND WITH_CSPARSE)
-  add_executable(sundials_testing sundials_testing.cpp)
-  target_link_libraries(sundials_testing
-    casadi_sundials_interface casadi_lapack_interface casadi_csparse_interface casadi
-    ${SUNDIALS_LIBRARIES} ${LAPACK_LIBRARIES} ${CSPARSE_LIBRARIES} ${BLAS_LIBRARIES} ${CASADI_DEPENDENCIES}
-  )
-endif()
-
 # Test integrators
 if(WITH_SUNDIALS AND WITH_CSPARSE)
   add_executable(sensitivity_analysis sensitivity_analysis.cpp)
