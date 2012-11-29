@@ -18,7 +18,7 @@
 #     License along with CasADi; if not, write to the Free Software
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 # 
-# 
+#
 from casadi import *
 import casadi as c
 from numpy import *
@@ -83,7 +83,7 @@ class Integrationtests(casadiTestCase):
           if integrator.hasOption("init_xdot"):
             integrator.setOption("init_xdot",[x0])
             integrator.setOption("calc_icB",True)
-            integrator.setOption("augmented_options", {"init_xdot":GenericType()})
+            integrator.setOption("augmented_options", {"init_xdot":None, "abstol":1e-11,"reltol":1e-11})
           #if "dae" in p_features and integrator.hasOption("init_z"):
           #  integrator.setOption("init_z",[0.1])
           #  integrator.setOption("augmented_options", {"init_z":GenericType(),"init_xdot":GenericType()})
@@ -113,8 +113,8 @@ class Integrationtests(casadiTestCase):
              (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rq},{'ode':x},{'rxf': rq+x*(exp(tend-tstart)-1)}),
              (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rq,'t':t},{'ode':rq*t},{'rxf': rq*exp(tend**2/2-tstart**2/2)}),
              (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rq,'t':t},{'ode':x*t},{'rxf': rq+x*(exp(tend-tstart)*(tend-1)-(tstart-1))}),
-             #(["dae"],{'x':x,'z':z},{'ode': z, 'alg': z},{},{},{'xf':x}),
-             #(["dae"],{'x':x,'p':p,'z':z},{'ode': z/p,'alg':z-x},{},{},{'xf':x*exp((tend-tstart)/p)}),
+             (["dae"],{'x':x,'z':z},{'ode': z, 'alg': z},{},{},{'xf':x}),
+             (["dae"],{'x':x,'p':p,'z':z},{'ode': z/p,'alg':z-x},{},{},{'xf':x*exp((tend-tstart)/p)}),
              ] :
            
           if p_features[0] in features:
