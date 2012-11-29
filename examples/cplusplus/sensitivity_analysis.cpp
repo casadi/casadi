@@ -136,20 +136,21 @@ int main(){
     // For all integrators
     enum Integrators{CVODES,IDAS,COLLOCATION,NUM_INTEGRATORS};
     for(int integrator=0; integrator<NUM_INTEGRATORS; ++integrator){
+
       // Get integrator
       Integrator I;
       switch(integrator){
         case CVODES:
           if(problem==DAE) continue; // Skip if DAE
-          cout << "== CVodesIntegrator == " << endl;
+          cout << endl << "== CVodesIntegrator == " << endl;
           I = CVodesIntegrator(ffcn);
           break;
         case IDAS:
-          cout << "== IdasIntegrator == " << endl;
+          cout << endl << "== IdasIntegrator == " << endl;
           I = IdasIntegrator(ffcn);
           break;
         case COLLOCATION:
-          cout << "== CollocationIntegrator == " << endl;
+          cout << endl << "== CollocationIntegrator == " << endl;
           I = CollocationIntegrator(ffcn);
           
           // Set collocation integrator specific options
