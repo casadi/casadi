@@ -37,7 +37,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
     # Time 
     t = ssym("t")
       
-    # Control
+    # Parameter
     u = ssym("u")
 
     # Differential states
@@ -73,9 +73,13 @@ for Integrators in (ODE_integrators,DAE_integrators):
     print "******"
     print "Testing DAE example"
     
-    t = ssym("t")
+    # Differential state
     x = ssym("x")
+    
+    # Algebraic variable
     z = ssym("z")
+    
+    # Parameter
     u = ssym("u")
     
     # Differential equation
@@ -88,7 +92,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
     quad = x*x + 3.0*u*u
 
     # DAE callback function
-    ffcn = SXFunction(daeIn(t=t,x=x,z=z,p=u),daeOut(ode=ode,alg=alg,quad=quad))
+    ffcn = SXFunction(daeIn(x=x,z=z,p=u),daeOut(ode=ode,alg=alg,quad=quad))
     
     # End time
     tf = 5.
