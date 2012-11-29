@@ -65,6 +65,9 @@ enum Operation{
   // Matrix multiplication
   OP_MATMUL,
   
+  // Solve linear system of equations
+  OP_SOLVE,
+  
   // Nonzero mapping
   OP_MAPPING,
   

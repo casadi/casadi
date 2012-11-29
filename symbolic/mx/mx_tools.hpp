@@ -320,6 +320,12 @@ void extractShared(std::vector<MX>& ex,
 /** \brief Print compact, introducing new variables for shared subexpressions */
 void printCompact(const MX& ex, std::ostream &stream=std::cout);
 
+/** \brief  Solve a system of equations: A*x = b 
+ * The solve routine works similar to Matlab's backslash when A is square and nonsingular.
+ * This algorithm is under development.
+ */
+MX solve(const MX& A, const MX& b);
+
 } // namespace CasADi
 
 #ifdef SWIG

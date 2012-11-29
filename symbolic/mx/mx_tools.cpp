@@ -29,6 +29,7 @@
 #include "../stl_vector_tools.hpp"
 #include "densification.hpp"
 #include "../fx/mx_function_internal.hpp"
+#include "solve.hpp"
 
 using namespace std;
 
@@ -54,8 +55,7 @@ MX vertcat(const vector<MX>& comp){
     }
 
     // Create a mapping matrix with the corresponding sparsity
-    MX ret;
-    ret.assignNode(new Mapping(sp));
+    MX ret = MX::create(new Mapping(sp));
     
     // Map the dependencies
     int offset=0;
@@ -114,21 +114,15 @@ void applymap(void (*f)(MX&), vector<MX>& comp) {
 }
 
 MX norm_2(const MX &x){
-  MX ret;
-  ret.assignNode(new Norm2(x));
-  return ret;
+  return MX::create(new Norm2(x));
 }
 
 MX norm_1(const MX &x){
-  MX ret;
-  ret.assignNode(new Norm1(x));
-  return ret;
+  return MX::create(new Norm1(x));
 }
 
 MX norm_inf(const MX &x){
-  MX ret;
-  ret.assignNode(new NormInf(x));
-  return ret;
+  return MX::create(new NormInf(x));
 }
 
 MX mul(const MX &x, const MX &y){
@@ -311,8 +305,7 @@ MX unite(const MX& A, const MX& B){
   }
   
   // Create mapping
-  MX ret;
-  ret.assignNode(new Mapping(sp));
+  MX ret = MX::create(new Mapping(sp));
   ret->assign(A,range(nzA.size()),nzA);
   ret->assign(B,range(nzB.size()),nzB);
   simplifyMapping(ret);
@@ -834,6 +827,9 @@ void printCompact(const MX& ex, std::ostream &stream){
   }
 }
 
+MX solve(const MX& A, const MX& b){
+  return MX::create(new Solve(A,b));
+}
 
 
 } // namespace CasADi

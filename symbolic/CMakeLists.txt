@@ -46,6 +46,7 @@ SET(CASADI_SRCS
   mx/unary_mx.cpp            mx/unary_mx.hpp            # Unary operation
   mx/binary_mx.cpp           mx/binary_mx.hpp           # Binary operation
   mx/multiplication.cpp      mx/multiplication.hpp      # Matrix multiplication
+  mx/solve.cpp               mx/solve.hpp               # Solve linear system of equations
   mx/evaluation_mx.cpp       mx/evaluation_mx.hpp       # FX function evaluation
   mx/norm.cpp                mx/norm.hpp                # 1-norm, 2-norm and infinity-norm
   mx/mapping.cpp             mx/mapping.hpp             # Maps non-zeros
