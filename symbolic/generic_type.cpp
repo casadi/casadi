@@ -174,7 +174,11 @@ GenericType::GenericType(){
 
 
 ostream& operator<<(ostream &stream, const GenericType& ref){
-  ref->print(stream);
+  if (ref.isNull()) {
+    stream << "None";
+  } else {
+    ref->print(stream);
+  }
   return stream;
 }
 
