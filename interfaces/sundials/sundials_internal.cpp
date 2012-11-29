@@ -41,7 +41,7 @@ SundialsInternal::SundialsInternal(const FX& f, const FX& g) : IntegratorInterna
   addOption("exact_jacobian",              OT_BOOLEAN,          true,           "Use exact Jacobian information for the integration");
   addOption("upper_bandwidth",             OT_INTEGER,          GenericType(),  "Upper band-width of banded Jacobian (estimations)");
   addOption("lower_bandwidth",             OT_INTEGER,          GenericType(),  "Lower band-width of banded Jacobian (estimations)");
-  addOption("linear_solver",               OT_STRING,           "dense",        "","user_defined|dense|banded|iterative");
+  addOption("linear_solver_type",          OT_STRING,           "dense",        "","user_defined|dense|banded|iterative");
   addOption("iterative_solver",            OT_STRING,           "gmres",        "","gmres|bcgstab|tfqmr");
   addOption("pretype",                     OT_STRING,           "none",         "","none|left|right|both");
   addOption("max_krylov",                  OT_INTEGER,          10,             "Maximum Krylov subspace size");
@@ -66,13 +66,13 @@ SundialsInternal::SundialsInternal(const FX& f, const FX& g) : IntegratorInterna
   addOption("interpolation_type",          OT_STRING,           "hermite",      "Type of interpolation for the adjoint sensitivities","hermite|polynomial");
   addOption("asens_upper_bandwidth",       OT_INTEGER,          GenericType(),  "Upper band-width of banded jacobians for backward integration");
   addOption("asens_lower_bandwidth",       OT_INTEGER,          GenericType(),  "lower band-width of banded jacobians for backward integration");
-  addOption("asens_linear_solver",         OT_STRING,           "dense",        "","dense|banded|iterative");
+  addOption("asens_linear_solver_type",    OT_STRING,           "dense",        "","dense|banded|iterative");
   addOption("asens_iterative_solver",      OT_STRING,           "gmres",        "","gmres|bcgstab|tfqmr");
   addOption("asens_pretype",               OT_STRING,           "none",         "","none|left|right|both");
   addOption("asens_max_krylov",            OT_INTEGER,          10,             "Maximum krylov subspace size");
   addOption("asens_reltol",                OT_REAL,             GenericType(),  "Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]");
   addOption("asens_abstol",                OT_REAL,             GenericType(),  "Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]");
-  addOption("linear_solver_creator",       OT_LINEARSOLVER,     GenericType(),  "An linear solver creator function");
+  addOption("linear_solver",       OT_LINEARSOLVER,     GenericType(),  "An linear solver creator function");
   addOption("linear_solver_options",       OT_DICTIONARY,       GenericType(),  "Options to be passed to the linear solver");
 }
 
@@ -101,11 +101,11 @@ void SundialsInternal::init(){
 
   
   // Linear solver for forward integration
-  if(getOption("linear_solver")=="dense"){
+  if(getOption("linear_solver_type")=="dense"){
     linsol_f_ = SD_DENSE;
-  } else if(getOption("linear_solver")=="banded") {
+  } else if(getOption("linear_solver_type")=="banded") {
     linsol_f_ = SD_BANDED;
-  } else if(getOption("linear_solver")=="iterative") {
+  } else if(getOption("linear_solver_type")=="iterative") {
     linsol_f_ = SD_ITERATIVE;
 
     // Iterative solver
@@ -123,16 +123,16 @@ void SundialsInternal::init(){
     else if(getOption("pretype")=="right")         pretype_f_ = PREC_RIGHT;
     else if(getOption("pretype")=="both")          pretype_f_ = PREC_BOTH;
     else                                           throw CasadiException("Unknown preconditioning type for forward integration");
-  } else if(getOption("linear_solver")=="user_defined") {
+  } else if(getOption("linear_solver_type")=="user_defined") {
     linsol_f_ = SD_USER_DEFINED;
   } else throw CasadiException("Unknown linear solver for forward integration");
   
   // Linear solver for backward integration
-  if(getOption("asens_linear_solver")=="dense"){
+  if(getOption("asens_linear_solver_type")=="dense"){
     linsol_g_ = SD_DENSE;
-  } else if(getOption("asens_linear_solver")=="banded") {
+  } else if(getOption("asens_linear_solver_type")=="banded") {
     linsol_g_ = SD_BANDED;
-  } else if(getOption("asens_linear_solver")=="iterative") {
+  } else if(getOption("asens_linear_solver_type")=="iterative") {
     linsol_g_ = SD_ITERATIVE;
 
     // Iterative solver
@@ -150,13 +150,13 @@ void SundialsInternal::init(){
     else if(getOption("asens_pretype")=="right")         pretype_g_ = PREC_RIGHT;
     else if(getOption("asens_pretype")=="both")          pretype_g_ = PREC_BOTH;
     else                                           throw CasadiException("Unknown preconditioning type for backward integration");
-  } else if(getOption("asens_linear_solver")=="user_defined") {
+  } else if(getOption("asens_linear")=="user_defined") {
     linsol_g_ = SD_USER_DEFINED;
   } else throw CasadiException("Unknown linear solver for backward integration");
   
   // Get the linear solver creator function
-  if(linsol_.isNull() && hasSetOption("linear_solver_creator")){
-    linearSolverCreator linear_solver_creator = getOption("linear_solver_creator");
+  if(linsol_.isNull() && hasSetOption("linear_solver")){
+    linearSolverCreator linear_solver_creator = getOption("linear_solver");
   
     // Allocate an NLP solver
     linsol_ = linear_solver_creator(CRSSparsity());

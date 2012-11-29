@@ -46,7 +46,7 @@ if coll:
   f_d.setOption("collocation_scheme","legendre")
   f_d.setOption("implicit_solver",KinsolSolver)
   f_d.setOption("implicit_solver_options",\
-    {'linear_solver_creator' : CSparse})
+    {'linear_solver' : CSparse})
   f_d.setOption("expand_f",True)
 else:
   f_d = CVodesIntegrator(f)

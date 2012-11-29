@@ -110,7 +110,7 @@ for Integrators in (ODE_integrators,DAE_integrators):
     opts["tf"]=tf
     if MyIntegrator==CollocationIntegrator:
       opts["implicit_solver"] = KinsolSolver
-      opts["implicit_solver_options"] = {"linear_solver_creator":CSparse}
+      opts["implicit_solver_options"] = {"linear_solver":CSparse}
       opts["expand_f"]=True
 
     # Integrator

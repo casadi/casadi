@@ -30,12 +30,12 @@ using namespace std;
 namespace CasADi{
 
 KinsolInternal::KinsolInternal(const FX& f, int nrhs) : ImplicitFunctionInternal(f,nrhs){
-  addOption("linear_solver",            OT_STRING, "dense");
+  addOption("linear_solver_type",       OT_STRING, "dense","dense|banded|iterative|user_defined");
   addOption("upper_bandwidth",          OT_INTEGER);
   addOption("lower_bandwidth",          OT_INTEGER);
   addOption("max_krylov",               OT_INTEGER, 0);
   addOption("exact_jacobian",           OT_BOOLEAN, true);
-  addOption("iterative_solver",         OT_STRING,"gmres");
+  addOption("iterative_solver",         OT_STRING,"gmres","gmres|bcgstab|tfqmr");
   addOption("f_scale",                  OT_REALVECTOR);
   addOption("u_scale",                  OT_REALVECTOR);
   addOption("pretype",                  OT_STRING, "none","","none|left|right|both");
@@ -157,7 +157,7 @@ void KinsolInternal::init(){
   }
 
   // attach a linear solver
-  if(getOption("linear_solver")=="dense"){
+  if(getOption("linear_solver_type")=="dense"){
     // Dense jacobian
     flag = KINDense(mem_, N_);
     casadi_assert_message(flag==KIN_SUCCESS, "KINDense");
@@ -167,7 +167,7 @@ void KinsolInternal::init(){
       casadi_assert_message(flag==KIN_SUCCESS, "KINDlsSetDenseJacFn");
     }
     
-  } else if(getOption("linear_solver")=="banded") {
+  } else if(getOption("linear_solver_type")=="banded") {
     // Banded jacobian
     flag = KINBand(mem_, N_, getOption("upper_bandwidth").toInt(), getOption("lower_bandwidth").toInt());
     casadi_assert_message(flag==KIN_SUCCESS, "KINBand");
@@ -177,7 +177,7 @@ void KinsolInternal::init(){
       casadi_assert_message(flag==KIN_SUCCESS, "KINDlsBandJacFn");
     }
     
-  } else if(getOption("linear_solver")=="iterative") {
+  } else if(getOption("linear_solver_type")=="iterative") {
     // Sparse (iterative) solver  
     // Max dimension of the Krylov space
     int maxl = getOption("max_krylov").toInt();
@@ -215,7 +215,7 @@ void KinsolInternal::init(){
       casadi_assert(flag==KIN_SUCCESS);
     }
     
-  } else if(getOption("linear_solver")=="user_defined") {
+  } else if(getOption("linear_solver_type")=="user_defined") {
     // Make sure that a Jacobian has been provided
     casadi_assert(!J_.isNull());
 

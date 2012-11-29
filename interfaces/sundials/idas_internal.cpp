@@ -112,13 +112,13 @@ void IdasInternal::init(){
   // Call the base class init
   SundialsInternal::init();
   
-  if(hasSetOption("linear_solver_creator")){
+  if(hasSetOption("linear_solver")){
     // Make sure that a Jacobian has been provided
     if(jac_.isNull()) jac_ = getJacobian();
     if(!jac_.isInit()) jac_.init();
     
     // Create a linear solver
-    linearSolverCreator creator = getOption("linear_solver_creator");
+    linearSolverCreator creator = getOption("linear_solver");
     linsol_ = creator(jac_.output().sparsity());
     linsol_.setSparsity(jac_.output().sparsity());
     linsol_.init();

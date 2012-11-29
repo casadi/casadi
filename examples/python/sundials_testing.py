@@ -94,7 +94,7 @@ def create_IDAS():
   
     # Set some options
     integrator.setOption("implicit_solver",KinsolSolver)
-    integrator.setOption("implicit_solver_options",{'linear_solver_creator' : CSparse})
+    integrator.setOption("implicit_solver_options",{'linear_solver' : CSparse})
     integrator.setOption("quadrature_solver",CSparse)
     integrator.setOption("startup_integrator",IdasIntegrator)
     integrator.setOption("expand_f",True)
@@ -142,7 +142,7 @@ def create_CVODES():
   
     # Set some options
     integrator.setOption("implicit_solver",KinsolSolver)
-    integrator.setOption("implicit_solver_options",{'linear_solver_creator' : CSparse})
+    integrator.setOption("implicit_solver_options",{'linear_solver' : CSparse})
     integrator.setOption("quadrature_solver",CSparse)
     integrator.setOption("startup_integrator",CVodesIntegrator)
     integrator.setOption("expand_f",True)
@@ -177,10 +177,10 @@ else:
 # Attach user-defined linear solver
 if user_defined_solver:
   if sparse_direct:
-    #integrator.setOption("linear_solver_creator",SuperLU)
-    integrator.setOption("linear_solver_creator",CSparse)
+    #integrator.setOption("linear_solver",SuperLU)
+    integrator.setOption("linear_solver",CSparse)
   else:
-    integrator.setOption("linear_solver_creator",LapackLUDense)
+    integrator.setOption("linear_solver",LapackLUDense)
 
 # Set common integrator options
 integrator.setOption("fsens_err_con",True)
@@ -200,7 +200,7 @@ integrator.setOption("t0",t0)
 integrator.setOption("tf",tf)
 
 if(user_defined_solver):
-  integrator.setOption("linear_solver","user_defined")
+  integrator.setOption("linear_solver_type","user_defined")
 
 # Initialize the integrator
 integrator.init()

@@ -32,7 +32,7 @@ ImplicitFunctionInternal::ImplicitFunctionInternal(const FX& f, int nrhs) : f_(f
   
   addOption("nlp_solver",       OT_NLPSOLVER, GenericType(), "The NLPSolver used to solve the implicit system.");
   addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLPSolver");
-  addOption("linear_solver_creator",    OT_LINEARSOLVER, GenericType(), "User-defined linear solver class. Needed for sensitivities.");
+  addOption("linear_solver",    OT_LINEARSOLVER, GenericType(), "User-defined linear solver class. Needed for sensitivities.");
   addOption("linear_solver_options",    OT_DICTIONARY, GenericType(), "Options to be passed to the linear solver.");
 }
 
@@ -68,8 +68,8 @@ void ImplicitFunctionInternal::init(){
   J_.init();
   
   // Get the linear solver creator function
-  if(linsol_.isNull() && hasSetOption("linear_solver_creator")){
-    linearSolverCreator linear_solver_creator = getOption("linear_solver_creator");
+  if(linsol_.isNull() && hasSetOption("linear_solver")){
+    linearSolverCreator linear_solver_creator = getOption("linear_solver");
   
     // Allocate an NLP solver
     linsol_ = linear_solver_creator(CRSSparsity());

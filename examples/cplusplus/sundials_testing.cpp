@@ -180,13 +180,13 @@ int main(){
   // Attach user-defined linear solver
   if(user_defined_solver){
     if(sparse_direct){
-      integrator.setOption("linear_solver_creator",CSparse::creator);
-      // integrator.setOption("linear_solver_creator",SuperLU::creator);
+      integrator.setOption("linear_solver",CSparse::creator);
+      // integrator.setOption("linear_solver",SuperLU::creator);
     } else {
-      integrator.setOption("linear_solver_creator",LapackLUDense::creator);
-      integrator.setOption("linear_solver","user_defined");
+      integrator.setOption("linear_solver",LapackLUDense::creator);
+      integrator.setOption("linear_solver_type","user_defined");
     }
-    // integrator.setOption("linear_solver","user_defined"); // FIXME: bug for second order
+    // integrator.setOption("linear_solver_type","user_defined"); // FIXME: bug for second order
   }
   
   // Set common integrator options
