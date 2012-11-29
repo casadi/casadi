@@ -98,6 +98,15 @@ if(WITH_SUNDIALS AND LAPACK_FOUND AND BLAS_FOUND AND WITH_CSPARSE)
   )
 endif()
 
+# Test integrators
+if(WITH_SUNDIALS AND WITH_CSPARSE)
+  add_executable(sensitivity_analysis sensitivity_analysis.cpp)
+  target_link_libraries(sensitivity_analysis
+    casadi_integration casadi_sundials_interface casadi_csparse_interface casadi
+    ${SUNDIALS_LIBRARIES} ${CSPARSE_LIBRARIES} ${CASADI_DEPENDENCIES}
+  )
+endif()
+
 if(LIFTOPT_FOUND)
   add_executable(test_liftopt test_liftopt.cpp)
   target_link_libraries(test_liftopt 
