@@ -419,6 +419,10 @@ std::pair<FX,FX> IntegratorInternal::getAugmentedGen(int nfwd, int nadj){
   XFunc f_aug(dae_in,dae_out);
   XFunc g_aug(rdae_in,rdae_out);
 
+  f_aug.init();
+  
+  casadi_assert_message(f_aug.getFree().size()==0,"IntegratorInternal::getDerivative: Found free variables " << f_aug.getFree() << " while constructing augmented dae. Make sure that gx, gz and gq have a linear dependency on rx, rz and rp. This is a restriction of the implementation.");
+  
   // Workaround, delete g_aug if its empty
   if(g.isNull() && nadj==0) g_aug = XFunc();
   
