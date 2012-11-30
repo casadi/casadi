@@ -148,13 +148,13 @@
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>CPUtime</td><td>OT_REAL</td><td></td><td>The maximum allowed CPU time in seconds for the whole initialisation (and the actually required one on output). Disabled if unset.</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>CPUtime</td><td>OT_REAL</td><td>None</td><td>The maximum allowed CPU time in seconds for the whole initialisation (and the actually required one on output). Disabled if unset.</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>automatic</td><td>How to calculate the Jacobians: "forward" (only forward mode) "reverse" (only adjoint mode) or "automatic" (a heuristic decides which is more appropriate)</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td></td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>None</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>64</td><td>Allow "number_of_adj_dir" to grow until it reaches this number</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>64</td><td>Allow "number_of_fwd_dir" to grow until it reaches this number</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td></td><td>Monitors to be activated</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>nWSR</td><td>OT_INTEGER</td><td></td><td>The maximum number of working set recalculations to be performed during the initial homotopy. Default is 5(nx + nc)</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>None</td><td>Monitors to be activated</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>nWSR</td><td>OT_INTEGER</td><td>None</td><td>The maximum number of working set recalculations to be performed during the initial homotopy. Default is 5(nx + nc)</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>unnamed_shared_object</td><td>n/a</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::QPOasesInternal</td></tr>
@@ -163,9 +163,9 @@
 <tr><td>printLevel</td><td>OT_STRING</td><td>medium</td><td>Defines the amount of text output during QP solution, see Section 5.7</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>True</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>True</td><td>function is sparse</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td></td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>None</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>False</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>user_data</td><td>OT_VOIDPTR</td><td></td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>None</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>False</td><td>verbose evaluation -- for debugging</td><td>CasADi::QPOasesInternal</td></tr>
 </table>
 */
@@ -175,13 +175,13 @@
 <table>
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
-<tr><td>CPUtime</td><td>OT_REAL</td><td></td><td>The maximum allowed CPU time in seconds for the whole initialisation (and the actually required one on output). Disabled if unset.</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>CPUtime</td><td>OT_REAL</td><td>None</td><td>The maximum allowed CPU time in seconds for the whole initialisation (and the actually required one on output). Disabled if unset.</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>automatic</td><td>How to calculate the Jacobians: "forward" (only forward mode) "reverse" (only adjoint mode) or "automatic" (a heuristic decides which is more appropriate)</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td></td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>None</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>64</td><td>Allow "number_of_adj_dir" to grow until it reaches this number</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>64</td><td>Allow "number_of_fwd_dir" to grow until it reaches this number</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td></td><td>Monitors to be activated</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>nWSR</td><td>OT_INTEGER</td><td></td><td>The maximum number of working set recalculations to be performed during the initial homotopy. Default is 5(nx + nc)</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>None</td><td>Monitors to be activated</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>nWSR</td><td>OT_INTEGER</td><td>None</td><td>The maximum number of working set recalculations to be performed during the initial homotopy. Default is 5(nx + nc)</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>unnamed_shared_object</td><td>n/a</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::QPOasesInternal</td></tr>
@@ -190,9 +190,9 @@
 <tr><td>printLevel</td><td>OT_STRING</td><td>medium</td><td>Defines the amount of text output during QP solution, see Section 5.7</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>True</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>True</td><td>function is sparse</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td></td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>None</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>False</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::QPOasesInternal</td></tr>
-<tr><td>user_data</td><td>OT_VOIDPTR</td><td></td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::QPOasesInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>None</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::QPOasesInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>False</td><td>verbose evaluation -- for debugging</td><td>CasADi::QPOasesInternal</td></tr>
 </table>
 */
@@ -316,11 +316,11 @@
 <tr><td>disable_internal_warnings</td><td>OT_BOOLEAN</td><td>false</td><td>Disable KINSOL internal warning messages</td><td>CasADi::KinsolInternal</td></tr>
 <tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>CasADi::KinsolInternal</td></tr>
 <tr><td>f_scale</td><td>OT_REALVECTOR</td><td></td><td></td><td>CasADi::KinsolInternal</td></tr>
-<tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td></td><td>CasADi::KinsolInternal</td></tr>
+<tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>gmres|bcgstab|tfqmr</td><td>CasADi::KinsolInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td></td><td>CasADi::KinsolInternal</td></tr>
-<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
+<tr><td>linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>dense|banded|iterative|user_defined</td><td>CasADi::KinsolInternal</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::KinsolInternal</td></tr>
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>0</td><td></td><td>CasADi::KinsolInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
@@ -358,11 +358,11 @@
 <tr><td>disable_internal_warnings</td><td>OT_BOOLEAN</td><td>false</td><td>Disable KINSOL internal warning messages</td><td>CasADi::KinsolInternal</td></tr>
 <tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td></td><td>CasADi::KinsolInternal</td></tr>
 <tr><td>f_scale</td><td>OT_REALVECTOR</td><td></td><td></td><td>CasADi::KinsolInternal</td></tr>
-<tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td></td><td>CasADi::KinsolInternal</td></tr>
+<tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>gmres|bcgstab|tfqmr</td><td>CasADi::KinsolInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td></td><td>CasADi::KinsolInternal</td></tr>
-<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
+<tr><td>linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>dense|banded|iterative|user_defined</td><td>CasADi::KinsolInternal</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td></td><td></td><td>CasADi::KinsolInternal</td></tr>
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>0</td><td></td><td>CasADi::KinsolInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
@@ -667,7 +667,7 @@
 <tr><td>abstol</td><td>OT_REAL</td><td>1e-6</td><td>Stopping criterion tolerance</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_fwd_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
@@ -696,7 +696,7 @@
 <tr><td>abstol</td><td>OT_REAL</td><td>1e-6</td><td>Stopping criterion tolerance</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_fwd_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
@@ -829,7 +829,7 @@
 <tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>asens_abstol</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>asens_linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>lower band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>Maximum krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::SundialsInternal</td></tr>
@@ -850,9 +850,9 @@
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>linear_multistep_method</td><td>OT_STRING</td><td>"bdf"</td><td>Integrator scheme (bdf|adams)</td><td>CasADi::CVodesInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Lower band-width of banded Jacobian (estimations)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>Maximum Krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::SundialsInternal</td></tr>
@@ -896,7 +896,7 @@
 <tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>asens_abstol</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>asens_linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>lower band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>Maximum krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::SundialsInternal</td></tr>
@@ -917,9 +917,9 @@
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>linear_multistep_method</td><td>OT_STRING</td><td>"bdf"</td><td>Integrator scheme (bdf|adams)</td><td>CasADi::CVodesInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Lower band-width of banded Jacobian (estimations)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>Maximum Krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::SundialsInternal</td></tr>
@@ -1247,7 +1247,7 @@
 <tr><td>jac_c_constant</td><td>OT_STRING</td><td>no</td><td>Indicates whether all equality constraints are linear (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>jac_d_constant</td><td>OT_STRING</td><td>no</td><td>Indicates whether all inequality constraints are linear (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>jacobian_approximation</td><td>OT_STRING</td><td>exact</td><td>Specifies technique to compute constraint Jacobian (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td></td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>None</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>jacobian_regularization_exponent</td><td>OT_REAL</td><td>0.25</td><td>Exponent for mu in the regularization for rank-deficient constraint Jacobians. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>jacobian_regularization_value</td><td>OT_REAL</td><td>1e-08</td><td>Size of the regularization for rank-deficient constraint Jacobians. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>kappa_d</td><td>OT_REAL</td><td>1e-05</td><td>Weight for linear damping term (to handle one-sided bounds). (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
@@ -1421,7 +1421,7 @@
 <tr><td>slack_move</td><td>OT_REAL</td><td>1.81898940355e-12</td><td>Correction size for very small slacks. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>soft_resto_pderror_reduction_factor</td><td>OT_REAL</td><td>0.9999</td><td>Required reduction in primal-dual error in the soft restoration phase. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>True</td><td>function is sparse</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td></td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>None</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>start_with_resto</td><td>OT_STRING</td><td>no</td><td>Tells algorithm to switch to restoration phase in first iteration. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>False</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>suppress_all_output</td><td>OT_STRING</td><td>no</td><td>Undocumented (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
@@ -1432,7 +1432,7 @@
 <tr><td>tiny_step_tol</td><td>OT_REAL</td><td>2.22044604925e-15</td><td>Tolerance for detecting numerically insignificant steps. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>tiny_step_y_tol</td><td>OT_REAL</td><td>0.01</td><td>Tolerance for quitting because of numerically insignificant steps. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>tol</td><td>OT_REAL</td><td>1e-08</td><td>Desired convergence tolerance (relative). (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>user_data</td><td>OT_VOIDPTR</td><td></td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>None</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>var_integer_md</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Integer metadata (a dictionary with lists of integers) about variables to be passed to IPOPT</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>var_numeric_md</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Numeric metadata (a dictionary with lists of reals) about variables to be passed to IPOPT</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>var_string_md</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>String metadata (a dictionary with lists of strings) about variables to be passed to IPOPT</td><td>CasADi::IpoptInternal</td></tr>
@@ -1564,7 +1564,7 @@
 <tr><td>jac_c_constant</td><td>OT_STRING</td><td>no</td><td>Indicates whether all equality constraints are linear (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>jac_d_constant</td><td>OT_STRING</td><td>no</td><td>Indicates whether all inequality constraints are linear (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>jacobian_approximation</td><td>OT_STRING</td><td>exact</td><td>Specifies technique to compute constraint Jacobian (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td></td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>None</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>jacobian_regularization_exponent</td><td>OT_REAL</td><td>0.25</td><td>Exponent for mu in the regularization for rank-deficient constraint Jacobians. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>jacobian_regularization_value</td><td>OT_REAL</td><td>1e-08</td><td>Size of the regularization for rank-deficient constraint Jacobians. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>kappa_d</td><td>OT_REAL</td><td>1e-05</td><td>Weight for linear damping term (to handle one-sided bounds). (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
@@ -1738,7 +1738,7 @@
 <tr><td>slack_move</td><td>OT_REAL</td><td>1.81898940355e-12</td><td>Correction size for very small slacks. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>soft_resto_pderror_reduction_factor</td><td>OT_REAL</td><td>0.9999</td><td>Required reduction in primal-dual error in the soft restoration phase. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>True</td><td>function is sparse</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td></td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>None</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>start_with_resto</td><td>OT_STRING</td><td>no</td><td>Tells algorithm to switch to restoration phase in first iteration. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>False</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>suppress_all_output</td><td>OT_STRING</td><td>no</td><td>Undocumented (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
@@ -1749,7 +1749,7 @@
 <tr><td>tiny_step_tol</td><td>OT_REAL</td><td>2.22044604925e-15</td><td>Tolerance for detecting numerically insignificant steps. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>tiny_step_y_tol</td><td>OT_REAL</td><td>0.01</td><td>Tolerance for quitting because of numerically insignificant steps. (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>tol</td><td>OT_REAL</td><td>1e-08</td><td>Desired convergence tolerance (relative). (see IPOPT documentation)</td><td>CasADi::IpoptInternal</td></tr>
-<tr><td>user_data</td><td>OT_VOIDPTR</td><td></td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::IpoptInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>None</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>var_integer_md</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Integer metadata (a dictionary with lists of integers) about variables to be passed to IPOPT</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>var_numeric_md</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Numeric metadata (a dictionary with lists of reals) about variables to be passed to IPOPT</td><td>CasADi::IpoptInternal</td></tr>
 <tr><td>var_string_md</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>String metadata (a dictionary with lists of strings) about variables to be passed to IPOPT</td><td>CasADi::IpoptInternal</td></tr>
@@ -1940,7 +1940,7 @@
 <tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>asens_abstol</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>asens_linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>lower band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>Maximum krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::SundialsInternal</td></tr>
@@ -1967,9 +1967,9 @@
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>Type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Lower band-width of banded Jacobian (estimations)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>Maximum Krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::SundialsInternal</td></tr>
@@ -2015,7 +2015,7 @@
 <tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>asens_abstol</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>asens_linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>lower band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>Maximum krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::SundialsInternal</td></tr>
@@ -2042,9 +2042,9 @@
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>Type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Lower band-width of banded Jacobian (estimations)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>Maximum Krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::SundialsInternal</td></tr>
@@ -2991,7 +2991,7 @@
 <tr><td>abstol</td><td>OT_REAL</td><td>1e-6</td><td>Stopping criterion tolerance</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_fwd_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
@@ -3020,7 +3020,7 @@
 <tr><td>abstol</td><td>OT_REAL</td><td>1e-6</td><td>Stopping criterion tolerance</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>User-defined linear solver class. Needed for sensitivities.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver.</td><td>CasADi::ImplicitFunctionInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_fwd_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
@@ -3099,7 +3099,7 @@
 <tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>asens_abstol</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>asens_linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>lower band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>Maximum krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::SundialsInternal</td></tr>
@@ -3117,9 +3117,9 @@
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>Type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Lower band-width of banded Jacobian (estimations)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>Maximum Krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::SundialsInternal</td></tr>
@@ -3162,7 +3162,7 @@
 <tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>asens_abstol</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>asens_linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>lower band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>Maximum krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::SundialsInternal</td></tr>
@@ -3180,9 +3180,9 @@
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>Type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>linear_solver_creator</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Lower band-width of banded Jacobian (estimations)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>Maximum Krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::SundialsInternal</td></tr>
@@ -3491,10 +3491,10 @@
 <tr><td>iteration_callback</td><td>OT_FX</td><td></td><td>A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>False</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td></td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>None</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>64</td><td>Allow "number_of_adj_dir" to grow until it reaches this number</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>64</td><td>Allow "number_of_fwd_dir" to grow until it reaches this number</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td></td><td>Monitors to be activated</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>None</td><td>Monitors to be activated</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>unnamed_shared_object</td><td>n/a</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::WorhpInternal</td></tr>
@@ -3504,9 +3504,9 @@
 <tr><td>print_time</td><td>OT_BOOLEAN</td><td>True</td><td>print information about execution time</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>True</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>True</td><td>function is sparse</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td></td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>None</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>False</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>user_data</td><td>OT_VOIDPTR</td><td></td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>None</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>False</td><td>verbose evaluation -- for debugging</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>False</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>CasADi::WorhpInternal</td></tr>
 </table>
@@ -3658,10 +3658,10 @@
 <tr><td>iteration_callback</td><td>OT_FX</td><td></td><td>A function that will be called at each iteration. Input scheme is the same as NLPSolver's output scheme. Output is scalar.</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>iteration_callback_ignore_errors</td><td>OT_BOOLEAN</td><td>False</td><td>If set to true, errors thrown by iteration_callback will be ignored.</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>iteration_callback_step</td><td>OT_INTEGER</td><td>1</td><td>Only call the callback function every few iterations.</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td></td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>None</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>64</td><td>Allow "number_of_adj_dir" to grow until it reaches this number</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>64</td><td>Allow "number_of_fwd_dir" to grow until it reaches this number</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td></td><td>Monitors to be activated</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>None</td><td>Monitors to be activated</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>unnamed_shared_object</td><td>n/a</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::WorhpInternal</td></tr>
@@ -3671,9 +3671,9 @@
 <tr><td>print_time</td><td>OT_BOOLEAN</td><td>True</td><td>print information about execution time</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>True</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>True</td><td>function is sparse</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td></td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>None</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>False</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::WorhpInternal</td></tr>
-<tr><td>user_data</td><td>OT_VOIDPTR</td><td></td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::WorhpInternal</td></tr>
+<tr><td>user_data</td><td>OT_VOIDPTR</td><td>None</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>False</td><td>verbose evaluation -- for debugging</td><td>CasADi::WorhpInternal</td></tr>
 <tr><td>warn_initial_bounds</td><td>OT_BOOLEAN</td><td>False</td><td>Warn if the initial guess does not satisfy LBX and UBX</td><td>CasADi::WorhpInternal</td></tr>
 </table>

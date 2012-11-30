@@ -65677,6 +65677,206 @@ casadi_calculus.hpp ";
 casadi_calculus.hpp ";
 
 
+// File: classCasADi_1_1Solve.xml
+%feature("docstring") CasADi::Solve "
+
+An MX atomic for solving a linear system of equations (backslash in Matlab)
+
+Joel Andersson
+
+C++ includes: solve.hpp ";
+
+%feature("docstring")  CasADi::Solve::Solve "
+
+Constructor. ";
+
+%feature("docstring")  CasADi::Solve::~Solve "
+
+Destructor. ";
+
+%feature("docstring")  CasADi::Solve::clone "
+
+Clone function. ";
+
+%feature("docstring")  CasADi::Solve::printPart "
+
+Print a part of the expression. ";
+
+%feature("docstring")  CasADi::Solve::evaluateD "
+
+Evaluate the function numerically. ";
+
+%feature("docstring")  CasADi::Solve::evaluateSX "
+
+Evaluate the function symbolically ( SX) ";
+
+%feature("docstring")  CasADi::Solve::evaluateMX "
+
+Evaluate the function symbolically ( MX) ";
+
+%feature("docstring")  CasADi::Solve::propagateSparsity "
+
+Propagate sparsity. ";
+
+%feature("docstring")  CasADi::Solve::getOp "
+
+Get the operation. ";
+
+%feature("docstring")  CasADi::Solve::__nonzero__ "
+
+Check the truth value of this node. ";
+
+%feature("docstring")  CasADi::Solve::deepCopyMembers "
+
+Deep copy data members. ";
+
+%feature("docstring")  CasADi::Solve::repr "
+
+Print a representation. ";
+
+%feature("docstring")  CasADi::Solve::print "
+
+Print a description. ";
+
+%feature("docstring")  CasADi::Solve::print "
+
+Print expression (make sure number of calls is not exceeded) ";
+
+%feature("docstring")  CasADi::Solve::evaluateD "
+
+Evaluate the function, no derivatives. ";
+
+%feature("docstring")  CasADi::Solve::evaluateSX "
+
+Evaluate symbolically ( SX), no derivatives. ";
+
+%feature("docstring")  CasADi::Solve::evaluateMX "
+
+Evaluate symbolically ( MX), no derivatives. ";
+
+%feature("docstring")  CasADi::Solve::getName "
+
+Get the name. ";
+
+%feature("docstring")  CasADi::Solve::isOutputNode "
+
+Check if evaluation output. ";
+
+%feature("docstring")  CasADi::Solve::isMultipleOutput "
+
+Check if a multiple output node. ";
+
+%feature("docstring")  CasADi::Solve::getFunction "
+
+Get function reference. ";
+
+%feature("docstring")  CasADi::Solve::getFunctionInput "
+
+Get function input. ";
+
+%feature("docstring")  CasADi::Solve::getFunctionOutput "
+
+Get function output. ";
+
+%feature("docstring")  CasADi::Solve::dep "
+
+dependencies - functions that have to be evaluated before this one ";
+
+%feature("docstring")  CasADi::Solve::dep "";
+
+%feature("docstring")  CasADi::Solve::ndep "
+
+Number of dependencies. ";
+
+%feature("docstring")  CasADi::Solve::hasDep "
+
+Does the node depend on other nodes. ";
+
+%feature("docstring")  CasADi::Solve::getNumOutputs "
+
+Number of outputs. ";
+
+%feature("docstring")  CasADi::Solve::getOutput "
+
+Get an output. ";
+
+%feature("docstring")  CasADi::Solve::sparsity "
+
+Get the sparsity. ";
+
+%feature("docstring")  CasADi::Solve::sparsity "
+
+Get the sparsity of output oind. ";
+
+%feature("docstring")  CasADi::Solve::isNonLinear "
+
+Is the node nonlinear. ";
+
+%feature("docstring")  CasADi::Solve::setSparsity "
+
+Set the sparsity. ";
+
+%feature("docstring")  CasADi::Solve::setDependencies "
+
+Set unary dependency. ";
+
+%feature("docstring")  CasADi::Solve::setDependencies "
+
+Set binary dependencies. ";
+
+%feature("docstring")  CasADi::Solve::setDependencies "
+
+Set ternary dependencies. ";
+
+%feature("docstring")  CasADi::Solve::setDependencies "
+
+Set multiple dependencies. ";
+
+%feature("docstring")  CasADi::Solve::addDependency "
+
+Add a dependency. ";
+
+%feature("docstring")  CasADi::Solve::assign "
+
+Assign nonzeros (mapping matrix) ";
+
+%feature("docstring")  CasADi::Solve::assign "
+
+Assign nonzeros (mapping matrix), output indices sequential. ";
+
+%feature("docstring")  CasADi::Solve::numel "
+
+Number of elements. ";
+
+%feature("docstring")  CasADi::Solve::size "
+
+Get size. ";
+
+%feature("docstring")  CasADi::Solve::size1 "
+
+Get size. ";
+
+%feature("docstring")  CasADi::Solve::size2 "
+
+Get size. ";
+
+%feature("docstring")  CasADi::Solve::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::Solve::init "
+
+Initialize the object. ";
+
+%feature("docstring")  CasADi::Solve::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::Solve::assertInit "
+
+Assert that the object has been initialized. ";
+
+
 // File: classCasADi_1_1SparseSparseOp.xml
 %feature("docstring") CasADi::SparseSparseOp "
 
@@ -77735,6 +77935,12 @@ Extract shared subexpressions from an set of expressions. ";
 
 Print compact, introducing new variables for shared subexpressions. ";
 
+%feature("docstring")  CasADi::solve "
+
+Solve a system of equations: A*x = b The solve routine works similar to
+Matlab's backslash when A is square and nonsingular. This algorithm is under
+development. ";
+
 %feature("docstring")  CasADi::vertcat "
 
 concatenate vertically ";
@@ -79569,6 +79775,12 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: slice_8hpp.xml
+
+
+// File: solve_8cpp.xml
+
+
+// File: solve_8hpp.xml
 
 
 // File: sparsity__tools_8cpp.xml
