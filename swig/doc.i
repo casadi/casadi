@@ -13074,7 +13074,7 @@ times t_i.
 | ive_solver   |              |              | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
 | asens_linear | OT_STRING    | \"dense\"      | (dense|bande | CasADi::Sund |
-| _solver      |              |              | d|iterative) | ialsInternal |
+| _solver_type |              |              | d|iterative) | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
 | asens_lower_ | OT_INTEGER   | GenericType( | lower band-  | CasADi::Sund |
 | bandwidth    |              | )            | width of     | ialsInternal |
@@ -13227,13 +13227,8 @@ times t_i.
 | step_method  |              |              | scheme       | esInternal   |
 |              |              |              | (bdf|adams)  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
-| r            |              |              | d|dense|band | ialsInternal |
-|              |              |              | ed|iterative |              |
-|              |              |              | )            |              |
-+--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_LINEARSOL | GenericType( | An linear    | CasADi::Sund |
-| r_creator    | VER          | )            | solver       | ialsInternal |
+| r            | VER          | )            | solver       | ialsInternal |
 |              |              |              | creator      |              |
 |              |              |              | function     |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -13241,6 +13236,11 @@ times t_i.
 | r_options    | Y            | )            | be passed to | ialsInternal |
 |              |              |              | the linear   |              |
 |              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
+| r_type       |              |              | d|dense|band | ialsInternal |
+|              |              |              | ed|iterative |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | lower_bandwi | OT_INTEGER   | GenericType( | Lower band-  | CasADi::Sund |
 | dth          |              | )            | width of     | ialsInternal |
@@ -14167,7 +14167,7 @@ rx, rz and rp.
 | ive_solver   |              |              | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
 | asens_linear | OT_STRING    | \"dense\"      | (dense|bande | CasADi::Sund |
-| _solver      |              |              | d|iterative) | ialsInternal |
+| _solver_type |              |              | d|iterative) | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
 | asens_lower_ | OT_INTEGER   | GenericType( | lower band-  | CasADi::Sund |
 | bandwidth    |              | )            | width of     | ialsInternal |
@@ -14320,13 +14320,8 @@ rx, rz and rp.
 | step_method  |              |              | scheme       | esInternal   |
 |              |              |              | (bdf|adams)  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
-| r            |              |              | d|dense|band | ialsInternal |
-|              |              |              | ed|iterative |              |
-|              |              |              | )            |              |
-+--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_LINEARSOL | GenericType( | An linear    | CasADi::Sund |
-| r_creator    | VER          | )            | solver       | ialsInternal |
+| r            | VER          | )            | solver       | ialsInternal |
 |              |              |              | creator      |              |
 |              |              |              | function     |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -14334,6 +14329,11 @@ rx, rz and rp.
 | r_options    | Y            | )            | be passed to | ialsInternal |
 |              |              |              | the linear   |              |
 |              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
+| r_type       |              |              | d|dense|band | ialsInternal |
+|              |              |              | ed|iterative |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | lower_bandwi | OT_INTEGER   | GenericType( | Lower band-  | CasADi::Sund |
 | dth          |              | )            | width of     | ialsInternal |
@@ -19875,7 +19875,7 @@ Joel Andersson
 | ive_solver   |              |              | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
 | asens_linear | OT_STRING    | \"dense\"      | (dense|bande | CasADi::Sund |
-| _solver      |              |              | d|iterative) | ialsInternal |
+| _solver_type |              |              | d|iterative) | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
 | asens_lower_ | OT_INTEGER   | GenericType( | lower band-  | CasADi::Sund |
 | bandwidth    |              | )            | width of     | ialsInternal |
@@ -20087,13 +20087,8 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
-| r            |              |              | d|dense|band | ialsInternal |
-|              |              |              | ed|iterative |              |
-|              |              |              | )            |              |
-+--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_LINEARSOL | GenericType( | An linear    | CasADi::Sund |
-| r_creator    | VER          | )            | solver       | ialsInternal |
+| r            | VER          | )            | solver       | ialsInternal |
 |              |              |              | creator      |              |
 |              |              |              | function     |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -20101,6 +20096,11 @@ Joel Andersson
 | r_options    | Y            | )            | be passed to | ialsInternal |
 |              |              |              | the linear   |              |
 |              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
+| r_type       |              |              | d|dense|band | ialsInternal |
+|              |              |              | ed|iterative |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | lower_bandwi | OT_INTEGER   | GenericType( | Lower band-  | CasADi::Sund |
 | dth          |              | )            | width of     | ialsInternal |
@@ -21044,7 +21044,7 @@ rx, rz and rp.
 | ive_solver   |              |              | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
 | asens_linear | OT_STRING    | \"dense\"      | (dense|bande | CasADi::Sund |
-| _solver      |              |              | d|iterative) | ialsInternal |
+| _solver_type |              |              | d|iterative) | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
 | asens_lower_ | OT_INTEGER   | GenericType( | lower band-  | CasADi::Sund |
 | bandwidth    |              | )            | width of     | ialsInternal |
@@ -21256,13 +21256,8 @@ rx, rz and rp.
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
-| r            |              |              | d|dense|band | ialsInternal |
-|              |              |              | ed|iterative |              |
-|              |              |              | )            |              |
-+--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_LINEARSOL | GenericType( | An linear    | CasADi::Sund |
-| r_creator    | VER          | )            | solver       | ialsInternal |
+| r            | VER          | )            | solver       | ialsInternal |
 |              |              |              | creator      |              |
 |              |              |              | function     |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -21270,6 +21265,11 @@ rx, rz and rp.
 | r_options    | Y            | )            | be passed to | ialsInternal |
 |              |              |              | the linear   |              |
 |              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
+| r_type       |              |              | d|dense|band | ialsInternal |
+|              |              |              | ed|iterative |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | lower_bandwi | OT_INTEGER   | GenericType( | Lower band-  | CasADi::Sund |
 | dth          |              | )            | width of     | ialsInternal |
@@ -21990,7 +21990,7 @@ Assert that the object has been initialized. ";
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_LINEARSOL | GenericType( | User-defined | CasADi::Impl |
-| r_creator    | VER          | )            | linear       | icitFunction |
+| r            | VER          | )            | linear       | icitFunction |
 |              |              |              | solver       | Internal     |
 |              |              |              | class.       |              |
 |              |              |              | Needed for s |              |
@@ -22692,7 +22692,7 @@ Internal class.
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_LINEARSOL | GenericType( | User-defined | CasADi::Impl |
-| r_creator    | VER          | )            | linear       | icitFunction |
+| r            | VER          | )            | linear       | icitFunction |
 |              |              |              | solver       | Internal     |
 |              |              |              | class.       |              |
 |              |              |              | Needed for s |              |
@@ -27332,7 +27332,7 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jacobian_gen | OT_JACOBIANG |              | Function     | CasADi::Ipop |
+| jacobian_gen | OT_JACOBIANG | None         | Function     | CasADi::Ipop |
 | erator       | ENERATOR     |              | pointer that | tInternal    |
 |              |              |              | returns a    |              |
 |              |              |              | Jacobian     |              |
@@ -28930,7 +28930,7 @@ n: number of decision variables (x)     m: number of constraints (A)
 | sparse       | OT_BOOLEAN   | True         | function is  | CasADi::Ipop |
 |              |              |              | sparse       | tInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| sparsity_gen | OT_SPARSITYG |              | Function     | CasADi::Ipop |
+| sparsity_gen | OT_SPARSITYG | None         | Function     | CasADi::Ipop |
 | erator       | ENERATOR     |              | that         | tInternal    |
 |              |              |              | provides     |              |
 |              |              |              | sparsity for |              |
@@ -29032,7 +29032,7 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   |              | A user-      | CasADi::Ipop |
+| user_data    | OT_VOIDPTR   | None         | A user-      | CasADi::Ipop |
 |              |              |              | defined      | tInternal    |
 |              |              |              | field that   |              |
 |              |              |              | can be used  |              |
@@ -30720,7 +30720,7 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jacobian_gen | OT_JACOBIANG |              | Function     | CasADi::Ipop |
+| jacobian_gen | OT_JACOBIANG | None         | Function     | CasADi::Ipop |
 | erator       | ENERATOR     |              | pointer that | tInternal    |
 |              |              |              | returns a    |              |
 |              |              |              | Jacobian     |              |
@@ -32318,7 +32318,7 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 | sparse       | OT_BOOLEAN   | True         | function is  | CasADi::Ipop |
 |              |              |              | sparse       | tInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| sparsity_gen | OT_SPARSITYG |              | Function     | CasADi::Ipop |
+| sparsity_gen | OT_SPARSITYG | None         | Function     | CasADi::Ipop |
 | erator       | ENERATOR     |              | that         | tInternal    |
 |              |              |              | provides     |              |
 |              |              |              | sparsity for |              |
@@ -32420,7 +32420,7 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   |              | A user-      | CasADi::Ipop |
+| user_data    | OT_VOIDPTR   | None         | A user-      | CasADi::Ipop |
 |              |              |              | defined      | tInternal    |
 |              |              |              | field that   |              |
 |              |              |              | can be used  |              |
@@ -33470,8 +33470,8 @@ Retrieve information about variables and constraints ";
 | f_scale      | OT_REALVECTO |              |              | CasADi::Kins |
 |              | R            |              |              | olInternal   |
 +--------------+--------------+--------------+--------------+--------------+
-| iterative_so | OT_STRING    | \"gmres\"      |              | CasADi::Kins |
-| lver         |              |              |              | olInternal   |
+| iterative_so | OT_STRING    | \"gmres\"      | gmres|bcgsta | CasADi::Kins |
+| lver         |              |              | b|tfqmr      | olInternal   |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -33486,11 +33486,8 @@ Retrieve information about variables and constraints ";
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_STRING    | \"dense\"      |              | CasADi::Kins |
-| r            |              |              |              | olInternal   |
-+--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_LINEARSOL | GenericType( | User-defined | CasADi::Impl |
-| r_creator    | VER          | )            | linear       | icitFunction |
+| r            | VER          | )            | linear       | icitFunction |
 |              |              |              | solver       | Internal     |
 |              |              |              | class.       |              |
 |              |              |              | Needed for s |              |
@@ -33501,6 +33498,10 @@ Retrieve information about variables and constraints ";
 | r_options    | Y            | )            | be passed to | icitFunction |
 |              |              |              | the linear   | Internal     |
 |              |              |              | solver.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_STRING    | \"dense\"      | dense|banded | CasADi::Kins |
+| r_type       |              |              | |iterative|u | olInternal   |
+|              |              |              | ser_defined  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | lower_bandwi | OT_INTEGER   |              |              | CasADi::Kins |
 | dth          |              |              |              | olInternal   |
@@ -34149,8 +34150,8 @@ See:   ImplicitFunction for more information
 | f_scale      | OT_REALVECTO |              |              | CasADi::Kins |
 |              | R            |              |              | olInternal   |
 +--------------+--------------+--------------+--------------+--------------+
-| iterative_so | OT_STRING    | \"gmres\"      |              | CasADi::Kins |
-| lver         |              |              |              | olInternal   |
+| iterative_so | OT_STRING    | \"gmres\"      | gmres|bcgsta | CasADi::Kins |
+| lver         |              |              | b|tfqmr      | olInternal   |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -34165,11 +34166,8 @@ See:   ImplicitFunction for more information
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_STRING    | \"dense\"      |              | CasADi::Kins |
-| r            |              |              |              | olInternal   |
-+--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_LINEARSOL | GenericType( | User-defined | CasADi::Impl |
-| r_creator    | VER          | )            | linear       | icitFunction |
+| r            | VER          | )            | linear       | icitFunction |
 |              |              |              | solver       | Internal     |
 |              |              |              | class.       |              |
 |              |              |              | Needed for s |              |
@@ -34180,6 +34178,10 @@ See:   ImplicitFunction for more information
 | r_options    | Y            | )            | be passed to | icitFunction |
 |              |              |              | the linear   | Internal     |
 |              |              |              | solver.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_STRING    | \"dense\"      | dense|banded | CasADi::Kins |
+| r_type       |              |              | |iterative|u | olInternal   |
+|              |              |              | ser_defined  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | lower_bandwi | OT_INTEGER   |              |              | CasADi::Kins |
 | dth          |              |              |              | olInternal   |
@@ -49617,7 +49619,7 @@ Joel Andersson
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_LINEARSOL | GenericType( | User-defined | CasADi::Impl |
-| r_creator    | VER          | )            | linear       | icitFunction |
+| r            | VER          | )            | linear       | icitFunction |
 |              |              |              | solver       | Internal     |
 |              |              |              | class.       |              |
 |              |              |              | Needed for s |              |
@@ -50193,7 +50195,7 @@ Joris Gillis
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_LINEARSOL | GenericType( | User-defined | CasADi::Impl |
-| r_creator    | VER          | )            | linear       | icitFunction |
+| r            | VER          | )            | linear       | icitFunction |
 |              |              |              | solver       | Internal     |
 |              |              |              | class.       |              |
 |              |              |              | Needed for s |              |
@@ -59789,7 +59791,7 @@ If H is not positive-definite, the solver should throw an error.
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| CPUtime      | OT_REAL      |              | The maximum  | CasADi::QPOa |
+| CPUtime      | OT_REAL      | None         | The maximum  | CasADi::QPOa |
 |              |              |              | allowed CPU  | sesInternal  |
 |              |              |              | time in      |              |
 |              |              |              | seconds for  |              |
@@ -59821,7 +59823,7 @@ If H is not positive-definite, the solver should throw an error.
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jacobian_gen | OT_JACOBIANG |              | Function     | CasADi::QPOa |
+| jacobian_gen | OT_JACOBIANG | None         | Function     | CasADi::QPOa |
 | erator       | ENERATOR     |              | pointer that | sesInternal  |
 |              |              |              | returns a    |              |
 |              |              |              | Jacobian     |              |
@@ -59848,10 +59850,10 @@ If H is not positive-definite, the solver should throw an error.
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC |              | Monitors to  | CasADi::QPOa |
+| monitor      | OT_STRINGVEC | None         | Monitors to  | CasADi::QPOa |
 |              | TOR          |              | be activated | sesInternal  |
 +--------------+--------------+--------------+--------------+--------------+
-| nWSR         | OT_INTEGER   |              | The maximum  | CasADi::QPOa |
+| nWSR         | OT_INTEGER   | None         | The maximum  | CasADi::QPOa |
 |              |              |              | number of    | sesInternal  |
 |              |              |              | working set  |              |
 |              |              |              | recalculatio |              |
@@ -59920,7 +59922,7 @@ If H is not positive-definite, the solver should throw an error.
 | sparse       | OT_BOOLEAN   | True         | function is  | CasADi::QPOa |
 |              |              |              | sparse       | sesInternal  |
 +--------------+--------------+--------------+--------------+--------------+
-| sparsity_gen | OT_SPARSITYG |              | Function     | CasADi::QPOa |
+| sparsity_gen | OT_SPARSITYG | None         | Function     | CasADi::QPOa |
 | erator       | ENERATOR     |              | that         | sesInternal  |
 |              |              |              | provides     |              |
 |              |              |              | sparsity for |              |
@@ -59943,7 +59945,7 @@ If H is not positive-definite, the solver should throw an error.
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   |              | A user-      | CasADi::QPOa |
+| user_data    | OT_VOIDPTR   | None         | A user-      | CasADi::QPOa |
 |              |              |              | defined      | sesInternal  |
 |              |              |              | field that   |              |
 |              |              |              | can be used  |              |
@@ -60383,7 +60385,7 @@ Joris Gillis, Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| CPUtime      | OT_REAL      |              | The maximum  | CasADi::QPOa |
+| CPUtime      | OT_REAL      | None         | The maximum  | CasADi::QPOa |
 |              |              |              | allowed CPU  | sesInternal  |
 |              |              |              | time in      |              |
 |              |              |              | seconds for  |              |
@@ -60415,7 +60417,7 @@ Joris Gillis, Joel Andersson
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jacobian_gen | OT_JACOBIANG |              | Function     | CasADi::QPOa |
+| jacobian_gen | OT_JACOBIANG | None         | Function     | CasADi::QPOa |
 | erator       | ENERATOR     |              | pointer that | sesInternal  |
 |              |              |              | returns a    |              |
 |              |              |              | Jacobian     |              |
@@ -60442,10 +60444,10 @@ Joris Gillis, Joel Andersson
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC |              | Monitors to  | CasADi::QPOa |
+| monitor      | OT_STRINGVEC | None         | Monitors to  | CasADi::QPOa |
 |              | TOR          |              | be activated | sesInternal  |
 +--------------+--------------+--------------+--------------+--------------+
-| nWSR         | OT_INTEGER   |              | The maximum  | CasADi::QPOa |
+| nWSR         | OT_INTEGER   | None         | The maximum  | CasADi::QPOa |
 |              |              |              | number of    | sesInternal  |
 |              |              |              | working set  |              |
 |              |              |              | recalculatio |              |
@@ -60514,7 +60516,7 @@ Joris Gillis, Joel Andersson
 | sparse       | OT_BOOLEAN   | True         | function is  | CasADi::QPOa |
 |              |              |              | sparse       | sesInternal  |
 +--------------+--------------+--------------+--------------+--------------+
-| sparsity_gen | OT_SPARSITYG |              | Function     | CasADi::QPOa |
+| sparsity_gen | OT_SPARSITYG | None         | Function     | CasADi::QPOa |
 | erator       | ENERATOR     |              | that         | sesInternal  |
 |              |              |              | provides     |              |
 |              |              |              | sparsity for |              |
@@ -60537,7 +60539,7 @@ Joris Gillis, Joel Andersson
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   |              | A user-      | CasADi::QPOa |
+| user_data    | OT_VOIDPTR   | None         | A user-      | CasADi::QPOa |
 |              |              |              | defined      | sesInternal  |
 |              |              |              | field that   |              |
 |              |              |              | can be used  |              |
@@ -67894,7 +67896,7 @@ Constructor. ";
 | ive_solver   |              |              | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
 | asens_linear | OT_STRING    | \"dense\"      | (dense|bande | CasADi::Sund |
-| _solver      |              |              | d|iterative) | ialsInternal |
+| _solver_type |              |              | d|iterative) | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
 | asens_lower_ | OT_INTEGER   | GenericType( | lower band-  | CasADi::Sund |
 | bandwidth    |              | )            | width of     | ialsInternal |
@@ -68029,13 +68031,8 @@ Constructor. ";
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
-| r            |              |              | d|dense|band | ialsInternal |
-|              |              |              | ed|iterative |              |
-|              |              |              | )            |              |
-+--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_LINEARSOL | GenericType( | An linear    | CasADi::Sund |
-| r_creator    | VER          | )            | solver       | ialsInternal |
+| r            | VER          | )            | solver       | ialsInternal |
 |              |              |              | creator      |              |
 |              |              |              | function     |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -68043,6 +68040,11 @@ Constructor. ";
 | r_options    | Y            | )            | be passed to | ialsInternal |
 |              |              |              | the linear   |              |
 |              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
+| r_type       |              |              | d|dense|band | ialsInternal |
+|              |              |              | ed|iterative |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | lower_bandwi | OT_INTEGER   | GenericType( | Lower band-  | CasADi::Sund |
 | dth          |              | )            | width of     | ialsInternal |
@@ -68878,7 +68880,7 @@ Return a string with a destription (for SWIG) ";
 | ive_solver   |              |              | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
 | asens_linear | OT_STRING    | \"dense\"      | (dense|bande | CasADi::Sund |
-| _solver      |              |              | d|iterative) | ialsInternal |
+| _solver_type |              |              | d|iterative) | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
 | asens_lower_ | OT_INTEGER   | GenericType( | lower band-  | CasADi::Sund |
 | bandwidth    |              | )            | width of     | ialsInternal |
@@ -69013,13 +69015,8 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
-| r            |              |              | d|dense|band | ialsInternal |
-|              |              |              | ed|iterative |              |
-|              |              |              | )            |              |
-+--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_LINEARSOL | GenericType( | An linear    | CasADi::Sund |
-| r_creator    | VER          | )            | solver       | ialsInternal |
+| r            | VER          | )            | solver       | ialsInternal |
 |              |              |              | creator      |              |
 |              |              |              | function     |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -69027,6 +69024,11 @@ Return a string with a destription (for SWIG) ";
 | r_options    | Y            | )            | be passed to | ialsInternal |
 |              |              |              | the linear   |              |
 |              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
+| r_type       |              |              | d|dense|band | ialsInternal |
+|              |              |              | ed|iterative |              |
+|              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | lower_bandwi | OT_INTEGER   | GenericType( | Lower band-  | CasADi::Sund |
 | dth          |              | )            | width of     | ialsInternal |
@@ -73618,7 +73620,7 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | every few    |              |
 |              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jacobian_gen | OT_JACOBIANG |              | Function     | CasADi::Worh |
+| jacobian_gen | OT_JACOBIANG | None         | Function     | CasADi::Worh |
 | erator       | ENERATOR     |              | pointer that | pInternal    |
 |              |              |              | returns a    |              |
 |              |              |              | Jacobian     |              |
@@ -73645,7 +73647,7 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC |              | Monitors to  | CasADi::Worh |
+| monitor      | OT_STRINGVEC | None         | Monitors to  | CasADi::Worh |
 |              | TOR          |              | be activated | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | unnamed_shar | n/a          | CasADi::Worh |
@@ -73715,7 +73717,7 @@ n: number of decision variables (x)     m: number of constraints (A)
 | sparse       | OT_BOOLEAN   | True         | function is  | CasADi::Worh |
 |              |              |              | sparse       | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| sparsity_gen | OT_SPARSITYG |              | Function     | CasADi::Worh |
+| sparsity_gen | OT_SPARSITYG | None         | Function     | CasADi::Worh |
 | erator       | ENERATOR     |              | that         | pInternal    |
 |              |              |              | provides     |              |
 |              |              |              | sparsity for |              |
@@ -73738,7 +73740,7 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   |              | A user-      | CasADi::Worh |
+| user_data    | OT_VOIDPTR   | None         | A user-      | CasADi::Worh |
 |              |              |              | defined      | pInternal    |
 |              |              |              | field that   |              |
 |              |              |              | can be used  |              |
@@ -75042,7 +75044,7 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | every few    |              |
 |              |              |              | iterations.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| jacobian_gen | OT_JACOBIANG |              | Function     | CasADi::Worh |
+| jacobian_gen | OT_JACOBIANG | None         | Function     | CasADi::Worh |
 | erator       | ENERATOR     |              | pointer that | pInternal    |
 |              |              |              | returns a    |              |
 |              |              |              | Jacobian     |              |
@@ -75069,7 +75071,7 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | reaches this |              |
 |              |              |              | number       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| monitor      | OT_STRINGVEC |              | Monitors to  | CasADi::Worh |
+| monitor      | OT_STRINGVEC | None         | Monitors to  | CasADi::Worh |
 |              | TOR          |              | be activated | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | unnamed_shar | n/a          | CasADi::Worh |
@@ -75139,7 +75141,7 @@ n: number of decision variables (x)     m: number of constraints (A)
 | sparse       | OT_BOOLEAN   | True         | function is  | CasADi::Worh |
 |              |              |              | sparse       | pInternal    |
 +--------------+--------------+--------------+--------------+--------------+
-| sparsity_gen | OT_SPARSITYG |              | Function     | CasADi::Worh |
+| sparsity_gen | OT_SPARSITYG | None         | Function     | CasADi::Worh |
 | erator       | ENERATOR     |              | that         | pInternal    |
 |              |              |              | provides     |              |
 |              |              |              | sparsity for |              |
@@ -75162,7 +75164,7 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | multiple     |              |
 |              |              |              | times        |              |
 +--------------+--------------+--------------+--------------+--------------+
-| user_data    | OT_VOIDPTR   |              | A user-      | CasADi::Worh |
+| user_data    | OT_VOIDPTR   | None         | A user-      | CasADi::Worh |
 |              |              |              | defined      | pInternal    |
 |              |              |              | field that   |              |
 |              |              |              | can be used  |              |
