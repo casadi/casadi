@@ -56,7 +56,7 @@ IdasInternal::IdasInternal(const FX& f, const FX& g) : SundialsInternal(f,g){
   addOption("cj_scaling",                  OT_BOOLEAN,          false,          "IDAS scaling on cj for the user-defined linear solver module");
   addOption("extra_fsens_calc_ic",         OT_BOOLEAN,          false,          "Call calc ic an extra time, with fsens=0");
   addOption("disable_internal_warnings",   OT_BOOLEAN,          false,          "Disable IDAS internal warning messages");
-  addOption("monitor",                     OT_STRINGVECTOR,     GenericType(),  "", "correctInitialConditions|res|resS|rhsQB", true);
+  addOption("monitor",                     OT_STRINGVECTOR,     GenericType(),  "", "correctInitialConditions|res|resS|resB|rhsQB", true);
   addOption("init_xdot",                   OT_REALVECTOR,       GenericType(),  "Initial values for the state derivatives");
   addOption("init_z",                      OT_REALVECTOR,       GenericType(),  "Initial values for the algebraic states");
   
@@ -414,6 +414,8 @@ void IdasInternal::initTaping(){
 }
 
 void IdasInternal::initAdj(){
+  log("IdasInternal::initAdj","start");
+
   casadi_assert(!isInitAdj_);
   int flag;
   
@@ -482,6 +484,8 @@ void IdasInternal::initAdj(){
   
   // Mark initialized
   isInitAdj_ = true;
+  
+  log("IdasInternal::initAdj","end");
 }
 
 
@@ -854,6 +858,8 @@ void IdasInternal::integrate(double t_out){
 }
 
 void IdasInternal::resetB(){
+  log("IdasInternal::resetB","begin");
+
   int flag;
   
   // Reset adjoint sensitivities for the parameters
@@ -866,6 +872,9 @@ void IdasInternal::resetB(){
   // Quickfix to get consistent initial conditions for the backward integration //FIXME!
   if(nrz_>0){
     // Write rz as an explicit function of the other variables
+    // Recall that g is linear in rx, rz, rp 
+    // 0 = gz(rx,rz)    1st order taylor around rz=0 =>   0 = diff(gz,rz)(rx,0).gz(rx,0)
+    // rz = - diff(gz,rz)^-1 . gz(rx,0)
     if(odefcn_.isNull()){
       SXFunction g = shared_cast<SXFunction>(g_);
       if(!g.isNull()){
@@ -928,13 +937,19 @@ void IdasInternal::resetB(){
   // Correct initial values for the integration if necessary
   int calc_icB = getOption("calc_icB");
   if(calc_icB){
+    log("IdasInternal::resetB","IDACalcICB begin");
     flag = IDACalcICB(mem_, whichB_, t0_, xz_, xzdot_);
     if(flag != IDA_SUCCESS) idas_error("IDACalcICB",flag);
-
+    log("IdasInternal::resetB","IDACalcICB end");
+    
     // Retrieve the initial values
     flag = IDAGetConsistentICB(mem_, whichB_, rxz_, rxzdot_);
     if(flag != IDA_SUCCESS) idas_error("IDAGetConsistentICB",flag);
+    
   }
+  
+  log("IdasInternal::resetB","end");
+  
 }
 
 void IdasInternal::integrateB(double t_out){
@@ -1135,6 +1150,26 @@ void IdasInternal::resB(double t, const double* xz, const double* xzdot, const d
   g_.setInput(xzA,RDAE_RX);
   g_.setInput(xzA+nrx_,RDAE_RZ);
 
+  if(monitored("resB")){
+    cout << "RDAE_T    = " << t << endl;
+    cout << "RDAE_X    = " << g_.input(RDAE_X) << endl;
+    cout << "RDAE_Z    = " << g_.input(RDAE_Z) << endl;
+    cout << "RDAE_P    = " << g_.input(RDAE_P) << endl;
+    cout << "RDAE_XDOT  = ";
+    for (int k=0;k<g_.input(RDAE_X).size();++k) {
+      cout << xzdot[k] << " " ;
+    }
+    cout << endl;
+    cout << "RDAE_RX    = " << g_.input(RDAE_RX) << endl;
+    cout << "RDAE_RZ    = " << g_.input(RDAE_RZ) << endl;
+    cout << "RDAE_RP    = " << g_.input(RDAE_RP) << endl;
+    cout << "RDAE_RXDOT  = ";
+    for (int k=0;k<g_.input(RDAE_RX).size();++k) {
+      cout << xzdotA[k] << " " ;
+    }
+    cout << endl;
+  }
+  
   // Evaluate
   g_.evaluate();
 
@@ -1142,10 +1177,23 @@ void IdasInternal::resB(double t, const double* xz, const double* xzdot, const d
   g_.getOutput(rrA,RDAE_ODE);
   g_.getOutput(rrA+nrx_,RDAE_ALG);
 
+  if(monitored("resB")){
+    cout << "RDAE_ODE    = " << g_.output(RDAE_ODE) << endl;
+    cout << "RDAE_ALG    = " << g_.output(RDAE_ALG) << endl;
+  }
+  
   // Subtract state derivative to get residual
   for(int i=0; i<nrx_; ++i){
     rrA[i] += xzdotA[i]; // BUG?
   }
+  
+  if(monitored("resB")){
+    g_.setOutput(rrA,RDAE_ODE);
+    g_.setOutput(rrA+nrx_,RDAE_ALG);
+    cout << "res ODE    = " << g_.output(RDAE_ODE) << endl;
+    cout << "res ALG    = " << g_.output(RDAE_ALG) << endl;
+  }
+  
   
   log("IdasInternal::resB","end");
 }
