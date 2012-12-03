@@ -928,7 +928,7 @@ void IdasInternal::resetB(){
   // Correct initial values for the integration if necessary
   int calc_icB = getOption("calc_icB");
   if(calc_icB){
-    flag = IDACalcICB(mem_, whichB_, t0_, rxz_, rxzdot_);
+    flag = IDACalcICB(mem_, whichB_, t0_, xz_, xzdot_);
     if(flag != IDA_SUCCESS) idas_error("IDACalcICB",flag);
 
     // Retrieve the initial values
