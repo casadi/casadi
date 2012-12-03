@@ -124,7 +124,7 @@ class casadiTestCase(unittest.TestCase):
             continue
           if (isnan(zt[i,j]) or isinf(zt[i,j])) and  (isinf(zt[i,j]) or isnan(zt[i,j])):
             continue
-          self.assertAlmostEqual(zt[i,j],zr[i,j],digits,"In %s: %s evaluation error.\n %s <->\n %s\n at elem(%d,%d): " % (name,failmessage,str(zt),str(zr), i,j, ))
+          self.assertAlmostEqual(zt[i,j],zr[i,j],digits,"In %s: %s evaluation error.\n %s <->\n %s\n [digits=%d] at elem(%d,%d): " % (name,failmessage,str(zt),str(zr), digits, i,j, ))
 
   def evaluationCheck(self,yt,yr,x,x0,name="",failmessage="",fmod=None,setx0=None):
     """ General unit test for checking casadi evaluation against a reference solution.
@@ -200,8 +200,10 @@ class casadiTestCase(unittest.TestCase):
     for i in range(len(pool.numpyoperators)):
       self.numpyEvaluationCheck(pool.casadioperators[i],pool.numpyoperators[i],x,x0,"%s:%s" % (name,pool.names[i]),"\n I tried to apply %s (%s) from test case '%s' to numerical value %s. But the result returned: " % (str(pool.casadioperators[i]),pool.names[i],name, str(x0)),fmod=fmod,setx0=setx0)
 
-  def checkfx(self,trial,solution,fwd=True,adj=True,jacobian=True,gradient=True,hessian=True,sens_der=True,digits=9,failmessage="",allow_empty=True,verbose=True):
+  def checkfx(self,trial,solution,fwd=True,adj=True,jacobian=True,gradient=True,hessian=True,sens_der=True,digits=9,digits_sens=None,failmessage="",allow_empty=True,verbose=True):
 
+    if digits_sens is None:
+      digits_sens = digits
      
     for i in range(trial.getNumInputs()):
       if (allow_empty and (trial.input(i).empty() or solution.input(i).empty() )): continue
@@ -211,12 +213,12 @@ class casadiTestCase(unittest.TestCase):
 
     trial_inputs    = [ DMatrix(trial.input(k)) for k in range(trial.getNumInputs())]
     solution_inputs = [ DMatrix(solution.input(k)) for k in range(solution.getNumInputs())] 
-        
+
     try:
-      trial.evaluate(fwd,adj)
-      solution.evaluate(fwd,adj)
+      trial.evaluate(0,0)
+      solution.evaluate(0,0)
     except Exception as e:
-      raise Exception(str(e) + "\nThis occured for simple evaluate(%d,%d) for: %s" % (fwd,adj,failmessage) )
+      raise Exception(str(e) + "\nThis occured for simple evaluate(%d,%d) for: %s" % (0,0,failmessage) )
 
     for i in range(trial.getNumInputs()):
       message = "input(%d) modified by evaluate" % i
@@ -242,16 +244,16 @@ class casadiTestCase(unittest.TestCase):
           solution.fwdSeed(i)[j]=fsm
           
           try:
-            trial.evaluate(fwd,adj)
-            solution.evaluate(fwd,adj)
+            trial.evaluate(fwd,0)
+            solution.evaluate(fwd,0)
           except Exception as e:
-            raise Exception(e.str() + "\nThis occured for simple evaluate(%d,%d) for fwdSeed(%d)[%d]=1 for: %s" % (fwd,adj,i,j,failmessage) )
+            raise Exception(str(e) + "\nThis occured for simple evaluate(%d,%d) for fwdSeed(%d)[%d]=1 for: %s" % (fwd,0,i,j,failmessage) )
           
           for k in range(trial.getNumOutputs()):
             if (allow_empty and (trial.output(k).empty() or solution.output(k).empty() )): continue
             message="fwdSeed(%d)[%d]=1 => fwdSens(%d)" % (i,j,k)
             if verbose: print message + ": " + str(trial.fwdSens(k))
-            self.checkarray(trial.fwdSens(k),solution.fwdSens(k),"",digits=digits,failmessage=failmessage+": "+message)
+            self.checkarray(trial.fwdSens(k),solution.fwdSens(k),"",digits=digits_sens,failmessage=failmessage+": "+message)
             
           trial.fwdSeed(i).setAll(0)
           solution.fwdSeed(i).setAll(0)
@@ -266,16 +268,16 @@ class casadiTestCase(unittest.TestCase):
           solution.adjSeed(i)[j]=asm
           
           try:
-            trial.evaluate(fwd,adj)
-            solution.evaluate(fwd,adj)
+            trial.evaluate(0,adj)
+            solution.evaluate(0,adj)
           except Exception as e:
-            raise Exception(e.str() + "\nThis occured for simple evaluate(%d,%d) for adjSeed(%d)[%d]=1 for: %s" % (fwd,adj,i,j,failmessage) )
+            raise Exception(str(e) + "\nThis occured for simple evaluate(%d,%d) for adjSeed(%d)[%d]=1 for: %s" % (0,adj,i,j,failmessage) )
 
           for k in range(trial.getNumInputs()):
             if (allow_empty and (trial.input(k).empty() or solution.input(k).empty() )): continue
             message="adjSeed(%d)[%d]=1 => adjSens(%d)" % (i,j,k)
             if verbose: print message + ": " + str(trial.adjSens(k))
-            self.checkarray(trial.adjSens(k),solution.adjSens(k),"",digits=digits,failmessage=failmessage+": "+message)
+            self.checkarray(trial.adjSens(k),solution.adjSens(k),"",digits=digits_sens,failmessage=failmessage+": "+message)
             
           trial.adjSeed(i).setAll(0)
           solution.adjSeed(i).setAll(0)
@@ -300,7 +302,7 @@ class casadiTestCase(unittest.TestCase):
           self.assertEqual(solutionjac.getNumOutputs(),solution.getNumOutputs()+1)
           for k in range(solution.getNumInputs()): solutionjac.input(k).set(solution_inputs[k])
           
-          self.checkfx(trialjac,solutionjac,fwd=fwd if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,digits=digits,failmessage="(%s).jacobian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)
+          self.checkfx(trialjac,solutionjac,fwd=fwd if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,digits=digits_sens,failmessage="(%s).jacobian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)
 
     if gradient:
       for i in range(trial.getNumInputs()):
@@ -317,7 +319,7 @@ class casadiTestCase(unittest.TestCase):
             self.assertEqual(solutiongrad.getNumInputs(),solution.getNumInputs())
             self.assertEqual(solutiongrad.getNumOutputs(),solution.getNumOutputs()+1)
             for k in range(solution.getNumInputs()): solutiongrad.input(k).set(solution_inputs[k])
-            self.checkfx(trialgrad,solutiongrad,fwd=fwd  if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,digits=digits,failmessage="(%s).gradient(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)
+            self.checkfx(trialgrad,solutiongrad,fwd=fwd  if sens_der else False,adj=adj if sens_der else False,jacobian=False,gradient=False,hessian=False,digits=digits_sens,failmessage="(%s).gradient(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)
 
     if hessian:
       for i in range(trial.getNumInputs()):
@@ -334,5 +336,23 @@ class casadiTestCase(unittest.TestCase):
             self.assertEqual(solutionhess.getNumInputs(),solution.getNumInputs())
             self.assertEqual(solutionhess.getNumOutputs(),solution.getNumOutputs()+2)
             for k in range(solution.getNumInputs()): solutionhess.input(k).set(solution_inputs[k])
-            self.checkfx(trialhess,solutionhess,fwd=fwd  if sens_der else False,adj=adj  if sens_der else False,jacobian=False,gradient=False,hessian=False,digits=digits,failmessage="(%s).hessian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)     
-          
+            self.checkfx(trialhess,solutionhess,fwd=fwd  if sens_der else False,adj=adj  if sens_der else False,jacobian=False,gradient=False,hessian=False,digits=digits_sens,failmessage="(%s).hessian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)     
+
+
+class run_only(object):
+  def __init__(self, args):
+    self.args = []
+    for a in args:
+      self.args.append(a)
+
+  def __call__(self, c):
+    print "run_only:"
+    for i in dir(c):
+      if i.startswith('test_'):
+        n = i[5:]
+        if not n in self.args:
+          delattr(c,i)
+        else:
+          print i
+    return c
+    
