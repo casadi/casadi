@@ -64,9 +64,12 @@ void IntegratorInternal::evaluate(int nfdir, int nadir){
   bool need_nondiff = true;
   bool need_fwd = nfdir!=0;
   bool need_adj = nadir!=0;
+    
+  // No sensitivity analysis
+  bool no_sens = !need_fwd && !need_adj;
   
   // Calculate without source code transformation
-  if(need_fwd || !need_adj){
+  if(no_sens || (need_fwd && !fwd_via_sct_)){
   
     // Number of sensitivities integrating forward
     int nsens = fwd_via_sct_ ? 0 : nfdir; // NOTE: Can be overly pessimistic e.g. if there are no seeds at all in some directions
