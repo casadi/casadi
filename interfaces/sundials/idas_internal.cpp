@@ -47,8 +47,8 @@ void IdasInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& alr
 
 IdasInternal::IdasInternal(const FX& f, const FX& g) : SundialsInternal(f,g){
   addOption("suppress_algebraic",          OT_BOOLEAN,          false,          "Supress algebraic variables in the error testing");
-  addOption("calc_ic",                     OT_BOOLEAN,          true,           "Use IDACalcIC to get consistent initial conditions. This only works for semi-explicit index-one systems. Else, you must provide consistent initial conditions yourself.");
-  addOption("calc_icB",                    OT_BOOLEAN,          false,          "Use IDACalcIC to get consistent initial conditions. This only works for semi-explicit index-one systems. Else, you must provide consistent initial conditions yourself.");
+  addOption("calc_ic",                     OT_BOOLEAN,          true,           "Use IDACalcIC to get consistent initial conditions.");
+  addOption("calc_icB",                    OT_BOOLEAN,          true,           "Use IDACalcIC to get consistent initial conditions.");
   addOption("abstolv",                     OT_REALVECTOR);
   addOption("fsens_abstolv",               OT_REALVECTOR); 
   addOption("max_step_size",               OT_REAL,             0,              "Maximim step size");
@@ -869,55 +869,6 @@ void IdasInternal::resetB(){
   const Matrix<double> &xf_aseed = input(INTEGRATOR_RX0);
   copy(xf_aseed.begin(),xf_aseed.end(),NV_DATA_S(rxz_));
   
-  // Quickfix to get consistent initial conditions for the backward integration //FIXME!
-  if(nrz_>0){
-    // Write rz as an explicit function of the other variables
-    // Recall that g is linear in rx, rz, rp 
-    // 0 = gz(rx,rz)    1st order taylor around rz=0 =>   0 = diff(gz,rz)(rx,0).gz(rx,0)
-    // rz = - diff(gz,rz)^-1 . gz(rx,0)
-    if(odefcn_.isNull()){
-      SXFunction g = shared_cast<SXFunction>(g_);
-      if(!g.isNull()){
-        // Get algebraic variable and equation
-        SXMatrix rz = g.inputExpr(RDAE_RZ);
-        SXMatrix ralg = g.outputExpr(RDAE_ALG);
-        
-        // Linearize
-        SXMatrix J = CasADi::jacobian(ralg,rz);
-        SXMatrix r = substitute(ralg,rz,SXMatrix(rz.sparsity(),0));
-        
-        // Solve for rz
-        SXMatrix ralg_explicit = solve(J,-r);
-      
-        // Get state derivative and differential equation
-        SXMatrix rode = g.outputExpr(RDAE_ODE);
-
-        // Substitute in the expression for z
-        rode = substitute(rode,rz,ralg_explicit);
-                
-        // Function to calculate rxdot and rz
-        vector<SXMatrix> odefcn_out(2);
-        odefcn_out[0] = -rode;
-        odefcn_out[1] = ralg_explicit;
-        odefcn_ = SXFunction(g.inputExpr(),odefcn_out);
-        odefcn_.init();
-      }
-    }
-
-    if(!odefcn_.isNull()){
-      odefcn_.setInput(&tf_,RDAE_T);
-      odefcn_.setInput(NV_DATA_S(xz_),RDAE_X);
-      odefcn_.setInput(NV_DATA_S(xz_)+nx_,RDAE_Z);
-      odefcn_.setInput(input(INTEGRATOR_P),RDAE_P);
-      odefcn_.setInput(input(INTEGRATOR_RP),RDAE_RP);
-      odefcn_.setInput(NV_DATA_S(rxz_),RDAE_RX);
-      odefcn_.setInput(NV_DATA_S(rxz_)+nrx_,RDAE_RZ); // NOTE: odefcn_ should not depend on rz
-    
-      odefcn_.evaluate();
-      odefcn_.getOutput(NV_DATA_S(rxzdot_),0);
-      odefcn_.getOutput(NV_DATA_S(rxz_)+nrx_,1);
-    }
-  }
   
   if(isInitAdj_){
     flag = IDAReInitB(mem_, whichB_, tf_, rxz_, rxzdot_);
