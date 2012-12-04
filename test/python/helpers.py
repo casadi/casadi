@@ -233,6 +233,26 @@ class casadiTestCase(unittest.TestCase):
       if verbose: print message + ": " + str(trial.output(i))
       if (allow_empty and (trial.output(i).empty() or solution.output(i).empty() )): continue
       self.checkarray(trial.output(i),solution.output(i),"",digits=digits,failmessage=failmessage+": "+message)
+      
+    try:
+      trial.evaluate(0,0)
+      solution.evaluate(0,0)
+    except Exception as e:
+      raise Exception(str(e) + "\nThis occured for repeated evaluate(%d,%d) for: %s" % (0,0,failmessage) )
+
+    for i in range(trial.getNumInputs()):
+      message = "input(%d) modified by repeated evaluate" % i
+      self.checkarray(trial.input(i),trial_inputs[i],"",digits=digits,failmessage=failmessage+": "+ message)
+      self.checkarray(solution.input(i),solution_inputs[i],"",digits=digits,failmessage=failmessage+": "+ message)
+
+    self.assertEqual(trial.getNumOutputs(),solution.getNumOutputs(),failmessage+": trial has %d outputs while solution has %d." % (trial.getNumOutputs(),solution.getNumOutputs()) )
+    self.assertEqual(trial.getNumInputs(),solution.getNumInputs(),failmessage+": trial has %d inputs while solution has %d." % (trial.getNumInputs(),solution.getNumInputs()) )
+
+    for i in range(trial.getNumOutputs()):
+      message = "output(%d)" % i
+      if verbose: print message + ": " + str(trial.output(i))
+      if (allow_empty and (trial.output(i).empty() or solution.output(i).empty() )): continue
+      self.checkarray(trial.output(i),solution.output(i),"",digits=digits,failmessage=failmessage+": "+message)
     
     if fwd:
       fsm = 1.7
