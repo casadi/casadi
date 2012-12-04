@@ -43,11 +43,11 @@ except:
   pass
   
 try:
-  integrators.append((IdasIntegrator,["dae","ode"],{"abstol": 1e-15,"reltol":1e-15,"fsens_err_con": True,"calc_icB":True,"linear_solver":CSparse}))
+  integrators.append((IdasIntegrator,["dae","ode"],{"abstol": 1e-15,"reltol":1e-15,"fsens_err_con": True,"calc_icB":True}))
 except:
   pass
 
-integrators.append((CollocationIntegrator,["dae","ode"],{"implicit_solver":KinsolSolver,"number_of_finite_elements": 100,"startup_integrator":CVodesIntegrator}))
+integrators.append((CollocationIntegrator,["dae","ode"],{"implicit_solver":KinsolSolver,"number_of_finite_elements": 18,"startup_integrator":CVodesIntegrator}))
 #integrators.append((CollocationIntegrator,["dae","ode"],{"implicit_solver":NLPImplicitSolver,"number_of_finite_elements": 100,"startup_integrator":CVodesIntegrator,"implicit_solver_options": {"nlp_solver": IpoptSolver,"linear_solver_creator": CSparse}}))
 #integrators.append((RKIntegrator,["ode"],{"number_of_finite_elements": 1000}))
 
@@ -65,6 +65,7 @@ class Integrationtests(casadiTestCase):
     tend=num['tend']
     x0=num['q0']
     p_=num['p']
+    rx0_= 0.13
     t=SX("t")
     x=SX("x")
     rx=SX("rx")
@@ -84,9 +85,9 @@ class Integrationtests(casadiTestCase):
           integrator.setOption(options)
           integrator.setOption("t0",tstart)
           if integrator.hasOption("abstol"):
-            integrator.setOption("abstol",1e-13)
+            integrator.setOption("abstol",1e-9)
           if integrator.hasOption("reltol"):
-            integrator.setOption("reltol",1e-13)
+            integrator.setOption("reltol",1e-9)
           integrator.setOption("tf",tend)
           if integrator.hasOption("init_xdot"):
             integrator.setOption("init_xdot",[x0])
@@ -116,7 +117,7 @@ class Integrationtests(casadiTestCase):
               rdout_["alg"] = ( rdout["ode"] - rz) * (-0.7)
               
             yield p_features, din, dout, rdin, rdout, solution
-            #yield p_features_, din_, dout_, rdin_, rdout_, solution
+            yield p_features_, din_, dout_, rdin_, rdout_, solution
           else:
             yield p_features, din, dout, rdin, rdout, solution
           
@@ -155,7 +156,9 @@ class Integrationtests(casadiTestCase):
              (["ode"],{'x':x,'p':p},{'ode':x},{'x':x,'rx':rx,'p':p,'rp':rp},{'ode':rx, 'quad': rp},{'rqf': rp*(tend-tstart)}),
              (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode':rx*t},{'rxf': rx*exp(tend**2/2-tstart**2/2)}),
              (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode':x*t},{'rxf': rx+x*(exp(tend-tstart)*(tend-1)-(tstart-1))}),
-             # quad(z)
+             (["dae"],{'x':x,'z':z},{'ode':z,'alg': -0.8*(z-x),'quad': z},{},{},{'qf':x*(exp(tend-tstart)-1)}),
+             (["dae"],{'x':x,'z':z},{'ode':z,'alg': -0.8*(z-x)},{'x':x,'rx':rx,'rz': rz,'z':z},{'ode':rz, 'alg': -0.7*(rz-rx), 'quad': rz},{'rqf': rx*(exp(tend-tstart)-1)}),
+             (["dae"],{'x':x,'z':z},{'ode':z,'alg': -0.8*(z-x)},{'x':x,'rx':rx,'rz': rz,'z':z},{'ode':rz, 'alg': -0.7*(rz-rx), 'quad': z},{'rqf': x*(exp(tend-tstart)-1)}),
              ] :
           for p_features, din, dout, rdin, rdout, solution in variations(p_features_, din_, dout_, rdin_, rdout_, solution_):
             if p_features[0] in features:
@@ -172,17 +175,49 @@ class Integrationtests(casadiTestCase):
               fs = SXFunction(integratorIn(x0=x,p=p,rx0=rx,rp=rp),integratorOut(**solution))
               fs.init()
               integrator = getIntegrator(f,g,p_features=features)
+#              reproduce = """
+#from casadi import *
+#t=SX("t")
+#x=SX("x")
+#rx=SX("rx")
+#p=SX("p")
+#dp=SX("dp")
+
+#z=SX("z")
+#rz=SX("rz")
+#rp=SX("rp")
+#f = SXFunction(daeIn(**{din}),daeOut(**{dout}))
+#f.init()
+#g = SXFunction(rdaeIn(**{rdin}),rdaeOut(**{rdout}))
+#g.init()
+
+#integrator = {intclass.__name__}(f,g)
+#integrator.setOption({options})
+#integrator.init()
+
+#integrator.input(INTEGRATOR_X0).set({x0})
+#if not integrator.input(INTEGRATOR_P).empty():
+#  integrator.input(INTEGRATOR_P).set({p_})
+#if not integrator.input(INTEGRATOR_RX0).empty():
+#  integrator.input(INTEGRATOR_RX0).set(0.13)
+#if not integrator.input(INTEGRATOR_RP).empty():
+#  integrator.input(INTEGRATOR_RP).set(0.127)
+#              """.format(din=din,dout=dout,rdin=rdin,rdout=rdout,x0=x0,p_=p_,intclass=Integrator,options=integrator.dictionary())
+#              message+="\nTo reproduce:\n" + reproduce
+ 
               
               for ff in [fs,integrator]:
                 ff.input(INTEGRATOR_X0).set(x0)
                 if not ff.input(INTEGRATOR_P).empty():
                   ff.input(INTEGRATOR_P).set(p_)
                 if not ff.input(INTEGRATOR_RX0).empty():
-                  ff.input(INTEGRATOR_RX0).set(0.13)
+                  ff.input(INTEGRATOR_RX0).set(rx0_)
                 if not ff.input(INTEGRATOR_RP).empty():
                   ff.input(INTEGRATOR_RP).set(0.127)
                   
-              self.checkfx(integrator,fs,gradient=False,hessian=False,sens_der=False,digits=7,digits_sens=5,failmessage=message,verbose=False)
+              integrator.evaluate(1,0)
+                  
+              self.checkfx(integrator,fs,gradient=False,hessian=False,sens_der=False,digits=4,digits_sens=4,failmessage=message,verbose=False)
 
         
   def setUp(self):
