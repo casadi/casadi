@@ -144,6 +144,7 @@
 <tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
 <tr><td>res</td><td>CasADi::IdasInternal</td></tr>
+<tr><td>resB</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>resS</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>rhsQB</td><td>CasADi::IdasInternal</td></tr>
 </table>
@@ -158,6 +159,7 @@
 <tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
 <tr><td>res</td><td>CasADi::IdasInternal</td></tr>
+<tr><td>resB</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>resS</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>rhsQB</td><td>CasADi::IdasInternal</td></tr>
 </table>
