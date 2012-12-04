@@ -58,7 +58,7 @@ public:
   
   //@{
   /// options
-  bool exact_jacobian_;
+  bool exact_jacobian_, exact_jacobianB_;
   double abstol_, reltol_;
   double fsens_abstol_, fsens_reltol_;
   double asens_abstol_, asens_reltol_;

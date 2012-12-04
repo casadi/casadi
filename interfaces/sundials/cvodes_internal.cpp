@@ -413,7 +413,7 @@ void CVodesInternal::rhs(double t, const double* x, double* xdot){
 int CVodesInternal::rhs_wrapper(double t, N_Vector x, N_Vector xdot, void *user_data){
 try{
     casadi_assert(user_data);
-    CVodesInternal *this_ = (CVodesInternal*)user_data;
+    CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
     this_->rhs(t,NV_DATA_S(x),NV_DATA_S(xdot));
     return 0;
   } catch(exception& e){
@@ -717,7 +717,7 @@ void CVodesInternal::rhsS(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector 
 int CVodesInternal::rhsS_wrapper(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF, N_Vector *xdotF, void *user_data, N_Vector tmp1, N_Vector tmp2){
 try{
     casadi_assert(user_data);
-    CVodesInternal *this_ = (CVodesInternal*)user_data;
+    CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
     this_->rhsS(Ns,t,x,xdot,xF,xdotF,tmp1,tmp2);
     return 0;
   } catch(exception& e){
@@ -749,7 +749,7 @@ void CVodesInternal::rhsS1(int Ns, double t, N_Vector x, N_Vector xdot, int iS, 
 int CVodesInternal::rhsS1_wrapper(int Ns, double t, N_Vector x, N_Vector xdot, int iS, N_Vector xF, N_Vector xdotF, void *user_data, N_Vector tmp1, N_Vector tmp2){
 try{
     casadi_assert(user_data);
-    CVodesInternal *this_ = (CVodesInternal*)user_data;
+    CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
     this_->rhsS1(Ns,t,x,xdot,iS,xF,xdotF,tmp1,tmp2);
     return 0;
   } catch(exception& e){
@@ -761,7 +761,7 @@ try{
 int CVodesInternal::rhsQ_wrapper(double t, N_Vector x, N_Vector qdot, void *user_data){
 try{
     casadi_assert(user_data);
-    CVodesInternal *this_ = (CVodesInternal*)user_data;
+    CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
     this_->rhsQ(t,NV_DATA_S(x),NV_DATA_S(qdot));
     return 0;
   } catch(exception& e){
@@ -808,7 +808,7 @@ void CVodesInternal::rhsQS(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector 
 int CVodesInternal::rhsQS_wrapper(int Ns, double t, N_Vector x, N_Vector *xF, N_Vector qdot, N_Vector *qdotF, void *user_data, N_Vector tmp1, N_Vector tmp2){
 try{
 //    casadi_assert(user_data);
-    CVodesInternal *this_ = (CVodesInternal*)user_data;
+    CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
     if(!this_){
       // SUNDIALS BUG!!!
       for(int i=0; i<Ns; ++i) N_VConst(0.0,qdotF[i]);
@@ -838,8 +838,8 @@ void CVodesInternal::rhsB(double t, const double* x, const double *rx, double* r
     cout << "t       = " << t << endl;
     cout << "x       = " << g_.input(RDAE_X) << endl;
     cout << "p       = " << g_.input(RDAE_P) << endl;
-    cout << "rp      = " << g_.input(RDAE_RP) << endl;
     cout << "rx      = " << g_.input(RDAE_RX) << endl;
+    cout << "rp      = " << g_.input(RDAE_RP) << endl;
   }
   
   // Evaluate
@@ -852,7 +852,7 @@ void CVodesInternal::rhsB(double t, const double* x, const double *rx, double* r
     cout << "xdotA = " << g_.output(RDAE_ODE) << endl;
   }
   
-  // Negate as we are integrating backward in time
+  // Negate (note definition of g)
   for(int i=0; i<nrx_; ++i)
     rxdot[i] *= -1;
 
@@ -902,7 +902,7 @@ void CVodesInternal::rhsBS(double t, N_Vector x, N_Vector *xF, N_Vector rx, N_Ve
 int CVodesInternal::rhsB_wrapper(double t, N_Vector x, N_Vector rx, N_Vector rxdot, void *user_data){
 try{
     casadi_assert(user_data);
-    CVodesInternal *this_ = (CVodesInternal*)user_data;
+    CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
     this_->rhsB(t,NV_DATA_S(x),NV_DATA_S(rx),NV_DATA_S(rxdot));
     return 0;
   } catch(exception& e){
@@ -914,7 +914,7 @@ try{
 int CVodesInternal::rhsBS_wrapper(double t, N_Vector x, N_Vector *xF, N_Vector xA, N_Vector xdotA, void *user_data){
 try{
     casadi_assert(user_data);
-    CVodesInternal *this_ = (CVodesInternal*)user_data;
+    CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
     this_->rhsBS(t,x,xF,xA,xdotA);
     return 0;
   } catch(exception& e){
@@ -926,7 +926,7 @@ try{
 int CVodesInternal::rhsQB_wrapper(double t, N_Vector x, N_Vector rx, N_Vector rqdot, void *user_data){
   try{
     casadi_assert(user_data);
-    CVodesInternal *this_ = (CVodesInternal*)user_data;
+    CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
     this_->rhsQB(t,NV_DATA_S(x),NV_DATA_S(rx),NV_DATA_S(rqdot));
     return 0;
   } catch(exception& e){
@@ -952,32 +952,32 @@ void CVodesInternal::rhsQB(double t, const double* x, const double* rx, double* 
     cout << "x       = " << g_.input(RDAE_X) << endl;
     cout << "p       = " << g_.input(RDAE_P) << endl;
     cout << "rx      = " << g_.input(RDAE_RX) << endl;
+    cout << "rp      = " << g_.input(RDAE_RP) << endl;
   }
   
   // Evaluate
   g_.evaluate();
 
   // Save to output
-  casadi_assert(g_.output(RDAE_QUAD).size()==nrq_);
   g_.getOutput(rqdot,RDAE_QUAD);
 
   if(monitor_rhsB_){
     cout << "qdotA = " << g_.output(RDAE_QUAD) << endl;
   }
   
-  // Negate as we are integrating backward in time
+  // Negate (note definition of g)
   for(int i=0; i<nrq_; ++i)
     rqdot[i] *= -1;
       
   if(monitor_rhsQB_){
-   cout << "CVodesInternal::rhsQB: end" << endl;
+    cout << "CVodesInternal::rhsQB: end" << endl;
   }
 }
 
 int CVodesInternal::jtimes_wrapper(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector xdot, void *user_data, N_Vector tmp){
   try{
     casadi_assert(user_data);
-    CVodesInternal *this_ = (CVodesInternal*)user_data;
+    CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
     casadi_assert(this_->f_.fwdSens(DAE_ODE).size() == this_->nx_);
     casadi_assert(NV_LENGTH_S(v) == this_->nx_);
     casadi_assert(NV_LENGTH_S(Jv) == this_->nx_);
@@ -1017,7 +1017,7 @@ void CVodesInternal::jtimes(const double *v, double* Jv, double t, const double*
 int CVodesInternal::djac_wrapper(long N, double t, N_Vector x, N_Vector xdot, DlsMat Jac, void *user_data,N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
   try{
     casadi_assert(user_data);
-    CVodesInternal *this_ = (CVodesInternal*)user_data;
+    CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
     this_->djac(N, t, x, xdot, Jac, tmp1, tmp2, tmp3);
     return 0;
   } catch(exception& e){
@@ -1064,7 +1064,7 @@ int CVodesInternal::bjac_wrapper(long N, long mupper, long mlower, double t, N_V
                         N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
   try{
     casadi_assert(user_data);
-    CVodesInternal *this_ = (CVodesInternal*)user_data;
+    CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
     this_->bjac(N, mupper, mlower, t, x, xdot, Jac, tmp1, tmp2, tmp3);
     return 0;
   } catch(exception& e){
@@ -1116,7 +1116,7 @@ void CVodesInternal::setStopTime(double tf){
 
 int CVodesInternal::psolve_wrapper(double t, N_Vector x, N_Vector xdot, N_Vector r, N_Vector z, double gamma, double delta, int lr, void *user_data, N_Vector tmp){
   try{
-    CVodesInternal *this_ = (CVodesInternal*)user_data;
+    CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
     casadi_assert(this_);
     this_->psolve(t, x, xdot, r, z, gamma, delta, lr, tmp);
     return 0;
@@ -1128,7 +1128,7 @@ int CVodesInternal::psolve_wrapper(double t, N_Vector x, N_Vector xdot, N_Vector
 
 int CVodesInternal::psetup_wrapper(double t, N_Vector x, N_Vector xdot, booleantype jok, booleantype *jcurPtr, double gamma, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
   try{
-    CVodesInternal *this_ = (CVodesInternal*)user_data;
+    CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
     casadi_assert(this_);
     this_->psetup(t, x, xdot, jok, jcurPtr, gamma, tmp1, tmp2, tmp3);
     return 0;

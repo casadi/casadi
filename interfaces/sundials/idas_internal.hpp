@@ -125,27 +125,29 @@ class IdasInternal : public SundialsInternal{
   void resS(int Ns, double t, const double* xz, const double* xzdot, const double *resval, N_Vector *xzF, N_Vector* xzdotF, N_Vector *rrF, double *tmp1, double *tmp2, double *tmp3);
   void rhsQ(double t, const double* xz, const double* xzdot, double* qdot);
   void rhsQS(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector *xzF, N_Vector *xzdotF, N_Vector rrQ, N_Vector *qdotF, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-  void resB(double t, const double* y, const double* xzdot, const double* xA, const double* xzdotA, double* rrA);
-  void rhsQB(double t, const double* y, const double* xzdot, const double* xA, const double* xzdotA, double *qdotA);
+  void resB(double t, const double* y, const double* xzdot, const double* xA, const double* xzdotB, double* rrB);
+  void rhsQB(double t, const double* y, const double* xzdot, const double* xA, const double* xzdotB, double *qdotA);
   void psolve(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector rvec, N_Vector zvec, double cj, double delta, N_Vector tmp);
   void psetup(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, double cj, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
   void djac(long Neq, double t, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
   void bjac(long Neq, long mupper, long mlower, double tt, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, N_Vector tmp1, N_Vector tmp2,N_Vector tmp3);
+  void djacB(long int NeqB, double t, double cjB, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector rrB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
   void lsetup(IDAMem IDA_mem, N_Vector xzp, N_Vector xzdotp, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
   void lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xzcur, N_Vector xzdotcur, N_Vector rescur);
 
   // Static wrappers to be passed to Sundials
   static int res_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, void *user_data);
+  static int resB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector rrB, void *user_data);
   static void ehfun_wrapper(int error_code, const char *module, const char *function, char *msg, void *eh_data);
   static int jtimes_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector v, N_Vector Jv, double cj, void *user_data, N_Vector tmp1, N_Vector tmp2);
   static int resS_wrapper(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector resval, N_Vector *xzF, N_Vector *xzdotF, N_Vector *resF, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
   static int rhsQ_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector qdot, void *user_data);
+  static int rhsQB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector qdotA, void *user_data);
   static int rhsQS_wrapper(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector *xzF, N_Vector *xzdotF, N_Vector rrQ, N_Vector *qdotF, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
-  static int resB_wrapper(double t, N_Vector y, N_Vector xzdot, N_Vector xA, N_Vector xzdotA, N_Vector resA, void *user_dataB);
-  static int rhsQB_wrapper(double t, N_Vector y, N_Vector xzdot, N_Vector xA, N_Vector xzdotA, N_Vector qdotA, void *user_dataB);
   static int psolve_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector rvec, N_Vector zvec, double cj, double delta, void *user_data, N_Vector tmp);
   static int psetup_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, double cj, void* user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
   static int djac_wrapper(long Neq, double t, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  static int djacB_wrapper(long int NeqB, double t, double cjB, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector rrB, DlsMat JacB, void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
   static int bjac_wrapper(long Neq, long mupper, long mlower, double tt, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2,N_Vector tmp3);
   static int lsetup_wrapper(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
   static int lsolve_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector ycur, N_Vector xzdotcur, N_Vector rescur);
@@ -209,7 +211,7 @@ class IdasInternal : public SundialsInternal{
   // Accummulated time since last reset:
   double t_res; // time spent in the DAE residual
   double t_fres; // time spent in the forward sensitivity residual
-  double t_jac; // time spent in the jacobian, or jacobian times vector function
+  double t_jac, t_jacB; // time spent in the jacobian, or jacobian times vector function
   double t_lsolve; // preconditioner/linear solver solve function
   double t_lsetup_jac; // preconditioner/linear solver setup function, generate jacobian
   double t_lsetup_fac; // preconditioner setup function, factorize jacobian

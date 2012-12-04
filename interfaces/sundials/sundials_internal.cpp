@@ -38,7 +38,8 @@ SundialsInternal::SundialsInternal(const FX& f, const FX& g) : IntegratorInterna
   addOption("max_num_steps",               OT_INTEGER,          10000,          "Maximum number of integrator steps");
   addOption("reltol",                      OT_REAL,             1e-6,           "Relative tolerence for the IVP solution");
   addOption("abstol",                      OT_REAL,             1e-8,           "Absolute tolerence  for the IVP solution");
-  addOption("exact_jacobian",              OT_BOOLEAN,          true,           "Use exact Jacobian information for the integration");
+  addOption("exact_jacobian",              OT_BOOLEAN,          true,           "Use exact Jacobian information for the forward integration");
+  addOption("exact_jacobianB",             OT_BOOLEAN,          false,          "Use exact Jacobian information for the backward integration");
   addOption("upper_bandwidth",             OT_INTEGER,          GenericType(),  "Upper band-width of banded Jacobian (estimations)");
   addOption("lower_bandwidth",             OT_INTEGER,          GenericType(),  "Lower band-width of banded Jacobian (estimations)");
   addOption("linear_solver_type",          OT_STRING,           "dense",        "","user_defined|dense|banded|iterative");
@@ -90,6 +91,7 @@ void SundialsInternal::init(){
   abstol_ = getOption("abstol");
   reltol_ = getOption("reltol");
   exact_jacobian_ = getOption("exact_jacobian");
+  exact_jacobianB_ = getOption("exact_jacobianB");
   max_num_steps_ = getOption("max_num_steps");
   finite_difference_fsens_ = getOption("finite_difference_fsens");
   fsens_abstol_ = hasSetOption("fsens_abstol") ? double(getOption("fsens_abstol")) : abstol_;

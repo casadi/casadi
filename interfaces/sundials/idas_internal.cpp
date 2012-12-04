@@ -548,7 +548,7 @@ void IdasInternal::res(double t, const double* xz, const double* xzdot, double* 
 
 int IdasInternal::res_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, void *user_data){
  try{
-    IdasInternal *this_ = (IdasInternal*)user_data;
+    IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
     this_->res(t,NV_DATA_S(xz),NV_DATA_S(xzdot),NV_DATA_S(rr));
     return 0;
   } catch(int flag){ // recoverable error
@@ -607,7 +607,7 @@ void IdasInternal::jtimes(double t, const double *xz, const double *xzdot, const
 
 int IdasInternal::jtimes_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector v, N_Vector Jv, double cj, void *user_data, N_Vector tmp1, N_Vector tmp2){
  try{
-    IdasInternal *this_ = (IdasInternal*)user_data;
+    IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
     this_->jtimes(t,NV_DATA_S(xz),NV_DATA_S(xzdot),NV_DATA_S(rr),NV_DATA_S(v),NV_DATA_S(Jv),cj,NV_DATA_S(tmp1),NV_DATA_S(tmp2));
     return 0;
   } catch(exception& e){
@@ -664,7 +664,7 @@ void IdasInternal::resS(int Ns, double t, const double* xz, const double* xzdot,
 
 int IdasInternal::resS_wrapper(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector resval, N_Vector *xzF, N_Vector *xzdotF, N_Vector *rrF, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
  try{
-    IdasInternal *this_ = (IdasInternal*)user_data;
+    IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
     this_->resS(Ns,t,NV_DATA_S(xz),NV_DATA_S(xzdot),NV_DATA_S(resval),xzF,xzdotF,rrF,NV_DATA_S(tmp1),NV_DATA_S(tmp2),NV_DATA_S(tmp3));
     return 0;
   } catch(exception& e){
@@ -687,7 +687,7 @@ void IdasInternal::reset(int nsens, int nsensB, int nsensB_store){
 //     reset(0);
 
   // Reset timers
-  t_res = t_fres = t_jac = t_lsolve = t_lsetup_jac = t_lsetup_fac = 0;
+  t_res = t_fres = t_jac = t_jacB = t_lsolve = t_lsetup_jac = t_lsetup_fac = 0;
     
   // Return flag
   int flag;
@@ -1024,7 +1024,7 @@ void IdasInternal::idas_error(const string& module, int flag){
 
 int IdasInternal::rhsQ_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rhsQ, void *user_data){
  try{
-    IdasInternal *this_ = (IdasInternal*)user_data;
+    IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
     this_->rhsQ(t,NV_DATA_S(xz),NV_DATA_S(xzdot),NV_DATA_S(rhsQ));
     return 0;
   } catch(exception& e){
@@ -1080,7 +1080,7 @@ int IdasInternal::rhsQS_wrapper(int Ns, double t, N_Vector xz, N_Vector xzdot, N
                                 N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
   
  try{
-    IdasInternal *this_ = (IdasInternal*)user_data;
+    IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
     this_->rhsQS(Ns,t,xz,xzdot,xzF,xzdotF,rrQ,qdotF,tmp1,tmp2,tmp3);
     return 0;
   } catch(exception& e){
@@ -1107,7 +1107,7 @@ void IdasInternal::resB(double t, const double* xz, const double* xzdot, const d
     cout << "RDAE_Z    = " << g_.input(RDAE_Z) << endl;
     cout << "RDAE_P    = " << g_.input(RDAE_P) << endl;
     cout << "RDAE_XDOT  = ";
-    for (int k=0;k<g_.input(RDAE_X).size();++k) {
+    for (int k=0;k<nx_;++k) {
       cout << xzdot[k] << " " ;
     }
     cout << endl;
@@ -1115,7 +1115,7 @@ void IdasInternal::resB(double t, const double* xz, const double* xzdot, const d
     cout << "RDAE_RZ    = " << g_.input(RDAE_RZ) << endl;
     cout << "RDAE_RP    = " << g_.input(RDAE_RP) << endl;
     cout << "RDAE_RXDOT  = ";
-    for (int k=0;k<g_.input(RDAE_RX).size();++k) {
+    for (int k=0;k<nrx_;++k) {
       cout << xzdotA[k] << " " ;
     }
     cout << endl;
@@ -1133,9 +1133,9 @@ void IdasInternal::resB(double t, const double* xz, const double* xzdot, const d
     cout << "RDAE_ALG    = " << g_.output(RDAE_ALG) << endl;
   }
   
-  // Subtract state derivative to get residual
+  // Add state derivative to get residual (note definition of g)
   for(int i=0; i<nrx_; ++i){
-    rrA[i] += xzdotA[i]; // BUG?
+    rrA[i] += xzdotA[i];
   }
   
   if(monitored("resB")){
@@ -1149,9 +1149,9 @@ void IdasInternal::resB(double t, const double* xz, const double* xzdot, const d
   log("IdasInternal::resB","end");
 }
 
-int IdasInternal::resB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzA, N_Vector xzdotA, N_Vector rrA, void *user_dataB){
+int IdasInternal::resB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzA, N_Vector xzdotA, N_Vector rrA, void *user_data){
  try{
-    IdasInternal *this_ = (IdasInternal*)user_dataB;
+    IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
     this_->resB(t,NV_DATA_S(xz),NV_DATA_S(xzdot),NV_DATA_S(xzA),NV_DATA_S(xzdotA),NV_DATA_S(rrA));
     return 0;
   } catch(exception& e){
@@ -1189,16 +1189,16 @@ void IdasInternal::rhsQB(double t, const double* xz, const double* xzdot, const 
     cout << "rhs = " << g_.output(RDAE_QUAD) << endl;
   }
   
-  // Negate as we are integrating backwards in time
+  // Negate (note definition of g)
   for(int i=0; i<nrq_; ++i)
     qdotA[i] *= -1;
   
   log("IdasInternal::rhsQB","end");
 }
 
-int IdasInternal::rhsQB_wrapper(double t, N_Vector y, N_Vector xzdot, N_Vector xzA, N_Vector xzdotA, N_Vector qdotA, void *user_dataB){
+int IdasInternal::rhsQB_wrapper(double t, N_Vector y, N_Vector xzdot, N_Vector xzA, N_Vector xzdotA, N_Vector qdotA, void *user_data){
  try{
-    IdasInternal *this_ = (IdasInternal*)user_dataB;
+    IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
     this_->rhsQB(t,NV_DATA_S(y),NV_DATA_S(xzdot),NV_DATA_S(xzA),NV_DATA_S(xzdotA),NV_DATA_S(qdotA));
     return 0;
   } catch(exception& e){
@@ -1228,9 +1228,6 @@ void IdasInternal::djac(long Neq, double t, double cj, N_Vector xz, N_Vector xzd
   const vector<int>& col = jac_.output().col();
   const vector<double>& val = jac_.output().data();
 
-  // Dimension of the Jacobian
-  //int jdim = jac_.output().size1();
-    
   // Loop over rows
   for(int i=0; i<rowind.size()-1; ++i){
     // Loop over non-zero entries
@@ -1252,11 +1249,66 @@ void IdasInternal::djac(long Neq, double t, double cj, N_Vector xz, N_Vector xzd
 
 int IdasInternal::djac_wrapper(long Neq, double t, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
  try{
-    IdasInternal *this_ = (IdasInternal*)user_data;
+    IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
     this_->djac(Neq, t, cj, xz, xzdot, rr, Jac, tmp1, tmp2, tmp3);
     return 0;
   } catch(exception& e){
     cerr << "djac failed: " << e.what() << endl;
+    return 1;
+  }
+}
+
+void IdasInternal::djacB(long int NeqB, double t, double cjB, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector rrB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B){
+  log("IdasInternal::djacB","begin");
+
+  // Get time
+  time1 = clock();
+  
+  // Pass input to the Jacobian function
+  jacB_.setInput(&t,RDAE_T);
+  jacB_.setInput(NV_DATA_S(xz),RDAE_X);
+  jacB_.setInput(NV_DATA_S(xz)+nx_,RDAE_Z);
+  jacB_.setInput(input(INTEGRATOR_P),RDAE_P);
+  jacB_.setInput(input(INTEGRATOR_RP),RDAE_RP);
+  jacB_.setInput(NV_DATA_S(xzB),RDAE_RX);
+  jacB_.setInput(NV_DATA_S(xzB)+nrx_,RDAE_RZ);
+  jacB_.setInput(cjB,RDAE_NUM_IN);
+  
+  // Evaluate Jacobian
+  jacB_.evaluate();
+
+  // Get sparsity and non-zero elements
+  const vector<int>& rowind = jacB_.output().rowind();
+  const vector<int>& col = jacB_.output().col();
+  const vector<double>& val = jacB_.output().data();
+  cout << "val = " << val << endl;
+
+  // Loop over rows
+  for(int i=0; i<rowind.size()-1; ++i){
+    // Loop over non-zero entries
+    for(int el=rowind[i]; el<rowind[i+1]; ++el){
+      
+      // Get column
+      int j = col[el];
+      
+      // Add to the element
+      DENSE_ELEM(JacB,i,j) = val[el];
+    }
+  }
+  
+  // Log time duration
+  time2 = clock();
+  t_jacB += double(time2-time1)/CLOCKS_PER_SEC;
+  log("IdasInternal::djacB","end");  
+}
+
+int IdasInternal::djacB_wrapper(long int NeqB, double t, double cjB, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector rrB, DlsMat JacB, void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B){
+ try{
+    IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
+    this_->djacB(NeqB, t, cjB, xz, xzdot, xzB, xzdotB, rrB, JacB, tmp1B, tmp2B, tmp3B);
+    return 0;
+  } catch(exception& e){
+    cerr << "djacB failed: " << e.what() << endl;
     return 1;
   }
 }
@@ -1302,7 +1354,7 @@ void IdasInternal::bjac(long Neq, long mupper, long mlower, double t, double cj,
 
 int IdasInternal::bjac_wrapper(long Neq, long mupper, long mlower, double tt, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2,N_Vector tmp3){
  try{
-    IdasInternal *this_ = (IdasInternal*)user_data;
+    IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
     this_->bjac(Neq, mupper, mlower, tt, cj, xz, xzdot, rr, Jac, tmp1, tmp2, tmp3);
     return 0;
   } catch(exception& e){
@@ -1319,7 +1371,7 @@ void IdasInternal::setStopTime(double tf){
 
 int IdasInternal::psolve_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector rvec, N_Vector zvec, double cj, double delta, void *user_data, N_Vector tmp){
  try{
-    IdasInternal *this_ = (IdasInternal*)user_data;
+    IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
     casadi_assert(this_);
     this_->psolve(t, xz, xzdot, rr, rvec, zvec, cj, delta, tmp);
     return 0;
@@ -1331,7 +1383,7 @@ int IdasInternal::psolve_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector
 
 int IdasInternal::psetup_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, double cj, void* user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
  try{
-    IdasInternal *this_ = (IdasInternal*)user_data;
+    IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
     casadi_assert(this_);
     this_->psetup(t, xz, xzdot, rr, cj, tmp1, tmp2, tmp3);
     return 0;
@@ -1543,8 +1595,18 @@ void IdasInternal::initUserDefinedLinearSolver(){
 }
 
 void IdasInternal::initDenseLinearSolverB(){
+  // Dense jacobian
   int flag = IDADenseB(mem_, whichB_, nrx_+nrz_);
   if(flag != IDA_SUCCESS) idas_error("IDADenseB",flag);
+  if(exact_jacobianB_){
+    // Generate jacobians if not already provided
+    if(jacB_.isNull()) jacB_ = getJacobianB();
+    if(!jacB_.isInit()) jacB_.init();
+    
+    // Pass to IDA
+    flag = IDADlsSetDenseJacFnB(mem_, whichB_, djacB_wrapper);
+    if(flag!=IDA_SUCCESS) idas_error("IDADlsSetDenseJacFnB",flag);
+  }
 }
   
 void IdasInternal::initBandedLinearSolverB(){
