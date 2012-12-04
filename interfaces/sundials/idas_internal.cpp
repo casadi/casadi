@@ -1281,7 +1281,6 @@ void IdasInternal::djacB(long int NeqB, double t, double cjB, N_Vector xz, N_Vec
   const vector<int>& rowind = jacB_.output().rowind();
   const vector<int>& col = jacB_.output().col();
   const vector<double>& val = jacB_.output().data();
-  cout << "val = " << val << endl;
 
   // Loop over rows
   for(int i=0; i<rowind.size()-1; ++i){
