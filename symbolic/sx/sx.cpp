@@ -258,15 +258,7 @@ bool SX::isSquared() const{
 }
 
 bool SX::isEquivalent(const SX& y, int depth) const{
-  if (isEqual(y)) return true;
-  if (isConstant() && y.isConstant()) return y.getValue()==getValue();
-  if (depth==0) return false;
-  
-  if (hasDep() && y.hasDep() && getOp()==y.getOp()) {
-    if (getDep(0).isEquivalent(y.getDep(0),depth-1)  && getDep(1).isEquivalent(y.getDep(1),depth-1)) return true;
-    return (operation_checker<CommChecker>(getOp()) && getDep(0).isEquivalent(y.getDep(1),depth-1)  && getDep(1).isEquivalent(y.getDep(0),depth-1));
-  }
-  return false;
+  return isEqual(y,depth);
 }
 
 SX SX::__div__(const SX& y) const{
