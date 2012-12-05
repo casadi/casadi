@@ -109,17 +109,15 @@ for Integrators in (ODE_integrators,DAE_integrators):
     print "Integrator: ", MyIntegrator.__name__
     print "========"
 
-    # Integrator options
-    opts = {}
-    opts["tf"]=tf
-    if MyIntegrator==CollocationIntegrator:
-      opts["implicit_solver"] = KinsolSolver
-      opts["implicit_solver_options"] = {"linear_solver":CSparse}
-      opts["expand_f"]=True
-
     # Integrator
     I = MyIntegrator(ffcn)
-    I.setOption(opts)
+    
+    # Integrator options
+    I.setOption("tf",tf)
+    if MyIntegrator==CollocationIntegrator:
+      I.setOption("implicit_solver",KinsolSolver)
+      I.setOption("implicit_solver_options",{"linear_solver":CSparse})
+      I.setOption("expand_f",True)
     I.init()
 
     # Integrate to get results
