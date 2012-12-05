@@ -61,7 +61,7 @@ public:
   bool exact_jacobian_, exact_jacobianB_;
   double abstol_, reltol_;
   double fsens_abstol_, fsens_reltol_;
-  double asens_abstol_, asens_reltol_;
+  double abstolB_, reltolB_;
   int max_num_steps_;
   bool finite_difference_fsens_;  
   bool stop_at_end_;

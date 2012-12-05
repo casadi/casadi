@@ -316,7 +316,7 @@ void CVodesInternal::initAdj(){
 //   if(flag != CV_SUCCESS) cvodes_error("CVodeInitBS",flag);
 
   // Set tolerances
-  flag = CVodeSStolerancesB(mem_, whichB_, asens_reltol_, asens_abstol_);
+  flag = CVodeSStolerancesB(mem_, whichB_, reltolB_, abstolB_);
   if(flag!=CV_SUCCESS) cvodes_error("CVodeSStolerancesB",flag);
 
   // User data
@@ -348,7 +348,7 @@ void CVodesInternal::initAdj(){
     flag = CVodeSetQuadErrConB(mem_, whichB_,true);
     if(flag != CV_SUCCESS) cvodes_error("CVodeSetQuadErrConB",flag);
       
-    flag = CVodeQuadSStolerancesB(mem_, whichB_, asens_reltol_, asens_abstol_);
+    flag = CVodeQuadSStolerancesB(mem_, whichB_, reltolB_, abstolB_);
     if(flag != CV_SUCCESS) cvodes_error("CVodeQuadSStolerancesB",flag);
   }
   
@@ -1314,12 +1314,12 @@ void CVodesInternal::initDenseLinearSolverB(){
 }
   
 void CVodesInternal::initBandedLinearSolverB(){
-  int flag = CVBandB(mem_, whichB_, nrx_, getOption("asens_upper_bandwidth").toInt(), getOption("asens_lower_bandwidth").toInt());
+  int flag = CVBandB(mem_, whichB_, nrx_, getOption("upper_bandwidthB").toInt(), getOption("lower_bandwidthB").toInt());
   if(flag!=CV_SUCCESS) cvodes_error("CVBandB",flag);
 }
   
 void CVodesInternal::initIterativeLinearSolverB(){
-  int maxl = getOption("asens_max_krylov");
+  int maxl = getOption("max_krylovB");
   int flag;
   switch(itsol_g_){
     case SD_GMRES:

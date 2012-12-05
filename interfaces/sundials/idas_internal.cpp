@@ -132,13 +132,13 @@ void IdasInternal::init(){
     }
   }
   
-  if(hasSetOption("asens_linear_solver")){
+  if(hasSetOption("linear_solverB")){
     // Make sure that a Jacobian has been provided
     if(jacB_.isNull()) jacB_ = getJacobianB();
     if(!jacB_.isInit()) jacB_.init();
     
     // Create a linear solver
-    linearSolverCreator creator = getOption("asens_linear_solver");
+    linearSolverCreator creator = getOption("linear_solverB");
     linsolB_ = creator(jacB_.output().sparsity());
     linsolB_.setSparsity(jacB_.output().sparsity());
     linsolB_.init();
@@ -450,7 +450,7 @@ void IdasInternal::initAdj(){
   if(flag != IDA_SUCCESS) idas_error("IDAInitB",flag);
 
   // Set tolerances
-  flag = IDASStolerancesB(mem_, whichB_, asens_reltol_, asens_abstol_);
+  flag = IDASStolerancesB(mem_, whichB_, reltolB_, abstolB_);
   if(flag!=IDA_SUCCESS) idas_error("IDASStolerancesB",flag);
 
   // User data
@@ -500,7 +500,7 @@ void IdasInternal::initAdj(){
     flag = IDASetQuadErrConB(mem_, whichB_,true);
     if(flag != IDA_SUCCESS) idas_error("IDASetQuadErrConB",flag);
     
-    flag = IDAQuadSStolerancesB(mem_, whichB_, asens_reltol_, asens_abstol_);
+    flag = IDAQuadSStolerancesB(mem_, whichB_, reltolB_, abstolB_);
     if(flag != IDA_SUCCESS) idas_error("IDAQuadSStolerancesB",flag);
   }
   
@@ -2040,7 +2040,7 @@ void IdasInternal::initDenseLinearSolverB(){
 }
   
 void IdasInternal::initBandedLinearSolverB(){
-  int flag = IDABandB(mem_, whichB_, nrx_+nrz_, getOption("asens_upper_bandwidth").toInt(), getOption("asens_lower_bandwidth").toInt());
+  int flag = IDABandB(mem_, whichB_, nrx_+nrz_, getOption("upper_bandwidthB").toInt(), getOption("lower_bandwidthB").toInt());
   if(flag != IDA_SUCCESS) idas_error("IDABand",flag);
   if(exact_jacobianB_){
     // Generate jacobians if not already provided
@@ -2054,7 +2054,7 @@ void IdasInternal::initBandedLinearSolverB(){
 }
   
 void IdasInternal::initIterativeLinearSolverB(){
-  int maxl = getOption("asens_max_krylov");
+  int maxl = getOption("max_krylovB");
   int flag;
   switch(itsol_g_){
     case SD_GMRES:

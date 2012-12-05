@@ -91,20 +91,20 @@ class Integrationtests(casadiTestCase):
     for Integrator, features, options in integrators:
       self.message(Integrator.__name__)
       
-      def itoptions(pre=""):
-        yield {pre+"iterative_solver": "gmres"}
-        yield {pre+"iterative_solver": "bcgstab"}
-        yield {pre+"iterative_solver": "tfqmr", "use_preconditionerB": True, "asens_linear_solver" : CSparse} # Bug in Sundials? Preconditioning seems to be needed
+      def itoptions(post=""):
+        yield {"iterative_solver"+post: "gmres"}
+        yield {"iterative_solver"+post: "bcgstab"}
+        yield {"iterative_solver"+post: "tfqmr", "use_preconditionerB": True, "linear_solverB" : CSparse} # Bug in Sundials? Preconditioning seems to be needed
        
-      def solveroptions(pre=""):
-        yield {pre+"linear_solver_type": "user_defined", pre+"linear_solver": CSparse }
-        yield {pre+"linear_solver_type": "dense" }
-        for it in itoptions(pre):
-          d = {pre+"linear_solver_type": "iterative" }
+      def solveroptions(post=""):
+        yield {"linear_solver_type" +post: "user_defined", "linear_solver"+post: CSparse }
+        yield {"linear_solver_type" +post: "dense" }
+        for it in itoptions(post):
+          d = {"linear_solver_type" +post: "iterative" }
           d.update(it)
           yield d
           
-      for a_options in solveroptions("asens_"):
+      for a_options in solveroptions("B"):
         for f_options in solveroptions():
           message = "f_options: %s , a_options: %s" % (str(f_options) , str(a_options))
           print message
