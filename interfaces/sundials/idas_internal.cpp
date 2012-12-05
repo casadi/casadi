@@ -56,7 +56,7 @@ IdasInternal::IdasInternal(const FX& f, const FX& g) : SundialsInternal(f,g){
   addOption("cj_scaling",                  OT_BOOLEAN,          false,          "IDAS scaling on cj for the user-defined linear solver module");
   addOption("extra_fsens_calc_ic",         OT_BOOLEAN,          false,          "Call calc ic an extra time, with fsens=0");
   addOption("disable_internal_warnings",   OT_BOOLEAN,          false,          "Disable IDAS internal warning messages");
-  addOption("monitor",                     OT_STRINGVECTOR,     GenericType(),  "", "correctInitialConditions|res|resS|resB|rhsQB", true);
+  addOption("monitor",                     OT_STRINGVECTOR,     GenericType(),  "", "correctInitialConditions|res|resS|resB|rhsQB|jtimesB", true);
   addOption("init_xdot",                   OT_REALVECTOR,       GenericType(),  "Initial values for the state derivatives");
   addOption("init_z",                      OT_REALVECTOR,       GenericType(),  "Initial values for the algebraic states");
   
@@ -239,6 +239,7 @@ void IdasInternal::init(){
     case SD_USER_DEFINED:
       initUserDefinedLinearSolver();
       break;
+    default: casadi_error("Uncaught switch");
   }
   
   // Quadrature equations
@@ -466,6 +467,7 @@ void IdasInternal::initAdj(){
     case SD_USER_DEFINED:
       initUserDefinedLinearSolverB();
       break;
+    default: casadi_error("Uncaught switch");
   }
   
   // Quadratures for the adjoint problem
@@ -612,6 +614,88 @@ int IdasInternal::jtimes_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector
     return 0;
   } catch(exception& e){
     cerr << "jtimes failed: " << e.what() << endl;
+    return 1;
+  }
+}
+
+void IdasInternal::jtimesB(double t, const double *xz, const double *xzdot, const double *xzB, const double *xzdotB, const double *resvalB, const double *vB, double *JvB, double cjB, double * tmp1B, double * tmp2B){
+  log("IdasInternal::jtimesB","begin");
+  // Get time
+  time1 = clock();
+  
+  // Pass input
+  g_.setInput(&t,RDAE_T);
+  g_.setInput(xz,RDAE_X);
+  g_.setInput(xz+nx_,RDAE_Z);
+  g_.setInput(input(INTEGRATOR_P),RDAE_P);
+
+  g_.setInput(xzB,RDAE_RX);
+  g_.setInput(xzB+nrx_,RDAE_RZ);
+  g_.setInput(input(INTEGRATOR_RP),RDAE_RP);
+  
+  // Pass seeds of the state vectors
+  g_.setFwdSeed(vB,RDAE_RX);
+  g_.setFwdSeed(vB+nx_,RDAE_RZ);
+  
+  if(monitored("jtimesB")){
+    cout << "RDAE_T    = " << t << endl;
+    cout << "RDAE_X    = " << g_.input(RDAE_X) << endl;
+    cout << "RDAE_Z    = " << g_.input(RDAE_Z) << endl;
+    cout << "RDAE_P    = " << g_.input(RDAE_P) << endl;
+    cout << "RDAE_XDOT  = ";
+    for (int k=0;k<nx_;++k) {
+      cout << xzdot[k] << " " ;
+    }
+    cout << endl;
+    cout << "RDAE_RX    = " << g_.input(RDAE_RX) << endl;
+    cout << "RDAE_RZ    = " << g_.input(RDAE_RZ) << endl;
+    cout << "RDAE_RP    = " << g_.input(RDAE_RP) << endl;
+    cout << "RDAE_RXDOT  = ";
+    for (int k=0;k<nrx_;++k) {
+      cout << xzdotB[k] << " " ;
+    }
+    cout << endl;
+    cout << "fwdSeed(RDAE_RX) = " << g_.fwdSeed(RDAE_RX) << endl;
+    cout << "fwdSeed(RDAE_RZ) = " << g_.fwdSeed(RDAE_RZ) << endl;
+  }
+  
+  // Evaluate the AD forward algorithm
+  g_.evaluate(1,0);
+
+  if(monitored("jtimesB")){
+    cout << "fwdSens(RDAE_ODE) = " << g_.fwdSens(RDAE_ODE) << endl;
+    cout << "fwdSens(RDAE_ALG) = " << g_.fwdSens(RDAE_ALG) << endl;
+  }
+  
+  // Get the output seeds
+  g_.getFwdSens(JvB,RDAE_ODE);
+  g_.getFwdSens(JvB+nx_,RDAE_ALG);
+
+  // Subtract state derivative to get residual
+  for(int i=0; i<nrx_; ++i){
+    JvB[i] += cjB*vB[i];
+  }
+
+  if(monitored("jtimesB")){
+    g_.setFwdSens(JvB,RDAE_ODE);
+    g_.setFwdSens(JvB+nx_,RDAE_ALG);
+    cout << "res fwdSens(RDAE_ODE)    = " << g_.output(RDAE_ODE) << endl;
+    cout << "res fwdSens(RDAE_ALG)    = " << g_.output(RDAE_ALG) << endl;
+  }
+  
+  // Log time duration
+  time2 = clock();
+  t_jac += double(time2-time1)/CLOCKS_PER_SEC;
+  log("IdasInternal::jtimesB","end");
+}
+
+int IdasInternal::jtimesB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resvalB, N_Vector vB, N_Vector JvB, double cjB, void *user_data, N_Vector tmp1B, N_Vector tmp2B) {
+ try{
+    IdasInternal *this_ = (IdasInternal*)user_data;
+    this_->jtimesB(t,NV_DATA_S(xz),NV_DATA_S(xzdot),NV_DATA_S(xzB),NV_DATA_S(xzdotB),NV_DATA_S(resvalB),NV_DATA_S(vB),NV_DATA_S(JvB), cjB, NV_DATA_S(tmp1B), NV_DATA_S(tmp2B));
+    return 0;
+  } catch(exception& e){
+    cerr << "jtimesB failed: " << e.what() << endl;
     return 1;
   }
 }
@@ -1351,13 +1435,67 @@ void IdasInternal::bjac(long Neq, long mupper, long mlower, double t, double cj,
   log("IdasInternal::bjac","end");
 }
 
-int IdasInternal::bjac_wrapper(long Neq, long mupper, long mlower, double tt, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2,N_Vector tmp3){
+int IdasInternal::bjac_wrapper(long Neq, long mupper, long mlower, double t, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2,N_Vector tmp3){
  try{
     IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
-    this_->bjac(Neq, mupper, mlower, tt, cj, xz, xzdot, rr, Jac, tmp1, tmp2, tmp3);
+    this_->bjac(Neq, mupper, mlower, t, cj, xz, xzdot, rr, Jac, tmp1, tmp2, tmp3);
     return 0;
   } catch(exception& e){
     cerr << "bjac failed: " << e.what() << endl;
+    return 1;
+  }
+}
+
+void IdasInternal::bjacB(long NeqB, long mupperB, long mlowerB, double t, double cjB, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resvalB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
+log("IdasInternal::bjacB","begin");
+
+  // Get time
+  time1 = clock();
+  
+  // Pass input to the Jacobian function
+  jacB_.setInput(&t,RDAE_T);
+  jacB_.setInput(NV_DATA_S(xz),RDAE_X);
+  jacB_.setInput(NV_DATA_S(xz)+nx_,RDAE_Z);
+  jacB_.setInput(input(INTEGRATOR_P),RDAE_P);
+  jacB_.setInput(input(INTEGRATOR_RP),RDAE_RP);
+  jacB_.setInput(NV_DATA_S(xzB),RDAE_RX);
+  jacB_.setInput(NV_DATA_S(xzB)+nrx_,RDAE_RZ);
+  jacB_.setInput(cjB,RDAE_NUM_IN);
+  
+  // Evaluate Jacobian
+  jacB_.evaluate();
+
+  // Get sparsity and non-zero elements
+  const vector<int>& rowind = jacB_.output().rowind();
+  const vector<int>& col = jacB_.output().col();
+  const vector<double>& val = jacB_.output().data();
+
+  // Loop over rows
+  for(int i=0; i<rowind.size()-1; ++i){
+    // Loop over non-zero entries
+    for(int el=rowind[i]; el<rowind[i+1]; ++el){
+      // Get column
+      int j = col[el];
+      
+      // Set the element
+      if(i-j>=-mupperB && i-j<=mlowerB)
+        BAND_ELEM(JacB,i,j) = val[el];
+    }
+  }
+  
+  // Log time duration
+  time2 = clock();
+  t_jacB += double(time2-time1)/CLOCKS_PER_SEC;
+  log("IdasInternal::bjacB","end");
+}
+
+int IdasInternal::bjacB_wrapper(long NeqB, long mupperB, long mlowerB, double t, double cjB, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resvalB, DlsMat JacB, void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
+ try{
+    IdasInternal *this_ = (IdasInternal*)user_data;
+    this_->bjacB(NeqB, mupperB, mlowerB, t, cjB, xz, xzdot, xzB, xzdotB, resvalB, JacB, tmp1B, tmp2B, tmp3B);
+    return 0;
+  } catch(exception& e){
+    cerr << "bjacB failed: " << e.what() << endl;
     return 1;
   }
 }
@@ -1556,6 +1694,7 @@ void IdasInternal::initIterativeLinearSolver(){
       flag = IDASptfqmr(mem_, maxl);
       if(flag != IDA_SUCCESS) idas_error("IDASptfqmr",flag);
       break;
+    default: casadi_error("Uncaught switch");
   }
         
   // Attach functions for jacobian information
@@ -1611,6 +1750,15 @@ void IdasInternal::initDenseLinearSolverB(){
 void IdasInternal::initBandedLinearSolverB(){
   int flag = IDABandB(mem_, whichB_, nrx_+nrz_, getOption("asens_upper_bandwidth").toInt(), getOption("asens_lower_bandwidth").toInt());
   if(flag != IDA_SUCCESS) idas_error("IDABand",flag);
+  if(exact_jacobianB_){
+    // Generate jacobians if not already provided
+    if(jacB_.isNull()) jacB_ = getJacobianB();
+    if(!jacB_.isInit()) jacB_.init();
+    
+    // Pass to IDA
+    flag = IDADlsSetBandJacFnB(mem_, whichB_, bjacB_wrapper);
+    if(flag!=IDA_SUCCESS) idas_error("IDADlsSetBandJacFnB",flag);
+  }
 }
   
 void IdasInternal::initIterativeLinearSolverB(){
@@ -1629,6 +1777,17 @@ void IdasInternal::initIterativeLinearSolverB(){
       flag = IDASptfqmrB(mem_, whichB_, maxl);
       if(flag != IDA_SUCCESS) idas_error("IDASptfqmrB",flag);
       break;
+    default: casadi_error("Uncaught switch");
+  }
+  
+  // Attach functions for jacobian information
+  if(exact_jacobianB_){
+    // Generate jacobians if not already provided
+    if(jacB_.isNull()) jacB_ = getJacobianB();
+    if(!jacB_.isInit()) jacB_.init();
+    
+    flag = IDASpilsSetJacTimesVecFnB(mem_, whichB_, jtimesB_wrapper);
+    if(flag != IDA_SUCCESS) idas_error("IDASpilsSetJacTimesVecFnB",flag);
   }
 }
   

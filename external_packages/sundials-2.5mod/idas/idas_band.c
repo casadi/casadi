@@ -403,7 +403,7 @@ int IDABandB(void *ida_mem, int which,
 
   if (flag != IDADLS_SUCCESS) {
     free(idadlsB_mem);
-    idadlsB_mem = NULL;
+    IDAB_mem->ida_lmem  = NULL;
   }
 
   return(flag);
