@@ -257,10 +257,6 @@ bool SX::isSquared() const{
   return isOp(OP_MUL) && node->dep(0).isEqual(node->dep(1),eq_depth_);
 }
 
-bool SX::isEquivalent(const SX& y, int depth) const{
-  return isEqual(y,depth);
-}
-
 SX SX::__div__(const SX& y) const{
   // Only simplifications that do not result in extra nodes area allowed
 
