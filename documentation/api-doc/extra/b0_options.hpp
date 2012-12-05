@@ -837,7 +837,8 @@
 <tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Upper band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOLEAN</td><td>false</td><td>Disable CVodes internal warning messages</td><td>CasADi::CVodesInternal</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Use exact Jacobian information for the integration</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Use exact Jacobian information for the forward integration</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>exact_jacobianB</td><td>OT_BOOLEAN</td><td>false</td><td>Use exact Jacobian information for the backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>Use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>fsens_abstol</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the forward sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>fsens_all_at_once</td><td>OT_BOOLEAN</td><td>true</td><td>Calculate all right hand sides of the sensitivity equations at once</td><td>CasADi::CVodesInternal</td></tr>
@@ -904,7 +905,8 @@
 <tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Upper band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOLEAN</td><td>false</td><td>Disable CVodes internal warning messages</td><td>CasADi::CVodesInternal</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Use exact Jacobian information for the integration</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Use exact Jacobian information for the forward integration</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>exact_jacobianB</td><td>OT_BOOLEAN</td><td>false</td><td>Use exact Jacobian information for the backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>Use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>fsens_abstol</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the forward sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>fsens_all_at_once</td><td>OT_BOOLEAN</td><td>true</td><td>Calculate all right hand sides of the sensitivity equations at once</td><td>CasADi::CVodesInternal</td></tr>
@@ -1947,11 +1949,12 @@
 <tr><td>asens_reltol</td><td>OT_REAL</td><td>GenericType()</td><td>Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Upper band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>calc_ic</td><td>OT_BOOLEAN</td><td>true</td><td>Use IDACalcIC to get consistent initial conditions. This only works for semi-explicit index-one systems. Else, you must provide consistent initial conditions yourself.</td><td>CasADi::IdasInternal</td></tr>
-<tr><td>calc_icB</td><td>OT_BOOLEAN</td><td>false</td><td>Use IDACalcIC to get consistent initial conditions. This only works for semi-explicit index-one systems. Else, you must provide consistent initial conditions yourself.</td><td>CasADi::IdasInternal</td></tr>
+<tr><td>calc_ic</td><td>OT_BOOLEAN</td><td>true</td><td>Use IDACalcIC to get consistent initial conditions.</td><td>CasADi::IdasInternal</td></tr>
+<tr><td>calc_icB</td><td>OT_BOOLEAN</td><td>true</td><td>Use IDACalcIC to get consistent initial conditions.</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>cj_scaling</td><td>OT_BOOLEAN</td><td>false</td><td>IDAS scaling on cj for the user-defined linear solver module</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOLEAN</td><td>false</td><td>Disable IDAS internal warning messages</td><td>CasADi::IdasInternal</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Use exact Jacobian information for the integration</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Use exact Jacobian information for the forward integration</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>exact_jacobianB</td><td>OT_BOOLEAN</td><td>false</td><td>Use exact Jacobian information for the backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>extra_fsens_calc_ic</td><td>OT_BOOLEAN</td><td>false</td><td>Call calc ic an extra time, with fsens=0</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>Use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>first_time</td><td>OT_REAL</td><td>GenericType()</td><td>First requested time as a fraction of the time interval</td><td>CasADi::IdasInternal</td></tr>
@@ -2022,11 +2025,12 @@
 <tr><td>asens_reltol</td><td>OT_REAL</td><td>GenericType()</td><td>Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Upper band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>calc_ic</td><td>OT_BOOLEAN</td><td>true</td><td>Use IDACalcIC to get consistent initial conditions. This only works for semi-explicit index-one systems. Else, you must provide consistent initial conditions yourself.</td><td>CasADi::IdasInternal</td></tr>
-<tr><td>calc_icB</td><td>OT_BOOLEAN</td><td>false</td><td>Use IDACalcIC to get consistent initial conditions. This only works for semi-explicit index-one systems. Else, you must provide consistent initial conditions yourself.</td><td>CasADi::IdasInternal</td></tr>
+<tr><td>calc_ic</td><td>OT_BOOLEAN</td><td>true</td><td>Use IDACalcIC to get consistent initial conditions.</td><td>CasADi::IdasInternal</td></tr>
+<tr><td>calc_icB</td><td>OT_BOOLEAN</td><td>true</td><td>Use IDACalcIC to get consistent initial conditions.</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>cj_scaling</td><td>OT_BOOLEAN</td><td>false</td><td>IDAS scaling on cj for the user-defined linear solver module</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOLEAN</td><td>false</td><td>Disable IDAS internal warning messages</td><td>CasADi::IdasInternal</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Use exact Jacobian information for the integration</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Use exact Jacobian information for the forward integration</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>exact_jacobianB</td><td>OT_BOOLEAN</td><td>false</td><td>Use exact Jacobian information for the backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>extra_fsens_calc_ic</td><td>OT_BOOLEAN</td><td>false</td><td>Call calc ic an extra time, with fsens=0</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>Use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>first_time</td><td>OT_REAL</td><td>GenericType()</td><td>First requested time as a fraction of the time interval</td><td>CasADi::IdasInternal</td></tr>
@@ -3106,7 +3110,8 @@
 <tr><td>asens_reltol</td><td>OT_REAL</td><td>GenericType()</td><td>Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Upper band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Use exact Jacobian information for the integration</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Use exact Jacobian information for the forward integration</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>exact_jacobianB</td><td>OT_BOOLEAN</td><td>false</td><td>Use exact Jacobian information for the backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>Use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>fsens_abstol</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the forward sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>fsens_err_con</td><td>OT_BOOLEAN</td><td>true</td><td>include the forward sensitivities in all error controls</td><td>CasADi::SundialsInternal</td></tr>
@@ -3169,7 +3174,8 @@
 <tr><td>asens_reltol</td><td>OT_REAL</td><td>GenericType()</td><td>Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Upper band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Use exact Jacobian information for the integration</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Use exact Jacobian information for the forward integration</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>exact_jacobianB</td><td>OT_BOOLEAN</td><td>false</td><td>Use exact Jacobian information for the backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>finite_difference_fsens</td><td>OT_BOOLEAN</td><td>false</td><td>Use finite differences to approximate the forward sensitivity equations (if AD is not available)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>fsens_abstol</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the forward sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>fsens_err_con</td><td>OT_BOOLEAN</td><td>true</td><td>include the forward sensitivities in all error controls</td><td>CasADi::SundialsInternal</td></tr>

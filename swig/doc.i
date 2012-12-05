@@ -20144,7 +20144,8 @@ Joel Andersson
 |              |              |              | uts)  (corre | ernal        |
 |              |              |              | ctInitialCon |              |
 |              |              |              | ditions|res| |              |
-|              |              |              | resS|rhsQB)  |              |
+|              |              |              | resS|resB|rh |              |
+|              |              |              | sQB)         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -20304,6 +20305,8 @@ Joel Andersson
 | outputs                  | CasADi::FXInternal   |
 +--------------------------+----------------------+
 | res                      | CasADi::IdasInternal |
++--------------------------+----------------------+
+| resB                     | CasADi::IdasInternal |
 +--------------------------+----------------------+
 | resS                     | CasADi::IdasInternal |
 +--------------------------+----------------------+
@@ -21313,7 +21316,8 @@ rx, rz and rp.
 |              |              |              | uts)  (corre | ernal        |
 |              |              |              | ctInitialCon |              |
 |              |              |              | ditions|res| |              |
-|              |              |              | resS|rhsQB)  |              |
+|              |              |              | resS|resB|rh |              |
+|              |              |              | sQB)         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -21473,6 +21477,8 @@ rx, rz and rp.
 | outputs                  | CasADi::FXInternal   |
 +--------------------------+----------------------+
 | res                      | CasADi::IdasInternal |
++--------------------------+----------------------+
+| resB                     | CasADi::IdasInternal |
 +--------------------------+----------------------+
 | resS                     | CasADi::IdasInternal |
 +--------------------------+----------------------+
