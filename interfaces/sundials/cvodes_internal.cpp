@@ -647,10 +647,10 @@ void CVodesInternal::cvodes_error(const string& module, int flag){
   casadi_error(ss.str());
 }
   
-void CVodesInternal::ehfun_wrapper(int error_code, const char *module, const char *function, char *msg, void *eh_data){
+void CVodesInternal::ehfun_wrapper(int error_code, const char *module, const char *function, char *msg, void *user_data){
 try{
-    casadi_assert(eh_data);
-    CVodesInternal *this_ = (CVodesInternal*)eh_data;
+    casadi_assert(user_data);
+    CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
     this_->ehfun(error_code,module,function,msg);        
   } catch(exception& e){
     cerr << "ehfun failed: " << e.what() << endl;
@@ -1185,7 +1185,7 @@ void CVodesInternal::lsetup(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector 
 
 int CVodesInternal::lsetup_wrapper(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot, booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3){
   try{
-    CVodesInternal *this_ = (CVodesInternal*)(cv_mem->cv_lmem);
+    CVodesInternal *this_ = static_cast<CVodesInternal*>(cv_mem->cv_lmem);
     casadi_assert(this_);
     this_->lsetup(cv_mem, convfail, x, xdot, jcurPtr, vtemp1, vtemp2, vtemp3);
     return 0;
@@ -1214,7 +1214,7 @@ void CVodesInternal::lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vect
 
 int CVodesInternal::lsolve_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector x, N_Vector xdot){
   try{
-    CVodesInternal *this_ = (CVodesInternal*)(cv_mem->cv_lmem);
+    CVodesInternal *this_ = static_cast<CVodesInternal*>(cv_mem->cv_lmem);
     casadi_assert(this_);
     this_->lsolve(cv_mem, b, weight, x, xdot);
     return 0;

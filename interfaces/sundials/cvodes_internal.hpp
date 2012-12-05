@@ -124,7 +124,7 @@ public:
   
   // Static wrappers to be passed to Sundials
   static int rhs_wrapper(double t, N_Vector x, N_Vector xdot, void *user_data);
-  static void ehfun_wrapper(int error_code, const char *module, const char *function, char *msg, void *eh_data);
+  static void ehfun_wrapper(int error_code, const char *module, const char *function, char *msg, void *user_data);
   static int rhsS_wrapper(int Ns, double t, N_Vector x, N_Vector xdot, N_Vector *xF, N_Vector *xdotF, void *user_data, N_Vector tmp1, N_Vector tmp2);
   static int rhsS1_wrapper(int Ns, double t, N_Vector x, N_Vector xdot, int iS, N_Vector xF, N_Vector xdotF, void *user_data, N_Vector tmp1, N_Vector tmp2);
   static int rhsQ_wrapper(double t, N_Vector x, N_Vector qdot, void *user_data);
