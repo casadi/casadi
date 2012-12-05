@@ -577,7 +577,7 @@ void FXInternal::getPartition(int iind, int oind, CRSSparsity& D1, CRSSparsity& 
 void FXInternal::evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
       const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
       const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
-      bool output_given, int offset_begin, int offset_end){
+      bool output_given){
   casadi_error("FXInternal::evalSX not defined for class " << typeid(*this).name());
 }
 

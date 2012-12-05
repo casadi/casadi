@@ -83,7 +83,7 @@ class SXFunctionInternal : public XFunctionInternal<SXFunction,SXFunctionInterna
   virtual void evalSX(const std::vector<SXMatrix>& arg, std::vector<SXMatrix>& res, 
                       const std::vector<std::vector<SXMatrix> >& fseed, std::vector<std::vector<SXMatrix> >& fsens, 
                       const std::vector<std::vector<SXMatrix> >& aseed, std::vector<std::vector<SXMatrix> >& asens,
-                      bool output_given, int offset_begin=0, int offset_end=0);
+                      bool output_given);
                           
   /** \brief  Check if smooth */
   bool isSmooth() const;

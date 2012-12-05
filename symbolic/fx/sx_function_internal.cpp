@@ -912,7 +912,7 @@ void SXFunctionInternal::updateNumSens(bool recursive){
 void SXFunctionInternal::evalSX(const vector<SXMatrix>& arg, vector<SXMatrix>& res, 
                                 const vector<vector<SXMatrix> >& fseed, vector<vector<SXMatrix> >& fsens, 
                                 const vector<vector<SXMatrix> >& aseed, vector<vector<SXMatrix> >& asens,
-                                bool output_given, int offset_begin, int offset_end){
+                                bool output_given){
 
   if(verbose()) cout << "SXFunctionInternal::eval begin" << endl;
   
@@ -949,7 +949,7 @@ void SXFunctionInternal::evalSX(const vector<SXMatrix>& arg, vector<SXMatrix>& r
         throw CasadiException(ss.str());
       }
     }
-    evalSX(arg_new,res,fseed,fsens,aseed,asens,output_given,offset_begin,offset_end);
+    evalSX(arg_new,res,fseed,fsens,aseed,asens,output_given);
     return;
   }
   
@@ -974,7 +974,7 @@ void SXFunctionInternal::evalSX(const vector<SXMatrix>& arg, vector<SXMatrix>& r
         }
       }
     }
-    evalSX(arg,res,fseed_new,fsens,aseed,asens,output_given,offset_begin,offset_end);
+    evalSX(arg,res,fseed_new,fsens,aseed,asens,output_given);
     return;
   }
   
@@ -999,7 +999,7 @@ void SXFunctionInternal::evalSX(const vector<SXMatrix>& arg, vector<SXMatrix>& r
         }
       }
     }
-    evalSX(arg,res,fseed,fsens,aseed_new,asens,output_given,offset_begin,offset_end);
+    evalSX(arg,res,fseed,fsens,aseed_new,asens,output_given);
     return;
   }
     
@@ -1053,24 +1053,8 @@ void SXFunctionInternal::evalSX(const vector<SXMatrix>& arg, vector<SXMatrix>& r
     it1 = s_pdwork.begin();
   }
 
-  // Section of the algorithm to be evaluated
-  vector<AlgEl>::const_iterator alg_begin = algorithm_.begin()+offset_begin;
-  vector<AlgEl>::const_iterator alg_end = offset_end > 0 ? algorithm_.begin() + offset_end : algorithm_.end() + offset_end;
-  
-  // Proceed to beginning
-  vector<AlgEl>::const_iterator it = algorithm_.begin();
-  for(; it!=alg_begin; ++it){
-    switch(it->op){
-      case OP_INPUT:     break;
-      case OP_OUTPUT:    break;
-      case OP_CONST:     c_it++; break;
-      case OP_PARAMETER: p_it++; break;
-      default:           b_it++; break;
-    }
-  }
-  
-  // Evaluate selection
-  for(; it!=alg_end; ++it){
+  // Evaluate algorithm
+  for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
     switch(it->op){
       case OP_INPUT:
         s_work_[it->res] = arg[it->arg.i[0]].data()[it->arg.i[1]]; break;
@@ -1114,9 +1098,6 @@ void SXFunctionInternal::evalSX(const vector<SXMatrix>& arg, vector<SXMatrix>& r
   // Quick return if no sensitivities
   if(!taping) return;
 
-  // Partial evaluation not supported past this point
-  casadi_assert_message(offset_begin==0 && offset_end==0, "Offsets in the algorithm not supported together with sensitivities.");
-  
   // Calculate forward sensitivities
   for(int dir=0; dir<nfdir; ++dir){
     vector<TapeEl<SX> >::const_iterator it2 = s_pdwork.begin();
