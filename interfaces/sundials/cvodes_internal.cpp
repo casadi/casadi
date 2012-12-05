@@ -97,33 +97,17 @@ void CVodesInternal::init(){
   monitor_rhs_   = monitored("res");
   monitor_rhsQB_ = monitored("resQB");
   
-  // Try to generate a jacobian if none provided
-  if(!linsol_.isNull() && jac_.isNull()){
-    log("CVodesInternal::init","generate jacobian");
-    SXFunction f = shared_cast<SXFunction>(f_);
-    if(!f.isNull()){
-      // Get the Jacobian in the Newton iteration
-      SX gamma("gamma");
-      SXMatrix jac = SXMatrix::eye(nx_) - gamma * f.jac(DAE_X,DAE_ODE);
-      
-      // Jacobian function
-      vector<SXMatrix> jac_in(M_NUM_IN);
-      jac_in[M_T] = f.inputExpr(DAE_T);
-      jac_in[M_Y] = f.inputExpr(DAE_X);
-      jac_in[M_P] = f.inputExpr(DAE_P);
-      jac_in[M_GAMMA] = gamma;
-      SXFunction M(jac_in,jac);
-      
-      // Pass sparsity to linear solver
-      linsol_.setSparsity(jac.sparsity());
-      
-      // Save function
-      jac_ = M;
-    }
+  // Generate a jacobian if none provided
+  if(!linsol_.isNull()){
+    if(jac_.isNull()) jac_ = getJacobian();
   }
-  
   if(!jac_.isNull()) jac_.init();
-  if(!linsol_.isNull()) linsol_.init();
+
+  // Pass sparsity to linear solver and initialize
+  if(!linsol_.isNull()){
+    linsol_.setSparsity(jac_.output().sparsity());
+    linsol_.init();
+  }
 
   // Get the number of forward and adjoint directions
   nfdir_f_ = f_.getOption("number_of_fwd_dir");
@@ -1161,10 +1145,11 @@ void CVodesInternal::psetup(double t, N_Vector x, N_Vector xdot, booleantype jok
   time1 = clock();
 
   // Pass input to the jacobian function
-  jac_.setInput(t,M_T);
-  jac_.setInput(NV_DATA_S(x),M_Y);
-  jac_.setInput(input(INTEGRATOR_P),M_P);
-  jac_.setInput(gamma,M_GAMMA);
+  jac_.setInput(&t,DAE_T);
+  jac_.setInput(NV_DATA_S(x),DAE_X);
+  jac_.setInput(input(INTEGRATOR_P),DAE_P);
+  jac_.setInput(-gamma,DAE_NUM_IN);
+  jac_.setInput(1.0,DAE_NUM_IN+1);
 
   // Evaluate jacobian
   jac_.evaluate();

@@ -27,12 +27,6 @@
 
 namespace CasADi{
   
-/// Input arguments of the Jacobian in the nonlinear iteration: M = 1 - gamma*df/dy
-enum MInput{M_T, M_Y, M_P, M_GAMMA, M_NUM_IN};
-
-/// Output arguments of the Jacobian function
-enum MOutput{M_M, M_NUM_OUT};
-  
 // Forward declaration of internal class 
 class CVodesInternal;
 
