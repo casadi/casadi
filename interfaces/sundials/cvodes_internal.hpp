@@ -85,6 +85,23 @@ public:
   /** \brief  Set the stop time of the forward integration */
   virtual void setStopTime(double tf);
   
+  /** \brief  Print solver statistics */  
+  virtual void printStats(std::ostream &stream) const;
+
+  /** \brief  Get the integrator Jacobian for the forward problem */
+  FX getJacobian();
+  
+  /** \brief  Get the integrator Jacobian for the forward problem (generic) */
+  template<typename FunctionType>
+  FunctionType getJacobianGen();
+  
+  /** \brief  Get the integrator Jacobian for the backward problem */
+  FX getJacobianB();
+  
+  /** \brief  Get the integrator Jacobian for the backward problem (generic) */
+  template<typename FunctionType>
+  FunctionType getJacobianGenB();
+  
   protected:
 
   // Sundials callback functions
@@ -122,8 +139,6 @@ public:
   static int psetup_wrapper(double t, N_Vector x, N_Vector xdot, booleantype jok, booleantype *jcurPtr, double gamma, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
   static int lsetup_wrapper(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot, booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
   static int lsolve_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector x, N_Vector xdot);
-  
-  virtual void printStats(std::ostream &stream) const;
   
   // CVodes memory block
   void* mem_;

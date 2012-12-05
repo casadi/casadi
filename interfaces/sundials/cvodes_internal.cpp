@@ -1354,5 +1354,65 @@ void CVodesInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& a
   jac_f_ = deepcopy(jac_f_,already_copied);
 }
 
+template<typename FunctionType>
+FunctionType CVodesInternal::getJacobianGen(){
+  FunctionType f = shared_cast<FunctionType>(f_);
+  casadi_assert(!f.isNull());
+  
+  // Get the Jacobian in the Newton iteration
+  typename FunctionType::MatType c_x = FunctionType::MatType::sym("c_x");
+  typename FunctionType::MatType c_xdot = FunctionType::MatType::sym("c_xdot");
+  typename FunctionType::MatType jac = c_x*f.jac(DAE_X,DAE_ODE) + c_xdot*FunctionType::MatType::eye(nx_);
+  
+  // Jacobian function
+  std::vector<typename FunctionType::MatType> jac_in = f.inputExpr();
+  jac_in.push_back(c_x);
+  jac_in.push_back(c_xdot);
+  
+  // Return generated function
+  return FunctionType(jac_in,jac);
+}
+
+
+FX CVodesInternal::getJacobian(){
+  if(is_a<SXFunction>(f_)){
+    return getJacobianGen<SXFunction>();
+  } else if(is_a<MXFunction>(f_)){
+    return getJacobianGen<MXFunction>();
+  } else {
+    throw CasadiException("CVodesInternal::getJacobian(): Not an SXFunction or MXFunction");
+  }
+}
+
+template<typename FunctionType>
+FunctionType CVodesInternal::getJacobianGenB(){
+  FunctionType g = shared_cast<FunctionType>(g_);
+  casadi_assert(!g.isNull());
+  
+  // Get the Jacobian in the Newton iteration
+  typename FunctionType::MatType c_x = FunctionType::MatType::sym("c_x");
+  typename FunctionType::MatType c_xdot = FunctionType::MatType::sym("c_xdot");
+  typename FunctionType::MatType jac = c_x*g.jac(RDAE_RX,RDAE_ODE) + c_xdot*FunctionType::MatType::eye(nrx_);
+    
+  // Jacobian function
+  std::vector<typename FunctionType::MatType> jac_in = g.inputExpr();
+  jac_in.push_back(c_x);
+  jac_in.push_back(c_xdot);
+  
+  // return generated function
+  return FunctionType(jac_in,jac);
+}
+
+FX CVodesInternal::getJacobianB(){
+  if(is_a<SXFunction>(g_)){
+    return getJacobianGenB<SXFunction>();
+  } else if(is_a<MXFunction>(g_)){
+    return getJacobianGenB<MXFunction>();
+  } else {
+    throw CasadiException("CVodesInternal::getJacobianB(): Not an SXFunction or MXFunction");
+  }
+}
+
+
 } // namespace CasADi
 
