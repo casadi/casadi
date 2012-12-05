@@ -186,7 +186,7 @@ class SX : public GenericExpression<SX>{
     *
     *  a.isEqual(b)  will return false, but a.isEquivalent(b) will return true
     */
-    bool isEquivalent(const SX& y, int depth=1) const;
+    bool isEquivalent(const SX& y, int depth) const;
 
     /** \brief Returns a number that is unique for a given SXNode. 
     * If the SX does not point to any node, 0 is returned.
@@ -277,6 +277,12 @@ class SX : public GenericExpression<SX>{
     /** \brief Get the maximum number of calls to the printing function when printing an expression */
     static long getMaxNumCallsInPrint();
     
+    /** \brief Set or reset the depth to which equalities are being checked for simplifications */
+    static void setEqualityCheckingDepth(int eq_depth=1);
+
+    /** \brief Get the depth to which equalities are being checked for simplifications */
+    static int getEqualityCheckingDepth();
+    
     /** \brief Assign the node to something, without invoking the deletion of the node, if the count reaches 0 */
     SXNode* assignNoDelete(const SX& scalar);
     
@@ -284,6 +290,9 @@ class SX : public GenericExpression<SX>{
   private:
     // Maximum number of calls
     static long max_num_calls_in_print_;
+    
+    // Depth when checking equalities
+    static int eq_depth_;
     
     // Pointer to node (SX is only a reference class)
     SXNode* node;

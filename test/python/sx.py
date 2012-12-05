@@ -822,12 +822,12 @@ class SXtests(casadiTestCase):
     
     SX.getMaxNumCallsInPrint()
     
-  def test_isEquivalent(self):
+  def test_isEqual(self):
     self.message("equivalent")
     x = SX("x")
     a = x*x
     b = x*x
-    self.assertTrue(a.isEquivalent(b))
+    self.assertTrue(a.isEqual(b,1))
     
   def test_SXsimplifications(self):
     self.message("simplifications")

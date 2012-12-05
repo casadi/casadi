@@ -180,17 +180,17 @@ SX SX::__add__(const SX& y) const{
           y.hasDep() && y.getOp()==OP_MUL && 
           getDep(0).isConstant() && getDep(0).getValue()==0.5 && 
           y.getDep(0).isConstant() && y.getDep(0).getValue()==0.5 &&
-          y.getDep(1).isEquivalent(getDep(1))) // 0.5x+0.5x = x
+          y.getDep(1).isEqual(getDep(1),eq_depth_)) // 0.5x+0.5x = x
     return getDep(1);
   else if(hasDep() && getOp()==OP_DIV && 
           y.hasDep() && y.getOp()==OP_DIV && 
           getDep(1).isConstant() && getDep(1).getValue()==2 && 
           y.getDep(1).isConstant() && y.getDep(1).getValue()==2 &&
-          y.getDep(0).isEquivalent(getDep(0))) // x/2+x/2 = x
+          y.getDep(0).isEqual(getDep(0),eq_depth_)) // x/2+x/2 = x
     return getDep(0);
-  else if(hasDep() && getOp()==OP_SUB && getDep(1).isEquivalent(y))
+  else if(hasDep() && getOp()==OP_SUB && getDep(1).isEqual(y,eq_depth_))
     return getDep(0);
-  else if(y.hasDep() && y.getOp()==OP_SUB && isEquivalent(y.getDep(1)))
+  else if(y.hasDep() && y.getOp()==OP_SUB && isEqual(y.getDep(1),eq_depth_))
     return y.getDep(0);
   else // create a new branch
     return BinarySX::create(OP_ADD,*this, y);
@@ -203,17 +203,17 @@ SX SX::__sub__(const SX& y) const{
     return *this;
   if(node->isZero()) // term1 is zero
     return -y;
-  if(isEquivalent(y)) // the terms are equal
+  if(isEqual(y,eq_depth_)) // the terms are equal
     return 0;
   else if(y.hasDep() && y.getOp()==OP_NEG) // x - (-y) -> x + y
     return __add__(-y);
-  else if(hasDep() && getOp()==OP_ADD && getDep(1).isEquivalent(y))
+  else if(hasDep() && getOp()==OP_ADD && getDep(1).isEqual(y,eq_depth_))
     return getDep(0);
-  else if(hasDep() && getOp()==OP_ADD && getDep(0).isEquivalent(y))
+  else if(hasDep() && getOp()==OP_ADD && getDep(0).isEqual(y,eq_depth_))
     return getDep(1);
-  else if(y.hasDep() && y.getOp()==OP_ADD && isEquivalent(y.getDep(1)))
+  else if(y.hasDep() && y.getOp()==OP_ADD && isEqual(y.getDep(1),eq_depth_))
     return -y.getDep(0);
-  else if(y.hasDep() && y.getOp()==OP_ADD && isEquivalent(y.getDep(0)))
+  else if(y.hasDep() && y.getOp()==OP_ADD && isEqual(y.getDep(0),eq_depth_))
     return -y.getDep(1);
   else // create a new branch
     return BinarySX::create(OP_SUB,*this,y);
@@ -241,20 +241,20 @@ SX SX::__mul__(const SX& y) const{
     return y.getDep(1);
   else if(isConstant() && y.hasDep() && y.getOp()==OP_DIV && y.getDep(1).isConstant() && getValue()==y.getDep(1).getValue()) // 5*(x/5) = x
     return y.getDep(0);
-  else if(hasDep() && getOp()==OP_DIV && getDep(1).isEquivalent(y)) // ((2/x)*x)
+  else if(hasDep() && getOp()==OP_DIV && getDep(1).isEqual(y,eq_depth_)) // ((2/x)*x)
     return getDep(0);
-  else if(y.hasDep() && y.getOp()==OP_DIV && y.getDep(1).isEquivalent(*this)) // ((2/x)*x)
+  else if(y.hasDep() && y.getOp()==OP_DIV && y.getDep(1).isEqual(*this,eq_depth_)) // ((2/x)*x)
     return y.getDep(0);
   else     // create a new branch
     return BinarySX::create(OP_MUL,*this,y);
 }
 
 bool SX::isDoubled() const{
-  return isOp(OP_ADD) && node->dep(0).isEquivalent(node->dep(1));
+  return isOp(OP_ADD) && node->dep(0).isEqual(node->dep(1),eq_depth_);
 }
     
 bool SX::isSquared() const{
-  return isOp(OP_MUL) && node->dep(0).isEquivalent(node->dep(1));
+  return isOp(OP_MUL) && node->dep(0).isEqual(node->dep(1),eq_depth_);
 }
 
 bool SX::isEquivalent(const SX& y, int depth) const{
@@ -272,13 +272,13 @@ SX SX::__div__(const SX& y) const{
     return *this;
   else if(y->isMinusOne())
     return -(*this);
-  else if(isEquivalent(y)) // terms are equal
+  else if(isEqual(y,eq_depth_)) // terms are equal
     return 1;
   else if(isDoubled() && y.isEqual(2))
     return node->dep(0);
-  else if(isOp(OP_MUL) && y.isEquivalent(node->dep(0)))
+  else if(isOp(OP_MUL) && y.isEqual(node->dep(0),eq_depth_))
     return node->dep(1);
-  else if(isOp(OP_MUL) && y.isEquivalent(node->dep(1)))
+  else if(isOp(OP_MUL) && y.isEqual(node->dep(1),eq_depth_))
     return node->dep(0);
   else if(node->isOne())
     return y.inv();
@@ -288,15 +288,15 @@ SX SX::__div__(const SX& y) const{
     return node->dep(0) / y->dep(0);
   else if(y.isConstant() && hasDep() && getOp()==OP_DIV && getDep(1).isConstant() && y.getValue()*getDep(1).getValue()==1) // (x/5)/0.2 
     return getDep(0);
-  else if(y.hasDep() && y.getOp()==OP_MUL && y.getDep(1).isEquivalent(*this)) // x/(2*x) = 1/2
+  else if(y.hasDep() && y.getOp()==OP_MUL && y.getDep(1).isEqual(*this,eq_depth_)) // x/(2*x) = 1/2
     return BinarySX::create(OP_DIV,1,y.getDep(0));
-  else if(hasDep() && getOp()==OP_NEG && getDep(0).isEquivalent(y))      // (-x)/x = -1
+  else if(hasDep() && getOp()==OP_NEG && getDep(0).isEqual(y,eq_depth_))      // (-x)/x = -1
     return -1;
-  else if(y.hasDep() && y.getOp()==OP_NEG && y.getDep(0).isEquivalent(*this))      // x/(-x) = 1
+  else if(y.hasDep() && y.getOp()==OP_NEG && y.getDep(0).isEqual(*this,eq_depth_))      // x/(-x) = 1
     return -1;
-  else if(y.hasDep() && y.getOp()==OP_NEG && hasDep() && getOp()==OP_NEG && getDep(0).isEquivalent(y.getDep(0)))      // (-x)/(-x) = 1
+  else if(y.hasDep() && y.getOp()==OP_NEG && hasDep() && getOp()==OP_NEG && getDep(0).isEqual(y.getDep(0),eq_depth_))      // (-x)/(-x) = 1
     return 1;
-  else if(isOp(OP_DIV) && y.isEquivalent(node->dep(0)))
+  else if(isOp(OP_DIV) && y.isEqual(node->dep(0),eq_depth_))
     return node->dep(1).inv();
   else // create a new branch
     return BinarySX::create(OP_DIV,*this,y);
@@ -749,6 +749,16 @@ void SX::setMaxNumCallsInPrint(long num){
 
 long SX::getMaxNumCallsInPrint(){
   return max_num_calls_in_print_;
+}
+
+int SX::eq_depth_ = 1;
+
+void SX::setEqualityCheckingDepth(int eq_depth){
+  eq_depth_ = eq_depth;
+}
+
+int SX::getEqualityCheckingDepth(){
+  return eq_depth_;
 }
 
 } // namespace CasADi
