@@ -210,74 +210,64 @@ void substituteInPlace(const SXMatrix &v, SXMatrix &vdef, std::vector<SXMatrix>&
   casadi_assert_message(v.sparsity() == vdef.sparsity(),"the sparsity patterns of the expression and its defining expression do not match");
   if(v.empty()) return; // quick return if nothing to replace
 
+  // Function inputs
+  std::vector<SXMatrix> f_in;
+  if(!reverse) f_in.push_back(v);
+
   // Function outputs
   std::vector<SXMatrix> f_out;
   f_out.push_back(vdef);
   f_out.insert(f_out.end(),ex.begin(),ex.end());
     
   // Write the mapping function
-  SXFunction f(v,f_out);
+  SXFunction f(f_in,f_out);
   f.init();
-
-  // Get references to the internal data structures
-  const std::vector<SXAlgEl>& algorithm = f.algorithm();
   
-  // Current place in the algorithm
-  int el = 0;
+  // Get references to the internal data structures
+  const vector<SXAlgEl>& algorithm = f.algorithm();
+  vector<SX> work(f.getWorkSize());
+  
+  // Iterator to the binary operations
+  vector<SX>::const_iterator b_it=f->operations_.begin();
+  
+  // Iterator to stack of constants
+  vector<SX>::const_iterator c_it = f->constants_.begin();
 
-  // Find out which places in the algorithm corresponds to the outputs
-  vector<int> output_indices;
-  output_indices.reserve(vdef.size());
-  int next_nz = 0;
-  for(vector<SXAlgEl>::const_iterator it=algorithm.begin(); it!=algorithm.end(); ++it, ++el){
-    if(it->op==OP_OUTPUT){
-      //int loc = it->arg.i[0];
-      int ind = it->res;
-      int nz = it->arg.i[1];
-      if(ind==0){
-        casadi_assert(nz==next_nz);
-        output_indices.push_back(el);
-        next_nz++;
+  // Iterator to free variables
+  vector<SX>::const_iterator p_it = f->free_vars_.begin();
+  
+  // Evaluate the algorithm
+  for(vector<SXAlgEl>::const_iterator it=algorithm.begin(); it<algorithm.end(); ++it){
+    switch(it->op){
+      case OP_INPUT:
+        // reverse is false, substitute out
+        work[it->res] = vdef.at(it->arg.i[1]);  
+        break;
+      case OP_OUTPUT:
+        if(it->res==0){
+          vdef.at(it->arg.i[1]) = work[it->arg.i[0]];
+          if(reverse){
+            // Use the new variable henceforth, substitute in
+            work[it->arg.i[0]] = v.at(it->arg.i[1]);
+          }
+        } else {
+          // Auxillary output
+          ex[it->res-1].at(it->arg.i[1]) = work[it->arg.i[0]];   
+        }
+        break;
+      case OP_CONST:      work[it->res] = *c_it++; break;
+      case OP_PARAMETER:  work[it->res] = *p_it++; break;
+      default:
+      {
+        switch(it->op){
+          CASADI_MATH_FUN_BUILTIN(work[it->arg.i[0]],work[it->arg.i[1]],work[it->res])
+        }
+        
+        // Avoid creating duplicates
+        const int depth = 2; // NOTE: a higher depth could possibly give more savings
+        work[it->res].assignIfDuplicate(*b_it++,depth);
       }
     }
-  }
-  casadi_assert(next_nz==vdef.size());
-
-  // No sensitivities
-  vector<vector<SXMatrix> > dummy;
-
-  // Input expressions
-  std::vector<SXMatrix> inputv = f->inputv_;
-
-  // (New) output expressions
-  std::vector<SXMatrix> outputv = f->outputv_;
-  
-  // Go to the beginning of the algorithm
-  el = 0;
-  
-  // Evaluate the expressions with known definitions
-  for(int nz=0; nz<output_indices.size(); ++nz){
-    
-    // The end of the portion of the algorithm to be evaluated
-    int next_el = output_indices[nz]+1;
-    
-    // Evaluate the corresponding part of the algorithm
-    f->evalSX(inputv, outputv, dummy, dummy, dummy, dummy, false, el, next_el);
-    
-    // Assign the corresponding variable
-    inputv[0].at(nz) = outputv[0].at(nz);
-        
-    // Go to the next location
-    el = next_el;
-  }
-  
-  // Evaluate the rest of the algorithm
-  f->evalSX(inputv, outputv, dummy, dummy, dummy, dummy, false, el, 0);
-  
-  // Get the result
-  vdef = outputv.front();
-  for(int k=0; k<ex.size(); ++k){
-    ex[k] = outputv[k+1];
   }
 }
 
