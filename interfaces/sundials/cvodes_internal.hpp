@@ -143,9 +143,6 @@ public:
   // CVodes memory block
   void* mem_;
   
-  // The jacobian of the ODE rhs fcn
-  FX jac_f_;
-  
   // For timings
   clock_t time1, time2;
   

@@ -33,7 +33,6 @@ CVodesInternal* CVodesInternal::clone() const{
   // Return a deep copy
   CVodesInternal* node = new CVodesInternal(f_,g_);
   node->setOption(dictionary());
-  node->jac_f_ = jac_f_;
   node->jac_ = jac_;
   node->linsol_ = linsol_;
   return node;
@@ -1015,17 +1014,19 @@ void CVodesInternal::djac(long N, double t, N_Vector x, N_Vector xdot, DlsMat Ja
   time1 = clock();
 
   // Pass inputs to the jacobian function
-  jac_f_.setInput(&t,DAE_T);
-  jac_f_.setInput(NV_DATA_S(x),DAE_X);
-  jac_f_.setInput(f_.input(DAE_P),DAE_P);
+  jac_.setInput(&t,DAE_T);
+  jac_.setInput(NV_DATA_S(x),DAE_X);
+  jac_.setInput(f_.input(DAE_P),DAE_P);
+  jac_.setInput(1.0,DAE_NUM_IN);
+  jac_.setInput(0.0,DAE_NUM_IN+1);
 
   // Evaluate
-  jac_f_.evaluate();
+  jac_.evaluate();
   
   // Get sparsity and non-zero elements
-  const vector<int>& rowind = jac_f_.output().rowind();
-  const vector<int>& col = jac_f_.output().col();
-  const vector<double>& val = jac_f_.output().data();
+  const vector<int>& rowind = jac_.output().rowind();
+  const vector<int>& col = jac_.output().col();
+  const vector<double>& val = jac_.output().data();
 
   // Loop over rows
   for(int i=0; i<rowind.size()-1; ++i){
@@ -1062,17 +1063,19 @@ void CVodesInternal::bjac(long N, long mupper, long mlower, double t, N_Vector x
   time1 = clock();
 
   // Pass inputs to the jacobian function
-  jac_f_.setInput(&t,DAE_T);
-  jac_f_.setInput(NV_DATA_S(x),DAE_X);
-  jac_f_.setInput(f_.input(DAE_P),DAE_P);
+  jac_.setInput(&t,DAE_T);
+  jac_.setInput(NV_DATA_S(x),DAE_X);
+  jac_.setInput(f_.input(DAE_P),DAE_P);
+  jac_.setInput(1.0,DAE_NUM_IN);
+  jac_.setInput(0.0,DAE_NUM_IN+1);
 
   // Evaluate
-  jac_f_.evaluate();
+  jac_.evaluate();
   
   // Get sparsity and non-zero elements
-  const vector<int>& rowind = jac_f_.output().rowind();
-  const vector<int>& col = jac_f_.output().col();
-  const vector<double>& val = jac_f_.output().data();
+  const vector<int>& rowind = jac_.output().rowind();
+  const vector<int>& col = jac_.output().col();
+  const vector<double>& val = jac_.output().data();
 
   // Loop over rows
   for(int i=0; i<rowind.size()-1; ++i){
@@ -1225,9 +1228,9 @@ void CVodesInternal::initDenseLinearSolver(){
   int flag = CVDense(mem_, nx_);
   if(flag!=CV_SUCCESS) cvodes_error("CVDense",flag);
   if(exact_jacobian_){
-    // Create jacobian if it does not exist
-    if(jac_f_.isNull()) jac_f_ = f_.jacobian(DAE_X,DAE_ODE);
-    jac_f_.init();
+    // Generate jacobians if not already provided
+    if(jac_.isNull()) jac_ = getJacobian();
+    if(!jac_.isInit()) jac_.init();
     
     // Pass to CVodes
     flag = CVDlsSetDenseJacFn(mem_, djac_wrapper);
@@ -1239,6 +1242,10 @@ void CVodesInternal::initBandedLinearSolver(){
   int flag = CVBand(mem_, nx_, getOption("upper_bandwidth").toInt(), getOption("lower_bandwidth").toInt());
   if(flag!=CV_SUCCESS) cvodes_error("CVBand",flag);
   if(exact_jacobian_){
+    // Generate jacobians if not already provided
+    if(jac_.isNull()) jac_ = getJacobian();
+    if(!jac_.isInit()) jac_.init();
+    
     flag = CVDlsSetBandJacFn(mem_, bjac_wrapper);
     if(flag!=CV_SUCCESS) cvodes_error("CVDlsSetBandJacFn",flag);
   }
@@ -1336,7 +1343,6 @@ void CVodesInternal::initUserDefinedLinearSolverB(){
 void CVodesInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
   SundialsInternal::deepCopyMembers(already_copied);
   jac_ = deepcopy(jac_,already_copied);
-  jac_f_ = deepcopy(jac_f_,already_copied);
 }
 
 template<typename FunctionType>
