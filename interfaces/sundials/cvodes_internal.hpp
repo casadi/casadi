@@ -84,15 +84,7 @@ public:
 
   /** \brief  Set the stop time of the forward integration */
   virtual void setStopTime(double tf);
-
-  /** \brief Get the jacobian in the nonlinear iteration
-  * The result is an CasADi::FX mapping from CasADi::Sundials::MInput to CasADi::Sundials::MOutput
-  */
-  virtual FX getJacobian();
   
-  /// Get the Linear solver
-  virtual LinearSolver getLinearSolver();
-
   protected:
 
   // Sundials callback functions
@@ -201,9 +193,6 @@ public:
   
   // Initialize the user defined linear solver (backward integration)
   void initUserDefinedLinearSolverB();
-
-  // Set linear solver
-  virtual void setLinearSolver(const LinearSolver& linsol, const FX& jac);
 
   int lmm_; // linear multistep method
   int iter_; // nonlinear solver iteration

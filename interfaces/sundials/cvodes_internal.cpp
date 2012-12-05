@@ -1348,20 +1348,6 @@ void CVodesInternal::initUserDefinedLinearSolverB(){
   casadi_assert_message(false, "Not implemented");
 }
 
-void CVodesInternal::setLinearSolver(const LinearSolver& linsol, const FX& jac){
-  linsol_ = linsol;
-  jac_ = jac;
-}
-
-FX CVodesInternal::getJacobian(){
-  return jac_;
-}
-  
-LinearSolver CVodesInternal::getLinearSolver(){
-  return linsol_;
-}
-
-
 void CVodesInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){
   SundialsInternal::deepCopyMembers(already_copied);
   jac_ = deepcopy(jac_,already_copied);
