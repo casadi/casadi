@@ -103,7 +103,14 @@ class IdasInternal : public SundialsInternal{
   template<typename FunctionType>
   FunctionType getJacobianGen();
   
-  /** \brief  Get the integrator Jacobian for the backward problem */
+  /** \brief  Get the integrator Jacobian for the backward problem
+  *
+  *  Structure:
+  *
+  *
+  *   | diff(gx,rx) + cj*diff(gx,dot(rx))  |   diff(gx,rz) |
+  *   | diff(gz,rx)                        |   diff(gz,rz) |
+  */
   FX getJacobianB();
   
   /** \brief  Get the integrator Jacobian for the backward problem (generic) */
@@ -129,14 +136,18 @@ class IdasInternal : public SundialsInternal{
   void resB(double t, const double* y, const double* xzdot, const double* xA, const double* xzdotB, double* rrB);
   void rhsQB(double t, const double* y, const double* xzdot, const double* xA, const double* xzdotB, double *qdotA);
   void psolve(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector rvec, N_Vector zvec, double cj, double delta, N_Vector tmp);
+  void psolveB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resvalB, N_Vector rvecB, N_Vector zvecB, double cjB, double deltaB, N_Vector tmpB);
   void psetup(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, double cj, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  void psetupB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resvalB, double cjB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
   void djac(long Neq, double t, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
   void djacB(long NeqB, double t, double cjB, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector rrB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
   void bjac(long Neq, long mupper, long mlower, double tt, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, N_Vector tmp1, N_Vector tmp2,N_Vector tmp3);
   void bjacB(long NeqB, long mupperB, long mlowerB, double tt, double cjB, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resvalB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
-  void lsetup(IDAMem IDA_mem, N_Vector xzp, N_Vector xzdotp, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
-  void lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xzcur, N_Vector xzdotcur, N_Vector rescur);
-
+  void lsetup(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+  void lsetupB(double t, double cj, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+  void lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xz, N_Vector xzdot, N_Vector rr);
+  void lsolveB(double t, double cj, double cjratio, N_Vector b, N_Vector weight, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector rr);
+  
   // Static wrappers to be passed to Sundials
   static int res_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, void *user_data);
   static int resB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector rrB, void *user_data);
@@ -149,13 +160,16 @@ class IdasInternal : public SundialsInternal{
   static int rhsQS_wrapper(int Ns, double t, N_Vector xz, N_Vector xzdot, N_Vector *xzF, N_Vector *xzdotF, N_Vector rrQ, N_Vector *qdotF, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
   static int psolve_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_Vector rvec, N_Vector zvec, double cj, double delta, void *user_data, N_Vector tmp);
   static int psetup_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, double cj, void* user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  static int psolveB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resvalB, N_Vector rvecB, N_Vector zvecB, double cjB, double deltaB, void *user_dataB, N_Vector tmpB);
+  static int psetupB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resvalB, double cjB, void *user_dataB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
   static int djac_wrapper(long Neq, double t, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
   static int djacB_wrapper(long NeqB, double t, double cjB, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector rrB, DlsMat JacB, void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
   static int bjac_wrapper(long Neq, long mupper, long mlower, double t, double cj, N_Vector xz, N_Vector xzdot, N_Vector rr, DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2,N_Vector tmp3);
   static int bjacB_wrapper(long NeqB, long mupperB, long mlowerB, double t, double cjB, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resvalB, DlsMat JacB, void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
   static int lsetup_wrapper(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
   static int lsolve_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector ycur, N_Vector xzdotcur, N_Vector rescur);
-  
+  static int lsetupB_wrapper(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+  static int lsolveB_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector ycur, N_Vector xzdotcur, N_Vector rescur);
  public:
 
   // Idas memory block

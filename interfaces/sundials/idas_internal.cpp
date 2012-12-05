@@ -56,7 +56,7 @@ IdasInternal::IdasInternal(const FX& f, const FX& g) : SundialsInternal(f,g){
   addOption("cj_scaling",                  OT_BOOLEAN,          false,          "IDAS scaling on cj for the user-defined linear solver module");
   addOption("extra_fsens_calc_ic",         OT_BOOLEAN,          false,          "Call calc ic an extra time, with fsens=0");
   addOption("disable_internal_warnings",   OT_BOOLEAN,          false,          "Disable IDAS internal warning messages");
-  addOption("monitor",                     OT_STRINGVECTOR,     GenericType(),  "", "correctInitialConditions|res|resS|resB|rhsQB|jtimesB", true);
+  addOption("monitor",                     OT_STRINGVECTOR,     GenericType(),  "", "correctInitialConditions|res|resS|resB|rhsQB|bjacB|jtimesB|psetupB|psolveB", true);
   addOption("init_xdot",                   OT_REALVECTOR,       GenericType(),  "Initial values for the state derivatives");
   addOption("init_z",                      OT_REALVECTOR,       GenericType(),  "Initial values for the algebraic states");
   
@@ -128,6 +128,26 @@ void IdasInternal::init(){
       if(!linsol_.isNull()){
         linsol_.setSparsity(jac_.output().sparsity());
         linsol_.init();
+      }
+    }
+  }
+  
+  if(hasSetOption("asens_linear_solver")){
+    // Make sure that a Jacobian has been provided
+    if(jacB_.isNull()) jacB_ = getJacobianB();
+    if(!jacB_.isInit()) jacB_.init();
+    
+    // Create a linear solver
+    linearSolverCreator creator = getOption("asens_linear_solver");
+    linsolB_ = creator(jacB_.output().sparsity());
+    linsolB_.setSparsity(jacB_.output().sparsity());
+    linsolB_.init();
+  } else {
+    if(!jacB_.isNull()){
+      jacB_.init();
+      if(!linsolB_.isNull()){
+        linsolB_.setSparsity(jacB_.output().sparsity());
+        linsolB_.init();
       }
     }
   }
@@ -1357,10 +1377,35 @@ void IdasInternal::djacB(long int NeqB, double t, double cjB, N_Vector xz, N_Vec
   jacB_.setInput(NV_DATA_S(xzB),RDAE_RX);
   jacB_.setInput(NV_DATA_S(xzB)+nrx_,RDAE_RZ);
   jacB_.setInput(cjB,RDAE_NUM_IN);
+
+  if(monitored("djacB")){
+    cout << "RDAE_T    = " << t << endl;
+    cout << "RDAE_X    = " << jacB_.input(RDAE_X) << endl;
+    cout << "RDAE_Z    = " << jacB_.input(RDAE_Z) << endl;
+    cout << "RDAE_P    = " << jacB_.input(RDAE_P) << endl;
+    cout << "RDAE_XDOT  = ";
+    for (int k=0;k<nx_;++k) {
+      cout << NV_DATA_S(xzdot)[k] << " " ;
+    }
+    cout << endl;
+    cout << "RDAE_RX    = " << jacB_.input(RDAE_RX) << endl;
+    cout << "RDAE_RZ    = " << jacB_.input(RDAE_RZ) << endl;
+    cout << "RDAE_RP    = " << jacB_.input(RDAE_RP) << endl;
+    cout << "RDAE_RXDOT  = ";
+    for (int k=0;k<nrx_;++k) {
+      cout << NV_DATA_S(xzdotB)[k] << " " ;
+    }
+    cout << endl;
+    cout << "cjB = " << cjB << endl;
+  }
   
   // Evaluate Jacobian
   jacB_.evaluate();
 
+  if(monitored("djacB")){
+    cout << "jacB = " << jacB_.output() << endl;
+  }
+  
   // Get sparsity and non-zero elements
   const vector<int>& rowind = jacB_.output().rowind();
   const vector<int>& col = jacB_.output().col();
@@ -1461,10 +1506,35 @@ log("IdasInternal::bjacB","begin");
   jacB_.setInput(NV_DATA_S(xzB),RDAE_RX);
   jacB_.setInput(NV_DATA_S(xzB)+nrx_,RDAE_RZ);
   jacB_.setInput(cjB,RDAE_NUM_IN);
-  
+
+  if(monitored("bjacB")){
+    cout << "RDAE_T    = " << t << endl;
+    cout << "RDAE_X    = " << jacB_.input(RDAE_X) << endl;
+    cout << "RDAE_Z    = " << jacB_.input(RDAE_Z) << endl;
+    cout << "RDAE_P    = " << jacB_.input(RDAE_P) << endl;
+    cout << "RDAE_XDOT  = ";
+    for (int k=0;k<nx_;++k) {
+      cout << NV_DATA_S(xzdot)[k] << " " ;
+    }
+    cout << endl;
+    cout << "RDAE_RX    = " << jacB_.input(RDAE_RX) << endl;
+    cout << "RDAE_RZ    = " << jacB_.input(RDAE_RZ) << endl;
+    cout << "RDAE_RP    = " << jacB_.input(RDAE_RP) << endl;
+    cout << "RDAE_RXDOT  = ";
+    for (int k=0;k<nrx_;++k) {
+      cout << NV_DATA_S(xzdotB)[k] << " " ;
+    }
+    cout << endl;
+    cout << "cjB = " << cjB << endl;
+  }
+
   // Evaluate Jacobian
   jacB_.evaluate();
 
+  if(monitored("bjacB")){
+    cout << "jacB = " << jacB_.output() << endl;
+  }
+  
   // Get sparsity and non-zero elements
   const vector<int>& rowind = jacB_.output().rowind();
   const vector<int>& col = jacB_.output().col();
@@ -1518,6 +1588,18 @@ int IdasInternal::psolve_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector
   }
 }
 
+int IdasInternal::psolveB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resvalB, N_Vector rvecB, N_Vector zvecB, double cjB, double deltaB, void *user_data, N_Vector tmpB){
+ try{
+    IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
+    casadi_assert(this_);
+    this_->psolveB(t, xz, xzdot, xzB, xzdotB, resvalB, rvecB, zvecB, cjB, deltaB, tmpB);
+    return 0;
+  } catch(exception& e){
+    cerr << "psolveB failed: " << e.what() << endl;
+    return 1;
+  }
+}
+
 int IdasInternal::psetup_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, double cj, void* user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
  try{
     IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
@@ -1526,6 +1608,18 @@ int IdasInternal::psetup_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector
     return 0;
   } catch(exception& e){
     cerr << "psetup failed: " << e.what() << endl;
+    return 1;
+  }
+}
+
+int IdasInternal::psetupB_wrapper(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resvalB, double cjB, void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B){
+ try{
+    IdasInternal *this_ = static_cast<IdasInternal*>(user_data);
+    casadi_assert(this_);
+    this_->psetupB(t, xz, xzdot, xzB, xzdotB, resvalB, cjB, tmp1B, tmp2B, tmp3B);
+    return 0;
+  } catch(exception& e){
+    cerr << "psetupB failed: " << e.what() << endl;
     return 1;
   }
 }
@@ -1542,13 +1636,53 @@ void IdasInternal::psolve(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, N_
   }
   
   // Solve the (possibly factorized) system 
-  casadi_assert(linsol_.output().size() == NV_LENGTH_S(zvec));
+  casadi_assert_message(linsol_.output().size() == NV_LENGTH_S(zvec),"Assertion error: " << linsol_.output().size() << " == " << NV_LENGTH_S(zvec));
   linsol_.solve(NV_DATA_S(zvec),1);
 
   // Log time duration
   time2 = clock();
   t_lsolve += double(time2-time1)/CLOCKS_PER_SEC;
   log("IdasInternal::psolve","end");
+}
+
+
+void IdasInternal::psolveB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resvalB, N_Vector rvecB, N_Vector zvecB, double cjB, double deltaB, N_Vector tmpB){
+  log("IdasInternal::psolveB","begin");
+  
+  // Get time
+  time1 = clock();
+
+  // Copy input to output, if necessary
+  if(rvecB!=zvecB){
+    N_VScale(1.0, rvecB, zvecB);
+  }
+  
+  casadi_assert(!linsolB_.isNull());
+  
+  // Solve the (possibly factorized) system 
+  casadi_assert_message(linsolB_.output().size() == NV_LENGTH_S(zvecB),"Assertion error: " << linsolB_.output().size() << " == " << NV_LENGTH_S(zvecB));
+  if (monitored("psolveB")) {
+    cout << "zvecB = " << std::endl;
+    for (int k=0;k<NV_LENGTH_S(zvecB);++k) {
+      cout << NV_DATA_S(zvecB)[k] << " " ;
+    }
+    cout << endl;
+  }
+  
+  linsolB_.solve(NV_DATA_S(zvecB),1);
+  
+  if (monitored("psolveB")) {
+    cout << "zvecB sol = " << std::endl;
+    for (int k=0;k<NV_LENGTH_S(zvecB);++k) {
+      cout << NV_DATA_S(zvecB)[k] << " " ;
+    }
+    cout << endl;
+  }
+  
+  // Log time duration
+  time2 = clock();
+  t_lsolve += double(time2-time1)/CLOCKS_PER_SEC;
+  log("IdasInternal::psolveB","end");
 }
 
 void IdasInternal::psetup(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, double cj, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3){
@@ -1585,6 +1719,70 @@ void IdasInternal::psetup(double t, N_Vector xz, N_Vector xzdot, N_Vector rr, do
   
 }
 
+
+void IdasInternal::psetupB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resvalB, double cjB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B){
+  log("IdasInternal::psetupB","begin");
+  
+  // Get time
+  time1 = clock();
+
+  // Pass input to the Jacobian function
+  jacB_.setInput(&t,RDAE_T);
+  jacB_.setInput(NV_DATA_S(xz),RDAE_X);
+  jacB_.setInput(NV_DATA_S(xz)+nx_,RDAE_Z);
+  jacB_.setInput(input(INTEGRATOR_P),RDAE_P);
+  jacB_.setInput(input(INTEGRATOR_RP),RDAE_RP);
+  jacB_.setInput(NV_DATA_S(xzB),RDAE_RX);
+  jacB_.setInput(NV_DATA_S(xzB)+nrx_,RDAE_RZ);
+  jacB_.setInput(cjB,RDAE_NUM_IN);
+  
+  if(monitored("psetupB")){
+    cout << "RDAE_T    = " << t << endl;
+    cout << "RDAE_X    = " << jacB_.input(RDAE_X) << endl;
+    cout << "RDAE_Z    = " << jacB_.input(RDAE_Z) << endl;
+    cout << "RDAE_P    = " << jacB_.input(RDAE_P) << endl;
+    cout << "RDAE_XDOT  = ";
+    for (int k=0;k<nx_;++k) {
+      cout << NV_DATA_S(xzdot)[k] << " " ;
+    }
+    cout << endl;
+    cout << "RDAE_RX    = " << jacB_.input(RDAE_RX) << endl;
+    cout << "RDAE_RZ    = " << jacB_.input(RDAE_RZ) << endl;
+    cout << "RDAE_RP    = " << jacB_.input(RDAE_RP) << endl;
+    cout << "RDAE_RXDOT  = ";
+    for (int k=0;k<nrx_;++k) {
+      cout << NV_DATA_S(xzdotB)[k] << " " ;
+    }
+    cout << endl;
+    cout << "cjB = " << cjB << endl;
+  }
+
+  // Evaluate jacobian
+  jacB_.evaluate();
+  
+  if(monitored("psetupB")){
+    cout << "psetupB = " << jacB_.output() << endl;
+  }
+
+  // Log time duration
+  time2 = clock();
+  t_lsetup_jac += double(time2-time1)/CLOCKS_PER_SEC;
+
+  // Pass non-zero elements to the linear solver
+  linsolB_.setInput(jacB_.output(),0);
+
+  // Prepare the solution of the linear system (e.g. factorize) -- only if the linear solver inherits from LinearSolver
+  linsolB_.prepare();
+
+  // Log time duration
+  time1 = clock();
+  t_lsetup_fac += double(time1-time2)/CLOCKS_PER_SEC;
+
+  log("IdasInternal::psetupB","end");
+  
+}
+
+
 int IdasInternal::lsetup_wrapper(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3){
  try{
     IdasInternal *this_ = (IdasInternal*)(IDA_mem->ida_lmem);
@@ -1597,6 +1795,38 @@ int IdasInternal::lsetup_wrapper(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_
   }
 }
 
+int IdasInternal::lsetupB_wrapper(IDAMem IDA_mem, N_Vector xzB, N_Vector xzdotB, N_Vector respB, N_Vector vtemp1B, N_Vector vtemp2B, N_Vector vtemp3B){
+ try{
+    IdasInternal *this_ = (IdasInternal*)(IDA_mem->ida_lmem);
+    casadi_assert(this_);
+    IDAadjMem IDAADJ_mem;
+    IDABMem IDAB_mem;
+    int flag;
+
+    // Current time
+    double t = IDA_mem->ida_tn; // TODO: is this correct?
+    // Multiple of df_dydot to be added to the matrix
+    double cj = IDA_mem->ida_cj;
+    
+    IDA_mem = (IDAMem) IDA_mem->ida_user_data;
+
+    IDAADJ_mem = IDA_mem->ida_adj_mem;
+    IDAB_mem = IDAADJ_mem->ia_bckpbCrt;
+    
+    // Get FORWARD solution from interpolation.
+    if (IDAADJ_mem->ia_noInterp==FALSE) {
+      flag = IDAADJ_mem->ia_getY(IDA_mem, t, IDAADJ_mem->ia_yyTmp, IDAADJ_mem->ia_ypTmp, NULL, NULL);
+      if (flag != IDA_SUCCESS) casadi_error("Could not interpolate forward states");
+    }
+    this_->lsetupB(t,cj,IDAADJ_mem->ia_yyTmp, IDAADJ_mem->ia_ypTmp,xzB,xzdotB,respB,vtemp1B,vtemp2B,vtemp3B);
+    return 0;
+  } catch(exception& e){
+    cerr << "lsetupB failed: " << e.what() << endl;
+    return -1;
+  }
+}
+
+
 int IdasInternal::lsolve_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xz, N_Vector xzdot, N_Vector rr){
  try{
    IdasInternal *this_ = (IdasInternal*)(IDA_mem->ida_lmem);
@@ -1608,6 +1838,41 @@ int IdasInternal::lsolve_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_
     return wrn;
   } catch(exception& e){
     cerr << "lsolve failed: " << e.what() << endl;
+    return -1;
+  }
+}
+
+int IdasInternal::lsolveB_wrapper(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xzB, N_Vector xzdotB, N_Vector rrB){
+ try{
+    IdasInternal *this_ = (IdasInternal*)(IDA_mem->ida_lmem);
+    casadi_assert(this_);
+    IDAadjMem IDAADJ_mem;
+    IDABMem IDAB_mem;
+    int flag;
+
+    // Current time
+    double t = IDA_mem->ida_tn; // TODO: is this correct?
+    // Multiple of df_dydot to be added to the matrix
+    double cj = IDA_mem->ida_cj;
+    double cjratio = IDA_mem->ida_cjratio;
+    
+    IDA_mem = (IDAMem) IDA_mem->ida_user_data;
+
+    IDAADJ_mem = IDA_mem->ida_adj_mem;
+    IDAB_mem = IDAADJ_mem->ia_bckpbCrt;
+
+    // Get FORWARD solution from interpolation.
+    if (IDAADJ_mem->ia_noInterp==FALSE) {
+      flag = IDAADJ_mem->ia_getY(IDA_mem, t, IDAADJ_mem->ia_yyTmp, IDAADJ_mem->ia_ypTmp, NULL, NULL);
+      if (flag != IDA_SUCCESS) casadi_error("Could not interpolate forward states");
+    }
+   this_->lsolveB(t,cj,cjratio,b,weight,IDAADJ_mem->ia_yyTmp, IDAADJ_mem->ia_ypTmp,xzB,xzdotB,rrB);
+   return 0;
+  } catch(int wrn){
+/*    cerr << "warning: " << wrn << endl;*/
+    return wrn;
+  } catch(exception& e){
+    cerr << "lsolveB failed: " << e.what() << endl;
     return -1;
   }
 }
@@ -1625,6 +1890,15 @@ void IdasInternal::lsetup(IDAMem IDA_mem, N_Vector xz, N_Vector xzdot, N_Vector 
   psetup(t, xz, xzdot, 0, cj, vtemp1, vtemp1, vtemp3);
   log("IdasInternal::lsetup","end");
 }
+
+void IdasInternal::lsetupB(double t, double cj, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector resp, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3){  
+  log("IdasInternal::lsetupB","begin");
+
+  // Call the preconditioner setup function (which sets up the linear solver)
+  psetupB(t, xz, xzdot, xzB, xzdotB, 0, cj, vtemp1, vtemp1, vtemp3);
+  log("IdasInternal::lsetupB","end");
+}
+
 
 void IdasInternal::lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector xz, N_Vector xzdot, N_Vector rr){
   log("IdasInternal::lsolve","begin");
@@ -1647,6 +1921,24 @@ void IdasInternal::lsolve(IDAMem IDA_mem, N_Vector b, N_Vector weight, N_Vector 
   }
   log("IdasInternal::lsolve","end");
 }
+
+void IdasInternal::lsolveB(double t, double cj, double cjratio, N_Vector b, N_Vector weight, N_Vector xz, N_Vector xzdot, N_Vector xzB, N_Vector xzdotB, N_Vector rr){
+  log("IdasInternal::lsolveB","begin");
+
+  // Accuracy
+  double delta = 0.0;
+  
+  // Call the preconditioner solve function (which solves the linear system)
+  psolveB(t, xz, xzdot, xzB, xzdotB, rr, b, b, cj, delta, 0);
+  
+  // Scale the correction to account for change in cj
+  if(cj_scaling_){
+    if (cjratio != 1.0) N_VScale(2.0/(1.0 + cjratio), b, b);
+  }
+
+  log("IdasInternal::lsolveB","end");
+}
+
 
 void IdasInternal::initDenseLinearSolver(){
   // Dense jacobian
@@ -1789,10 +2081,39 @@ void IdasInternal::initIterativeLinearSolverB(){
     flag = IDASpilsSetJacTimesVecFnB(mem_, whichB_, jtimesB_wrapper);
     if(flag != IDA_SUCCESS) idas_error("IDASpilsSetJacTimesVecFnB",flag);
   }
+  
+  // Add a preconditioner
+  if(use_preconditionerB_){
+    // Make sure that a Jacobian has been provided
+    if(jacB_.isNull()) throw CasadiException("IdasInternal::init(): No backwards Jacobian has been provided.");
+
+    // Make sure that a linear solver has been providided
+    if(linsolB_.isNull()) throw CasadiException("IdasInternal::init(): No backwards user defined linear solver has been provided.");
+
+    // Pass to IDA
+    flag = IDASpilsSetPreconditionerB(mem_, whichB_, psetupB_wrapper, psolveB_wrapper);
+    if(flag != IDA_SUCCESS) idas_error("IDASpilsSetPreconditionerB",flag);
+  }
+  
 }
   
 void IdasInternal::initUserDefinedLinearSolverB(){
-  casadi_assert_message(false, "Not implemented");
+    // Make sure that a Jacobian has been provided
+  casadi_assert(!jacB_.isNull());
+
+  // Make sure that a linear solver has been providided
+  casadi_assert(!linsolB_.isNull());
+
+  //  Set fields in the IDA memory
+  IDAMem IDA_mem = IDAMem(mem_);
+  IDAadjMem IDAADJ_mem = IDA_mem->ida_adj_mem;
+  IDABMem IDAB_mem = IDAADJ_mem->IDAB_mem;
+  IDAB_mem->ida_lmem   = this;
+
+  IDAB_mem->IDA_mem->ida_lmem = this;
+  IDAB_mem->IDA_mem->ida_lsetup = lsetupB_wrapper;
+  IDAB_mem->IDA_mem->ida_lsolve = lsolveB_wrapper;
+  IDAB_mem->IDA_mem->ida_setupNonNull = TRUE;
 }
 
 void IdasInternal::setLinearSolver(const LinearSolver& linsol, const FX& jac){
