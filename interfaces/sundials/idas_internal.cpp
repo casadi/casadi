@@ -2116,16 +2116,6 @@ void IdasInternal::initUserDefinedLinearSolverB(){
   IDAB_mem->IDA_mem->ida_setupNonNull = TRUE;
 }
 
-void IdasInternal::setLinearSolver(const LinearSolver& linsol, const FX& jac){
-  linsol_ = linsol;
-  jac_ = jac;
-
-  // Try to generate a jacobian of none provided
-  if(jac_.isNull()){
-    jac_ = getJacobian();
-  }
-}
-
 template<typename FunctionType>
 FunctionType IdasInternal::getJacobianGen(){
   FunctionType f = shared_cast<FunctionType>(f_);
@@ -2185,11 +2175,6 @@ FX IdasInternal::getJacobianB(){
   } else {
     throw CasadiException("IdasInternal::getJacobianB(): Not an SXFunction or MXFunction");
   }
-}
-
-  
-LinearSolver IdasInternal::getLinearSolver(){
-  return linsol_;
 }
 
 } // namespace CasADi

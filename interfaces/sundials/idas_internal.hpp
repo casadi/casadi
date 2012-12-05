@@ -116,9 +116,6 @@ class IdasInternal : public SundialsInternal{
   /** \brief  Get the integrator Jacobian for the backward problem (generic) */
   template<typename FunctionType>
   FunctionType getJacobianGenB();
-  
-  /// Get the Linear solver
-  virtual LinearSolver getLinearSolver();
 
   /// Correct the initial conditions, i.e. calculate
   void correctInitialConditions();
@@ -244,9 +241,6 @@ class IdasInternal : public SundialsInternal{
   // Scaling of cj
   bool cj_scaling_;
 
-  // Set linear solver
-  virtual void setLinearSolver(const LinearSolver& linsol, const FX& jac);
-  
   // Disable IDAS internal warning messages
   bool disable_internal_warnings_;
   
