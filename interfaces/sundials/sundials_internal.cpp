@@ -39,7 +39,7 @@ SundialsInternal::SundialsInternal(const FX& f, const FX& g) : IntegratorInterna
   addOption("reltol",                      OT_REAL,             1e-6,           "Relative tolerence for the IVP solution");
   addOption("abstol",                      OT_REAL,             1e-8,           "Absolute tolerence  for the IVP solution");
   addOption("exact_jacobian",              OT_BOOLEAN,          true,           "Use exact Jacobian information for the forward integration");
-  addOption("exact_jacobianB",             OT_BOOLEAN,          false,          "Use exact Jacobian information for the backward integration");
+  addOption("exact_jacobianB",             OT_BOOLEAN,          false,           "Use exact Jacobian information for the backward integration");
   addOption("upper_bandwidth",             OT_INTEGER,          GenericType(),  "Upper band-width of banded Jacobian (estimations)");
   addOption("lower_bandwidth",             OT_INTEGER,          GenericType(),  "Lower band-width of banded Jacobian (estimations)");
   addOption("linear_solver_type",          OT_STRING,           "dense",        "","user_defined|dense|banded|iterative");
@@ -159,34 +159,39 @@ void SundialsInternal::init(){
     linsol_g_ = SD_USER_DEFINED;
   } else throw CasadiException("Unknown linear solver for backward integration");
   
-  // Get the linear solver creator function
-  if(linsol_.isNull() && hasSetOption("linear_solver")){
-    linearSolverCreator linear_solver_creator = getOption("linear_solver");
+  // Create a Jacobian if requested
+  if (exact_jacobian_) jac_ = getJacobian();
+  // Initialize Jacobian if availabe
+  if(!jac_.isNull() && !jac_.isInit()) jac_.init();
+
+  // Create a backwards Jacobian if requested
+  if (exact_jacobianB_) jacB_ = getJacobianB();
+  // Initialize backwards  Jacobian if availabe
+  if(!jacB_.isNull() && !jacB_.isInit()) jacB_.init();
   
-    // Allocate an NLP solver
-    linsol_ = linear_solver_creator(CRSSparsity());
-  
+  if(hasSetOption("linear_solver") && !jac_.isNull()){
+    // Create a linear solver
+    linearSolverCreator creator = getOption("linear_solver");
+    linsol_ = creator(jac_.output().sparsity());
+    linsol_.setSparsity(jac_.output().sparsity());
     // Pass options
     if(hasSetOption("linear_solver_options")){
-      const Dictionary& linear_solver_options = getOption("linear_solver_options");
-      linsol_.setOption(linear_solver_options);
+      linsol_.setOption(getOption("linear_solver_options"));
     }
+    linsol_.init();
   }
   
-  // Get the linear solver creator function
-  if(linsolB_.isNull() && hasSetOption("linear_solverB")){
-    linearSolverCreator linear_solver_creatorB = getOption("linear_solverB");
-  
-    // Allocate an NLP solver
-    linsolB_ = linear_solver_creatorB(CRSSparsity());
-  
+  if(hasSetOption("linear_solverB") && !jacB_.isNull()){
+    // Create a linear solver
+    linearSolverCreator creator = getOption("linear_solverB");
+    linsolB_ = creator(jacB_.output().sparsity());
+    linsolB_.setSparsity(jacB_.output().sparsity());
     // Pass options
     if(hasSetOption("linear_solver_optionsB")){
-      const Dictionary& linear_solver_optionsB = getOption("linear_solver_optionsB");
-      linsolB_.setOption(linear_solver_optionsB);
+      linsolB_.setOption(getOption("linear_solver_optionsB"));
     }
+    linsolB_.init();
   }
-  
 }
 
 void SundialsInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& already_copied){

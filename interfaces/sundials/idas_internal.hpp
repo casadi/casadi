@@ -96,27 +96,26 @@ class IdasInternal : public SundialsInternal{
   /** \brief  Print solver statistics */  
   virtual void printStats(std::ostream &stream) const;
   
-  /** \brief  Get the integrator Jacobian for the forward problem */
-  FX getJacobian();
-  
   /** \brief  Get the integrator Jacobian for the forward problem (generic) */
   template<typename FunctionType>
   FunctionType getJacobianGen();
   
-  /** \brief  Get the integrator Jacobian for the backward problem
-  *
-  *  Structure:
+  /** \brief  Get the integrator Jacobian for the backward problem (generic) 
+  *   Structure:
   *
   *
   *   | diff(gx,rx) + cj*diff(gx,dot(rx))  |   diff(gx,rz) |
   *   | diff(gz,rx)                        |   diff(gz,rz) |
   */
-  FX getJacobianB();
-  
-  /** \brief  Get the integrator Jacobian for the backward problem (generic) */
   template<typename FunctionType>
   FunctionType getJacobianGenB();
 
+  /** \brief  Get the integrator Jacobian for the forward problem */
+  virtual FX getJacobian();
+  
+  /** \brief  Get the integrator Jacobian for the backward problem */
+  virtual FX getJacobianB();
+  
   /// Correct the initial conditions, i.e. calculate
   void correctInitialConditions();
   
@@ -247,8 +246,6 @@ class IdasInternal : public SundialsInternal{
   //  Initial values for xdot and z
   std::vector<double> init_z_, init_xdot_;
   
-  // Jacobian of the DAE with respect to the state and state derivatives
-  FX jac_, jacB_;
 };
 
 } // namespace CasADi

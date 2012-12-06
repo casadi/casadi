@@ -87,20 +87,20 @@ public:
   
   /** \brief  Print solver statistics */  
   virtual void printStats(std::ostream &stream) const;
-
-  /** \brief  Get the integrator Jacobian for the forward problem */
-  FX getJacobian();
   
   /** \brief  Get the integrator Jacobian for the forward problem (generic) */
   template<typename FunctionType>
   FunctionType getJacobianGen();
   
-  /** \brief  Get the integrator Jacobian for the backward problem */
-  FX getJacobianB();
-  
   /** \brief  Get the integrator Jacobian for the backward problem (generic) */
   template<typename FunctionType>
   FunctionType getJacobianGenB();
+  
+  /** \brief  Get the integrator Jacobian for the forward problem */
+  virtual FX getJacobian();
+  
+  /** \brief  Get the integrator Jacobian for the backward problem */
+  virtual FX getJacobianB();
   
   protected:
 
@@ -115,12 +115,19 @@ public:
   void rhsBS(double t, N_Vector x, N_Vector *xF, N_Vector xA, N_Vector xdotA);
   void rhsQB(double t, const double* x, const double* rx, double* rqdot);
   void jtimes(const double *v, double* Jv, double t, const double* x, const double* fy, double* tmp);
+  void jtimesB(N_Vector vB, N_Vector JvB, double t, N_Vector x, N_Vector xB, N_Vector fyB, N_Vector tmpB);
   void djac(long N, double t, N_Vector x, N_Vector fy, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  void djacB(long NeqB, double t, N_Vector x, N_Vector xB, N_Vector fyB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
   void bjac(long N, long mupper, long mlower, double t, N_Vector x, N_Vector fy, DlsMat Jac, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  void bjacB(long NeqB, long mupperB, long mlowerB, double t, N_Vector x, N_Vector xB, N_Vector fyB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
   void psolve(double t, N_Vector x, N_Vector fy, N_Vector r, N_Vector z, double gamma, double delta, int lr, N_Vector tmp);
+  void psolveB(double t, N_Vector x, N_Vector xB, N_Vector fyB, N_Vector rvecB, N_Vector zvecB, double gammaB, double deltaB, int lr, N_Vector tmpB);
   void psetup(double t, N_Vector x, N_Vector fy, booleantype jok, booleantype *jcurPtr, double gamma, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  void psetupB(double t, N_Vector x, N_Vector xB, N_Vector fyB, booleantype jokB, booleantype *jcurPtrB, double gammaB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
   void lsetup(CVodeMem cv_mem, int convfail, N_Vector ypred, N_Vector fpred, booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+  void lsetupB(double t, double gamma, int convfail, N_Vector x, N_Vector xB, N_Vector fyB, booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
   void lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector ycur, N_Vector fcur);
+  void lsolveB(double t, double gamma, N_Vector b, N_Vector weight, N_Vector x, N_Vector xB, N_Vector fyB);
   
   // Static wrappers to be passed to Sundials
   static int rhs_wrapper(double t, N_Vector x, N_Vector xdot, void *user_data);
@@ -133,12 +140,19 @@ public:
   static int rhsBS_wrapper(double t, N_Vector x, N_Vector *xF, N_Vector xA, N_Vector xdotA, void *user_data);
   static int rhsQB_wrapper(double t, N_Vector x, N_Vector xA, N_Vector qdotA, void *user_data);
   static int jtimes_wrapper(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector xdot, void *user_data, N_Vector tmp);
+  static int jtimesB_wrapper(N_Vector vB, N_Vector JvB, double t, N_Vector x, N_Vector xB, N_Vector fyB, void *user_data ,N_Vector tmpB);
   static int djac_wrapper(long N, double t, N_Vector x, N_Vector xdot, DlsMat Jac, void *user_data,N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  static int djacB_wrapper(long NeqB, double t, N_Vector x, N_Vector xB, N_Vector fyB, DlsMat JacB, void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
   static int bjac_wrapper(long N, long mupper, long mlower, double t, N_Vector x, N_Vector xdot, DlsMat Jac, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  static int bjacB_wrapper(long NeqB, long mupperB, long mlowerB, double t, N_Vector x, N_Vector xB, N_Vector fyB, DlsMat JacB, void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
   static int psolve_wrapper(double t, N_Vector x, N_Vector xdot, N_Vector r, N_Vector z, double gamma, double delta, int lr, void *user_data, N_Vector tmp);
+  static int psolveB_wrapper(double t, N_Vector x, N_Vector xB, N_Vector fyB, N_Vector rvecB, N_Vector zvecB, double gammaB, double deltaB, int lr, void *user_data, N_Vector tmpB);
   static int psetup_wrapper(double t, N_Vector x, N_Vector xdot, booleantype jok, booleantype *jcurPtr, double gamma, void *user_data, N_Vector tmp1, N_Vector tmp2, N_Vector tmp3);
+  static int psetupB_wrapper(double t, N_Vector x, N_Vector xB, N_Vector fyB, booleantype jokB, booleantype *jcurPtrB, double gammaB, void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B);
   static int lsetup_wrapper(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot, booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
   static int lsolve_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector x, N_Vector xdot);
+  static int lsetupB_wrapper(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot, booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3);
+  static int lsolveB_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector x, N_Vector xdot);
   
   // CVodes memory block
   void* mem_;
@@ -215,8 +229,6 @@ public:
   
   bool disable_internal_warnings_;
   
-  // Jacobian of the ODE with respect to the state and state derivatives
-  FX jac_;
 };
 
 } // namespace CasADi

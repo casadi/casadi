@@ -111,47 +111,7 @@ void IdasInternal::init(){
   
   // Call the base class init
   SundialsInternal::init();
-  
-  if(hasSetOption("linear_solver")){
-    // Make sure that a Jacobian has been provided
-    if(jac_.isNull()) jac_ = getJacobian();
-    if(!jac_.isInit()) jac_.init();
-    
-    // Create a linear solver
-    linearSolverCreator creator = getOption("linear_solver");
-    linsol_ = creator(jac_.output().sparsity());
-    linsol_.setSparsity(jac_.output().sparsity());
-    linsol_.init();
-  } else {
-    if(!jac_.isNull()){
-      jac_.init();
-      if(!linsol_.isNull()){
-        linsol_.setSparsity(jac_.output().sparsity());
-        linsol_.init();
-      }
-    }
-  }
-  
-  if(hasSetOption("linear_solverB")){
-    // Make sure that a Jacobian has been provided
-    if(jacB_.isNull()) jacB_ = getJacobianB();
-    if(!jacB_.isInit()) jacB_.init();
-    
-    // Create a linear solver
-    linearSolverCreator creator = getOption("linear_solverB");
-    linsolB_ = creator(jacB_.output().sparsity());
-    linsolB_.setSparsity(jacB_.output().sparsity());
-    linsolB_.init();
-  } else {
-    if(!jacB_.isNull()){
-      jacB_.init();
-      if(!linsolB_.isNull()){
-        linsolB_.setSparsity(jacB_.output().sparsity());
-        linsolB_.init();
-      }
-    }
-  }
-  
+
   // Get initial conditions for the state derivatives
   if(hasSetOption("init_xdot") && !getOption("init_xdot").isNull()){
     init_xdot_ = getOption("init_xdot").toDoubleVector();
@@ -654,8 +614,13 @@ void IdasInternal::jtimesB(double t, const double *xz, const double *xzdot, cons
   g_.setInput(input(INTEGRATOR_RP),RDAE_RP);
   
   // Pass seeds of the state vectors
+  g_.fwdSeed(RDAE_T).setZero();
+  g_.fwdSeed(RDAE_X).setZero();
+  g_.fwdSeed(RDAE_Z).setZero();
+  g_.fwdSeed(RDAE_P).setZero();
   g_.setFwdSeed(vB,RDAE_RX);
   g_.setFwdSeed(vB+nx_,RDAE_RZ);
+  g_.fwdSeed(RDAE_RP).setZero();
   
   if(monitored("jtimesB")){
     cout << "RDAE_T    = " << t << endl;
@@ -1725,7 +1690,7 @@ void IdasInternal::psetupB(double t, N_Vector xz, N_Vector xzdot, N_Vector xzB, 
   
   // Get time
   time1 = clock();
-
+  
   // Pass input to the Jacobian function
   jacB_.setInput(&t,RDAE_T);
   jacB_.setInput(NV_DATA_S(xz),RDAE_X);
@@ -2029,10 +1994,6 @@ void IdasInternal::initDenseLinearSolverB(){
   int flag = IDADenseB(mem_, whichB_, nrx_+nrz_);
   if(flag != IDA_SUCCESS) idas_error("IDADenseB",flag);
   if(exact_jacobianB_){
-    // Generate jacobians if not already provided
-    if(jacB_.isNull()) jacB_ = getJacobianB();
-    if(!jacB_.isInit()) jacB_.init();
-    
     // Pass to IDA
     flag = IDADlsSetDenseJacFnB(mem_, whichB_, djacB_wrapper);
     if(flag!=IDA_SUCCESS) idas_error("IDADlsSetDenseJacFnB",flag);
@@ -2043,10 +2004,6 @@ void IdasInternal::initBandedLinearSolverB(){
   int flag = IDABandB(mem_, whichB_, nrx_+nrz_, getOption("upper_bandwidthB").toInt(), getOption("lower_bandwidthB").toInt());
   if(flag != IDA_SUCCESS) idas_error("IDABand",flag);
   if(exact_jacobianB_){
-    // Generate jacobians if not already provided
-    if(jacB_.isNull()) jacB_ = getJacobianB();
-    if(!jacB_.isInit()) jacB_.init();
-    
     // Pass to IDA
     flag = IDADlsSetBandJacFnB(mem_, whichB_, bjacB_wrapper);
     if(flag!=IDA_SUCCESS) idas_error("IDADlsSetBandJacFnB",flag);
@@ -2073,11 +2030,7 @@ void IdasInternal::initIterativeLinearSolverB(){
   }
   
   // Attach functions for jacobian information
-  if(exact_jacobianB_){
-    // Generate jacobians if not already provided
-    if(jacB_.isNull()) jacB_ = getJacobianB();
-    if(!jacB_.isInit()) jacB_.init();
-    
+  if(exact_jacobianB_){ 
     flag = IDASpilsSetJacTimesVecFnB(mem_, whichB_, jtimesB_wrapper);
     if(flag != IDA_SUCCESS) idas_error("IDASpilsSetJacTimesVecFnB",flag);
   }
@@ -2136,17 +2089,6 @@ FunctionType IdasInternal::getJacobianGen(){
   return FunctionType(jac_in,jac);
 }
 
-
-FX IdasInternal::getJacobian(){
-  if(is_a<SXFunction>(f_)){
-    return getJacobianGen<SXFunction>();
-  } else if(is_a<MXFunction>(f_)){
-    return getJacobianGen<MXFunction>();
-  } else {
-    throw CasadiException("IdasInternal::getJacobian(): Not an SXFunction or MXFunction");
-  }
-}
-
 template<typename FunctionType>
 FunctionType IdasInternal::getJacobianGenB(){
   FunctionType g = shared_cast<FunctionType>(g_);
@@ -2176,6 +2118,17 @@ FX IdasInternal::getJacobianB(){
     throw CasadiException("IdasInternal::getJacobianB(): Not an SXFunction or MXFunction");
   }
 }
+
+FX IdasInternal::getJacobian(){
+  if(is_a<SXFunction>(f_)){
+    return getJacobianGen<SXFunction>();
+  } else if(is_a<MXFunction>(f_)){
+    return getJacobianGen<MXFunction>();
+  } else {
+    throw CasadiException("IdasInternal::getJacobian(): Not an SXFunction or MXFunction");
+  }
+}
+
 
 } // namespace CasADi
 

@@ -94,6 +94,15 @@ public:
   /// Use preconditioning
   bool use_preconditioner_, use_preconditionerB_;
   
+  // Jacobian of the DAE with respect to the state and state derivatives
+  FX jac_, jacB_;
+  
+  /** \brief  Get the integrator Jacobian for the forward problem */
+  virtual FX getJacobian()=0;
+  
+  /** \brief  Get the integrator Jacobian for the backward problem */
+  virtual FX getJacobianB()=0;
+  
 };
   
 } // namespace CasADi
