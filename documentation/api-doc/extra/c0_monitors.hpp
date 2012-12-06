@@ -140,9 +140,13 @@
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
+<tr><td>bjacB</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>correctInitialConditions</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jtimesB</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>psetupB</td><td>CasADi::IdasInternal</td></tr>
+<tr><td>psolveB</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>res</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>resB</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>resS</td><td>CasADi::IdasInternal</td></tr>
@@ -155,9 +159,13 @@
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
+<tr><td>bjacB</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>correctInitialConditions</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>jtimesB</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
+<tr><td>psetupB</td><td>CasADi::IdasInternal</td></tr>
+<tr><td>psolveB</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>res</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>resB</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>resS</td><td>CasADi::IdasInternal</td></tr>

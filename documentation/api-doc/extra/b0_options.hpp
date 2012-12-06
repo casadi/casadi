@@ -395,7 +395,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>collocation_scheme</td><td>OT_STRING</td><td>"radau"</td><td>Collocation scheme (radau|legendre)</td><td>CasADi::CollocationIntegratorInternal</td></tr>
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the ODE/DAE residual function in an SX graph</td><td>CasADi::CollocationIntegratorInternal</td></tr>
@@ -437,7 +437,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>collocation_scheme</td><td>OT_STRING</td><td>"radau"</td><td>Collocation scheme (radau|legendre)</td><td>CasADi::CollocationIntegratorInternal</td></tr>
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the ODE/DAE residual function in an SX graph</td><td>CasADi::CollocationIntegratorInternal</td></tr>
@@ -825,16 +825,9 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>Absolute tolerence  for the IVP solution</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>abstolB</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_abstol</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>lower band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>Maximum krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_reltol</td><td>OT_REAL</td><td>GenericType()</td><td>Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Upper band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOLEAN</td><td>false</td><td>Disable CVodes internal warning messages</td><td>CasADi::CVodesInternal</td></tr>
 <tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Use exact Jacobian information for the forward integration</td><td>CasADi::SundialsInternal</td></tr>
@@ -849,13 +842,19 @@
 <tr><td>fwd_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>Type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>iterative_solverB</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>linear_multistep_method</td><td>OT_STRING</td><td>"bdf"</td><td>Integrator scheme (bdf|adams)</td><td>CasADi::CVodesInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>A custom linear solver creator function</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solverB</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>A custom linear solver creator function for backwards integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver_optionsB</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver for backwards integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver_typeB</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Lower band-width of banded Jacobian (estimations)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>lower_bandwidthB</td><td>OT_INTEGER</td><td>GenericType()</td><td>lower band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>Maximum Krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>max_krylovB</td><td>OT_INTEGER</td><td>10</td><td>Maximum krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>Maximum number of integrator steps</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
@@ -868,10 +867,12 @@
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>pretypeB</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>quad_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>Should the quadratures affect the step size control</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>CasADi::FXInternal</td></tr>
 <tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>Relative tolerence for the IVP solution</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>reltolB</td><td>OT_REAL</td><td>GenericType()</td><td>Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
@@ -881,7 +882,9 @@
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>End of the time horizon</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Upper band-width of banded Jacobian (estimations)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>upper_bandwidthB</td><td>OT_INTEGER</td><td>GenericType()</td><td>Upper band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>Precondition an iterative solver</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>use_preconditionerB</td><td>OT_BOOLEAN</td><td>false</td><td>Precondition an iterative solver for the backwards problem</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -893,16 +896,9 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>Absolute tolerence  for the IVP solution</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>abstolB</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_abstol</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>lower band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>Maximum krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_reltol</td><td>OT_REAL</td><td>GenericType()</td><td>Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Upper band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>disable_internal_warnings</td><td>OT_BOOLEAN</td><td>false</td><td>Disable CVodes internal warning messages</td><td>CasADi::CVodesInternal</td></tr>
 <tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Use exact Jacobian information for the forward integration</td><td>CasADi::SundialsInternal</td></tr>
@@ -917,13 +913,19 @@
 <tr><td>fwd_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>Type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>iterative_solverB</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>linear_multistep_method</td><td>OT_STRING</td><td>"bdf"</td><td>Integrator scheme (bdf|adams)</td><td>CasADi::CVodesInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>A custom linear solver creator function</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solverB</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>A custom linear solver creator function for backwards integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver_optionsB</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver for backwards integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver_typeB</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Lower band-width of banded Jacobian (estimations)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>lower_bandwidthB</td><td>OT_INTEGER</td><td>GenericType()</td><td>lower band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>Maximum Krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>max_krylovB</td><td>OT_INTEGER</td><td>10</td><td>Maximum krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>Maximum number of integrator steps</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
@@ -936,10 +938,12 @@
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>pretypeB</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>quad_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>Should the quadratures affect the step size control</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>CasADi::FXInternal</td></tr>
 <tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>Relative tolerence for the IVP solution</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>reltolB</td><td>OT_REAL</td><td>GenericType()</td><td>Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
@@ -949,7 +953,9 @@
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>End of the time horizon</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Upper band-width of banded Jacobian (estimations)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>upper_bandwidthB</td><td>OT_INTEGER</td><td>GenericType()</td><td>Upper band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>Precondition an iterative solver</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>use_preconditionerB</td><td>OT_BOOLEAN</td><td>false</td><td>Precondition an iterative solver for the backwards problem</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -1937,17 +1943,10 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>Absolute tolerence  for the IVP solution</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>abstolB</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>abstolv</td><td>OT_REALVECTOR</td><td></td><td></td><td>CasADi::IdasInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_abstol</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>lower band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>Maximum krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_reltol</td><td>OT_REAL</td><td>GenericType()</td><td>Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Upper band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>calc_ic</td><td>OT_BOOLEAN</td><td>true</td><td>Use IDACalcIC to get consistent initial conditions.</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>calc_icB</td><td>OT_BOOLEAN</td><td>true</td><td>Use IDACalcIC to get consistent initial conditions.</td><td>CasADi::IdasInternal</td></tr>
@@ -1969,28 +1968,36 @@
 <tr><td>init_z</td><td>OT_REALVECTOR</td><td>GenericType()</td><td>Initial values for the algebraic states</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>Type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>iterative_solverB</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>A custom linear solver creator function</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solverB</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>A custom linear solver creator function for backwards integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver_optionsB</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver for backwards integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver_typeB</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Lower band-width of banded Jacobian (estimations)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>lower_bandwidthB</td><td>OT_INTEGER</td><td>GenericType()</td><td>lower band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>Maximum Krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>max_krylovB</td><td>OT_INTEGER</td><td>10</td><td>Maximum krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>Maximum number of integrator steps</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_fwd_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_step_size</td><td>OT_REAL</td><td>0</td><td>Maximim step size</td><td>CasADi::IdasInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(correctInitialConditions|res|resS|resB|rhsQB)</td><td>CasADi::FXInternal<br />CasADi::IdasInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(correctInitialConditions|res|resS|resB|rhsQB|bjacB|jtimesB|psetupB|psolveB)</td><td>CasADi::FXInternal<br />CasADi::IdasInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>pretypeB</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>quad_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>Should the quadratures affect the step size control</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>CasADi::FXInternal</td></tr>
 <tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>Relative tolerence for the IVP solution</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>reltolB</td><td>OT_REAL</td><td>GenericType()</td><td>Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
@@ -2001,7 +2008,9 @@
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>End of the time horizon</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Upper band-width of banded Jacobian (estimations)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>upper_bandwidthB</td><td>OT_INTEGER</td><td>GenericType()</td><td>Upper band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>Precondition an iterative solver</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>use_preconditionerB</td><td>OT_BOOLEAN</td><td>false</td><td>Precondition an iterative solver for the backwards problem</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -2013,17 +2022,10 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>Absolute tolerence  for the IVP solution</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>abstolB</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>abstolv</td><td>OT_REALVECTOR</td><td></td><td></td><td>CasADi::IdasInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_abstol</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>lower band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>Maximum krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_reltol</td><td>OT_REAL</td><td>GenericType()</td><td>Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Upper band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>calc_ic</td><td>OT_BOOLEAN</td><td>true</td><td>Use IDACalcIC to get consistent initial conditions.</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>calc_icB</td><td>OT_BOOLEAN</td><td>true</td><td>Use IDACalcIC to get consistent initial conditions.</td><td>CasADi::IdasInternal</td></tr>
@@ -2045,28 +2047,36 @@
 <tr><td>init_z</td><td>OT_REALVECTOR</td><td>GenericType()</td><td>Initial values for the algebraic states</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>Type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>iterative_solverB</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>A custom linear solver creator function</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solverB</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>A custom linear solver creator function for backwards integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver_optionsB</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver for backwards integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver_typeB</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Lower band-width of banded Jacobian (estimations)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>lower_bandwidthB</td><td>OT_INTEGER</td><td>GenericType()</td><td>lower band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>Maximum Krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>max_krylovB</td><td>OT_INTEGER</td><td>10</td><td>Maximum krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>Maximum number of integrator steps</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_number_of_fwd_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_fwd_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
 <tr><td>max_step_size</td><td>OT_REAL</td><td>0</td><td>Maximim step size</td><td>CasADi::IdasInternal</td></tr>
-<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(correctInitialConditions|res|resS|resB|rhsQB)</td><td>CasADi::FXInternal<br />CasADi::IdasInternal</td></tr>
+<tr><td>monitor</td><td>OT_STRINGVECTOR</td><td>GenericType()</td><td>Monitors to be activated (inputs|outputs)<br />(correctInitialConditions|res|resS|resB|rhsQB|bjacB|jtimesB|psetupB|psolveB)</td><td>CasADi::FXInternal<br />CasADi::IdasInternal</td></tr>
 <tr><td>name</td><td>OT_STRING</td><td>"unnamed_shared_object"</td><td>name of the object</td><td>CasADi::OptionsFunctionalityNode</td></tr>
 <tr><td>number_of_adj_dir</td><td>OT_INTEGER</td><td>1</td><td>number of adjoint derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>number_of_fwd_dir</td><td>OT_INTEGER</td><td>1</td><td>number of forward derivatives to be calculated simultanously</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>pretypeB</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>quad_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>Should the quadratures affect the step size control</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>CasADi::FXInternal</td></tr>
 <tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>Relative tolerence for the IVP solution</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>reltolB</td><td>OT_REAL</td><td>GenericType()</td><td>Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
@@ -2077,7 +2087,9 @@
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>End of the time horizon</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Upper band-width of banded Jacobian (estimations)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>upper_bandwidthB</td><td>OT_INTEGER</td><td>GenericType()</td><td>Upper band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>Precondition an iterative solver</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>use_preconditionerB</td><td>OT_BOOLEAN</td><td>false</td><td>Precondition an iterative solver for the backwards problem</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -2089,7 +2101,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>fwd_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
@@ -2122,7 +2134,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>fwd_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
@@ -2445,7 +2457,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>fwd_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
@@ -2475,7 +2487,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>fwd_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
@@ -2819,7 +2831,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the ODE/DAE residual function in an SX graph</td><td>CasADi::RKIntegratorInternal</td></tr>
 <tr><td>expand_q</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the quadrature function in an SX graph</td><td>CasADi::RKIntegratorInternal</td></tr>
@@ -2853,7 +2865,7 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
+<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>expand_f</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the ODE/DAE residual function in an SX graph</td><td>CasADi::RKIntegratorInternal</td></tr>
 <tr><td>expand_q</td><td>OT_BOOLEAN</td><td>false</td><td>Expand the quadrature function in an SX graph</td><td>CasADi::RKIntegratorInternal</td></tr>
@@ -3099,16 +3111,9 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>Absolute tolerence  for the IVP solution</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>abstolB</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_abstol</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>lower band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>Maximum krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_reltol</td><td>OT_REAL</td><td>GenericType()</td><td>Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Upper band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Use exact Jacobian information for the forward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>exact_jacobianB</td><td>OT_BOOLEAN</td><td>false</td><td>Use exact Jacobian information for the backward integration</td><td>CasADi::SundialsInternal</td></tr>
@@ -3121,12 +3126,18 @@
 <tr><td>fwd_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>Type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>iterative_solverB</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>A custom linear solver creator function</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solverB</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>A custom linear solver creator function for backwards integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver_optionsB</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver for backwards integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver_typeB</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Lower band-width of banded Jacobian (estimations)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>lower_bandwidthB</td><td>OT_INTEGER</td><td>GenericType()</td><td>lower band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>Maximum Krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>max_krylovB</td><td>OT_INTEGER</td><td>10</td><td>Maximum krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>Maximum number of integrator steps</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
@@ -3138,10 +3149,12 @@
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>pretypeB</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>quad_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>Should the quadratures affect the step size control</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>CasADi::FXInternal</td></tr>
 <tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>Relative tolerence for the IVP solution</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>reltolB</td><td>OT_REAL</td><td>GenericType()</td><td>Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
@@ -3151,7 +3164,9 @@
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>End of the time horizon</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Upper band-width of banded Jacobian (estimations)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>upper_bandwidthB</td><td>OT_INTEGER</td><td>GenericType()</td><td>Upper band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>Precondition an iterative solver</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>use_preconditionerB</td><td>OT_BOOLEAN</td><td>false</td><td>Precondition an iterative solver for the backwards problem</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>
@@ -3163,16 +3178,9 @@
 <caption>List of available options</caption>
 <tr><th>Id</th><th>Type</th><th>Default</th><th>Description</th><th>Used in</th></tr>
 <tr><td>abstol</td><td>OT_REAL</td><td>1e-8</td><td>Absolute tolerence  for the IVP solution</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>abstolB</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>ad_mode</td><td>OT_STRING</td><td>"automatic"</td><td>How to calculate the Jacobians: \"forward\" (only forward mode) \"reverse\" (only adjoint mode) or \"automatic\" (a heuristic decides which is more appropriate) (forward|reverse|automatic)</td><td>CasADi::FXInternal</td></tr>
-<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
-<tr><td>asens_abstol</td><td>OT_REAL</td><td>GenericType()</td><td>Absolute tolerence for the adjoint sensitivity solution [default: equal to abstol]</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>lower band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_max_krylov</td><td>OT_INTEGER</td><td>10</td><td>Maximum krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_reltol</td><td>OT_REAL</td><td>GenericType()</td><td>Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>asens_upper_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Upper band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>adj_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating adjoint directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>augmented_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed down to the augmented integrator, if one is constructed.</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>exact_jacobian</td><td>OT_BOOLEAN</td><td>true</td><td>Use exact Jacobian information for the forward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>exact_jacobianB</td><td>OT_BOOLEAN</td><td>false</td><td>Use exact Jacobian information for the backward integration</td><td>CasADi::SundialsInternal</td></tr>
@@ -3185,12 +3193,18 @@
 <tr><td>fwd_via_sct</td><td>OT_BOOLEAN</td><td>true</td><td>Generate new functions for calculating forward directional derivatives</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>interpolation_type</td><td>OT_STRING</td><td>"hermite"</td><td>Type of interpolation for the adjoint sensitivities (hermite|polynomial)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>iterative_solver</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>iterative_solverB</td><td>OT_STRING</td><td>"gmres"</td><td>(gmres|bcgstab|tfqmr)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>jacobian_generator</td><td>OT_JACOBIANGENERATOR</td><td>GenericType()</td><td>Function pointer that returns a Jacobian function given a set of desired Jacobian blocks, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
-<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>An linear solver creator function</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>A custom linear solver creator function</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solverB</td><td>OT_LINEARSOLVER</td><td>GenericType()</td><td>A custom linear solver creator function for backwards integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>linear_solver_options</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver_optionsB</td><td>OT_DICTIONARY</td><td>GenericType()</td><td>Options to be passed to the linear solver for backwards integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>linear_solver_type</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>linear_solver_typeB</td><td>OT_STRING</td><td>"dense"</td><td>(user_defined|dense|banded|iterative)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>lower_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Lower band-width of banded Jacobian (estimations)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>lower_bandwidthB</td><td>OT_INTEGER</td><td>GenericType()</td><td>lower band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_krylov</td><td>OT_INTEGER</td><td>10</td><td>Maximum Krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>max_krylovB</td><td>OT_INTEGER</td><td>10</td><td>Maximum krylov subspace size</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_multistep_order</td><td>OT_INTEGER</td><td>5</td><td></td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_num_steps</td><td>OT_INTEGER</td><td>10000</td><td>Maximum number of integrator steps</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>max_number_of_adj_dir</td><td>OT_INTEGER</td><td>optimized_num_dir</td><td>Allow \"number_of_adj_dir\" to grow until it reaches this number</td><td>CasADi::FXInternal</td></tr>
@@ -3202,10 +3216,12 @@
 <tr><td>numeric_hessian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Hessians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>numeric_jacobian</td><td>OT_BOOLEAN</td><td>false</td><td>Calculate Jacobians numerically (using directional derivatives) rather than with the built-in method</td><td>CasADi::FXInternal</td></tr>
 <tr><td>pretype</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>pretypeB</td><td>OT_STRING</td><td>"none"</td><td>(none|left|right|both)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>print_stats</td><td>OT_BOOLEAN</td><td>false</td><td>Print out statistics after integration</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>quad_err_con</td><td>OT_BOOLEAN</td><td>false</td><td>Should the quadratures affect the step size control</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>regularity_check</td><td>OT_BOOLEAN</td><td>true</td><td>Throw exceptions when NaN or Inf appears during evaluation</td><td>CasADi::FXInternal</td></tr>
 <tr><td>reltol</td><td>OT_REAL</td><td>1e-6</td><td>Relative tolerence for the IVP solution</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>reltolB</td><td>OT_REAL</td><td>GenericType()</td><td>Relative tolerence for the adjoint sensitivity solution [default: equal to reltol]</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>sensitivity_method</td><td>OT_STRING</td><td>"simultaneous"</td><td>(simultaneous|staggered)</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
@@ -3215,7 +3231,9 @@
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>End of the time horizon</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>upper_bandwidth</td><td>OT_INTEGER</td><td>GenericType()</td><td>Upper band-width of banded Jacobian (estimations)</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>upper_bandwidthB</td><td>OT_INTEGER</td><td>GenericType()</td><td>Upper band-width of banded jacobians for backward integration</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>use_preconditioner</td><td>OT_BOOLEAN</td><td>false</td><td>Precondition an iterative solver</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>use_preconditionerB</td><td>OT_BOOLEAN</td><td>false</td><td>Precondition an iterative solver for the backwards problem</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>user_data</td><td>OT_VOIDPTR</td><td>GenericType()</td><td>A user-defined field that can be used to identify the function or pass additional information</td><td>CasADi::FXInternal</td></tr>
 <tr><td>verbose</td><td>OT_BOOLEAN</td><td>false</td><td>verbose evaluation -- for debugging</td><td>CasADi::FXInternal</td></tr>
 </table>

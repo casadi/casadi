@@ -187,13 +187,6 @@
 <tr><td>SCHEME_unknown</td><td></td></tr>
 </table>
 */
-/** \defgroup scheme_MOutput
-<table>
-<caption>Output scheme: CasADi::MOutput  (M_NUM_OUT = 1) </caption>
-<tr><th>Name</th><th>Description</th></tr>
-<tr><td>M_M</td><td></td></tr>
-</table>
-*/
 /** \defgroup scheme_MayerInput
 <table>
 <caption>Input scheme: CasADi::MayerInput  (MAYER_NUM_IN = 2) </caption>
@@ -300,16 +293,6 @@
 <tr><td>CONTROLSIMULATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1) [x0].</td></tr>
 <tr><td>CONTROLSIMULATOR_P</td><td>Parameters that are fixed over the entire horizon (dimension np-by-1) [p].</td></tr>
 <tr><td>CONTROLSIMULATOR_U</td><td>Parameters that change over the integration intervals (dimension (ns-1)-by-nu) [u].</td></tr>
-</table>
-*/
-/** \defgroup scheme_MInput
-<table>
-<caption>Input scheme: CasADi::MInput  (M_NUM_IN = 4) </caption>
-<tr><th>Name</th><th>Description</th></tr>
-<tr><td>M_T</td><td></td></tr>
-<tr><td>M_Y</td><td></td></tr>
-<tr><td>M_P</td><td></td></tr>
-<tr><td>M_GAMMA</td><td></td></tr>
 </table>
 */
 /** \defgroup scheme_LOFunOutputs

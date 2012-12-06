@@ -13126,6 +13126,14 @@ times t_i.
 | an           |              |              | Jacobian     | ialsInternal |
 |              |              |              | information  |              |
 |              |              |              | for the      |              |
+|              |              |              | forward      |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
+| exact_jacobi | OT_BOOLEAN   | false        | Use exact    | CasADi::Sund |
+| anB          |              |              | Jacobian     | ialsInternal |
+|              |              |              | information  |              |
+|              |              |              | for the      |              |
+|              |              |              | backward     |              |
 |              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | finite_diffe | OT_BOOLEAN   | false        | Use finite   | CasADi::Sund |
@@ -14219,6 +14227,14 @@ rx, rz and rp.
 | an           |              |              | Jacobian     | ialsInternal |
 |              |              |              | information  |              |
 |              |              |              | for the      |              |
+|              |              |              | forward      |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
+| exact_jacobi | OT_BOOLEAN   | false        | Use exact    | CasADi::Sund |
+| anB          |              |              | Jacobian     | ialsInternal |
+|              |              |              | information  |              |
+|              |              |              | for the      |              |
+|              |              |              | backward     |              |
 |              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | finite_diffe | OT_BOOLEAN   | false        | Use finite   | CasADi::Sund |
@@ -14685,14 +14701,25 @@ Integrate backward until a specified time point. ";
 
 Set the stop time of the forward integration. ";
 
+%feature("docstring")  CasADi::CVodesInternal::printStats "
+
+Print solver statistics. ";
+
 %feature("docstring")  CasADi::CVodesInternal::getJacobian "
 
-Get the jacobian in the nonlinear iteration The result is an CasADi::FX
-mapping from CasADi::Sundials::MInput to CasADi::Sundials::MOutput. ";
+Get the integrator Jacobian for the forward problem. ";
 
-%feature("docstring")  CasADi::CVodesInternal::getLinearSolver "
+%feature("docstring")  CasADi::CVodesInternal::getJacobianGen "
 
-Get the Linear solver. ";
+Get the integrator Jacobian for the forward problem (generic) ";
+
+%feature("docstring")  CasADi::CVodesInternal::getJacobianB "
+
+Get the integrator Jacobian for the backward problem. ";
+
+%feature("docstring")  CasADi::CVodesInternal::getJacobianGenB "
+
+Get the integrator Jacobian for the backward problem (generic) ";
 
 %feature("docstring")  CasADi::CVodesInternal::evaluate "
 
@@ -19923,37 +19950,13 @@ Joel Andersson
 |              |              |              | consistent   |              |
 |              |              |              | initial      |              |
 |              |              |              | conditions.  |              |
-|              |              |              | This only    |              |
-|              |              |              | works for    |              |
-|              |              |              | semi-        |              |
-|              |              |              | explicit     |              |
-|              |              |              | index-one    |              |
-|              |              |              | systems.     |              |
-|              |              |              | Else, you    |              |
-|              |              |              | must provide |              |
-|              |              |              | consistent   |              |
-|              |              |              | initial      |              |
-|              |              |              | conditions   |              |
-|              |              |              | yourself.    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| calc_icB     | OT_BOOLEAN   | false        | Use          | CasADi::Idas |
+| calc_icB     | OT_BOOLEAN   | true         | Use          | CasADi::Idas |
 |              |              |              | IDACalcIC to | Internal     |
 |              |              |              | get          |              |
 |              |              |              | consistent   |              |
 |              |              |              | initial      |              |
 |              |              |              | conditions.  |              |
-|              |              |              | This only    |              |
-|              |              |              | works for    |              |
-|              |              |              | semi-        |              |
-|              |              |              | explicit     |              |
-|              |              |              | index-one    |              |
-|              |              |              | systems.     |              |
-|              |              |              | Else, you    |              |
-|              |              |              | must provide |              |
-|              |              |              | consistent   |              |
-|              |              |              | initial      |              |
-|              |              |              | conditions   |              |
-|              |              |              | yourself.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | cj_scaling   | OT_BOOLEAN   | false        | IDAS scaling | CasADi::Idas |
 |              |              |              | on cj for    | Internal     |
@@ -19972,6 +19975,14 @@ Joel Andersson
 | an           |              |              | Jacobian     | ialsInternal |
 |              |              |              | information  |              |
 |              |              |              | for the      |              |
+|              |              |              | forward      |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
+| exact_jacobi | OT_BOOLEAN   | false        | Use exact    | CasADi::Sund |
+| anB          |              |              | Jacobian     | ialsInternal |
+|              |              |              | information  |              |
+|              |              |              | for the      |              |
+|              |              |              | backward     |              |
 |              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | extra_fsens_ | OT_BOOLEAN   | false        | Call calc ic | CasADi::Idas |
@@ -21095,37 +21106,13 @@ rx, rz and rp.
 |              |              |              | consistent   |              |
 |              |              |              | initial      |              |
 |              |              |              | conditions.  |              |
-|              |              |              | This only    |              |
-|              |              |              | works for    |              |
-|              |              |              | semi-        |              |
-|              |              |              | explicit     |              |
-|              |              |              | index-one    |              |
-|              |              |              | systems.     |              |
-|              |              |              | Else, you    |              |
-|              |              |              | must provide |              |
-|              |              |              | consistent   |              |
-|              |              |              | initial      |              |
-|              |              |              | conditions   |              |
-|              |              |              | yourself.    |              |
 +--------------+--------------+--------------+--------------+--------------+
-| calc_icB     | OT_BOOLEAN   | false        | Use          | CasADi::Idas |
+| calc_icB     | OT_BOOLEAN   | true         | Use          | CasADi::Idas |
 |              |              |              | IDACalcIC to | Internal     |
 |              |              |              | get          |              |
 |              |              |              | consistent   |              |
 |              |              |              | initial      |              |
 |              |              |              | conditions.  |              |
-|              |              |              | This only    |              |
-|              |              |              | works for    |              |
-|              |              |              | semi-        |              |
-|              |              |              | explicit     |              |
-|              |              |              | index-one    |              |
-|              |              |              | systems.     |              |
-|              |              |              | Else, you    |              |
-|              |              |              | must provide |              |
-|              |              |              | consistent   |              |
-|              |              |              | initial      |              |
-|              |              |              | conditions   |              |
-|              |              |              | yourself.    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | cj_scaling   | OT_BOOLEAN   | false        | IDAS scaling | CasADi::Idas |
 |              |              |              | on cj for    | Internal     |
@@ -21144,6 +21131,14 @@ rx, rz and rp.
 | an           |              |              | Jacobian     | ialsInternal |
 |              |              |              | information  |              |
 |              |              |              | for the      |              |
+|              |              |              | forward      |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
+| exact_jacobi | OT_BOOLEAN   | false        | Use exact    | CasADi::Sund |
+| anB          |              |              | Jacobian     | ialsInternal |
+|              |              |              | information  |              |
+|              |              |              | for the      |              |
+|              |              |              | backward     |              |
 |              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | extra_fsens_ | OT_BOOLEAN   | false        | Call calc ic | CasADi::Idas |
@@ -21653,15 +21648,16 @@ Get the integrator Jacobian for the forward problem (generic) ";
 
 %feature("docstring")  CasADi::IdasInternal::getJacobianB "
 
-Get the integrator Jacobian for the backward problem. ";
+Get the integrator Jacobian for the backward problem.
+
+Structure:
+
+| diff(gx,rx) + cj*diff(gx,dot(rx)) | diff(gx,rz) | | diff(gz,rx) |
+diff(gz,rz) | ";
 
 %feature("docstring")  CasADi::IdasInternal::getJacobianGenB "
 
 Get the integrator Jacobian for the backward problem (generic) ";
-
-%feature("docstring")  CasADi::IdasInternal::getLinearSolver "
-
-Get the Linear solver. ";
 
 %feature("docstring")  CasADi::IdasInternal::correctInitialConditions "
 
@@ -21682,8 +21678,6 @@ Correct the initial conditions, i.e. calculate. ";
 %feature("docstring")  CasADi::IdasInternal::initIterativeLinearSolverB "";
 
 %feature("docstring")  CasADi::IdasInternal::initUserDefinedLinearSolverB "";
-
-%feature("docstring")  CasADi::IdasInternal::setLinearSolver "";
 
 %feature("docstring")  CasADi::IdasInternal::evaluate "
 
@@ -67948,6 +67942,14 @@ Constructor. ";
 | an           |              |              | Jacobian     | ialsInternal |
 |              |              |              | information  |              |
 |              |              |              | for the      |              |
+|              |              |              | forward      |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
+| exact_jacobi | OT_BOOLEAN   | false        | Use exact    | CasADi::Sund |
+| anB          |              |              | Jacobian     | ialsInternal |
+|              |              |              | information  |              |
+|              |              |              | for the      |              |
+|              |              |              | backward     |              |
 |              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | finite_diffe | OT_BOOLEAN   | false        | Use finite   | CasADi::Sund |
@@ -68932,6 +68934,14 @@ Return a string with a destription (for SWIG) ";
 | an           |              |              | Jacobian     | ialsInternal |
 |              |              |              | information  |              |
 |              |              |              | for the      |              |
+|              |              |              | forward      |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
+| exact_jacobi | OT_BOOLEAN   | false        | Use exact    | CasADi::Sund |
+| anB          |              |              | Jacobian     | ialsInternal |
+|              |              |              | information  |              |
+|              |              |              | for the      |              |
+|              |              |              | backward     |              |
 |              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | finite_diffe | OT_BOOLEAN   | false        | Use finite   | CasADi::Sund |
@@ -69794,12 +69804,6 @@ Check if the node is an even square. ";
 %feature("docstring")  CasADi::SX::getNdeps "
 
 Get the number of dependencies of a binary SX. ";
-
-%feature("docstring")  CasADi::SX::isEquivalent "
-
-Check if two nodes are equivalent up to a given depth a = x*x b = x*x.
-
-a.isEqual(b) will return false, but a.isEquivalent(b) will return true ";
 
 %feature("docstring")  CasADi::SX::__hash__ "
 
