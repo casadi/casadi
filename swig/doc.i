@@ -94,7 +94,7 @@ Joel Andersson
 |              |              |              | functions    | gratorIntern |
 |              |              |              | for          | al           |
 |              |              |              | calculating  |              |
-|              |              |              | forward      |              |
+|              |              |              | adjoint      |              |
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -970,7 +970,7 @@ thus x := [xd,xa]
 |              |              |              | functions    | gratorIntern |
 |              |              |              | for          | al           |
 |              |              |              | calculating  |              |
-|              |              |              | forward      |              |
+|              |              |              | adjoint      |              |
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -5586,7 +5586,7 @@ Joel Andersson
 |              |              |              | functions    | gratorIntern |
 |              |              |              | for          | al           |
 |              |              |              | calculating  |              |
-|              |              |              | forward      |              |
+|              |              |              | adjoint      |              |
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -6492,7 +6492,7 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | functions    | gratorIntern |
 |              |              |              | for          | al           |
 |              |              |              | calculating  |              |
-|              |              |              | forward      |              |
+|              |              |              | adjoint      |              |
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -13030,6 +13030,16 @@ times t_i.
 |              |              |              | for the IVP  |              |
 |              |              |              | solution     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| abstolB      | OT_REAL      | GenericType( | Absolute     | CasADi::Sund |
+|              |              | )            | tolerence    | ialsInternal |
+|              |              |              | for the      |              |
+|              |              |              | adjoint      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | abstol]      |              |
++--------------+--------------+--------------+--------------+--------------+
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
@@ -13056,57 +13066,9 @@ times t_i.
 |              |              |              | functions    | gratorIntern |
 |              |              |              | for          | al           |
 |              |              |              | calculating  |              |
-|              |              |              | forward      |              |
+|              |              |              | adjoint      |              |
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_abstol | OT_REAL      | GenericType( | Absolute     | CasADi::Sund |
-|              |              | )            | tolerence    | ialsInternal |
-|              |              |              | for the      |              |
-|              |              |              | adjoint      |              |
-|              |              |              | sensitivity  |              |
-|              |              |              | solution     |              |
-|              |              |              | [default:    |              |
-|              |              |              | equal to     |              |
-|              |              |              | abstol]      |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_iterat | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
-| ive_solver   |              |              | ab|tfqmr)    | ialsInternal |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_linear | OT_STRING    | \"dense\"      | (dense|bande | CasADi::Sund |
-| _solver_type |              |              | d|iterative) | ialsInternal |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_lower_ | OT_INTEGER   | GenericType( | lower band-  | CasADi::Sund |
-| bandwidth    |              | )            | width of     | ialsInternal |
-|              |              |              | banded       |              |
-|              |              |              | jacobians    |              |
-|              |              |              | for backward |              |
-|              |              |              | integration  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_max_kr | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
-| ylov         |              |              | krylov       | ialsInternal |
-|              |              |              | subspace     |              |
-|              |              |              | size         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_pretyp | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
-| e            |              |              | ight|both)   | ialsInternal |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_reltol | OT_REAL      | GenericType( | Relative     | CasADi::Sund |
-|              |              | )            | tolerence    | ialsInternal |
-|              |              |              | for the      |              |
-|              |              |              | adjoint      |              |
-|              |              |              | sensitivity  |              |
-|              |              |              | solution     |              |
-|              |              |              | [default:    |              |
-|              |              |              | equal to     |              |
-|              |              |              | reltol]      |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_upper_ | OT_INTEGER   | GenericType( | Upper band-  | CasADi::Sund |
-| bandwidth    |              | )            | width of     | ialsInternal |
-|              |              |              | banded       |              |
-|              |              |              | jacobians    |              |
-|              |              |              | for backward |              |
-|              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | augmented_op | OT_DICTIONAR | GenericType( | Options to   | CasADi::Inte |
 | tions        | Y            | )            | be passed    | gratorIntern |
@@ -13218,6 +13180,9 @@ times t_i.
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
 | lver         |              |              | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
+| iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
+| lverB        |              |              | ab|tfqmr)    | ialsInternal |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -13235,18 +13200,39 @@ times t_i.
 | step_method  |              |              | scheme       | esInternal   |
 |              |              |              | (bdf|adams)  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_LINEARSOL | GenericType( | An linear    | CasADi::Sund |
-| r            | VER          | )            | solver       | ialsInternal |
+| linear_solve | OT_LINEARSOL | GenericType( | A custom     | CasADi::Sund |
+| r            | VER          | )            | linear       | ialsInternal |
+|              |              |              | solver       |              |
 |              |              |              | creator      |              |
 |              |              |              | function     |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | A custom     | CasADi::Sund |
+| rB           | VER          | )            | linear       | ialsInternal |
+|              |              |              | solver       |              |
+|              |              |              | creator      |              |
+|              |              |              | function for |              |
+|              |              |              | backwards    |              |
+|              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Sund |
 | r_options    | Y            | )            | be passed to | ialsInternal |
 |              |              |              | the linear   |              |
 |              |              |              | solver       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Sund |
+| r_optionsB   | Y            | )            | be passed to | ialsInternal |
+|              |              |              | the linear   |              |
+|              |              |              | solver for   |              |
+|              |              |              | backwards    |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
 | r_type       |              |              | d|dense|band | ialsInternal |
+|              |              |              | ed|iterative |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
+| r_typeB      |              |              | d|dense|band | ialsInternal |
 |              |              |              | ed|iterative |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -13256,8 +13242,20 @@ times t_i.
 |              |              |              | Jacobian (es |              |
 |              |              |              | timations)   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| lower_bandwi | OT_INTEGER   | GenericType( | lower band-  | CasADi::Sund |
+| dthB         |              | )            | width of     | ialsInternal |
+|              |              |              | banded       |              |
+|              |              |              | jacobians    |              |
+|              |              |              | for backward |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
 | max_krylov   | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
 |              |              |              | Krylov       | ialsInternal |
+|              |              |              | subspace     |              |
+|              |              |              | size         |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_krylovB  | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
+|              |              |              | krylov       | ialsInternal |
 |              |              |              | subspace     |              |
 |              |              |              | size         |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -13337,6 +13335,9 @@ times t_i.
 | pretype      | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
 |              |              |              | ight|both)   | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
+| pretypeB     | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
+|              |              |              | ight|both)   | ialsInternal |
++--------------+--------------+--------------+--------------+--------------+
 | print_stats  | OT_BOOLEAN   | false        | Print out    | CasADi::Inte |
 |              |              |              | statistics   | gratorIntern |
 |              |              |              | after        | al           |
@@ -13359,6 +13360,16 @@ times t_i.
 |              |              |              | tolerence    | ialsInternal |
 |              |              |              | for the IVP  |              |
 |              |              |              | solution     |              |
++--------------+--------------+--------------+--------------+--------------+
+| reltolB      | OT_REAL      | GenericType( | Relative     | CasADi::Sund |
+|              |              | )            | tolerence    | ialsInternal |
+|              |              |              | for the      |              |
+|              |              |              | adjoint      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | reltol]      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sensitivity_ | OT_STRING    | \"simultaneou | (simultaneou | CasADi::Sund |
 | method       |              | s\"           | s|staggered) | ialsInternal |
@@ -13415,9 +13426,23 @@ times t_i.
 |              |              |              | Jacobian (es |              |
 |              |              |              | timations)   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| upper_bandwi | OT_INTEGER   | GenericType( | Upper band-  | CasADi::Sund |
+| dthB         |              | )            | width of     | ialsInternal |
+|              |              |              | banded       |              |
+|              |              |              | jacobians    |              |
+|              |              |              | for backward |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
 | use_precondi | OT_BOOLEAN   | false        | Precondition | CasADi::Sund |
 | tioner       |              |              | an iterative | ialsInternal |
 |              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| use_precondi | OT_BOOLEAN   | false        | Precondition | CasADi::Sund |
+| tionerB      |              |              | an iterative | ialsInternal |
+|              |              |              | solver for   |              |
+|              |              |              | the          |              |
+|              |              |              | backwards    |              |
+|              |              |              | problem      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
 |              |              | )            | defined      | ternal       |
@@ -14131,6 +14156,16 @@ rx, rz and rp.
 |              |              |              | for the IVP  |              |
 |              |              |              | solution     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| abstolB      | OT_REAL      | GenericType( | Absolute     | CasADi::Sund |
+|              |              | )            | tolerence    | ialsInternal |
+|              |              |              | for the      |              |
+|              |              |              | adjoint      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | abstol]      |              |
++--------------+--------------+--------------+--------------+--------------+
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
@@ -14157,57 +14192,9 @@ rx, rz and rp.
 |              |              |              | functions    | gratorIntern |
 |              |              |              | for          | al           |
 |              |              |              | calculating  |              |
-|              |              |              | forward      |              |
+|              |              |              | adjoint      |              |
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_abstol | OT_REAL      | GenericType( | Absolute     | CasADi::Sund |
-|              |              | )            | tolerence    | ialsInternal |
-|              |              |              | for the      |              |
-|              |              |              | adjoint      |              |
-|              |              |              | sensitivity  |              |
-|              |              |              | solution     |              |
-|              |              |              | [default:    |              |
-|              |              |              | equal to     |              |
-|              |              |              | abstol]      |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_iterat | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
-| ive_solver   |              |              | ab|tfqmr)    | ialsInternal |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_linear | OT_STRING    | \"dense\"      | (dense|bande | CasADi::Sund |
-| _solver_type |              |              | d|iterative) | ialsInternal |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_lower_ | OT_INTEGER   | GenericType( | lower band-  | CasADi::Sund |
-| bandwidth    |              | )            | width of     | ialsInternal |
-|              |              |              | banded       |              |
-|              |              |              | jacobians    |              |
-|              |              |              | for backward |              |
-|              |              |              | integration  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_max_kr | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
-| ylov         |              |              | krylov       | ialsInternal |
-|              |              |              | subspace     |              |
-|              |              |              | size         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_pretyp | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
-| e            |              |              | ight|both)   | ialsInternal |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_reltol | OT_REAL      | GenericType( | Relative     | CasADi::Sund |
-|              |              | )            | tolerence    | ialsInternal |
-|              |              |              | for the      |              |
-|              |              |              | adjoint      |              |
-|              |              |              | sensitivity  |              |
-|              |              |              | solution     |              |
-|              |              |              | [default:    |              |
-|              |              |              | equal to     |              |
-|              |              |              | reltol]      |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_upper_ | OT_INTEGER   | GenericType( | Upper band-  | CasADi::Sund |
-| bandwidth    |              | )            | width of     | ialsInternal |
-|              |              |              | banded       |              |
-|              |              |              | jacobians    |              |
-|              |              |              | for backward |              |
-|              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | augmented_op | OT_DICTIONAR | GenericType( | Options to   | CasADi::Inte |
 | tions        | Y            | )            | be passed    | gratorIntern |
@@ -14319,6 +14306,9 @@ rx, rz and rp.
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
 | lver         |              |              | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
+| iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
+| lverB        |              |              | ab|tfqmr)    | ialsInternal |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -14336,18 +14326,39 @@ rx, rz and rp.
 | step_method  |              |              | scheme       | esInternal   |
 |              |              |              | (bdf|adams)  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_LINEARSOL | GenericType( | An linear    | CasADi::Sund |
-| r            | VER          | )            | solver       | ialsInternal |
+| linear_solve | OT_LINEARSOL | GenericType( | A custom     | CasADi::Sund |
+| r            | VER          | )            | linear       | ialsInternal |
+|              |              |              | solver       |              |
 |              |              |              | creator      |              |
 |              |              |              | function     |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | A custom     | CasADi::Sund |
+| rB           | VER          | )            | linear       | ialsInternal |
+|              |              |              | solver       |              |
+|              |              |              | creator      |              |
+|              |              |              | function for |              |
+|              |              |              | backwards    |              |
+|              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Sund |
 | r_options    | Y            | )            | be passed to | ialsInternal |
 |              |              |              | the linear   |              |
 |              |              |              | solver       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Sund |
+| r_optionsB   | Y            | )            | be passed to | ialsInternal |
+|              |              |              | the linear   |              |
+|              |              |              | solver for   |              |
+|              |              |              | backwards    |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
 | r_type       |              |              | d|dense|band | ialsInternal |
+|              |              |              | ed|iterative |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
+| r_typeB      |              |              | d|dense|band | ialsInternal |
 |              |              |              | ed|iterative |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -14357,8 +14368,20 @@ rx, rz and rp.
 |              |              |              | Jacobian (es |              |
 |              |              |              | timations)   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| lower_bandwi | OT_INTEGER   | GenericType( | lower band-  | CasADi::Sund |
+| dthB         |              | )            | width of     | ialsInternal |
+|              |              |              | banded       |              |
+|              |              |              | jacobians    |              |
+|              |              |              | for backward |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
 | max_krylov   | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
 |              |              |              | Krylov       | ialsInternal |
+|              |              |              | subspace     |              |
+|              |              |              | size         |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_krylovB  | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
+|              |              |              | krylov       | ialsInternal |
 |              |              |              | subspace     |              |
 |              |              |              | size         |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -14438,6 +14461,9 @@ rx, rz and rp.
 | pretype      | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
 |              |              |              | ight|both)   | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
+| pretypeB     | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
+|              |              |              | ight|both)   | ialsInternal |
++--------------+--------------+--------------+--------------+--------------+
 | print_stats  | OT_BOOLEAN   | false        | Print out    | CasADi::Inte |
 |              |              |              | statistics   | gratorIntern |
 |              |              |              | after        | al           |
@@ -14460,6 +14486,16 @@ rx, rz and rp.
 |              |              |              | tolerence    | ialsInternal |
 |              |              |              | for the IVP  |              |
 |              |              |              | solution     |              |
++--------------+--------------+--------------+--------------+--------------+
+| reltolB      | OT_REAL      | GenericType( | Relative     | CasADi::Sund |
+|              |              | )            | tolerence    | ialsInternal |
+|              |              |              | for the      |              |
+|              |              |              | adjoint      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | reltol]      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sensitivity_ | OT_STRING    | \"simultaneou | (simultaneou | CasADi::Sund |
 | method       |              | s\"           | s|staggered) | ialsInternal |
@@ -14516,9 +14552,23 @@ rx, rz and rp.
 |              |              |              | Jacobian (es |              |
 |              |              |              | timations)   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| upper_bandwi | OT_INTEGER   | GenericType( | Upper band-  | CasADi::Sund |
+| dthB         |              | )            | width of     | ialsInternal |
+|              |              |              | banded       |              |
+|              |              |              | jacobians    |              |
+|              |              |              | for backward |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
 | use_precondi | OT_BOOLEAN   | false        | Precondition | CasADi::Sund |
 | tioner       |              |              | an iterative | ialsInternal |
 |              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| use_precondi | OT_BOOLEAN   | false        | Precondition | CasADi::Sund |
+| tionerB      |              |              | an iterative | ialsInternal |
+|              |              |              | solver for   |              |
+|              |              |              | the          |              |
+|              |              |              | backwards    |              |
+|              |              |              | problem      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
 |              |              | )            | defined      | ternal       |
@@ -14705,21 +14755,25 @@ Set the stop time of the forward integration. ";
 
 Print solver statistics. ";
 
-%feature("docstring")  CasADi::CVodesInternal::getJacobian "
-
-Get the integrator Jacobian for the forward problem. ";
-
 %feature("docstring")  CasADi::CVodesInternal::getJacobianGen "
 
 Get the integrator Jacobian for the forward problem (generic) ";
+
+%feature("docstring")  CasADi::CVodesInternal::getJacobianGenB "
+
+Get the integrator Jacobian for the backward problem (generic) ";
+
+%feature("docstring")  CasADi::CVodesInternal::getJacobian "
+
+Get the integrator Jacobian for the forward problem. ";
 
 %feature("docstring")  CasADi::CVodesInternal::getJacobianB "
 
 Get the integrator Jacobian for the backward problem. ";
 
-%feature("docstring")  CasADi::CVodesInternal::getJacobianGenB "
+%feature("docstring")  CasADi::CVodesInternal::getJacobian "
 
-Get the integrator Jacobian for the backward problem (generic) ";
+Calculate the jacobian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::CVodesInternal::evaluate "
 
@@ -14747,10 +14801,6 @@ Is the class able to propate seeds through the algorithm? ";
 
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
-
-%feature("docstring")  CasADi::CVodesInternal::getJacobian "
-
-Calculate the jacobian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::CVodesInternal::getAugmented "
 
@@ -19855,6 +19905,16 @@ Joel Andersson
 |              |              |              | for the IVP  |              |
 |              |              |              | solution     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| abstolB      | OT_REAL      | GenericType( | Absolute     | CasADi::Sund |
+|              |              | )            | tolerence    | ialsInternal |
+|              |              |              | for the      |              |
+|              |              |              | adjoint      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | abstol]      |              |
++--------------+--------------+--------------+--------------+--------------+
 | abstolv      | OT_REALVECTO |              |              | CasADi::Idas |
 |              | R            |              |              | Internal     |
 +--------------+--------------+--------------+--------------+--------------+
@@ -19884,57 +19944,9 @@ Joel Andersson
 |              |              |              | functions    | gratorIntern |
 |              |              |              | for          | al           |
 |              |              |              | calculating  |              |
-|              |              |              | forward      |              |
+|              |              |              | adjoint      |              |
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_abstol | OT_REAL      | GenericType( | Absolute     | CasADi::Sund |
-|              |              | )            | tolerence    | ialsInternal |
-|              |              |              | for the      |              |
-|              |              |              | adjoint      |              |
-|              |              |              | sensitivity  |              |
-|              |              |              | solution     |              |
-|              |              |              | [default:    |              |
-|              |              |              | equal to     |              |
-|              |              |              | abstol]      |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_iterat | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
-| ive_solver   |              |              | ab|tfqmr)    | ialsInternal |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_linear | OT_STRING    | \"dense\"      | (dense|bande | CasADi::Sund |
-| _solver_type |              |              | d|iterative) | ialsInternal |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_lower_ | OT_INTEGER   | GenericType( | lower band-  | CasADi::Sund |
-| bandwidth    |              | )            | width of     | ialsInternal |
-|              |              |              | banded       |              |
-|              |              |              | jacobians    |              |
-|              |              |              | for backward |              |
-|              |              |              | integration  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_max_kr | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
-| ylov         |              |              | krylov       | ialsInternal |
-|              |              |              | subspace     |              |
-|              |              |              | size         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_pretyp | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
-| e            |              |              | ight|both)   | ialsInternal |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_reltol | OT_REAL      | GenericType( | Relative     | CasADi::Sund |
-|              |              | )            | tolerence    | ialsInternal |
-|              |              |              | for the      |              |
-|              |              |              | adjoint      |              |
-|              |              |              | sensitivity  |              |
-|              |              |              | solution     |              |
-|              |              |              | [default:    |              |
-|              |              |              | equal to     |              |
-|              |              |              | reltol]      |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_upper_ | OT_INTEGER   | GenericType( | Upper band-  | CasADi::Sund |
-| bandwidth    |              | )            | width of     | ialsInternal |
-|              |              |              | banded       |              |
-|              |              |              | jacobians    |              |
-|              |              |              | for backward |              |
-|              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | augmented_op | OT_DICTIONAR | GenericType( | Options to   | CasADi::Inte |
 | tions        | Y            | )            | be passed    | gratorIntern |
@@ -20085,6 +20097,9 @@ Joel Andersson
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
 | lver         |              |              | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
+| iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
+| lverB        |              |              | ab|tfqmr)    | ialsInternal |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -20098,18 +20113,39 @@ Joel Andersson
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_LINEARSOL | GenericType( | An linear    | CasADi::Sund |
-| r            | VER          | )            | solver       | ialsInternal |
+| linear_solve | OT_LINEARSOL | GenericType( | A custom     | CasADi::Sund |
+| r            | VER          | )            | linear       | ialsInternal |
+|              |              |              | solver       |              |
 |              |              |              | creator      |              |
 |              |              |              | function     |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | A custom     | CasADi::Sund |
+| rB           | VER          | )            | linear       | ialsInternal |
+|              |              |              | solver       |              |
+|              |              |              | creator      |              |
+|              |              |              | function for |              |
+|              |              |              | backwards    |              |
+|              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Sund |
 | r_options    | Y            | )            | be passed to | ialsInternal |
 |              |              |              | the linear   |              |
 |              |              |              | solver       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Sund |
+| r_optionsB   | Y            | )            | be passed to | ialsInternal |
+|              |              |              | the linear   |              |
+|              |              |              | solver for   |              |
+|              |              |              | backwards    |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
 | r_type       |              |              | d|dense|band | ialsInternal |
+|              |              |              | ed|iterative |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
+| r_typeB      |              |              | d|dense|band | ialsInternal |
 |              |              |              | ed|iterative |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -20119,8 +20155,20 @@ Joel Andersson
 |              |              |              | Jacobian (es |              |
 |              |              |              | timations)   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| lower_bandwi | OT_INTEGER   | GenericType( | lower band-  | CasADi::Sund |
+| dthB         |              | )            | width of     | ialsInternal |
+|              |              |              | banded       |              |
+|              |              |              | jacobians    |              |
+|              |              |              | for backward |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
 | max_krylov   | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
 |              |              |              | Krylov       | ialsInternal |
+|              |              |              | subspace     |              |
+|              |              |              | size         |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_krylovB  | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
+|              |              |              | krylov       | ialsInternal |
 |              |              |              | subspace     |              |
 |              |              |              | size         |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -20156,7 +20204,9 @@ Joel Andersson
 |              |              |              | ctInitialCon |              |
 |              |              |              | ditions|res| |              |
 |              |              |              | resS|resB|rh |              |
-|              |              |              | sQB)         |              |
+|              |              |              | sQB|bjacB|jt |              |
+|              |              |              | imesB|psetup |              |
+|              |              |              | B|psolveB)   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -20201,6 +20251,9 @@ Joel Andersson
 | pretype      | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
 |              |              |              | ight|both)   | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
+| pretypeB     | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
+|              |              |              | ight|both)   | ialsInternal |
++--------------+--------------+--------------+--------------+--------------+
 | print_stats  | OT_BOOLEAN   | false        | Print out    | CasADi::Inte |
 |              |              |              | statistics   | gratorIntern |
 |              |              |              | after        | al           |
@@ -20223,6 +20276,16 @@ Joel Andersson
 |              |              |              | tolerence    | ialsInternal |
 |              |              |              | for the IVP  |              |
 |              |              |              | solution     |              |
++--------------+--------------+--------------+--------------+--------------+
+| reltolB      | OT_REAL      | GenericType( | Relative     | CasADi::Sund |
+|              |              | )            | tolerence    | ialsInternal |
+|              |              |              | for the      |              |
+|              |              |              | adjoint      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | reltol]      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sensitivity_ | OT_STRING    | \"simultaneou | (simultaneou | CasADi::Sund |
 | method       |              | s\"           | s|staggered) | ialsInternal |
@@ -20285,9 +20348,23 @@ Joel Andersson
 |              |              |              | Jacobian (es |              |
 |              |              |              | timations)   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| upper_bandwi | OT_INTEGER   | GenericType( | Upper band-  | CasADi::Sund |
+| dthB         |              | )            | width of     | ialsInternal |
+|              |              |              | banded       |              |
+|              |              |              | jacobians    |              |
+|              |              |              | for backward |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
 | use_precondi | OT_BOOLEAN   | false        | Precondition | CasADi::Sund |
 | tioner       |              |              | an iterative | ialsInternal |
 |              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| use_precondi | OT_BOOLEAN   | false        | Precondition | CasADi::Sund |
+| tionerB      |              |              | an iterative | ialsInternal |
+|              |              |              | solver for   |              |
+|              |              |              | the          |              |
+|              |              |              | backwards    |              |
+|              |              |              | problem      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
 |              |              | )            | defined      | ternal       |
@@ -20309,11 +20386,19 @@ Joel Andersson
 +--------------------------+----------------------+
 |            Id            |       Used in        |
 +==========================+======================+
+| bjacB                    | CasADi::IdasInternal |
++--------------------------+----------------------+
 | correctInitialConditions | CasADi::IdasInternal |
 +--------------------------+----------------------+
 | inputs                   | CasADi::FXInternal   |
 +--------------------------+----------------------+
+| jtimesB                  | CasADi::IdasInternal |
++--------------------------+----------------------+
 | outputs                  | CasADi::FXInternal   |
++--------------------------+----------------------+
+| psetupB                  | CasADi::IdasInternal |
++--------------------------+----------------------+
+| psolveB                  | CasADi::IdasInternal |
 +--------------------------+----------------------+
 | res                      | CasADi::IdasInternal |
 +--------------------------+----------------------+
@@ -21011,6 +21096,16 @@ rx, rz and rp.
 |              |              |              | for the IVP  |              |
 |              |              |              | solution     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| abstolB      | OT_REAL      | GenericType( | Absolute     | CasADi::Sund |
+|              |              | )            | tolerence    | ialsInternal |
+|              |              |              | for the      |              |
+|              |              |              | adjoint      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | abstol]      |              |
++--------------+--------------+--------------+--------------+--------------+
 | abstolv      | OT_REALVECTO |              |              | CasADi::Idas |
 |              | R            |              |              | Internal     |
 +--------------+--------------+--------------+--------------+--------------+
@@ -21040,57 +21135,9 @@ rx, rz and rp.
 |              |              |              | functions    | gratorIntern |
 |              |              |              | for          | al           |
 |              |              |              | calculating  |              |
-|              |              |              | forward      |              |
+|              |              |              | adjoint      |              |
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_abstol | OT_REAL      | GenericType( | Absolute     | CasADi::Sund |
-|              |              | )            | tolerence    | ialsInternal |
-|              |              |              | for the      |              |
-|              |              |              | adjoint      |              |
-|              |              |              | sensitivity  |              |
-|              |              |              | solution     |              |
-|              |              |              | [default:    |              |
-|              |              |              | equal to     |              |
-|              |              |              | abstol]      |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_iterat | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
-| ive_solver   |              |              | ab|tfqmr)    | ialsInternal |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_linear | OT_STRING    | \"dense\"      | (dense|bande | CasADi::Sund |
-| _solver_type |              |              | d|iterative) | ialsInternal |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_lower_ | OT_INTEGER   | GenericType( | lower band-  | CasADi::Sund |
-| bandwidth    |              | )            | width of     | ialsInternal |
-|              |              |              | banded       |              |
-|              |              |              | jacobians    |              |
-|              |              |              | for backward |              |
-|              |              |              | integration  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_max_kr | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
-| ylov         |              |              | krylov       | ialsInternal |
-|              |              |              | subspace     |              |
-|              |              |              | size         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_pretyp | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
-| e            |              |              | ight|both)   | ialsInternal |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_reltol | OT_REAL      | GenericType( | Relative     | CasADi::Sund |
-|              |              | )            | tolerence    | ialsInternal |
-|              |              |              | for the      |              |
-|              |              |              | adjoint      |              |
-|              |              |              | sensitivity  |              |
-|              |              |              | solution     |              |
-|              |              |              | [default:    |              |
-|              |              |              | equal to     |              |
-|              |              |              | reltol]      |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_upper_ | OT_INTEGER   | GenericType( | Upper band-  | CasADi::Sund |
-| bandwidth    |              | )            | width of     | ialsInternal |
-|              |              |              | banded       |              |
-|              |              |              | jacobians    |              |
-|              |              |              | for backward |              |
-|              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | augmented_op | OT_DICTIONAR | GenericType( | Options to   | CasADi::Inte |
 | tions        | Y            | )            | be passed    | gratorIntern |
@@ -21241,6 +21288,9 @@ rx, rz and rp.
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
 | lver         |              |              | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
+| iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
+| lverB        |              |              | ab|tfqmr)    | ialsInternal |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -21254,18 +21304,39 @@ rx, rz and rp.
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_LINEARSOL | GenericType( | An linear    | CasADi::Sund |
-| r            | VER          | )            | solver       | ialsInternal |
+| linear_solve | OT_LINEARSOL | GenericType( | A custom     | CasADi::Sund |
+| r            | VER          | )            | linear       | ialsInternal |
+|              |              |              | solver       |              |
 |              |              |              | creator      |              |
 |              |              |              | function     |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | A custom     | CasADi::Sund |
+| rB           | VER          | )            | linear       | ialsInternal |
+|              |              |              | solver       |              |
+|              |              |              | creator      |              |
+|              |              |              | function for |              |
+|              |              |              | backwards    |              |
+|              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Sund |
 | r_options    | Y            | )            | be passed to | ialsInternal |
 |              |              |              | the linear   |              |
 |              |              |              | solver       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Sund |
+| r_optionsB   | Y            | )            | be passed to | ialsInternal |
+|              |              |              | the linear   |              |
+|              |              |              | solver for   |              |
+|              |              |              | backwards    |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
 | r_type       |              |              | d|dense|band | ialsInternal |
+|              |              |              | ed|iterative |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
+| r_typeB      |              |              | d|dense|band | ialsInternal |
 |              |              |              | ed|iterative |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -21275,8 +21346,20 @@ rx, rz and rp.
 |              |              |              | Jacobian (es |              |
 |              |              |              | timations)   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| lower_bandwi | OT_INTEGER   | GenericType( | lower band-  | CasADi::Sund |
+| dthB         |              | )            | width of     | ialsInternal |
+|              |              |              | banded       |              |
+|              |              |              | jacobians    |              |
+|              |              |              | for backward |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
 | max_krylov   | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
 |              |              |              | Krylov       | ialsInternal |
+|              |              |              | subspace     |              |
+|              |              |              | size         |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_krylovB  | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
+|              |              |              | krylov       | ialsInternal |
 |              |              |              | subspace     |              |
 |              |              |              | size         |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -21312,7 +21395,9 @@ rx, rz and rp.
 |              |              |              | ctInitialCon |              |
 |              |              |              | ditions|res| |              |
 |              |              |              | resS|resB|rh |              |
-|              |              |              | sQB)         |              |
+|              |              |              | sQB|bjacB|jt |              |
+|              |              |              | imesB|psetup |              |
+|              |              |              | B|psolveB)   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -21357,6 +21442,9 @@ rx, rz and rp.
 | pretype      | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
 |              |              |              | ight|both)   | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
+| pretypeB     | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
+|              |              |              | ight|both)   | ialsInternal |
++--------------+--------------+--------------+--------------+--------------+
 | print_stats  | OT_BOOLEAN   | false        | Print out    | CasADi::Inte |
 |              |              |              | statistics   | gratorIntern |
 |              |              |              | after        | al           |
@@ -21379,6 +21467,16 @@ rx, rz and rp.
 |              |              |              | tolerence    | ialsInternal |
 |              |              |              | for the IVP  |              |
 |              |              |              | solution     |              |
++--------------+--------------+--------------+--------------+--------------+
+| reltolB      | OT_REAL      | GenericType( | Relative     | CasADi::Sund |
+|              |              | )            | tolerence    | ialsInternal |
+|              |              |              | for the      |              |
+|              |              |              | adjoint      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | reltol]      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sensitivity_ | OT_STRING    | \"simultaneou | (simultaneou | CasADi::Sund |
 | method       |              | s\"           | s|staggered) | ialsInternal |
@@ -21441,9 +21539,23 @@ rx, rz and rp.
 |              |              |              | Jacobian (es |              |
 |              |              |              | timations)   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| upper_bandwi | OT_INTEGER   | GenericType( | Upper band-  | CasADi::Sund |
+| dthB         |              | )            | width of     | ialsInternal |
+|              |              |              | banded       |              |
+|              |              |              | jacobians    |              |
+|              |              |              | for backward |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
 | use_precondi | OT_BOOLEAN   | false        | Precondition | CasADi::Sund |
 | tioner       |              |              | an iterative | ialsInternal |
 |              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| use_precondi | OT_BOOLEAN   | false        | Precondition | CasADi::Sund |
+| tionerB      |              |              | an iterative | ialsInternal |
+|              |              |              | solver for   |              |
+|              |              |              | the          |              |
+|              |              |              | backwards    |              |
+|              |              |              | problem      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
 |              |              | )            | defined      | ternal       |
@@ -21465,11 +21577,19 @@ rx, rz and rp.
 +--------------------------+----------------------+
 |            Id            |       Used in        |
 +==========================+======================+
+| bjacB                    | CasADi::IdasInternal |
++--------------------------+----------------------+
 | correctInitialConditions | CasADi::IdasInternal |
 +--------------------------+----------------------+
 | inputs                   | CasADi::FXInternal   |
 +--------------------------+----------------------+
+| jtimesB                  | CasADi::IdasInternal |
++--------------------------+----------------------+
 | outputs                  | CasADi::FXInternal   |
++--------------------------+----------------------+
+| psetupB                  | CasADi::IdasInternal |
++--------------------------+----------------------+
+| psolveB                  | CasADi::IdasInternal |
 +--------------------------+----------------------+
 | res                      | CasADi::IdasInternal |
 +--------------------------+----------------------+
@@ -21638,26 +21758,24 @@ Set the stop time of the forward integration. ";
 
 Print solver statistics. ";
 
-%feature("docstring")  CasADi::IdasInternal::getJacobian "
-
-Get the integrator Jacobian for the forward problem. ";
-
 %feature("docstring")  CasADi::IdasInternal::getJacobianGen "
 
 Get the integrator Jacobian for the forward problem (generic) ";
 
-%feature("docstring")  CasADi::IdasInternal::getJacobianB "
+%feature("docstring")  CasADi::IdasInternal::getJacobianGenB "
 
-Get the integrator Jacobian for the backward problem.
-
-Structure:
+Get the integrator Jacobian for the backward problem (generic) Structure:
 
 | diff(gx,rx) + cj*diff(gx,dot(rx)) | diff(gx,rz) | | diff(gz,rx) |
 diff(gz,rz) | ";
 
-%feature("docstring")  CasADi::IdasInternal::getJacobianGenB "
+%feature("docstring")  CasADi::IdasInternal::getJacobian "
 
-Get the integrator Jacobian for the backward problem (generic) ";
+Get the integrator Jacobian for the forward problem. ";
+
+%feature("docstring")  CasADi::IdasInternal::getJacobianB "
+
+Get the integrator Jacobian for the backward problem. ";
 
 %feature("docstring")  CasADi::IdasInternal::correctInitialConditions "
 
@@ -21678,6 +21796,10 @@ Correct the initial conditions, i.e. calculate. ";
 %feature("docstring")  CasADi::IdasInternal::initIterativeLinearSolverB "";
 
 %feature("docstring")  CasADi::IdasInternal::initUserDefinedLinearSolverB "";
+
+%feature("docstring")  CasADi::IdasInternal::getJacobian "
+
+Calculate the jacobian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::IdasInternal::evaluate "
 
@@ -21705,10 +21827,6 @@ Is the class able to propate seeds through the algorithm? ";
 
 Generate a function that calculates nfwd forward derivatives and nadj
 adjoint derivatives. ";
-
-%feature("docstring")  CasADi::IdasInternal::getJacobian "
-
-Calculate the jacobian of output oind with respect to input iind. ";
 
 %feature("docstring")  CasADi::IdasInternal::getAugmented "
 
@@ -23514,7 +23632,7 @@ Joel Andersson
 |              |              |              | functions    | gratorIntern |
 |              |              |              | for          | al           |
 |              |              |              | calculating  |              |
-|              |              |              | forward      |              |
+|              |              |              | adjoint      |              |
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -24314,7 +24432,7 @@ Joel Andersson
 |              |              |              | functions    | gratorIntern |
 |              |              |              | for          | al           |
 |              |              |              | calculating  |              |
-|              |              |              | forward      |              |
+|              |              |              | adjoint      |              |
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -62520,7 +62638,7 @@ Joel Andersson
 |              |              |              | functions    | gratorIntern |
 |              |              |              | for          | al           |
 |              |              |              | calculating  |              |
-|              |              |              | forward      |              |
+|              |              |              | adjoint      |              |
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -63350,7 +63468,7 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | functions    | gratorIntern |
 |              |              |              | for          | al           |
 |              |              |              | calculating  |              |
-|              |              |              | forward      |              |
+|              |              |              | adjoint      |              |
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -67852,6 +67970,16 @@ Constructor. ";
 |              |              |              | for the IVP  |              |
 |              |              |              | solution     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| abstolB      | OT_REAL      | GenericType( | Absolute     | CasADi::Sund |
+|              |              | )            | tolerence    | ialsInternal |
+|              |              |              | for the      |              |
+|              |              |              | adjoint      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | abstol]      |              |
++--------------+--------------+--------------+--------------+--------------+
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
@@ -67878,57 +68006,9 @@ Constructor. ";
 |              |              |              | functions    | gratorIntern |
 |              |              |              | for          | al           |
 |              |              |              | calculating  |              |
-|              |              |              | forward      |              |
+|              |              |              | adjoint      |              |
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_abstol | OT_REAL      | GenericType( | Absolute     | CasADi::Sund |
-|              |              | )            | tolerence    | ialsInternal |
-|              |              |              | for the      |              |
-|              |              |              | adjoint      |              |
-|              |              |              | sensitivity  |              |
-|              |              |              | solution     |              |
-|              |              |              | [default:    |              |
-|              |              |              | equal to     |              |
-|              |              |              | abstol]      |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_iterat | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
-| ive_solver   |              |              | ab|tfqmr)    | ialsInternal |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_linear | OT_STRING    | \"dense\"      | (dense|bande | CasADi::Sund |
-| _solver_type |              |              | d|iterative) | ialsInternal |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_lower_ | OT_INTEGER   | GenericType( | lower band-  | CasADi::Sund |
-| bandwidth    |              | )            | width of     | ialsInternal |
-|              |              |              | banded       |              |
-|              |              |              | jacobians    |              |
-|              |              |              | for backward |              |
-|              |              |              | integration  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_max_kr | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
-| ylov         |              |              | krylov       | ialsInternal |
-|              |              |              | subspace     |              |
-|              |              |              | size         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_pretyp | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
-| e            |              |              | ight|both)   | ialsInternal |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_reltol | OT_REAL      | GenericType( | Relative     | CasADi::Sund |
-|              |              | )            | tolerence    | ialsInternal |
-|              |              |              | for the      |              |
-|              |              |              | adjoint      |              |
-|              |              |              | sensitivity  |              |
-|              |              |              | solution     |              |
-|              |              |              | [default:    |              |
-|              |              |              | equal to     |              |
-|              |              |              | reltol]      |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_upper_ | OT_INTEGER   | GenericType( | Upper band-  | CasADi::Sund |
-| bandwidth    |              | )            | width of     | ialsInternal |
-|              |              |              | banded       |              |
-|              |              |              | jacobians    |              |
-|              |              |              | for backward |              |
-|              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | augmented_op | OT_DICTIONAR | GenericType( | Options to   | CasADi::Inte |
 | tions        | Y            | )            | be passed    | gratorIntern |
@@ -68026,6 +68106,9 @@ Constructor. ";
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
 | lver         |              |              | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
+| iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
+| lverB        |              |              | ab|tfqmr)    | ialsInternal |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -68039,18 +68122,39 @@ Constructor. ";
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_LINEARSOL | GenericType( | An linear    | CasADi::Sund |
-| r            | VER          | )            | solver       | ialsInternal |
+| linear_solve | OT_LINEARSOL | GenericType( | A custom     | CasADi::Sund |
+| r            | VER          | )            | linear       | ialsInternal |
+|              |              |              | solver       |              |
 |              |              |              | creator      |              |
 |              |              |              | function     |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | A custom     | CasADi::Sund |
+| rB           | VER          | )            | linear       | ialsInternal |
+|              |              |              | solver       |              |
+|              |              |              | creator      |              |
+|              |              |              | function for |              |
+|              |              |              | backwards    |              |
+|              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Sund |
 | r_options    | Y            | )            | be passed to | ialsInternal |
 |              |              |              | the linear   |              |
 |              |              |              | solver       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Sund |
+| r_optionsB   | Y            | )            | be passed to | ialsInternal |
+|              |              |              | the linear   |              |
+|              |              |              | solver for   |              |
+|              |              |              | backwards    |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
 | r_type       |              |              | d|dense|band | ialsInternal |
+|              |              |              | ed|iterative |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
+| r_typeB      |              |              | d|dense|band | ialsInternal |
 |              |              |              | ed|iterative |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -68060,8 +68164,20 @@ Constructor. ";
 |              |              |              | Jacobian (es |              |
 |              |              |              | timations)   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| lower_bandwi | OT_INTEGER   | GenericType( | lower band-  | CasADi::Sund |
+| dthB         |              | )            | width of     | ialsInternal |
+|              |              |              | banded       |              |
+|              |              |              | jacobians    |              |
+|              |              |              | for backward |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
 | max_krylov   | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
 |              |              |              | Krylov       | ialsInternal |
+|              |              |              | subspace     |              |
+|              |              |              | size         |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_krylovB  | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
+|              |              |              | krylov       | ialsInternal |
 |              |              |              | subspace     |              |
 |              |              |              | size         |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -68135,6 +68251,9 @@ Constructor. ";
 | pretype      | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
 |              |              |              | ight|both)   | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
+| pretypeB     | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
+|              |              |              | ight|both)   | ialsInternal |
++--------------+--------------+--------------+--------------+--------------+
 | print_stats  | OT_BOOLEAN   | false        | Print out    | CasADi::Inte |
 |              |              |              | statistics   | gratorIntern |
 |              |              |              | after        | al           |
@@ -68157,6 +68276,16 @@ Constructor. ";
 |              |              |              | tolerence    | ialsInternal |
 |              |              |              | for the IVP  |              |
 |              |              |              | solution     |              |
++--------------+--------------+--------------+--------------+--------------+
+| reltolB      | OT_REAL      | GenericType( | Relative     | CasADi::Sund |
+|              |              | )            | tolerence    | ialsInternal |
+|              |              |              | for the      |              |
+|              |              |              | adjoint      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | reltol]      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sensitivity_ | OT_STRING    | \"simultaneou | (simultaneou | CasADi::Sund |
 | method       |              | s\"           | s|staggered) | ialsInternal |
@@ -68213,9 +68342,23 @@ Constructor. ";
 |              |              |              | Jacobian (es |              |
 |              |              |              | timations)   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| upper_bandwi | OT_INTEGER   | GenericType( | Upper band-  | CasADi::Sund |
+| dthB         |              | )            | width of     | ialsInternal |
+|              |              |              | banded       |              |
+|              |              |              | jacobians    |              |
+|              |              |              | for backward |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
 | use_precondi | OT_BOOLEAN   | false        | Precondition | CasADi::Sund |
 | tioner       |              |              | an iterative | ialsInternal |
 |              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| use_precondi | OT_BOOLEAN   | false        | Precondition | CasADi::Sund |
+| tionerB      |              |              | an iterative | ialsInternal |
+|              |              |              | solver for   |              |
+|              |              |              | the          |              |
+|              |              |              | backwards    |              |
+|              |              |              | problem      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
 |              |              | )            | defined      | ternal       |
@@ -68844,6 +68987,16 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | for the IVP  |              |
 |              |              |              | solution     |              |
 +--------------+--------------+--------------+--------------+--------------+
+| abstolB      | OT_REAL      | GenericType( | Absolute     | CasADi::Sund |
+|              |              | )            | tolerence    | ialsInternal |
+|              |              |              | for the      |              |
+|              |              |              | adjoint      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | abstol]      |              |
++--------------+--------------+--------------+--------------+--------------+
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
@@ -68870,57 +69023,9 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | functions    | gratorIntern |
 |              |              |              | for          | al           |
 |              |              |              | calculating  |              |
-|              |              |              | forward      |              |
+|              |              |              | adjoint      |              |
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_abstol | OT_REAL      | GenericType( | Absolute     | CasADi::Sund |
-|              |              | )            | tolerence    | ialsInternal |
-|              |              |              | for the      |              |
-|              |              |              | adjoint      |              |
-|              |              |              | sensitivity  |              |
-|              |              |              | solution     |              |
-|              |              |              | [default:    |              |
-|              |              |              | equal to     |              |
-|              |              |              | abstol]      |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_iterat | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
-| ive_solver   |              |              | ab|tfqmr)    | ialsInternal |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_linear | OT_STRING    | \"dense\"      | (dense|bande | CasADi::Sund |
-| _solver_type |              |              | d|iterative) | ialsInternal |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_lower_ | OT_INTEGER   | GenericType( | lower band-  | CasADi::Sund |
-| bandwidth    |              | )            | width of     | ialsInternal |
-|              |              |              | banded       |              |
-|              |              |              | jacobians    |              |
-|              |              |              | for backward |              |
-|              |              |              | integration  |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_max_kr | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
-| ylov         |              |              | krylov       | ialsInternal |
-|              |              |              | subspace     |              |
-|              |              |              | size         |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_pretyp | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
-| e            |              |              | ight|both)   | ialsInternal |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_reltol | OT_REAL      | GenericType( | Relative     | CasADi::Sund |
-|              |              | )            | tolerence    | ialsInternal |
-|              |              |              | for the      |              |
-|              |              |              | adjoint      |              |
-|              |              |              | sensitivity  |              |
-|              |              |              | solution     |              |
-|              |              |              | [default:    |              |
-|              |              |              | equal to     |              |
-|              |              |              | reltol]      |              |
-+--------------+--------------+--------------+--------------+--------------+
-| asens_upper_ | OT_INTEGER   | GenericType( | Upper band-  | CasADi::Sund |
-| bandwidth    |              | )            | width of     | ialsInternal |
-|              |              |              | banded       |              |
-|              |              |              | jacobians    |              |
-|              |              |              | for backward |              |
-|              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | augmented_op | OT_DICTIONAR | GenericType( | Options to   | CasADi::Inte |
 | tions        | Y            | )            | be passed    | gratorIntern |
@@ -69018,6 +69123,9 @@ Return a string with a destription (for SWIG) ";
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
 | lver         |              |              | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
+| iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
+| lverB        |              |              | ab|tfqmr)    | ialsInternal |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -69031,18 +69139,39 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | internal     |              |
 |              |              |              | routines     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_LINEARSOL | GenericType( | An linear    | CasADi::Sund |
-| r            | VER          | )            | solver       | ialsInternal |
+| linear_solve | OT_LINEARSOL | GenericType( | A custom     | CasADi::Sund |
+| r            | VER          | )            | linear       | ialsInternal |
+|              |              |              | solver       |              |
 |              |              |              | creator      |              |
 |              |              |              | function     |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | A custom     | CasADi::Sund |
+| rB           | VER          | )            | linear       | ialsInternal |
+|              |              |              | solver       |              |
+|              |              |              | creator      |              |
+|              |              |              | function for |              |
+|              |              |              | backwards    |              |
+|              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Sund |
 | r_options    | Y            | )            | be passed to | ialsInternal |
 |              |              |              | the linear   |              |
 |              |              |              | solver       |              |
 +--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Sund |
+| r_optionsB   | Y            | )            | be passed to | ialsInternal |
+|              |              |              | the linear   |              |
+|              |              |              | solver for   |              |
+|              |              |              | backwards    |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
 | r_type       |              |              | d|dense|band | ialsInternal |
+|              |              |              | ed|iterative |              |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
+| r_typeB      |              |              | d|dense|band | ialsInternal |
 |              |              |              | ed|iterative |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -69052,8 +69181,20 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | Jacobian (es |              |
 |              |              |              | timations)   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| lower_bandwi | OT_INTEGER   | GenericType( | lower band-  | CasADi::Sund |
+| dthB         |              | )            | width of     | ialsInternal |
+|              |              |              | banded       |              |
+|              |              |              | jacobians    |              |
+|              |              |              | for backward |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
 | max_krylov   | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
 |              |              |              | Krylov       | ialsInternal |
+|              |              |              | subspace     |              |
+|              |              |              | size         |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_krylovB  | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
+|              |              |              | krylov       | ialsInternal |
 |              |              |              | subspace     |              |
 |              |              |              | size         |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -69127,6 +69268,9 @@ Return a string with a destription (for SWIG) ";
 | pretype      | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
 |              |              |              | ight|both)   | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
+| pretypeB     | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
+|              |              |              | ight|both)   | ialsInternal |
++--------------+--------------+--------------+--------------+--------------+
 | print_stats  | OT_BOOLEAN   | false        | Print out    | CasADi::Inte |
 |              |              |              | statistics   | gratorIntern |
 |              |              |              | after        | al           |
@@ -69149,6 +69293,16 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | tolerence    | ialsInternal |
 |              |              |              | for the IVP  |              |
 |              |              |              | solution     |              |
++--------------+--------------+--------------+--------------+--------------+
+| reltolB      | OT_REAL      | GenericType( | Relative     | CasADi::Sund |
+|              |              | )            | tolerence    | ialsInternal |
+|              |              |              | for the      |              |
+|              |              |              | adjoint      |              |
+|              |              |              | sensitivity  |              |
+|              |              |              | solution     |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | reltol]      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | sensitivity_ | OT_STRING    | \"simultaneou | (simultaneou | CasADi::Sund |
 | method       |              | s\"           | s|staggered) | ialsInternal |
@@ -69205,9 +69359,23 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | Jacobian (es |              |
 |              |              |              | timations)   |              |
 +--------------+--------------+--------------+--------------+--------------+
+| upper_bandwi | OT_INTEGER   | GenericType( | Upper band-  | CasADi::Sund |
+| dthB         |              | )            | width of     | ialsInternal |
+|              |              |              | banded       |              |
+|              |              |              | jacobians    |              |
+|              |              |              | for backward |              |
+|              |              |              | integration  |              |
++--------------+--------------+--------------+--------------+--------------+
 | use_precondi | OT_BOOLEAN   | false        | Precondition | CasADi::Sund |
 | tioner       |              |              | an iterative | ialsInternal |
 |              |              |              | solver       |              |
++--------------+--------------+--------------+--------------+--------------+
+| use_precondi | OT_BOOLEAN   | false        | Precondition | CasADi::Sund |
+| tionerB      |              |              | an iterative | ialsInternal |
+|              |              |              | solver for   |              |
+|              |              |              | the          |              |
+|              |              |              | backwards    |              |
+|              |              |              | problem      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
 |              |              | )            | defined      | ternal       |
@@ -69338,6 +69506,14 @@ Deep copy data members. ";
 %feature("docstring")  CasADi::SundialsInternal::setStopTime "
 
 Set stop time for the integration. ";
+
+%feature("docstring")  CasADi::SundialsInternal::getJacobian "
+
+Get the integrator Jacobian for the forward problem. ";
+
+%feature("docstring")  CasADi::SundialsInternal::getJacobianB "
+
+Get the integrator Jacobian for the backward problem. ";
 
 %feature("docstring")  CasADi::SundialsInternal::clone "
 
@@ -80038,9 +80214,6 @@ This file does absolutely nothing but including all headers ";
 // File: group__scheme__InputOutputScheme.xml
 
 
-// File: group__scheme__MOutput.xml
-
-
 // File: group__scheme__MayerInput.xml
 
 
@@ -80066,9 +80239,6 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: group__scheme__ControlSimulatorInput.xml
-
-
-// File: group__scheme__MInput.xml
 
 
 // File: group__scheme__LOFunOutputs.xml
