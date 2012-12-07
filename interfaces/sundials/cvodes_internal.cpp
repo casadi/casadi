@@ -815,7 +815,7 @@ void CVodesInternal::rhsB(double t, const double* x, const double *rx, double* r
   g_.getOutput(rxdot,RDAE_ODE);
 
   if(monitor_rhsB_){
-    cout << "xdotA = " << g_.output(RDAE_ODE) << endl;
+    cout << "xdotB = " << g_.output(RDAE_ODE) << endl;
   }
   
   // Negate (note definition of g)
@@ -875,11 +875,11 @@ try{
   }
 }
 
-int CVodesInternal::rhsBS_wrapper(double t, N_Vector x, N_Vector *xF, N_Vector xA, N_Vector xdotA, void *user_data){
+int CVodesInternal::rhsBS_wrapper(double t, N_Vector x, N_Vector *xF, N_Vector xB, N_Vector xdotB, void *user_data){
 try{
     casadi_assert(user_data);
     CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
-    this_->rhsBS(t,x,xF,xA,xdotA);
+    this_->rhsBS(t,x,xF,xB,xdotB);
     return 0;
   } catch(exception& e){
     cerr << "rhsBS failed: " << e.what() << endl;;
@@ -926,7 +926,7 @@ void CVodesInternal::rhsQB(double t, const double* x, const double* rx, double* 
   g_.getOutput(rqdot,RDAE_QUAD);
 
   if(monitor_rhsB_){
-    cout << "qdotA = " << g_.output(RDAE_QUAD) << endl;
+    cout << "qdotB = " << g_.output(RDAE_QUAD) << endl;
   }
   
   // Negate (note definition of g)
@@ -942,10 +942,7 @@ int CVodesInternal::jtimes_wrapper(N_Vector v, N_Vector Jv, double t, N_Vector x
   try{
     casadi_assert(user_data);
     CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
-    casadi_assert(this_->f_.fwdSens(DAE_ODE).size() == this_->nx_);
-    casadi_assert(NV_LENGTH_S(v) == this_->nx_);
-    casadi_assert(NV_LENGTH_S(Jv) == this_->nx_);
-    this_->jtimes(NV_DATA_S(v),NV_DATA_S(Jv),t,NV_DATA_S(x),NV_DATA_S(xdot),NV_DATA_S(tmp));
+    this_->jtimes(v,Jv,t,x,xdot,tmp);
     return 0;
   } catch(exception& e){
     cerr << "jtimes failed: " << e.what() << endl;;
@@ -953,11 +950,11 @@ int CVodesInternal::jtimes_wrapper(N_Vector v, N_Vector Jv, double t, N_Vector x
   }
 }
 
-int CVodesInternal::jtimesB_wrapper(N_Vector vB, N_Vector JvB, double t, N_Vector x, N_Vector xB, N_Vector fyB, void *user_data ,N_Vector tmpB) {
+int CVodesInternal::jtimesB_wrapper(N_Vector vB, N_Vector JvB, double t, N_Vector x, N_Vector xB, N_Vector xdotB, void *user_data ,N_Vector tmpB) {
   try{
     casadi_assert(user_data);
     CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
-    this_->jtimesB(vB, JvB, t, x, xB, fyB, tmpB);
+    this_->jtimesB(vB, JvB, t, x, xB, xdotB, tmpB);
     return 0;
   } catch(exception& e){
     cerr << "jtimes failed: " << e.what() << endl;;
@@ -965,26 +962,26 @@ int CVodesInternal::jtimesB_wrapper(N_Vector vB, N_Vector JvB, double t, N_Vecto
   }
 }
 
-void CVodesInternal::jtimes(const double *v, double* Jv, double t, const double* y, const double* xdot, double* tmp){
+void CVodesInternal::jtimes(N_Vector v, N_Vector Jv, double t, N_Vector x, N_Vector xdot, N_Vector tmp){
   log("IdasInternal::jtimes","begin");
   // Get time
   time1 = clock();
 
   // Pass input
   f_.setInput(&t,DAE_T);
-  f_.setInput(y,DAE_X);
+  f_.setInput(NV_DATA_S(x),DAE_X);
   f_.setInput(input(INTEGRATOR_P),DAE_P);
 
   // Pass input seeds
   f_.fwdSeed(DAE_T).setZero();
-  f_.setFwdSeed(v,DAE_X);
-  fill_n(f_.fwdSeed(DAE_P).begin(),np_,0.0);
+  f_.setFwdSeed(NV_DATA_S(v),DAE_X);
+  f_.setFwdSeed(0.0,DAE_P);
   
   // Evaluate
   f_.evaluate(1,0);
 
   // Get the output seeds
-  f_.getFwdSens(Jv,DAE_ODE);
+  f_.getFwdSens(NV_DATA_S(Jv),DAE_ODE);
   
   // Log time duration
   time2 = clock();
@@ -993,7 +990,7 @@ void CVodesInternal::jtimes(const double *v, double* Jv, double t, const double*
   log("IdasInternal::jtimes","end");
 }
 
-void CVodesInternal::jtimesB(N_Vector vB, N_Vector JvB, double t, N_Vector x, N_Vector xB, N_Vector fyB, N_Vector tmpB) {
+void CVodesInternal::jtimesB(N_Vector vB, N_Vector JvB, double t, N_Vector x, N_Vector xB, N_Vector xdotB, N_Vector tmpB) {
   log("IdasInternal::jtimesB","begin");
   // Get time
   time1 = clock();
@@ -1036,11 +1033,11 @@ int CVodesInternal::djac_wrapper(long N, double t, N_Vector x, N_Vector xdot, Dl
   }
 }
 
-int CVodesInternal::djacB_wrapper(long NeqB, double t, N_Vector x, N_Vector xB, N_Vector fyB, DlsMat JacB, void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
+int CVodesInternal::djacB_wrapper(long NeqB, double t, N_Vector x, N_Vector xB, N_Vector xdotB, DlsMat JacB, void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
   try{
     casadi_assert(user_data);
     CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
-    this_->djacB(NeqB, t, x, xB, fyB, JacB, tmp1B, tmp2B, tmp3B);
+    this_->djacB(NeqB, t, x, xB, xdotB, JacB, tmp1B, tmp2B, tmp3B);
     return 0;
   } catch(exception& e){
     cerr << "djacB failed: " << e.what() << endl;;
@@ -1088,7 +1085,7 @@ void CVodesInternal::djac(long N, double t, N_Vector x, N_Vector xdot, DlsMat Ja
   log("IdasInternal::djac","wnd");
 }
 
-void CVodesInternal::djacB(long NeqB, double t, N_Vector x, N_Vector xB, N_Vector fyB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
+void CVodesInternal::djacB(long NeqB, double t, N_Vector x, N_Vector xB, N_Vector xdotB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
   log("IdasInternal::djacB","begin");
   // Get time
   time1 = clock();
@@ -1141,11 +1138,11 @@ int CVodesInternal::bjac_wrapper(long N, long mupper, long mlower, double t, N_V
   }
 }
 
-int CVodesInternal::bjacB_wrapper(long NeqB, long mupperB, long mlowerB, double t, N_Vector x, N_Vector xB, N_Vector fyB, DlsMat JacB, void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
+int CVodesInternal::bjacB_wrapper(long NeqB, long mupperB, long mlowerB, double t, N_Vector x, N_Vector xB, N_Vector xdotB, DlsMat JacB, void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
   try{
     casadi_assert(user_data);
     CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
-    this_->bjacB(NeqB, mupperB, mlowerB, t, x, xB, fyB, JacB, tmp1B, tmp2B, tmp3B);
+    this_->bjacB(NeqB, mupperB, mlowerB, t, x, xB, xdotB, JacB, tmp1B, tmp2B, tmp3B);
     return 0;
   } catch(exception& e){
     cerr << "bjacB failed: " << e.what() << endl;;
@@ -1194,7 +1191,7 @@ void CVodesInternal::bjac(long N, long mupper, long mlower, double t, N_Vector x
   log("IdasInternal::bjac","end");
 }
 
-void CVodesInternal::bjacB(long NeqB, long mupperB, long mlowerB, double t, N_Vector x, N_Vector xB, N_Vector fyB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
+void CVodesInternal::bjacB(long NeqB, long mupperB, long mlowerB, double t, N_Vector x, N_Vector xB, N_Vector xdotB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
   log("IdasInternal::bjacB","begin");
   
   // Get time
@@ -1255,11 +1252,11 @@ int CVodesInternal::psolve_wrapper(double t, N_Vector x, N_Vector xdot, N_Vector
   }
 }
 
-int CVodesInternal::psolveB_wrapper(double t, N_Vector x, N_Vector xB, N_Vector fyB, N_Vector rvecB, N_Vector zvecB, double gammaB, double deltaB, int lr, void *user_data, N_Vector tmpB){
+int CVodesInternal::psolveB_wrapper(double t, N_Vector x, N_Vector xB, N_Vector xdotB, N_Vector rvecB, N_Vector zvecB, double gammaB, double deltaB, int lr, void *user_data, N_Vector tmpB){
   try{
     CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
     casadi_assert(this_);
-    this_->psolveB(t, x, xB, fyB, rvecB, zvecB, gammaB, deltaB, lr, tmpB);
+    this_->psolveB(t, x, xB, xdotB, rvecB, zvecB, gammaB, deltaB, lr, tmpB);
     return 0;
   } catch(exception& e){
     cerr << "psolveB failed: " << e.what() << endl;;
@@ -1279,11 +1276,11 @@ int CVodesInternal::psetup_wrapper(double t, N_Vector x, N_Vector xdot, booleant
   }
 }
 
-int CVodesInternal::psetupB_wrapper(double t, N_Vector x, N_Vector xB, N_Vector fyB, booleantype jokB, booleantype *jcurPtrB, double gammaB, void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B){
+int CVodesInternal::psetupB_wrapper(double t, N_Vector x, N_Vector xB, N_Vector xdotB, booleantype jokB, booleantype *jcurPtrB, double gammaB, void *user_data, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B){
   try{
     CVodesInternal *this_ = static_cast<CVodesInternal*>(user_data);
     casadi_assert(this_);
-    this_->psetupB(t, x, xB, fyB, jokB, jcurPtrB, gammaB, tmp1B, tmp2B, tmp3B);
+    this_->psetupB(t, x, xB, xdotB, jokB, jcurPtrB, gammaB, tmp1B, tmp2B, tmp3B);
     return 0;
   } catch(exception& e){
     cerr << "psetupB failed: " << e.what() << endl;;
@@ -1309,7 +1306,7 @@ void CVodesInternal::psolve(double t, N_Vector x, N_Vector xdot, N_Vector r, N_V
   t_lsolve += double(time2-time1)/CLOCKS_PER_SEC;
 }
 
-void CVodesInternal::psolveB(double t, N_Vector x, N_Vector xB, N_Vector fyB, N_Vector rvecB, N_Vector zvecB, double gammaB, double deltaB, int lr, N_Vector tmpB) {
+void CVodesInternal::psolveB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, N_Vector rvecB, N_Vector zvecB, double gammaB, double deltaB, int lr, N_Vector tmpB) {
  // Get time
   time1 = clock();
 
@@ -1359,7 +1356,7 @@ void CVodesInternal::psetup(double t, N_Vector x, N_Vector xdot, booleantype jok
   log("IdasInternal::psetup","end");
 }
 
-void CVodesInternal::psetupB(double t, N_Vector x, N_Vector xB, N_Vector fyB, booleantype jokB, booleantype *jcurPtrB, double gammaB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
+void CVodesInternal::psetupB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, booleantype jokB, booleantype *jcurPtrB, double gammaB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
   log("IdasInternal::psetupB","begin");
   // Get time
   time1 = clock();
@@ -1416,9 +1413,9 @@ void CVodesInternal::lsetup(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector 
   psetup(t, x, xdot, FALSE, jcurPtr, gamma, vtemp1, vtemp2, vtemp3);
 }
 
-void CVodesInternal::lsetupB(double t, double gamma, int convfail, N_Vector x, N_Vector xB, N_Vector fyB, booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
+void CVodesInternal::lsetupB(double t, double gamma, int convfail, N_Vector x, N_Vector xB, N_Vector xdotB, booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3) {
   // Call the preconditioner setup function (which sets up the linear solver)
-  psetupB(t, x, xB, fyB, FALSE, jcurPtr, gamma, vtemp1, vtemp2, vtemp3);
+  psetupB(t, x, xB, xdotB, FALSE, jcurPtr, gamma, vtemp1, vtemp2, vtemp3);
 }
 
 int CVodesInternal::lsetup_wrapper(CVodeMem cv_mem, int convfail, N_Vector x, N_Vector xdot, booleantype *jcurPtr, N_Vector vtemp1, N_Vector vtemp2, N_Vector vtemp3){
@@ -1446,7 +1443,7 @@ int CVodesInternal::lsetupB_wrapper(CVodeMem cv_mem, int convfail, N_Vector x, N
     double t = cv_mem->cv_tn; // TODO: is this correct?
     double gamma = cv_mem->cv_gamma;
     
-    cv_mem = (CVodeMem) cv_mem->cv_user_data;
+    cv_mem = static_cast<CVodeMem>(cv_mem->cv_user_data);
 
     ca_mem = cv_mem->cv_adj_mem;
     cvB_mem = ca_mem->ca_bckpbCrt;
@@ -1480,7 +1477,7 @@ void CVodesInternal::lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vect
   psolve(t, x, xdot, b, b, gamma, delta, lr, 0);
 }
 
-void CVodesInternal::lsolveB(double t, double gamma, N_Vector b, N_Vector weight, N_Vector x, N_Vector xB, N_Vector fyB) {
+void CVodesInternal::lsolveB(double t, double gamma, N_Vector b, N_Vector weight, N_Vector x, N_Vector xB, N_Vector xdotB) {
   // Accuracy
   double delta = 0.0;
   
@@ -1488,7 +1485,7 @@ void CVodesInternal::lsolveB(double t, double gamma, N_Vector b, N_Vector weight
   int lr = 1;
   
   // Call the preconditioner solve function (which solves the linear system)
-  psolveB(t, x, xB, fyB, b, b, gamma, delta, lr, 0);
+  psolveB(t, x, xB, xdotB, b, b, gamma, delta, lr, 0);
 }
 
 int CVodesInternal::lsolve_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector x, N_Vector xdot){
@@ -1516,7 +1513,7 @@ int CVodesInternal::lsolveB_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight
     double t = cv_mem->cv_tn; // TODO: is this correct?
     double gamma = cv_mem->cv_gamma;
     
-    cv_mem = (CVodeMem) cv_mem->cv_user_data;
+    cv_mem = static_cast<CVodeMem>(cv_mem->cv_user_data);
 
     ca_mem = cv_mem->cv_adj_mem;
     cvB_mem = ca_mem->ca_bckpbCrt;
@@ -1600,7 +1597,7 @@ void CVodesInternal::initUserDefinedLinearSolver(){
   if(linsol_.isNull()) throw CasadiException("CVodesInternal::initUserDefinedLinearSolver(): No user defined linear solver has been provided.");
 
   //  Set fields in the IDA memory
-  CVodeMem cv_mem = CVodeMem(mem_);
+  CVodeMem cv_mem = static_cast<CVodeMem>(mem_);
   cv_mem->cv_lmem   = this;
   cv_mem->cv_lsetup = lsetup_wrapper;
   cv_mem->cv_lsolve = lsolve_wrapper;
@@ -1677,7 +1674,7 @@ void CVodesInternal::initUserDefinedLinearSolverB(){
   // Make sure that a linear solver has been providided
   if(linsolB_.isNull()) throw CasadiException("CVodesInternal::initUserDefinedLinearSolverB(): No user defined backward linear solver has been provided.");
 
-  CVodeMem cv_mem = CVodeMem(mem_);
+  CVodeMem cv_mem = static_cast<CVodeMem>(mem_);
   CVadjMem ca_mem = cv_mem->cv_adj_mem;
   CVodeBMem cvB_mem = ca_mem->cvB_mem;
   cvB_mem->cv_lmem   = this;
