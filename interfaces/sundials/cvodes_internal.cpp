@@ -1096,7 +1096,7 @@ void CVodesInternal::djacB(long NeqB, double t, N_Vector x, N_Vector xB, N_Vecto
   jacB_.setInput(input(INTEGRATOR_P),DAE_P);
   jacB_.setInput(NV_DATA_S(xB),RDAE_RX);
   jacB_.setInput(input(INTEGRATOR_RP),RDAE_RP);
-  jacB_.setInput(1.0,RDAE_NUM_IN);
+  jacB_.setInput(-1.0,RDAE_NUM_IN);
   jacB_.setInput(0.0,RDAE_NUM_IN+1);
 
   // Evaluate
@@ -1203,7 +1203,7 @@ void CVodesInternal::bjacB(long NeqB, long mupperB, long mlowerB, double t, N_Ve
   jacB_.setInput(input(INTEGRATOR_P),DAE_P);
   jacB_.setInput(NV_DATA_S(xB),RDAE_RX);
   jacB_.setInput(input(INTEGRATOR_RP),RDAE_RP);
-  jacB_.setInput(1.0,DAE_NUM_IN);
+  jacB_.setInput(-1.0,DAE_NUM_IN);
   jacB_.setInput(0.0,DAE_NUM_IN+1);
 
   // Evaluate
@@ -1367,8 +1367,8 @@ void CVodesInternal::psetupB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, 
   jacB_.setInput(input(INTEGRATOR_P),DAE_P);
   jacB_.setInput(NV_DATA_S(xB),RDAE_RX);
   jacB_.setInput(input(INTEGRATOR_RP),RDAE_RP);
-  jacB_.setInput(-gammaB,RDAE_NUM_IN);
-  jacB_.setInput(1.0,RDAE_NUM_IN+1);
+  jacB_.setInput(gammaB,RDAE_NUM_IN); // FIXME? Is this right
+  jacB_.setInput(1.0,RDAE_NUM_IN+1); // FIXME? Is this right
 
   if(monitored("psetupB")){
     cout << "RDAE_T    = " << t << endl;
