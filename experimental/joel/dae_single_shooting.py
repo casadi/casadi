@@ -20,40 +20,45 @@
 # 
 # 
 from casadi import *
-import numpy as NP
-import matplotlib.pyplot as plt
 
-nk = 20    # Control discretization
-tf = 10.0  # End time
+# Time
+t = ssym("t")
 
-# Declare variables (use scalar graph)
-u  = ssym("u")    # control
-x  = ssym("x",2)  # state
+# States
+x = ssym("x",2)
 
-# ODE right hand side
-xdot = vertcat( [(1 - x[1]*x[1])*x[0] - x[1] + u, x[0] ])
-quad = x[0]*x[0] + x[1]*x[1] + u*u
-                
-# DAE residual function
-f = SXFunction(daeIn(x=x,p=u),daeOut(ode=xdot,quad=quad))
+# control
+u = ssym("u")
+
+# algebraic variable
+z = ssym("z")
+
+# DAE
+f_x = vertcat(( x[1], z - x[0] + u ))
+f_z = z + (x[0]**2 - 1)*x[1]
+f_q = x[0]**2 + x[1]**2 + u**2
+
+# DAE callback function
+f = SXFunction([x,z,u,t],[f_x,f_z,f_q])
 
 # Create an integrator
-f_d = CVodesIntegrator(f)
-f_d.setOption("tf",tf/nk) # final time
-f_d.init()
+DT = 0.5   # Length of a control interval
+I = IdasIntegrator(f)
+I.setOption("tf",DT)
+I.init()
 
-# All controls (use matrix graph)
-U = msym("U",nk) # nk-by-1 symbolic variable
+# All controls
+N =  20    # Number of control intervals
+U = msym("U",N)
 
-# The initial state (x_0=0, x_1=1, x_2=0)
-X  = msym([0,1])
-
-# Const function
+# Eliminate all intermediate X:es and sum up cost contributions
+X  = msym([1,0])
 J = 0
-
-# Build a graph of integrator calls
-for k in range(nk):
-  X,Q,_,_ = f_d.call(integratorIn(x0=X,p=U[k]))
+for k in range(N):
+  # Call the integrator
+  (X,Q,_,_) = I.call( (X,U[k]) )
+  
+  # Add quadrature to objective
   J += Q
   
 # Objective function: x_2(T)
@@ -64,24 +69,37 @@ gfcn = MXFunction([U],[X])
 
 # Allocate an NLP solver
 solver = IpoptSolver(jfcn,gfcn)
+solver.setOption("generate_hessian",True)
 solver.init()
 
-# Set bounds and initial guess
-solver.setInput(-0.75*NP.ones(nk), NLP_LBX)
-solver.setInput(1.0*NP.ones(nk), NLP_UBX)
-solver.setInput(NP.zeros(nk),NLP_X_INIT)
-solver.setInput(NP.zeros(2),NLP_LBG)
-solver.setInput(NP.zeros(2),NLP_UBG)
+# Variable bounds
+solver.setInput(-0.8, NLP_LBX)
+solver.setInput( 1.0, NLP_UBX)
+
+# Constraint bounds
+solver.setInput( 0.0, NLP_LBG)
+solver.setInput( 0.0, NLP_UBG)
+
+# Initial guess
+solver.setInput( 0.0, NLP_X_INIT)
 
 # Solve the problem
 solver.solve()
 
+
+
+import numpy as NP
+import matplotlib.pyplot as plt
+
 # Retrieve the solution
 u_opt = NP.array(solver.output(NLP_X_OPT))
 
+# End time
+T =  N*DT  
+
 # Time grid
-tgrid_x = NP.linspace(0,10,nk+1)
-tgrid_u = NP.linspace(0,10,nk)
+tgrid_x = NP.linspace(0,T,N+1)
+tgrid_u = NP.linspace(0,T,N)
 
 # Plot the results
 plt.figure(1)
