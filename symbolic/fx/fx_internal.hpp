@@ -354,6 +354,9 @@ class FXInternal : public OptionsFunctionalityNode{
     
     /** \brief  Dictionary of statistics (resulting from evaluate) */
     Dictionary stats_;
+    
+    /** \brief  Flag to indicate wether statistics must be gathered */
+    bool gather_stats_;
 
     /// Cache for functions to evaluate directional derivatives
     std::vector<std::vector<FX> > derivative_fcn_;

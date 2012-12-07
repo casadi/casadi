@@ -155,6 +155,8 @@ void IntegratorInternal::evaluate(int nfdir, int nadir){
   
   // Print statistics
   if(getOption("print_stats")) printStats(std::cout);
+  
+  if (!integrator_augmented_.isNull()) stats_["augmented_stats"] =  integrator_augmented_.getStats();
 }
 
 void IntegratorInternal::init(){
@@ -545,18 +547,17 @@ FX IntegratorInternal::getDerivative(int nfwd, int nadj){
   std::pair<FX,FX> aug_dae = getAugmented(nfwd,nadj);
   
   // Create integrator for augmented DAE
-  Integrator integrator;
-  integrator.assignNode(create(aug_dae.first,aug_dae.second));
+  integrator_augmented_.assignNode(create(aug_dae.first,aug_dae.second));
   
   // Copy options
-  integrator.setOption(dictionary());
+  integrator_augmented_.setOption(dictionary());
   
   // Pass down specific options if provided
   if (hasSetOption("augmented_options"))
-    integrator.setOption(getOption("augmented_options"));
+    integrator_augmented_.setOption(getOption("augmented_options"));
   
   // Initialize the integrator since we will call it below
-  integrator.init();
+  integrator_augmented_.init();
   
   // All inputs of the return function
   vector<MX> ret_in;
@@ -645,7 +646,7 @@ FX IntegratorInternal::getDerivative(int nfwd, int nadj){
   integrator_in[INTEGRATOR_P] = p_aug;
   integrator_in[INTEGRATOR_RX0] = rx0_aug;
   integrator_in[INTEGRATOR_RP] = rp_aug;
-  vector<MX> integrator_out = integrator.call(integrator_in);
+  vector<MX> integrator_out = integrator_augmented_.call(integrator_in);
   
   // Augmented results
   MX xf_aug = integrator_out[INTEGRATOR_XF];

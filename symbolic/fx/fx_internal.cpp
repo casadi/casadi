@@ -50,6 +50,7 @@ FXInternal::FXInternal(){
   addOption("user_data",                OT_VOIDPTR,             GenericType(),  "A user-defined field that can be used to identify the function or pass additional information");
   addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "Monitors to be activated","inputs|outputs");
   addOption("regularity_check",         OT_BOOLEAN,             true,          "Throw exceptions when NaN or Inf appears during evaluation");
+  addOption("gather_stats",             OT_BOOLEAN,             false,         "Flag to indicate wether statistics must be gathered");
   
   verbose_ = false;
   jacgen_ = 0;
@@ -105,6 +106,7 @@ void FXInternal::init(){
   monitor_inputs_ = monitored("inputs");
   monitor_outputs_ = monitored("outputs");
   
+  gather_stats_ = getOption("gather_stats");
 
   // Mark the function as initialized
   is_init_ = true;

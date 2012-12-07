@@ -923,6 +923,19 @@ void IdasInternal::integrate(double t_out){
   // Print statistics
   if(getOption("print_stats")) printStats(std::cout);
   
+  if (gather_stats_) {
+    long nsteps, nfevals, nlinsetups, netfails;
+    int qlast, qcur;
+    double hinused, hlast, hcur, tcur;
+    int flag = IDAGetIntegratorStats(mem_, &nsteps, &nfevals, &nlinsetups,&netfails, &qlast, &qcur, &hinused,&hlast, &hcur, &tcur);
+    if(flag!=IDA_SUCCESS) idas_error("IDAGetIntegratorStats",flag);
+
+    stats_["nsteps"] = 1.0*nsteps;
+    stats_["nlinsetups"] = 1.0*nlinsetups;
+    
+  }
+  
+  
   log("IdasInternal::integrate","end");
 }
 
