@@ -59,38 +59,46 @@ class Integrationtests(casadiTestCase):
 
   def test_lsolvers(self):
     self.message("Test different linear solvers")
-    
-    num=self.num
-    tend=num['tend']
-    x0=num['q0']
-    p_=num['p']
-    rx0_= 0.13
-    t=SX("t")
-    x=SX("x")
-    rx=SX("rx")
-    p=SX("p")
-    dp=SX("dp")
 
-    z=SX("z")
-    rz=SX("rz")
-    rp=SX("rp")
+    tstart = ssym("tstart")
+    tend = ssym("tstart")
     
-    tstart = 0.2
-
     integrators = [
-              (IdasIntegrator,["dae"],{"abstol": 1e-9,"reltol":1e-9,"fsens_err_con": True,"calc_ic":True,"calc_icB":True}),
+              (IdasIntegrator,["dae","ode"],{"abstol": 1e-9,"reltol":1e-9,"fsens_err_con": True,"calc_ic":True,"calc_icB":True}),
               (CVodesIntegrator,["ode"],{"abstol": 1e-15,"reltol":1e-15,"fsens_err_con": True,"quad_err_con": False})
               ]
               
-    def checks():      
+    def checks():  
+      t=SX("t")
+      x=SX("x")
+      rx=SX("rx")
+      p=SX("p")
+      dp=SX("dp")
+
+      z=SX("z")
+      rz=SX("rz")
+      rp=SX("rp")    
       solutionin = {'x0':x, 'p': p, 'rx0': rx,'rp' : rp}            
       pointA = {'x0':7.1,'p': 2, 'rx0': 0.13, 'rp': 0.127}
-      yield (["dae"],{'x': x, 'z': z},{'alg': x-z, 'ode': z},{'x': x, 'z': z, 'rx': rx, 'rz': rz},{'alg': x-rz, 'ode': rz},solutionin,{'rxf': rx+x*(exp(tend-tstart)-1), 'xf':x*exp(tend-tstart)},pointA)
-      yield (["dae"],{'x': x, 'z': z},{'alg': x-z, 'ode': z},{'x': x, 'z': z, 'rx': rx, 'rz': rz},{'alg': rx-rz, 'ode': rz},solutionin,{'rxf': rx*exp(tend-tstart), 'xf':x*exp(tend-tstart)},pointA)
-      yield (["ode"],{'x': x},{'ode': x},{'x': x,'rx': rx},{'ode': x},solutionin,{'rxf': rx+x*(exp(tend-tstart)-1), 'xf':x*exp(tend-tstart)},pointA)
-      yield (["ode"],{'x': x},{'ode': x},{'x': x,'rx': rx},{'ode': rx},solutionin,{'rxf': rx*exp(tend-tstart), 'xf':x*exp(tend-tstart)},pointA)
-              
-    for p_features, din, dout, rdin, rdout, solutionin, solution, point in checks():
+      ti = (0.2,2.3)
+      yield (["dae"],{'x': x, 'z': z},{'alg': x-z, 'ode': z},{'x': x, 'z': z, 'rx': rx, 'rz': rz},{'alg': x-rz, 'ode': rz},solutionin,{'rxf': rx+x*(exp(tend-tstart)-1), 'xf':x*exp(tend-tstart)},pointA,ti)
+      yield (["dae"],{'x': x, 'z': z},{'alg': x-z, 'ode': z},{'x': x, 'z': z, 'rx': rx, 'rz': rz},{'alg': rx-rz, 'ode': rz},solutionin,{'rxf': rx*exp(tend-tstart), 'xf':x*exp(tend-tstart)},pointA,ti)
+      yield (["ode"],{'x': x},{'ode': x},{'x': x,'rx': rx},{'ode': x},solutionin,{'rxf': rx+x*(exp(tend-tstart)-1), 'xf':x*exp(tend-tstart)},pointA,ti)
+      yield (["ode"],{'x': x},{'ode': x},{'x': x,'rx': rx},{'ode': rx},solutionin,{'rxf': rx*exp(tend-tstart), 'xf':x*exp(tend-tstart)},pointA,ti)
+      
+      A=array([1,0.1])
+      p0 = 1.13
+
+      q=ssym("y",2,1)
+      y0=q[0]
+      yc0=dy0=q[1]
+      p=ssym("p",1,1)
+
+      s1=(2*y0-log(yc0**2/p+1))/2-log(cos(arctan(yc0/sqrt(p))+sqrt(p)*(tend-tstart)))
+      s2=sqrt(p)*tan(arctan(yc0/sqrt(p))+sqrt(p)*(tend-tstart))
+      yield (["ode"],{'x':q,'p':p},{'ode': vertcat([q[1],p[0]+q[1]**2 ])},{},{},{'x0':q, 'p': p} ,{'xf': vertcat([s1,s2])},{'x0': A, 'p': p0},(0,0.4) )
+
+    for p_features, din, dout, rdin, rdout, solutionin, solution, point, (tstart_, tend_) in checks():
 
       for Integrator, features, options in integrators:
         self.message(Integrator.__name__)
@@ -102,6 +110,9 @@ class Integrationtests(casadiTestCase):
              
           f = SXFunction(daeIn(**din),daeOut(**dout))
           f.init()
+            
+          for k in solution.keys():
+            solution[k] = substitute(solution[k],vertcat([tstart,tend]),vertcat([tstart_,tend_]))
           
           fs = SXFunction(integratorIn(**solutionin),integratorOut(**solution))
           fs.init()
@@ -126,8 +137,8 @@ class Integrationtests(casadiTestCase):
               print message
               integrator = Integrator(f,g)
               integrator.setOption("exact_jacobianB",True)
-              integrator.setOption("t0",tstart)
-              integrator.setOption("tf",tend)
+              integrator.setOption("t0",tstart_)
+              integrator.setOption("tf",tend_)
               integrator.setOption(options)
               integrator.setOption(f_options)
               integrator.setOption(a_options)
@@ -151,120 +162,142 @@ class Integrationtests(casadiTestCase):
     self.message("Extensive integrator tests")
     
     num=self.num
-    tend=num['tend']
-    x0=num['q0']
-    p_=num['p']
-    rx0_= 0.13
-    t=SX("t")
-    x=SX("x")
-    rx=SX("rx")
-    p=SX("p")
-    dp=SX("dp")
+    tstart = ssym("tstart")
+    tend = ssym("tstart")
 
-    z=SX("z")
-    rz=SX("rz")
-    rp=SX("rp")
     
-    for tstart in [0.2]:
-      for Integrator, features, options in integrators:
-        self.message(Integrator.__name__)
-          
-        def getIntegrator(f,g=FX(),p_features=[]):
-          integrator = Integrator(f,g)
-          integrator.setOption(options)
-          integrator.setOption("t0",tstart)
-          if integrator.hasOption("abstol"):
-            integrator.setOption("abstol",1e-9)
-          if integrator.hasOption("reltol"):
-            integrator.setOption("reltol",1e-9)
-          integrator.setOption("tf",tend)
-          if integrator.hasOption("init_xdot"):
-            integrator.setOption("init_xdot",[x0])
-            integrator.setOption("calc_icB",True)
-            integrator.setOption("augmented_options", {"init_xdot":None, "abstol":1e-9,"reltol":1e-9})
-          #if "dae" in p_features and integrator.hasOption("init_z"):
-          #  integrator.setOption("init_z",[0.1])
-          #  integrator.setOption("augmented_options", {"init_z":GenericType(),"init_xdot":GenericType()})
-          integrator.init()
-          return integrator
-          
-        def variations(p_features, din, dout, rdin, rdout, solutionin, solution, point):
-          if "ode" in p_features:
-            p_features_ = copy.copy(p_features)
-            p_features_[p_features.index("ode")] = "dae"
-            din_ = copy.copy(din)
-            dout_ = copy.copy(dout)
-            rdin_ = copy.copy(rdin)
-            rdout_ = copy.copy(rdout)
-            din_["z"] = z
-            dout_["ode"] = z
-            dout_["alg"] = ( dout["ode"] - z) * (-0.8)
-            if len(rdin_)>0:
-              rdin_["rz"] = rz
-              rdin_["z"] = z
-              rdout_["ode"] = rz
-              rdout_["alg"] = ( rdout["ode"] - rz) * (-0.7)
-              
-            yield p_features, din, dout, rdin, rdout, solutionin, solution, point
-            yield p_features_, din_, dout_, rdin_, rdout_, solutionin, solution, point
-          else:
-            yield p_features, din, dout, rdin, rdout, solutionin, solution, point
-          
-        def checks():      
-          si = {'x0':x, 'p': p, 'rx0': rx,'rp' : rp}            
-          pointA = {'x0':x0,'p': p_, 'rx0': rx0_, 'rp': 0.127}
-          yield (["ode"],{'x':x},{'ode': 0},{},{},si,{'xf':x},pointA)
-          yield (["ode"],{'x':x},{'ode': 1},{},{},si,{'xf':x+(tend-tstart)},pointA)
-          yield (["ode"],{'x':x},{'ode': x},{},{},si,{'xf':x*exp(tend-tstart)},pointA)
-          yield (["ode"],{'x':x,'t':t},{'ode': t},{},{},si,{'xf':x+(tend**2/2-tstart**2/2)},pointA)
-          yield (["ode"],{'x':x,'t':t},{'ode': x*t},{},{},si,{'xf':x*exp(tend**2/2-tstart**2/2)},pointA)
-          yield (["ode"],{'x':x,'p':p},{'ode': x/p},{},{},si,{'xf':x*exp((tend-tstart)/p)},pointA)
-          yield (["ode"],{'x':x},{'ode': x,'quad':0},{},{},si,{'qf':0},pointA)
-          yield (["ode"],{'x':x},{'ode': x,'quad':1},{},{},si,{'qf':(tend-tstart)},pointA)
-          yield (["ode"],{'x':x},{'ode': 0,'quad':x},{},{},si,{'qf':x*(tend-tstart)},pointA)
-          #yield ({'x':x},{'ode': 1,'quad':x},{'qf':(x-tstart)*(tend-tstart)+(tend**2/2-tstart**2/2)}), # bug in cvodes quad_err_con
-          yield (["ode"],{'x':x},{'ode': x,'quad':x},{},{},si,{'qf':x*(exp(tend-tstart)-1)},pointA)
-          yield (["ode"],{'x':x,'t':t},{'ode': x,'quad':t},{},{},si,{'qf':(tend**2/2-tstart**2/2)},pointA)
-          yield (["ode"],{'x':x,'t':t},{'ode': x,'quad':x*t},{},{},si,{'qf':x*(exp(tend-tstart)*(tend-1)-(tstart-1))},pointA)
-          yield (["ode"],{'x':x,'p':p},{'ode': x,'quad':x/p},{},{},si,{'qf':x*(exp((tend-tstart))-1)/p},pointA)
-          yield (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rx},{'ode':0},si,{'rxf': rx},pointA)
-          yield (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rx},{'ode':1},si,{'rxf': rx+tend-tstart},pointA)
-          yield (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode':t},si,{'rxf': rx+tend**2/2-tstart**2/2},pointA)
-          yield (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rx},{'ode':rx},si,{'rxf': rx*exp(tend-tstart)},pointA)
-          yield (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rx},{'ode':x},si,{'rxf': rx+x*(exp(tend-tstart)-1)},pointA)
-          yield (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode':x*t},si,{'rxf': rx+x*(exp(tend-tstart)*(tend-1)-(tstart-1))},pointA)
-          yield (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode':rx*t},si,{'rxf': rx*exp(tend**2/2-tstart**2/2)},pointA)
-          yield (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rx},{'ode':rx, 'quad': 0},si,{'rqf': 0},pointA)
-          yield (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rx},{'ode':rx, 'quad': 1},si,{'rqf': (tend-tstart)},pointA)
-          yield (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rx},{'ode':rx, 'quad': rx},si,{'rqf': rx*(exp(tend-tstart)-1)},pointA)
-          yield (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rx},{'ode':rx, 'quad': x},si,{'rqf': x*(exp(tend-tstart)-1)},pointA)
-          yield (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode':rx, 'quad': t},si,{'rqf': (tend**2/2-tstart**2/2)},pointA)
-          yield (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode':rx, 'quad': x*t},si,{'rqf': x*(exp(tend-tstart)*(tend-1)-(tstart-1))},pointA)
-          yield (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode':rx, 'quad': rx*t},si,{'rqf': rx*(exp(tend-tstart)*(tstart+1)-(tend+1))},pointA) # this one is special: integrate(t*rx*exp(tf-t),t,t0,tf)
-          yield (["ode"],{'x':x,'p':p},{'ode':x},{'x':x,'rx':rx,'p':p},{'ode':rx, 'quad': p},si,{'rqf': p*(tend-tstart)},pointA)
-          yield (["ode"],{'x':x,'p':p},{'ode':x},{'x':x,'rx':rx,'p':p,'rp':rp},{'ode':rx, 'quad': rp},si,{'rqf': rp*(tend-tstart)},pointA)
-          yield (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode':rx*t},si,{'rxf': rx*exp(tend**2/2-tstart**2/2)},pointA)
-          yield (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode':x*t},si,{'rxf': rx+x*(exp(tend-tstart)*(tend-1)-(tstart-1))},pointA)
-          yield (["dae"],{'x':x,'z':z},{'ode':z,'alg': -0.8*(z-x),'quad': z},{},{},si,{'qf':x*(exp(tend-tstart)-1)},pointA)
-          yield (["dae"],{'x':x,'z':z},{'ode':z,'alg': -0.8*(z-x)},{'x':x,'rx':rx,'rz': rz,'z':z},{'ode':rz, 'alg': -0.7*(rz-rx), 'quad': rz},si,{'rqf': rx*(exp(tend-tstart)-1)},pointA)
-          yield (["dae"],{'x':x,'z':z},{'ode':z,'alg': -0.8*(z-x)},{'x':x,'rx':rx,'rz': rz,'z':z},{'ode':rz, 'alg': -0.7*(rz-rx), 'quad': z},si,{'rqf': x*(exp(tend-tstart)-1)},pointA)
+    for Integrator, features, options in integrators:
+      self.message(Integrator.__name__)
         
-        for tt in checks():
-          for p_features, din, dout, rdin, rdout, solutionin, solution, point in variations(*tt):
-            if p_features[0] in features:
-              message = "%s: %s => %s, %s => %s, explicit (%s) tstart = %f" % (Integrator.__name__,str(din),str(dout),str(rdin),str(rdout),str(solution),tstart)
-              print message
-              g = FX()
-              if len(rdin)>1:
-                g = SXFunction(rdaeIn(**rdin),rdaeOut(**rdout))
-                g.init()
-                 
-              f = SXFunction(daeIn(**din),daeOut(**dout))
-              f.init()
-              
-              fs = SXFunction(integratorIn(**solutionin),integratorOut(**solution))
-              fs.init()
-              integrator = getIntegrator(f,g,p_features=features)
+        
+      def variations(p_features, din, dout, rdin, rdout, *args):
+        if "ode" in p_features:
+          p_features_ = copy.copy(p_features)
+          p_features_[p_features.index("ode")] = "dae"
+          din_ = copy.copy(din)
+          dout_ = copy.copy(dout)
+          rdin_ = copy.copy(rdin)
+          rdout_ = copy.copy(rdout)
+          z = ssym("x", din_["x"].shape)
+          din_["z"] = z
+          dout_["ode"] = z
+          dout_["alg"] = ( dout["ode"] - z) * (-0.8)
+          if len(rdin_)>0:
+            rz = ssym("rx", rdin_["rx"].shape)
+            rdin_["rz"] = rz
+            rdin_["z"] = z
+            rdout_["ode"] = rz
+            rdout_["alg"] = ( rdout["ode"] - rz) * (-0.7)
+            
+          yield (p_features, din, dout, rdin, rdout) + tuple(args)
+          yield (p_features_, din_, dout_, rdin_, rdout_) + tuple(args)
+        else:
+          yield (p_features, din, dout, rdin, rdout) + tuple(args)
+        
+      def checks():
+        x0=num['q0']
+        p_=num['p']
+        rx0_= 0.13
+        t=ssym("t")
+        x=ssym("x")
+        rx=ssym("rx")
+        p=ssym("p")
+        dp=ssym("dp")
+
+        z=ssym("z")
+        rz=ssym("rz")
+        rp=ssym("rp")
+        
+        si = {'x0':x, 'p': p, 'rx0': rx,'rp' : rp}            
+        pointA = {'x0':x0,'p': p_, 'rx0': rx0_, 'rp': 0.127}
+        
+        ti = (0.2,num['tend'])
+        yield (["ode"],{'x':x},{'ode': 0},{},{},si,{'xf':x},pointA,ti)
+        yield (["ode"],{'x':x},{'ode': 1},{},{},si,{'xf':x+(tend-tstart)},pointA,ti)
+        yield (["ode"],{'x':x},{'ode': x},{},{},si,{'xf':x*exp(tend-tstart)},pointA,ti)
+        yield (["ode"],{'x':x,'t':t},{'ode': t},{},{},si,{'xf':x+(tend**2/2-tstart**2/2)},pointA,ti)
+        yield (["ode"],{'x':x,'t':t},{'ode': x*t},{},{},si,{'xf':x*exp(tend**2/2-tstart**2/2)},pointA,ti)
+        yield (["ode"],{'x':x,'p':p},{'ode': x/p},{},{},si,{'xf':x*exp((tend-tstart)/p)},pointA,ti)
+        yield (["ode"],{'x':x},{'ode': x,'quad':0},{},{},si,{'qf':0},pointA,ti)
+        yield (["ode"],{'x':x},{'ode': x,'quad':1},{},{},si,{'qf':(tend-tstart)},pointA,ti)
+        yield (["ode"],{'x':x},{'ode': 0,'quad':x},{},{},si,{'qf':x*(tend-tstart)},pointA,ti)
+        #yield ({'x':x},{'ode': 1,'quad':x},{'qf':(x-tstart)*(tend-tstart)+(tend**2/2-tstart**2/2)}), # bug in cvodes quad_err_con
+        yield (["ode"],{'x':x},{'ode': x,'quad':x},{},{},si,{'qf':x*(exp(tend-tstart)-1)},pointA,ti)
+        yield (["ode"],{'x':x,'t':t},{'ode': x,'quad':t},{},{},si,{'qf':(tend**2/2-tstart**2/2)},pointA,ti)
+        yield (["ode"],{'x':x,'t':t},{'ode': x,'quad':x*t},{},{},si,{'qf':x*(exp(tend-tstart)*(tend-1)-(tstart-1))},pointA,ti)
+        yield (["ode"],{'x':x,'p':p},{'ode': x,'quad':x/p},{},{},si,{'qf':x*(exp((tend-tstart))-1)/p},pointA,ti)
+        yield (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rx},{'ode':0},si,{'rxf': rx},pointA,ti)
+        yield (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rx},{'ode':1},si,{'rxf': rx+tend-tstart},pointA,ti)
+        yield (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode':t},si,{'rxf': rx+tend**2/2-tstart**2/2},pointA,ti)
+        yield (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rx},{'ode':rx},si,{'rxf': rx*exp(tend-tstart)},pointA,ti)
+        yield (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rx},{'ode':x},si,{'rxf': rx+x*(exp(tend-tstart)-1)},pointA,ti)
+        yield (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode':x*t},si,{'rxf': rx+x*(exp(tend-tstart)*(tend-1)-(tstart-1))},pointA,ti)
+        yield (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode':rx*t},si,{'rxf': rx*exp(tend**2/2-tstart**2/2)},pointA,ti)
+        yield (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rx},{'ode':rx, 'quad': 0},si,{'rqf': 0},pointA,ti)
+        yield (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rx},{'ode':rx, 'quad': 1},si,{'rqf': (tend-tstart)},pointA,ti)
+        yield (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rx},{'ode':rx, 'quad': rx},si,{'rqf': rx*(exp(tend-tstart)-1)},pointA,ti)
+        yield (["ode"],{'x':x},{'ode':x},{'x':x,'rx':rx},{'ode':rx, 'quad': x},si,{'rqf': x*(exp(tend-tstart)-1)},pointA,ti)
+        yield (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode':rx, 'quad': t},si,{'rqf': (tend**2/2-tstart**2/2)},pointA,ti)
+        yield (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode':rx, 'quad': x*t},si,{'rqf': x*(exp(tend-tstart)*(tend-1)-(tstart-1))},pointA,ti)
+        yield (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode':rx, 'quad': rx*t},si,{'rqf': rx*(exp(tend-tstart)*(tstart+1)-(tend+1))},pointA,ti) # this one is special: integrate(t*rx*exp(tf-t),t,t0,tf)
+        yield (["ode"],{'x':x,'p':p},{'ode':x},{'x':x,'rx':rx,'p':p},{'ode':rx, 'quad': p},si,{'rqf': p*(tend-tstart)},pointA,ti)
+        yield (["ode"],{'x':x,'p':p},{'ode':x},{'x':x,'rx':rx,'p':p,'rp':rp},{'ode':rx, 'quad': rp},si,{'rqf': rp*(tend-tstart)},pointA,ti)
+        yield (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode':rx*t},si,{'rxf': rx*exp(tend**2/2-tstart**2/2)},pointA,ti)
+        yield (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode':x*t},si,{'rxf': rx+x*(exp(tend-tstart)*(tend-1)-(tstart-1))},pointA,ti)
+        yield (["dae"],{'x':x,'z':z},{'ode':z,'alg': -0.8*(z-x),'quad': z},{},{},si,{'qf':x*(exp(tend-tstart)-1)},pointA,ti)
+        yield (["dae"],{'x':x,'z':z},{'ode':z,'alg': -0.8*(z-x)},{'x':x,'rx':rx,'rz': rz,'z':z},{'ode':rz, 'alg': -0.7*(rz-rx), 'quad': rz},si,{'rqf': rx*(exp(tend-tstart)-1)},pointA,ti)
+        yield (["dae"],{'x':x,'z':z},{'ode':z,'alg': -0.8*(z-x)},{'x':x,'rx':rx,'rz': rz,'z':z},{'ode':rz, 'alg': -0.7*(rz-rx), 'quad': z},si,{'rqf': x*(exp(tend-tstart)-1)},pointA,ti)
+        
+        
+        A=array([1,0.1])
+        p0 = 1.13
+
+        q=ssym("y",2,1)
+        y0=q[0]
+        yc0=dy0=q[1]
+        p=ssym("p",1,1)
+        
+        s1=(2*y0-log(yc0**2/p+1))/2-log(cos(arctan(yc0/sqrt(p))+sqrt(p)*(tend-tstart)))
+        s2=sqrt(p)*tan(arctan(yc0/sqrt(p))+sqrt(p)*(tend-tstart))
+        yield (["ode"],{'x':q,'p':p},{'ode': vertcat([q[1],p[0]+q[1]**2 ])},{},{},{'x0':q, 'p': p} ,{'xf': vertcat([s1,s2])},{'x0': A, 'p': p0},(0,0.4) )
+      
+      for tt in checks():
+        print tt
+        for p_features, din, dout, rdin, rdout, solutionin, solution, point, (tstart_, tend_) in variations(*tt):
+          if p_features[0] in features:
+            message = "%s: %s => %s, %s => %s, explicit (%s) tstart = %f" % (Integrator.__name__,str(din),str(dout),str(rdin),str(rdout),str(solution),tstart_)
+            print message
+            g = FX()
+            if len(rdin)>1:
+              g = SXFunction(rdaeIn(**rdin),rdaeOut(**rdout))
+              g.init()
+               
+            f = SXFunction(daeIn(**din),daeOut(**dout))
+            f.init()
+            
+            for k in solution.keys():
+              solution[k] = substitute(solution[k],vertcat([tstart,tend]),vertcat([tstart_,tend_]))
+            
+            fs = SXFunction(integratorIn(**solutionin),integratorOut(**solution))
+            fs.init()
+            
+            integrator = Integrator(f,g)
+            integrator.setOption(options)
+            integrator.setOption("t0",tstart_)
+            if integrator.hasOption("abstol"):
+              integrator.setOption("abstol",1e-9)
+            if integrator.hasOption("reltol"):
+              integrator.setOption("reltol",1e-9)
+            integrator.setOption("tf",tend_)
+            if integrator.hasOption("init_xdot"):
+              integrator.setOption("init_xdot",list(DMatrix(point["x0"])))
+              integrator.setOption("calc_icB",True)
+              integrator.setOption("augmented_options", {"init_xdot":None, "abstol":1e-9,"reltol":1e-9})
+            #if "dae" in p_features and integrator.hasOption("init_z"):
+            #  integrator.setOption("init_z",[0.1])
+            #  integrator.setOption("augmented_options", {"init_z":GenericType(),"init_xdot":GenericType()})
+            integrator.init()
+
 #              reproduce = """
 #from casadi import *
 #t=SX("t")
@@ -294,17 +327,17 @@ class Integrationtests(casadiTestCase):
 #  integrator.input(INTEGRATOR_RP).set(0.127)
 #              """.format(din=din,dout=dout,rdin=rdin,rdout=rdout,x0=x0,p_=p_,intclass=Integrator,options=integrator.dictionary())
 #              message+="\nTo reproduce:\n" + reproduce
- 
-                  
-         
-              for ff in [fs,integrator]:
-                for k,v in point.items():
-                  i = getattr(casadi,('integrator_'+k).upper())
-                  if not ff.input(i).empty():
-                    ff.input(i).set(v)
-              integrator.evaluate(1,0)
-              
-              self.checkfx(integrator,fs,gradient=False,hessian=False,sens_der=False,digits=4,digits_sens=4,failmessage=message,verbose=False)
+
+                
+       
+            for ff in [fs,integrator]:
+              for k,v in point.items():
+                i = getattr(casadi,('integrator_'+k).upper())
+                if not ff.input(i).empty():
+                  ff.input(i).set(v)
+            integrator.evaluate(1,0)
+            
+            self.checkfx(integrator,fs,gradient=False,hessian=False,sens_der=False,digits=4,digits_sens=4,failmessage=message,verbose=False)
 
         
   def setUp(self):
