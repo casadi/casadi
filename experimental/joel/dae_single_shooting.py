@@ -21,71 +21,58 @@
 # 
 from casadi import *
 
-# Time
-t = ssym("t")
+# Declare variables
+x = ssym("x",2) # Differential states
+z = ssym("z")   # Algebraic variable
+u = ssym("u")   # Control
+t = ssym("t")   # Time
 
-# States
-x = ssym("x",2)
+# Differential equation
+f_x = vertcat((x[1], z-x[0]+u ))
 
-# control
-u = ssym("u")
+# Algebraic equation
+f_z = z + (x[0]**2-1)*x[1]
 
-# algebraic variable
-z = ssym("z")
-
-# DAE
-f_x = vertcat(( x[1], z - x[0] + u ))
-f_z = z + (x[0]**2 - 1)*x[1]
+# Lagrange cost term (quadrature)
 f_q = x[0]**2 + x[1]**2 + u**2
 
 # DAE callback function
 f = SXFunction([x,z,u,t],[f_x,f_z,f_q])
 
 # Create an integrator
-DT = 0.5   # Length of a control interval
 I = IdasIntegrator(f)
-I.setOption("tf",DT)
+I.setOption("tf",0.5) # interval length
 I.init()
 
 # All controls
-N =  20    # Number of control intervals
-U = msym("U",N)
+U = msym("U",20)
 
-# Eliminate all intermediate X:es and sum up cost contributions
+# Construct graph of integrator calls
 X  = msym([1,0])
 J = 0
-for k in range(N):
-  # Call the integrator
-  (X,Q,_,_) = I.call( (X,U[k]) )
+for k in range(20):
+  (X,Q,_,_) = I.call( (X,U[k]) )   # Call the integrator
+  J += Q                           # Sum up quadratures
   
-  # Add quadrature to objective
-  J += Q
-  
-# Objective function: x_2(T)
-jfcn = MXFunction([U],[J])
-
-# Terminal constraints: x_0(T)=x_1(T)=0
-gfcn = MXFunction([U],[X])
+# NLP callback functions
+jfcn = MXFunction([U],[J]) # Objective 
+gfcn = MXFunction([U],[X]) # Constraint
 
 # Allocate an NLP solver
 solver = IpoptSolver(jfcn,gfcn)
 solver.setOption("generate_hessian",True)
 solver.init()
 
-# Variable bounds
-solver.setInput(-0.8, NLP_LBX)
-solver.setInput( 1.0, NLP_UBX)
-
-# Constraint bounds
-solver.setInput( 0.0, NLP_LBG)
-solver.setInput( 0.0, NLP_UBG)
-
-# Initial guess
-solver.setInput( 0.0, NLP_X_INIT)
-
-# Solve the problem
+# Pass bounds, initial guess and solve NLP
+solver.setInput(-0.8, NLP_LBX)    # Lower variable bound
+solver.setInput( 1.0, NLP_UBX)    # Upper variable bound
+solver.setInput( 0.0, NLP_LBG)    # Lower constraint bound
+solver.setInput( 0.0, NLP_UBG)    # Upper constraint bound
+solver.setInput( 0.0, NLP_X_INIT) # Initial guess
 solver.solve()
 
+from casadi.tools import *
+dotsave(f_z,format="ps",filename="f_z.eps")
 
 
 import numpy as NP
@@ -95,7 +82,8 @@ import matplotlib.pyplot as plt
 u_opt = NP.array(solver.output(NLP_X_OPT))
 
 # End time
-T =  N*DT  
+T =  10  
+N = 20
 
 # Time grid
 tgrid_x = NP.linspace(0,T,N+1)
