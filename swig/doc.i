@@ -13286,7 +13286,7 @@ times t_i.
 |              |              |              | (inputs|outp | ADi::CVodesI |
 |              |              |              | uts)  (res|r | nternal      |
 |              |              |              | esB|resQB|re |              |
-|              |              |              | set)         |              |
+|              |              |              | set|psetupB) |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -13467,6 +13467,8 @@ times t_i.
 | inputs  | CasADi::FXInternal     |
 +---------+------------------------+
 | outputs | CasADi::FXInternal     |
++---------+------------------------+
+| psetupB | CasADi::CVodesInternal |
 +---------+------------------------+
 | res     | CasADi::CVodesInternal |
 +---------+------------------------+
@@ -14412,7 +14414,7 @@ rx, rz and rp.
 |              |              |              | (inputs|outp | ADi::CVodesI |
 |              |              |              | uts)  (res|r | nternal      |
 |              |              |              | esB|resQB|re |              |
-|              |              |              | set)         |              |
+|              |              |              | set|psetupB) |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -14593,6 +14595,8 @@ rx, rz and rp.
 | inputs  | CasADi::FXInternal     |
 +---------+------------------------+
 | outputs | CasADi::FXInternal     |
++---------+------------------------+
+| psetupB | CasADi::CVodesInternal |
 +---------+------------------------+
 | res     | CasADi::CVodesInternal |
 +---------+------------------------+
