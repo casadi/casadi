@@ -25,7 +25,6 @@ from casadi import *
 x = ssym("x",2) # Differential states
 z = ssym("z")   # Algebraic variable
 u = ssym("u")   # Control
-t = ssym("t")   # Time
 
 # Differential equation
 f_x = vertcat((x[1], z*x[1]-x[0]+u ))
@@ -33,29 +32,24 @@ f_x = vertcat((x[1], z*x[1]-x[0]+u ))
 # Algebraic equation
 f_z = x[0]**2 + z - 1
 
-# Lagrange cost term (quadrature)
-f_q = x[0]**2 + x[1]**2 + u**2
-
 # DAE callback function
-f = SXFunction([x,z,u,t],[f_x,f_z,f_q])
+f = SXFunction(daeIn(x=x,z=z,p=u),daeOut(ode=f_x,alg=f_z))
 
 # Create an integrator
 I = IdasIntegrator(f)
-I.setOption("tf",0.5) # interval length
+I.setOption("tf",2.0) # interval length
 I.init()
 
 # All controls
-U = msym("U",20)
+U = msym("U",5)
 
 # Construct graph of integrator calls
 X  = msym([1,0])
-J = 0
-for k in range(20):
-  (X,Q,_,_) = I.call( (X,U[k]) )   # Call the integrator
-  J += Q                           # Sum up quadratures
+for k in range(5):
+  (X,_,_,_) = I.call( (X,U[k]) )   # Call the integrator
   
 # NLP callback functions
-jfcn = MXFunction([U],[J]) # Objective 
+jfcn = MXFunction([U],[inner_prod(U,U)]) # Objective 
 gfcn = MXFunction([U],[X]) # Constraint
 
 # Allocate an NLP solver
@@ -70,31 +64,3 @@ solver.setInput( 0.0, NLP_LBG)    # Lower constraint bound
 solver.setInput( 0.0, NLP_UBG)    # Upper constraint bound
 solver.setInput( 0.0, NLP_X_INIT) # Initial guess
 solver.solve()
-
-from casadi.tools import *
-dotsave(f_z,format="ps",filename="f_z.eps")
-
-
-import numpy as NP
-import matplotlib.pyplot as plt
-
-# Retrieve the solution
-u_opt = NP.array(solver.output(NLP_X_OPT))
-
-# End time
-T =  10  
-N = 20
-
-# Time grid
-tgrid_x = NP.linspace(0,T,N+1)
-tgrid_u = NP.linspace(0,T,N)
-
-# Plot the results
-plt.figure(1)
-plt.clf()
-plt.plot(tgrid_u,u_opt,'-.')
-plt.title("Van der Pol optimization - single shooting")
-plt.xlabel('time')
-plt.legend(['u trajectory'])
-plt.grid()
-plt.show()
