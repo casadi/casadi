@@ -28,10 +28,10 @@ u = ssym("u")   # Control
 t = ssym("t")   # Time
 
 # Differential equation
-f_x = vertcat((x[1], z-x[0]+u ))
+f_x = vertcat((x[1], z*x[1]-x[0]+u ))
 
 # Algebraic equation
-f_z = z + (x[0]**2-1)*x[1]
+f_z = x[0]**2 + z - 1
 
 # Lagrange cost term (quadrature)
 f_q = x[0]**2 + x[1]**2 + u**2
