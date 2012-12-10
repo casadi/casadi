@@ -296,6 +296,7 @@ dae.init()
 # We solve the ricatti equation by simulating backwards in time until steady state is reached.
 integrator = CVodesIntegrator(dae)
 integrator.setOption("reltol",1e-16)
+integrator.setOption("stop_at_end",False)
 integrator.init()
 # Start from P = identity matrix
 u = DMatrix.eye(ns)
@@ -326,7 +327,8 @@ print "(positive definite)"
 # Check that it does indeed satisfy the ricatti equation
 dae.setInput(integrator.output(),DAE_X)
 dae.evaluate()
-assert(max(fabs(dae.output()))<1e-9)
+print max(fabs(dae.output()))
+assert(max(fabs(dae.output()))<1e-8)
 
 # From P, obtain a feedback matrix K
 K = mul([inv(R),B.T,P_])
@@ -343,6 +345,7 @@ dae.init()
 
 integrator = CVodesIntegrator(dae)
 integrator.setOption("reltol",1e-16)
+integrator.setOption("stop_at_end",False)
 integrator.init()
 integrator.setInput(flatten(P_),INTEGRATOR_X0)
 integrator.input(INTEGRATOR_X0)[0] += 1e-9 # Put a tiny perturbation
