@@ -43,7 +43,9 @@ SimulatorInternal::~SimulatorInternal(){
 void SimulatorInternal::init(){
   // Let the integration time start from the first point of the time grid.
   if (!grid_.empty()) integrator_.setOption("t0",grid_[0]);
-
+  // Let the integration time stop at the last point of the time grid.
+  if (!grid_.empty()) integrator_.setOption("tf",grid_[grid_.size()-1]);
+  
   casadi_assert_message(isNonDecreasing(grid_),"The supplied time grid must be non-decreasing."); 
   
   // Initialize the integrator
