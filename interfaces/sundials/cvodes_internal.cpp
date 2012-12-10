@@ -1502,6 +1502,8 @@ int CVodesInternal::lsetupB_wrapper(CVodeMem cv_mem, int convfail, N_Vector x, N
 }
 
 void CVodesInternal::lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector x, N_Vector xdot){
+  log("IdasInternal::lsolve","begin");
+  
   // Current time
   double t = cv_mem->cv_tn;
 
@@ -1516,9 +1518,12 @@ void CVodesInternal::lsolve(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vect
   
   // Call the preconditioner solve function (which solves the linear system)
   psolve(t, x, xdot, b, b, gamma, delta, lr, 0);
+  
+  log("IdasInternal::lsolve","end");
 }
 
 void CVodesInternal::lsolveB(double t, double gamma, N_Vector b, N_Vector weight, N_Vector x, N_Vector xB, N_Vector xdotB) {
+  log("IdasInternal::lsolveB","begin");
   // Accuracy
   double delta = 0.0;
   
@@ -1527,6 +1532,8 @@ void CVodesInternal::lsolveB(double t, double gamma, N_Vector b, N_Vector weight
   
   // Call the preconditioner solve function (which solves the linear system)
   psolveB(t, x, xB, xdotB, b, b, gamma, delta, lr, 0);
+  
+  log("IdasInternal::lsolveB","end");
 }
 
 int CVodesInternal::lsolve_wrapper(CVodeMem cv_mem, N_Vector b, N_Vector weight, N_Vector x, N_Vector xdot){
