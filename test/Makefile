@@ -23,6 +23,7 @@ cpp: examples_indoc_cpp  examples_code_cpp
 unittests: unittests_py unittests_oct
 
 unittests_py:
+	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" # No memory checks
 	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" $(MEMCHECK) -passoptions="memcheck$(MEMCHECK)"
   
 unittests_oct:
