@@ -50,7 +50,7 @@ SundialsInternal::SundialsInternal(const FX& f, const FX& g) : IntegratorInterna
   addOption("max_multistep_order",         OT_INTEGER,          5);
   addOption("use_preconditioner",          OT_BOOLEAN,          false,          "Precondition an iterative solver");
   addOption("use_preconditionerB",         OT_BOOLEAN,          false,          "Precondition an iterative solver for the backwards problem");
-  addOption("stop_at_end",                 OT_BOOLEAN,          false,          "Stop the integrator at the end of the interval");
+  addOption("stop_at_end",                 OT_BOOLEAN,          true,          "Stop the integrator at the end of the interval");
   
   // Quadratures
   addOption("quad_err_con",                OT_BOOLEAN,          false,          "Should the quadratures affect the step size control");
@@ -165,7 +165,7 @@ void SundialsInternal::init(){
   if(!jac_.isNull() && !jac_.isInit()) jac_.init();
 
   // Create a backwards Jacobian if requested
-  if (exact_jacobianB_) jacB_ = getJacobianB();
+  if(exact_jacobianB_ && !g_.isNull()) jacB_ = getJacobianB();
   // Initialize backwards  Jacobian if availabe
   if(!jacB_.isNull() && !jacB_.isInit()) jacB_.init();
   
