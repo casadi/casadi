@@ -869,6 +869,10 @@ void IdasInternal::correctInitialConditions(){
   
 void IdasInternal::integrate(double t_out){
   log("IdasInternal::integrate","begin");
+  
+  casadi_assert_message(t_out>=t0_,"IdasInternal::integrate(" << t_out << "): Cannot integrate to a time earlier than t0 (" << t0_ << ")");
+  casadi_assert_message(t_out<=tf_ || !stop_at_end_,"IdasInternal::integrate(" << t_out << "): Cannot integrate past a time later than tf (" << tf_ << ") unless stop_at_end is set to False.");
+  
   int flag;
   
   // Check if we are already at the output time

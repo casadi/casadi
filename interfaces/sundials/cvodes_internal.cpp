@@ -442,6 +442,10 @@ void CVodesInternal::reset(int nsens, int nsensB, int nsensB_store){
 
 void CVodesInternal::integrate(double t_out){
   log("CVODES::integrate begin");
+  
+  casadi_assert_message(t_out>=t0_,"CVodesInternal::integrate(" << t_out << "): Cannot integrate to a time earlier than t0 (" << t0_ << ")");
+  casadi_assert_message(t_out<=tf_ || !stop_at_end_,"CVodesInternal::integrate(" << t_out << "): Cannot integrate past a time later than tf (" << tf_ << ") unless stop_at_end is set to False.");
+  
   int flag;
     
   // tolerance
