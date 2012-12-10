@@ -391,6 +391,7 @@ try{
 }
   
 void CVodesInternal::reset(int nsens, int nsensB, int nsensB_store){
+  casadi_log("CVodesInternal::reset begin");
   // Reset the base classes
   SundialsInternal::reset(nsens,nsensB,nsensB_store);
   
@@ -438,10 +439,11 @@ void CVodesInternal::reset(int nsens, int nsensB, int nsensB_store){
   
   // Set the stop time of the integration -- don't integrate past this point
   if(stop_at_end_) setStopTime(tf_);
+  casadi_log("CVodesInternal::reset end");
 }
 
 void CVodesInternal::integrate(double t_out){
-  log("CVODES::integrate begin");
+  casadi_log("CVodesInternal::integrate(" << t_out << ") begin");
   
   casadi_assert_message(t_out>=t0_,"CVodesInternal::integrate(" << t_out << "): Cannot integrate to a time earlier than t0 (" << t0_ << ")");
   casadi_assert_message(t_out<=tf_ || !stop_at_end_,"CVodesInternal::integrate(" << t_out << "): Cannot integrate past a time later than tf (" << tf_ << ") unless stop_at_end is set to False.");
@@ -496,10 +498,11 @@ void CVodesInternal::integrate(double t_out){
     
   }
   
-  log("CVODES::integrate end");
+  casadi_log("CVodesInternal::integrate(" << t_out << ") end");
 }
 
 void CVodesInternal::resetB(){
+  casadi_log("CVodesInternal::resetB begin");
   int flag;
   
   if(isInitAdj_){
@@ -517,9 +520,11 @@ void CVodesInternal::resetB(){
     // Initialize the adjoint integration
     initAdj();
   }
+  casadi_log("CVodesInternal::resetB end");
 }
 
 void CVodesInternal::integrateB(double t_out){
+  casadi_log("CVodesInternal::integrateB(" << t_out << ") begin");
   int flag;
   
   // Integrate backward to t_out
@@ -550,7 +555,7 @@ void CVodesInternal::integrateB(double t_out){
     stats_["nlinsetupsB"] = 1.0*nlinsetups;
     
   }
-  
+  casadi_log("CVodesInternal::integrateB(" << t_out << ") end");
 }
 
 void CVodesInternal::printStats(std::ostream &stream) const{
@@ -1092,8 +1097,21 @@ void CVodesInternal::djac(long N, double t, N_Vector x, N_Vector xdot, DlsMat Ja
   jac_.setInput(1.0,DAE_NUM_IN);
   jac_.setInput(0.0,DAE_NUM_IN+1);
 
+
+  if(monitored("djac")){
+    cout << "DAE_T    = " << t << endl;
+    cout << "DAE_X    = " << jac_.input(DAE_X) << endl;
+    cout << "RDAE_P    = " << jac_.input(DAE_P) << endl;
+    cout << "c_x = " << jac_.input(DAE_NUM_IN) << endl;
+    cout << "c_xdot = " << jac_.input(DAE_NUM_IN+1) << endl;
+  }
+  
   // Evaluate
   jac_.evaluate();
+  
+  if(monitored("djac")){
+    cout << "jac = " << jac_.output() << endl;
+  }
   
   // Get sparsity and non-zero elements
   const vector<int>& rowind = jac_.output().rowind();
@@ -1116,7 +1134,7 @@ void CVodesInternal::djac(long N, double t, N_Vector x, N_Vector xdot, DlsMat Ja
   time2 = clock();
   t_jac += double(time2-time1)/CLOCKS_PER_SEC;
   
-  log("IdasInternal::djac","wnd");
+  log("IdasInternal::djac","end");
 }
 
 void CVodesInternal::djacB(long NeqB, double t, N_Vector x, N_Vector xB, N_Vector xdotB, DlsMat JacB, N_Vector tmp1B, N_Vector tmp2B, N_Vector tmp3B) {
@@ -1130,7 +1148,7 @@ void CVodesInternal::djacB(long NeqB, double t, N_Vector x, N_Vector xB, N_Vecto
   jacB_.setInput(input(INTEGRATOR_P),RDAE_P);
   jacB_.setInput(NV_DATA_S(xB),RDAE_RX);
   jacB_.setInput(input(INTEGRATOR_RP),RDAE_RP);
-  jacB_.setInput(-1.0,RDAE_NUM_IN);
+  jacB_.setInput(-1.0,RDAE_NUM_IN); // validated
   jacB_.setInput(0.0,RDAE_NUM_IN+1);
 
   
@@ -1430,8 +1448,8 @@ void CVodesInternal::psetupB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, 
   jacB_.setInput(input(INTEGRATOR_P),RDAE_P);
   jacB_.setInput(NV_DATA_S(xB),RDAE_RX);
   jacB_.setInput(input(INTEGRATOR_RP),RDAE_RP);
-  jacB_.setInput(gammaB,RDAE_NUM_IN); // FIXME? Is this right
-  jacB_.setInput(1.0,RDAE_NUM_IN+1); // FIXME? Is this right
+  jacB_.setInput(gammaB,RDAE_NUM_IN); // validated
+  jacB_.setInput(1.0,RDAE_NUM_IN+1); // validated
 
   if(monitored("psetupB")){
     cout << "RDAE_T    = " << t << endl;
@@ -1619,22 +1637,19 @@ void CVodesInternal::initBandedLinearSolver(){
 }
   
 void CVodesInternal::initIterativeLinearSolver(){
-  // Max dimension of the Krylov space
-  int maxl = getOption("max_krylov");
-
   // Attach the sparse solver
   int flag;
   switch(itsol_f_){
     case SD_GMRES:
-      flag = CVSpgmr(mem_, pretype_f_, maxl);
+      flag = CVSpgmr(mem_, pretype_f_, max_krylov_);
       if(flag!=CV_SUCCESS) cvodes_error("CVBand",flag);
       break;
     case SD_BCGSTAB:
-      flag = CVSpbcg(mem_, pretype_f_, maxl);
+      flag = CVSpbcg(mem_, pretype_f_, max_krylov_);
       if(flag!=CV_SUCCESS) cvodes_error("CVSpbcg",flag);
       break;
     case SD_TFQMR:
-      flag = CVSptfqmr(mem_, pretype_f_, maxl);
+      flag = CVSptfqmr(mem_, pretype_f_, max_krylov_);
       if(flag!=CV_SUCCESS) cvodes_error("CVSptfqmr",flag);
       break;
   }
@@ -1699,19 +1714,18 @@ void CVodesInternal::initBandedLinearSolverB(){
 }
   
 void CVodesInternal::initIterativeLinearSolverB(){
-  int maxl = getOption("max_krylovB");
   int flag;
   switch(itsol_g_){
     case SD_GMRES:
-      flag = CVSpgmrB(mem_, whichB_, pretype_g_, maxl);
+      flag = CVSpgmrB(mem_, whichB_, pretype_g_, max_krylovB_);
       if(flag!=CV_SUCCESS) cvodes_error("CVSpgmrB",flag);
       break;
     case SD_BCGSTAB:
-      flag = CVSpbcgB(mem_, whichB_, pretype_g_, maxl);
+      flag = CVSpbcgB(mem_, whichB_, pretype_g_, max_krylovB_);
       if(flag!=CV_SUCCESS) cvodes_error("CVSpbcgB",flag);
       break;
     case SD_TFQMR:
-      flag = CVSptfqmrB(mem_, whichB_, pretype_g_, maxl);
+      flag = CVSptfqmrB(mem_, whichB_, pretype_g_, max_krylovB_);
       if(flag!=CV_SUCCESS) cvodes_error("CVSptfqmrB",flag);
       break;
   }

@@ -6112,6 +6112,10 @@ static int cvNlsNewton(CVodeMem cv_mem, int nflag)
     callSetup = FALSE;
   }
   
+   /* At this point,
+     zn[0]  <- y_n(0)
+                     */
+ 
   /* Looping point for the solution of the nonlinear system.
      Evaluate f at the predicted y, call lsetup if indicated, and
      call cvNewtonIteration for the Newton iteration itself.      */
@@ -6148,8 +6152,8 @@ static int cvNlsNewton(CVodeMem cv_mem, int nflag)
     }
 
     /* Set acor to zero and load prediction into y vector */
-    N_VConst(ZERO, acor);
-    N_VScale(ONE, zn[0], y);
+    N_VConst(ZERO, acor);     // acor <- 0
+    N_VScale(ONE, zn[0], y);  // y <- zn[0] 
 
     if (do_sensi_sim)
       for (is=0; is<Ns; is++) {
@@ -6211,7 +6215,11 @@ static int cvNewtonIteration(CVodeMem cv_mem)
      acor   <- 0
      acorS  <- 0
      y      <- y_n(0)
-     yS     <- yS_n(0)                 */
+     yS     <- yS_n(0) 
+     
+     gamma  <- h*rl1
+                     */
+
 
   /* Looping point for Newton iteration */
   loop {
@@ -6221,11 +6229,15 @@ static int cvNewtonIteration(CVodeMem cv_mem)
     N_VLinearSum(gamma, ftemp, -ONE, tempv, tempv);
 
     /* Call the lsolve function */
-    b = tempv;
-
-    retval = lsolve(cv_mem, b, ewt, y, ftemp); 
+    b = tempv;  // b <- gamma*ftemp - acor - rl1*zn[1]
+    
+    retval = lsolve(cv_mem, b, ewt, y, ftemp); // b = M^(-1) b
     nni++;
 
+    // Used for validating casadi#536
+    //printf("step[b]=");
+    //N_VPrint_Serial(b);
+    
     if (retval < 0) return(CV_LSOLVE_FAIL);
     
     /* If lsolve had a recoverable failure and Jacobian data is
@@ -6257,9 +6269,9 @@ static int cvNewtonIteration(CVodeMem cv_mem)
     
     /* Get WRMS norm of correction; add correction to acor and y */
 
-    del = N_VWrmsNorm(b, ewt);
-    N_VLinearSum(ONE, acor, ONE, b, acor);
-    N_VLinearSum(ONE, zn[0], ONE, acor, y);
+    del = N_VWrmsNorm(b, ewt);              // del  = || b ||_2,ewt
+    N_VLinearSum(ONE, acor, ONE, b, acor);  // acor += b 
+    N_VLinearSum(ONE, zn[0], ONE, acor, y); // y = zn[0] + acor
 
     if (do_sensi_sim) {
       delS = cvSensUpdateNorm(cv_mem, del, bS, ewtS);

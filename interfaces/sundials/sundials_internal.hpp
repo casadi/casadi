@@ -91,6 +91,9 @@ public:
   /// Preconditioning
   int pretype_f_, pretype_g_;
   
+  /// Max krylov size
+  int max_krylov_, max_krylovB_;
+  
   /// Use preconditioning
   bool use_preconditioner_, use_preconditionerB_;
   

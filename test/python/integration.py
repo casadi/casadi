@@ -58,11 +58,139 @@ for cl, t, options in integrators:
 class Integrationtests(casadiTestCase):
 
   @skip(memcheck)
+  def test_jac(self):
+    self.message("Test exact jacobian #536")
+    # This test is not automized, but works by inspection only.
+    # To activate, recompile after ucnommenting the printout lines in cvodes.c, near "Used for validating casadi#536"
+    #return
+    DMatrix.setPrecision(18)
+
+    tstart = ssym("tstart")
+    tend = ssym("tend")
+    
+    integrators = [
+              (IdasIntegrator,["dae","ode"],{"abstol": 1e-9,"reltol":1e-9,"fsens_err_con": True,"calc_ic":True,"calc_icB":True}),
+              (CVodesIntegrator,["ode"],{"abstol": 1e-5,"reltol":1e-5,"fsens_err_con": False,"quad_err_con": False})
+              ]
+
+    def variations(p_features, din, dout, rdin, rdout, *args):
+      if "ode" in p_features:
+        p_features_ = copy.copy(p_features)
+        p_features_[p_features.index("ode")] = "dae"
+        din_ = copy.copy(din)
+        dout_ = copy.copy(dout)
+        rdin_ = copy.copy(rdin)
+        rdout_ = copy.copy(rdout)
+        z = ssym("x", din_["x"].shape)
+        din_["z"] = z
+        dout_["ode"] = z
+        dout_["alg"] = ( dout["ode"] - z) * (-0.8)
+        if len(rdin_)>0:
+          rz = ssym("rx", rdin_["rx"].shape)
+          rdin_["rz"] = rz
+          rdin_["z"] = z
+          rdout_["ode"] = rz
+          rdout_["alg"] = ( rdout["ode"] - rz) * (-0.7)
+          
+        yield (p_features, din, dout, rdin, rdout) + tuple(args)
+        yield (p_features_, din_, dout_, rdin_, rdout_) + tuple(args)
+      else:
+        yield (p_features, din, dout, rdin, rdout) + tuple(args)
+        
+    def checks(): 
+      Ns = 1
+      
+      x  = ssym("x")
+      rx = ssym("rx")
+      t = ssym("t")
+
+      ti = (0,0.9995)
+      pointA = {'x0': 1, 'rx0': 1}
+      
+      si = {'x0':x, 'rx0': rx}
+      
+      #sol = {'rxf': 1.0/(1-tend)}
+      sol = {'rxf': rx*exp(tend), 'xf': x*exp(tend)}
+     
+      yield (["ode"],{'x':x,'t':t},{'ode':x},{'x':x,'rx':rx,'t':t},{'ode': rx},si,sol,pointA,ti)
+      
+      
+    refXF = refRXF = None
+
+    for tt in checks():
+      for p_features, din, dout, rdin, rdout,  solutionin, solution, point, (tstart_, tend_) in variations(*tt):
+        for Integrator, features, options in integrators:
+          self.message(Integrator.__name__)
+          if p_features[0] in features:
+            g = FX()
+            if len(rdin)>1:
+              g = SXFunction(rdaeIn(**rdin),rdaeOut(**rdout))
+              g.init()
+               
+            f = SXFunction(daeIn(**din),daeOut(**dout))
+            f.init()
+            
+            for k in solution.keys():
+              solution[k] = substitute(solution[k],vertcat([tstart,tend]),vertcat([tstart_,tend_]))
+
+            fs = SXFunction(integratorIn(**solutionin),integratorOut(**solution))
+            fs.init()
+              
+          
+            def itoptions(post=""):
+              yield {"iterative_solver"+post: "gmres"}
+              yield {"iterative_solver"+post: "bcgstab"}
+              yield {"iterative_solver"+post: "tfqmr", "use_preconditionerB": True, "linear_solverB" : CSparse} # Bug in Sundials? Preconditioning seems to be needed
+             
+            def solveroptions(post=""):
+              yield {"linear_solver_type" +post: "dense" }
+              #for it in itoptions(post):
+              #  d = {"linear_solver_type" +post: "iterative" }
+              #  d.update(it)
+              #  yield d
+              #yield {"linear_solver_type" +post: "banded", "lower_bandwidth"+post: 0, "upper_bandwidth"+post: 0 }
+              yield {"linear_solver_type" +post: "user_defined", "linear_solver"+post: CSparse }
+                
+            for a_options in solveroptions("B"):
+              for f_options in solveroptions():
+                message = "f_options: %s , a_options: %s" % (str(f_options) , str(a_options))
+                print message
+                integrator = Integrator(f,g)
+                integrator.setOption("exact_jacobianB",True)
+                integrator.setOption("gather_stats",True)
+                integrator.setOption("verbose",True)
+                #integrator.setOption("monitor",["djacB","resB","djac","res"])
+                integrator.setOption("t0",tstart_)
+                integrator.setOption("tf",tend_)
+                integrator.setOption(options)
+                integrator.setOption(f_options)
+                integrator.setOption(a_options)
+                integrator.init()
+                for ff in [fs,integrator]:
+                  for k,v in point.items():
+                    i = getattr(casadi,('integrator_'+k).upper())
+                    if not ff.input(i).empty():
+                      ff.input(i).set(v)
+
+                integrator.evaluate(0,0)
+                fs.evaluate(0,0)
+                print "res=",integrator.output(INTEGRATOR_XF)-fs.output(INTEGRATOR_XF), fs.output(INTEGRATOR_XF)
+                print "Rres=",integrator.output(INTEGRATOR_RXF)-fs.output(INTEGRATOR_RXF), fs.output(INTEGRATOR_RXF)
+                # self.checkarray(integrator.output(INTEGRATOR_RXF),fs.output(INTEGRATOR_RXF),digits=4)
+                stats = integrator.getStats()
+                
+                print stats
+                self.assertTrue(stats["nsteps"]<1500)
+                self.assertTrue(stats["nstepsB"]<2500)
+                self.assertTrue(stats["nlinsetups"]<100)
+                self.assertTrue(stats["nlinsetupsB"]<250)
+
+  @skip(memcheck)
   def test_lsolvers(self):
     self.message("Test different linear solvers")
 
     tstart = ssym("tstart")
-    tend = ssym("tstart")
+    tend = ssym("tend")
     
     integrators = [
               (IdasIntegrator,["dae","ode"],{"abstol": 1e-9,"reltol":1e-9,"fsens_err_con": True,"calc_ic":True,"calc_icB":True}),

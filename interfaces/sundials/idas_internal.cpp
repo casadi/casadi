@@ -48,7 +48,7 @@ void IdasInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& alr
 IdasInternal::IdasInternal(const FX& f, const FX& g) : SundialsInternal(f,g){
   addOption("suppress_algebraic",          OT_BOOLEAN,          false,          "Supress algebraic variables in the error testing");
   addOption("calc_ic",                     OT_BOOLEAN,          true,           "Use IDACalcIC to get consistent initial conditions.");
-  addOption("calc_icB",                    OT_BOOLEAN,          true,           "Use IDACalcIC to get consistent initial conditions for backwards system.");
+  addOption("calc_icB",                    OT_BOOLEAN,          GenericType(),  "Use IDACalcIC to get consistent initial conditions for backwards system [default: equal to calc_ic].");
   addOption("abstolv",                     OT_REALVECTOR);
   addOption("fsens_abstolv",               OT_REALVECTOR); 
   addOption("max_step_size",               OT_REAL,             0,              "Maximim step size");
@@ -868,7 +868,7 @@ void IdasInternal::correctInitialConditions(){
 }
   
 void IdasInternal::integrate(double t_out){
-  log("IdasInternal::integrate","begin");
+  casadi_log("IdasInternal::integrate(" << t_out << ") begin");
   
   casadi_assert_message(t_out>=t0_,"IdasInternal::integrate(" << t_out << "): Cannot integrate to a time earlier than t0 (" << t0_ << ")");
   casadi_assert_message(t_out<=tf_ || !stop_at_end_,"IdasInternal::integrate(" << t_out << "): Cannot integrate past a time later than tf (" << tf_ << ") unless stop_at_end is set to False.");
@@ -940,7 +940,7 @@ void IdasInternal::integrate(double t_out){
   }
   
   
-  log("IdasInternal::integrate","end");
+  casadi_log("IdasInternal::integrate(" << t_out << ") end");
 }
 
 void IdasInternal::resetB(){
@@ -972,7 +972,7 @@ void IdasInternal::resetB(){
   }
   
   // Correct initial values for the integration if necessary
-  int calc_icB = getOption("calc_icB");
+  bool calc_icB = hasSetOption("calc_icB") ?  getOption("calc_icB") : getOption("calc_ic");
   if(calc_icB){
     log("IdasInternal::resetB","IDACalcICB begin");
     flag = IDACalcICB(mem_, whichB_, t0_, xz_, xzdot_);
@@ -990,6 +990,7 @@ void IdasInternal::resetB(){
 }
 
 void IdasInternal::integrateB(double t_out){
+  casadi_log("IdasInternal::integrateB(" << t_out << ") begin");
   int flag;
   // Integrate backwards to t_out
   flag = IDASolveB(mem_, t_out, IDA_NORMAL);
@@ -1024,6 +1025,7 @@ void IdasInternal::integrateB(double t_out){
     stats_["nstepsB"] = 1.0*nsteps;
     stats_["nlinsetupsB"] = 1.0*nlinsetups;
   }
+  casadi_log("IdasInternal::integrateB(" << t_out << ") end");
 }
 
 void IdasInternal::printStats(std::ostream &stream) const{
@@ -1941,22 +1943,19 @@ void IdasInternal::initBandedLinearSolver(){
 }
   
 void IdasInternal::initIterativeLinearSolver(){
-  // Max dimension of the Krylov space
-  int maxl = getOption("max_krylov");
-      
   // Attach an iterative solver
   int flag;
   switch(itsol_f_){
     case SD_GMRES:
-      flag = IDASpgmr(mem_, maxl);
+      flag = IDASpgmr(mem_, max_krylov_);
       if(flag != IDA_SUCCESS) idas_error("IDASpgmr",flag);
       break;
     case SD_BCGSTAB:
-      flag = IDASpbcg(mem_, maxl);
+      flag = IDASpbcg(mem_, max_krylov_);
       if(flag != IDA_SUCCESS) idas_error("IDASpbcg",flag);
       break;
     case SD_TFQMR:
-      flag = IDASptfqmr(mem_, maxl);
+      flag = IDASptfqmr(mem_, max_krylov_);
       if(flag != IDA_SUCCESS) idas_error("IDASptfqmr",flag);
       break;
     default: casadi_error("Uncaught switch");
@@ -2019,19 +2018,18 @@ void IdasInternal::initBandedLinearSolverB(){
 }
   
 void IdasInternal::initIterativeLinearSolverB(){
-  int maxl = getOption("max_krylovB");
   int flag;
   switch(itsol_g_){
     case SD_GMRES:
-      flag = IDASpgmrB(mem_, whichB_, maxl);
+      flag = IDASpgmrB(mem_, whichB_, max_krylovB_);
       if(flag != IDA_SUCCESS) idas_error("IDASpgmrB",flag);
       break;
     case SD_BCGSTAB:
-      flag = IDASpbcgB(mem_, whichB_, maxl);
+      flag = IDASpbcgB(mem_, whichB_, max_krylovB_);
       if(flag != IDA_SUCCESS) idas_error("IDASpbcgB",flag);
       break;
     case SD_TFQMR:
-      flag = IDASptfqmrB(mem_, whichB_, maxl);
+      flag = IDASptfqmrB(mem_, whichB_, max_krylovB_);
       if(flag != IDA_SUCCESS) idas_error("IDASptfqmrB",flag);
       break;
     default: casadi_error("Uncaught switch");
