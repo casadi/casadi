@@ -877,7 +877,7 @@
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>Number of steps between two consecutive checkpoints</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>true</td><td>Stop the integrator at the end of the interval</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>End of the time horizon</td><td>CasADi::IntegratorInternal</td></tr>
@@ -948,7 +948,7 @@
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>Number of steps between two consecutive checkpoints</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>true</td><td>Stop the integrator at the end of the interval</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>End of the time horizon</td><td>CasADi::IntegratorInternal</td></tr>
@@ -2002,7 +2002,7 @@
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>Number of steps between two consecutive checkpoints</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>true</td><td>Stop the integrator at the end of the interval</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>suppress_algebraic</td><td>OT_BOOLEAN</td><td>false</td><td>Supress algebraic variables in the error testing</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>CasADi::IntegratorInternal</td></tr>
@@ -2081,7 +2081,7 @@
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>Number of steps between two consecutive checkpoints</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>true</td><td>Stop the integrator at the end of the interval</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>suppress_algebraic</td><td>OT_BOOLEAN</td><td>false</td><td>Supress algebraic variables in the error testing</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>CasADi::IntegratorInternal</td></tr>
@@ -3159,7 +3159,7 @@
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>Number of steps between two consecutive checkpoints</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>true</td><td>Stop the integrator at the end of the interval</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>End of the time horizon</td><td>CasADi::IntegratorInternal</td></tr>
@@ -3226,7 +3226,7 @@
 <tr><td>sparse</td><td>OT_BOOLEAN</td><td>true</td><td>function is sparse</td><td>CasADi::FXInternal</td></tr>
 <tr><td>sparsity_generator</td><td>OT_SPARSITYGENERATOR</td><td>GenericType()</td><td>Function that provides sparsity for a given input output block, overrides internal routines</td><td>CasADi::FXInternal</td></tr>
 <tr><td>steps_per_checkpoint</td><td>OT_INTEGER</td><td>20</td><td>Number of steps between two consecutive checkpoints</td><td>CasADi::SundialsInternal</td></tr>
-<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>false</td><td>Stop the integrator at the end of the interval</td><td>CasADi::SundialsInternal</td></tr>
+<tr><td>stop_at_end</td><td>OT_BOOLEAN</td><td>true</td><td>Stop the integrator at the end of the interval</td><td>CasADi::SundialsInternal</td></tr>
 <tr><td>store_jacobians</td><td>OT_BOOLEAN</td><td>false</td><td>keep references to generated Jacobians in order to avoid generating identical Jacobians multiple times</td><td>CasADi::FXInternal</td></tr>
 <tr><td>t0</td><td>OT_REAL</td><td>0.0</td><td>Beginning of the time horizon</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>tf</td><td>OT_REAL</td><td>1.0</td><td>End of the time horizon</td><td>CasADi::IntegratorInternal</td></tr>
