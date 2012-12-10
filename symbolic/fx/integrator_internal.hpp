@@ -121,9 +121,6 @@ public:
   /// Generate new functions for calculating forward/adjoint directional derivatives
   bool fwd_via_sct_, adj_via_sct_;
   
-  /// Integrator for augmented DAE
-  Integrator integrator_augmented_;
-  
 };
   
 } // namespace CasADi
