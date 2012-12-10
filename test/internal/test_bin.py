@@ -29,7 +29,7 @@ from subprocess import *
 
 t = TestSuite(dirname=src,
   workingdir = lambda dir : os.path.join(dir,'..'),
-  command = lambda dir,fn:  ['bin/'+fn],
+  command = lambda dir,fn,opt:  ['bin/'+fn]+opt,
   inputs = {'det_minor': "5"},
     args=sys.argv[2:]
   )

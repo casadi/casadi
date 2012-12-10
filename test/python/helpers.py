@@ -25,6 +25,12 @@ import unittest
 import sys
 from math import isnan, isinf
 
+import sys
+
+memcheck = "memcheck-memcheck" in sys.argv
+
+if memcheck: del sys.argv[sys.argv.index("memcheck-memcheck")]
+if "memcheck" in sys.argv: del sys.argv[sys.argv.index("memcheck")]
 
 from StringIO import StringIO
 import sys
@@ -375,4 +381,18 @@ class run_only(object):
         else:
           print i
     return c
+    
+class skip(object):
+  def __init__(self, skip=True):
+    self.skip = skip
+
+  def __call__(self, c):
+    if isinstance(c,unittest.TestCase):
+      if i.startswith('test_'):
+        delattr(c,i)
+      return c
+    else:
+      def n(self):
+        print "Skipping %s" % (str(c.__name__))
+      return n
     

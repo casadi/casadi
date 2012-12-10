@@ -57,6 +57,7 @@ for cl, t, options in integrators:
   
 class Integrationtests(casadiTestCase):
 
+  @skip(memcheck)
   def test_lsolvers(self):
     self.message("Test different linear solvers")
 
@@ -157,7 +158,7 @@ class Integrationtests(casadiTestCase):
               
 
 
-
+  @skip(memcheck)
   def test_X(self):
     self.message("Extensive integrator tests")
     
@@ -1150,7 +1151,7 @@ class Integrationtests(casadiTestCase):
     #H2 = DMatrix(H.output())
     
     #self.checkarray(H1,H2,"hessian")
-
+    
   def test_issue535(self):
     self.message("regression test for #535")
     t=ssym("t")

@@ -130,7 +130,7 @@ class TestSuite:
     args: a list of command line options:
        -skipfiles="file1 file2"   get's added to skipfiles
        -memcheck           Include a check for memory leaks
-       
+       -passoptions="option1 option2"   get's passed onto the command constructor as third argument
      
     
     """
@@ -152,6 +152,7 @@ class TestSuite:
     self.allowable_returncodes = allowable_returncodes 
     self.workingdir = workingdir
     self.memcheck = False
+    self.passoptions = []
     self.stderr_trigger = stderr_trigger
     self.stdout_trigger = stdout_trigger
     if check_depreciation:
@@ -171,7 +172,10 @@ class TestSuite:
       if m:
         self.memcheck = True
         okay = True
-        
+      m = re.search('-passoptions=(.*)', arg)
+      if m:
+        self.passoptions+=m.group(1).split(' ')
+        okay = True
       if not(okay):
         print "Unknown argument: ", arg
 
@@ -200,7 +204,7 @@ class TestSuite:
     self.stats['numtests']+=1
     print ("%02d. " % self.stats['numtests']) + fn
     t0 = time.clock()
-    p=Popen(self.command(dir,fn),cwd=self.workingdir(dir),stdout=PIPE, stderr=PIPE, stdin=PIPE)
+    p=Popen(self.command(dir,fn,self.passoptions),cwd=self.workingdir(dir),stdout=PIPE, stderr=PIPE, stdin=PIPE)
 
     inp = None
     if fn in self.inputs:
@@ -254,7 +258,7 @@ class TestSuite:
       suppressions = ["internal/valgrind-python.supp"]
       supps = ":".join([os.path.join(os.getcwd(),s) for s in suppressions])
       stdoutfile = tempfile.TemporaryFile()
-      p=Popen(['valgrind','--leak-check=full','--suppressions='+supps]+self.command(dir,fn),cwd=self.workingdir(dir),stdout=stdoutfile, stderr=PIPE, stdin=PIPE)
+      p=Popen(['valgrind','--leak-check=full','--suppressions='+supps]+self.command(dir,fn,self.passoptions),cwd=self.workingdir(dir),stdout=stdoutfile, stderr=PIPE, stdin=PIPE)
       f=Popen(['grep','-E','-A','10', "definitely lost|leaks|ERROR SUMMARY|Invalid read"],stdin=p.stderr,stdout=PIPE)
       p.stderr.close()
       alarm(60*60) # 1 hour

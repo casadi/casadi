@@ -23,8 +23,7 @@ cpp: examples_indoc_cpp  examples_code_cpp
 unittests: unittests_py unittests_oct
 
 unittests_py:
-	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py symbolic.py" $(MEMCHECK)
-	python internal/test_py.py python -skipfiles="$(shell cd python && ls *.py | grep -v symbolic.py && cd ..) complexity.py speed.py mx_jacobian_sparsity.py"
+	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" $(MEMCHECK) -passoptions="memcheck$(MEMCHECK)"
   
 unittests_oct:
 	python internal/test_oct.py octave
