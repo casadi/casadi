@@ -1122,8 +1122,8 @@ void CVodesInternal::djacB(long NeqB, double t, N_Vector x, N_Vector xB, N_Vecto
     cout << "RDAE_P    = " << jacB_.input(RDAE_P) << endl;
     cout << "RDAE_RX    = " << jacB_.input(RDAE_RX) << endl;
     cout << "RDAE_RP    = " << jacB_.input(RDAE_RP) << endl;
-    cout << "c_x = " << jacB_.input(DAE_NUM_IN) << endl;
-    cout << "c_xdot = " << jacB_.input(DAE_NUM_IN) << endl;
+    cout << "c_x = " << jacB_.input(RDAE_NUM_IN) << endl;
+    cout << "c_xdot = " << jacB_.input(RDAE_NUM_IN+1) << endl;
   }
   
   // Evaluate
@@ -1234,8 +1234,8 @@ void CVodesInternal::bjacB(long NeqB, long mupperB, long mlowerB, double t, N_Ve
   jacB_.setInput(input(INTEGRATOR_P),RDAE_P);
   jacB_.setInput(NV_DATA_S(xB),RDAE_RX);
   jacB_.setInput(input(INTEGRATOR_RP),RDAE_RP);
-  jacB_.setInput(-1.0,DAE_NUM_IN);
-  jacB_.setInput(0.0,DAE_NUM_IN+1);
+  jacB_.setInput(-1.0,RDAE_NUM_IN);
+  jacB_.setInput(0.0,RDAE_NUM_IN+1);
   
   if(monitored("bjacB")){
     cout << "RDAE_T    = " << t << endl;
@@ -1243,8 +1243,8 @@ void CVodesInternal::bjacB(long NeqB, long mupperB, long mlowerB, double t, N_Ve
     cout << "RDAE_P    = " << jacB_.input(RDAE_P) << endl;
     cout << "RDAE_RX    = " << jacB_.input(RDAE_RX) << endl;
     cout << "RDAE_RP    = " << jacB_.input(RDAE_RP) << endl;
-    cout << "c_x = " << jacB_.input(DAE_NUM_IN) << endl;
-    cout << "c_xdot = " << jacB_.input(DAE_NUM_IN) << endl;
+    cout << "c_x = " << jacB_.input(RDAE_NUM_IN) << endl;
+    cout << "c_xdot = " << jacB_.input(RDAE_NUM_IN+1) << endl;
   }
 
   // Evaluate
