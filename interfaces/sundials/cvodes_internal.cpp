@@ -44,7 +44,7 @@ CVodesInternal::CVodesInternal(const FX& f, const FX& g) : SundialsInternal(f,g)
   addOption("nonlinear_solver_iteration",       OT_STRING,              "newton",       "","newton|functional");
   addOption("fsens_all_at_once",                OT_BOOLEAN,             true,           "Calculate all right hand sides of the sensitivity equations at once");
   addOption("disable_internal_warnings",        OT_BOOLEAN,             false,          "Disable CVodes internal warning messages");
-  addOption("monitor",                          OT_STRINGVECTOR,        GenericType(),  "", "res|resB|resQB|reset|psetupB", true);
+  addOption("monitor",                          OT_STRINGVECTOR,        GenericType(),  "", "res|resB|resQB|reset|psetupB|djacB", true);
     
   mem_ = 0;
 
@@ -1105,14 +1105,29 @@ void CVodesInternal::djacB(long NeqB, double t, N_Vector x, N_Vector xB, N_Vecto
   // Pass inputs to the jacobian function
   jacB_.setInput(&t,RDAE_T);
   jacB_.setInput(NV_DATA_S(x),RDAE_X);
-  jacB_.setInput(input(INTEGRATOR_P),DAE_P);
+  jacB_.setInput(input(INTEGRATOR_P),RDAE_P);
   jacB_.setInput(NV_DATA_S(xB),RDAE_RX);
   jacB_.setInput(input(INTEGRATOR_RP),RDAE_RP);
   jacB_.setInput(-1.0,RDAE_NUM_IN);
   jacB_.setInput(0.0,RDAE_NUM_IN+1);
 
+  
+  if(monitored("djacB")){
+    cout << "RDAE_T    = " << t << endl;
+    cout << "RDAE_X    = " << jacB_.input(RDAE_X) << endl;
+    cout << "RDAE_P    = " << jacB_.input(RDAE_P) << endl;
+    cout << "RDAE_RX    = " << jacB_.input(RDAE_RX) << endl;
+    cout << "RDAE_RP    = " << jacB_.input(RDAE_RP) << endl;
+    cout << "c_x = " << jacB_.input(DAE_NUM_IN) << endl;
+    cout << "c_xdot = " << jacB_.input(DAE_NUM_IN) << endl;
+  }
+  
   // Evaluate
   jacB_.evaluate();
+  
+  if(monitored("djacB")){
+    cout << "jacB = " << jacB_.output() << endl;
+  }
   
   // Get sparsity and non-zero elements
   const vector<int>& rowind = jacB_.output().rowind();
@@ -1212,14 +1227,28 @@ void CVodesInternal::bjacB(long NeqB, long mupperB, long mlowerB, double t, N_Ve
   // Pass inputs to the jacobian function
   jacB_.setInput(&t,RDAE_T);
   jacB_.setInput(NV_DATA_S(x),RDAE_X);
-  jacB_.setInput(input(INTEGRATOR_P),DAE_P);
+  jacB_.setInput(input(INTEGRATOR_P),RDAE_P);
   jacB_.setInput(NV_DATA_S(xB),RDAE_RX);
   jacB_.setInput(input(INTEGRATOR_RP),RDAE_RP);
   jacB_.setInput(-1.0,DAE_NUM_IN);
   jacB_.setInput(0.0,DAE_NUM_IN+1);
+  
+  if(monitored("bjacB")){
+    cout << "RDAE_T    = " << t << endl;
+    cout << "RDAE_X    = " << jacB_.input(RDAE_X) << endl;
+    cout << "RDAE_P    = " << jacB_.input(RDAE_P) << endl;
+    cout << "RDAE_RX    = " << jacB_.input(RDAE_RX) << endl;
+    cout << "RDAE_RP    = " << jacB_.input(RDAE_RP) << endl;
+    cout << "c_x = " << jacB_.input(DAE_NUM_IN) << endl;
+    cout << "c_xdot = " << jacB_.input(DAE_NUM_IN) << endl;
+  }
 
   // Evaluate
   jacB_.evaluate();
+  
+  if(monitored("bjacB")){
+    cout << "jacB = " << jacB_.output() << endl;
+  }
   
   // Get sparsity and non-zero elements
   const vector<int>& rowind = jacB_.output().rowind();
@@ -1376,7 +1405,7 @@ void CVodesInternal::psetupB(double t, N_Vector x, N_Vector xB, N_Vector xdotB, 
   // Pass inputs to the jacobian function
   jacB_.setInput(&t,RDAE_T);
   jacB_.setInput(NV_DATA_S(x),RDAE_X);
-  jacB_.setInput(input(INTEGRATOR_P),DAE_P);
+  jacB_.setInput(input(INTEGRATOR_P),RDAE_P);
   jacB_.setInput(NV_DATA_S(xB),RDAE_RX);
   jacB_.setInput(input(INTEGRATOR_RP),RDAE_RP);
   jacB_.setInput(gammaB,RDAE_NUM_IN); // FIXME? Is this right
