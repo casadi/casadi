@@ -48,7 +48,7 @@ void IdasInternal::deepCopyMembers(std::map<SharedObjectNode*,SharedObject>& alr
 IdasInternal::IdasInternal(const FX& f, const FX& g) : SundialsInternal(f,g){
   addOption("suppress_algebraic",          OT_BOOLEAN,          false,          "Supress algebraic variables in the error testing");
   addOption("calc_ic",                     OT_BOOLEAN,          true,           "Use IDACalcIC to get consistent initial conditions.");
-  addOption("calc_icB",                    OT_BOOLEAN,          true,           "Use IDACalcIC to get consistent initial conditions.");
+  addOption("calc_icB",                    OT_BOOLEAN,          true,           "Use IDACalcIC to get consistent initial conditions for backwards system.");
   addOption("abstolv",                     OT_REALVECTOR);
   addOption("fsens_abstolv",               OT_REALVECTOR); 
   addOption("max_step_size",               OT_REAL,             0,              "Maximim step size");
