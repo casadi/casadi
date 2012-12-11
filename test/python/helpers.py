@@ -364,6 +364,9 @@ class casadiTestCase(unittest.TestCase):
             for k in range(solution.getNumInputs()): solutionhess.input(k).set(solution_inputs[k])
             self.checkfx(trialhess,solutionhess,fwd=fwd  if sens_der else False,adj=adj  if sens_der else False,jacobian=False,gradient=False,hessian=False,digits=digits_sens,failmessage="(%s).hessian(%d,%d)" % (failmessage,i,j),allow_empty=allow_empty,verbose=verbose)     
 
+    for k in range(trial.getNumInputs()):
+      trial.input(k).set(trial_inputs[k])
+      solution.input(k).set(solution_inputs[k])
 
 class run_only(object):
   def __init__(self, args):
@@ -387,6 +390,7 @@ class skip(object):
     self.skip = skip
 
   def __call__(self, c):
+    if not self.skip: return c
     if isinstance(c,unittest.TestCase):
       if i.startswith('test_'):
         delattr(c,i)
