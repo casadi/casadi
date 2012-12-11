@@ -21,6 +21,16 @@
 # 
 from casadi import *
 
+"""
+This example mainly intended for CasADi presentations. 
+It implements direct single shooting for DAEs in only about 30 lines of code, 
+using a minimal number of concepts.
+
+We do not recommend using this example as a template for solving optimal control problems in practise.
+
+Joel Andersson, 2012
+"""
+
 # Declare variables
 x = ssym("x",2) # Differential states
 z = ssym("z")   # Algebraic variable
@@ -28,13 +38,13 @@ u = ssym("u")   # Control
 t = ssym("t")   # Time
 
 # Differential equation
-f_x = vertcat((x[1], z*x[1]-x[0]+u ))
+f_x = vertcat((z*x[0]-x[1]+u, x[0]))
 
 # Algebraic equation
-f_z = x[0]**2 + z - 1
+f_z = x[1]**2 + z - 1
 
 # Lagrange cost term (quadrature)
-f_q = x[0]**2 + x[1]**2 + u**2
+f_q = x[1]**2 + x[1]**2 + u**2
 
 # DAE callback function
 f = SXFunction([x,z,u,t],[f_x,f_z,f_q])
@@ -48,7 +58,7 @@ I.init()
 U = msym("U",20)
 
 # Construct graph of integrator calls
-X  = msym([1,0])
+X  = msym([0,1])
 J = 0
 for k in range(20):
   (X,Q,_,_) = I.call( (X,U[k]) )   # Call the integrator
@@ -64,37 +74,9 @@ solver.setOption("generate_hessian",True)
 solver.init()
 
 # Pass bounds, initial guess and solve NLP
-solver.setInput(-0.8, NLP_LBX)    # Lower variable bound
-solver.setInput( 1.0, NLP_UBX)    # Upper variable bound
-solver.setInput( 0.0, NLP_LBG)    # Lower constraint bound
-solver.setInput( 0.0, NLP_UBG)    # Upper constraint bound
-solver.setInput( 0.0, NLP_X_INIT) # Initial guess
+solver.setInput(-0.75, NLP_LBX)    # Lower variable bound
+solver.setInput( 1.0,  NLP_UBX)    # Upper variable bound
+solver.setInput( 0.0,  NLP_LBG)    # Lower constraint bound
+solver.setInput( 0.0,  NLP_UBG)    # Upper constraint bound
+solver.setInput( 0.0,  NLP_X_INIT) # Initial guess
 solver.solve()
-
-from casadi.tools import *
-dotsave(f_z,format="ps",filename="f_z.eps")
-
-
-import numpy as NP
-import matplotlib.pyplot as plt
-
-# Retrieve the solution
-u_opt = NP.array(solver.output(NLP_X_OPT))
-
-# End time
-T =  10  
-N = 20
-
-# Time grid
-tgrid_x = NP.linspace(0,T,N+1)
-tgrid_u = NP.linspace(0,T,N)
-
-# Plot the results
-plt.figure(1)
-plt.clf()
-plt.plot(tgrid_u,u_opt,'-.')
-plt.title("Van der Pol optimization - single shooting")
-plt.xlabel('time')
-plt.legend(['u trajectory'])
-plt.grid()
-plt.show()
