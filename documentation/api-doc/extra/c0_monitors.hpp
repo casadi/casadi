@@ -52,6 +52,7 @@
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
+<tr><td>djacB</td><td>CasADi::CVodesInternal</td></tr>
 <tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
 <tr><td>psetupB</td><td>CasADi::CVodesInternal</td></tr>
@@ -67,6 +68,7 @@
 <table>
 <caption>List of available monitors</caption>
 <tr><th>Id</th><th>Used in</th></tr>
+<tr><td>djacB</td><td>CasADi::CVodesInternal</td></tr>
 <tr><td>inputs</td><td>CasADi::FXInternal</td></tr>
 <tr><td>outputs</td><td>CasADi::FXInternal</td></tr>
 <tr><td>psetupB</td><td>CasADi::CVodesInternal</td></tr>

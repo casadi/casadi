@@ -13394,7 +13394,7 @@ times t_i.
 |              |              |              | consecutive  |              |
 |              |              |              | checkpoints  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| stop_at_end  | OT_BOOLEAN   | false        | Stop the     | CasADi::Sund |
+| stop_at_end  | OT_BOOLEAN   | true         | Stop the     | CasADi::Sund |
 |              |              |              | integrator   | ialsInternal |
 |              |              |              | at the end   |              |
 |              |              |              | of the       |              |
@@ -14522,7 +14522,7 @@ rx, rz and rp.
 |              |              |              | consecutive  |              |
 |              |              |              | checkpoints  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| stop_at_end  | OT_BOOLEAN   | false        | Stop the     | CasADi::Sund |
+| stop_at_end  | OT_BOOLEAN   | true         | Stop the     | CasADi::Sund |
 |              |              |              | integrator   | ialsInternal |
 |              |              |              | at the end   |              |
 |              |              |              | of the       |              |
@@ -20314,7 +20314,7 @@ Joel Andersson
 |              |              |              | consecutive  |              |
 |              |              |              | checkpoints  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| stop_at_end  | OT_BOOLEAN   | false        | Stop the     | CasADi::Sund |
+| stop_at_end  | OT_BOOLEAN   | true         | Stop the     | CasADi::Sund |
 |              |              |              | integrator   | ialsInternal |
 |              |              |              | at the end   |              |
 |              |              |              | of the       |              |
@@ -21505,7 +21505,7 @@ rx, rz and rp.
 |              |              |              | consecutive  |              |
 |              |              |              | checkpoints  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| stop_at_end  | OT_BOOLEAN   | false        | Stop the     | CasADi::Sund |
+| stop_at_end  | OT_BOOLEAN   | true         | Stop the     | CasADi::Sund |
 |              |              |              | integrator   | ialsInternal |
 |              |              |              | at the end   |              |
 |              |              |              | of the       |              |
@@ -68314,7 +68314,7 @@ Constructor. ";
 |              |              |              | consecutive  |              |
 |              |              |              | checkpoints  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| stop_at_end  | OT_BOOLEAN   | false        | Stop the     | CasADi::Sund |
+| stop_at_end  | OT_BOOLEAN   | true         | Stop the     | CasADi::Sund |
 |              |              |              | integrator   | ialsInternal |
 |              |              |              | at the end   |              |
 |              |              |              | of the       |              |
@@ -69331,7 +69331,7 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | consecutive  |              |
 |              |              |              | checkpoints  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| stop_at_end  | OT_BOOLEAN   | false        | Stop the     | CasADi::Sund |
+| stop_at_end  | OT_BOOLEAN   | true         | Stop the     | CasADi::Sund |
 |              |              |              | integrator   | ialsInternal |
 |              |              |              | at the end   |              |
 |              |              |              | of the       |              |
