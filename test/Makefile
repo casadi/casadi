@@ -24,8 +24,9 @@ unittests: unittests_py unittests_oct
 
 unittests_py:
 	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" # No memory checks
+ifdef MEMCHECK
 	python internal/test_py.py python -skipfiles="alltests.py helpers.py complexity.py speed.py" $(MEMCHECK) -passoptions="memcheck$(MEMCHECK)"
-  
+endif
 unittests_oct:
 	python internal/test_oct.py octave
 
