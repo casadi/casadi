@@ -538,6 +538,9 @@ void FXInternal::getPartition(int iind, int oind, CRSSparsity& D1, CRSSparsity& 
     // Star coloring if symmetric
     log("FXInternal::getPartition starColoring");
     D1 = A.starColoring();
+    if(verbose()){
+      cout << "Star coloring completed: " << D1.size1() << " directional derivatives needed (" << A.size2() << " without coloring)." << endl;
+    }
     
   } else {
     
