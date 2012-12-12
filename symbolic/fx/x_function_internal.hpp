@@ -530,9 +530,29 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
   // A vector used to resolve collitions between directions
   std::vector<int> hits;
   
+  // Progress
+  int progress = -10;
+  
+  // Number of sweeps
+  int nsweep_fwd = nfdir/max_nfdir;   // Number of sweeps needed for the forward mode
+  if(nfdir%max_nfdir>0) nsweep_fwd++;
+  int nsweep_adj = nadir/max_nadir;   // Number of sweeps needed for the adjoint mode
+  if(nadir%max_nadir>0) nsweep_adj++;
+  int nsweep = std::max(nsweep_fwd,nsweep_adj);
+  if(verbose())   std::cout << "XFunctionInternal::jac " << nsweep << " sweeps needed for " << nfdir << " forward and " << nadir << " adjoint directions"  << std::endl;
+  
   // Evaluate until everything has been determinated
-  while (offset_nfdir < nfdir || offset_nadir < nadir) {
-      
+  for(int s=0; s<nsweep; ++s){
+    // Print progress
+    if(verbose()){
+      int progress_new = (s*100)/nsweep;
+      // Print when entering a new decade
+      if(progress_new / 10 > progress / 10){
+        progress = progress_new;
+        std::cout << progress << " %"  << std::endl;
+      }
+    }
+    
     // Number of forward and adjoint directions in the current "batch"
     int nfdir_batch = std::min(nfdir - offset_nfdir, max_nfdir);
     int nadir_batch = std::min(nadir - offset_nadir, max_nadir);
