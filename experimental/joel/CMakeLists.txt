@@ -83,6 +83,9 @@ target_link_libraries(ticket_484 casadi ${CASADI_DEPENDENCIES})
 add_executable(ticket_491 ticket_491.cpp )
 target_link_libraries(ticket_491 casadi ${CASADI_DEPENDENCIES})
 
+add_executable(issue_548 issue_548.cpp )
+target_link_libraries(issue_548 casadi ${CASADI_DEPENDENCIES})
+
 if(WITH_LLVM)
   add_subdirectory(llvm)
 endif(WITH_LLVM)
