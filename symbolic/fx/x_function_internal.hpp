@@ -539,7 +539,7 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
     
     // Forward seeds
     fseed.resize(nfdir_batch);
-    for(int d=0; d<nfdir; ++d){
+    for(int d=0; d<nfdir_batch; ++d){
       // initialize to zero
       fseed[d].resize(getNumInputs());
       for(int ind=0; ind<fseed[offset_nfdir+d].size(); ++ind){
