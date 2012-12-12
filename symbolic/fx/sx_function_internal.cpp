@@ -914,7 +914,7 @@ void SXFunctionInternal::evalSX(const vector<SXMatrix>& arg, vector<SXMatrix>& r
                                 const vector<vector<SXMatrix> >& aseed, vector<vector<SXMatrix> >& asens,
                                 bool output_given){
 
-  if(verbose()) cout << "SXFunctionInternal::eval begin" << endl;
+  if(verbose()) cout << "SXFunctionInternal::evalSX begin" << endl;
   
   // Assert number of inputs
   casadi_assert_message(inputv_.size() == arg.size(),"Wrong number of inputs. Expecting " << inputv_.size() << ", got " << arg.size());
@@ -1054,6 +1054,7 @@ void SXFunctionInternal::evalSX(const vector<SXMatrix>& arg, vector<SXMatrix>& r
   }
 
   // Evaluate algorithm
+  if(verbose()) cout << "SXFunctionInternal::evalSX evaluating algorithm forward" << endl;
   for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
     switch(it->op){
       case OP_INPUT:
@@ -1099,6 +1100,7 @@ void SXFunctionInternal::evalSX(const vector<SXMatrix>& arg, vector<SXMatrix>& r
   if(!taping) return;
 
   // Calculate forward sensitivities
+  if(verbose()) cout << "SXFunctionInternal::evalSX calculating forward derivatives" << endl;
   for(int dir=0; dir<nfdir; ++dir){
     vector<TapeEl<SX> >::const_iterator it2 = s_pdwork.begin();
     for(vector<AlgEl>::const_iterator it = algorithm_.begin(); it!=algorithm_.end(); ++it){
@@ -1120,6 +1122,7 @@ void SXFunctionInternal::evalSX(const vector<SXMatrix>& arg, vector<SXMatrix>& r
   }
 
   // Calculate adjoint sensitivities
+  if(verbose()) cout << "SXFunctionInternal::evalSX calculating adjoint derivatives" << endl;
   if(nadir>0) fill(s_work_.begin(),s_work_.end(),0);
   for(int dir=0; dir<nadir; ++dir){
     vector<TapeEl<SX> >::const_reverse_iterator it2 = s_pdwork.rbegin();
@@ -1152,6 +1155,7 @@ void SXFunctionInternal::evalSX(const vector<SXMatrix>& arg, vector<SXMatrix>& r
       }
     }
   }
+  if(verbose()) cout << "SXFunctionInternal::evalSX end" << endl;
 }
 
 SXFunctionInternal* SXFunctionInternal::clone() const{
