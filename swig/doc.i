@@ -114,6 +114,13 @@ Joel Andersson
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -990,6 +997,13 @@ thus x := [xd,xa]
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -1628,6 +1642,13 @@ Assert that the object has been initialized. ";
 +--------------+--------------+--------------+--------------+--------------+
 | final_time   | OT_REAL      | 1            |              | CasADi::Acad |
 |              |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | hessian_appr | OT_STRING    |              |              | CasADi::Acad |
 | oximation    |              |              |              | oOCPInternal |
@@ -2370,6 +2391,13 @@ Return a string with a destription (for SWIG) ";
 +--------------+--------------+--------------+--------------+--------------+
 | final_time   | OT_REAL      | 1            |              | CasADi::Acad |
 |              |              |              |              | oOCPInternal |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | hessian_appr | OT_STRING    |              |              | CasADi::Acad |
 | oximation    |              |              |              | oOCPInternal |
@@ -3518,6 +3546,13 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -4205,6 +4240,13 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -4788,6 +4830,13 @@ Joel Andersson
 | final_time   | OT_REAL      | 1            |              | CasADi::OCPS |
 |              |              |              |              | olverInterna |
 |              |              |              |              | l            |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | integrator   | OT_INTEGRATO | GenericType( | An           | CasADi::Coll |
 |              | R            | )            | integrator   | ocationInter |
@@ -5621,6 +5670,13 @@ Joel Andersson
 |              |              |              | forward      |              |
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | hotstart     | OT_BOOLEAN   | true         | Initialize   | CasADi::Coll |
 |              |              |              | the          | ocationInteg |
@@ -6528,6 +6584,13 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | hotstart     | OT_BOOLEAN   | true         | Initialize   | CasADi::Coll |
 |              |              |              | the          | ocationInteg |
 |              |              |              | trajectory   | ratorInterna |
@@ -7259,6 +7322,13 @@ Assert that the object has been initialized. ";
 | final_time   | OT_REAL      | 1            |              | CasADi::OCPS |
 |              |              |              |              | olverInterna |
 |              |              |              |              | l            |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | integrator   | OT_INTEGRATO | GenericType( | An           | CasADi::Coll |
 |              | R            | )            | integrator   | ocationInter |
@@ -8177,6 +8247,13 @@ Joris Gillis
 | rpolation    |              |              | |linear      | rolSimulator |
 |              |              |              |              | Internal     |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | integrator   | OT_INTEGRATO | GenericType( | An           | CasADi::Cont |
 |              | R            | )            | integrator   | rolSimulator |
 |              |              |              | creator      | Internal     |
@@ -9051,6 +9128,13 @@ Joel Andersson
 | rpolation    |              |              | |linear      | rolSimulator |
 |              |              |              |              | Internal     |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | integrator   | OT_INTEGRATO | GenericType( | An           | CasADi::Cont |
 |              | R            | )            | integrator   | rolSimulator |
 |              |              |              | creator      | Internal     |
@@ -9692,6 +9776,13 @@ If H is not positive-definite, the solver should throw an error.
 |              |              |              | Default:     |              |
 |              |              |              | false        |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -10314,6 +10405,13 @@ Attila Kozma, Joel Andersson
 |              |              |              | format.      |              |
 |              |              |              | Default:     |              |
 |              |              |              | false        |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -11770,6 +11868,13 @@ therefore more expensive if A is invariant.
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -12471,6 +12576,13 @@ Solves the linear system A.x = b for x
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -13169,6 +13281,13 @@ times t_i.
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | interpolatio | OT_STRING    | \"hermite\"    | Type of inte | CasADi::Sund |
 | n_type       |              |              | rpolation    | ialsInternal |
 |              |              |              | for the      |              |
@@ -13286,7 +13405,8 @@ times t_i.
 |              |              |              | (inputs|outp | ADi::CVodesI |
 |              |              |              | uts)  (res|r | nternal      |
 |              |              |              | esB|resQB|re |              |
-|              |              |              | set|psetupB) |              |
+|              |              |              | set|psetupB| |              |
+|              |              |              | djacB)       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -13464,6 +13584,8 @@ times t_i.
 +---------+------------------------+
 |   Id    |        Used in         |
 +=========+========================+
+| djacB   | CasADi::CVodesInternal |
++---------+------------------------+
 | inputs  | CasADi::FXInternal     |
 +---------+------------------------+
 | outputs | CasADi::FXInternal     |
@@ -13478,6 +13600,17 @@ times t_i.
 +---------+------------------------+
 | reset   | CasADi::CVodesInternal |
 +---------+------------------------+
+
+>List of available stats
++-----------------+----------------------------+
+|       Id        |          Used in           |
++=================+============================+
+| augmented_stats | CasADi::IntegratorInternal |
++-----------------+----------------------------+
+| nlinsetups      | CasADi::CVodesInternal     |
++-----------------+----------------------------+
+| nsteps          | CasADi::CVodesInternal     |
++-----------------+----------------------------+
 
 C++ includes: cvodes_integrator.hpp ";
 
@@ -14297,6 +14430,13 @@ rx, rz and rp.
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | interpolatio | OT_STRING    | \"hermite\"    | Type of inte | CasADi::Sund |
 | n_type       |              |              | rpolation    | ialsInternal |
 |              |              |              | for the      |              |
@@ -14414,7 +14554,8 @@ rx, rz and rp.
 |              |              |              | (inputs|outp | ADi::CVodesI |
 |              |              |              | uts)  (res|r | nternal      |
 |              |              |              | esB|resQB|re |              |
-|              |              |              | set|psetupB) |              |
+|              |              |              | set|psetupB| |              |
+|              |              |              | djacB)       |              |
 +--------------+--------------+--------------+--------------+--------------+
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
@@ -14592,6 +14733,8 @@ rx, rz and rp.
 +---------+------------------------+
 |   Id    |        Used in         |
 +=========+========================+
+| djacB   | CasADi::CVodesInternal |
++---------+------------------------+
 | inputs  | CasADi::FXInternal     |
 +---------+------------------------+
 | outputs | CasADi::FXInternal     |
@@ -14606,6 +14749,17 @@ rx, rz and rp.
 +---------+------------------------+
 | reset   | CasADi::CVodesInternal |
 +---------+------------------------+
+
+>List of available stats
++-----------------+----------------------------+
+|       Id        |          Used in           |
++=================+============================+
+| augmented_stats | CasADi::IntegratorInternal |
++-----------------+----------------------------+
+| nlinsetups      | CasADi::CVodesInternal     |
++-----------------+----------------------------+
+| nsteps          | CasADi::CVodesInternal     |
++-----------------+----------------------------+
 
 C++ includes: cvodes_internal.hpp ";
 
@@ -15285,6 +15439,13 @@ Joel Andersson
 |              |              |              | (forward|rev |              |
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -15968,6 +16129,13 @@ Joel Andersson
 |              |              |              | (forward|rev |              |
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -16678,6 +16846,13 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -17358,6 +17533,13 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | (forward|rev |              |
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -18242,6 +18424,13 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -18956,6 +19145,13 @@ Joel Andersson
 |              |              |              | (forward|rev |              |
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -19972,7 +20168,10 @@ Joel Andersson
 |              |              |              | get          |              |
 |              |              |              | consistent   |              |
 |              |              |              | initial      |              |
-|              |              |              | conditions.  |              |
+|              |              |              | conditions   |              |
+|              |              |              | for          |              |
+|              |              |              | backwards    |              |
+|              |              |              | system.      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | cj_scaling   | OT_BOOLEAN   | false        | IDAS scaling | CasADi::Idas |
 |              |              |              | on cj for    | Internal     |
@@ -20078,6 +20277,13 @@ Joel Andersson
 |              |              |              | forward      |              |
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | init_xdot    | OT_REALVECTO | GenericType( | Initial      | CasADi::Idas |
 |              | R            | )            | values for   | Internal     |
@@ -20412,6 +20618,17 @@ Joel Andersson
 +--------------------------+----------------------+
 | rhsQB                    | CasADi::IdasInternal |
 +--------------------------+----------------------+
+
+>List of available stats
++-----------------+----------------------------+
+|       Id        |          Used in           |
++=================+============================+
+| augmented_stats | CasADi::IntegratorInternal |
++-----------------+----------------------------+
+| nlinsetups      | CasADi::IdasInternal       |
++-----------------+----------------------------+
+| nsteps          | CasADi::IdasInternal       |
++-----------------+----------------------------+
 
 C++ includes: idas_integrator.hpp ";
 
@@ -21163,7 +21380,10 @@ rx, rz and rp.
 |              |              |              | get          |              |
 |              |              |              | consistent   |              |
 |              |              |              | initial      |              |
-|              |              |              | conditions.  |              |
+|              |              |              | conditions   |              |
+|              |              |              | for          |              |
+|              |              |              | backwards    |              |
+|              |              |              | system.      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | cj_scaling   | OT_BOOLEAN   | false        | IDAS scaling | CasADi::Idas |
 |              |              |              | on cj for    | Internal     |
@@ -21269,6 +21489,13 @@ rx, rz and rp.
 |              |              |              | forward      |              |
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | init_xdot    | OT_REALVECTO | GenericType( | Initial      | CasADi::Idas |
 |              | R            | )            | values for   | Internal     |
@@ -21603,6 +21830,17 @@ rx, rz and rp.
 +--------------------------+----------------------+
 | rhsQB                    | CasADi::IdasInternal |
 +--------------------------+----------------------+
+
+>List of available stats
++-----------------+----------------------------+
+|       Id        |          Used in           |
++=================+============================+
+| augmented_stats | CasADi::IntegratorInternal |
++-----------------+----------------------------+
+| nlinsetups      | CasADi::IdasInternal       |
++-----------------+----------------------------+
+| nsteps          | CasADi::IdasInternal       |
++-----------------+----------------------------+
 
 C++ includes: idas_internal.hpp ";
 
@@ -22097,6 +22335,13 @@ Assert that the object has been initialized. ";
 |              |              |              | (forward|rev |              |
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -22799,6 +23044,13 @@ Internal class.
 |              |              |              | (forward|rev |              |
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -23656,6 +23908,13 @@ Joel Andersson
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -23789,6 +24048,13 @@ Joel Andersson
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
+
+>List of available stats
++-----------------+----------------------------+
+|       Id        |          Used in           |
++=================+============================+
+| augmented_stats | CasADi::IntegratorInternal |
++-----------------+----------------------------+
 
 C++ includes: integrator.hpp ";
 
@@ -24456,6 +24722,13 @@ Joel Andersson
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -24589,6 +24862,13 @@ Joel Andersson
 |              |              |              | for          |              |
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
+
+>List of available stats
++-----------------+----------------------------+
+|       Id        |          Used in           |
++=================+============================+
+| augmented_stats | CasADi::IntegratorInternal |
++-----------------+----------------------------+
 
 C++ includes: integrator_internal.hpp ";
 
@@ -25087,6 +25367,13 @@ Assert that the object has been initialized. ";
 |              |              |              | scalar       |              |
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
 |              |              |              | Newton       | olverInterna |
@@ -25763,6 +26050,13 @@ Joel Andersson
 |              |              |              | scalar       |              |
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
 |              |              |              | Newton       | olverInterna |
@@ -27324,6 +27618,13 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | (see IPOPT d |              |
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | False        | Flag to      | CasADi::Ipop |
+|              |              |              | indicate     | tInternal    |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gauss_newton | OT_BOOLEAN   | False        | Use Gauss    | CasADi::Ipop |
 |              |              |              | Newton       | tInternal    |
@@ -30713,6 +31014,13 @@ wrong for equality constraints. Change the 'fixed_variable_treatment' to
 |              |              |              | ocumentation |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | False        | Flag to      | CasADi::Ipop |
+|              |              |              | indicate     | tInternal    |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | gauss_newton | OT_BOOLEAN   | False        | Use Gauss    | CasADi::Ipop |
 |              |              |              | Newton       | tInternal    |
 |              |              |              | Hessian appr |              |
@@ -33592,6 +33900,13 @@ Retrieve information about variables and constraints ";
 | f_scale      | OT_REALVECTO |              |              | CasADi::Kins |
 |              | R            |              |              | olInternal   |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | iterative_so | OT_STRING    | \"gmres\"      | gmres|bcgsta | CasADi::Kins |
 | lver         |              |              | b|tfqmr      | olInternal   |
 +--------------+--------------+--------------+--------------+--------------+
@@ -34271,6 +34586,13 @@ See:   ImplicitFunction for more information
 +--------------+--------------+--------------+--------------+--------------+
 | f_scale      | OT_REALVECTO |              |              | CasADi::Kins |
 |              | R            |              |              | olInternal   |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | iterative_so | OT_STRING    | \"gmres\"      | gmres|bcgsta | CasADi::Kins |
 | lver         |              |              | b|tfqmr      | olInternal   |
@@ -35341,6 +35663,13 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
 |              |              |              | Newton       | olverInterna |
 |              |              |              | Hessian appr | l            |
@@ -36137,6 +36466,13 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | scalar       |              |
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
 |              |              |              | Newton       | olverInterna |
@@ -36985,6 +37321,13 @@ therefore more expensive if A is invariant.
 | n            |              |              |              | ckLUDenseInt |
 |              |              |              |              | ernal        |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -37694,6 +38037,13 @@ Internal class.
 | n            |              |              |              | ckLUDenseInt |
 |              |              |              |              | ernal        |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -38246,6 +38596,13 @@ therefore more expensive if A is invariant.
 |              |              |              | (forward|rev |              |
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -38948,6 +39305,13 @@ Internal class.
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -39551,6 +39915,13 @@ Joel Andersson
 |              |              |              | scalar       |              |
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
 |              |              |              | Newton       | olverInterna |
@@ -40490,6 +40861,13 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
 |              |              |              | Newton       | olverInterna |
 |              |              |              | Hessian appr | l            |
@@ -41240,6 +41618,13 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
 |              |              |              | Newton       | olverInterna |
 |              |              |              | Hessian appr | l            |
@@ -41907,6 +42292,13 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | scalar       |              |
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
 |              |              |              | Newton       | olverInterna |
@@ -42707,6 +43099,13 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -43399,6 +43798,13 @@ Internal class Solves the linear system A.x = b for x
 |              |              |              | (forward|rev |              |
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -45361,6 +45767,13 @@ Joel Andersson
 |              |              |              |              | olverInterna |
 |              |              |              |              | l            |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | integrator   | OT_INTEGRATO | GenericType( | An           | CasADi::Mult |
 |              | R            | )            | integrator   | ipleShooting |
 |              |              |              | creator      | Internal     |
@@ -46228,6 +46641,13 @@ Return a string with a destription (for SWIG) ";
 | final_time   | OT_REAL      | 1            |              | CasADi::OCPS |
 |              |              |              |              | olverInterna |
 |              |              |              |              | l            |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | integrator   | OT_INTEGRATO | GenericType( | An           | CasADi::Mult |
 |              | R            | )            | integrator   | ipleShooting |
@@ -48115,6 +48535,13 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -48865,6 +49292,13 @@ Joel Andersson
 |              |              |              | (forward|rev |              |
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -49727,6 +50161,13 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -50302,6 +50743,13 @@ Joris Gillis
 |              |              |              | (forward|rev |              |
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -51057,6 +51505,13 @@ If H is not positive-definite, the solver should throw an error.
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -51634,6 +52089,13 @@ Joris Gillis
 |              |              |              | (forward|rev |              |
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -52396,6 +52858,13 @@ Joel Andersson
 |              |              |              | scalar       |              |
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
 |              |              |              | Newton       | olverInterna |
@@ -53244,6 +53713,13 @@ Joel Andersson
 |              |              |              | scalar       |              |
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
 |              |              |              | Newton       | olverInterna |
@@ -55355,6 +55831,13 @@ Joel Andersson
 |              |              |              |              | olverInterna |
 |              |              |              |              | l            |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -56123,6 +56606,13 @@ Joel Andersson
 |              |              |              |              | olverInterna |
 |              |              |              |              | l            |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -56802,6 +57292,13 @@ If H is not positive-definite, the solver should throw an error.
 |              |              |              | setArTol to  |              |
 |              |              |              | OOQP         |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -57407,6 +57904,13 @@ reInit();
 |              |              |              | with         |              |
 |              |              |              | setArTol to  |              |
 |              |              |              | OOQP         |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -58605,6 +59109,13 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -59315,6 +59826,13 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -59945,6 +60463,13 @@ If H is not positive-definite, the solver should throw an error.
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | False        | Flag to      | CasADi::QPOa |
+|              |              |              | indicate     | sesInternal  |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | None         | Function     | CasADi::QPOa |
 | erator       | ENERATOR     |              | pointer that | sesInternal  |
 |              |              |              | returns a    |              |
@@ -60538,6 +61063,13 @@ Joris Gillis, Joel Andersson
 |              |              |              | which is     |              |
 |              |              |              | more         |              |
 |              |              |              | appropriate) |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | False        | Flag to      | CasADi::QPOa |
+|              |              |              | indicate     | sesInternal  |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | None         | Function     | CasADi::QPOa |
 | erator       | ENERATOR     |              | pointer that | sesInternal  |
@@ -61287,6 +61819,13 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -62006,6 +62545,13 @@ Internal class.
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -62672,6 +63218,13 @@ Joel Andersson
 |              |              |              | forward      |              |
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | interpolatio | OT_INTEGER   | 4            | Order of the | CasADi::RKIn |
 | n_order      |              |              | interpolatin | tegratorInte |
@@ -63502,6 +64055,13 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | forward      |              |
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | interpolatio | OT_INTEGER   | 4            | Order of the | CasADi::RKIn |
 | n_order      |              |              | interpolatin | tegratorInte |
@@ -64492,6 +65052,13 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -65221,6 +65788,13 @@ Joel Andersson
 |              |              |              | (forward|rev |              |
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -66306,6 +66880,13 @@ Assert that the object has been initialized. ";
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
 |              |              |              | Newton       | olverInterna |
 |              |              |              | Hessian appr | l            |
@@ -67081,6 +67662,13 @@ Attila Kozma, Joel Andersson and Joris Gillis
 |              |              |              | scalar       |              |
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | gauss_newton | OT_BOOLEAN   | false        | Use Gauss    | CasADi::NLPS |
 |              |              |              | Newton       | olverInterna |
@@ -68099,6 +68687,13 @@ Constructor. ";
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | interpolatio | OT_STRING    | \"hermite\"    | Type of inte | CasADi::Sund |
 | n_type       |              |              | rpolation    | ialsInternal |
 |              |              |              | for the      |              |
@@ -69115,6 +69710,13 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | forward      |              |
 |              |              |              | directional  |              |
 |              |              |              | derivatives  |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | interpolatio | OT_STRING    | \"hermite\"    | Type of inte | CasADi::Sund |
 | n_type       |              |              | rpolation    | ialsInternal |
@@ -70170,6 +70772,13 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
 |              |              |              | returns a    |              |
@@ -70972,6 +71581,13 @@ Joel Andersson
 |              |              |              | (forward|rev |              |
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -73751,6 +74367,13 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | False        | Flag to      | CasADi::Worh |
+|              |              |              | indicate     | pInternal    |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | gauss_newton | OT_BOOLEAN   | False        | Use Gauss    | CasADi::Worh |
 |              |              |              | Newton       | pInternal    |
 |              |              |              | Hessian appr |              |
@@ -75175,6 +75798,13 @@ n: number of decision variables (x)     m: number of constraints (A)
 |              |              |              | operations,  |              |
 |              |              |              | i.e. MX-> SX |              |
 +--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | False        | Flag to      | CasADi::Worh |
+|              |              |              | indicate     | pInternal    |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
 | gauss_newton | OT_BOOLEAN   | False        | Use Gauss    | CasADi::Worh |
 |              |              |              | Newton       | pInternal    |
 |              |              |              | Hessian appr |              |
@@ -76011,6 +76641,13 @@ Joel Andersson
 |              |              |              | (forward|rev |              |
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
