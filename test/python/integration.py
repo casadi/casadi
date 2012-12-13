@@ -47,7 +47,7 @@ try:
 except:
   pass
 
-integrators.append((CollocationIntegrator,["dae","ode"],{"implicit_solver":KinsolSolver,"number_of_finite_elements": 18,"startup_integrator":CVodesIntegrator}))
+integrators.append((CollocationIntegrator,["dae","ode"],{"implicit_solver":KinsolSolver,"number_of_finite_elements": 18,"startup_integrator":CVodesIntegrator, "implicit_solver_options": {"linear_solver": CSparse}}))
 #integrators.append((CollocationIntegrator,["dae","ode"],{"implicit_solver":NLPImplicitSolver,"number_of_finite_elements": 100,"startup_integrator":CVodesIntegrator,"implicit_solver_options": {"nlp_solver": IpoptSolver,"linear_solver_creator": CSparse}}))
 #integrators.append((RKIntegrator,["ode"],{"number_of_finite_elements": 1000}))
 
@@ -165,6 +165,9 @@ class Integrationtests(casadiTestCase):
     num=self.num
     tstart = ssym("tstart")
     tend = ssym("tstart")
+    
+    # simulator tests
+    N = 3
 
     
     for Integrator, features, options in integrators:
@@ -276,11 +279,12 @@ class Integrationtests(casadiTestCase):
             f = SXFunction(daeIn(**din),daeOut(**dout))
             f.init()
             
-            for k in solution.keys():
-              solution[k] = substitute(solution[k],vertcat([tstart,tend]),vertcat([tstart_,tend_]))
-            
-            fs = SXFunction(integratorIn(**solutionin),integratorOut(**solution))
+            fsa = SXFunction(integratorIn(**solutionin),[vertcat([substitute(i,vertcat([tstart,tend]),vertcat([tstart_,linspace(tstart_,tend_,N)[j]])).T for j in range(N)]) for i in integratorOut(**solution)])
+            fsa.init()
+
+            fs = SXFunction(integratorIn(**solutionin),[ substitute(i,vertcat([tstart,tend]),vertcat([tstart_,tend_])) for i in integratorOut(**solution)])
             fs.init()
+            
             
             integrator = Integrator(f,g)
             integrator.setOption(options)
@@ -330,8 +334,10 @@ class Integrationtests(casadiTestCase):
 #              message+="\nTo reproduce:\n" + reproduce
 
                 
-       
-            for ff in [fs,integrator]:
+            sim = Simulator(integrator,linspace(tstart_,tend_,N))
+            sim.init()
+              
+            for ff in [fs,integrator,sim,fsa]:
               for k,v in point.items():
                 i = getattr(casadi,('integrator_'+k).upper())
                 if not ff.input(i).empty():
@@ -339,6 +345,7 @@ class Integrationtests(casadiTestCase):
             integrator.evaluate(1,0)
             
             self.checkfx(integrator,fs,gradient=False,hessian=False,sens_der=False,digits=4,digits_sens=4,failmessage=message,verbose=False)
+            self.checkfx(sim,fsa,adj=False,gradient=False,hessian=False,sens_der=False,digits=4,digits_sens=4,failmessage="Simulator(%s) " % message,verbose=False)
 
         
   def setUp(self):
