@@ -85,6 +85,13 @@ public:
   
   /// Current Hessian approximation
   DMatrix Bk_;
+  
+  /// Print iteration header
+  void printIteration(std::ostream &stream);
+  
+  /// Print iteration
+  void printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf, 
+                      double corr_norm, double ls_param, bool ls_success, int ls_trials);
 };
 
 } // namespace CasADi
