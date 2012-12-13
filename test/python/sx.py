@@ -993,6 +993,12 @@ class SXtests(casadiTestCase):
     self.checkarray(f.output(),x0**3,"if_else sens")
     self.checkarray(f.fwdSens(),3*(-x0)**2*dx,"if_else sens")
     self.checkarray(f.adjSens(),3*(-x0)**2*dx,"if_else sens")
+    
+  def test_issue548(self):
+    x = ssym('x',100)
+    f = SXFunction([x],[sum(x)**2])
+    f.init()
+    h = f.hessian()
 
 if __name__ == '__main__':
     unittest.main()
