@@ -560,9 +560,10 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
     // Forward seeds
     fseed.resize(nfdir_batch);
     for(int d=0; d<nfdir_batch; ++d){
+      
       // initialize to zero
       fseed[d].resize(getNumInputs());
-      for(int ind=0; ind<fseed[offset_nfdir+d].size(); ++ind){
+      for(int ind=0; ind<fseed[d].size(); ++ind){
         fseed[d][ind] = MatType(input(ind).sparsity(),0);
       }
       
@@ -582,7 +583,7 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
     for(int d=0; d<nadir_batch; ++d){
       //initialize to zero
       aseed[d].resize(getNumOutputs());
-      for(int ind=0; ind<aseed[offset_nadir+d].size(); ++ind){
+      for(int ind=0; ind<aseed[d].size(); ++ind){
         aseed[d][ind] = MatType(output(ind).sparsity(),0);
       }
       
@@ -602,7 +603,7 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
     for(int d=0; d<nfdir_batch; ++d){
       // initialize to zero
       fsens[d].resize(getNumOutputs());
-      for(int oind=0; oind<fsens[offset_nfdir+d].size(); ++oind){
+      for(int oind=0; oind<fsens[d].size(); ++oind){
         fsens[d][oind] = MatType(output(oind).sparsity(),0);
       }
     }
@@ -612,7 +613,7 @@ MatType XFunctionInternal<PublicType,DerivedType,MatType,NodeType>::jac(int iind
     for(int d=0; d<nadir_batch; ++d){
       // initialize to zero
       asens[d].resize(getNumInputs());
-      for(int ind=0; ind<asens[offset_nadir+d].size(); ++ind){
+      for(int ind=0; ind<asens[d].size(); ++ind){
         asens[d][ind] = MatType(input(ind).sparsity(),0);
       }
     }
