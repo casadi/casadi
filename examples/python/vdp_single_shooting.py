@@ -28,7 +28,7 @@ tf = 10.0  # End time
 
 # Declare variables (use scalar graph)
 u  = ssym("u")    # control
-x  = ssym("x",3)  # state
+x  = ssym("x",3)  # states
 
 # ODE right hand side
 xdot = vertcat( [(1 - x[1]*x[1])*x[0] - x[1] + u, \
@@ -42,7 +42,6 @@ f = SXFunction(daeIn(x=x,p=u),daeOut(ode=xdot))
 f_d = CVodesIntegrator(f)
 f_d.setOption("abstol",1e-8) # tolerance
 f_d.setOption("reltol",1e-8) # tolerance
-f_d.setOption("steps_per_checkpoint",1000)
 f_d.setOption("tf",tf/nk) # final time
 f_d.init()
 
@@ -67,11 +66,11 @@ solver = IpoptSolver(F,G)
 solver.init()
 
 # Set bounds and initial guess
-solver.setInput(-0.75*NP.ones(nk), NLP_LBX)
-solver.setInput(1.0*NP.ones(nk), NLP_UBX)
-solver.setInput(NP.zeros(nk),NLP_X_INIT)
-solver.setInput(NP.zeros(2),NLP_LBG)
-solver.setInput(NP.zeros(2),NLP_UBG)
+solver.setInput(-0.75, NLP_LBX)
+solver.setInput( 1.,   NLP_UBX)
+solver.setInput( 0.,   NLP_X_INIT)
+solver.setInput( 0.,   NLP_LBG)
+solver.setInput( 0.,   NLP_UBG)
 
 # Solve the problem
 solver.solve()
