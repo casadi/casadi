@@ -82,12 +82,6 @@ public:
   // Collocated times
   std::vector<std::vector<double> > coll_time_;
   
-  // Collocation interpolation of output
-  FX Lfcn_;
-  
-  // Interpolation order
-  int deg_;
-  
 };
 
 } // namespace CasADi
