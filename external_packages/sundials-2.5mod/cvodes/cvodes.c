@@ -4597,6 +4597,11 @@ static int cvYddNorm(CVodeMem cv_mem, realtype hg, realtype *yddnrm)
 static int cvInitialSetup(CVodeMem cv_mem)
 {
   int ier;
+  
+  /* Shut off error control of quadrature states if there are no quadrature states
+     Avoids errors when integrating a system with forward quadratures but no backwards quadratures
+  */
+  errconQ = errconQ && N_VLength(znQ[0])>0;
 
   /* Did the user specify tolerances? */
   if (itol == CV_NN) {

@@ -168,6 +168,11 @@ realtype N_VMinQuotient(N_Vector num, N_Vector denom)
   return((realtype) num->ops->nvminquotient(num, denom));
 }
 
+long int N_VLength(N_Vector x)
+{
+  return((long int) x->ops->nvlength(x));
+}
+
 /*
  * -----------------------------------------------------------------
  * Additional functions exported by the generic NVECTOR:
