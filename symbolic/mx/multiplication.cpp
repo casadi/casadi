@@ -60,25 +60,25 @@ void Multiplication::evaluateD(const DMatrixPtrV& input, DMatrixPtrV& output, co
   int nadj = adjSeed.size();
 
   fill(output[0]->begin(),output[0]->end(),0);
-  DMatrix::mul_no_alloc(*input[0],*input[1],*output[0]);
+  DMatrix::mul_no_alloc_nt(*input[0],*input[1],*output[0]);
 
   // Forward sensitivities: dot(Z) = dot(X)*Y + X*dot(Y)
   for(int d=0; d<nfwd; ++d){
     fill(fwdSens[d][0]->begin(),fwdSens[d][0]->end(),0);
-    DMatrix::mul_no_alloc(*fwdSeed[d][0],*input[1],*fwdSens[d][0]);
-    DMatrix::mul_no_alloc(*input[0],*fwdSeed[d][1],*fwdSens[d][0]);
+    DMatrix::mul_no_alloc_nt(*fwdSeed[d][0],*input[1],*fwdSens[d][0]);
+    DMatrix::mul_no_alloc_nt(*input[0],*fwdSeed[d][1],*fwdSens[d][0]);
   }
 
   // Adjoint sensitivities
   for(int d=0; d<nadj; ++d){
-    DMatrix::mul_no_alloc1(*adjSens[d][0],*input[1],*adjSeed[d][0]);
+    DMatrix::mul_no_alloc_nn(*adjSeed[d][0],*input[1],*adjSens[d][0]);
     DMatrix::mul_no_alloc2(*input[0],*adjSens[d][1],*adjSeed[d][0]);
   }
 }
 
 void Multiplication::evaluateSX(const SXMatrixPtrV& input, SXMatrixPtrV& output, const SXMatrixPtrVV& fwdSeed, SXMatrixPtrVV& fwdSens, const SXMatrixPtrVV& adjSeed, SXMatrixPtrVV& adjSens){
   fill(output[0]->begin(),output[0]->end(),0);
-  SXMatrix::mul_no_alloc(*input[0],*input[1],*output[0]);
+  SXMatrix::mul_no_alloc_nt(*input[0],*input[1],*output[0]);
 }
 
 void Multiplication::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){

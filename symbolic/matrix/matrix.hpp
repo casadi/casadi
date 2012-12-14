@@ -463,12 +463,12 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     Matrix<T> mul(const Matrix<T> &y) const;
 
     /// Matrix product, no memory allocation: z += mul(x,y)
-    static void mul_no_alloc(const Matrix<T> &x, const Matrix<T> &y_trans, Matrix<T>& z);
+    static void mul_no_alloc_nn(const Matrix<T>& x, const Matrix<T> &y, Matrix<T>& z);
+    
+    /// Matrix product, no memory allocation: z += mul(x,trans(y))
+    static void mul_no_alloc_nt(const Matrix<T> &x, const Matrix<T> &y_trans, Matrix<T>& z);
 
-    /// Matrix product, no memory allocation: x += mul(z,trans(y))
-    static void mul_no_alloc1(Matrix<T> &x, const Matrix<T> &y_trans, const Matrix<T>& z);
-
-    /// Matrix product, no memory allocation: y += mul(trans(x),z)
+    /// Matrix product, no memory allocation: y += mul(trans(z),x)
     static void mul_no_alloc2(const Matrix<T> &x, Matrix<T> &y_trans, const Matrix<T>& z);
     
     /// Propagate sparsity using 0-1 logic through a matrix product, no memory allocation: z = mul(x,y)
