@@ -1192,7 +1192,11 @@ Matrix<T> Matrix<T>::mul(const Matrix<T> &y) const{
 
 template<class T>
 void Matrix<T>::mul_no_alloc_nn(const Matrix<T> &x, const Matrix<T> &y, Matrix<T>& z){
-
+  // Assert dimensions
+  casadi_assert(x.size1()==z.size1());
+  casadi_assert(y.size2()==z.size2());
+  casadi_assert(x.size2()==y.size1());
+  
   // Direct access to the arrays
   const std::vector<int> &x_rowind = x.rowind();
   const std::vector<int> &x_col = x.col();
@@ -1205,7 +1209,7 @@ void Matrix<T>::mul_no_alloc_nn(const Matrix<T> &x, const Matrix<T> &y, Matrix<T
   std::vector<T> &z_data = z.data();
 
   // loop over the rows of the first argument
-  for(int i=0; i<x.size1(); ++i){
+  for(int i=0; i<x_rowind.size()-1; ++i){
     for(int el=x_rowind[i]; el<x_rowind[i+1]; ++el){ // loop over the non-zeros of the first argument
       int j = x_col[el];
       int el1 = z_rowind[i];
@@ -1227,30 +1231,34 @@ void Matrix<T>::mul_no_alloc_nn(const Matrix<T> &x, const Matrix<T> &y, Matrix<T
 
 
 template<class T>
-void Matrix<T>::mul_no_alloc2(const Matrix<T> &x, Matrix<T> &y_trans, const Matrix<T>& z){
-
+void Matrix<T>::mul_no_alloc_tn(const Matrix<T>& x_trans, const Matrix<T> &y, Matrix<T> &z){
+  // Assert dimensions
+  casadi_assert(x_trans.size2()==z.size1());
+  casadi_assert(y.size2()==z.size2());
+  casadi_assert(x_trans.size1()==y.size1());
+  
   // Direct access to the arrays
-  const std::vector<T> &z_data = z.data();
-  const std::vector<int> &z_col = z.col();
+  const std::vector<int> &x_colind = x_trans.rowind();
+  const std::vector<int> &x_row = x_trans.col();
+  const std::vector<T> &x_trans_data = x_trans.data();
+  const std::vector<int> &y_rowind = y.rowind();
+  const std::vector<int> &y_col = y.col();
+  const std::vector<T> &y_data = y.data();
   const std::vector<int> &z_rowind = z.rowind();
-  const std::vector<T> &x_data = x.data();
-  const std::vector<int> &x_col = x.col();
-  std::vector<T> &y_trans_data = y_trans.data();
-  const std::vector<int> &y_row = y_trans.col();
-  const std::vector<int> &x_rowind = x.rowind();
-  const std::vector<int> &y_colind = y_trans.rowind();
+  const std::vector<int> &z_col = z.col();
+  std::vector<T> &z_data = z.data();
 
-  // loop over the row of the resulting matrix)
-  for(int i=0; i<z.size1(); ++i){
-    for(int el=z_rowind[i]; el<z_rowind[i+1]; ++el){ // loop over the non-zeros of the resulting matrix
-      int j = z_col[el];
-      int el1 = x_rowind[i];
-      int el2 = y_colind[j];
-      while(el1 < x_rowind[i+1] && el2 < y_colind[j+1]){ // loop over non-zero elements
-        int j1 = x_col[el1];
-        int i2 = y_row[el2];      
+  // loop over the columns of the first argument
+  for(int i=0; i<x_colind.size()-1; ++i){
+    for(int el=x_colind[i]; el<x_colind[i+1]; ++el){ // loop over the non-zeros of the first argument
+      int j = x_row[el];
+      int el1 = y_rowind[i];
+      int el2 = z_rowind[j];
+      while(el1 < y_rowind[i+1] && el2 < z_rowind[j+1]){ // loop over matching non-zero elements
+        int j1 = y_col[el1];
+        int i2 = z_col[el2];      
         if(j1==i2){
-          y_trans_data[el2++] += z_data[el] * x_data[el1++];
+          z_data[el2++] += x_trans_data[el] * y_data[el1++];
         } else if(j1<i2) {
           el1++;
         } else {
@@ -1263,6 +1271,11 @@ void Matrix<T>::mul_no_alloc2(const Matrix<T> &x, Matrix<T> &y_trans, const Matr
 
 template<class T>
 void Matrix<T>::mul_no_alloc_nt(const Matrix<T> &x, const Matrix<T> &y_trans, Matrix<T>& z){
+  // Assert dimensions
+  casadi_assert(x.size1()==z.size1());
+  casadi_assert(y_trans.size1()==z.size2());
+  casadi_assert(x.size2()==y_trans.size2());
+  
   // Direct access to the arrays
   const std::vector<int> &x_rowind = x.rowind();
   const std::vector<int> &x_col = x.col();
@@ -1275,6 +1288,7 @@ void Matrix<T>::mul_no_alloc_nt(const Matrix<T> &x, const Matrix<T> &y_trans, Ma
   std::vector<T> &z_data = z.data();
 
   #ifdef WITH_EIGEN3
+  // NOTE: this doesn't belong here. It should be put at some higher level. Also, is this really fast than the implementation below?
   if (x.dense() && y_trans.dense() && z.dense()) {
     Eigen::Map< const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic , Eigen::RowMajor > > X(&x_data[0],x.size1(),x.size2());
     Eigen::Map< const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic > > Y(&y_trans_data[0],y_trans.size2(),y_trans.size1());
@@ -1284,7 +1298,7 @@ void Matrix<T>::mul_no_alloc_nt(const Matrix<T> &x, const Matrix<T> &y_trans, Ma
   }
   #endif
   
-  // loop over the rows of the resulting matrix)
+  // loop over the rows of the resulting matrix
   for(int i=0; i<z_rowind.size()-1; ++i){
     for(int el=z_rowind[i]; el<z_rowind[i+1]; ++el){ // loop over the non-zeros of the resulting matrix
       int j = z_col[el];
