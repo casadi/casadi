@@ -86,6 +86,9 @@ public:
   /// Current Hessian approximation
   DMatrix Bk_;
   
+  /// Calculates inner_prod(x,mul(A,x))
+  static double quad_form(const std::vector<double>& x, const DMatrix& A);
+  
   /// Print iteration header
   void printIteration(std::ostream &stream);
   

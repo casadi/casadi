@@ -358,7 +358,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
 //    if ((norm_2(p) / norm_2(x)).at(0) > 500.){
 //      casadi_warning("Search direction has very large values, indefinite Hessian might have ouccured.");
 //    }
-    double gain = inner_prod(DMatrix(dx), mul(Bk_, DMatrix(dx))).at(0); // FIXME
+    double gain = quad_form(dx,Bk_);
     if (gain < 0){
       casadi_warning("Indefinite Hessian detected...");
     }
@@ -639,6 +639,33 @@ void SQPInternal::printIteration(std::ostream &stream, int iter, double obj, dou
   stream << (ls_success ? ' ' : 'F');
   stream << setw(w) << ls_trials;
   stream << endl;
+}
+
+double SQPInternal::quad_form(const std::vector<double>& x, const DMatrix& A){
+  // Assert dimensions
+  casadi_assert(x.size()==A.size1() && x.size()==A.size2());
+  
+  // Access the internal data of A
+  const std::vector<int> &A_rowind = A.rowind();
+  const std::vector<int> &A_col = A.col();
+  const std::vector<double> &A_data = A.data();
+  
+  // Return value
+  double ret=0;
+
+  // Loop over the rows of A
+  for(int i=0; i<x.size(); ++i){
+    // Loop over the nonzeros of A
+    for(int el=A_rowind[i]; el<A_rowind[i+1]; ++el){
+      // Get column
+      int j = A_col[el];
+      
+      // Add contribution
+      ret += x[i]*A_data[el]*x[j];
+    }
+  }
+  
+  return ret;
 }
 
 } // namespace CasADi
