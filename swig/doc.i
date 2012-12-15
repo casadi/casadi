@@ -67283,6 +67283,14 @@ Evaluate. ";
 
 Access QPSolver. ";
 
+%feature("docstring")  CasADi::SQPInternal::printIteration "
+
+Print iteration header. ";
+
+%feature("docstring")  CasADi::SQPInternal::printIteration "
+
+Print iteration. ";
+
 %feature("docstring")  CasADi::SQPInternal::reportConstraints "
 
 Prints out a human readable report about possible constraint violations -
