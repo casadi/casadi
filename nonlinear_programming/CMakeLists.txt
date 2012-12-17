@@ -6,6 +6,7 @@ SET(NONLINEAR_PROGRAMMING_SRCS
   lifted_sqp.hpp          lifted_sqp.cpp          lifted_sqp_internal.hpp   lifted_sqp_internal.cpp
   nlp_qp_solver.hpp       nlp_qp_solver.cpp       nlp_qp_internal.hpp       nlp_qp_internal.cpp
   nlp_implicit_solver.hpp nlp_implicit_solver.cpp nlp_implicit_internal.hpp nlp_implicit_internal.cpp
+  newton_implicit_solver.hpp newton_implicit_solver.cpp newton_implicit_internal.hpp newton_implicit_internal.cpp
 )
 
 if(ENABLE_STATIC)

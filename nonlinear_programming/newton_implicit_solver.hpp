@@ -20,61 +20,52 @@
  *
  */
 
-#ifndef IMPLICIT_FUNCTION_HPP
-#define IMPLICIT_FUNCTION_HPP
+#ifndef NEWTON_IMPLICIT_SOLVER_HPP
+#define NEWTON_IMPLICIT_SOLVER_HPP
 
-#include "fx.hpp"
+#include "symbolic/fx/implicit_function.hpp"
 
-namespace CasADi{
-// Forward declaration of internal class
-class ImplicitFunctionInternal;
+namespace CasADi {
+  
+  
+// Forward declaration of internal class 
+class NewtonImplicitInternal;
 
-/** 
- \defgroup ImplicitFunction_doc
+  /** \brief Implements simple newton iterations to solve an implicit function.
 
-  The equation:
-  
-  F(z, x1, x2, ..., xn) == 0
-  
-  where d_F/dz is invertable, implicitly defines the equation:
-  
-  z := G(x1, x2, ..., xn)
-  
-  
-  
-  F should be an FX mapping from (n+1) inputs to m outputs.
-  The first output is the residual that should be zero.
-  
-  ImplicitFunction (G) is an FX mapping from n inputs to m outputs. 
-  n may be zero.
-  The first output is the solved for z.
-  
-  You can provide an initial guess for z by setting output(0) of ImplicitFunction.
-  
-
-*/
-/**
-Abstract base class for the implicit function classes
-
-@copydoc ImplicitFunction_doc
-
-\author Joel Andersson
-\date 2011
-*/
-class ImplicitFunction : public FX{
+   @copydoc ImplicitFunction_doc
+      
+   \author Joris Gillis
+   \date 2012
+  */
+class NewtonImplicitSolver : public ImplicitFunction {
 public:
-  
-  /// Access functions of the node
-  ImplicitFunctionInternal* operator->();
 
-  /// Const access functions of the node
-  const ImplicitFunctionInternal* operator->() const;
+  /** \brief  Default constructor */
+  NewtonImplicitSolver();
+  
+  explicit NewtonImplicitSolver(const FX& f, int nrhs=1);
+  
+  /** \brief  Access functions of the node */
+  NewtonImplicitInternal* operator->();
+  const NewtonImplicitInternal* operator->() const;
 
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
+  
+  /// Static creator function
+  #ifdef SWIG
+  %callback("%s_cb");
+  #endif
+  static ImplicitFunction creator(const FX& f){ return NewtonImplicitSolver(f);}
+  #ifdef SWIG
+  %nocallback;
+  #endif
+
 };
+
 
 } // namespace CasADi
 
-#endif //IMPLICIT_FUNCTION_HPP
+#endif //NEWTON_IMPLICIT_SOLVER_HPP
 

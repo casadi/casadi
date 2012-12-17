@@ -30,6 +30,7 @@ using namespace std;
 namespace CasADi{
 
 KinsolInternal::KinsolInternal(const FX& f, int nrhs) : ImplicitFunctionInternal(f,nrhs){
+  addOption("abstol",                      OT_REAL,1e-6,"Stopping criterion tolerance");
   addOption("linear_solver_type",       OT_STRING, "dense","dense|banded|iterative|user_defined");
   addOption("upper_bandwidth",          OT_INTEGER);
   addOption("lower_bandwidth",          OT_INTEGER);

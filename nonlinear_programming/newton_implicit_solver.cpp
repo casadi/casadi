@@ -20,20 +20,30 @@
  *
  */
 
-%{
-#include "nonlinear_programming/symbolic_nlp.hpp"
-#include "nonlinear_programming/sqp_method.hpp"
-#include "nonlinear_programming/ip_method.hpp"
-#include "nonlinear_programming/lifted_sqp.hpp"
-#include "nonlinear_programming/nlp_qp_solver.hpp"
-#include "nonlinear_programming/nlp_implicit_solver.hpp"
-#include "nonlinear_programming/newton_implicit_solver.hpp"
-%}
+#include "newton_implicit_internal.hpp"
+#include "newton_implicit_solver.hpp"
 
-%include "nonlinear_programming/symbolic_nlp.hpp"
-%include "nonlinear_programming/sqp_method.hpp"
-%include "nonlinear_programming/ip_method.hpp"
-%include "nonlinear_programming/lifted_sqp.hpp"
-%include "nonlinear_programming/nlp_qp_solver.hpp"
-%include "nonlinear_programming/nlp_implicit_solver.hpp"
-%include "nonlinear_programming/newton_implicit_solver.hpp"
+using namespace std;
+namespace CasADi{
+
+NewtonImplicitSolver::NewtonImplicitSolver(){ 
+}
+
+NewtonImplicitSolver::NewtonImplicitSolver(const FX& f, int nrhs)  {
+  assignNode(new NewtonImplicitInternal(f,nrhs));
+}
+
+NewtonImplicitInternal* NewtonImplicitSolver::operator->(){
+  return (NewtonImplicitInternal*)(FX::operator->());
+}
+
+const NewtonImplicitInternal* NewtonImplicitSolver::operator->() const{
+  return (const NewtonImplicitInternal*)(FX::operator->());
+
+}
+
+bool NewtonImplicitSolver::checkNode() const{
+  return dynamic_cast<const NewtonImplicitInternal*>(get());
+}
+
+} // namespace CasADi
