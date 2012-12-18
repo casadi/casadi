@@ -80,7 +80,11 @@ class ImplicitFunctionInternal : public FXInternal{
     // Linear solver
     LinearSolver linsol_; 
   protected:
-    void evaluate_sens(int nfdir, int nadir);
+  
+    /** Calculate sensitivities of implicit solver
+    * \param linsol_prepared may specify that the linear solver is already prepared with the Jacobian
+    */
+    void evaluate_sens(int nfdir, int nadir, bool linsol_prepared=false);
 };
 
 

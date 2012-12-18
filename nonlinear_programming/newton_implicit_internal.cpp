@@ -122,7 +122,7 @@ void NewtonImplicitInternal::evaluate(int nfdir, int nadir) {
   if(nfdir==0 && nadir==0)
     return;
   
-  evaluate_sens(nfdir,nadir);
+  evaluate_sens(nfdir,nadir,true);
 
 }
 

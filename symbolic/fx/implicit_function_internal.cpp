@@ -86,24 +86,39 @@ void ImplicitFunctionInternal::init(){
   
 }
 
-void ImplicitFunctionInternal::evaluate_sens(int nfdir, int nadir) {
+void ImplicitFunctionInternal::evaluate_sens(int nfdir, int nadir, bool linsol_prepared) {
   // Make sure that a linear solver has been provided
   casadi_assert_message(!linsol_.isNull(),"Sensitivities of an implicit function requires a provided linear solver");
   casadi_assert_message(!J_.isNull(),"Sensitivities of an implicit function requires an exact Jacobian");
+  
+  
+  // General scheme:  f(z,x_i) = 0
+  //
+  //  Forward sensitivities:
+  //     dot(f(z,x_i)) = 0
+  //     df/dz dot(z) + Sum_i df/dx_i dot(x_i) = 0
+  //
+  //     dot(z) = [df/dz]^(-1) [ Sum_i df/dx_i dot(x_i) ] 
+  //
+  //     dot(y_i) = dy_i/dz dot(z) + Sum_j dy_i/dx_i dot(x_i)
+  //
+  //  Adjoint sensitivitites:
 
-  // Pass inputs
-  J_.setInput(output(),0);
-  for(int i=0; i<getNumInputs(); ++i)
-    J_.setInput(input(i),i+1);
+  if (!linsol_prepared) {
+    // Pass inputs
+    J_.setInput(output(),0);
+    for(int i=0; i<getNumInputs(); ++i)
+      J_.setInput(input(i),i+1);
 
-  // Evaluate jacobian
-  J_.evaluate();
+    // Evaluate jacobian
+    J_.evaluate();
 
-  // Pass non-zero elements, scaled by -gamma, to the linear solver
-  linsol_.setInput(J_.output(),0);
+    // Pass non-zero elements, scaled by -gamma, to the linear solver
+    linsol_.setInput(J_.output(),0);
 
-  // Prepare the solution of the linear system (e.g. factorize)
-  linsol_.prepare();
+    // Prepare the solution of the linear system (e.g. factorize)
+    linsol_.prepare();
+  }
   
   // Pass inputs to function
   f_.setInput(output(0),0);
