@@ -22306,6 +22306,27 @@ Assert that the object has been initialized. ";
 // File: classCasADi_1_1ImplicitFunction.xml
 %feature("docstring") CasADi::ImplicitFunction "
 
+Abstract base class for the implicit function classes
+
+The equation:
+
+F(z, x1, x2, ..., xn) == 0
+
+where d_F/dz is invertable, implicitly defines the equation:
+
+z := G(x1, x2, ..., xn)
+
+F should be an FX mapping from (n+1) inputs to m outputs. The first output
+is the residual that should be zero.
+
+ImplicitFunction (G) is an FX mapping from n inputs to m outputs. n may be
+zero. The first output is the solved for z.
+
+You can provide an initial guess for z by setting output(0) of
+ImplicitFunction.
+
+Joel Andersson
+
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
@@ -34510,8 +34531,6 @@ Assert that the object has been initialized. ";
 
 Kinsol solver class.
 
-Abstract base class for the implicit function classes
-
 The equation:
 
 F(z, x1, x2, ..., xn) == 0
@@ -34520,19 +34539,16 @@ where d_F/dz is invertable, implicitly defines the equation:
 
 z := G(x1, x2, ..., xn)
 
-F should be an FX mapping from (n+1) inputs to 1 output. ImplicitFunction
-(G) is an FX mapping from n inputs to 1 output.
+F should be an FX mapping from (n+1) inputs to m outputs. The first output
+is the residual that should be zero.
 
-n may be zero.
+ImplicitFunction (G) is an FX mapping from n inputs to m outputs. n may be
+zero. The first output is the solved for z.
 
 You can provide an initial guess for z by setting output(0) of
-ImplicitFunction.
-
-Joel Andersson
-
-You can provide an initial guess by setting output(0).  A good initial guess
-may be needed to avoid errors like \"The linear solver's setup function
-failed in an unrecoverable manner.\"
+ImplicitFunction.  You can provide an initial guess by setting output(0).  A
+good initial guess may be needed to avoid errors like \"The linear solver's
+setup function failed in an unrecoverable manner.\"
 
 The constraints option expects an integer entry for each variable u:
 
@@ -50106,12 +50122,10 @@ Check if smooth. ";
 %feature("docstring")  CasADi::NanSX::mark "";
 
 
-// File: classCasADi_1_1NLPImplicitInternal.xml
-%feature("docstring") CasADi::NLPImplicitInternal "
+// File: classCasADi_1_1NewtonImplicitInternal.xml
+%feature("docstring") CasADi::NewtonImplicitInternal "
 
-Internal class for NLPImplicitInternal.
-
-Abstract base class for the implicit function classes
+Internal class for NewtonImplicitInternal.
 
 The equation:
 
@@ -50121,15 +50135,964 @@ where d_F/dz is invertable, implicitly defines the equation:
 
 z := G(x1, x2, ..., xn)
 
-F should be an FX mapping from (n+1) inputs to 1 output. ImplicitFunction
-(G) is an FX mapping from n inputs to 1 output.
+F should be an FX mapping from (n+1) inputs to m outputs. The first output
+is the residual that should be zero.
 
-n may be zero.
+ImplicitFunction (G) is an FX mapping from n inputs to m outputs. n may be
+zero. The first output is the solved for z.
 
 You can provide an initial guess for z by setting output(0) of
 ImplicitFunction.
 
-Joel Andersson
+C++ includes: newton_implicit_internal.hpp ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::getHessian "";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::getGradient "";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::getJacobian "";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::derivative "
+
+Return function that calculates forward derivatives This method returns a
+cached instance if available, and calls FX getDerivative(int nfwd, int nadj)
+if no cached version is available. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::getDerivative "
+
+Constructs and returns a function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::input "";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::input "";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::input "";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::inputNoCheck "";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::inputNoCheck "";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::output "
+
+Access output argument. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::output "";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::outputNoCheck "";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::outputNoCheck "";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::fwdSeed "";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::fwdSeedNoCheck "";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::fwdSeedNoCheck "";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::fwdSens "";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::fwdSensNoCheck "";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::fwdSensNoCheck "";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::adjSeed "";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::adjSeedNoCheck "";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::adjSeedNoCheck "";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::adjSens "";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::adjSensNoCheck "";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::adjSensNoCheck "";
+
+%feature("docstring")
+CasADi::NewtonImplicitInternal::NewtonImplicitInternal "
+
+Constructor. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::clone "
+
+Clone. ";
+
+%feature("docstring")
+CasADi::NewtonImplicitInternal::NewtonImplicitInternal "
+
+Create a new Solver. ";
+
+%feature("docstring")
+CasADi::NewtonImplicitInternal::~NewtonImplicitInternal "
+
+Destructor. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::init "
+
+Initialize. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::evaluate "
+
+Solve the system of equations. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::create "
+
+Create a new ImplicitFunctionInternal. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::jac "
+
+Generate a linear solver for the sensitivity equations. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::jac "
+
+Generate a linear solver for the sensitivity equations. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::requestNumSens "
+
+Request a number of forward/adjoint derivative directions. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::spInit "
+
+Reset the sparsity propagation. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::evalSX "
+
+Evaluate symbolically, SX type. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::evalMX "
+
+Evaluate symbolically, MX type. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::call "
+
+Call a function, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::call "
+
+Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::iStruct "
+
+Access an input. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::iStruct "
+
+Const access an input. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::oStruct "
+
+Access an output. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::oStruct "
+
+Const access an output. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::print "
+
+Print. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::repr "
+
+Print. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::getPartition "
+
+Get the unidirectional or bidirectional partition. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::verbose "
+
+Verbose mode? ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::monitored "
+
+Is function fcn being monitored. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::setNumInputs "
+
+Set the number of function inputs. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::setNumOutputs "
+
+Set the number of function outputs. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::getNumInputs "
+
+Get the number of function inputs. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::getNumOutputs "
+
+Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::getStat "
+
+Get single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::getJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::log "
+
+Log the status of the solver. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::log "
+
+Log the status of the solver, function given. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::setOption "
+
+set an option. The setOptions are in general only considered before the init
+function, if any. If properties changes, the init function should be called
+again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::setOption "
+
+set a set of options. The setOptions are in general only considered before
+the init function, if any. If properties changes, the init function should
+be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::getOptionDescription
+"
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::deepCopyMembers "
+
+Deep copy data members. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::assertInit "
+
+Assert that the object has been initialized. ";
+
+
+// File: classCasADi_1_1NewtonImplicitSolver.xml
+%feature("docstring") CasADi::NewtonImplicitSolver "
+
+Implements simple newton iterations to solve an implicit function.
+
+The equation:
+
+F(z, x1, x2, ..., xn) == 0
+
+where d_F/dz is invertable, implicitly defines the equation:
+
+z := G(x1, x2, ..., xn)
+
+F should be an FX mapping from (n+1) inputs to m outputs. The first output
+is the residual that should be zero.
+
+ImplicitFunction (G) is an FX mapping from n inputs to m outputs. n may be
+zero. The first output is the solved for z.
+
+You can provide an initial guess for z by setting output(0) of
+ImplicitFunction.
+
+Joris Gillis
+
+C++ includes: newton_implicit_solver.hpp ";
+
+/*  Setters  */
+
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
+
+*/
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::setInput "
+
+Reads in the input argument from val. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::setOutput "
+
+Reads in the output argument from val. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::setFwdSeed "
+
+Reads in the forward seed from val. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::setFwdSens "
+
+Reads in the forward sensitivity from val. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::setAdjSeed "
+
+Reads in the adjoint seed from val. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::setAdjSens "
+
+Reads in the adjoint sensitivity from val. ";
+
+/*  Getters  */
+
+/* A group of accessor for numerical data that operate on preallocated data.
+get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
+
+*/
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::getInput "
+
+Writes out the input argument into val. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::getOutput "
+
+Writes out the output argument into val. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::getFwdSeed "
+
+Writes out the forward seed into val. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::getFwdSens "
+
+Writes out the forward sensitivity into val. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::getAdjSeed "
+
+Writes out the adjoint seed into val. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::getAdjSens "
+
+Writes out the adjoint sensitivity into val. ";
+
+/*  Option Functionality  */
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::setOption "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::setOption "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::makeUnique "
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::makeUnique "";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::NewtonImplicitSolver "
+
+Default constructor. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::NewtonImplicitSolver "";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::checkNode "
+
+Check if the node is pointing to the right type of object. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::getNumInputs "
+
+Get number of inputs. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::getNumOutputs "
+
+Get number of outputs. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::setNumInputs "
+
+Set number of inputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::setNumOutputs "
+
+Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::solve "
+
+the same as evaluate(0,0) ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::jacobian "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::hessian "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::call "
+
+Create a function call (single input) ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::call "
+
+Create a function call ( MX graph) ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::call "
+
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::call "
+
+Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
+be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::eval "
+
+evaluate symbolically, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::eval "
+
+evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::eval "
+
+Evaluate symbolically with with directional derivatives, SX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::eval "
+
+Evaluate symbolically with with directional derivatives, MX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::eval "
+
+evaluate symbolically, single input, single output ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::evalMX "
+
+evaluate symbolically, MX type (unambiguous) ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::evalMX "
+
+Evaluate symbolically with with directional derivatives, MX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::evalSX "
+
+evaluate symbolically, SX type (unambiguous) ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::evalSX "
+
+Evaluate symbolically with with directional derivatives, SX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::indexed_one_based "";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::indexed_zero_based "";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::output "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::output "
+
+Access output argument Note that copies in Python are shallow by default and
+fx.output() gives a reference/pointer to an internal data structure. So if
+you want save fx.output(), you need to make a deep copy using for example
+DMatrix(fx.output()). ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::fwdSeed "
+
+Const access forward seed. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::fwdSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::adjSeed "
+
+Const access adjoint seed. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::adjSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::getStat "
+
+Get a single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::addMonitor "
+
+Add modules to be monitored. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::removeMonitor "
+
+Remove modules to be monitored. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::clone "
+
+Deep copy. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::assignNode "
+
+Assign the node to a node class pointer (or null) ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::assignNodeNoCount "
+
+Assign the node to a node class pointer without reference counting: inproper
+use will cause memory leaks! ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::get "
+
+Get a const pointer to the node. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::get "
+
+Get a pointer to the node. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::swap "
+
+Swap content with another instance. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::repr "
+
+Print a representation of the object. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::print "
+
+Print a destription of the object. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::init "
+
+Initialize the object: more documentation in the node class (
+SharedObjectNode and derived classes) ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::isInit "
+
+Is initialized? ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::assertInit "
+
+Assert that it is initialized. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::isNull "
+
+Is a null pointer? ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::getRepresentation "
+
+Return a string with a representation (for SWIG) ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::getDescription "
+
+Return a string with a destription (for SWIG) ";
+
+
+// File: classCasADi_1_1NLPImplicitInternal.xml
+%feature("docstring") CasADi::NLPImplicitInternal "
+
+Internal class for NLPImplicitInternal.
+
+The equation:
+
+F(z, x1, x2, ..., xn) == 0
+
+where d_F/dz is invertable, implicitly defines the equation:
+
+z := G(x1, x2, ..., xn)
+
+F should be an FX mapping from (n+1) inputs to m outputs. The first output
+is the residual that should be zero.
+
+ImplicitFunction (G) is an FX mapping from n inputs to m outputs. n may be
+zero. The first output is the solved for z.
+
+You can provide an initial guess for z by setting output(0) of
+ImplicitFunction.
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -50692,8 +51655,6 @@ Assert that the object has been initialized. ";
 
 Use an NLPSolver as ImplicitFunction solver.
 
-Abstract base class for the implicit function classes
-
 The equation:
 
 F(z, x1, x2, ..., xn) == 0
@@ -50702,15 +51663,14 @@ where d_F/dz is invertable, implicitly defines the equation:
 
 z := G(x1, x2, ..., xn)
 
-F should be an FX mapping from (n+1) inputs to 1 output. ImplicitFunction
-(G) is an FX mapping from n inputs to 1 output.
+F should be an FX mapping from (n+1) inputs to m outputs. The first output
+is the residual that should be zero.
 
-n may be zero.
+ImplicitFunction (G) is an FX mapping from n inputs to m outputs. n may be
+zero. The first output is the solved for z.
 
 You can provide an initial guess for z by setting output(0) of
 ImplicitFunction.
-
-Joel Andersson
 
 Joris Gillis
 
@@ -79381,6 +80341,8 @@ Get a lower bounds. ";
 
 Get the initial guess. ";
 
+%feature("docstring")  CasADi::Xk_update "";
+
 
 // File: namespaceIpopt.xml
 
@@ -80431,6 +81393,18 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: mx__tools_8hpp.xml
+
+
+// File: newton__implicit__internal_8cpp.xml
+
+
+// File: newton__implicit__internal_8hpp.xml
+
+
+// File: newton__implicit__solver_8cpp.xml
+
+
+// File: newton__implicit__solver_8hpp.xml
 
 
 // File: nlp__implicit__internal_8cpp.xml

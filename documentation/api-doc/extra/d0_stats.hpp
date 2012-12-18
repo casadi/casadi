@@ -126,6 +126,24 @@
 <tr><td>nsteps</td><td>CasADi::IdasInternal</td></tr>
 </table>
 */
+/** \class CasADi::NewtonImplicitInternal
+\n
+\par
+<table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>iter</td><td>CasADi::NewtonImplicitInternal</td></tr>
+</table>
+*/
+/** \class CasADi::NewtonImplicitSolver
+\n
+\par
+<table>
+<caption>List of available stats</caption>
+<tr><th>Id</th><th>Used in</th></tr>
+<tr><td>iter</td><td>CasADi::NewtonImplicitInternal</td></tr>
+</table>
+*/
 /** \class CasADi::IntegratorInternal
 \n
 \par
