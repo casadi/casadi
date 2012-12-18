@@ -49,7 +49,7 @@ void ParallelizerInternal::init(){
   } else if(getOption("parallelization")=="mpi") {
     mode_ = MPI;
   } else {
-    throw CasadiException(string("Parallelization mode: ")+getOption("parallelization").toString());
+    casadi_error("Parallelization mode " << getOption("parallelization") << " unknown.");
   }
 
   // Switch to serial mode if OPENMP is not supported
