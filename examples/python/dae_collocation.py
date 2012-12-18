@@ -377,14 +377,24 @@ Obj = 0
 [obj] = MayerTerm.call([0., XD[k][i][j], XA[k][i][j-1], U[k], P])
 Obj += obj
 
-#Implement Lagrange term
+# Implement Lagrange term
+lDotAtTauRoot = C.T
+lAtOne = D
+
+ldInv = np.linalg.inv(lDotAtTauRoot[1:,1:])
+ld0 = lDotAtTauRoot[1:,0]
+lagrangeTerm = 0
 for k in range(nk):
     for i in range(nicp):
-        # For all collocation points
-        for j in range(1,deg+1):
-            [obj] = LagrangeTerm.call([0., XD[k][i][j], XA[k][i][j-1], U[k], P])
-            Obj += obj
+        dQs = h*veccat([LagrangeTerm.call([0., XD[k][i][j], XA[k][i][j-1], U[k], P])[0] \
+                        for j in range(1,deg+1)])
+        Qs = mul( ldInv, dQs)
+        m = mul( Qs.T, lAtOne[1:])
+        lagrangeTerm += m
 
+Obj += lagrangeTerm        
+
+# objective function
 ofcn = MXFunction([V], [Obj])
 
 
