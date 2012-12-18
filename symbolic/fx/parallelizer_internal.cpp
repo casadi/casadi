@@ -134,7 +134,7 @@ void ParallelizerInternal::evaluate(int nfdir, int nadir){
     int cnt=0;
     #pragma omp parallel for firstprivate(cnt)
     for(int task=0; task<funcs_.size(); ++task) {
-      if (task==0) {
+      if (gather_stats_ && task==0) {
         stats_["max_threads"] = omp_get_max_threads();
         stats_["num_threads"] = omp_get_num_threads();
       }
@@ -148,25 +148,28 @@ void ParallelizerInternal::evaluate(int nfdir, int nadir){
       task_cputime[task] =  task_endtime[task] - task_starttime[task];
       task_order[task] = cnt++;
     }
-    stats_["task_allocation"] = task_allocation;
-    stats_["task_order"] = task_order;
-    stats_["task_cputime"] = task_cputime;
-    
+    if (gather_stats_) {
+      stats_["task_allocation"] = task_allocation;
+      stats_["task_order"] = task_order;
+      stats_["task_cputime"] = task_cputime;
+    }
     // Measure all times relative to the earliest start_time.
     double start = *std::min_element(task_starttime.begin(),task_starttime.end());
     for (int task=0; task<funcs_.size(); ++task) {
       task_starttime[task] =  task_starttime[task] - start;
       task_endtime[task] = task_endtime[task] - start;
     }
-    stats_["task_starttime"] = task_starttime;
-    stats_["task_endtime"] = task_endtime;
+    if (gather_stats_) {
+      stats_["task_starttime"] = task_starttime;
+      stats_["task_endtime"] = task_endtime;
+    }
     
     #endif //WITH_OPENMP
     #ifndef WITH_OPENMP
-      throw CasadiException("ParallelizerInternal::evaluate: OPENMP support was not available during CasADi compilation");
+      casadi_error("ParallelizerInternal::evaluate: OPENMP support was not available during CasADi compilation");
     #endif //WITH_OPENMP
   } else if(mode_ == MPI){
-    throw CasadiException("ParallelizerInternal::evaluate: MPI not implemented");
+    casadi_error("ParallelizerInternal::evaluate: MPI not implemented");
   }
   first_call_ = false;
 }
