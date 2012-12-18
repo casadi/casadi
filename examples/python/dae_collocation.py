@@ -85,8 +85,8 @@ tau = ssym("tau")
 tau_root = collocation_points[cp][deg]
 T = np.zeros((nk,deg+1))
 for i in range(nk):
-  for j in range(deg+1):
-	T[i][j] = h*(i + tau_root[j])
+    for j in range(deg+1):
+        T[i][j] = h*(i + tau_root[j])
 
 # For all collocation points: eq 10.4 or 10.17 in Biegler's book
 # Construct Lagrange polynomials to get the polynomial basis at the collocation point
@@ -319,7 +319,7 @@ ubg.append(ic_max)
 for k in range(nk):
     for i in range(nicp):
         # For all collocation points
-        for j in range(1,deg+1):   		
+        for j in range(1,deg+1):                
             # Get an expression for the state derivative at the collocation point
             xp_jk = 0
             for j2 in range (deg+1):
