@@ -184,6 +184,11 @@ void ParallelizerInternal::evaluateTask(int task, int nfdir, int nadir){
     fcn.input(j-inind_[task]).set(input(j));
   }
   
+  // Copy outputs to functions (outputs are sometimes used for initialization)
+  for(int j=outind_[task]; j<outind_[task+1]; ++j){
+    fcn.output(j-outind_[task]).set(output(j));
+  }
+  
   // Copy forward seeds
   for(int dir=0; dir<nfdir; ++dir){
     for(int j=inind_[task]; j<inind_[task+1]; ++j){
