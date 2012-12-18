@@ -30,8 +30,13 @@ namespace CasADi {
 
 NewtonImplicitInternal* NewtonImplicitInternal::clone() const{
   // Return a deep copy
-  NewtonImplicitInternal* node = new NewtonImplicitInternal(f_,nrhs_);
-  if(!node->is_init_)
+  FX f = shared_cast<FX>(f_.clone());
+  NewtonImplicitInternal* node = new NewtonImplicitInternal(f,nrhs_);
+  node->setOption(dictionary());
+  node->J_ = shared_cast<FX>(J_.clone());
+  node->linsol_ = shared_cast<LinearSolver>(linsol_.clone());
+  
+  if(isInit())
     node->init();
   return node;
 }

@@ -30,8 +30,13 @@ namespace CasADi {
 
 NLPImplicitInternal* NLPImplicitInternal::clone() const{
   // Return a deep copy
-  NLPImplicitInternal* node = new NLPImplicitInternal(f_,nrhs_);
-  if(!node->is_init_)
+  FX f = shared_cast<FX>(f_.clone());
+  NLPImplicitInternal* node = new NLPImplicitInternal(f,nrhs_);
+  node->setOption(dictionary());
+  node->J_= shared_cast<FX>(J_.clone());
+  node->linsol_ =shared_cast<LinearSolver>(linsol_.clone());
+  
+  if(isInit())
     node->init();
   return node;
 }
