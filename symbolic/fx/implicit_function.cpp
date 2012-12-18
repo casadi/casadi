@@ -37,6 +37,11 @@ bool ImplicitFunction::checkNode() const{
   return dynamic_cast<const ImplicitFunctionInternal*>(get())!=0;
 }
 
+FX ImplicitFunction::getF() const {
+  casadi_assert(checkNode());
+  return (*this)->f_;
+}
+
 
 } // namespace CasADi
 
