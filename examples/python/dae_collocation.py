@@ -85,8 +85,8 @@ tau = ssym("tau")
 tau_root = collocation_points[cp][deg]
 T = np.zeros((nk,deg+1))
 for i in range(nk):
-  for j in range(deg+1):
-	T[i][j] = h*(i + tau_root[j])
+    for j in range(deg+1):
+        T[i][j] = h*(i + tau_root[j])
 
 # For all collocation points: eq 10.4 or 10.17 in Biegler's book
 # Construct Lagrange polynomials to get the polynomial basis at the collocation point
@@ -319,7 +319,7 @@ ubg.append(ic_max)
 for k in range(nk):
     for i in range(nicp):
         # For all collocation points
-        for j in range(1,deg+1):   		
+        for j in range(1,deg+1):                
             # Get an expression for the state derivative at the collocation point
             xp_jk = 0
             for j2 in range (deg+1):
@@ -377,14 +377,24 @@ Obj = 0
 [obj] = MayerTerm.call([0., XD[k][i][j], XA[k][i][j-1], U[k], P])
 Obj += obj
 
-#Implement Lagrange term
+# Implement Lagrange term
+lDotAtTauRoot = C.T
+lAtOne = D
+
+ldInv = np.linalg.inv(lDotAtTauRoot[1:,1:])
+ld0 = lDotAtTauRoot[1:,0]
+lagrangeTerm = 0
 for k in range(nk):
     for i in range(nicp):
-        # For all collocation points
-        for j in range(1,deg+1):
-            [obj] = LagrangeTerm.call([0., XD[k][i][j], XA[k][i][j-1], U[k], P])
-            Obj += obj
+        dQs = h*veccat([LagrangeTerm.call([0., XD[k][i][j], XA[k][i][j-1], U[k], P])[0] \
+                        for j in range(1,deg+1)])
+        Qs = mul( ldInv, dQs)
+        m = mul( Qs.T, lAtOne[1:])
+        lagrangeTerm += m
 
+Obj += lagrangeTerm        
+
+# objective function
 ofcn = MXFunction([V], [Obj])
 
 
