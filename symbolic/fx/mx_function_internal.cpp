@@ -82,6 +82,7 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv, const std:
         n->init();
         
         // Create a new variable
+        rep_name.str("");
         rep_name.clear();
         rep_name << "r_" << ind;
         MX new_var = msym(rep_name.str(),n->sparsity());
