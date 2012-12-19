@@ -93,6 +93,21 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv, const std:
           // Variable to be replaced
           MX v_dep = n->dep(iind);
           casadi_assert_message(v_dep.isSymbolic(),"Mapping inputs may only map to symbolic variables.");
+
+          // Check if variable exists already in the list of to-be-replaced-variables
+          bool exists = false;
+          for (int i=0;i<v.size();++i) {
+            if (v[i].get() == v_dep.get()) {
+              exists = true;
+              break;
+            }
+          }
+          if (!exists) {
+            // Save variable to list of variables to be replaced
+            v.push_back(v_dep);
+            vdef.push_back(MX::create(new Mapping(v_dep.sparsity())));
+          }
+          MX &vdef_dep = vdef.back();
           
           // Express this variable in terms of the new variable
           const vector<pair<int,int> >& assigns = n->index_output_sorted_[0][iind];
@@ -102,19 +117,21 @@ MXFunctionInternal::MXFunctionInternal(const std::vector<MX>& inputv, const std:
             inz.push_back(it_ass->second);
             onz.push_back(it_ass->first);
           }
-          MX vdef_dep = MX::create(new Mapping(v_dep.sparsity()));
+          // TODO: error if onz is already taken
           vdef_dep->assign(new_var,inz,onz);
-          
-          // Save variable to list of variables to be replaced
-          v.push_back(v_dep);
-          vdef.push_back(vdef_dep);
+
+
         }
-        
         // Replace variable
         *it = new_var;
       }
     }
     
+    casadi_assert(v.size()==vdef.size());
+    for (int i=0;i<v.size();++i) {
+       std::cout << v[i] << " -> " << vdef[i] << std::endl;
+    }
+
     // Replace expressions
     outputv_ = substitute(outputv_,v,vdef);
   }
