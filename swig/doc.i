@@ -22331,10 +22331,6 @@ Joel Andersson
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| abstol       | OT_REAL      | 0.000        | Stopping     | CasADi::Impl |
-|              |              |              | criterion    | icitFunction |
-|              |              |              | tolerance    | Internal     |
-+--------------+--------------+--------------+--------------+--------------+
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
@@ -22412,18 +22408,6 @@ Joel Andersson
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| nlp_solver   | OT_NLPSOLVER | GenericType( | The          | CasADi::Impl |
-|              |              | )            | NLPSolver    | icitFunction |
-|              |              |              | used to      | Internal     |
-|              |              |              | solve the    |              |
-|              |              |              | implicit     |              |
-|              |              |              | system.      |              |
-+--------------+--------------+--------------+--------------+--------------+
-| nlp_solver_o | OT_DICTIONAR | GenericType( | Options to   | CasADi::Impl |
-| ptions       | Y            | )            | be passed to | icitFunction |
-|              |              |              | the          | Internal     |
-|              |              |              | NLPSolver    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
 | j_dir        |              |              | adjoint      | ternal       |
@@ -22627,6 +22611,10 @@ point to this new object. ";
 %feature("docstring")  CasADi::ImplicitFunction::checkNode "
 
 Check if the node is pointing to the right type of object. ";
+
+%feature("docstring")  CasADi::ImplicitFunction::getF "
+
+Access F. ";
 
 %feature("docstring")  CasADi::ImplicitFunction::getNumInputs "
 
@@ -23040,10 +23028,6 @@ Internal class.
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| abstol       | OT_REAL      | 0.000        | Stopping     | CasADi::Impl |
-|              |              |              | criterion    | icitFunction |
-|              |              |              | tolerance    | Internal     |
-+--------------+--------------+--------------+--------------+--------------+
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
@@ -23121,18 +23105,6 @@ Internal class.
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| nlp_solver   | OT_NLPSOLVER | GenericType( | The          | CasADi::Impl |
-|              |              | )            | NLPSolver    | icitFunction |
-|              |              |              | used to      | Internal     |
-|              |              |              | solve the    |              |
-|              |              |              | implicit     |              |
-|              |              |              | system.      |              |
-+--------------+--------------+--------------+--------------+--------------+
-| nlp_solver_o | OT_DICTIONAR | GenericType( | Options to   | CasADi::Impl |
-| ptions       | Y            | )            | be passed to | icitFunction |
-|              |              |              | the          | Internal     |
-|              |              |              | NLPSolver    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
 | j_dir        |              |              | adjoint      | ternal       |
@@ -33880,9 +33852,9 @@ Retrieve information about variables and constraints ";
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| abstol       | OT_REAL      | 0.000        | Stopping     | CasADi::Impl |
-|              |              |              | criterion    | icitFunction |
-|              |              |              | tolerance    | Internal     |
+| abstol       | OT_REAL      | 0.000        | Stopping     | CasADi::Kins |
+|              |              |              | criterion    | olInternal   |
+|              |              |              | tolerance    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
@@ -33990,18 +33962,6 @@ Retrieve information about variables and constraints ";
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| nlp_solver   | OT_NLPSOLVER | GenericType( | The          | CasADi::Impl |
-|              |              | )            | NLPSolver    | icitFunction |
-|              |              |              | used to      | Internal     |
-|              |              |              | solve the    |              |
-|              |              |              | implicit     |              |
-|              |              |              | system.      |              |
-+--------------+--------------+--------------+--------------+--------------+
-| nlp_solver_o | OT_DICTIONAR | GenericType( | Options to   | CasADi::Impl |
-| ptions       | Y            | )            | be passed to | icitFunction |
-|              |              |              | the          | Internal     |
-|              |              |              | NLPSolver    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
 | j_dir        |              |              | adjoint      | ternal       |
@@ -34562,9 +34522,9 @@ See:   ImplicitFunction for more information
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| abstol       | OT_REAL      | 0.000        | Stopping     | CasADi::Impl |
-|              |              |              | criterion    | icitFunction |
-|              |              |              | tolerance    | Internal     |
+| abstol       | OT_REAL      | 0.000        | Stopping     | CasADi::Kins |
+|              |              |              | criterion    | olInternal   |
+|              |              |              | tolerance    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
@@ -34672,18 +34632,6 @@ See:   ImplicitFunction for more information
 | name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
-+--------------+--------------+--------------+--------------+--------------+
-| nlp_solver   | OT_NLPSOLVER | GenericType( | The          | CasADi::Impl |
-|              |              | )            | NLPSolver    | icitFunction |
-|              |              |              | used to      | Internal     |
-|              |              |              | solve the    |              |
-|              |              |              | implicit     |              |
-|              |              |              | system.      |              |
-+--------------+--------------+--------------+--------------+--------------+
-| nlp_solver_o | OT_DICTIONAR | GenericType( | Options to   | CasADi::Impl |
-| ptions       | Y            | )            | be passed to | icitFunction |
-|              |              |              | the          | Internal     |
-|              |              |              | NLPSolver    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
 | j_dir        |              |              | adjoint      | ternal       |
@@ -34947,6 +34895,10 @@ Set Jacobian. ";
 %feature("docstring")  CasADi::KinsolSolver::getJacobian "
 
 Get Jacobian. ";
+
+%feature("docstring")  CasADi::KinsolSolver::getF "
+
+Access F. ";
 
 %feature("docstring")  CasADi::KinsolSolver::getNumInputs "
 
@@ -50144,6 +50096,211 @@ zero. The first output is the solved for z.
 You can provide an initial guess for z by setting output(0) of
 ImplicitFunction.
 
+>List of available options
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| abstol       | OT_REAL      | 0.000        | Stopping     | CasADi::Newt |
+|              |              |              | criterion    | onImplicitIn |
+|              |              |              | tolerance    | ternal       |
++--------------+--------------+--------------+--------------+--------------+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
+|              |              |              | calculate    | ternal       |
+|              |              |              | the          |              |
+|              |              |              | Jacobians:   |              |
+|              |              |              | \"forward\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | forward      |              |
+|              |              |              | mode)        |              |
+|              |              |              | \"reverse\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | adjoint      |              |
+|              |              |              | mode) or     |              |
+|              |              |              | \"automatic\"  |              |
+|              |              |              | (a heuristic |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
+|              |              |              | (forward|rev |              |
+|              |              |              | erse|automat |              |
+|              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | pointer that | ternal       |
+|              |              |              | returns a    |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | function     |              |
+|              |              |              | given a set  |              |
+|              |              |              | of desired   |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | blocks,      |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | User-defined | CasADi::Impl |
+| r            | VER          | )            | linear       | icitFunction |
+|              |              |              | solver       | Internal     |
+|              |              |              | class.       |              |
+|              |              |              | Needed for s |              |
+|              |              |              | ensitivities |              |
+|              |              |              | .            |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Impl |
+| r_options    | Y            | )            | be passed to | icitFunction |
+|              |              |              | the linear   | Internal     |
+|              |              |              | solver.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_iter     | OT_INTEGER   | 1000         | Maximum      | CasADi::Newt |
+|              |              |              | number of    | onImplicitIn |
+|              |              |              | Newton       | ternal       |
+|              |              |              | iterations   |              |
+|              |              |              | to perform   |              |
+|              |              |              | before       |              |
+|              |              |              | returning.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal   Cas |
+|              |              |              | (inputs|outp | ADi::NewtonI |
+|              |              |              | uts)  (step| | mplicitInter |
+|              |              |              | stepsize|J|F | nal          |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| j_dir        |              |              | adjoint      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| d_dir        |              |              | forward      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| ian          |              |              | Hessians     | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| bian         |              |              | Jacobians    | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
+|              |              |              | sparse       | ternal       |
++--------------+--------------+--------------+--------------+--------------+
+| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | that         | ternal       |
+|              |              |              | provides     |              |
+|              |              |              | sparsity for |              |
+|              |              |              | a given      |              |
+|              |              |              | input output |              |
+|              |              |              | block,       |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
+| ans          |              |              | references   | ternal       |
+|              |              |              | to generated |              |
+|              |              |              | Jacobians in |              |
+|              |              |              | order to     |              |
+|              |              |              | avoid        |              |
+|              |              |              | generating   |              |
+|              |              |              | identical    |              |
+|              |              |              | Jacobians    |              |
+|              |              |              | multiple     |              |
+|              |              |              | times        |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
+|              |              | )            | defined      | ternal       |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
+|              |              |              | evaluation   | ternal       |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+
+>List of available monitors
++----------+--------------------------------+
+|    Id    |            Used in             |
++==========+================================+
+| F        | CasADi::NewtonImplicitInternal |
++----------+--------------------------------+
+| J        | CasADi::NewtonImplicitInternal |
++----------+--------------------------------+
+| inputs   | CasADi::FXInternal             |
++----------+--------------------------------+
+| outputs  | CasADi::FXInternal             |
++----------+--------------------------------+
+| step     | CasADi::NewtonImplicitInternal |
++----------+--------------------------------+
+| stepsize | CasADi::NewtonImplicitInternal |
++----------+--------------------------------+
+
+>List of available stats
++------+--------------------------------+
+|  Id  |            Used in             |
++======+================================+
+| iter | CasADi::NewtonImplicitInternal |
++------+--------------------------------+
+
 C++ includes: newton_implicit_internal.hpp ";
 
 %feature("docstring")  CasADi::NewtonImplicitInternal::hessian "
@@ -50545,6 +50702,211 @@ ImplicitFunction.
 
 Joris Gillis
 
+>List of available options
++--------------+--------------+--------------+--------------+--------------+
+|      Id      |     Type     |   Default    | Description  |   Used in    |
++==============+==============+==============+==============+==============+
+| abstol       | OT_REAL      | 0.000        | Stopping     | CasADi::Newt |
+|              |              |              | criterion    | onImplicitIn |
+|              |              |              | tolerance    | ternal       |
++--------------+--------------+--------------+--------------+--------------+
+| ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
+|              |              |              | calculate    | ternal       |
+|              |              |              | the          |              |
+|              |              |              | Jacobians:   |              |
+|              |              |              | \"forward\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | forward      |              |
+|              |              |              | mode)        |              |
+|              |              |              | \"reverse\"    |              |
+|              |              |              | (only        |              |
+|              |              |              | adjoint      |              |
+|              |              |              | mode) or     |              |
+|              |              |              | \"automatic\"  |              |
+|              |              |              | (a heuristic |              |
+|              |              |              | decides      |              |
+|              |              |              | which is     |              |
+|              |              |              | more         |              |
+|              |              |              | appropriate) |              |
+|              |              |              | (forward|rev |              |
+|              |              |              | erse|automat |              |
+|              |              |              | ic)          |              |
++--------------+--------------+--------------+--------------+--------------+
+| gather_stats | OT_BOOLEAN   | false        | Flag to      | CasADi::FXIn |
+|              |              |              | indicate     | ternal       |
+|              |              |              | wether       |              |
+|              |              |              | statistics   |              |
+|              |              |              | must be      |              |
+|              |              |              | gathered     |              |
++--------------+--------------+--------------+--------------+--------------+
+| jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | pointer that | ternal       |
+|              |              |              | returns a    |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | function     |              |
+|              |              |              | given a set  |              |
+|              |              |              | of desired   |              |
+|              |              |              | Jacobian     |              |
+|              |              |              | blocks,      |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_LINEARSOL | GenericType( | User-defined | CasADi::Impl |
+| r            | VER          | )            | linear       | icitFunction |
+|              |              |              | solver       | Internal     |
+|              |              |              | class.       |              |
+|              |              |              | Needed for s |              |
+|              |              |              | ensitivities |              |
+|              |              |              | .            |              |
++--------------+--------------+--------------+--------------+--------------+
+| linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Impl |
+| r_options    | Y            | )            | be passed to | icitFunction |
+|              |              |              | the linear   | Internal     |
+|              |              |              | solver.      |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_iter     | OT_INTEGER   | 1000         | Maximum      | CasADi::Newt |
+|              |              |              | number of    | onImplicitIn |
+|              |              |              | Newton       | ternal       |
+|              |              |              | iterations   |              |
+|              |              |              | to perform   |              |
+|              |              |              | before       |              |
+|              |              |              | returning.   |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_adj_dir    |              | m_dir        | r_of_adj_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| max_number_o | OT_INTEGER   | optimized_nu | Allow \"numbe | CasADi::FXIn |
+| f_fwd_dir    |              | m_dir        | r_of_fwd_dir | ternal       |
+|              |              |              | \" to grow    |              |
+|              |              |              | until it     |              |
+|              |              |              | reaches this |              |
+|              |              |              | number       |              |
++--------------+--------------+--------------+--------------+--------------+
+| monitor      | OT_STRINGVEC | GenericType( | Monitors to  | CasADi::FXIn |
+|              | TOR          | )            | be activated | ternal   Cas |
+|              |              |              | (inputs|outp | ADi::NewtonI |
+|              |              |              | uts)  (step| | mplicitInter |
+|              |              |              | stepsize|J|F | nal          |
+|              |              |              | )            |              |
++--------------+--------------+--------------+--------------+--------------+
+| name         | OT_STRING    | \"unnamed_sha | name of the  | CasADi::Opti |
+|              |              | red_object\"  | object       | onsFunctiona |
+|              |              |              |              | lityNode     |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| j_dir        |              |              | adjoint      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| number_of_fw | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
+| d_dir        |              |              | forward      | ternal       |
+|              |              |              | derivatives  |              |
+|              |              |              | to be        |              |
+|              |              |              | calculated s |              |
+|              |              |              | imultanously |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_hess | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| ian          |              |              | Hessians     | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| numeric_jaco | OT_BOOLEAN   | false        | Calculate    | CasADi::FXIn |
+| bian         |              |              | Jacobians    | ternal       |
+|              |              |              | numerically  |              |
+|              |              |              | (using       |              |
+|              |              |              | directional  |              |
+|              |              |              | derivatives) |              |
+|              |              |              | rather than  |              |
+|              |              |              | with the     |              |
+|              |              |              | built-in     |              |
+|              |              |              | method       |              |
++--------------+--------------+--------------+--------------+--------------+
+| regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
+| heck         |              |              | exceptions   | ternal       |
+|              |              |              | when NaN or  |              |
+|              |              |              | Inf appears  |              |
+|              |              |              | during       |              |
+|              |              |              | evaluation   |              |
++--------------+--------------+--------------+--------------+--------------+
+| sparse       | OT_BOOLEAN   | true         | function is  | CasADi::FXIn |
+|              |              |              | sparse       | ternal       |
++--------------+--------------+--------------+--------------+--------------+
+| sparsity_gen | OT_SPARSITYG | GenericType( | Function     | CasADi::FXIn |
+| erator       | ENERATOR     | )            | that         | ternal       |
+|              |              |              | provides     |              |
+|              |              |              | sparsity for |              |
+|              |              |              | a given      |              |
+|              |              |              | input output |              |
+|              |              |              | block,       |              |
+|              |              |              | overrides    |              |
+|              |              |              | internal     |              |
+|              |              |              | routines     |              |
++--------------+--------------+--------------+--------------+--------------+
+| store_jacobi | OT_BOOLEAN   | false        | keep         | CasADi::FXIn |
+| ans          |              |              | references   | ternal       |
+|              |              |              | to generated |              |
+|              |              |              | Jacobians in |              |
+|              |              |              | order to     |              |
+|              |              |              | avoid        |              |
+|              |              |              | generating   |              |
+|              |              |              | identical    |              |
+|              |              |              | Jacobians    |              |
+|              |              |              | multiple     |              |
+|              |              |              | times        |              |
++--------------+--------------+--------------+--------------+--------------+
+| user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
+|              |              | )            | defined      | ternal       |
+|              |              |              | field that   |              |
+|              |              |              | can be used  |              |
+|              |              |              | to identify  |              |
+|              |              |              | the function |              |
+|              |              |              | or pass      |              |
+|              |              |              | additional   |              |
+|              |              |              | information  |              |
++--------------+--------------+--------------+--------------+--------------+
+| verbose      | OT_BOOLEAN   | false        | verbose      | CasADi::FXIn |
+|              |              |              | evaluation   | ternal       |
+|              |              |              | for          |              |
+|              |              |              | debugging    |              |
++--------------+--------------+--------------+--------------+--------------+
+
+>List of available monitors
++----------+--------------------------------+
+|    Id    |            Used in             |
++==========+================================+
+| F        | CasADi::NewtonImplicitInternal |
++----------+--------------------------------+
+| J        | CasADi::NewtonImplicitInternal |
++----------+--------------------------------+
+| inputs   | CasADi::FXInternal             |
++----------+--------------------------------+
+| outputs  | CasADi::FXInternal             |
++----------+--------------------------------+
+| step     | CasADi::NewtonImplicitInternal |
++----------+--------------------------------+
+| stepsize | CasADi::NewtonImplicitInternal |
++----------+--------------------------------+
+
+>List of available stats
++------+--------------------------------+
+|  Id  |            Used in             |
++======+================================+
+| iter | CasADi::NewtonImplicitInternal |
++------+--------------------------------+
+
 C++ includes: newton_implicit_solver.hpp ";
 
 /*  Setters  */
@@ -50668,6 +51030,10 @@ Default constructor. ";
 %feature("docstring")  CasADi::NewtonImplicitSolver::checkNode "
 
 Check if the node is pointing to the right type of object. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::getF "
+
+Access F. ";
 
 %feature("docstring")  CasADi::NewtonImplicitSolver::getNumInputs "
 
@@ -51098,10 +51464,6 @@ ImplicitFunction.
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| abstol       | OT_REAL      | 0.000        | Stopping     | CasADi::Impl |
-|              |              |              | criterion    | icitFunction |
-|              |              |              | tolerance    | Internal     |
-+--------------+--------------+--------------+--------------+--------------+
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
@@ -51180,16 +51542,16 @@ ImplicitFunction.
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| nlp_solver   | OT_NLPSOLVER | GenericType( | The          | CasADi::Impl |
-|              |              | )            | NLPSolver    | icitFunction |
-|              |              |              | used to      | Internal     |
+| nlp_solver   | OT_NLPSOLVER | GenericType( | The          | CasADi::NLPI |
+|              |              | )            | NLPSolver    | mplicitInter |
+|              |              |              | used to      | nal          |
 |              |              |              | solve the    |              |
 |              |              |              | implicit     |              |
 |              |              |              | system.      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| nlp_solver_o | OT_DICTIONAR | GenericType( | Options to   | CasADi::Impl |
-| ptions       | Y            | )            | be passed to | icitFunction |
-|              |              |              | the          | Internal     |
+| nlp_solver_o | OT_DICTIONAR | GenericType( | Options to   | CasADi::NLPI |
+| ptions       | Y            | )            | be passed to | mplicitInter |
+|              |              |              | the          | nal          |
 |              |              |              | NLPSolver    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
@@ -51678,10 +52040,6 @@ Joris Gillis
 +--------------+--------------+--------------+--------------+--------------+
 |      Id      |     Type     |   Default    | Description  |   Used in    |
 +==============+==============+==============+==============+==============+
-| abstol       | OT_REAL      | 0.000        | Stopping     | CasADi::Impl |
-|              |              |              | criterion    | icitFunction |
-|              |              |              | tolerance    | Internal     |
-+--------------+--------------+--------------+--------------+--------------+
 | ad_mode      | OT_STRING    | \"automatic\"  | How to       | CasADi::FXIn |
 |              |              |              | calculate    | ternal       |
 |              |              |              | the          |              |
@@ -51760,16 +52118,16 @@ Joris Gillis
 |              |              | red_object\"  | object       | onsFunctiona |
 |              |              |              |              | lityNode     |
 +--------------+--------------+--------------+--------------+--------------+
-| nlp_solver   | OT_NLPSOLVER | GenericType( | The          | CasADi::Impl |
-|              |              | )            | NLPSolver    | icitFunction |
-|              |              |              | used to      | Internal     |
+| nlp_solver   | OT_NLPSOLVER | GenericType( | The          | CasADi::NLPI |
+|              |              | )            | NLPSolver    | mplicitInter |
+|              |              |              | used to      | nal          |
 |              |              |              | solve the    |              |
 |              |              |              | implicit     |              |
 |              |              |              | system.      |              |
 +--------------+--------------+--------------+--------------+--------------+
-| nlp_solver_o | OT_DICTIONAR | GenericType( | Options to   | CasADi::Impl |
-| ptions       | Y            | )            | be passed to | icitFunction |
-|              |              |              | the          | Internal     |
+| nlp_solver_o | OT_DICTIONAR | GenericType( | Options to   | CasADi::NLPI |
+| ptions       | Y            | )            | be passed to | mplicitInter |
+|              |              |              | the          | nal          |
 |              |              |              | NLPSolver    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | number_of_ad | OT_INTEGER   | 1            | number of    | CasADi::FXIn |
@@ -51980,6 +52338,10 @@ Default constructor. ";
 %feature("docstring")  CasADi::NLPImplicitSolver::checkNode "
 
 Check if the node is pointing to the right type of object. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::getF "
+
+Access F. ";
 
 %feature("docstring")  CasADi::NLPImplicitSolver::getNumInputs "
 
