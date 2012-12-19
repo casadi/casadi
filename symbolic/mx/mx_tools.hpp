@@ -326,12 +326,22 @@ void printCompact(const MX& ex, std::ostream &stream=std::cout);
  */
 MX solve(const MX& A, const MX& b);
 
+//@{
+/** \brief Calculate jacobian via source code transformation
+
+Uses CasADi::MXFunction::jac
+ */
+MX jacobian(const MX &ex, const MX &arg);
+MX gradient(const MX &ex, const MX &arg);
+//@}
+
 } // namespace CasADi
 
 #ifdef SWIG
 // Template instantiations
 %template(Pair_MX_MXVector) std::pair<CasADi::MX, std::vector<CasADi::MX> >;
 #endif // SWIG
+
 
 
 

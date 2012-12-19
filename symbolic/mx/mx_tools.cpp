@@ -831,6 +831,16 @@ MX solve(const MX& A, const MX& b){
   return MX::create(new Solve(A,b));
 }
 
+MX jacobian(const MX& ex, const MX &arg) {
+  MXFunction temp(arg,ex); // make a runtime
+  temp.init();
+  return temp.jac();
+}
+
+MX gradient(const MX& ex, const MX &arg) {
+  return trans(jacobian(ex,arg));
+}
+
 
 } // namespace CasADi
 
