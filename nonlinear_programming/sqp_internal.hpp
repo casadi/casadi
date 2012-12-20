@@ -128,7 +128,7 @@ public:
   virtual void eval_jac_g(const std::vector<double>& x, std::vector<double>& g, Matrix<double>& J);
 
   // Evaluate the gradient of the objective
-  void eval_grad_f();
+  virtual void eval_grad_f(const std::vector<double>& x, double& f, std::vector<double>& grad_f);
 
 };
 

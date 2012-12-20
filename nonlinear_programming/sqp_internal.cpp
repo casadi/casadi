@@ -228,12 +228,11 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     }
     
     // Evaluate the gradient of the objective function (NOTE: This should not be needed when exact Hessian is used. The Hessian of the Lagrangian gives the gradient of the Lagrangian. The gradient of the objective function can be obtained from knowing the Jacobian of the constraints. The calculation could be desirable anyway, due to numeric cancellation
-    eval_grad_f();
-    const DMatrix& gfk = F_.adjSens();
+    eval_grad_f(x_,fk_,gf_);
 
     // Pass data to QP solver
     qp_solver_.setInput(Bk_, QP_H);
-    qp_solver_.setInput(gfk,QP_G);
+    qp_solver_.setInput(gf_,QP_G);
     // Hot-starting if possible
     qp_solver_.setInput(qp_solver_.output(QP_PRIMAL), QP_X_INIT);
     //TODO: Fix hot-starting of dual variables
@@ -662,7 +661,7 @@ void SQPInternal::reset_h(){
   } 
 }
 
-  void SQPInternal::eval_jac_g(const std::vector<double>& x, std::vector<double>& g, Matrix<double>& J){
+void SQPInternal::eval_jac_g(const std::vector<double>& x, std::vector<double>& g, Matrix<double>& J){
   J_.setInput(x);
   J_.evaluate();
   J_.output(1).get(g,DENSE);
@@ -676,25 +675,21 @@ void SQPInternal::reset_h(){
   }
 }
 
-void SQPInternal::eval_grad_f(){
-  F_.setInput(x_);
+void SQPInternal::eval_grad_f(const std::vector<double>& x, double& f, std::vector<double>& grad_f){
+  F_.setInput(x);
   F_.setAdjSeed(1.0);
   F_.evaluate(0,1);
-  F_.getOutput(fk_);
-  
-  // Gradient of objective
-  const DMatrix& gfk = F_.adjSens();
+  F_.output().get(f);
+  F_.adjSens().get(grad_f,DENSE);
   
   if (monitored("eval_f")){
-    cout << "(main loop) x = " << x_ << endl;
-    cout << "(main loop) F = " << endl;
-    F_.output().printSparse();
+    cout << "x = " << x << endl;
+    cout << "f = " << f << endl;
   }
   
   if (monitored("eval_grad_f")) {
-    cout << "(main loop) x = " << x_ << endl;
-    cout << "(main loop) gradF = " << endl;
-    gfk.printSparse();
+    cout << "x      = " << x << endl;
+    cout << "grad_f = " << grad_f << endl;
   }
 }
 
