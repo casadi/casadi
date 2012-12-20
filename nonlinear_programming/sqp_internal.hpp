@@ -26,6 +26,7 @@
 #include "sqp_method.hpp"
 #include "symbolic/fx/nlp_solver_internal.hpp"
 #include "symbolic/fx/qp_solver.hpp"
+#include <deque>
 
 namespace CasADi{
     
@@ -79,6 +80,9 @@ public:
   /// Constraint function value
   std::vector<double> gk_, gk_cand_;
   
+  /// Gradient of the objective function
+  std::vector<double> gf_;
+
   /// BFGS update function
   enum BFGSMdoe{ BFGS_BK, BFGS_X, BFGS_X_OLD, BFGS_GLAG, BFGS_GLAG_OLD, BFGS_NUM_IN}; 
   FX bfgs_;
@@ -95,6 +99,9 @@ public:
   /// Regularization
   bool regularize_;
 
+  // Storage for merit function
+  std::deque<double> merit_mem_;
+
   /// Calculates inner_prod(x,mul(A,x))
   static double quad_form(const std::vector<double>& x, const DMatrix& A);
   
@@ -104,6 +111,22 @@ public:
   /// Print iteration
   void printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf, 
                       double corr_norm, double ls_param, bool ls_success, int ls_trials);
+
+  // Reset the Hessian or Hessian approximation
+  void reset_h();
+
+  // Evaluate the Hessian of the Lagrangian
+  void eval_h();
+
+  // Evaluate the constraints
+  void eval_g();
+
+  // Evaluate the Jacobian of the constraints
+  void eval_jac_g();
+
+  // Evaluate the gradient of the objective
+  void eval_grad_f();
+
 };
 
 } // namespace CasADi
