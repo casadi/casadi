@@ -94,6 +94,7 @@ SXFunctionInternal::~SXFunctionInternal(){
 }
 
 void SXFunctionInternal::evaluate(int nfdir, int nadir){
+  casadi_log("SXFunctionInternal::evaluate(" << nfdir << ", " << nadir<< "):begin  " << getOption("name"));
   // Compiletime optimization for certain common cases
   switch(nfdir){
     case 0:
@@ -105,6 +106,7 @@ void SXFunctionInternal::evaluate(int nfdir, int nadir){
     default:
       evaluateGen1(int_runtime(nfdir),nadir); break;
   }
+  casadi_log("SXFunctionInternal::evaluate(" << nfdir << ", " << nadir<< "):end " << getOption("name"));
 }
 
 template<typename T1>

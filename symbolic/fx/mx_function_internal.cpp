@@ -480,7 +480,7 @@ void MXFunctionInternal::updatePointers(const AlgEl& el, int nfdir, int nadir){
 }
 
 void MXFunctionInternal::evaluate(int nfdir, int nadir){
-  log("MXFunctionInternal::evaluate begin");
+  casadi_log("MXFunctionInternal::evaluate(" << nfdir << ", " << nadir<< "):begin "  << getOption("name"));
 
   // Make sure that there are no free variables
   if (!free_vars_.empty()) {
@@ -599,7 +599,7 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
     
     log("MXFunctionInternal::evaluate evaluated adjoint");
   }
-  log("MXFunctionInternal::evaluate end");
+  casadi_log("MXFunctionInternal::evaluate(" << nfdir << ", " << nadir<< "):end "  << getOption("name"));
 }
 
 void MXFunctionInternal::print(ostream &stream) const{

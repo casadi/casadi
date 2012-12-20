@@ -53,7 +53,7 @@ NewtonImplicitInternal::~NewtonImplicitInternal(){
 double Xk_update (double Xk, double step) { return Xk-step; }
 
 void NewtonImplicitInternal::evaluate(int nfdir, int nadir) {
-
+  casadi_log("NewtonImplicitInternal::evaluate(" << nfdir << ", " << nadir<< "):begin");
   // Pass the inputs to J
   for (int i=1;i<J_.getNumInputs();++i) {
     std::copy(input(i-1).data().begin(),input(i-1).data().end(),J_.input(i).data().begin());
@@ -128,7 +128,7 @@ void NewtonImplicitInternal::evaluate(int nfdir, int nadir) {
     return;
   
   evaluate_sens(nfdir,nadir,true);
-
+  casadi_log("NewtonImplicitInternal::evaluate(" << nfdir << ", " << nadir<< "):end");
 }
 
 void NewtonImplicitInternal::init(){
