@@ -116,7 +116,7 @@ public:
   void reset_h();
 
   // Evaluate the Hessian of the Lagrangian
-  void eval_h();
+  virtual void eval_h(const std::vector<double>& x, const std::vector<double>& lambda, double sigma, Matrix<double>& H);
 
   // Evaluate the constraints
   void eval_g();

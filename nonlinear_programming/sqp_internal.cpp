@@ -214,7 +214,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     if(iter % 10 == 0) printIteration(cout);
     
     // Evaluating Hessian if needed
-    eval_h();
+    eval_h(x_,mu_,1.0,Bk_);
 
     if(m_>0){
       // Evaluate the constraint function (NOTE: This is not needed. The constraint function should be evaluated as a byproduct of the Jacobian below)
@@ -597,23 +597,23 @@ void SQPInternal::reset_h(){
   }
 }
 
-void SQPInternal::eval_h(){
+  void SQPInternal::eval_h(const std::vector<double>& x, const std::vector<double>& lambda, double sigma, Matrix<double>& H){
 
   if(hess_mode_==HESS_EXACT){
 
     int n_hess_in = H_.getNumInputs() - (parametric_ ? 1 : 0);
-    H_.setInput(x_);
+    H_.setInput(x);
     if(n_hess_in>1){
-      H_.setInput(mu_, n_hess_in == 4 ? 2 : 1);
-      H_.setInput(1, n_hess_in == 4 ? 3 : 2);
+      H_.setInput(lambda, n_hess_in == 4 ? 2 : 1);
+      H_.setInput(sigma, n_hess_in == 4 ? 3 : 2);
     }
     H_.evaluate();
-    H_.getOutput(Bk_);
+    H_.getOutput(H);
     // Determing regularization parameter with Gershgorin theorem
     if(regularize_){
-      const vector<int>& rowind = Bk_.rowind();
-      const vector<int>& col = Bk_.col();
-      vector<double>& data = Bk_.data();
+      const vector<int>& rowind = H.rowind();
+      const vector<int>& col = H.col();
+      vector<double>& data = H.data();
       double reg_param = 0;
       for(int i=0; i<rowind.size()-1; ++i){
 	double mineig = 0;
@@ -644,7 +644,7 @@ void SQPInternal::eval_h(){
   
   if (monitored("eval_h")) {
     cout << "(main loop) B = " << endl;
-    Bk_.printSparse();
+    H.printSparse();
   }
 }
 
