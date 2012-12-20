@@ -129,6 +129,17 @@ void SQPInternal::init(){
   // Jacobian
   Jk_ = DMatrix(A_sparsity);
 
+  // Bounds of the QP
+  qp_LBA_.resize(m_);
+  qp_UBA_.resize(m_);
+  qp_LBX_.resize(n_);
+  qp_UBX_.resize(n_);
+
+  // QP solution
+  dx_.resize(n_);
+  qp_DUAL_X_.resize(n_);
+  qp_DUAL_A_.resize(m_);
+
   // Gradient of the objective
   gf_.resize(n_);
 
@@ -230,71 +241,33 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     // Evaluate the gradient of the objective function (NOTE: This should not be needed when exact Hessian is used. The Hessian of the Lagrangian gives the gradient of the Lagrangian. The gradient of the objective function can be obtained from knowing the Jacobian of the constraints. The calculation could be desirable anyway, due to numeric cancellation
     eval_grad_f(x_,fk_,gf_);
 
-    // Pass data to QP solver
-    qp_solver_.setInput(Bk_, QP_H);
-    qp_solver_.setInput(gf_,QP_G);
-    // Hot-starting if possible
-    qp_solver_.setInput(qp_solver_.output(QP_PRIMAL), QP_X_INIT);
-    //TODO: Fix hot-starting of dual variables
-    //qp_solver_.setInput(mu_qp, QP_LAMBDA_INIT);
-      
-    if(m_>0){
-      qp_solver_.setInput(Jk_,QP_A);
-      transform(lbg.begin(),lbg.end(),gk_.begin(),qp_solver_.input(QP_LBA).begin(),minus<double>());
-      transform(ubg.begin(),ubg.end(),gk_.begin(),qp_solver_.input(QP_UBA).begin(),minus<double>());
-    }
+    // Formulate the QP
+    transform(lbx.begin(),lbx.end(),x_.begin(),qp_LBX_.begin(),minus<double>());
+    transform(ubx.begin(),ubx.end(),x_.begin(),qp_UBX_.begin(),minus<double>());
+    transform(lbg.begin(),lbg.end(),gk_.begin(),qp_LBA_.begin(),minus<double>());
+    transform(ubg.begin(),ubg.end(),gk_.begin(),qp_UBA_.begin(),minus<double>());
 
-    transform(lbx.begin(),lbx.end(),x_.begin(),qp_solver_.input(QP_LBX).begin(),minus<double>());
-    transform(ubx.begin(),ubx.end(),x_.begin(),qp_solver_.input(QP_UBX).begin(),minus<double>());
-    
-    if (monitored("qp")) {
-      cout << "(main loop) QP_H = " << endl;
-      qp_solver_.input(QP_H).printDense();
-      cout << "(main loop) QP_A = " << endl;
-      qp_solver_.input(QP_A).printDense();
-      cout << "(main loop) QP_G = " << endl;
-      qp_solver_.input(QP_G).printDense();
-      cout << "(main loop) QP_LBA = " << endl;
-      qp_solver_.input(QP_LBA).printDense();
-      cout << "(main loop) QP_UBA = " << endl;
-      qp_solver_.input(QP_UBA).printDense();
-      cout << "(main loop) QP_LBX = " << endl;
-      qp_solver_.input(QP_LBX).printDense();
-      cout << "(main loop) QP_UBX = " << endl;
-      qp_solver_.input(QP_UBX).printDense();
-    }
+    // Solve the QP
+    solve_QP(Bk_,gf_,qp_LBX_,qp_UBX_,Jk_,qp_LBA_,qp_UBA_,dx_,qp_DUAL_X_,qp_DUAL_A_);
 
-    // Solve the QP subproblem
-    qp_solver_.evaluate();
-
-    // Get the optimal solution
-    const vector<double>& dx = qp_solver_.output(QP_PRIMAL).data();
-    if (monitored("dx")){
-      cout << "(main loop) dx = " << endl;
-      cout << dx << endl;
-    }
     // Detecting indefiniteness
 //    if ((norm_2(p) / norm_2(x)).at(0) > 500.){
 //      casadi_warning("Search direction has very large values, indefinite Hessian might have ouccured.");
 //    }
-    double gain = quad_form(dx,Bk_);
+    double gain = quad_form(dx_,Bk_);
     if (gain < 0){
       casadi_warning("Indefinite Hessian detected...");
     }
         
-    // Get the dual solution for the inequalities
-    const vector<double>& mu_qp = qp_solver_.output(QP_LAMBDA_A).data();
-    const vector<double>& mu_x_qp = qp_solver_.output(QP_LAMBDA_X).data();
-
     // Calculate penalty parameter of merit function
     for(int j=0; j<m_; ++j){
-      if( fabs(mu_qp[j]) > sigma_){
-        sigma_ = fabs(mu_qp[j]) * 1.01;
+      if( fabs(qp_DUAL_A_[j]) > sigma_){
+        sigma_ = fabs(qp_DUAL_A_[j]) * 1.01;
       }
     }
 //    for(int j = 0; j < n; ++j){
-//      if( fabs(mu_x_qp[j]) > sigma_){
-//        sigma_ = fabs(mu_x_qp[j]) * 1.01;
+//      if( fabs(qp_DUAL_X_[j]) > sigma_){
+//        sigma_ = fabs(qp_DUAL_X_[j]) * 1.01;
 //      }
 //    }
 
@@ -311,7 +284,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     }
 
     // Right-hand side of Armijo condition
-    F_.setFwdSeed(dx);
+    F_.setFwdSeed(dx_);
     F_.evaluate(1, 0);
     double F_sens;
     F_.getFwdSens(F_sens);
@@ -334,7 +307,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     // Line-search loop
     int ls_counter = 1;
     while (true){
-      for(int i=0; i<n_; ++i) x_cand_[i] = x_[i] + t * dx[i]; 
+      for(int i=0; i<n_; ++i) x_cand_[i] = x_[i] + t * dx_[i]; 
       // Evaluating objective and constraints
       F_.setInput(x_cand_);
       F_.evaluate();
@@ -384,8 +357,8 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     copy(x_cand_.begin(),x_cand_.end(),x_.begin());
     fk_ = fk_cand;
     copy(gk_cand_.begin(),gk_cand_.end(),gk_.begin());
-    for(int i=0; i<m_; ++i) mu_[i] = t * mu_qp[i] + (1 - t) * mu_[i];
-    for(int i=0; i<n_; ++i) mu_x_[i] = t * mu_x_qp[i] + (1 - t) * mu_x_[i];
+    for(int i=0; i<m_; ++i) mu_[i] = t * qp_DUAL_A_[i] + (1 - t) * mu_[i];
+    for(int i=0; i<n_; ++i) mu_x_[i] = t * qp_DUAL_X_[i] + (1 - t) * mu_x_[i];
 
     // Evaluating objective gradient
     F_.setInput(x_);
@@ -488,7 +461,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
 
     // 1-norm of step
     double dx_norm1 = 0;
-    for(vector<double>::const_iterator it=dx.begin(); it!=dx.end(); ++it) dx_norm1 += fabs(*it);
+    for(vector<double>::const_iterator it=dx_.begin(); it!=dx_.end(); ++it) dx_norm1 += fabs(*it);
     
     // Printing information about the actual iterate
     printIteration(cout,iter,fk_cand,pr_inf,gLag_norm1,dx_norm1,t,ls_counter!=maxiter_ls_,ls_counter);
@@ -692,5 +665,56 @@ void SQPInternal::eval_grad_f(const std::vector<double>& x, double& f, std::vect
     cout << "grad_f = " << grad_f << endl;
   }
 }
+
+void SQPInternal::solve_QP(const Matrix<double>& H, const std::vector<double>& g,
+			   const std::vector<double>& lbx, const std::vector<double>& ubx,
+			   const Matrix<double>& A, const std::vector<double>& lbA, const std::vector<double>& ubA,
+			   std::vector<double>& x_opt, std::vector<double>& lambda_x_opt, std::vector<double>& lambda_A_opt){
+
+  // Pass data to QP solver
+  qp_solver_.setInput(H, QP_H);
+  qp_solver_.setInput(g,QP_G);
+
+  // Hot-starting if possible
+  qp_solver_.setInput(x_opt, QP_X_INIT);
+  
+  //TODO: Fix hot-starting of dual variables
+  //qp_solver_.setInput(lambda_A_opt, QP_LAMBDA_INIT);
+  
+  // Pass simple bounds
+  qp_solver_.setInput(lbx, QP_LBX);
+  qp_solver_.setInput(ubx, QP_UBX);
+
+  // Pass linear bounds
+  if(m_>0){
+    qp_solver_.setInput(A, QP_A);
+    qp_solver_.setInput(lbA, QP_LBA);
+    qp_solver_.setInput(ubA, QP_UBA);
+  }
+  
+  if (monitored("qp")) {
+    cout << "H = " << endl;
+    H.printDense();
+    cout << "A = " << endl;
+    A.printDense();
+    cout << "g = " << g << endl;
+    cout << "lbx = " << lbx << endl;
+    cout << "ubx = " << ubx << endl;
+    cout << "lbA = " << lbA << endl;
+    cout << "ubA = " << ubA << endl;
+  }
+
+  // Solve the QP
+  qp_solver_.evaluate();
+  
+  // Get the optimal solution
+  qp_solver_.getOutput(x_opt,QP_PRIMAL);
+  qp_solver_.getOutput(lambda_x_opt,QP_LAMBDA_X);
+  qp_solver_.getOutput(lambda_A_opt,QP_LAMBDA_A);
+  if (monitored("dx")){
+    cout << "dx = " << x_opt << endl;
+  }
+}
+  
 
 } // namespace CasADi

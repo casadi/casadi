@@ -99,6 +99,12 @@ public:
   // Current Jacobian
   DMatrix Jk_;
 
+  // Bounds of the QP
+  std::vector<double> qp_LBA_, qp_UBA_, qp_LBX_, qp_UBX_;
+
+  // QP solution
+  std::vector<double> dx_, qp_DUAL_X_, qp_DUAL_A_;
+
   /// Regularization
   bool regularize_;
 
@@ -129,6 +135,12 @@ public:
 
   // Evaluate the gradient of the objective
   virtual void eval_grad_f(const std::vector<double>& x, double& f, std::vector<double>& grad_f);
+
+  // Solve the QP subproblem
+  virtual void solve_QP(const Matrix<double>& H, const std::vector<double>& g,
+			const std::vector<double>& lbx, const std::vector<double>& ubx,
+			const Matrix<double>& A, const std::vector<double>& lbA, const std::vector<double>& ubA,
+			std::vector<double>& x_opt, std::vector<double>& lambda_x_opt, std::vector<double>& lambda_A_opt);
 
 };
 
