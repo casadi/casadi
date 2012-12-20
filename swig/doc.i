@@ -78818,6 +78818,14 @@ Create a vector of length p with n-by-m matrix symbolic variables. ";
 Create a vector of length r of vectors of length p with n-by-m matrices with
 symbolic variables. ";
 
+%feature("docstring")  CasADi::jacobian "
+
+Calculate jacobian via source code transformation.
+
+Uses CasADi::MXFunction::jac ";
+
+%feature("docstring")  CasADi::gradient "";
+
 %feature("docstring")  CasADi::deepcopy "
 
 Make a deep copy of an object (Note: default is a shallow copy!) ";
