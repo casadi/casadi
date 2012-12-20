@@ -126,6 +126,9 @@ void SQPInternal::init(){
   // Hessian approximation
   Bk_ = DMatrix(H_sparsity);
   
+  // Jacobian
+  Jk_ = DMatrix(A_sparsity);
+
   // Gradient of the objective
   gf_.resize(n_);
 
@@ -221,7 +224,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       eval_g(x_,gk_);
       
       // Evaluate the constraint Jacobian
-      eval_jac_g();
+      eval_jac_g(x_,gk_,Jk_);
     }
     
     // Evaluate the gradient of the objective function (NOTE: This should not be needed when exact Hessian is used. The Hessian of the Lagrangian gives the gradient of the Lagrangian. The gradient of the objective function can be obtained from knowing the Jacobian of the constraints. The calculation could be desirable anyway, due to numeric cancellation
@@ -237,7 +240,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     //qp_solver_.setInput(mu_qp, QP_LAMBDA_INIT);
       
     if(m_>0){
-      qp_solver_.setInput(J_.output(),QP_A);
+      qp_solver_.setInput(Jk_,QP_A);
       transform(lbg.begin(),lbg.end(),gk_.begin(),qp_solver_.input(QP_LBA).begin(),minus<double>());
       transform(ubg.begin(),ubg.end(),gk_.begin(),qp_solver_.input(QP_UBA).begin(),minus<double>());
     }
@@ -659,14 +662,17 @@ void SQPInternal::reset_h(){
   } 
 }
 
-void SQPInternal::eval_jac_g(){
-  J_.setInput(x_);
+  void SQPInternal::eval_jac_g(const std::vector<double>& x, std::vector<double>& g, Matrix<double>& J){
+  J_.setInput(x);
   J_.evaluate();
-  
+  J_.output(1).get(g,DENSE);
+  J_.output(0).get(J);
+
   if (monitored("eval_jac_g")) {
-    cout << "(main loop) x = " << x_ << endl;
-    cout << "(main loop) J = " << endl;
-    J_.output().printSparse();
+    cout << "x = " << x << endl;
+    cout << "g = " << g << endl;
+    cout << "J = " << endl;
+    J.printSparse();
   }
 }
 

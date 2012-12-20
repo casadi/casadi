@@ -96,6 +96,9 @@ public:
   /// Current Hessian approximation
   DMatrix Bk_;
   
+  // Current Jacobian
+  DMatrix Jk_;
+
   /// Regularization
   bool regularize_;
 
@@ -122,7 +125,7 @@ public:
   virtual void eval_g(const std::vector<double>& x, std::vector<double>& g);
 
   // Evaluate the Jacobian of the constraints
-  void eval_jac_g();
+  virtual void eval_jac_g(const std::vector<double>& x, std::vector<double>& g, Matrix<double>& J);
 
   // Evaluate the gradient of the objective
   void eval_grad_f();
