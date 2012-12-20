@@ -80,12 +80,21 @@ public:
   std::vector<double> gk_, gk_cand_;
   
   /// BFGS update function
-  enum{ BFGS_BK, BFGS_X, BFGS_X_OLD, BFGS_GLAG, BFGS_GLAG_OLD, BFGS_NUM_IN}; 
+  enum BFGSMdoe{ BFGS_BK, BFGS_X, BFGS_X_OLD, BFGS_GLAG, BFGS_GLAG_OLD, BFGS_NUM_IN}; 
   FX bfgs_;
   
+  /// Supported Hessian modes
+  enum HessMode{ HESS_EXACT, HESS_BFGS};
+
+  /// Hessian mode
+  HessMode hess_mode_;
+
   /// Current Hessian approximation
   DMatrix Bk_;
   
+  /// Regularization
+  bool regularize_;
+
   /// Calculates inner_prod(x,mul(A,x))
   static double quad_form(const std::vector<double>& x, const DMatrix& A);
   

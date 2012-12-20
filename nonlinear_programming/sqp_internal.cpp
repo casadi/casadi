@@ -73,8 +73,13 @@ void SQPInternal::init(){
   lbfgs_memory_ = getOption("lbfgs_memory");
   tol_pr_ = getOption("tol_pr");
   tol_du_ = getOption("tol_du");
-  
-  if (getOption("hessian_approximation")=="exact" && H_.isNull()) {
+  regularize_ = getOption("regularize");
+  if(getOption("hessian_approximation")=="exact")
+    hess_mode_ = HESS_EXACT;
+  else if(getOption("hessian_approximation")=="limited-memory")
+    hess_mode_ = HESS_BFGS;
+   
+  if (hess_mode_== HESS_EXACT && H_.isNull()) {
     if (!getOption("generate_hessian")){
       casadi_error("SQPInternal::evaluate: you set option 'hessian_approximation' to 'exact', but no hessian was supplied. Try with option \"generate_hessian\".");
     }
@@ -86,7 +91,7 @@ void SQPInternal::init(){
   }
   
   // Allocate a QP solver
-  CRSSparsity H_sparsity = getOption("hessian_approximation")=="exact"? H_.output().sparsity() : sp_dense(n_,n_);
+  CRSSparsity H_sparsity = hess_mode_==HESS_EXACT ? H_.output().sparsity() : sp_dense(n_,n_);
   H_sparsity = H_sparsity + DMatrix::eye(n_).sparsity();
   CRSSparsity A_sparsity = J_.isNull() ? CRSSparsity(0,n_,false) : J_.output().sparsity();
 
@@ -121,7 +126,7 @@ void SQPInternal::init(){
   Bk_ = DMatrix(H_sparsity);
   
   // Create Hessian update function
-  if(getOption("hessian_approximation") == "limited-memory"){
+  if(hess_mode_ = HESS_BFGS){
     // Create expressions corresponding to Bk, x, x_old, gLag and gLag_old
     SXMatrix Bk = ssym("Bk",H_sparsity);
     SXMatrix x = ssym("x",input(NLP_X_INIT).sparsity());
@@ -189,7 +194,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   fill(gLag_.begin(),gLag_.end(),0);
 
   // Initial Hessian approximation of BFGS
-  if ( getOption("hessian_approximation") == "limited-memory") {
+  if ( hess_mode_ = HESS_BFGS){
     Bk_.set(DMatrix::eye(n_));
   }
 
@@ -219,7 +224,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       printIteration(cout);
     
     // Evaluating Hessian if needed
-    if (getOption("hessian_approximation") == "exact") {
+    if (hess_mode_==HESS_EXACT){
       int n_hess_in = H_.getNumInputs() - (parametric_ ? 1 : 0);
       H_.setInput(x_);
       if(n_hess_in>1){
@@ -229,7 +234,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       H_.evaluate();
       H_.getOutput(Bk_);
       // Determing regularization parameter with Gershgorin theorem
-      if (bool(getOption("regularize"))){
+      if(regularize_){
         const vector<int>& rowind = Bk_.rowind();
         const vector<int>& col = Bk_.col();
         vector<double>& data = Bk_.data();
@@ -495,7 +500,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     transform(gLag_old_.begin(),gLag_old_.end(),mu_x_.begin(),gLag_old_.begin(),plus<double>()); // gLag_old += mu_x_;
 
     // Updating Lagrange Hessian if needed. (BFGS with careful updates and restarts)
-    if (getOption("hessian_approximation") == "limited-memory") { 
+    if( hess_mode_ == HESS_BFGS){
       if (it_counter % lbfgs_memory_ == 0){
         // Remove off-diagonal entries
         const vector<int>& rowind = Bk_.rowind();
