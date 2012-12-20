@@ -130,7 +130,7 @@ void SQPInternal::init(){
   gf_.resize(n_);
 
   // Create Hessian update function
-  if(hess_mode_ = HESS_BFGS){
+  if(hess_mode_ == HESS_BFGS){
     // Create expressions corresponding to Bk, x, x_old, gLag and gLag_old
     SXMatrix Bk = ssym("Bk",H_sparsity);
     SXMatrix x = ssym("x",input(NLP_X_INIT).sparsity());
@@ -587,7 +587,7 @@ double SQPInternal::quad_form(const std::vector<double>& x, const DMatrix& A){
 
 void SQPInternal::reset_h(){
   // Initial Hessian approximation of BFGS
-  if ( hess_mode_ = HESS_BFGS){
+  if ( hess_mode_ == HESS_BFGS){
     Bk_.set(DMatrix::eye(n_));
   }
 
