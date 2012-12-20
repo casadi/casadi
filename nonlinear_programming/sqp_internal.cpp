@@ -218,7 +218,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
 
     if(m_>0){
       // Evaluate the constraint function (NOTE: This is not needed. The constraint function should be evaluated as a byproduct of the Jacobian below)
-      eval_g();
+      eval_g(x_,gk_);
       
       // Evaluate the constraint Jacobian
       eval_jac_g();
@@ -648,15 +648,14 @@ void SQPInternal::reset_h(){
   }
 }
 
-void SQPInternal::eval_g(){
-  G_.setInput(x_);
+  void SQPInternal::eval_g(const std::vector<double>& x, std::vector<double>& g){
+  G_.setInput(x);
   G_.evaluate();
-  G_.getOutput(gk_);
+  G_.output().get(g,DENSE);
   
   if (monitored("eval_g")) {
-    cout << "(main loop) x = " << x_ << endl;
-    cout << "(main loop) G = " << endl;
-    G_.output().printSparse();
+    cout << "(main loop) x = " << x << endl;
+    cout << "(main loop) G = " << g << endl;
   } 
 }
 

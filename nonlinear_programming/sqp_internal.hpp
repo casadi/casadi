@@ -119,7 +119,7 @@ public:
   virtual void eval_h(const std::vector<double>& x, const std::vector<double>& lambda, double sigma, Matrix<double>& H);
 
   // Evaluate the constraints
-  void eval_g();
+  virtual void eval_g(const std::vector<double>& x, std::vector<double>& g);
 
   // Evaluate the Jacobian of the constraints
   void eval_jac_g();
