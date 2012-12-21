@@ -146,6 +146,12 @@ class FX : public OptionsFunctionality{
    */
   void requestNumSens(int nfwd, int nadj);
   
+  /** \brief Get the number of allocated forward directional derivatives */
+  int numAllocFwd() const;
+
+  /** \brief Get the number of allocated adjoint directional derivatives */
+  int numAllocAdj() const;
+
   /** \brief  Evaluate */
   void evaluate(int nfdir=0, int nadir=0);
   

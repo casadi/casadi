@@ -72,8 +72,8 @@ void EvaluationMX::evaluateD(const DMatrixPtrV& arg, DMatrixPtrV& res,
   int nadir = aseed.size();
 
   // Number of derivative directions supported by the function
-  int max_nfdir = fcn_->nfdir_;
-  int max_nadir = fcn_->nadir_;
+  int max_nfdir = fcn_.numAllocFwd();
+  int max_nadir = fcn_.numAllocAdj();
 
   // Current forward and adjoint direction
   int offset_nfdir = 0, offset_nadir = 0;

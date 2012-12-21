@@ -371,6 +371,13 @@ FX FX::derivative(int nfwd, int nadj){
   return (*this)->derivative(nfwd,nadj);
 }
 
+int FX::numAllocFwd() const{
+  return (*this)->nfdir_;
+}
+
+int FX::numAllocAdj() const{
+  return (*this)->nadir_;
+}
 
 } // namespace CasADi
 
