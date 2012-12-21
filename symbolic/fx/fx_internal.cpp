@@ -137,10 +137,6 @@ void FXInternal::requestNumSens(int nfwd, int nadj){
   int nfwd_new = std::max(nfwd,std::max(nfdir_,int(getOption("number_of_fwd_dir"))));
   int nadj_new = std::max(nadj,std::max(nadir_,int(getOption("number_of_adj_dir"))));
   
-  // Increase to the requested number
-  nfwd_new = std::max(nfwd_new,nfwd);
-  nadj_new = std::max(nadj_new,nadj);
-    
   // Cap at the maximum
   nfwd_new = std::min(nfwd_new,int(getOption("max_number_of_fwd_dir")));
   nadj_new = std::min(nadj_new,int(getOption("max_number_of_adj_dir")));
