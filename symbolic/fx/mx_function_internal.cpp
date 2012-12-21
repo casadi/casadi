@@ -429,6 +429,13 @@ void MXFunctionInternal::updateNumSens(bool recursive){
     it->dataF.resize(nfdir_,it->data);
     it->dataA.resize(nadir_,it->data);
   }
+
+  // Request more derivative from the embedded functions
+  for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it){
+    if(it->op==OP_CALL){
+      it->data->getFunction().requestNumSens(nfdir_,nadir_);
+    }
+  }
 }
 
 void MXFunctionInternal::setLiftingFunction(LiftingFunction liftfun, void* user_data){

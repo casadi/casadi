@@ -79,7 +79,17 @@ void ImplicitFunctionInternal::init(){
     linsol_.init();
   }
     
+  // Allocate memory for directional derivatives
+  ImplicitFunctionInternal::updateNumSens(false);
+
+}
+
+void ImplicitFunctionInternal::updateNumSens(bool recursive){
+  // Call the base class if needed
+  if(recursive) FXInternal::updateNumSens(recursive);
   
+  // Request more directional derivatives for the residual function
+  f_.requestNumSens(nfdir_,nadir_);
 }
 
 void ImplicitFunctionInternal::evaluate_sens(int nfdir, int nadir, bool linsol_prepared) {
