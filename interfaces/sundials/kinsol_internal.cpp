@@ -242,9 +242,6 @@ void KinsolInternal::init(){
 }
 
 void KinsolInternal::evaluate(int nfdir, int nadir){
-  casadi_assert(nfdir<=nfdir_fcn_);
-  casadi_assert(nadir<=nadir_fcn_);
-  
   // Reset the counters
   t_func_ = 0;
   t_jac_ = 0;

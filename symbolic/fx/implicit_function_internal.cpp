@@ -55,10 +55,6 @@ void ImplicitFunctionInternal::init(){
   // Number of equations
   N_ = output().size();
 
-  // Get the number of directions of the function
-  nfdir_fcn_ = f_.getOption("number_of_fwd_dir");
-  nadir_fcn_ = f_.getOption("number_of_adj_dir");
-
   // Generate Jacobian if not provided
   if(J_.isNull()) J_ = f_.jacobian(0,0);
   J_.init();
