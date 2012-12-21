@@ -68613,6 +68613,18 @@ Print iteration header. ";
 
 Print iteration. ";
 
+%feature("docstring")  CasADi::SQPInternal::reset_h "";
+
+%feature("docstring")  CasADi::SQPInternal::eval_h "";
+
+%feature("docstring")  CasADi::SQPInternal::eval_g "";
+
+%feature("docstring")  CasADi::SQPInternal::eval_jac_g "";
+
+%feature("docstring")  CasADi::SQPInternal::eval_grad_f "";
+
+%feature("docstring")  CasADi::SQPInternal::solve_QP "";
+
 %feature("docstring")  CasADi::SQPInternal::reportConstraints "
 
 Prints out a human readable report about possible constraint violations -
