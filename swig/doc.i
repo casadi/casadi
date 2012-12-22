@@ -504,6 +504,14 @@ is never decreased and never increased beyond the number set by the option
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
 
+%feature("docstring")  CasADi::AcadoIntegrator::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
+
 %feature("docstring")  CasADi::AcadoIntegrator::evaluate "
 
 Evaluate. ";
@@ -1980,6 +1988,14 @@ is never decreased and never increased beyond the number set by the option
 
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
+
+%feature("docstring")  CasADi::AcadoOCP::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::AcadoOCP::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
 
 %feature("docstring")  CasADi::AcadoOCP::evaluate "
 
@@ -3847,6 +3863,14 @@ is never decreased and never increased beyond the number set by the option
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
 
+%feature("docstring")  CasADi::CFunction::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::CFunction::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
+
 %feature("docstring")  CasADi::CFunction::evaluate "
 
 Evaluate. ";
@@ -5192,6 +5216,14 @@ is never decreased and never increased beyond the number set by the option
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
 
+%feature("docstring")  CasADi::Collocation::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::Collocation::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
+
 %feature("docstring")  CasADi::Collocation::evaluate "
 
 Evaluate. ";
@@ -6132,6 +6164,14 @@ is never decreased and never increased beyond the number set by the option
 
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::evaluate "
 
@@ -8706,6 +8746,14 @@ is never decreased and never increased beyond the number set by the option
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
 
+%feature("docstring")  CasADi::ControlSimulator::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::ControlSimulator::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
+
 %feature("docstring")  CasADi::ControlSimulator::evaluate "
 
 Evaluate. ";
@@ -10727,6 +10775,14 @@ is never decreased and never increased beyond the number set by the option
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
 
+%feature("docstring")  CasADi::CplexSolver::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::CplexSolver::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
+
 %feature("docstring")  CasADi::CplexSolver::evaluate "
 
 Evaluate. ";
@@ -12188,6 +12244,14 @@ is never decreased and never increased beyond the number set by the option
 
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
+
+%feature("docstring")  CasADi::CSparse::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::CSparse::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
 
 %feature("docstring")  CasADi::CSparse::evaluate "
 
@@ -13882,6 +13946,14 @@ is never decreased and never increased beyond the number set by the option
 
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
+
+%feature("docstring")  CasADi::CVodesIntegrator::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::CVodesIntegrator::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
 
 %feature("docstring")  CasADi::CVodesIntegrator::evaluate "
 
@@ -15733,6 +15805,14 @@ is never decreased and never increased beyond the number set by the option
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
 
+%feature("docstring")  CasADi::Derivative::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::Derivative::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
+
 %feature("docstring")  CasADi::Derivative::evaluate "
 
 Evaluate. ";
@@ -17144,6 +17224,14 @@ is never decreased and never increased beyond the number set by the option
 
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
+
+%feature("docstring")  CasADi::ExternalFunction::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::ExternalFunction::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
 
 %feature("docstring")  CasADi::ExternalFunction::evaluate "
 
@@ -18725,6 +18813,14 @@ is never decreased and never increased beyond the number set by the option
 
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
+
+%feature("docstring")  CasADi::FX::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::FX::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
 
 %feature("docstring")  CasADi::FX::evaluate "
 
@@ -20909,6 +21005,14 @@ is never decreased and never increased beyond the number set by the option
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
 
+%feature("docstring")  CasADi::IdasIntegrator::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::IdasIntegrator::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
+
 %feature("docstring")  CasADi::IdasIntegrator::evaluate "
 
 Evaluate. ";
@@ -22659,6 +22763,14 @@ is never decreased and never increased beyond the number set by the option
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
 
+%feature("docstring")  CasADi::ImplicitFunction::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::ImplicitFunction::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
+
 %feature("docstring")  CasADi::ImplicitFunction::evaluate "
 
 Evaluate. ";
@@ -23307,6 +23419,11 @@ Destructor. ";
 
 Initialize. ";
 
+%feature("docstring")  CasADi::ImplicitFunctionInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization.
+";
+
 %feature("docstring")  CasADi::ImplicitFunctionInternal::evaluate "
 
 Solve the system of equations. ";
@@ -23322,11 +23439,6 @@ Generate a linear solver for the sensitivity equations. ";
 %feature("docstring")  CasADi::ImplicitFunctionInternal::jac "
 
 Generate a linear solver for the sensitivity equations. ";
-
-%feature("docstring")  CasADi::ImplicitFunctionInternal::updateNumSens "
-
-Update the number of sensitivity directions during or after initialization,
-if recursive==true, updateNumSens is also invoked for the baseclass. ";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::requestNumSens "
 
@@ -24261,6 +24373,14 @@ is never decreased and never increased beyond the number set by the option
 
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
+
+%feature("docstring")  CasADi::Integrator::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::Integrator::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
 
 %feature("docstring")  CasADi::Integrator::evaluate "
 
@@ -26450,6 +26570,14 @@ is never decreased and never increased beyond the number set by the option
 
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
+
+%feature("docstring")  CasADi::IPMethod::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::IPMethod::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
 
 %feature("docstring")  CasADi::IPMethod::evaluate "
 
@@ -33411,6 +33539,14 @@ is never decreased and never increased beyond the number set by the option
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
 
+%feature("docstring")  CasADi::IpoptSolver::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::IpoptSolver::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
+
 %feature("docstring")  CasADi::IpoptSolver::evaluate "
 
 Evaluate. ";
@@ -34237,18 +34373,18 @@ Residual. ";
 
 Create a new ImplicitFunctionInternal. ";
 
-%feature("docstring")  CasADi::KinsolInternal::jac "
-
-Generate a linear solver for the sensitivity equations. ";
-
-%feature("docstring")  CasADi::KinsolInternal::jac "
-
-Generate a linear solver for the sensitivity equations. ";
-
 %feature("docstring")  CasADi::KinsolInternal::updateNumSens "
 
-Update the number of sensitivity directions during or after initialization,
-if recursive==true, updateNumSens is also invoked for the baseclass. ";
+Update the number of sensitivity directions during or after initialization.
+";
+
+%feature("docstring")  CasADi::KinsolInternal::jac "
+
+Generate a linear solver for the sensitivity equations. ";
+
+%feature("docstring")  CasADi::KinsolInternal::jac "
+
+Generate a linear solver for the sensitivity equations. ";
 
 %feature("docstring")  CasADi::KinsolInternal::requestNumSens "
 
@@ -34942,6 +35078,14 @@ is never decreased and never increased beyond the number set by the option
 
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
+
+%feature("docstring")  CasADi::KinsolSolver::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::KinsolSolver::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
 
 %feature("docstring")  CasADi::KinsolSolver::evaluate "
 
@@ -36867,6 +37011,14 @@ is never decreased and never increased beyond the number set by the option
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
 
+%feature("docstring")  CasADi::KnitroSolver::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::KnitroSolver::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
+
 %feature("docstring")  CasADi::KnitroSolver::evaluate "
 
 Evaluate. ";
@@ -37609,6 +37761,14 @@ is never decreased and never increased beyond the number set by the option
 
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
+
+%feature("docstring")  CasADi::LapackLUDense::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::LapackLUDense::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
 
 %feature("docstring")  CasADi::LapackLUDense::evaluate "
 
@@ -38885,6 +39045,14 @@ is never decreased and never increased beyond the number set by the option
 
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
+
+%feature("docstring")  CasADi::LapackQRDense::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::LapackQRDense::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
 
 %feature("docstring")  CasADi::LapackQRDense::evaluate "
 
@@ -40368,6 +40536,14 @@ is never decreased and never increased beyond the number set by the option
 
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
+
+%feature("docstring")  CasADi::LiftedSQP::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::LiftedSQP::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
 
 %feature("docstring")  CasADi::LiftedSQP::evaluate "
 
@@ -42673,6 +42849,14 @@ is never decreased and never increased beyond the number set by the option
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
 
+%feature("docstring")  CasADi::LiftoptSolver::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::LiftoptSolver::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
+
 %feature("docstring")  CasADi::LiftoptSolver::evaluate "
 
 Evaluate. ";
@@ -43379,6 +43563,14 @@ is never decreased and never increased beyond the number set by the option
 
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
+
+%feature("docstring")  CasADi::LinearSolver::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::LinearSolver::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
 
 %feature("docstring")  CasADi::LinearSolver::evaluate "
 
@@ -46144,6 +46336,14 @@ is never decreased and never increased beyond the number set by the option
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
 
+%feature("docstring")  CasADi::MultipleShooting::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::MultipleShooting::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
+
 %feature("docstring")  CasADi::MultipleShooting::evaluate "
 
 Evaluate. ";
@@ -48868,6 +49068,14 @@ is never decreased and never increased beyond the number set by the option
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
 
+%feature("docstring")  CasADi::MXFunction::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::MXFunction::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
+
 %feature("docstring")  CasADi::MXFunction::evaluate "
 
 Evaluate. ";
@@ -50428,18 +50636,18 @@ Solve the system of equations. ";
 
 Create a new ImplicitFunctionInternal. ";
 
-%feature("docstring")  CasADi::NewtonImplicitInternal::jac "
-
-Generate a linear solver for the sensitivity equations. ";
-
-%feature("docstring")  CasADi::NewtonImplicitInternal::jac "
-
-Generate a linear solver for the sensitivity equations. ";
-
 %feature("docstring")  CasADi::NewtonImplicitInternal::updateNumSens "
 
-Update the number of sensitivity directions during or after initialization,
-if recursive==true, updateNumSens is also invoked for the baseclass. ";
+Update the number of sensitivity directions during or after initialization.
+";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::jac "
+
+Generate a linear solver for the sensitivity equations. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::jac "
+
+Generate a linear solver for the sensitivity equations. ";
 
 %feature("docstring")  CasADi::NewtonImplicitInternal::requestNumSens "
 
@@ -51077,6 +51285,14 @@ is never decreased and never increased beyond the number set by the option
 
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
 
 %feature("docstring")  CasADi::NewtonImplicitSolver::evaluate "
 
@@ -51763,18 +51979,18 @@ Solve the system of equations. ";
 
 Create a new ImplicitFunctionInternal. ";
 
-%feature("docstring")  CasADi::NLPImplicitInternal::jac "
-
-Generate a linear solver for the sensitivity equations. ";
-
-%feature("docstring")  CasADi::NLPImplicitInternal::jac "
-
-Generate a linear solver for the sensitivity equations. ";
-
 %feature("docstring")  CasADi::NLPImplicitInternal::updateNumSens "
 
-Update the number of sensitivity directions during or after initialization,
-if recursive==true, updateNumSens is also invoked for the baseclass. ";
+Update the number of sensitivity directions during or after initialization.
+";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::jac "
+
+Generate a linear solver for the sensitivity equations. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::jac "
+
+Generate a linear solver for the sensitivity equations. ";
 
 %feature("docstring")  CasADi::NLPImplicitInternal::requestNumSens "
 
@@ -52385,6 +52601,14 @@ is never decreased and never increased beyond the number set by the option
 
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
 
 %feature("docstring")  CasADi::NLPImplicitSolver::evaluate "
 
@@ -53718,6 +53942,14 @@ is never decreased and never increased beyond the number set by the option
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
 
+%feature("docstring")  CasADi::NLPQPSolver::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
+
 %feature("docstring")  CasADi::NLPQPSolver::evaluate "
 
 Evaluate. ";
@@ -54572,6 +54804,14 @@ is never decreased and never increased beyond the number set by the option
 
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
+
+%feature("docstring")  CasADi::NLPSolver::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::NLPSolver::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
 
 %feature("docstring")  CasADi::NLPSolver::evaluate "
 
@@ -57458,6 +57698,14 @@ is never decreased and never increased beyond the number set by the option
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
 
+%feature("docstring")  CasADi::OCPSolver::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::OCPSolver::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
+
 %feature("docstring")  CasADi::OCPSolver::evaluate "
 
 Evaluate. ";
@@ -59535,6 +59783,14 @@ is never decreased and never increased beyond the number set by the option
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
 
+%feature("docstring")  CasADi::OOQPSolver::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::OOQPSolver::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
+
 %feature("docstring")  CasADi::OOQPSolver::evaluate "
 
 Evaluate. ";
@@ -60750,6 +61006,14 @@ is never decreased and never increased beyond the number set by the option
 
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
+
+%feature("docstring")  CasADi::Parallelizer::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::Parallelizer::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
 
 %feature("docstring")  CasADi::Parallelizer::evaluate "
 
@@ -62698,6 +62962,14 @@ is never decreased and never increased beyond the number set by the option
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
 
+%feature("docstring")  CasADi::QPOasesSolver::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::QPOasesSolver::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
+
 %feature("docstring")  CasADi::QPOasesSolver::evaluate "
 
 Evaluate. ";
@@ -63433,6 +63705,14 @@ is never decreased and never increased beyond the number set by the option
 
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
+
+%feature("docstring")  CasADi::QPSolver::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::QPSolver::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
 
 %feature("docstring")  CasADi::QPSolver::evaluate "
 
@@ -64931,6 +65211,14 @@ is never decreased and never increased beyond the number set by the option
 
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
+
+%feature("docstring")  CasADi::RKIntegrator::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::RKIntegrator::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
 
 %feature("docstring")  CasADi::RKIntegrator::evaluate "
 
@@ -66705,6 +66993,14 @@ is never decreased and never increased beyond the number set by the option
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
 
+%feature("docstring")  CasADi::Simulator::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::Simulator::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
+
 %feature("docstring")  CasADi::Simulator::evaluate "
 
 Evaluate. ";
@@ -68393,7 +68689,7 @@ Assert that the object has been initialized. ";
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| regularize   | OT_BOOLEAN   | 0            | Automatic re | CasADi::SQPI |
+| regularize   | OT_BOOLEAN   | false        | Automatic re | CasADi::SQPI |
 |              |              |              | gularization | nternal      |
 |              |              |              | of Lagrange  |              |
 |              |              |              | Hessian.     |              |
@@ -69196,7 +69492,7 @@ Attila Kozma, Joel Andersson and Joris Gillis
 |              |              |              | during       |              |
 |              |              |              | evaluation   |              |
 +--------------+--------------+--------------+--------------+--------------+
-| regularize   | OT_BOOLEAN   | 0            | Automatic re | CasADi::SQPI |
+| regularize   | OT_BOOLEAN   | false        | Automatic re | CasADi::SQPI |
 |              |              |              | gularization | nternal      |
 |              |              |              | of Lagrange  |              |
 |              |              |              | Hessian.     |              |
@@ -69489,6 +69785,14 @@ is never decreased and never increased beyond the number set by the option
 
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
+
+%feature("docstring")  CasADi::SQPMethod::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::SQPMethod::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
 
 %feature("docstring")  CasADi::SQPMethod::evaluate "
 
@@ -70533,6 +70837,14 @@ is never decreased and never increased beyond the number set by the option
 
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
+
+%feature("docstring")  CasADi::SundialsIntegrator::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::SundialsIntegrator::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
 
 %feature("docstring")  CasADi::SundialsIntegrator::evaluate "
 
@@ -72533,6 +72845,14 @@ is never decreased and never increased beyond the number set by the option
 
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
+
+%feature("docstring")  CasADi::SXFunction::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::SXFunction::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
 
 %feature("docstring")  CasADi::SXFunction::evaluate "
 
@@ -77588,6 +77908,14 @@ is never decreased and never increased beyond the number set by the option
 
 If the number was changed during the call, updateNumSens() is automatically
 invoked. ";
+
+%feature("docstring")  CasADi::WorhpSolver::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::WorhpSolver::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
 
 %feature("docstring")  CasADi::WorhpSolver::evaluate "
 
