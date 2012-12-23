@@ -39,7 +39,6 @@ option(WITH_PYTHON_INTERRUPTS "With interrupt handling inside python interface" 
 # option(WITH_GSL "Compile the GSL interface" ON)
 option(WITH_OPENMP "Compile with parallelization support" OFF)
 option(WITH_OOQP "Enable OOQP interface" ON)
-option(WITH_FORTRAN "Enable Fortran linking, if this is set to OFF, no Fortran linking will be invoked (should not be needed, CMakeDetermineFortranCompiler should do the job)" ON)
 option(WITH_SWIG_SPLIT "Split SWIG wrapper generation into multiple modules" OFF) 
 option(WITH_WORHP "Compile the WORHP interface" ON) 
 option(WITH_ACADO "Compile the interfaces to ACADO and qpOASES, if it can be found" OFF) 
@@ -48,14 +47,6 @@ option(WITH_SUNDIALS "Compile the interface to Sundials (the source code for Sun
 option(WITH_QPOASES "Compile the interface to qpOASES (the source code for qpOASES 3.0beta is included)" ON)
 option(WITH_CSPARSE "Compile the interface to CSparse (the source code for CSparse is included)" ON)
 option(WITH_IPOPT "Compile the interface to IPOPT" ON)
-
-# Enable Fortran linking (needed e.g. for LAPACK/BLAS), if Fortran is available
-if(WITH_FORTRAN)
-  include(CMakeDetermineFortranCompiler)
-  if(CMAKE_Fortran_COMPILER)
-    enable_language(Fortran)
-  endif()
-endif()
 
 # For code optimization
 if(CMAKE_BUILD_TYPE)
