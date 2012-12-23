@@ -182,12 +182,6 @@ class IdasInternal : public SundialsInternal{
 
   // sensitivity method
   int ism_;
-  
-  // Calculate the error message map
-  static std::map<int,std::string> calc_flagmap();
-  
-  // Error message map
-  static std::map<int,std::string> flagmap;
  
   // Throw error
   static void idas_error(const std::string& module, int flag);

@@ -271,12 +271,7 @@ void Mapping::init(){
 void Mapping::evaluateMX(const MXPtrV& input, MXPtrV& output, const MXPtrVV& fwdSeed, MXPtrVV& fwdSens, const MXPtrVV& adjSeed, MXPtrVV& adjSens, bool output_given){
   // Sparsity
   const CRSSparsity &sp = sparsity();
-  const vector<int>& rowind = sp.rowind();
-  const vector<int>& col = sp.col();
   vector<int> row = sp.getRow();
-
-  // Dimensions
-  int d1=sp.size1(), d2=sp.size2();
   
   // Number of derivative directions
   int nfwd = fwdSens.size();

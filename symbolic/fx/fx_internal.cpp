@@ -345,10 +345,6 @@ CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
     int nz_seed = use_fwd ? nz_in  : nz_out;
     int nz_sens = use_fwd ? nz_out : nz_in;
 
-    // Input/output index
-    int ind_seed = use_fwd ? iind : oind;
-    int ind_sens = use_fwd ? oind : iind;
-
     // Print
     if(verbose()){
       std::cout << "FXInternal::getJacSparsity: using " << (use_fwd ? "forward" : "adjoint") << " mode: ";
@@ -727,7 +723,7 @@ int FXInternal::outputSchemeEntry(const std::string &name) const {
 }
 
 int FXInternal::schemeEntry(InputOutputScheme scheme, const std::string &name) const {
-  if (scheme=SCHEME_unknown) casadi_error("Unable to look up '" <<  name<< "' in input scheme, as the input scheme of this function is unknown. You can only index with integers.");
+  if (scheme==SCHEME_unknown) casadi_error("Unable to look up '" <<  name<< "' in input scheme, as the input scheme of this function is unknown. You can only index with integers.");
   if (name=="") casadi_error("FXInternal::inputSchemeEntry: you supplied an empty string as the name of a entry in " << getSchemeName(scheme) << ". Available names are: " << getSchemeEntryNames(scheme) << ".");
   int n = getSchemeEntryEnum(scheme,name);
   if (n==-1) casadi_error("FXInternal::inputSchemeEntry: could not find entry '" << name << "' in " << getSchemeName(scheme) << ". Available names are: " << getSchemeEntryNames(scheme) << ".");

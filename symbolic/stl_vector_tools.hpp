@@ -460,7 +460,6 @@ namespace CasADi{
     while(!getline(file, line, '\n').eof()) {
       std::istringstream reader(line);
       std::vector<T> lineData;
-      std::string::const_iterator i = line.begin();
       
       while(!reader.eof()) {
         T val;

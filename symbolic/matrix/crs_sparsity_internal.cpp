@@ -1708,9 +1708,6 @@ CRSSparsity CRSSparsityInternal::multiply(const CRSSparsity& B) const{
       C.colRef().resize(2*(C.size())+m);
     }
     
-    // C->i and C->x may be reallocated
-    int* Ci = &C.colRef().front();
-
     // column j of C starts here
     Cp[j] = nz;
     for(int p = Bp[j] ; p<Bp[j+1] ; ++p){
@@ -1727,7 +1724,7 @@ CRSSparsity CRSSparsityInternal::multiply(const CRSSparsity& B) const{
 }
 
 void CRSSparsityInternal::prefactorize(int order, int qr, std::vector<int>& S_pinv, std::vector<int>& S_q, std::vector<int>& S_parent, std::vector<int>& S_cp, std::vector<int>& S_leftmost, int& S_m2, double& S_lnz, double& S_unz) const{
-  int k, ok = 1;
+  int k;
   int n = nrow_;
   vector<int> post;
   

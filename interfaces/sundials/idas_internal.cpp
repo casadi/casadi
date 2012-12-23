@@ -1058,39 +1058,14 @@ void IdasInternal::printStats(std::ostream &stream) const{
   stream << "Time spent to factorize the jacobian in the linear solver setup function: " << t_lsetup_fac << " s." << endl;
   stream << std::endl;
 }
-
-map<int,string> IdasInternal::calc_flagmap(){
-  map<int,string> f;
-  f[IDA_TSTOP_RETURN] = "IDA_TSTOP_RETURN";
-  f[IDA_ROOT_RETURN] = "IDA_ROOT_RETURN";
-  f[IDA_MEM_NULL] = "IDA_MEM_NULL";
-  f[IDA_ILL_INPUT] = "IDA_ILL_INPUT";
-  f[IDA_TOO_MUCH_WORK] = "IDA_TOO_MUCH_WORK";
-  f[IDA_TOO_MUCH_ACC] = "IDA_TOO_MUCH_ACC";
-  f[IDA_ERR_FAIL] = "IDA_ERR_FAIL";
-  f[IDA_CONV_FAIL] = "IDA_CONV_FAIL";
-  f[IDA_LINIT_FAIL] = "IDA_LINIT_FAIL";
-  f[IDA_LSETUP_FAIL] = "IDA_LSETUP_FAIL";
-  f[IDA_LSOLVE_FAIL] = "IDA_LSOLVE_FAIL";
-  f[IDA_CONSTR_FAIL] = "IDA_CONSTR_FAIL";
-  f[IDA_REP_RES_ERR] = "IDA_REP_RES_ERR";
-  f[IDA_RES_FAIL] = "IDA_RES_FAIL";
-  f[IDA_RTFUNC_FAIL] = "IDA_RTFUNC_FAIL";
-  f[IDA_SUCCESS] = "IDA_SUCCESS";
-
-  return f;
-}
   
-map<int,string> IdasInternal::flagmap = IdasInternal::calc_flagmap();
-
 void IdasInternal::idas_error(const string& module, int flag){
   // Find the error
-  map<int,string>::const_iterator it = flagmap.find(flag);
   const char* flagname = IDAGetReturnFlagName(flag);
   stringstream ss;
   ss << "Module \"" << module << "\" returned flag " << flag << " (\"" << flagname << "\").";
   ss << " Consult Idas documentation." << std::endl;
-  delete flagname;
+  delete flagname; // This cannot be ok! delete is a C++ command and IDAS is written in C! Furthermore, there is no reason to expect this function to return a dynamically allocated string!
   
   // Heuristics
   if (

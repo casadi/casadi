@@ -54,6 +54,7 @@ void RKIntegratorInternal::init(){
   
   // Interpolation order
   int deg = getOption("interpolation_order");
+  casadi_assert_message(deg==1, "Not implemented");
 
   // Expand f?
   bool expand_f = getOption("expand_f");

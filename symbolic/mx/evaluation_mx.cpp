@@ -35,7 +35,6 @@ EvaluationMX::EvaluationMX(const FX& fcn, const std::vector<MX> &arg) : fcn_(fcn
       
   // Number inputs and outputs
   int num_in = fcn.getNumInputs();
-  int num_out = fcn.getNumOutputs();
 
   // All dependencies of the function
   vector<MX> d = arg;
