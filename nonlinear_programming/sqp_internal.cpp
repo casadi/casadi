@@ -259,12 +259,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     double l1_infeas = l1_merit(gk_, lbg, ubg); // FIXME: What about simple bounds?
 
     // Right-hand side of Armijo condition
-    F_.setInput(x_);
-    F_.setFwdSeed(dx_);
-    F_.evaluate(1, 0);
-    double F_sens;
-    F_.getFwdSens(F_sens);
-    
+    double F_sens = inner_prod(dx_, gf_);    
     double L1dir = F_sens - sigma_ * l1_infeas;
     double L1merit = fk_ + sigma_ * l1_infeas;
 
@@ -714,8 +709,6 @@ double SQPInternal::l1_merit(const std::vector<double>& g, const std::vector<dou
   // TODO: What about simple bounds?
   
   return l1_infeas;
-}
-
-
+}  
 
 } // namespace CasADi

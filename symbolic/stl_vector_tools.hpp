@@ -595,6 +595,16 @@ namespace CasADi{
     return true;
   }
   
+  template<typename T>
+  double inner_prod(const std::vector<T>& a, const std::vector<T>& b){
+    T ret = 0;
+    for(int k=0; k<a.size(); ++k){
+      ret += a[k]*b[k];
+    }
+    return ret;
+  }
+  
+  
 } // namespace CasADi
 
 #endif // SWIG

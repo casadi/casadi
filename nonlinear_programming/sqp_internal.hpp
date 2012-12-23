@@ -150,6 +150,7 @@ public:
   
   /// Calculates 1-norm of a vector
   static double norm1(const std::vector<double>& x);
+
 };
 
 } // namespace CasADi
