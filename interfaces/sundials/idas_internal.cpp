@@ -1061,11 +1061,11 @@ void IdasInternal::printStats(std::ostream &stream) const{
   
 void IdasInternal::idas_error(const string& module, int flag){
   // Find the error
-  const char* flagname = IDAGetReturnFlagName(flag);
+  char* flagname = IDAGetReturnFlagName(flag);
   stringstream ss;
   ss << "Module \"" << module << "\" returned flag " << flag << " (\"" << flagname << "\").";
   ss << " Consult Idas documentation." << std::endl;
-  delete flagname; // This cannot be ok! delete is a C++ command and IDAS is written in C! Furthermore, there is no reason to expect this function to return a dynamically allocated string!
+  free(flagname);
   
   // Heuristics
   if (
