@@ -230,13 +230,8 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     // Evaluating Hessian if needed
     eval_h(x_,mu_,1.0,Bk_);
 
-    if(m_>0){
-      // Evaluate the constraint function (NOTE: This is not needed. The constraint function should be evaluated as a byproduct of the Jacobian below)
-      eval_g(x_,gk_);
-      
-      // Evaluate the constraint Jacobian
-      eval_jac_g(x_,gk_,Jk_);
-    }
+    // Evaluate the constraint Jacobian
+    eval_jac_g(x_,gk_,Jk_);
     
     // Evaluate the gradient of the objective function (NOTE: This should not be needed when exact Hessian is used. The Hessian of the Lagrangian gives the gradient of the Lagrangian. The gradient of the objective function can be obtained from knowing the Jacobian of the constraints. The calculation could be desirable anyway, due to numeric cancellation
     eval_grad_f(x_,fk_,gf_);
@@ -264,6 +259,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     double l1_infeas = l1_merit(gk_, lbg, ubg); // FIXME: What about simple bounds?
 
     // Right-hand side of Armijo condition
+    F_.setInput(x_);
     F_.setFwdSeed(dx_);
     F_.evaluate(1, 0);
     double F_sens;
@@ -277,7 +273,6 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     if (merit_mem_.size() > merit_memsize_){
       merit_mem_.pop_front();
     }
-
     // Default stepsize
     double t = 1.0;   
     double fk_cand;
@@ -287,20 +282,15 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     // Line-search loop
     int ls_counter = 1;
     while (true){
-      for(int i=0; i<n_; ++i) x_cand_[i] = x_[i] + t * dx_[i]; 
+      for(int i=0; i<n_; ++i) x_cand_[i] = x_[i] + t * dx_[i];
+      
       // Evaluating objective and constraints
-      F_.setInput(x_cand_);
-      F_.evaluate();
-      F_.getOutput(fk_cand);
-      l1_infeas = 0.;
-      if(m_>0){
-        G_.setInput(x_cand_);
-        G_.evaluate();
-        G_.getOutput(gk_cand_);
+      eval_f(x_cand_,fk_cand);
+      eval_g(x_cand_,gk_cand_);
 
-        // Calculating merit-function in candidate
-        l1_infeas = l1_merit(gk_cand_, lbg, ubg);
-      }
+      // Calculating merit-function in candidate
+      l1_infeas = l1_merit(gk_cand_, lbg, ubg);
+      
       L1merit_cand = fk_cand + sigma_ * l1_infeas;
       // Calculating maximal merit function value so far
       double meritmax = -1E20;
@@ -333,23 +323,19 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     for(int i=0; i<n_; ++i) mu_x_[i] = t * qp_DUAL_X_[i] + (1 - t) * mu_x_[i];
 
     // Evaluating objective gradient
-    F_.setInput(x_);
-    F_.setAdjSeed(1.0);
-    F_.evaluate(0, 1);
-    F_.getAdjSens(gLag_); 
+    double dummy;
+    eval_grad_f(x_, dummy, gLag_);
 
     // Adjoint derivative of constraint function
     if(m_>0){
+      G_.setInput(x_);
       G_.setAdjSeed(mu_);
       G_.evaluate(0, 1);
       transform(gLag_.begin(),gLag_.end(),G_.adjSens().begin(),gLag_.begin(),plus<double>()); // gLag_ += G_.adjSens()
     }
     transform(gLag_.begin(),gLag_.end(),mu_x_.begin(),gLag_.begin(),plus<double>()); // gLag_ += mu_x_;
 
-    F_.setInput(x_old_);
-    F_.setAdjSeed(1.0);
-    F_.evaluate(0, 1);
-    F_.getAdjSens(gLag_old_);
+    eval_grad_f(x_old_, dummy, gLag_old_);
     if(m_>0){
       G_.setInput(x_old_);
       G_.setAdjSeed(mu_);
@@ -544,7 +530,7 @@ void SQPInternal::reset_h(){
   }
 }
 
-  void SQPInternal::eval_h(const std::vector<double>& x, const std::vector<double>& lambda, double sigma, Matrix<double>& H){
+void SQPInternal::eval_h(const std::vector<double>& x, const std::vector<double>& lambda, double sigma, Matrix<double>& H){
 
   if(hess_mode_==HESS_EXACT){
 
@@ -595,7 +581,10 @@ void SQPInternal::reset_h(){
   }
 }
 
-  void SQPInternal::eval_g(const std::vector<double>& x, std::vector<double>& g){
+void SQPInternal::eval_g(const std::vector<double>& x, std::vector<double>& g){
+  // Quick return if no constraints
+  if(m_==0) return;
+  
   G_.setInput(x);
   G_.evaluate();
   G_.output().get(g,DENSE);
@@ -607,6 +596,9 @@ void SQPInternal::reset_h(){
 }
 
 void SQPInternal::eval_jac_g(const std::vector<double>& x, std::vector<double>& g, Matrix<double>& J){
+  // Quick return if no constraints
+  if(m_==0) return;
+
   J_.setInput(x);
   J_.evaluate();
   J_.output(1).get(g,DENSE);
@@ -638,6 +630,18 @@ void SQPInternal::eval_grad_f(const std::vector<double>& x, double& f, std::vect
   }
 }
 
+  
+void SQPInternal::eval_f(const std::vector<double>& x, double& f){
+  F_.setInput(x);
+  F_.evaluate();
+  F_.output().get(f);
+
+  if (monitored("eval_f")){
+    cout << "x = " << x << endl;
+    cout << "f = " << f << endl;
+  }
+}
+  
 void SQPInternal::solve_QP(const Matrix<double>& H, const std::vector<double>& g,
 			   const std::vector<double>& lbx, const std::vector<double>& ubx,
 			   const Matrix<double>& A, const std::vector<double>& lbA, const std::vector<double>& ubA,
