@@ -251,37 +251,17 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     solve_QP(Bk_,gf_,qp_LBX_,qp_UBX_,Jk_,qp_LBA_,qp_UBA_,dx_,qp_DUAL_X_,qp_DUAL_A_);
 
     // Detecting indefiniteness
-//    if ((norm_2(p) / norm_2(x)).at(0) > 500.){
-//      casadi_warning("Search direction has very large values, indefinite Hessian might have ouccured.");
-//    }
     double gain = quad_form(dx_,Bk_);
     if (gain < 0){
       casadi_warning("Indefinite Hessian detected...");
     }
         
     // Calculate penalty parameter of merit function
-    for(int j=0; j<m_; ++j){
-      if( fabs(qp_DUAL_A_[j]) > sigma_){
-        sigma_ = fabs(qp_DUAL_A_[j]) * 1.01;
-      }
-    }
-//    for(int j = 0; j < n; ++j){
-//      if( fabs(qp_DUAL_X_[j]) > sigma_){
-//        sigma_ = fabs(qp_DUAL_X_[j]) * 1.01;
-//      }
-//    }
+    sigma_ = std::max(sigma_,1.01*norm1(qp_DUAL_A_));
+    // sigma_ = std::max(sigma_,1.01*norm1(qp_DUAL_X_)); // FIXME: What about simple bounds?
 
     // Calculate L1-merit function in the actual iterate
-    double l1_infeas = 0.;
-    for(int j=0; j<m_; ++j){
-      // Left-hand side violated
-      if(lbg[j] - gk_[j] > 0.){
-        l1_infeas += lbg[j] - gk_[j];
-      }
-      else if (gk_[j] - ubg[j] > 0.){
-        l1_infeas += gk_[j] - ubg[j];
-      }
-    }
+    double l1_infeas = l1_merit(gk_, lbg, ubg); // FIXME: What about simple bounds?
 
     // Right-hand side of Armijo condition
     F_.setFwdSeed(dx_);
@@ -313,21 +293,13 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       F_.evaluate();
       F_.getOutput(fk_cand);
       l1_infeas = 0.;
-      if (!G_.isNull()){
+      if(m_>0){
         G_.setInput(x_cand_);
         G_.evaluate();
         G_.getOutput(gk_cand_);
 
         // Calculating merit-function in candidate
-        for(int j=0; j<m_; ++j){
-          // Left-hand side violated
-          if (lbg[j] - gk_cand_[j] > 0.){
-            l1_infeas += lbg[j] - gk_cand_[j];
-          }
-          else if (gk_cand_[j] - ubg[j] > 0.){
-            l1_infeas += gk_cand_[j] - ubg[j];
-          }
-        }
+        l1_infeas = l1_merit(gk_cand_, lbg, ubg);
       }
       L1merit_cand = fk_cand + sigma_ * l1_infeas;
       // Calculating maximal merit function value so far
@@ -716,5 +688,30 @@ void SQPInternal::solve_QP(const Matrix<double>& H, const std::vector<double>& g
   }
 }
   
+double SQPInternal::norm1(const std::vector<double>& x){
+  double ret = 0;
+  for(vector<double>::const_iterator it=x.begin(); it!=x.end(); ++it){
+    ret = fmax(ret,fabs(*it));
+  }
+  return ret;
+}
+
+double SQPInternal::l1_merit(const std::vector<double>& g, const std::vector<double>& lbg, const std::vector<double>& ubg){
+  // Calculate L1-merit function
+  double l1_infeas = 0.;
+  for(int j=0; j<g.size(); ++j){
+    if(lbg[j] > g[j]){
+      l1_infeas += lbg[j] - g[j];
+    } else if (g[j] > ubg[j]){
+      l1_infeas += g[j] - ubg[j];
+    }
+  }
+
+  // TODO: What about simple bounds?
+  
+  return l1_infeas;
+}
+
+
 
 } // namespace CasADi
