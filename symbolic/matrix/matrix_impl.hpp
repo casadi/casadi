@@ -1229,7 +1229,48 @@ void Matrix<T>::mul_no_alloc_nn(const Matrix<T> &x, const Matrix<T> &y, Matrix<T
   }
 }
 
-
+  template<class T>
+  void Matrix<T>::mul_no_alloc_nn(const Matrix<T> &x, const std::vector<T> &y, std::vector<T>& z){
+    // Assert dimensions
+    casadi_assert(x.size1()==z.size());
+    casadi_assert(x.size2()==y.size());
+    
+    // Direct access to the arrays
+    const std::vector<int> &x_rowind = x.rowind();
+    const std::vector<int> &x_col = x.col();
+    const std::vector<T> &x_data = x.data();
+    
+    // loop over the rows of the matrix
+    for(int i=0; i<x_rowind.size()-1; ++i){
+      for(int el=x_rowind[i]; el<x_rowind[i+1]; ++el){ // loop over the non-zeros of the matrix
+        int j = x_col[el];
+        
+        // Perform operation
+        z[i] += x_data[el] * y[j];
+      }
+    }
+  }
+  
+  template<class T>
+  void Matrix<T>::mul_no_alloc_tn(const Matrix<T>& x_trans, const std::vector<T> &y, std::vector<T> &z){
+    // Assert dimensions
+    casadi_assert(x_trans.size2()==z.size());
+    casadi_assert(x_trans.size1()==y.size());
+    
+    // Direct access to the arrays
+    const std::vector<int> &x_colind = x_trans.rowind();
+    const std::vector<int> &x_row = x_trans.col();
+    const std::vector<T> &x_trans_data = x_trans.data();
+    
+    // loop over the columns of the matrix
+    for(int i=0; i<x_colind.size()-1; ++i){
+      for(int el=x_colind[i]; el<x_colind[i+1]; ++el){ // loop over the non-zeros of the matrix
+        int j = x_row[el];
+        z[j] += x_trans_data[el] * y[i];
+      }
+    }
+  }
+  
 template<class T>
 void Matrix<T>::mul_no_alloc_tn(const Matrix<T>& x_trans, const Matrix<T> &y, Matrix<T> &z){
   // Assert dimensions

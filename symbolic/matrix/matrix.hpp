@@ -459,18 +459,24 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     Matrix<T> __mrdivide__  (const Matrix<T> &y) const;
     //@}
     
-    /// Matrix product
+    /// Matrix-matrix product
     Matrix<T> mul(const Matrix<T> &y) const;
 
-    /// Matrix product, no memory allocation: z += mul(x,y)
+    /// Matrix-matrix product, no memory allocation: z += mul(x,y)
     static void mul_no_alloc_nn(const Matrix<T>& x, const Matrix<T> &y, Matrix<T>& z);
     
-    /// Matrix product, no memory allocation: z += mul(x,trans(y))
+    /// Matrix-matrix product, no memory allocation: z += mul(x,trans(y))
     static void mul_no_alloc_nt(const Matrix<T> &x, const Matrix<T> &y_trans, Matrix<T>& z);
 
-    /// Matrix product, no memory allocation: z += mul(trans(x),y)
+    /// Matrix-matrix product, no memory allocation: z += mul(trans(x),y)
     static void mul_no_alloc_tn(const Matrix<T>& trans_x, const Matrix<T> &y, Matrix<T>& z);
-    
+  
+    /// Matrix-vector product, no memory allocation: z += mul(x,y)
+    static void mul_no_alloc_nn(const Matrix<T>& x, const std::vector<T> &y, std::vector<T>& z);
+
+    /// vector-matrix product, no memory allocation: z += mul(trans(x),y)
+    static void mul_no_alloc_tn(const Matrix<T>& trans_x, const std::vector<T> &y, std::vector<T>& z);
+  
     /// Propagate sparsity using 0-1 logic through a matrix product, no memory allocation: z = mul(x,y)
     static void mul_sparsity(Matrix<T> &x, Matrix<T> &y_trans, Matrix<T>& z, bool fwd);
     

@@ -211,9 +211,19 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   // Lagrange gradient in the next iterate
   fill(gLag_.begin(),gLag_.end(),0);
 
-  // Reset the Hessian or Hessian approximation
-  reset_h();
+  // Initialize or reset the Hessian or Hessian approximation
+  if( hess_mode_ == HESS_BFGS){
+    reset_h();
+  } else {
+    eval_h(x_,mu_,1.0,Bk_);
+  }
+  
+  // Initial constraint Jacobian
+  eval_jac_g(x_,gk_,Jk_);
 
+  // Initial objective gradient
+  eval_grad_f(x_,fk_,gf_);
+  
   // Reset
   merit_mem_.clear();
   sigma_ = 0.;
@@ -227,15 +237,6 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     // Print header occasionally
     if(iter % 10 == 0) printIteration(cout);
     
-    // Evaluating Hessian if needed
-    eval_h(x_,mu_,1.0,Bk_);
-
-    // Evaluate the constraint Jacobian
-    eval_jac_g(x_,gk_,Jk_);
-    
-    // Evaluate the gradient of the objective function (NOTE: This should not be needed when exact Hessian is used. The Hessian of the Lagrangian gives the gradient of the Lagrangian. The gradient of the objective function can be obtained from knowing the Jacobian of the constraints. The calculation could be desirable anyway, due to numeric cancellation
-    eval_grad_f(x_,fk_,gf_);
-
     // Formulate the QP
     transform(lbx.begin(),lbx.end(),x_.begin(),qp_LBX_.begin(),minus<double>());
     transform(ubx.begin(),ubx.end(),x_.begin(),qp_UBX_.begin(),minus<double>());
@@ -288,7 +289,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       
       L1merit_cand = fk_cand + sigma_ * l1_infeas;
       // Calculating maximal merit function value so far
-      double meritmax = -1E20;
+      double meritmax = -std::numeric_limits<double>::infinity();
       for(int k = 0; k < merit_mem_.size(); ++k){
         if (merit_mem_[k] > meritmax){
           meritmax = merit_mem_[k];
@@ -309,38 +310,38 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       }
       ++ls_counter;
     }
-    // Candidate accepted
-    copy(x_.begin(),x_.end(),x_old_.begin());
-    copy(x_cand_.begin(),x_cand_.end(),x_.begin());
-    fk_ = fk_cand;
-    copy(gk_cand_.begin(),gk_cand_.end(),gk_.begin());
+    
+    // Candidate accepted, update dual variables
     for(int i=0; i<m_; ++i) mu_[i] = t * qp_DUAL_A_[i] + (1 - t) * mu_[i];
     for(int i=0; i<n_; ++i) mu_x_[i] = t * qp_DUAL_X_[i] + (1 - t) * mu_x_[i];
-
-    // Evaluating objective gradient
-    double dummy;
-    eval_grad_f(x_, dummy, gLag_);
-
-    // Adjoint derivative of constraint function
-    if(m_>0){
-      G_.setInput(x_);
-      G_.setAdjSeed(mu_);
-      G_.evaluate(0, 1);
-      transform(gLag_.begin(),gLag_.end(),G_.adjSens().begin(),gLag_.begin(),plus<double>()); // gLag_ += G_.adjSens()
-    }
-    transform(gLag_.begin(),gLag_.end(),mu_x_.begin(),gLag_.begin(),plus<double>()); // gLag_ += mu_x_;
-
-    eval_grad_f(x_old_, dummy, gLag_old_);
-    if(m_>0){
-      G_.setInput(x_old_);
-      G_.setAdjSeed(mu_);
-      G_.evaluate(0, 1);
-      transform(gLag_old_.begin(),gLag_old_.end(),G_.adjSens().begin(),gLag_old_.begin(),plus<double>()); // gLag_old_ += G_.adjSens();
-    }
-    transform(gLag_old_.begin(),gLag_old_.end(),mu_x_.begin(),gLag_old_.begin(),plus<double>()); // gLag_old += mu_x_;
-
-    // Updating Lagrange Hessian if needed. (BFGS with careful updates and restarts)
+    
     if( hess_mode_ == HESS_BFGS){
+      // Evaluate the gradient of the Lagrangian with the old x but new mu (for BFGS)
+      copy(gf_.begin(),gf_.end(),gLag_old_.begin());
+      if(m_>0) DMatrix::mul_no_alloc_tn(Jk_,mu_,gLag_old_);
+      // gLag_old += mu_x_;
+      transform(gLag_old_.begin(),gLag_old_.end(),mu_x_.begin(),gLag_old_.begin(),plus<double>());
+    }
+    
+    // Candidate accepted, update the primal variable
+    copy(x_.begin(),x_.end(),x_old_.begin());
+    copy(x_cand_.begin(),x_cand_.end(),x_.begin());
+    
+    // Evaluate the constraint Jacobian
+    eval_jac_g(x_,gk_,Jk_);
+    
+    // Evaluate the gradient of the objective function
+    eval_grad_f(x_,fk_,gf_);
+    
+    // Evaluate the gradient of the Lagrangian with the new x and new mu
+    copy(gf_.begin(),gf_.end(),gLag_.begin());
+    if(m_>0) DMatrix::mul_no_alloc_tn(Jk_,mu_,gLag_);
+    // gLag += mu_x_;
+    transform(gLag_.begin(),gLag_.end(),mu_x_.begin(),gLag_.begin(),plus<double>());
+
+    // Updating Lagrange Hessian
+    if( hess_mode_ == HESS_BFGS){
+      // BFGS with careful updates and restarts
       if (iter % lbfgs_memory_ == 0){
         // Remove off-diagonal entries
         const vector<int>& rowind = Bk_.rowind();
@@ -368,7 +369,11 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       
       // Get the updated Hessian
       bfgs_.getOutput(Bk_);
+    } else {
+      // Exact Hessian
+      eval_h(x_,mu_,1.0,Bk_);
     }
+    
     // Calculating optimality criterion
     // Primal infeasability
     double pr_infG = 0.;
