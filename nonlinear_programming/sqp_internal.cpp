@@ -292,13 +292,8 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       
       L1merit_cand = fk_cand + sigma_ * l1_infeas;
       // Calculating maximal merit function value so far
-      double meritmax = -std::numeric_limits<double>::infinity();
-      for(int k = 0; k < merit_mem_.size(); ++k){
-        if (merit_mem_[k] > meritmax){
-          meritmax = merit_mem_[k];
-        }
-      }
-      if (L1merit_cand <= meritmax + t * c1_ * L1dir){ 
+      double meritmax = *max_element(merit_mem_.begin(), merit_mem_.end());
+      if (L1merit_cand <= meritmax + t * c1_ * L1dir){
         // Accepting candidate
         break;
       }
@@ -346,16 +341,13 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     if( hess_mode_ == HESS_BFGS){
       // BFGS with careful updates and restarts
       if (iter % lbfgs_memory_ == 0){
-        // Remove off-diagonal entries
-        const vector<int>& rowind = Bk_.rowind();
-        const vector<int>& col = Bk_.col();
-        vector<double>& data = Bk_.data();
-        for(int i=0; i<rowind.size()-1; ++i){
-          for(int el=rowind[i]; el<rowind[i+1]; ++el){
-            int j = col[el];
-            if(i!=j){
-              data[el] = 0;
-            }
+        // Reset Hessian approximation by dropping all off-diagonal entries
+        const vector<int>& rowind = Bk_.rowind();      // Access sparsity (row offset)
+        const vector<int>& col = Bk_.col();            // Access sparsity (column)
+        vector<double>& data = Bk_.data();             // Access nonzero elements
+        for(int i=0; i<rowind.size()-1; ++i){          // Loop over the rows of the Hessian
+          for(int el=rowind[i]; el<rowind[i+1]; ++el){ // Loop over the nonzero elements of the row
+            if(i!=col[el]) data[el] = 0;               // Remove if off-diagonal entries
           }
         }
       }
@@ -378,43 +370,27 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     }
     
     // Calculating optimality criterion
+    
     // Primal infeasability
-    double pr_infG = 0.;
-    double pr_infx = 0.;
-    if (!G_.isNull()){
-      // Nonlinear constraints
-      for(int j=0; j<m_; ++j){
-        // Equality
-        if (ubg[j] - lbg[j] < 1E-20){
-          pr_infG += fabs(gk_cand_[j] - lbg[j]);
-        }
-        // Inequality, left-hand side violated
-        else if(lbg[j] - gk_cand_[j] > 0.){
-          pr_infG += lbg[j] - gk_cand_[j];
-        }
-        // Inequality, right-hand side violated
-        else if(gk_cand_[j] - ubg[j] > 0.){
-          pr_infG += gk_cand_[j] - ubg[j];
-          //cout << color << "SQP: " << mu.elem(j) << defcol << endl;
-        }
-      }
-      // Bound constraints
-      for(int j=0; j<n_; ++j){
-        // Equality
-        if (ubx[j] - lbx[j] < 1E-20){
-          pr_infx += fabs(x_[j] - lbx[j]);
-        }
-        // Inequality, left-hand side violated
-        else if ( lbx[j] - x_[j] > 0.){
-          pr_infx += lbx[j] - x_[j];
-        }
-        // Inequality, right-hand side violated
-        else if ( x_[j] - ubx[j] > 0.){
-          pr_infx += x_[j] - ubx[j];
-        }
+    double pr_inf = 0;
+  
+    // Nonlinear constraints
+    for(int j=0; j<m_; ++j){
+      if(lbg[j] > gk_cand_[j]){
+        pr_inf += lbg[j] - gk_cand_[j];
+      } else if(gk_cand_[j] > ubg[j]){
+        pr_inf += gk_cand_[j] - ubg[j];
       }
     }
-    double pr_inf = pr_infG + pr_infx;
+      
+    // Bound constraints
+    for(int j=0; j<n_; ++j){
+      if ( lbx[j] > x_[j]){
+        pr_inf += lbx[j] - x_[j];
+      } else if ( x_[j] > ubx[j]){
+        pr_inf += x_[j] - ubx[j];
+      }
+    }
     
     // 1-norm of lagrange gradient
     double gLag_norm1 = 0;
@@ -552,28 +528,28 @@ void SQPInternal::eval_h(const std::vector<double>& x, const std::vector<double>
       vector<double>& data = H.data();
       double reg_param = 0;
       for(int i=0; i<rowind.size()-1; ++i){
-	double mineig = 0;
-	for(int el=rowind[i]; el<rowind[i+1]; ++el){
-	  int j = col[el];
-	  if(i == j){
-	    mineig += data[el];
-	  } else {
-	    mineig -= fabs(data[el]);
-	  }
-	  //          cout << "(" << r << "," << col[el] << "): " << data[el] << endl; 
-	}
-	reg_param = fmin(reg_param,mineig);
+        double mineig = 0;
+        for(int el=rowind[i]; el<rowind[i+1]; ++el){
+          int j = col[el];
+          if(i == j){
+            mineig += data[el];
+          } else {
+            mineig -= fabs(data[el]);
+          }
+          //          cout << "(" << r << "," << col[el] << "): " << data[el] << endl;
+        }
+        reg_param = fmin(reg_param,mineig);
       }
       //      cout << "Regularization parameter: " << -reg_param << endl;
       if ( reg_param < 0.){
-	for(int i=0; i<rowind.size()-1; ++i){
-	  for(int el=rowind[i]; el<rowind[i+1]; ++el){
-	    int j = col[el];
-	    if(i==j){
-	      data[el] += -reg_param;
-	    }
-	  }
-	}
+        for(int i=0; i<rowind.size()-1; ++i){
+          for(int el=rowind[i]; el<rowind[i+1]; ++el){
+            int j = col[el];
+            if(i==j){
+              data[el] += -reg_param;
+            }
+          }
+        }
       }
     }
   }
