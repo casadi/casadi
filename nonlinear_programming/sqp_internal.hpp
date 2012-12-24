@@ -93,6 +93,9 @@ public:
   /// Hessian mode
   HessMode hess_mode_;
 
+  /// Initial Hessian approximation (BFGS)
+  DMatrix B_init_;
+  
   /// Current Hessian approximation
   DMatrix Bk_;
   

@@ -177,6 +177,9 @@ void SQPInternal::init(){
     bfgs_.setOption("number_of_fwd_dir",0);
     bfgs_.setOption("number_of_adj_dir",0);
     bfgs_.init();
+    
+    // Initial Hessian approximation
+    B_init_ = DMatrix::eye(n_);
   }
 }
 
@@ -521,7 +524,7 @@ double SQPInternal::quad_form(const std::vector<double>& x, const DMatrix& A){
 void SQPInternal::reset_h(){
   // Initial Hessian approximation of BFGS
   if ( hess_mode_ == HESS_BFGS){
-    Bk_.set(DMatrix::eye(n_));
+    Bk_.set(B_init_);
   }
 
   if (monitored("eval_h")) {
