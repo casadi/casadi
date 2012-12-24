@@ -145,15 +145,13 @@ public:
 			const Matrix<double>& A, const std::vector<double>& lbA, const std::vector<double>& ubA,
 			std::vector<double>& x_opt, std::vector<double>& lambda_x_opt, std::vector<double>& lambda_A_opt);
   
-  // Calculate the L1 merit function
-  double l1_merit(const std::vector<double>& g, const std::vector<double>& lbg, const std::vector<double>& ubg);
+  // Calculate the L1-norm of the primal infeasibility
+  double primalInfeasibility(const std::vector<double>& x, const std::vector<double>& lbx, const std::vector<double>& ubx,
+                             const std::vector<double>& g, const std::vector<double>& lbg, const std::vector<double>& ubg);
   
   /// Calculates inner_prod(x,mul(A,x))
   static double quad_form(const std::vector<double>& x, const DMatrix& A);
   
-  /// Calculates 1-norm of a vector
-  static double norm1(const std::vector<double>& x);
-
 };
 
 } // namespace CasADi

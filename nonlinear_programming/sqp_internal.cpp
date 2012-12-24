@@ -256,11 +256,11 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     }
         
     // Calculate penalty parameter of merit function
-    sigma_ = std::max(sigma_,1.01*norm1(qp_DUAL_A_));
-    // sigma_ = std::max(sigma_,1.01*norm1(qp_DUAL_X_)); // FIXME: What about simple bounds?
+    sigma_ = std::max(sigma_,1.01*norm_inf(qp_DUAL_X_));
+    sigma_ = std::max(sigma_,1.01*norm_inf(qp_DUAL_A_));
 
     // Calculate L1-merit function in the actual iterate
-    double l1_infeas = l1_merit(gk_, lbg, ubg); // FIXME: What about simple bounds?
+    double l1_infeas = primalInfeasibility(x_, lbx, ubx, gk_, lbg, ubg);
 
     // Right-hand side of Armijo condition
     double F_sens = inner_prod(dx_, gf_);    
@@ -273,10 +273,10 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       merit_mem_.pop_front();
     }
     // Default stepsize
-    double t = 1.0;   
+    double t = 1.0;
     double fk_cand;
     // Merit function value in candidate
-    double L1merit_cand = 0.;
+    double L1merit_cand = 0;
 
     // Line-search loop
     int ls_counter = 1;
@@ -288,7 +288,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       eval_g(x_cand_,gk_cand_);
 
       // Calculating merit-function in candidate
-      l1_infeas = l1_merit(gk_cand_, lbg, ubg);
+      l1_infeas = primalInfeasibility(x_cand_, lbx, ubx, gk_cand_, lbg, ubg);
       
       L1merit_cand = fk_cand + sigma_ * l1_infeas;
       // Calculating maximal merit function value so far
@@ -368,37 +368,15 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       // Exact Hessian
       eval_h(x_,mu_,1.0,Bk_);
     }
-    
-    // Calculating optimality criterion
-    
+        
     // Primal infeasability
-    double pr_inf = 0;
-  
-    // Nonlinear constraints
-    for(int j=0; j<m_; ++j){
-      if(lbg[j] > gk_cand_[j]){
-        pr_inf += lbg[j] - gk_cand_[j];
-      } else if(gk_cand_[j] > ubg[j]){
-        pr_inf += gk_cand_[j] - ubg[j];
-      }
-    }
-      
-    // Bound constraints
-    for(int j=0; j<n_; ++j){
-      if ( lbx[j] > x_[j]){
-        pr_inf += lbx[j] - x_[j];
-      } else if ( x_[j] > ubx[j]){
-        pr_inf += x_[j] - ubx[j];
-      }
-    }
+    double pr_inf = primalInfeasibility(x_, lbx, ubx, gk_cand_, lbg, ubg);
     
     // 1-norm of lagrange gradient
-    double gLag_norm1 = 0;
-    for(vector<double>::const_iterator it=gLag_.begin(); it!=gLag_.end(); ++it) gLag_norm1 += fabs(*it);
+    double gLag_norm1 = norm_1(gLag_);
 
     // 1-norm of step
-    double dx_norm1 = 0;
-    for(vector<double>::const_iterator it=dx_.begin(); it!=dx_.end(); ++it) dx_norm1 += fabs(*it);
+    double dx_norm1 = norm_1(dx_);
     
     // Printing information about the actual iterate
     printIteration(cout,iter,fk_cand,pr_inf,gLag_norm1,dx_norm1,t,ls_counter!=maxiter_ls_,ls_counter);
@@ -671,28 +649,24 @@ void SQPInternal::solve_QP(const Matrix<double>& H, const std::vector<double>& g
   }
 }
   
-double SQPInternal::norm1(const std::vector<double>& x){
-  double ret = 0;
-  for(vector<double>::const_iterator it=x.begin(); it!=x.end(); ++it){
-    ret = fmax(ret,fabs(*it));
-  }
-  return ret;
-}
-
-double SQPInternal::l1_merit(const std::vector<double>& g, const std::vector<double>& lbg, const std::vector<double>& ubg){
-  // Calculate L1-merit function
-  double l1_infeas = 0.;
-  for(int j=0; j<g.size(); ++j){
-    if(lbg[j] > g[j]){
-      l1_infeas += lbg[j] - g[j];
-    } else if (g[j] > ubg[j]){
-      l1_infeas += g[j] - ubg[j];
-    }
-  }
-
-  // TODO: What about simple bounds?
+double SQPInternal::primalInfeasibility(const std::vector<double>& x, const std::vector<double>& lbx, const std::vector<double>& ubx,
+                                        const std::vector<double>& g, const std::vector<double>& lbg, const std::vector<double>& ubg){
+  // L1-norm of the primal infeasibility
+  double pr_inf = 0;
   
-  return l1_infeas;
+  // Bound constraints
+  for(int j=0; j<x.size(); ++j){
+    pr_inf += max(0., lbx[j] - x[j]);
+    pr_inf += max(0., x[j] - ubx[j]);
+  }
+  
+  // Nonlinear constraints
+  for(int j=0; j<g.size(); ++j){
+    pr_inf += max(0., lbg[j] - g[j]);
+    pr_inf += max(0., g[j] - ubg[j]);
+  }
+  
+  return pr_inf;
 }  
 
 } // namespace CasADi

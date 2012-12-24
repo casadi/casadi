@@ -596,7 +596,7 @@ namespace CasADi{
   }
   
   template<typename T>
-  double inner_prod(const std::vector<T>& a, const std::vector<T>& b){
+  T inner_prod(const std::vector<T>& a, const std::vector<T>& b){
     T ret = 0;
     for(int k=0; k<a.size(); ++k){
       ret += a[k]*b[k];
@@ -604,6 +604,23 @@ namespace CasADi{
     return ret;
   }
   
+  template<typename T>
+  T norm_inf(const std::vector<T>& x){
+    T ret = 0;
+    for(int k=0; k<x.size(); ++k){
+      ret = fmax(ret,fabs(x[k]));
+    }
+    return ret;
+  }
+  
+  template<typename T>
+  T norm_1(const std::vector<T>& x){
+    T ret = 0;
+    for(int k=0; k<x.size(); ++k){
+      ret += fabs(x[k]);
+    }
+    return ret;
+  }
   
 } // namespace CasADi
 
