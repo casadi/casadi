@@ -265,7 +265,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     if(iter % 10 == 0) printIteration(cout);
     
     // Printing information about the actual iterate
-    printIteration(cout,iter,fk_,pr_inf,gLag_norm1,dx_norm1,t,ls_success,ls_iter);
+    printIteration(cout,iter,fk_,pr_inf,gLag_norm1,dx_norm1,ls_iter,ls_success);
     
     // Call callback function if present
     if (!callback_.isNull()) {
@@ -443,32 +443,28 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   // Save statistics
   stats_["iter_count"] = iter;
 }
-
+  
 void SQPInternal::printIteration(std::ostream &stream){
-  const int w=15;
-  stream << setw(w) << "iter";
-  stream << setw(w) << "obj";
-  stream << setw(w) << "pr_inf";
-  stream << setw(w) << "du_inf";
-  stream << setw(w) << "corr_norm";
-  stream << setw(w) << "ls_param";
+  stream << setw(4)  << "iter";
+  stream << setw(14) << "objective";
+  stream << setw(9) << "inf_pr";
+  stream << setw(9) << "inf_du";
+  stream << setw(9) << "||d||";
+  stream << setw(3) << "ls";
   stream << ' ';
-  stream << setw(w) << "ls_trials";
   stream << endl;
 }
   
 void SQPInternal::printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf, 
-                                 double corr_norm, double ls_param, bool ls_success, int ls_trials){
-  const int w=15;
+                                 double corr_norm, int ls_trials, bool ls_success){
   stream << scientific;
-  stream << setw(w) << iter;
-  stream << setw(w) << obj;
-  stream << setw(w) << pr_inf;
-  stream << setw(w) << du_inf;
-  stream << setw(w) << corr_norm;
-  stream << setw(w) << ls_param;
+  stream << setw(4) << iter;
+  stream << setw(14) << setprecision(6) << obj;
+  stream << setw(9) << setprecision(2) << pr_inf;
+  stream << setw(9) << setprecision(2) << du_inf;
+  stream << setw(9) << setprecision(2) << corr_norm;
+  stream << setw(3) << ls_trials;
   stream << (ls_success ? ' ' : 'F');
-  stream << setw(w) << ls_trials;
   stream << endl;
 }
 

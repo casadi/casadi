@@ -119,7 +119,7 @@ public:
   
   /// Print iteration
   void printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf, 
-                      double corr_norm, double ls_param, bool ls_success, int ls_trials);
+                      double corr_norm, int ls_trials, bool ls_success);
 
   // Reset the Hessian or Hessian approximation
   void reset_h();
