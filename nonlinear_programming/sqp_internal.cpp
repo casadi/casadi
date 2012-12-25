@@ -502,7 +502,8 @@ void SQPInternal::reset_h(){
   }
 
   if (monitored("eval_h")) {
-    cout << "(pre) B = " << endl;
+    cout << "x = " << x_ << endl;
+    cout << "H = " << endl;
     Bk_.printSparse();
   }
 }
@@ -553,7 +554,8 @@ void SQPInternal::eval_h(const std::vector<double>& x, const std::vector<double>
   }
   
   if (monitored("eval_h")) {
-    cout << "(main loop) B = " << endl;
+    cout << "x = " << x << endl;
+    cout << "H = " << endl;
     H.printSparse();
   }
 }
@@ -567,8 +569,8 @@ void SQPInternal::eval_g(const std::vector<double>& x, std::vector<double>& g){
   G_.output().get(g,DENSE);
   
   if (monitored("eval_g")) {
-    cout << "(main loop) x = " << x << endl;
-    cout << "(main loop) G = " << g << endl;
+    cout << "x = " << x << endl;
+    cout << "g = " << g << endl;
   } 
 }
 
