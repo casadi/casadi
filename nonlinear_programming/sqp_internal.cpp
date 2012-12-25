@@ -238,6 +238,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   // Initialize or reset the Hessian or Hessian approximation
   if( hess_mode_ == HESS_BFGS){
     reset_h();
+    reg_ = 0;
   } else {
     eval_h(x_,mu_,1.0,Bk_);
   }
@@ -286,7 +287,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     if(iter % 10 == 0) printIteration(cout);
     
     // Printing information about the actual iterate
-    printIteration(cout,iter,fk_,pr_inf,gLag_norm1,dx_norm1,ls_iter,ls_success);
+    printIteration(cout,iter,fk_,pr_inf,gLag_norm1,dx_norm1,reg_,ls_iter,ls_success);
     
     // Call callback function if present
     if (!callback_.isNull()) {
@@ -474,19 +475,26 @@ void SQPInternal::printIteration(std::ostream &stream){
   stream << setw(9) << "inf_pr";
   stream << setw(9) << "inf_du";
   stream << setw(9) << "||d||";
+  stream << setw(7) << "lg(rg)";
   stream << setw(3) << "ls";
   stream << ' ';
   stream << endl;
 }
   
 void SQPInternal::printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf, 
-                                 double corr_norm, int ls_trials, bool ls_success){
-  stream << scientific;
+                                 double dx_norm, double rg, int ls_trials, bool ls_success){
   stream << setw(4) << iter;
+  stream << scientific;
   stream << setw(14) << setprecision(6) << obj;
   stream << setw(9) << setprecision(2) << pr_inf;
   stream << setw(9) << setprecision(2) << du_inf;
-  stream << setw(9) << setprecision(2) << corr_norm;
+  stream << setw(9) << setprecision(2) << dx_norm;
+  stream << fixed;
+  if(rg>0){
+    stream << setw(7) << setprecision(2) << log10(rg);
+  } else {
+    stream << setw(7) << "-";
+  }
   stream << setw(3) << ls_trials;
   stream << (ls_success ? ' ' : 'F');
   stream << endl;
@@ -532,48 +540,57 @@ void SQPInternal::reset_h(){
   }
 }
 
-void SQPInternal::eval_h(const std::vector<double>& x, const std::vector<double>& lambda, double sigma, Matrix<double>& H){
-
-  if(hess_mode_==HESS_EXACT){
-
-    int n_hess_in = H_.getNumInputs() - (parametric_ ? 1 : 0);
-    H_.setInput(x);
-    if(n_hess_in>1){
-      H_.setInput(lambda, n_hess_in == 4 ? 2 : 1);
-      H_.setInput(sigma, n_hess_in == 4 ? 3 : 2);
+  double SQPInternal::getRegularization(const Matrix<double>& H){
+    const vector<int>& rowind = H.rowind();
+    const vector<int>& col = H.col();
+    const vector<double>& data = H.data();
+    double reg_param = 0;
+    for(int i=0; i<rowind.size()-1; ++i){
+      double mineig = 0;
+      for(int el=rowind[i]; el<rowind[i+1]; ++el){
+        int j = col[el];
+        if(i == j){
+          mineig += data[el];
+        } else {
+          mineig -= fabs(data[el]);
+        }
+      }
+      reg_param = fmin(reg_param,mineig);
     }
-    H_.evaluate();
-    H_.getOutput(H);
-    // Determing regularization parameter with Gershgorin theorem
-    if(regularize_){
-      const vector<int>& rowind = H.rowind();
-      const vector<int>& col = H.col();
-      vector<double>& data = H.data();
-      double reg_param = 0;
-      for(int i=0; i<rowind.size()-1; ++i){
-        double mineig = 0;
-        for(int el=rowind[i]; el<rowind[i+1]; ++el){
-          int j = col[el];
-          if(i == j){
-            mineig += data[el];
-          } else {
-            mineig -= fabs(data[el]);
-          }
-          //          cout << "(" << r << "," << col[el] << "): " << data[el] << endl;
-        }
-        reg_param = fmin(reg_param,mineig);
-      }
-      //      cout << "Regularization parameter: " << -reg_param << endl;
-      if ( reg_param < 0.){
-        for(int i=0; i<rowind.size()-1; ++i){
-          for(int el=rowind[i]; el<rowind[i+1]; ++el){
-            int j = col[el];
-            if(i==j){
-              data[el] += -reg_param;
-            }
-          }
+    return -reg_param;
+  }
+  
+  void SQPInternal::regularize(Matrix<double>& H, double reg){
+    const vector<int>& rowind = H.rowind();
+    const vector<int>& col = H.col();
+    vector<double>& data = H.data();
+    
+    for(int i=0; i<rowind.size()-1; ++i){
+      for(int el=rowind[i]; el<rowind[i+1]; ++el){
+        int j = col[el];
+        if(i==j){
+          data[el] += reg;
         }
       }
+    }
+  }
+
+  
+void SQPInternal::eval_h(const std::vector<double>& x, const std::vector<double>& lambda, double sigma, Matrix<double>& H){
+  int n_hess_in = H_.getNumInputs() - (parametric_ ? 1 : 0);
+  H_.setInput(x);
+  if(n_hess_in>1){
+    H_.setInput(lambda, n_hess_in == 4 ? 2 : 1);
+    H_.setInput(sigma, n_hess_in == 4 ? 3 : 2);
+  }
+  H_.evaluate();
+  H_.getOutput(H);
+    
+  // Determing regularization parameter with Gershgorin theorem
+  if(regularize_){
+    reg_ = getRegularization(H);
+    if(reg_ > 0){
+      regularize(H,reg_);
     }
   }
   

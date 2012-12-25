@@ -62,6 +62,9 @@ public:
   int merit_memsize_;
   //@}
 
+  /// Hessian regularization
+  double reg_;
+  
   /// Access QPSolver
   const QPSolver getQPSolver() const { return qp_solver_;}
   
@@ -119,7 +122,7 @@ public:
   
   /// Print iteration
   void printIteration(std::ostream &stream, int iter, double obj, double pr_inf, double du_inf, 
-                      double corr_norm, int ls_trials, bool ls_success);
+                      double dx_norm, double reg, int ls_trials, bool ls_success);
 
   // Reset the Hessian or Hessian approximation
   void reset_h();
@@ -138,6 +141,12 @@ public:
 
   // Evaluate the Hessian of the Lagrangian
   virtual void eval_h(const std::vector<double>& x, const std::vector<double>& lambda, double sigma, Matrix<double>& H);
+  
+  // Calculate the regularization parameter using Gershgorin theorem
+  double getRegularization(const Matrix<double>& H);
+  
+  // Regularize by adding a multiple of the identity
+  void regularize(Matrix<double>& H, double reg);
   
   // Solve the QP subproblem
   virtual void solve_QP(const Matrix<double>& H, const std::vector<double>& g,
