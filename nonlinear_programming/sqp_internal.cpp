@@ -220,6 +220,21 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   } else {
     eval_h(x_,mu_,1.0,Bk_);
   }
+
+  // Evaluate the initial gradient of the Lagrangian
+  copy(gf_.begin(),gf_.end(),gLag_.begin());
+  if(m_>0) DMatrix::mul_no_alloc_tn(Jk_,mu_,gLag_);
+  // gLag += mu_x_;
+  transform(gLag_.begin(),gLag_.end(),mu_x_.begin(),gLag_.begin(),plus<double>());
+
+  // Number of SQP iterations
+  int iter = 0;
+
+  // Number of line-search iterations
+  int ls_iter = 0;
+  
+  // Last linesearch successfull
+  bool ls_success = true;
   
   // Initial constraint Jacobian
   eval_jac_g(x_,gk_,Jk_);
@@ -231,14 +246,55 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   merit_mem_.clear();
   sigma_ = 0.;
 
-  // Print header
-  printIteration(cout);
+  // Default stepsize
+  double t = 0;
   
   // MAIN OPTIMIZATION LOOP
-  int iter = 1;
   while(true){
+    
+    // Primal infeasability
+    double pr_inf = primalInfeasibility(x_, lbx, ubx, gk_, lbg, ubg);
+    
+    // 1-norm of lagrange gradient
+    double gLag_norm1 = norm_1(gLag_);
+    
+    // 1-norm of step
+    double dx_norm1 = norm_1(dx_);
+    
     // Print header occasionally
     if(iter % 10 == 0) printIteration(cout);
+    
+    // Printing information about the actual iterate
+    printIteration(cout,iter,fk_,pr_inf,gLag_norm1,dx_norm1,t,ls_success,ls_iter);
+    
+    // Call callback function if present
+    if (!callback_.isNull()) {
+      callback_.input(NLP_COST).set(fk_);
+      callback_.input(NLP_X_OPT).set(x_);
+      callback_.input(NLP_LAMBDA_G).set(mu_);
+      callback_.input(NLP_LAMBDA_X).set(mu_x_);
+      callback_.input(NLP_G).set(gk_);
+      callback_.evaluate();
+      
+      if (callback_.output(0).at(0)) {
+        cout << "SQP: aborted by callback..." << endl;
+        break;
+      }
+    }
+    
+    // Checking convergence criteria
+    if (pr_inf < tol_pr_ && gLag_norm1 < tol_du_){
+      cout << "SQP: Convergence achieved after " << iter << " iterations." << endl;
+      break;
+    }
+    
+    if (iter >= maxiter_){
+      cout << "SQP: Maximum number of iterations reached, quiting..." << endl;
+      break;
+    }
+    
+    // Start a new iteration
+    iter++;
     
     // Formulate the QP
     transform(lbx.begin(),lbx.end(),x_.begin(),qp_LBX_.begin(),minus<double>());
@@ -272,41 +328,48 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     if (merit_mem_.size() > merit_memsize_){
       merit_mem_.pop_front();
     }
-    // Default stepsize
-    double t = 1.0;
+    // Stepsize
+    t = 1.0;
     double fk_cand;
     // Merit function value in candidate
     double L1merit_cand = 0;
 
-    // Line-search loop
-    int ls_counter = 1;
-    while (true){
-      for(int i=0; i<n_; ++i) x_cand_[i] = x_[i] + t * dx_[i];
-      
-      // Evaluating objective and constraints
-      eval_f(x_cand_,fk_cand);
-      eval_g(x_cand_,gk_cand_);
+    // Reset line-search counter, success marker
+    ls_iter = 0;
+    ls_success = true;
 
-      // Calculating merit-function in candidate
-      l1_infeas = primalInfeasibility(x_cand_, lbx, ubx, gk_cand_, lbg, ubg);
+    // Line-search
+    if(maxiter_ls_>0){ // maxiter_ls_== 0 disables line-search
       
-      L1merit_cand = fk_cand + sigma_ * l1_infeas;
-      // Calculating maximal merit function value so far
-      double meritmax = *max_element(merit_mem_.begin(), merit_mem_.end());
-      if (L1merit_cand <= meritmax + t * c1_ * L1dir){
-        // Accepting candidate
-        break;
-      }
-      else{
+      // Line-search loop
+      while (true){
+        for(int i=0; i<n_; ++i) x_cand_[i] = x_[i] + t * dx_[i];
+      
+        // Evaluating objective and constraints
+        eval_f(x_cand_,fk_cand);
+        eval_g(x_cand_,gk_cand_);
+        ls_iter++;
+
+        // Calculating merit-function in candidate
+        l1_infeas = primalInfeasibility(x_cand_, lbx, ubx, gk_cand_, lbg, ubg);
+      
+        L1merit_cand = fk_cand + sigma_ * l1_infeas;
+        // Calculating maximal merit function value so far
+        double meritmax = *max_element(merit_mem_.begin(), merit_mem_.end());
+        if (L1merit_cand <= meritmax + t * c1_ * L1dir){
+          // Accepting candidate
+          break;
+        }
+      
+        // Line-search not successful, but we accept it.
+        if(ls_iter == maxiter_ls_){
+          ls_success = false;
+          break;
+        }
+      
         // Backtracking
-        t = beta_ * t; 
+        t = beta_ * t;
       }
-
-      // Line-search not successful, but we accept it.
-      if(ls_counter == maxiter_ls_){
-        break;
-      }
-      ++ls_counter;
     }
     
     // Candidate accepted, update dual variables
@@ -368,45 +431,6 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       // Exact Hessian
       eval_h(x_,mu_,1.0,Bk_);
     }
-        
-    // Primal infeasability
-    double pr_inf = primalInfeasibility(x_, lbx, ubx, gk_cand_, lbg, ubg);
-    
-    // 1-norm of lagrange gradient
-    double gLag_norm1 = norm_1(gLag_);
-
-    // 1-norm of step
-    double dx_norm1 = norm_1(dx_);
-    
-    // Printing information about the actual iterate
-    printIteration(cout,iter,fk_cand,pr_inf,gLag_norm1,dx_norm1,t,ls_counter!=maxiter_ls_,ls_counter);
-    
-    // Call callback function if present
-    if (!callback_.isNull()) {
-      callback_.input(NLP_COST).set(fk_);
-      callback_.input(NLP_X_OPT).set(x_);
-      callback_.input(NLP_LAMBDA_G).set(mu_);
-      callback_.input(NLP_LAMBDA_X).set(mu_x_);
-      callback_.input(NLP_G).set(gk_);
-      callback_.evaluate();
-      
-      if (callback_.output(0).at(0)) {
-       cout << "SQP: aborted by callback...\n"; 
-       break;
-      }
-    }
-
-    // Checking convergence criteria
-    if (pr_inf < tol_pr_ && gLag_norm1 < tol_du_){
-      cout << "SQP: Convergence achieved after " << iter << " iterations.\n";
-      break;
-    }
-
-    if (iter == maxiter_){
-      cout << "SQP: Maximum number of iterations reached, quiting...\n"; 
-      break;
-    }
-    ++iter;
   }
   
   // Save results to outputs
