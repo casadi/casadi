@@ -52,6 +52,7 @@ SQPInternal::SQPInternal(const FX& F, const FX& G, const FX& H, const FX& J) : N
   addOption("merit_memory",      OT_INTEGER,      4,              "Size of memory to store history of merit function values");
   addOption("lbfgs_memory",      OT_INTEGER,     10,              "Size of L-BFGS memory.");
   addOption("regularize",        OT_BOOLEAN,  false,              "Automatic regularization of Lagrange Hessian.");
+  addOption("print_header",      OT_BOOLEAN,   true,              "Print the header with problem statistics");
   
   // Monitors
   addOption("monitor",      OT_STRINGVECTOR, GenericType(),  "", "eval_f|eval_g|eval_jac_g|eval_grad_f|eval_h|qp|dx", true);
@@ -181,6 +182,26 @@ void SQPInternal::init(){
     // Initial Hessian approximation
     B_init_ = DMatrix::eye(n_);
   }
+  
+  // Header
+  if(bool(getOption("print_header"))){
+    cout << "-------------------------------------------" << endl;
+    cout << "This is CasADi::SQPMethod." << endl;
+    switch (hess_mode_) {
+      case HESS_EXACT:
+        cout << "Using exact Hessian" << endl;
+        break;
+      case HESS_BFGS:
+        cout << "Using limited memory BFGS Hessian approximation" << endl;
+        break;
+    }
+    cout << endl;
+    cout << "Number of variables:                       " << setw(9) << n_ << endl;
+    cout << "Number of constraints:                     " << setw(9) << m_ << endl;
+    cout << "Number of nonzeros in constraint Jacobian: " << setw(9) << A_sparsity.size() << endl;
+    cout << "Number of nonzeros in Lagrangian Hessian:  " << setw(9) << H_sparsity.size() << endl;
+    cout << endl;
+  }
 }
 
 void SQPInternal::evaluate(int nfdir, int nadir){
@@ -277,19 +298,22 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       callback_.evaluate();
       
       if (callback_.output(0).at(0)) {
-        cout << "SQP: aborted by callback..." << endl;
+        cout << endl;
+        cout << "CasADi::SQPMethod: aborted by callback..." << endl;
         break;
       }
     }
     
     // Checking convergence criteria
     if (pr_inf < tol_pr_ && gLag_norm1 < tol_du_){
-      cout << "SQP: Convergence achieved after " << iter << " iterations." << endl;
+      cout << endl;
+      cout << "CasADi::SQPMethod: Convergence achieved after " << iter << " iterations." << endl;
       break;
     }
     
     if (iter >= maxiter_){
-      cout << "SQP: Maximum number of iterations reached, quiting..." << endl;
+      cout << endl;
+      cout << "CasADi::SQPMethod: Maximum number of iterations reached." << endl;
       break;
     }
     
