@@ -45217,7 +45217,7 @@ Make the matrix an empty n-by-m matrix. ";
 
 %feature("docstring")  CasADi::Matrix::mul "
 
-Matrix product. ";
+Matrix-matrix product. ";
 
 %feature("docstring")  CasADi::Matrix::trans "
 
@@ -68911,15 +68911,19 @@ Print iteration. ";
 
 %feature("docstring")  CasADi::SQPInternal::reset_h "";
 
-%feature("docstring")  CasADi::SQPInternal::eval_h "";
+%feature("docstring")  CasADi::SQPInternal::eval_f "";
+
+%feature("docstring")  CasADi::SQPInternal::eval_grad_f "";
 
 %feature("docstring")  CasADi::SQPInternal::eval_g "";
 
 %feature("docstring")  CasADi::SQPInternal::eval_jac_g "";
 
-%feature("docstring")  CasADi::SQPInternal::eval_grad_f "";
+%feature("docstring")  CasADi::SQPInternal::eval_h "";
 
 %feature("docstring")  CasADi::SQPInternal::solve_QP "";
+
+%feature("docstring")  CasADi::SQPInternal::l1_merit "";
 
 %feature("docstring")  CasADi::SQPInternal::reportConstraints "
 
@@ -80655,6 +80659,8 @@ ENTRY_INDEX_1, ENTRY_VALUE_1, ENTRY_INDEX_2, ENTRY_VALUE_2 ...) ";
 %feature("docstring")  CasADi::isRegular "
 
 Checks if vector does not contain NaN or Inf. ";
+
+%feature("docstring")  CasADi::inner_prod "";
 
 %feature("docstring")  CasADi::if_else "";
 
