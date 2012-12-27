@@ -71,6 +71,9 @@ class ImplicitFunctionInternal : public FXInternal{
     /** \brief Generate a linear solver for the sensitivity equations */
     ImplicitFunction jac(const std::vector<int> iind, int oind=0);
     
+    /// Set the jacobian of F
+    void setJacobian(FX &J);
+    
     /// Jacobian
     FX J_;
     

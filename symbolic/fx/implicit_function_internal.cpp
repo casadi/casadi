@@ -268,6 +268,10 @@ ImplicitFunction ImplicitFunctionInternal::jac(const std::vector<int> iind, int 
 
 ImplicitFunctionInternal::~ImplicitFunctionInternal(){
 }
+
+void ImplicitFunctionInternal::setJacobian(FX &J) {
+  J_ = J;
+}
  
  
 } // namespace CasADi

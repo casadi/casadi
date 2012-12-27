@@ -42,6 +42,12 @@ FX ImplicitFunction::getF() const {
   return (*this)->f_;
 }
 
+void ImplicitFunction::setJacobian(FX &J) {
+  casadi_assert(checkNode());
+  (*this)->setJacobian(J);
+}
+  
+
 
 } // namespace CasADi
 

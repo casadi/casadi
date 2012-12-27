@@ -73,6 +73,9 @@ public:
   /// Check if the node is pointing to the right type of object
   virtual bool checkNode() const;
   
+  /// Set the jacobian of F
+  void setJacobian(FX &J);
+  
   /// Access F
   FX getF() const;
 };
