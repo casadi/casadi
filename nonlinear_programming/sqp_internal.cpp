@@ -232,9 +232,12 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   fill(mu_.begin(),mu_.end(),0);
   fill(mu_x_.begin(),mu_x_.end(),0);
 
-  // Lagrange gradient in the next iterate
-  fill(gLag_.begin(),gLag_.end(),0);
-
+  // Initial constraint Jacobian
+  eval_jac_g(x_,gk_,Jk_);
+  
+  // Initial objective gradient
+  eval_grad_f(x_,fk_,gf_);
+  
   // Initialize or reset the Hessian or Hessian approximation
   if( hess_mode_ == HESS_BFGS){
     reset_h();
@@ -257,12 +260,6 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   
   // Last linesearch successfull
   bool ls_success = true;
-  
-  // Initial constraint Jacobian
-  eval_jac_g(x_,gk_,Jk_);
-
-  // Initial objective gradient
-  eval_grad_f(x_,fk_,gf_);
   
   // Reset
   merit_mem_.clear();
