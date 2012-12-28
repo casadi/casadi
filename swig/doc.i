@@ -22716,6 +22716,10 @@ point to this new object. ";
 
 Check if the node is pointing to the right type of object. ";
 
+%feature("docstring")  CasADi::ImplicitFunction::setJacobian "
+
+Set the jacobian of F. ";
+
 %feature("docstring")  CasADi::ImplicitFunction::getF "
 
 Access F. ";
@@ -23439,6 +23443,10 @@ Generate a linear solver for the sensitivity equations. ";
 %feature("docstring")  CasADi::ImplicitFunctionInternal::jac "
 
 Generate a linear solver for the sensitivity equations. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::setJacobian "
+
+Set the jacobian of F. ";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::requestNumSens "
 
@@ -34386,6 +34394,10 @@ Generate a linear solver for the sensitivity equations. ";
 
 Generate a linear solver for the sensitivity equations. ";
 
+%feature("docstring")  CasADi::KinsolInternal::setJacobian "
+
+Set the jacobian of F. ";
+
 %feature("docstring")  CasADi::KinsolInternal::requestNumSens "
 
 Request a number of forward/adjoint derivative directions. ";
@@ -35031,6 +35043,10 @@ Set Jacobian. ";
 %feature("docstring")  CasADi::KinsolSolver::getJacobian "
 
 Get Jacobian. ";
+
+%feature("docstring")  CasADi::KinsolSolver::setJacobian "
+
+Set the jacobian of F. ";
 
 %feature("docstring")  CasADi::KinsolSolver::getF "
 
@@ -50649,6 +50665,10 @@ Generate a linear solver for the sensitivity equations. ";
 
 Generate a linear solver for the sensitivity equations. ";
 
+%feature("docstring")  CasADi::NewtonImplicitInternal::setJacobian "
+
+Set the jacobian of F. ";
+
 %feature("docstring")  CasADi::NewtonImplicitInternal::requestNumSens "
 
 Request a number of forward/adjoint derivative directions. ";
@@ -51238,6 +51258,10 @@ Default constructor. ";
 %feature("docstring")  CasADi::NewtonImplicitSolver::checkNode "
 
 Check if the node is pointing to the right type of object. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::setJacobian "
+
+Set the jacobian of F. ";
 
 %feature("docstring")  CasADi::NewtonImplicitSolver::getF "
 
@@ -51992,6 +52016,10 @@ Generate a linear solver for the sensitivity equations. ";
 
 Generate a linear solver for the sensitivity equations. ";
 
+%feature("docstring")  CasADi::NLPImplicitInternal::setJacobian "
+
+Set the jacobian of F. ";
+
 %feature("docstring")  CasADi::NLPImplicitInternal::requestNumSens "
 
 Request a number of forward/adjoint derivative directions. ";
@@ -52554,6 +52582,10 @@ Default constructor. ";
 %feature("docstring")  CasADi::NLPImplicitSolver::checkNode "
 
 Check if the node is pointing to the right type of object. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::setJacobian "
+
+Set the jacobian of F. ";
 
 %feature("docstring")  CasADi::NLPImplicitSolver::getF "
 
@@ -68921,9 +68953,13 @@ Print iteration. ";
 
 %feature("docstring")  CasADi::SQPInternal::eval_h "";
 
+%feature("docstring")  CasADi::SQPInternal::getRegularization "";
+
+%feature("docstring")  CasADi::SQPInternal::regularize "";
+
 %feature("docstring")  CasADi::SQPInternal::solve_QP "";
 
-%feature("docstring")  CasADi::SQPInternal::l1_merit "";
+%feature("docstring")  CasADi::SQPInternal::primalInfeasibility "";
 
 %feature("docstring")  CasADi::SQPInternal::reportConstraints "
 
@@ -80661,6 +80697,10 @@ ENTRY_INDEX_1, ENTRY_VALUE_1, ENTRY_INDEX_2, ENTRY_VALUE_2 ...) ";
 Checks if vector does not contain NaN or Inf. ";
 
 %feature("docstring")  CasADi::inner_prod "";
+
+%feature("docstring")  CasADi::norm_inf "";
+
+%feature("docstring")  CasADi::norm_1 "";
 
 %feature("docstring")  CasADi::if_else "";
 
