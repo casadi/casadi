@@ -68704,6 +68704,11 @@ Assert that the object has been initialized. ";
 |              |              |              | fixed        |              |
 |              |              |              | parameters.  |              |
 +--------------+--------------+--------------+--------------+--------------+
+| print_header | OT_BOOLEAN   | true         | Print the    | CasADi::SQPI |
+|              |              |              | header with  | nternal      |
+|              |              |              | problem      |              |
+|              |              |              | statistics   |              |
++--------------+--------------+--------------+--------------+--------------+
 | qp_solver    | OT_QPSOLVER  | GenericType( | The QP       | CasADi::SQPI |
 |              |              | )            | solver to be | nternal      |
 |              |              |              | used by the  |              |
@@ -69514,6 +69519,11 @@ Attila Kozma, Joel Andersson and Joris Gillis
 |              |              |              | denoting     |              |
 |              |              |              | fixed        |              |
 |              |              |              | parameters.  |              |
++--------------+--------------+--------------+--------------+--------------+
+| print_header | OT_BOOLEAN   | true         | Print the    | CasADi::SQPI |
+|              |              |              | header with  | nternal      |
+|              |              |              | problem      |              |
+|              |              |              | statistics   |              |
 +--------------+--------------+--------------+--------------+--------------+
 | qp_solver    | OT_QPSOLVER  | GenericType( | The QP       | CasADi::SQPI |
 |              |              | )            | solver to be | nternal      |
