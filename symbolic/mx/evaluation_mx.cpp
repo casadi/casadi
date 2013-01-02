@@ -424,6 +424,7 @@ void EvaluationMX::create(const FX& fcn, const std::vector<MX> &arg,
     Derivative dfcn(fcn,nfdir,nadir);
     stringstream ss;
     ss << "der_" << fcn.getOption("name") << "_" << nfdir << "_" << nadir;
+    dfcn.setOption("verbose",fcn.getOption("verbose"));
     dfcn.setOption("name",ss.str());
     dfcn.init();
     

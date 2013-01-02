@@ -502,6 +502,7 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
   // Evaluate all of the nodes of the algorithm: should only evaluate nodes that have not yet been calculated!
   int alg_counter = 0;
   for(vector<AlgEl>::iterator it=algorithm_.begin(); it!=algorithm_.end(); ++it, ++alg_counter){
+  
     // Spill existing work elements if needed
     if(nadir>0 && it->op!=OP_OUTPUT){
       for(vector<int>::const_iterator c=it->res.begin(); c!=it->res.end(); ++c){
@@ -543,10 +544,10 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
     }
   }
   
-  log("MXFunctionInternal::evaluate evaluated forward");
+  casadi_log("MXFunctionInternal::evaluate(" << nfdir << ", " << nadir<< "):evaluated forward "  << getOption("name"));
           
   if(nadir>0){
-    log("MXFunctionInternal::evaluate evaluating adjoint");
+    casadi_log("MXFunctionInternal::evaluate(" << nfdir << ", " << nadir<< "):adjoints:begin "  << getOption("name"));
     
     // Tape iterator (reuse same name to prevent usage of the forward iterator)
     vector<pair<pair<int,int>,DMatrix> >::const_reverse_iterator tape_it = tape_.rbegin();
@@ -604,7 +605,7 @@ void MXFunctionInternal::evaluate(int nfdir, int nadir){
       }
     }
     
-    log("MXFunctionInternal::evaluate evaluated adjoint");
+    casadi_log("MXFunctionInternal::evaluate(" << nfdir << ", " << nadir<< "):adjoints:end"  << getOption("name"));
   }
   casadi_log("MXFunctionInternal::evaluate(" << nfdir << ", " << nadir<< "):end "  << getOption("name"));
 }

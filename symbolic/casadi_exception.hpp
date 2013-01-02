@@ -102,7 +102,9 @@ class CasadiException : public std::exception{
 
 #define casadi_log(msg) \
   if(verbose()){ \
-    std::cout << "CasADi log message: " << msg << std::endl; \
+    std::stringstream ss_internal_; \
+    ss_internal_ << msg  <<  std::endl; \
+    std::cout << "CasADi log message: " << ss_internal_.str() << std::endl; \
   }
   
 #define casadi_error(msg) \

@@ -94,6 +94,8 @@ void DerivativeInternal::evaluate(int nfdir, int nadir){
   casadi_assert_message(nfdir==0, "Not implemeted");
   casadi_assert_message(nadir==0, "Not implemeted");
   
+  casadi_log("DerivativeInternal::evaluate(" << nfdir << ", " << nadir<< "):begin  " << getOption("name"));
+  
   // Number inputs and outputs of the function
   int num_in = fcn_.getNumInputs();
   int num_out = fcn_.getNumOutputs();
@@ -169,6 +171,7 @@ void DerivativeInternal::evaluate(int nfdir, int nadir){
     // No longer first batch
     first_batch = false;
   }
+  casadi_log("DerivativeInternal::evaluate(" << nfdir << ", " << nadir<< "):end  " << getOption("name"));
 }
 
 } // namespace CasADi
