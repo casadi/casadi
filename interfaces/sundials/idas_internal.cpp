@@ -1008,6 +1008,22 @@ void IdasInternal::integrateB(double t_out){
   // Save the adjoint sensitivities
   const double *rxz = NV_DATA_S(rxz_);
   copy(rxz,rxz+nrx_,output(INTEGRATOR_RXF).begin());
+  
+  if (gather_stats_) {
+    long nsteps, nfevals, nlinsetups, netfails;
+    int qlast, qcur;
+    double hinused, hlast, hcur, tcur;
+    
+    IDAMem IDA_mem = IDAMem(mem_);
+    IDAadjMem IDAADJ_mem = IDA_mem->ida_adj_mem;
+    IDABMem IDAB_mem = IDAADJ_mem->IDAB_mem;
+    
+    int flag = IDAGetIntegratorStats(IDAB_mem->IDA_mem, &nsteps, &nfevals, &nlinsetups,&netfails, &qlast, &qcur, &hinused,&hlast, &hcur, &tcur);
+    if(flag!=IDA_SUCCESS) idas_error("IDAGetIntegratorStatsB",flag);
+
+    stats_["nstepsB"] = 1.0*nsteps;
+    stats_["nlinsetupsB"] = 1.0*nlinsetups;
+  }
 }
 
 void IdasInternal::printStats(std::ostream &stream) const{

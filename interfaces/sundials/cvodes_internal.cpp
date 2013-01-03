@@ -533,6 +533,24 @@ void CVodesInternal::integrateB(double t_out){
 
   flag = CVodeGetQuadB(mem_, whichB_, &tret, rq_);
   if(flag!=CV_SUCCESS) cvodes_error("CVodeGetQuadB",flag);
+  
+  
+  if (gather_stats_) {
+    long nsteps, nfevals, nlinsetups, netfails;
+    int qlast, qcur;
+    double hinused, hlast, hcur, tcur;
+    CVodeMem cv_mem = static_cast<CVodeMem>(mem_);
+    CVadjMem ca_mem = cv_mem->cv_adj_mem;
+    CVodeBMem cvB_mem = ca_mem->cvB_mem;
+  
+    int flag = CVodeGetIntegratorStats(cvB_mem->cv_mem, &nsteps, &nfevals,&nlinsetups, &netfails, &qlast, &qcur,&hinused, &hlast, &hcur, &tcur);
+    if(flag!=CV_SUCCESS) cvodes_error("CVodeGetIntegratorStats",flag);
+  
+    stats_["nstepsB"] = 1.0*nsteps;
+    stats_["nlinsetupsB"] = 1.0*nlinsetups;
+    
+  }
+  
 }
 
 void CVodesInternal::printStats(std::ostream &stream) const{
