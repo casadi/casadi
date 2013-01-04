@@ -1960,6 +1960,22 @@ class MXtests(casadiTestCase):
     
     self.assertAlmostEqual(f.output(),12)
     
+  def test_jacobian_tools(self):
+    self.message("jacobian")
+    
+    X = msym("X")
+
+    Y = jacobian(X**2,X)
+    
+    f = MXFunction([X],[Y])
+    f.init()
+    
+    f.input().set(2.3)
+    f.evaluate()
+    
+    self.assertAlmostEqual(f.output(),4.6)
+    
+    
 if __name__ == '__main__':
     unittest.main()
 
