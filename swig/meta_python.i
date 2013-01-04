@@ -149,7 +149,7 @@ template<> char meta< double >::expected_message[] = "Expecting double";
 template <>
 int meta< double >::as(PyObject * p, double &m) {
   NATIVERETURN(double,m)
-  if (PyInt_Check(p) || PyBool_Check(p) || PyFloat_Check(p)) {
+  if (PyInt_Check(p) || PyLong_Check(p) || PyBool_Check(p) || PyFloat_Check(p)) {
     PyObject *r = PyNumber_Float(p);
     if (!r) return false;
     m = PyFloat_AsDouble(r);
@@ -166,7 +166,7 @@ int meta< double >::as(PyObject * p, double &m) {
 }
    
 template <> bool meta< double >::couldbe(PyObject * p) {
- if (PyInt_Check(p) || PyBool_Check(p) || PyFloat_Check(p)) return true;
+ if (PyInt_Check(p) || PyLong_Check(p) || PyBool_Check(p) || PyFloat_Check(p)) return true;
  
  if (PyObject_HasAttrString(p,"dtype")) {
    PyObject *r = PyObject_GetAttrString(p,"dtype");

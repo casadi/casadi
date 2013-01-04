@@ -804,6 +804,15 @@ class typemaptests(casadiTestCase):
     integr.evaluate(1,1)
 
     print integr.dictionary()
+    
+  def test_issue570(self):
+    self.message("Issue #570: long int")
+    longint = 10**50
+    print type(longint)
+    print casadi.SX('x') + longint
+    print longint + casadi.SX('x')
+    print casadi.ssym('x') + longint
+    print longint + casadi.ssym('x')
 
 if __name__ == '__main__':
     unittest.main()
