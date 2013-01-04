@@ -78,6 +78,18 @@ class FunctionPool:
     self.names.append(name)
 
 class casadiTestCase(unittest.TestCase):
+
+  def randDMatrix(self,n,m=1,sparsity=1,valuegenerator=lambda : random.normal(0,1) ):
+    if sparsity < 1:
+      spp = self.randDMatrix(n,m,sparsity=1,valuegenerator=lambda : random.uniform(0,1) )
+      spm = (spp < sparsity)
+      makeSparse(spm)
+      return DMatrix(spm.sparsity(),[valuegenerator() for i in range(spm.size())])
+    else:
+      return DMatrix([valuegenerator() for i in range(n*m)],n,m)
+    
+  
+  
   def message(self,s):
       print s
       sys.stdout.flush()
