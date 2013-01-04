@@ -6,7 +6,9 @@
 <tr><th>Id</th><th>Used in</th></tr>
 <tr><td>augmented_stats</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>nlinsetups</td><td>CasADi::CVodesInternal</td></tr>
+<tr><td>nlinsetupsB</td><td>CasADi::CVodesInternal</td></tr>
 <tr><td>nsteps</td><td>CasADi::CVodesInternal</td></tr>
+<tr><td>nstepsB</td><td>CasADi::CVodesInternal</td></tr>
 </table>
 */
 /** \class CasADi::CVodesIntegrator
@@ -17,7 +19,9 @@
 <tr><th>Id</th><th>Used in</th></tr>
 <tr><td>augmented_stats</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>nlinsetups</td><td>CasADi::CVodesInternal</td></tr>
+<tr><td>nlinsetupsB</td><td>CasADi::CVodesInternal</td></tr>
 <tr><td>nsteps</td><td>CasADi::CVodesInternal</td></tr>
+<tr><td>nstepsB</td><td>CasADi::CVodesInternal</td></tr>
 </table>
 */
 /** \class CasADi::LiftedSQPInternal
@@ -112,7 +116,9 @@
 <tr><th>Id</th><th>Used in</th></tr>
 <tr><td>augmented_stats</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>nlinsetups</td><td>CasADi::IdasInternal</td></tr>
+<tr><td>nlinsetupsB</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>nsteps</td><td>CasADi::IdasInternal</td></tr>
+<tr><td>nstepsB</td><td>CasADi::IdasInternal</td></tr>
 </table>
 */
 /** \class CasADi::IdasIntegrator
@@ -123,7 +129,9 @@
 <tr><th>Id</th><th>Used in</th></tr>
 <tr><td>augmented_stats</td><td>CasADi::IntegratorInternal</td></tr>
 <tr><td>nlinsetups</td><td>CasADi::IdasInternal</td></tr>
+<tr><td>nlinsetupsB</td><td>CasADi::IdasInternal</td></tr>
 <tr><td>nsteps</td><td>CasADi::IdasInternal</td></tr>
+<tr><td>nstepsB</td><td>CasADi::IdasInternal</td></tr>
 </table>
 */
 /** \class CasADi::NewtonImplicitInternal
