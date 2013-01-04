@@ -673,12 +673,25 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     /** \brief  The following function is used to ensure similarity to MX, which is reference counted */
     bool isNull() const{ return false;}
     
+    // @{
+    /// Set the 'precision, width & scientific' used in printing and serializing to streams
+    static void setPrecision(int precision) { stream_precision_ = precision; }
+    static void setWidth(int width) { stream_width_ = width; }
+    static void setScientific(bool scientific) { stream_width_ = scientific; }
+    // @}
+    
   private:
     /// Sparsity of the matrix in a compressed row storage (CRS) format
     CRSSparsity sparsity_;
     
     /// Nonzero elements
     std::vector<T> data_;
+    
+    /// Precision used in streams
+    static int stream_precision_;
+    static int stream_width_;
+    static bool stream_scientific_;
+    
 };
 
 } // namespace CasADi

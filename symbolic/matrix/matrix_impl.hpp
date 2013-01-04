@@ -43,6 +43,13 @@ const T& Matrix<T>::elem(int i, int j) const{
 }
 
 template<class T>
+int Matrix<T>::stream_precision_ = 6;
+template<class T>
+int Matrix<T>::stream_width_ = 0;
+template<class T>
+bool Matrix<T>::stream_scientific_ = false;
+
+template<class T>
 T& Matrix<T>::elem(int i, int j){
   int oldsize = sparsity().size();
   int ind = sparsityRef().getNZ(i,j);
@@ -454,12 +461,42 @@ std::string Matrix<T>::className(){ return std::string("Matrix<") + typeName<T>(
 template<class T>
 void Matrix<T>::printScalar(std::ostream &stream) const {
   casadi_assert_message(numel()==1, "Not a scalar");
+  
+  std::streamsize precision = stream.precision();
+  std::streamsize width = stream.width();
+  std::ios_base::fmtflags flags = stream.flags();
+  
+  stream.precision(stream_precision_);
+  stream.width(stream_width_);
+  if (stream_scientific_) {
+    stream.setf(std::ios::scientific);
+  } else {
+    stream.unsetf(std::ios::scientific);
+  }
+  
   stream << toScalar();
+  
+  stream.precision(precision);
+  stream.width(width);
+  stream.flags(flags); 
 }
   
 template<class T>
 void Matrix<T>::printVector(std::ostream &stream) const {
   casadi_assert_message(vector(),"Not a vector");
+  
+  std::streamsize precision = stream.precision();
+  std::streamsize width = stream.width();
+  std::ios_base::fmtflags flags = stream.flags();
+  
+  stream.precision(stream_precision_);
+  stream.width(stream_width_);
+  if (stream_scientific_) {
+    stream.setf(std::ios::scientific);
+  } else {
+    stream.unsetf(std::ios::scientific);
+  }
+  
   stream << "[";
   
   // Loop over rows
@@ -474,11 +511,28 @@ void Matrix<T>::printVector(std::ostream &stream) const {
       stream << data()[rowind(i)];
     }
   }
-  stream << "]";  
+  stream << "]"; 
+    
+  stream.precision(precision);
+  stream.width(width);
+  stream.flags(flags); 
 }
 
 template<class T>
 void Matrix<T>::printMatrix(std::ostream &stream) const{
+
+  std::streamsize precision = stream.precision();
+  std::streamsize width = stream.width();
+  std::ios_base::fmtflags flags = stream.flags();
+  
+  stream.precision(stream_precision_);
+  stream.width(stream_width_);
+  if (stream_scientific_) {
+    stream.setf(std::ios::scientific);
+  } else {
+    stream.unsetf(std::ios::scientific);
+  }
+  
   for(int i=0; i<size1(); ++i){
     if(i==0)
       stream << "[[";
@@ -507,6 +561,11 @@ void Matrix<T>::printMatrix(std::ostream &stream) const{
     else
       stream << "]" << std::endl;
   }
+  
+    
+  stream.precision(precision);
+  stream.width(width);
+  stream.flags(flags);
 }
 
 template<class T>
