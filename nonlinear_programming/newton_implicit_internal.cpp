@@ -116,19 +116,19 @@ void NewtonImplicitInternal::evaluate(int nfdir, int nadir) {
   
   }
   
-  if (gather_stats_) stats_["iter"] = i+1; 
+  int Niter = i+1;
+  if (gather_stats_) stats_["iter"] = Niter; 
   
   // Pass the remainder of outputs
   for (int i=2;i<J_.getNumOutputs();++i) {
     std::copy(J_.output(i).data().begin(),J_.output(i).data().end(),output(i-1).data().begin());
   }
   
-  // End of function if no sensitivities
-  if(nfdir==0 && nadir==0)
-    return;
+  // Delegate calculation of sensitivities to base class
+  if(nfdir!=0 || nadir!=0)
+    evaluate_sens(nfdir,nadir,true);
   
-  evaluate_sens(nfdir,nadir,true);
-  casadi_log("NewtonImplicitInternal::evaluate(" << nfdir << ", " << nadir<< "):end");
+  casadi_log("NewtonImplicitInternal::evaluate(" << nfdir << ", " << nadir<< "):end after " << Niter << " steps");
 }
 
 void NewtonImplicitInternal::init(){
