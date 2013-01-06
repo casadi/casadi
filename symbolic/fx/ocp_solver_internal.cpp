@@ -32,9 +32,9 @@ using namespace std;
 namespace CasADi{
 
 OCPSolverInternal::OCPSolverInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn) : ffcn_(ffcn), mfcn_(mfcn), cfcn_(cfcn), rfcn_(rfcn){
-  addOption("number_of_parameters", OT_INTEGER,  0);
-  addOption("number_of_grid_points", OT_INTEGER,  20);
-  addOption("final_time",OT_REAL, 1.0);
+  addOption("number_of_parameters",  OT_INTEGER,                0);
+  addOption("number_of_grid_points", OT_INTEGER,               20);
+  addOption("final_time",            OT_REAL,                 1.0);
 }
 
 OCPSolverInternal::~OCPSolverInternal(){
@@ -50,6 +50,9 @@ void OCPSolverInternal::init(){
   
   // Get the number of grid points
   nk_ = getOption("number_of_grid_points");
+
+  // Read final time
+  tf_ = getOption("final_time");
 
   // Get the number of differential states
   nx_ = ffcn_.input(DAE_X).size();
@@ -75,7 +78,6 @@ void OCPSolverInternal::init(){
   
   // Specify the inputs
   setNumInputs(OCP_NUM_IN);
-  input(OCP_T) = Matrix<double>(nk_+1,1,0);
   input(OCP_LBX) = input(OCP_UBX) = input(OCP_X_INIT) = Matrix<double>(nx_,nk_+1,0);
   input(OCP_LBU) = input(OCP_UBU) = input(OCP_U_INIT) = Matrix<double>(nu_,nk_,0);
   input(OCP_LBP) = input(OCP_UBP) = input(OCP_P_INIT) = Matrix<double>(np_,1,0);

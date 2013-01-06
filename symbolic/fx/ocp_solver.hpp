@@ -50,8 +50,6 @@ enum MayerInput{
 ///   np: Number of parameters: from option number_of_parameters\n
 ///   nh: Number of point constraints: from cfcn.input(0).size()
 enum OCPInput{
-  /// Time grid: ((ns+1) x 1) - default: linspace(0,t_final,ns+1) [t] 
-  OCP_T,   
   /// States lower bounds (nx x (ns+1)) [lbx]
   OCP_LBX,
   /// States upper bounds (nx x (ns+1)) [ubx]
@@ -101,7 +99,7 @@ enum OCPOutput{
    *
    *
       \author Joel Andersson
-      \date 2011
+      \date 2011-2013
   */ 
   class OCPSolver : public FX{
   public:

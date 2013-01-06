@@ -277,7 +277,6 @@ class OCPtests(casadiTestCase):
     ms.setOption("final_time",tf)
     ms.setOption("nlp_solver",IpoptSolver)
     ms.init()
-    self.checkarray(linspace(0,tf,ns+1),ms.input(OCP_T),"timegrid")
     
     for i in [OCP_LBX,OCP_UBX,OCP_X_INIT]:
       self.checkarray(ms.input(i).shape,(nx,ns+1),"shape")
@@ -316,7 +315,6 @@ class OCPtests(casadiTestCase):
     ms.setOption("final_time",tf)
     ms.setOption("nlp_solver",IpoptSolver)
     ms.init()
-    self.checkarray(linspace(0,tf,ns+1),ms.input(OCP_T),"timegrid")
     
     for i in [OCP_LBX,OCP_UBX,OCP_X_INIT]:
       self.checkarray(ms.input(i).shape,(nx,ns+1),"shape")

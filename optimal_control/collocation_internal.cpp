@@ -62,10 +62,6 @@ void CollocationInternal::init(){
   // Path constraints present?
   bool path_constraints = nh_>0;
   
-  // Set time grid
-  for(int k=0; k<=nk_; ++k)
-    input(OCP_T).at(k) = (k*tf)/nk_;
-    
   // Count the total number of NLP variables
   int NV = np_ + // global parameters
            nx_*(nk_+1) + // local state
@@ -123,7 +119,7 @@ void CollocationInternal::init(){
   vector<vector<MX> > fcn_in(nk_);
   for(int k=0; k<nk_; ++k){
     fcn_in[k].resize(DAE_NUM_IN);
-    fcn_in[k][DAE_T] = input(OCP_T).at(k);
+    fcn_in[k][DAE_T] = (k*tf_)/nk_;
     fcn_in[k][DAE_P] = vertcat(P,U.at(k));
     fcn_in[k][DAE_X] = X[k];
   }
