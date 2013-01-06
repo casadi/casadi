@@ -64,7 +64,7 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
     case SCHEME_NLPOutput: return "x_opt, cost, lambda_g, lambda_x, g";
     case SCHEME_MayerInput: return "x, p";
     case SCHEME_OCPInput: return "lbx, ubx, x_init, lbu, ubu, u_init, lbp, ubp, p_init, lbh, ubh, lbg, ubg";
-    case SCHEME_OCPOutput: return "x_opt, u_opt, p_opt";
+    case SCHEME_OCPOutput: return "x_opt, u_opt, p_opt, cost";
     case SCHEME_QPInput: return "h, g, a, lba, uba, lbx, ubx, x_init, lambda_init";
     case SCHEME_QPOutput: return "primal, cost, lambda_a, lambda_x";
     case SCHEME_unknown: return "not available";
@@ -212,7 +212,8 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==0) return "x_opt";
       if(i==1) return "u_opt";
       if(i==2) return "p_opt";
-      casadi_error("getSchemeEntryName: supplied number is out of range. OCPOutput has only 3 entries: ('OCPOutput', 'x_opt, u_opt, p_opt')");
+      if(i==3) return "cost";
+      casadi_error("getSchemeEntryName: supplied number is out of range. OCPOutput has only 4 entries: ('OCPOutput', 'x_opt, u_opt, p_opt, cost')");
       break;
     case SCHEME_QPInput: 
       if(i==0) return "h";
@@ -377,7 +378,8 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==0) return "Optimal state trajectory";
       if(i==1) return "Optimal control trajectory";
       if(i==2) return "Optimal parameters";
-      casadi_error("getSchemeEntryDoc: supplied number is out of range. OCPOutput has only 3 entries: ('OCPOutput', 'x_opt, u_opt, p_opt')");
+      if(i==3) return "Objective/cost function for optimal solution (1 x 1)";
+      casadi_error("getSchemeEntryDoc: supplied number is out of range. OCPOutput has only 4 entries: ('OCPOutput', 'x_opt, u_opt, p_opt, cost')");
       break;
     case SCHEME_QPInput: 
       if(i==0) return "The square matrix H: sparse, (nx x nx). Only the lower triangular part is actually used. The matrix is assumed to be symmetrical.";
@@ -543,7 +545,8 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==0) return "OCP_X_OPT";
       if(i==1) return "OCP_U_OPT";
       if(i==2) return "OCP_P_OPT";
-      casadi_error("getSchemeEntryEnumName: supplied number is out of range. OCPOutput has only 3 entries: ('OCPOutput', 'x_opt, u_opt, p_opt')");
+      if(i==3) return "OCP_COST";
+      casadi_error("getSchemeEntryEnumName: supplied number is out of range. OCPOutput has only 4 entries: ('OCPOutput', 'x_opt, u_opt, p_opt, cost')");
       break;
     case SCHEME_QPInput: 
       if(i==0) return "QP_H";
@@ -694,6 +697,7 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if(name=="x_opt") return 0;
       if(name=="u_opt") return 1;
       if(name=="p_opt") return 2;
+      if(name=="cost") return 3;
       break;
     case SCHEME_QPInput: 
       if(name=="h") return 0;

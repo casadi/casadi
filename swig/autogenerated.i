@@ -751,8 +751,9 @@ def ocpOut(*dummy,**kwargs):
     x_opt -- Optimal state trajectory [OCP_X_OPT]
     u_opt -- Optimal control trajectory [OCP_U_OPT]
     p_opt -- Optimal parameters [OCP_P_OPT]
+    cost  -- Objective/cost function for optimal solution (1 x 1) [OCP_COST]
   """
-  if(len(dummy)>0): raise Exception("Error in ocpOut: syntax has become more strict. You must use keyword arguments now, for your own safety.\n ocpOut(my_x_opt, my_u_opt, my_p_opt)\nmust be written\n ocpOut(x_opt=my_x_opt, u_opt=my_u_opt, p_opt=my_p_opt)\nwhere any keyword is optional.")
+  if(len(dummy)>0): raise Exception("Error in ocpOut: syntax has become more strict. You must use keyword arguments now, for your own safety.\n ocpOut(my_x_opt, my_u_opt, my_p_opt, my_cost)\nmust be written\n ocpOut(x_opt=my_x_opt, u_opt=my_u_opt, p_opt=my_p_opt, cost=my_cost)\nwhere any keyword is optional.")
   x_opt = []
   if 'x_opt' in kwargs:
     x_opt = kwargs['x_opt']
@@ -762,10 +763,13 @@ def ocpOut(*dummy,**kwargs):
   p_opt = []
   if 'p_opt' in kwargs:
     p_opt = kwargs['p_opt']
+  cost = []
+  if 'cost' in kwargs:
+    cost = kwargs['cost']
   for k in kwargs.keys():
-    if not(k in ['x_opt','u_opt','p_opt']):
-      raise Exception("Keyword error in ocpOut: '%s' is not recognized. Available keywords are: x_opt, u_opt, p_opt" % k )
-  return [x_opt,u_opt,p_opt]
+    if not(k in ['x_opt','u_opt','p_opt','cost']):
+      raise Exception("Keyword error in ocpOut: '%s' is not recognized. Available keywords are: x_opt, u_opt, p_opt, cost" % k )
+  return [x_opt,u_opt,p_opt,cost]
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON

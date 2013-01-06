@@ -395,17 +395,18 @@ std::vector<M> ocpIn(const std::string arg_s0="",M arg_m0=M(),const std::string 
 /// 
 /// \copydoc scheme_OCPOutput
 template<class M>
-std::vector<M> ocpOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M()){
-  std::vector<M> ret(3);
+std::vector<M> ocpOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M()){
+  std::vector<M> ret(4);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
   if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
   if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
+  if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
   typedef typename std::map<std::string,M>::const_iterator it_type;
   for(it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_OCPOutput,it->first);
     if (n==-1)
-      casadi_error("Keyword error in OCPOutput: '" << it->first << "' is not recognized. Available keywords are: x_opt, u_opt, p_opt");
+      casadi_error("Keyword error in OCPOutput: '" << it->first << "' is not recognized. Available keywords are: x_opt, u_opt, p_opt, cost");
     ret[n] = it->second;
   }
   return ret;
