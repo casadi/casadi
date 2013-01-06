@@ -673,7 +673,6 @@ def ocpIn(*dummy,**kwargs):
   nh: Number of point constraints: from cfcn.input(0).size()
   
   Keyword arguments:
-    t      -- Time grid: ((ns+1) x 1) - default: linspace(0,t_final,ns+1) [OCP_T]
     lbx    -- States lower bounds (nx x (ns+1)) [OCP_LBX]
     ubx    -- States upper bounds (nx x (ns+1)) [OCP_UBX]
     x_init -- States initial guess (nx x (ns+1)) [OCP_X_INIT]
@@ -688,10 +687,7 @@ def ocpIn(*dummy,**kwargs):
     lbg    -- Lower bound for the coupling constraints [OCP_LBG]
     ubg    -- Upper bound for the coupling constraints [OCP_UBG]
   """
-  if(len(dummy)>0): raise Exception("Error in ocpIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n ocpIn(my_t, my_lbx, my_ubx, my_x_init, my_lbu, my_ubu, my_u_init, my_lbp, my_ubp, my_p_init, my_lbh, my_ubh, my_lbg, my_ubg)\nmust be written\n ocpIn(t=my_t, lbx=my_lbx, ubx=my_ubx, x_init=my_x_init, lbu=my_lbu, ubu=my_ubu, u_init=my_u_init, lbp=my_lbp, ubp=my_ubp, p_init=my_p_init, lbh=my_lbh, ubh=my_ubh, lbg=my_lbg, ubg=my_ubg)\nwhere any keyword is optional.")
-  t = []
-  if 't' in kwargs:
-    t = kwargs['t']
+  if(len(dummy)>0): raise Exception("Error in ocpIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n ocpIn(my_lbx, my_ubx, my_x_init, my_lbu, my_ubu, my_u_init, my_lbp, my_ubp, my_p_init, my_lbh, my_ubh, my_lbg, my_ubg)\nmust be written\n ocpIn(lbx=my_lbx, ubx=my_ubx, x_init=my_x_init, lbu=my_lbu, ubu=my_ubu, u_init=my_u_init, lbp=my_lbp, ubp=my_ubp, p_init=my_p_init, lbh=my_lbh, ubh=my_ubh, lbg=my_lbg, ubg=my_ubg)\nwhere any keyword is optional.")
   lbx = []
   if 'lbx' in kwargs:
     lbx = kwargs['lbx']
@@ -732,9 +728,9 @@ def ocpIn(*dummy,**kwargs):
   if 'ubg' in kwargs:
     ubg = kwargs['ubg']
   for k in kwargs.keys():
-    if not(k in ['t','lbx','ubx','x_init','lbu','ubu','u_init','lbp','ubp','p_init','lbh','ubh','lbg','ubg']):
-      raise Exception("Keyword error in ocpIn: '%s' is not recognized. Available keywords are: t, lbx, ubx, x_init, lbu, ubu, u_init, lbp, ubp, p_init, lbh, ubh, lbg, ubg" % k )
-  return [t,lbx,ubx,x_init,lbu,ubu,u_init,lbp,ubp,p_init,lbh,ubh,lbg,ubg]
+    if not(k in ['lbx','ubx','x_init','lbu','ubu','u_init','lbp','ubp','p_init','lbh','ubh','lbg','ubg']):
+      raise Exception("Keyword error in ocpIn: '%s' is not recognized. Available keywords are: lbx, ubx, x_init, lbu, ubu, u_init, lbp, ubp, p_init, lbh, ubh, lbg, ubg" % k )
+  return [lbx,ubx,x_init,lbu,ubu,u_init,lbp,ubp,p_init,lbh,ubh,lbg,ubg]
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON

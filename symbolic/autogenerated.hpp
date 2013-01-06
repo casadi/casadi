@@ -365,8 +365,8 @@ std::vector<M> mayerIn(const std::string arg_s0="",M arg_m0=M(),const std::strin
 /// 
 /// \copydoc scheme_OCPInput
 template<class M>
-std::vector<M> ocpIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M(),const std::string arg_s8="",M arg_m8=M(),const std::string arg_s9="",M arg_m9=M(),const std::string arg_s10="",M arg_m10=M(),const std::string arg_s11="",M arg_m11=M(),const std::string arg_s12="",M arg_m12=M(),const std::string arg_s13="",M arg_m13=M()){
-  std::vector<M> ret(14);
+std::vector<M> ocpIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M(),const std::string arg_s5="",M arg_m5=M(),const std::string arg_s6="",M arg_m6=M(),const std::string arg_s7="",M arg_m7=M(),const std::string arg_s8="",M arg_m8=M(),const std::string arg_s9="",M arg_m9=M(),const std::string arg_s10="",M arg_m10=M(),const std::string arg_s11="",M arg_m11=M(),const std::string arg_s12="",M arg_m12=M()){
+  std::vector<M> ret(13);
   std::map<std::string,M> arg;
   if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
   if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
@@ -381,12 +381,11 @@ std::vector<M> ocpIn(const std::string arg_s0="",M arg_m0=M(),const std::string 
   if (arg_s10!="") arg.insert(make_pair(arg_s10,arg_m10));
   if (arg_s11!="") arg.insert(make_pair(arg_s11,arg_m11));
   if (arg_s12!="") arg.insert(make_pair(arg_s12,arg_m12));
-  if (arg_s13!="") arg.insert(make_pair(arg_s13,arg_m13));
   typedef typename std::map<std::string,M>::const_iterator it_type;
   for(it_type it = arg.begin(); it != arg.end(); it++) {
     int n = getSchemeEntryEnum(SCHEME_OCPInput,it->first);
     if (n==-1)
-      casadi_error("Keyword error in OCPInput: '" << it->first << "' is not recognized. Available keywords are: t, lbx, ubx, x_init, lbu, ubu, u_init, lbp, ubp, p_init, lbh, ubh, lbg, ubg");
+      casadi_error("Keyword error in OCPInput: '" << it->first << "' is not recognized. Available keywords are: lbx, ubx, x_init, lbu, ubu, u_init, lbp, ubp, p_init, lbh, ubh, lbg, ubg");
     ret[n] = it->second;
   }
   return ret;
