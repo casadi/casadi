@@ -68,20 +68,18 @@ class CollocationInternal : public OCPSolverInternal{
     void reportConstraints(std::ostream &stream=std::cout);
     
   protected:
-    // ODE/DAE integrator
-    FX integrator_;
-    
     // NLP objective function
     MXFunction F_;
     
     // NLP constraint function
     MXFunction G_;
 
-    // Evaluates F and G as well as the lagrangian: L = sigma*f + lambda'*g
-    MXFunction FG_;
-
     // NLP solver
     NLPSolver nlp_solver_;
+
+    // Interpolation order
+    int deg_;
+
 };
                         
 } // namespace CasADi

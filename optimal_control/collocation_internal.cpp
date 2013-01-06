@@ -21,22 +21,22 @@
  */
 
 #include "collocation_internal.hpp"
-#include "../symbolic/fx/integrator.hpp"
 #include "../symbolic/matrix/matrix_tools.hpp"
+#include "../symbolic/sx/sx_tools.hpp"
 #include "../symbolic/mx/mx_tools.hpp"
-#include "../symbolic/stl_vector_tools.hpp"
 #include "../symbolic/fx/fx_tools.hpp"
+#include "../symbolic/stl_vector_tools.hpp"
+#include "../symbolic/fx/integrator.hpp"
 
 using namespace std;
 namespace CasADi{
     
 CollocationInternal::CollocationInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn) : OCPSolverInternal(ffcn, mfcn, cfcn, rfcn){
-  addOption("parallelization", OT_STRING, GenericType(), "Passed on to CasADi::Parallelizer");
-  addOption("nlp_solver",               OT_NLPSOLVER,  GenericType(), "An NLPSolver creator function");
-  addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLP Solver");
-  addOption("integrator",               OT_INTEGRATOR, GenericType(), "An integrator creator function");
-  addOption("integrator_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the integrator");
-  casadi_error("The collocation OCP solver is not yet ready");
+  addOption("nlp_solver",               	OT_NLPSOLVER,  GenericType(), "An NLPSolver creator function");
+  addOption("nlp_solver_options",       	OT_DICTIONARY, GenericType(), "Options to be passed to the NLP Solver");
+  addOption("interpolation_order",          OT_INTEGER,  3,  "Order of the interpolating polynomials");
+  addOption("collocation_scheme",           OT_STRING,  "radau",  "Collocation scheme","radau|legendre");
+  casadi_warning("CasADi::Collocation is still experimental");
 }
 
 CollocationInternal::~CollocationInternal(){
@@ -45,156 +45,185 @@ CollocationInternal::~CollocationInternal(){
 void CollocationInternal::init(){
   // Initialize the base classes
   OCPSolverInternal::init();
+  
+  // Legendre collocation points
+  double legendre_points[][6] = {
+    {0},
+    {0,0.500000},
+    {0,0.211325,0.788675},
+    {0,0.112702,0.500000,0.887298},
+    {0,0.069432,0.330009,0.669991,0.930568},
+    {0,0.046910,0.230765,0.500000,0.769235,0.953090}};
 
-  // Create an integrator instance
-  integratorCreator integrator_creator = getOption("integrator");
-  integrator_ = integrator_creator(ffcn_,FX());
-  if(hasSetOption("integrator_options")){
-    integrator_.setOption(getOption("integrator_options"));
+  // Radau collocation points
+  double radau_points[][6] = {
+    {0},
+    {0,1.000000},
+    {0,0.333333,1.000000},
+    {0,0.155051,0.644949,1.000000},
+    {0,0.088588,0.409467,0.787659,1.000000},
+    {0,0.057104,0.276843,0.583590,0.860240,1.000000}};
+
+  // Read options
+  bool use_radau;
+  if(getOption("collocation_scheme")=="radau"){
+    use_radau = true;
+  } else if(getOption("collocation_scheme")=="legendre"){
+    use_radau = false;
   }
 
-  // Set t0 and tf
-  double tf = getOption("final_time");
-  integrator_.setOption("t0",0);
-  integrator_.setOption("tf",tf/nk_);
-  integrator_.init();
-  
-  // Path constraints present?
-  bool path_constraints = nh_>0;
-  
-  // Count the total number of NLP variables
-  int NV = np_ + // global parameters
-           nx_*(nk_+1) + // local state
-           nu_*nk_; // local control
-           
-  // Declare variable vector for the NLP
-  // The structure is as follows:
-  // np x 1  (parameters)
-  // ------
-  // nx x 1  (states at time i=0)
-  // nu x 1  (controls in interval i=0)
-  // ------
-  // nx x 1  (states at time i=1)
-  // nu x 1  (controls in interval i=1)
-  // ------
-  // .....
-  // ------
-  // nx x 1  (states at time i=nk)
-  
-  MX V("V",NV);
+  // Interpolation order
+  deg_ = getOption("interpolation_order");
 
-  // Global parameters
-  MX P = V(range(np_));
+  // All collocation time points
+  double* tau_root = use_radau ? radau_points[deg_] : legendre_points[deg_];
 
-  // offset in the variable vector
-  int v_offset=np_; 
-  
-  // Disretized variables for each shooting node
-  vector<MX> X(nk_+1), U(nk_);
-  for(int k=0; k<=nk_; ++k){ // interior nodes
-    // Local state
-    X[k] = V[range(v_offset,v_offset+nx_)];
-    v_offset += nx_;
-    
-    // Variables below do not appear at the end point
-    if(k==nk_) break;
-    
-    // Local control
-    U[k] = V[range(v_offset,v_offset+nu_)];
-    v_offset += nu_;
+  // Size of the finite elements
+  double h = tf_/nk_;
+
+  // Coefficients of the collocation equation
+  vector<vector<MX> > C(deg_+1,vector<MX>(deg_+1));
+
+  // Coefficients of the collocation equation as DMatrix
+  DMatrix C_num = DMatrix(deg_+1,deg_+1,0);
+
+  // Coefficients of the continuity equation
+  vector<MX> D(deg_+1);
+
+  // Coefficients of the collocation equation as DMatrix
+  DMatrix D_num = DMatrix(deg_+1,1,0);
+
+  // Collocation point
+  SXMatrix tau = ssym("tau");
+
+  // For all collocation points
+  for(int j=0; j<deg_+1; ++j){
+    // Construct Lagrange polynomials to get the polynomial basis at the collocation point
+    SXMatrix L = 1;
+    for(int j2=0; j2<deg_+1; ++j2){
+      if(j2 != j){
+        L *= (tau-tau_root[j2])/(tau_root[j]-tau_root[j2]);
+      }
+    }
+
+    SXFunction lfcn(tau,L);
+    lfcn.init();
+
+    // Evaluate the polynomial at the final time to get the coefficients of the continuity equation
+    lfcn.setInput(1.0);
+    lfcn.evaluate();
+    D[j] = lfcn.output();
+    D_num(j) = lfcn.output();
+
+    // Evaluate the time derivative of the polynomial at all collocation points to get the coefficients of the continuity equation
+    for(int j2=0; j2<deg_+1; ++j2){
+      lfcn.setInput(tau_root[j2]);
+      lfcn.setFwdSeed(1.0);
+      lfcn.evaluate(1,0);
+      C[j][j2] = lfcn.fwdSens();
+      C_num(j,j2) = lfcn.fwdSens();
+    }
   }
-  
-  // Make sure that the size of the variable vector is consistent with the number of variables that we have referenced
-  casadi_assert(v_offset==NV);
 
-  // Input to the parallel integrator evaluation
-  vector<vector<MX> > int_in(nk_);
+  C_num(std::vector<int>(1,0),ALL) = 0;
+  C_num(0,0)   = 1;
+
+  // All collocation time points
+  vector<vector<double> > T(nk_);
   for(int k=0; k<nk_; ++k){
-    int_in[k].resize(INTEGRATOR_NUM_IN);
-    int_in[k][INTEGRATOR_P] = vertcat(P,U[k]);
-    int_in[k][INTEGRATOR_X0] = X[k];
+	  T[k].resize(deg_+1);
+	  for(int j=0; j<=deg_; ++j){
+		  T[k][j] = h*(k + tau_root[j]);
+	  }
   }
 
-  // Input to the parallel function evaluation
-  vector<vector<MX> > fcn_in(nk_);
+  // Total number of variables
+  int nlp_nx = 0;
+  nlp_nx += nk_*(deg_+1)*nx_;   // Collocated states
+  nlp_nx += nk_*nu_;            // Parametrized controls
+  nlp_nx += nx_;               	// Final state
+
+  // NLP variable vector
+  MX nlp_x = msym("x",nlp_nx);
+  int offset = 0;
+
+  // Get collocated states and parametrized control
+  vector<vector<MX> > X(nk_+1);
+  vector<MX> U(nk_);
   for(int k=0; k<nk_; ++k){
-    fcn_in[k].resize(DAE_NUM_IN);
-    fcn_in[k][DAE_T] = (k*tf_)/nk_;
-    fcn_in[k][DAE_P] = vertcat(P,U.at(k));
-    fcn_in[k][DAE_X] = X[k];
+    // Collocated states
+	X[k].resize(deg_+1);
+    for(int j=0; j<=deg_; ++j){
+        // Get the expression for the state vector
+        X[k][j] = nlp_x[Slice(offset,offset+nx_)];
+        offset += nx_;
+    }
+
+    // Parametrized controls
+    U[k] = nlp_x[Slice(offset,offset+nu_)];
+    offset += nu_;
   }
 
-  // Options for the parallelizer
-  Dictionary paropt;
-  paropt["save_corrected_input"] = true;
-  
-  // Transmit parallelization mode
-  if(hasSetOption("parallelization"))
-    paropt["parallelization"] = getOption("parallelization");
-  
-  // Evaluate function in parallel
-  vector<vector<MX> > pI_out = integrator_.call(int_in,paropt);
+  // State at end time
+  X[nk_].resize(1);
+  X[nk_][0] = nlp_x[Slice(offset,offset+nx_)];
+  offset += nx_;
+  casadi_assert(offset==nlp_nx);
 
-  // Evaluate path constraints in parallel
-  vector<vector<MX> > pC_out;
-  if(path_constraints)
-    pC_out = cfcn_.call(fcn_in,paropt);
-  
-  //Constraint function
-  vector<MX> gg(2*nk_);
+  // Constraint function for the NLP
+  vector<MX> nlp_g;
 
-  // Collect the outputs
-  for(int k=0; k<nk_; ++k){
-    //append continuity constraints
-    gg[2*k] = pI_out[k][INTEGRATOR_XF] - X[k+1];
-    
-    // append the path constraints
-    if(path_constraints)
-      gg[2*k+1] = pC_out[k][0];
-  }
-
-  // Terminal constraints
-  MX g = vertcat(gg);
-  G_ = MXFunction(V,g);
-  G_.setOption("numeric_jacobian",false);
-
-
-  vector<MX> f;
   // Objective function
-  if (mfcn_.getNumInputs()==1) {
-    f = mfcn_.call(X.back());
-  } else {
-    vector<MX> mfcn_argin(MAYER_NUM_IN); 
-    mfcn_argin[MAYER_X] = X.back();
-    mfcn_argin[MAYER_P] = V(range(np_));
-    f = mfcn_.call(mfcn_argin);
+  MX nlp_j = 0;
+
+  // For all finite elements
+  for(int k=0; k<nk_; ++k){
+
+    // For all collocation points
+    for(int j=1; j<=deg_; ++j){
+
+        // Get an expression for the state derivative at the collocation point
+        MX xp_jk = 0;
+        for(int r=0; r<=deg_; ++r){
+            xp_jk += C[r][j]*X[k][r];
+        }
+
+        // Add collocation equations to the NLP
+        MX fk = ffcn_.call(daeIn("x",X[k][j],"p",U[k]))[DAE_ODE];
+        nlp_g.push_back(h*fk - xp_jk);
+    }
+
+    // Get an expression for the state at the end of the finite element
+    MX xf_k = 0;
+    for(int r=0; r<=deg_; ++r){
+        xf_k += D[r]*X[k][r];
+    }
+
+    // Add continuity equation to NLP
+    nlp_g.push_back(X[k+1][0] - xf_k);
+
+    // Add path constraints
+    vector<MX> cfcn_in(2);
+    cfcn_in[0] = X[k+1][0];
+    cfcn_in[1] = U[k];
+    MX pk = cfcn_.call(cfcn_in).at(0);
+    nlp_g.push_back(pk);
+
+    // Add integral objective function term
+	//    [Jk] = lfcn.call([X[k+1,0], U[k]])
+	//    nlp_j += Jk
   }
-  F_ = MXFunction(V,f);
 
-  // Objective scaling factor
-  MX sigma("sigma");
-  
-  // Lagrange multipliers
-  MX lambda("lambda",g.size1());
-  
-  // Lagrangian
-  MX L = sigma*f[0] + inner_prod(lambda,g);
-  
-  // Input of the function
-  vector<MX> FG_in(3);
-  FG_in[0] = V;
-  FG_in[1] = lambda;
-  FG_in[2] = sigma;
+  // Add end cost
+  MX Jk = mfcn_.call(mayerIn("x",X[nk_][0])).at(0);
+  nlp_j += Jk;
 
-  // Output of the function
-  vector<MX> FG_out(3);
-  FG_out[0] = f[0];
-  FG_out[1] = g;
-  FG_out[2] = L;
-  
-  // Function that evaluates function and constraints that can also be used to get the gradient of the constraint
-  FG_ = MXFunction(FG_in,FG_out);
-  
+  // Objective function of the NLP
+  F_ = MXFunction(nlp_x, nlp_j);
+
+  // Nonlinear constraint function
+  G_ = MXFunction(nlp_x, vertcat(nlp_g));
+
   // Get the NLP creator function
   NLPSolverCreator nlp_solver_creator = getOption("nlp_solver");
   
@@ -220,15 +249,17 @@ void CollocationInternal::getGuess(vector<double>& V_init) const{
   // Running index
   int el=0;
   
-    // Pass guess for parameters
-    for(int i=0; i<np_; ++i){
-      V_init[el++] = p_init.elem(i);
-    }
+  // Pass guess for parameters
+  for(int i=0; i<np_; ++i){
+    V_init[el++] = p_init.elem(i);
+  }
   
   for(int k=0; k<nk_; ++k){
     // Pass guess for state
-    for(int i=0; i<nx_; ++i){
-      V_init[el++] = x_init.elem(i,k);
+    for(int j=0; j<=deg_; ++j){
+      for(int i=0; i<nx_; ++i){
+         V_init[el++] = x_init.elem(i,k);
+      }
     }
     
     // Pass guess for control
@@ -269,8 +300,16 @@ void CollocationInternal::getVariableBounds(vector<double>& V_min, vector<double
     for(int i=0; i<nx_; ++i){
       V_min[min_el++] = x_min.elem(i,k);
       V_max[max_el++] = x_max.elem(i,k);
-    }
-    
+	}
+
+    // Pass bounds on collocation points
+	for(int j=0; j<deg_; ++j){
+	  for(int i=0; i<nx_; ++i){
+	    V_min[min_el++] = -numeric_limits<double>::infinity();
+	    V_max[max_el++] =  numeric_limits<double>::infinity();
+	  }
+	}
+
     // Pass bounds on control
     for(int i=0; i<nu_; ++i){
       V_min[min_el++] = u_min.elem(i,k);
@@ -296,9 +335,11 @@ void CollocationInternal::getConstraintBounds(vector<double>& G_min, vector<doub
   int min_el=0, max_el=0;
   
   for(int k=0; k<nk_; ++k){
-    for(int i=0; i<nx_; ++i){
-      G_min[min_el++] = 0.;
-      G_max[max_el++] = 0.;
+	for(int j=0; j<=deg_; ++j){
+      for(int i=0; i<nx_; ++i){
+        G_min[min_el++] = 0.;
+        G_max[max_el++] = 0.;
+      }
     }
     
     for(int i=0; i<nh_; ++i){
@@ -330,6 +371,9 @@ void CollocationInternal::setOptimalSolution( const vector<double> &V_opt ){
       x_opt(i,k) = V_opt[el++];
     }
     
+    // Skip collocation points
+    el += deg_*nx_;
+
     // Pass optimized control
     for(int i=0; i<nu_; ++i){
       u_opt(i,k) = V_opt[el++];
