@@ -77,9 +77,6 @@ class MultipleShootingInternal : public OCPSolverInternal{
     // NLP constraint function
     MXFunction G_;
 
-    // Evaluates F and G as well as the lagrangian: L = sigma*f + lambda'*g
-    MXFunction FG_;
-
     // NLP solver
     NLPSolver nlp_solver_;
 };
