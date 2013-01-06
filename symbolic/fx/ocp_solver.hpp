@@ -88,6 +88,8 @@ enum OCPOutput{
   OCP_U_OPT, 
   /// Optimal parameters [p_opt]
   OCP_P_OPT, 
+  /// Objective/cost function for optimal solution (1 x 1) [cost]
+  OCP_COST,
   /// Number of outputs to an OCP solver
   OCP_NUM_OUT
 };

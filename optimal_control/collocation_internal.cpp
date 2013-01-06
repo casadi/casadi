@@ -400,6 +400,9 @@ void CollocationInternal::evaluate(int nfdir, int nadir){
   
   // Save the optimal solution
   setOptimalSolution(nlp_solver_.output(NLP_X_OPT).data());
+
+  // Save the optimal cost
+  output(OCP_COST).set(nlp_solver_.output(NLP_COST));
 }
 
 
