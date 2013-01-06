@@ -305,8 +305,8 @@ void CollocationInternal::getVariableBounds(vector<double>& V_min, vector<double
     // Pass bounds on collocation points
 	for(int j=0; j<deg_; ++j){
 	  for(int i=0; i<nx_; ++i){
-	    V_min[min_el++] = -numeric_limits<double>::infinity();
-	    V_max[max_el++] =  numeric_limits<double>::infinity();
+	    V_min[min_el++] = std::min(x_min.elem(i,k),x_min.elem(i,k+1));
+	    V_max[max_el++] = std::max(x_max.elem(i,k),x_max.elem(i,k+1));
 	  }
 	}
 
