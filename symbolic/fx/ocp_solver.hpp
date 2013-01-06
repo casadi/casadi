@@ -58,12 +58,6 @@ enum OCPInput{
   OCP_UBX,
   /// States initial guess (nx x (ns+1)) [x_init]
   OCP_X_INIT,
-  /// States deriatives lower bounds (nx x (ns+1)) [lbxp]
-  OCP_LBXP,
-  /// States deriatives upper bounds (nx x (ns+1)) [ubxp]
-  OCP_UBXP,
-  /// States deriatives initial guess (nx x (ns+1)) [xp_init]
-  OCP_XP_INIT,
   /// Controls lower bounds (nu x ns) [lbu]
   OCP_LBU,
   /// Controls upper bounds (nu x ns) [ubu]
@@ -94,8 +88,6 @@ enum OCPOutput{
   OCP_X_OPT, 
   /// Optimal control trajectory [u_opt]
   OCP_U_OPT, 
-  /// Optimal state derivative trajectory [xp_opt]
-  OCP_XP_OPT, 
   /// Optimal parameters [p_opt]
   OCP_P_OPT, 
   /// Number of outputs to an OCP solver

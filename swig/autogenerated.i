@@ -673,25 +673,22 @@ def ocpIn(*dummy,**kwargs):
   nh: Number of point constraints: from cfcn.input(0).size()
   
   Keyword arguments:
-    t       -- Time grid: ((ns+1) x 1) - default: linspace(0,t_final,ns+1) [OCP_T]
-    lbx     -- States lower bounds (nx x (ns+1)) [OCP_LBX]
-    ubx     -- States upper bounds (nx x (ns+1)) [OCP_UBX]
-    x_init  -- States initial guess (nx x (ns+1)) [OCP_X_INIT]
-    lbxp    -- States deriatives lower bounds (nx x (ns+1)) [OCP_LBXP]
-    ubxp    -- States deriatives upper bounds (nx x (ns+1)) [OCP_UBXP]
-    xp_init -- States deriatives initial guess (nx x (ns+1)) [OCP_XP_INIT]
-    lbu     -- Controls lower bounds (nu x ns) [OCP_LBU]
-    ubu     -- Controls upper bounds (nu x ns) [OCP_UBU]
-    u_init  -- Controls initial guess (nu x ns) [OCP_U_INIT]
-    lbp     -- Parameters lower bounds (np x 1) [OCP_LBP]
-    ubp     -- Parameters upper bounds (np x 1) [OCP_UBP]
-    p_init  -- Parameters initial guess (np x 1) [OCP_P_INIT]
-    lbh     -- Point constraint lower bound (nh x (ns+1)) [OCP_LBH]
-    ubh     -- Point constraint upper bound (nh x (ns+1)) [OCP_UBH]
-    lbg     -- Lower bound for the coupling constraints [OCP_LBG]
-    ubg     -- Upper bound for the coupling constraints [OCP_UBG]
+    t      -- Time grid: ((ns+1) x 1) - default: linspace(0,t_final,ns+1) [OCP_T]
+    lbx    -- States lower bounds (nx x (ns+1)) [OCP_LBX]
+    ubx    -- States upper bounds (nx x (ns+1)) [OCP_UBX]
+    x_init -- States initial guess (nx x (ns+1)) [OCP_X_INIT]
+    lbu    -- Controls lower bounds (nu x ns) [OCP_LBU]
+    ubu    -- Controls upper bounds (nu x ns) [OCP_UBU]
+    u_init -- Controls initial guess (nu x ns) [OCP_U_INIT]
+    lbp    -- Parameters lower bounds (np x 1) [OCP_LBP]
+    ubp    -- Parameters upper bounds (np x 1) [OCP_UBP]
+    p_init -- Parameters initial guess (np x 1) [OCP_P_INIT]
+    lbh    -- Point constraint lower bound (nh x (ns+1)) [OCP_LBH]
+    ubh    -- Point constraint upper bound (nh x (ns+1)) [OCP_UBH]
+    lbg    -- Lower bound for the coupling constraints [OCP_LBG]
+    ubg    -- Upper bound for the coupling constraints [OCP_UBG]
   """
-  if(len(dummy)>0): raise Exception("Error in ocpIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n ocpIn(my_t, my_lbx, my_ubx, my_x_init, my_lbxp, my_ubxp, my_xp_init, my_lbu, my_ubu, my_u_init, my_lbp, my_ubp, my_p_init, my_lbh, my_ubh, my_lbg, my_ubg)\nmust be written\n ocpIn(t=my_t, lbx=my_lbx, ubx=my_ubx, x_init=my_x_init, lbxp=my_lbxp, ubxp=my_ubxp, xp_init=my_xp_init, lbu=my_lbu, ubu=my_ubu, u_init=my_u_init, lbp=my_lbp, ubp=my_ubp, p_init=my_p_init, lbh=my_lbh, ubh=my_ubh, lbg=my_lbg, ubg=my_ubg)\nwhere any keyword is optional.")
+  if(len(dummy)>0): raise Exception("Error in ocpIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n ocpIn(my_t, my_lbx, my_ubx, my_x_init, my_lbu, my_ubu, my_u_init, my_lbp, my_ubp, my_p_init, my_lbh, my_ubh, my_lbg, my_ubg)\nmust be written\n ocpIn(t=my_t, lbx=my_lbx, ubx=my_ubx, x_init=my_x_init, lbu=my_lbu, ubu=my_ubu, u_init=my_u_init, lbp=my_lbp, ubp=my_ubp, p_init=my_p_init, lbh=my_lbh, ubh=my_ubh, lbg=my_lbg, ubg=my_ubg)\nwhere any keyword is optional.")
   t = []
   if 't' in kwargs:
     t = kwargs['t']
@@ -704,15 +701,6 @@ def ocpIn(*dummy,**kwargs):
   x_init = []
   if 'x_init' in kwargs:
     x_init = kwargs['x_init']
-  lbxp = []
-  if 'lbxp' in kwargs:
-    lbxp = kwargs['lbxp']
-  ubxp = []
-  if 'ubxp' in kwargs:
-    ubxp = kwargs['ubxp']
-  xp_init = []
-  if 'xp_init' in kwargs:
-    xp_init = kwargs['xp_init']
   lbu = []
   if 'lbu' in kwargs:
     lbu = kwargs['lbu']
@@ -744,9 +732,9 @@ def ocpIn(*dummy,**kwargs):
   if 'ubg' in kwargs:
     ubg = kwargs['ubg']
   for k in kwargs.keys():
-    if not(k in ['t','lbx','ubx','x_init','lbxp','ubxp','xp_init','lbu','ubu','u_init','lbp','ubp','p_init','lbh','ubh','lbg','ubg']):
-      raise Exception("Keyword error in ocpIn: '%s' is not recognized. Available keywords are: t, lbx, ubx, x_init, lbxp, ubxp, xp_init, lbu, ubu, u_init, lbp, ubp, p_init, lbh, ubh, lbg, ubg" % k )
-  return [t,lbx,ubx,x_init,lbxp,ubxp,xp_init,lbu,ubu,u_init,lbp,ubp,p_init,lbh,ubh,lbg,ubg]
+    if not(k in ['t','lbx','ubx','x_init','lbu','ubu','u_init','lbp','ubp','p_init','lbh','ubh','lbg','ubg']):
+      raise Exception("Keyword error in ocpIn: '%s' is not recognized. Available keywords are: t, lbx, ubx, x_init, lbu, ubu, u_init, lbp, ubp, p_init, lbh, ubh, lbg, ubg" % k )
+  return [t,lbx,ubx,x_init,lbu,ubu,u_init,lbp,ubp,p_init,lbh,ubh,lbg,ubg]
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
@@ -764,28 +752,24 @@ def ocpOut(*dummy,**kwargs):
   Output arguments of an OCP Solver
   
   Keyword arguments:
-    x_opt  -- Optimal state trajectory [OCP_X_OPT]
-    u_opt  -- Optimal control trajectory [OCP_U_OPT]
-    xp_opt -- Optimal state derivative trajectory [OCP_XP_OPT]
-    p_opt  -- Optimal parameters [OCP_P_OPT]
+    x_opt -- Optimal state trajectory [OCP_X_OPT]
+    u_opt -- Optimal control trajectory [OCP_U_OPT]
+    p_opt -- Optimal parameters [OCP_P_OPT]
   """
-  if(len(dummy)>0): raise Exception("Error in ocpOut: syntax has become more strict. You must use keyword arguments now, for your own safety.\n ocpOut(my_x_opt, my_u_opt, my_xp_opt, my_p_opt)\nmust be written\n ocpOut(x_opt=my_x_opt, u_opt=my_u_opt, xp_opt=my_xp_opt, p_opt=my_p_opt)\nwhere any keyword is optional.")
+  if(len(dummy)>0): raise Exception("Error in ocpOut: syntax has become more strict. You must use keyword arguments now, for your own safety.\n ocpOut(my_x_opt, my_u_opt, my_p_opt)\nmust be written\n ocpOut(x_opt=my_x_opt, u_opt=my_u_opt, p_opt=my_p_opt)\nwhere any keyword is optional.")
   x_opt = []
   if 'x_opt' in kwargs:
     x_opt = kwargs['x_opt']
   u_opt = []
   if 'u_opt' in kwargs:
     u_opt = kwargs['u_opt']
-  xp_opt = []
-  if 'xp_opt' in kwargs:
-    xp_opt = kwargs['xp_opt']
   p_opt = []
   if 'p_opt' in kwargs:
     p_opt = kwargs['p_opt']
   for k in kwargs.keys():
-    if not(k in ['x_opt','u_opt','xp_opt','p_opt']):
-      raise Exception("Keyword error in ocpOut: '%s' is not recognized. Available keywords are: x_opt, u_opt, xp_opt, p_opt" % k )
-  return [x_opt,u_opt,xp_opt,p_opt]
+    if not(k in ['x_opt','u_opt','p_opt']):
+      raise Exception("Keyword error in ocpOut: '%s' is not recognized. Available keywords are: x_opt, u_opt, p_opt" % k )
+  return [x_opt,u_opt,p_opt]
 %}
 #endif //SWIGPYTHON
 #ifndef SWIGPYTHON
