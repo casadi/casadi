@@ -23,3 +23,6 @@ octave-core
 documentation/examples/ctemplate/compiler.sh
 documentation/examples/ctemplate/linker.sh
 
+# Eclipse
+.project
+.cproject
