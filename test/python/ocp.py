@@ -282,11 +282,6 @@ class OCPtests(casadiTestCase):
     for i in [OCP_LBX,OCP_UBX,OCP_X_INIT]:
       self.checkarray(ms.input(i).shape,(nx,ns+1),"shape")
       
-
-    self.checkarray(ms.input(OCP_LBXP).shape,(nx,ns+1),"shape")
-    self.checkarray(ms.input(OCP_UBXP).shape,(nx,ns+1),"shape")
-    self.checkarray(ms.input(OCP_XP_INIT).shape,(0,0),"shape") # is this a bug?
-    
     for i in [OCP_LBU,OCP_UBU,OCP_U_INIT]:
       self.checkarray(ms.input(i).shape,(nu,ns),"shape")
     
@@ -326,11 +321,6 @@ class OCPtests(casadiTestCase):
     for i in [OCP_LBX,OCP_UBX,OCP_X_INIT]:
       self.checkarray(ms.input(i).shape,(nx,ns+1),"shape")
       
-
-    self.checkarray(ms.input(OCP_LBXP).shape,(nx,ns+1),"shape")
-    self.checkarray(ms.input(OCP_UBXP).shape,(nx,ns+1),"shape")
-    self.checkarray(ms.input(OCP_XP_INIT).shape,(0,0),"shape") # is this a bug?
-    
     for i in [OCP_LBU,OCP_UBU,OCP_U_INIT]:
       self.checkarray(ms.input(i).shape,(nu,ns),"shape")
     
