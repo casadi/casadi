@@ -26,7 +26,7 @@
 #include "optimal_control/variable_tools.hpp"
 #include "optimal_control/ocp_tools.hpp"
 #include "optimal_control/multiple_shooting.hpp"
-#include "optimal_control/collocation.hpp"
+#include "optimal_control/direct_collocation.hpp"
 %}
 
 %include "optimal_control/variable.hpp"
@@ -34,7 +34,7 @@
 %include "optimal_control/variable_tools.hpp"
 %include "optimal_control/ocp_tools.hpp"
 %include "optimal_control/multiple_shooting.hpp"
-%include "optimal_control/collocation.hpp"
+%include "optimal_control/direct_collocation.hpp"
 
 #ifdef SWIGPYTHON
 %pythoncode %{

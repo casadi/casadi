@@ -20,44 +20,44 @@
  *
  */
 
-#include "collocation_internal.hpp"
+#include "direct_collocation_internal.hpp"
 
 namespace CasADi{
     
-Collocation::Collocation(){
+DirectCollocation::DirectCollocation(){
 }
     
-Collocation::Collocation(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn){
-  assignNode(new CollocationInternal(ffcn,mfcn,cfcn,rfcn));
+DirectCollocation::DirectCollocation(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn){
+  assignNode(new DirectCollocationInternal(ffcn,mfcn,cfcn,rfcn));
 }
 
-const CollocationInternal* Collocation::operator->() const{
-  return (const CollocationInternal*)FX::operator->();
+const DirectCollocationInternal* DirectCollocation::operator->() const{
+  return (const DirectCollocationInternal*)FX::operator->();
 }
 
-CollocationInternal* Collocation::operator->(){
-  return (CollocationInternal*)FX::operator->();
+DirectCollocationInternal* DirectCollocation::operator->(){
+  return (DirectCollocationInternal*)FX::operator->();
 }
 
-void Collocation::getGuess(std::vector<double>& V_init) const{
+void DirectCollocation::getGuess(std::vector<double>& V_init) const{
   (*this)->getGuess(V_init);
 }
     
-void Collocation::getVariableBounds(std::vector<double>& V_min, std::vector<double>& V_max) const{
+void DirectCollocation::getVariableBounds(std::vector<double>& V_min, std::vector<double>& V_max) const{
   (*this)->getVariableBounds(V_min,V_max);
 }
     
-void Collocation::getConstraintBounds(std::vector<double>& G_min, std::vector<double>& G_max) const{
+void DirectCollocation::getConstraintBounds(std::vector<double>& G_min, std::vector<double>& G_max) const{
   (*this)->getConstraintBounds(G_min,G_max);
 }
 
-void Collocation::setOptimalSolution( const std::vector<double> &V_opt ){
+void DirectCollocation::setOptimalSolution( const std::vector<double> &V_opt ){
   (*this)->setOptimalSolution(V_opt);
 }
 
-  NLPSolver Collocation::getNLPSolver() const { return isNull() ? NLPSolver(): (*this)->nlp_solver_; }
+  NLPSolver DirectCollocation::getNLPSolver() const { return isNull() ? NLPSolver(): (*this)->nlp_solver_; }
   
-void Collocation::reportConstraints(std::ostream &stream) { 
+void DirectCollocation::reportConstraints(std::ostream &stream) { 
   (*this)->reportConstraints();
 }
 

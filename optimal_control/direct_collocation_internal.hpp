@@ -20,56 +20,69 @@
  *
  */
 
-#ifndef COLLOCATION_HPP
-#define COLLOCATION_HPP
+#ifndef DIRECT_COLLOCATION_INTERNAL_HPP
+#define DIRECT_COLLOCATION_INTERNAL_HPP
 
-#include "../symbolic/fx/ocp_solver.hpp"
-#include "../symbolic/fx/nlp_solver.hpp"
+#include "direct_collocation.hpp"
+#include "../symbolic/fx/ocp_solver_internal.hpp"
+
+#include "../symbolic/fx/parallelizer.hpp"
+#include "../symbolic/fx/c_function.hpp"
+#include "../symbolic/fx/mx_function.hpp"
+#include "../symbolic/fx/sx_function.hpp"
 
 namespace CasADi{
-  class CollocationInternal;
-    
-  /** \brief Direct collocation
-   *
-   *   \author Joel Andersson
-   *   \date 2012
-  */ 
-class Collocation : public OCPSolver{
-  public:
-    /// Default constructor
-    Collocation();
   
-    /// Constructor
-    explicit Collocation(const FX& ffcn, const FX& mfcn, const FX& cfcn=FX(), const FX& rfcn=FX());
+class DirectCollocationInternal : public OCPSolverInternal{
+  friend class DirectCollocation;
+  
+  public:
+    // Constructor
+    DirectCollocationInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn);
 
-    /// Access functions of the node
-    CollocationInternal* operator->();
+    // clone
+    virtual DirectCollocationInternal* clone() const{ return new DirectCollocationInternal(*this);}
 
-    /// Const access functions of the node
-    const CollocationInternal* operator->() const;
+    // Destructor
+    virtual ~DirectCollocationInternal();
     
-    /// Get the variables
+    // Initialize
+    virtual void init();
+
+    // Solve the OCP
+    virtual void evaluate(int nfdir, int nadir);
+   
+    // Get the variables
     void getGuess(std::vector<double>& V_init) const;
     
-    /// Get the variables
+    // Get the variables
     void getVariableBounds(std::vector<double>& V_min, std::vector<double>& V_max) const;
     
-    /// Get the constraints
+    // Get the constraints
     void getConstraintBounds(std::vector<double>& G_min, std::vector<double>& G_max) const;
 
-    /// Set the optimal solution
+    // Set the optimal solution
     void setOptimalSolution( const std::vector<double> &V_opt );
     
-    /// Access the underlying NLPSolver object
-    NLPSolver getNLPSolver() const;
-
-    /// Prints out a human readable report about possible constraint violations, after solving 
+    // Prints out a human readable report about possible constraint violations - all constraints
     void reportConstraints(std::ostream &stream=std::cout);
+    
+  protected:
+    // NLP objective function
+    MXFunction F_;
+    
+    // NLP constraint function
+    MXFunction G_;
 
-    /// Return the report as a string
-    std::string getReportConstraints() { std::stringstream s; reportConstraints(s); return s.str(); }
+    // NLP solver
+    NLPSolver nlp_solver_;
+
+    // Interpolation order
+    int deg_;
+
 };
                         
 } // namespace CasADi
 
-#endif // COLLOCATION_HPP
+
+#endif // DIRECT_COLLOCATION_INTERNAL_HPP

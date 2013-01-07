@@ -20,7 +20,7 @@
  *
  */
 
-#include "collocation_internal.hpp"
+#include "direct_collocation_internal.hpp"
 #include "../symbolic/matrix/matrix_tools.hpp"
 #include "../symbolic/sx/sx_tools.hpp"
 #include "../symbolic/mx/mx_tools.hpp"
@@ -31,18 +31,18 @@
 using namespace std;
 namespace CasADi{
     
-CollocationInternal::CollocationInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn) : OCPSolverInternal(ffcn, mfcn, cfcn, rfcn){
+DirectCollocationInternal::DirectCollocationInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn) : OCPSolverInternal(ffcn, mfcn, cfcn, rfcn){
   addOption("nlp_solver",               	OT_NLPSOLVER,  GenericType(), "An NLPSolver creator function");
   addOption("nlp_solver_options",       	OT_DICTIONARY, GenericType(), "Options to be passed to the NLP Solver");
   addOption("interpolation_order",          OT_INTEGER,  3,  "Order of the interpolating polynomials");
   addOption("collocation_scheme",           OT_STRING,  "radau",  "Collocation scheme","radau|legendre");
-  casadi_warning("CasADi::Collocation is still experimental");
+  casadi_warning("CasADi::DirectCollocation is still experimental");
 }
 
-CollocationInternal::~CollocationInternal(){
+DirectCollocationInternal::~DirectCollocationInternal(){
 }
 
-void CollocationInternal::init(){
+void DirectCollocationInternal::init(){
   // Initialize the base classes
   OCPSolverInternal::init();
   
@@ -242,7 +242,7 @@ void CollocationInternal::init(){
   nlp_solver_.init();
 }
 
-void CollocationInternal::getGuess(vector<double>& V_init) const{
+void DirectCollocationInternal::getGuess(vector<double>& V_init) const{
   // OCP solution guess
   const Matrix<double> &p_init = input(OCP_P_INIT);
   const Matrix<double> &x_init = input(OCP_X_INIT);
@@ -278,7 +278,7 @@ void CollocationInternal::getGuess(vector<double>& V_init) const{
   casadi_assert(el==V_init.size());
 }
 
-void CollocationInternal::getVariableBounds(vector<double>& V_min, vector<double>& V_max) const{
+void DirectCollocationInternal::getVariableBounds(vector<double>& V_min, vector<double>& V_max) const{
   // OCP variable bounds 
   const Matrix<double> &p_min = input(OCP_LBP);
   const Matrix<double> &p_max = input(OCP_UBP);
@@ -328,7 +328,7 @@ void CollocationInternal::getVariableBounds(vector<double>& V_min, vector<double
   casadi_assert(min_el==V_min.size() && max_el==V_max.size());
 }
 
-void CollocationInternal::getConstraintBounds(vector<double>& G_min, vector<double>& G_max) const{
+void DirectCollocationInternal::getConstraintBounds(vector<double>& G_min, vector<double>& G_max) const{
   // OCP constraint bounds
   const Matrix<double> &h_min = input(OCP_LBH);
   const Matrix<double> &h_max = input(OCP_UBH);
@@ -352,7 +352,7 @@ void CollocationInternal::getConstraintBounds(vector<double>& G_min, vector<doub
   casadi_assert(min_el==G_min.size() && max_el==G_max.size());
 }
 
-void CollocationInternal::setOptimalSolution( const vector<double> &V_opt ){
+void DirectCollocationInternal::setOptimalSolution( const vector<double> &V_opt ){
   // OCP solution
   Matrix<double> &p_opt = output(OCP_P_OPT);
   Matrix<double> &x_opt = output(OCP_X_OPT);
@@ -389,7 +389,7 @@ void CollocationInternal::setOptimalSolution( const vector<double> &V_opt ){
   casadi_assert(el==V_opt.size());
 }
 
-void CollocationInternal::evaluate(int nfdir, int nadir){
+void DirectCollocationInternal::evaluate(int nfdir, int nadir){
   // get NLP variable bounds and initial guess
   getGuess(nlp_solver_.input(NLP_X_INIT).data());
   getVariableBounds(nlp_solver_.input(NLP_LBX).data(),nlp_solver_.input(NLP_UBX).data());
@@ -408,7 +408,7 @@ void CollocationInternal::evaluate(int nfdir, int nadir){
 }
 
 
-void CollocationInternal::reportConstraints(std::ostream &stream) { 
+void DirectCollocationInternal::reportConstraints(std::ostream &stream) { 
   stream << "Reporting Collocation constraints" << endl;
  
   CasADi::reportConstraints(stream,output(OCP_X_OPT),input(OCP_LBX),input(OCP_UBX), "states");

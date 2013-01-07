@@ -7,7 +7,7 @@ SET(OPTIMAL_CONTROL
   xml_node.hpp              xml_node.cpp
   ocp_tools.hpp             ocp_tools.cpp
   multiple_shooting.hpp     multiple_shooting.cpp   multiple_shooting_internal.hpp   multiple_shooting_internal.cpp
-  collocation.hpp           collocation.cpp         collocation_internal.hpp         collocation_internal.cpp
+  direct_collocation.hpp    direct_collocation.cpp  direct_collocation_internal.hpp  direct_collocation_internal.cpp
 )
 
 if(ENABLE_STATIC)
