@@ -46,6 +46,9 @@ void CollocationInternal::init(){
   // Initialize the base classes
   OCPSolverInternal::init();
   
+  // Free parameters currently not supported
+  casadi_assert_message(np_==0, "Not implemented");
+
   // Legendre collocation points
   double legendre_points[][6] = {
     {0},
@@ -203,11 +206,10 @@ void CollocationInternal::init(){
     nlp_g.push_back(X[k+1][0] - xf_k);
 
     // Add path constraints
-    vector<MX> cfcn_in(2);
-    cfcn_in[0] = X[k+1][0];
-    cfcn_in[1] = U[k];
-    MX pk = cfcn_.call(cfcn_in).at(0);
-    nlp_g.push_back(pk);
+    if(nh_>0){
+      MX pk = cfcn_.call(daeIn("x",X[k+1][0],"p",U[k])).at(0);
+      nlp_g.push_back(pk);
+    }
 
     // Add integral objective function term
 	//    [Jk] = lfcn.call([X[k+1,0], U[k]])
