@@ -82,7 +82,7 @@ void DirectMultipleShootingInternal::init(){
   MX V("V",NV);
 
   // Global parameters
-  MX P = V(range(np_));
+  MX P = V(Slice(0,np_));
 
   // offset in the variable vector
   int v_offset=np_; 
@@ -91,14 +91,14 @@ void DirectMultipleShootingInternal::init(){
   vector<MX> X(nk_+1), U(nk_);
   for(int k=0; k<=nk_; ++k){ // interior nodes
     // Local state
-    X[k] = V[range(v_offset,v_offset+nx_)];
+    X[k] = V[Slice(v_offset,v_offset+nx_)];
     v_offset += nx_;
     
     // Variables below do not appear at the end point
     if(k==nk_) break;
     
     // Local control
-    U[k] = V[range(v_offset,v_offset+nu_)];
+    U[k] = V[Slice(v_offset,v_offset+nu_)];
     v_offset += nu_;
   }
   
@@ -165,7 +165,7 @@ void DirectMultipleShootingInternal::init(){
   } else {
     vector<MX> mfcn_argin(MAYER_NUM_IN); 
     mfcn_argin[MAYER_X] = X.back();
-    mfcn_argin[MAYER_P] = V(range(np_));
+    mfcn_argin[MAYER_P] = P;
     f = mfcn_.call(mfcn_argin);
   }
   F_ = MXFunction(V,f);
@@ -195,10 +195,10 @@ void DirectMultipleShootingInternal::getGuess(vector<double>& V_init) const{
   // Running index
   int el=0;
   
-    // Pass guess for parameters
-    for(int i=0; i<np_; ++i){
-      V_init[el++] = p_init.elem(i);
-    }
+  // Pass guess for parameters
+  for(int i=0; i<np_; ++i){
+    V_init[el++] = p_init.elem(i);
+  }
   
   for(int k=0; k<nk_; ++k){
     // Pass guess for state
@@ -211,7 +211,7 @@ void DirectMultipleShootingInternal::getGuess(vector<double>& V_init) const{
       V_init[el++] = u_init.elem(i,k);
     }
   }
-
+  
   // Pass guess for final state
   for(int i=0; i<nx_; ++i){
     V_init[el++] = x_init.elem(i,nk_);
