@@ -287,7 +287,6 @@ void DirectCollocationInternal::getVariableBounds(vector<double>& V_min, vector<
   const Matrix<double> &u_min = input(OCP_LBU);
   const Matrix<double> &u_max = input(OCP_UBU);
 
-
   // Running index
   int min_el=0, max_el=0;
   
@@ -298,19 +297,20 @@ void DirectCollocationInternal::getVariableBounds(vector<double>& V_min, vector<
   }
 
   for(int k=0; k<nk_; ++k){
+    
     // Pass bounds on state
     for(int i=0; i<nx_; ++i){
       V_min[min_el++] = x_min.elem(i,k);
       V_max[max_el++] = x_max.elem(i,k);
-	}
-
+    }
+    
     // Pass bounds on collocation points
-	for(int j=0; j<deg_; ++j){
-	  for(int i=0; i<nx_; ++i){
-	    V_min[min_el++] = std::min(x_min.elem(i,k),x_min.elem(i,k+1));
-	    V_max[max_el++] = std::max(x_max.elem(i,k),x_max.elem(i,k+1));
-	  }
-	}
+    for(int j=0; j<deg_; ++j){
+      for(int i=0; i<nx_; ++i){
+	V_min[min_el++] = std::min(x_min.elem(i,k),x_min.elem(i,k+1));
+	V_max[max_el++] = std::max(x_max.elem(i,k),x_max.elem(i,k+1));
+      }
+    }
 
     // Pass bounds on control
     for(int i=0; i<nu_; ++i){
