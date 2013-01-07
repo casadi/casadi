@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 2.0)
 
 SET(OPTIMAL_CONTROL
-  variable.hpp              variable.cpp            variable_internal.hpp             variable_internal.cpp
-  variable_tools.hpp        variable_tools.cpp
-  symbolic_ocp.hpp          symbolic_ocp.cpp
-  xml_node.hpp              xml_node.cpp
-  ocp_tools.hpp             ocp_tools.cpp
-  multiple_shooting.hpp     multiple_shooting.cpp   multiple_shooting_internal.hpp   multiple_shooting_internal.cpp
-  direct_collocation.hpp    direct_collocation.cpp  direct_collocation_internal.hpp  direct_collocation_internal.cpp
+  variable.hpp                   variable.cpp            variable_internal.hpp             variable_internal.cpp
+  variable_tools.hpp             variable_tools.cpp
+  symbolic_ocp.hpp               symbolic_ocp.cpp
+  xml_node.hpp                   xml_node.cpp
+  ocp_tools.hpp                  ocp_tools.cpp
+  direct_multiple_shooting.hpp   direct_multiple_shooting.cpp   direct_multiple_shooting_internal.hpp   direct_multiple_shooting_internal.cpp
+  direct_collocation.hpp         direct_collocation.cpp         direct_collocation_internal.hpp         direct_collocation_internal.cpp
 )
 
 if(ENABLE_STATIC)

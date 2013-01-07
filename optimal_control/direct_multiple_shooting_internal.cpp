@@ -20,7 +20,7 @@
  *
  */
 
-#include "multiple_shooting_internal.hpp"
+#include "direct_multiple_shooting_internal.hpp"
 #include "../symbolic/fx/integrator.hpp"
 #include "../symbolic/matrix/matrix_tools.hpp"
 #include "../symbolic/mx/mx_tools.hpp"
@@ -30,7 +30,7 @@
 using namespace std;
 namespace CasADi{
     
-MultipleShootingInternal::MultipleShootingInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn) : OCPSolverInternal(ffcn, mfcn, cfcn, rfcn){
+DirectMultipleShootingInternal::DirectMultipleShootingInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn) : OCPSolverInternal(ffcn, mfcn, cfcn, rfcn){
   addOption("parallelization", OT_STRING, GenericType(), "Passed on to CasADi::Parallelizer");
   addOption("nlp_solver",               OT_NLPSOLVER,  GenericType(), "An NLPSolver creator function");
   addOption("nlp_solver_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the NLP Solver");
@@ -38,10 +38,10 @@ MultipleShootingInternal::MultipleShootingInternal(const FX& ffcn, const FX& mfc
   addOption("integrator_options",       OT_DICTIONARY, GenericType(), "Options to be passed to the integrator");
 }
 
-MultipleShootingInternal::~MultipleShootingInternal(){
+DirectMultipleShootingInternal::~DirectMultipleShootingInternal(){
 }
 
-void MultipleShootingInternal::init(){
+void DirectMultipleShootingInternal::init(){
   // Initialize the base classes
   OCPSolverInternal::init();
 
@@ -186,7 +186,7 @@ void MultipleShootingInternal::init(){
   nlp_solver_.init();
 }
 
-void MultipleShootingInternal::getGuess(vector<double>& V_init) const{
+void DirectMultipleShootingInternal::getGuess(vector<double>& V_init) const{
   // OCP solution guess
   const Matrix<double> &p_init = input(OCP_P_INIT);
   const Matrix<double> &x_init = input(OCP_X_INIT);
@@ -220,7 +220,7 @@ void MultipleShootingInternal::getGuess(vector<double>& V_init) const{
   casadi_assert(el==V_init.size());
 }
 
-void MultipleShootingInternal::getVariableBounds(vector<double>& V_min, vector<double>& V_max) const{
+void DirectMultipleShootingInternal::getVariableBounds(vector<double>& V_min, vector<double>& V_max) const{
   // OCP variable bounds 
   const Matrix<double> &p_min = input(OCP_LBP);
   const Matrix<double> &p_max = input(OCP_UBP);
@@ -262,7 +262,7 @@ void MultipleShootingInternal::getVariableBounds(vector<double>& V_min, vector<d
   casadi_assert(min_el==V_min.size() && max_el==V_max.size());
 }
 
-void MultipleShootingInternal::getConstraintBounds(vector<double>& G_min, vector<double>& G_max) const{
+void DirectMultipleShootingInternal::getConstraintBounds(vector<double>& G_min, vector<double>& G_max) const{
   // OCP constraint bounds
   const Matrix<double> &h_min = input(OCP_LBH);
   const Matrix<double> &h_max = input(OCP_UBH);
@@ -284,7 +284,7 @@ void MultipleShootingInternal::getConstraintBounds(vector<double>& G_min, vector
   casadi_assert(min_el==G_min.size() && max_el==G_max.size());
 }
 
-void MultipleShootingInternal::setOptimalSolution(const vector<double> &V_opt){
+void DirectMultipleShootingInternal::setOptimalSolution(const vector<double> &V_opt){
   // OCP solution
   Matrix<double> &p_opt = output(OCP_P_OPT);
   Matrix<double> &x_opt = output(OCP_X_OPT);
@@ -318,7 +318,7 @@ void MultipleShootingInternal::setOptimalSolution(const vector<double> &V_opt){
   casadi_assert(el==V_opt.size());
 }
 
-void MultipleShootingInternal::evaluate(int nfdir, int nadir){
+void DirectMultipleShootingInternal::evaluate(int nfdir, int nadir){
   // get NLP variable bounds and initial guess
   getGuess(nlp_solver_.input(NLP_X_INIT).data());
   getVariableBounds(nlp_solver_.input(NLP_LBX).data(),nlp_solver_.input(NLP_UBX).data());
@@ -337,8 +337,8 @@ void MultipleShootingInternal::evaluate(int nfdir, int nadir){
 }
 
 
-void MultipleShootingInternal::reportConstraints(std::ostream &stream) { 
-  stream << "Reporting MultipleShooting constraints" << endl;
+void DirectMultipleShootingInternal::reportConstraints(std::ostream &stream) { 
+  stream << "Reporting DirectMultipleShooting constraints" << endl;
  
   CasADi::reportConstraints(stream,output(OCP_X_OPT),input(OCP_LBX),input(OCP_UBX), "states");
   CasADi::reportConstraints(stream,output(OCP_U_OPT),input(OCP_LBU),input(OCP_UBU), "controls");

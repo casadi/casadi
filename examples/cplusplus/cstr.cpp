@@ -31,7 +31,7 @@
 #include <optimal_control/symbolic_ocp.hpp>
 #include <optimal_control/ocp_tools.hpp>
 #include <optimal_control/variable_tools.hpp>
-#include <optimal_control/multiple_shooting.hpp>
+#include <optimal_control/direct_multiple_shooting.hpp>
 
 using namespace CasADi;
 using namespace std;
@@ -92,8 +92,8 @@ int main(){
   SXFunction dae(daeIn("x",x, "p",u, "t",t),daeOut("ode",ocp.ode));
 
   // Create a multiple shooting discretization
-  MultipleShooting ocp_solver;
-  ocp_solver = MultipleShooting(dae,mterm);
+  DirectMultipleShooting ocp_solver;
+  ocp_solver = DirectMultipleShooting(dae,mterm);
   ocp_solver.setOption("integrator",IdasIntegrator::creator);
   ocp_solver.setOption("integrator_options",integrator_options);
   ocp_solver.setOption("number_of_grid_points",num_nodes);

@@ -20,10 +20,10 @@
  *
  */
 
-#ifndef MULTIPLE_SHOOTING_INTERNAL_HPP
-#define MULTIPLE_SHOOTING_INTERNAL_HPP
+#ifndef DIRECT_MULTIPLE_SHOOTING_INTERNAL_HPP
+#define DIRECT_MULTIPLE_SHOOTING_INTERNAL_HPP
 
-#include "multiple_shooting.hpp"
+#include "direct_multiple_shooting.hpp"
 #include "../symbolic/fx/ocp_solver_internal.hpp"
 
 #include "../symbolic/fx/parallelizer.hpp"
@@ -33,18 +33,18 @@
 
 namespace CasADi{
   
-class MultipleShootingInternal : public OCPSolverInternal{
-  friend class MultipleShooting;
+class DirectMultipleShootingInternal : public OCPSolverInternal{
+  friend class DirectMultipleShooting;
   
   public:
     // Constructor
-    MultipleShootingInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn);
+    DirectMultipleShootingInternal(const FX& ffcn, const FX& mfcn, const FX& cfcn, const FX& rfcn);
 
     // clone
-    virtual MultipleShootingInternal* clone() const{ return new MultipleShootingInternal(*this);}
+    virtual DirectMultipleShootingInternal* clone() const{ return new DirectMultipleShootingInternal(*this);}
 
     // Destructor
-    virtual ~MultipleShootingInternal();
+    virtual ~DirectMultipleShootingInternal();
     
     // Initialize
     virtual void init();
@@ -84,4 +84,4 @@ class MultipleShootingInternal : public OCPSolverInternal{
 } // namespace CasADi
 
 
-#endif // MULTIPLE_SHOOTING_INTERNAL_HPP
+#endif // DIRECT_MULTIPLE_SHOOTING_INTERNAL_HPP

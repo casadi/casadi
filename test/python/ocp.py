@@ -271,7 +271,7 @@ class OCPtests(casadiTestCase):
     xf = x0 + p[0]
     daeres = SXFunction(daeIn(t=t, x=x0, p=p),daeOut(ode=xf))
     mayer = SXFunction([x0],[7*x0[0]])
-    ms = MultipleShooting(daeres,mayer)
+    ms = DirectMultipleShooting(daeres,mayer)
     ms.setOption("integrator",CVodesIntegrator)
     ms.setOption("number_of_grid_points",ns)
     ms.setOption("final_time",tf)
@@ -308,7 +308,7 @@ class OCPtests(casadiTestCase):
     cfcn = SXFunction(daeIn(t=t,x=x0, p=p),[x0[:nh,0]])
     cfcn.init()
     
-    ms = MultipleShooting(daeres,mayer,cfcn)
+    ms = DirectMultipleShooting(daeres,mayer,cfcn)
     ms.setOption("integrator",CVodesIntegrator)
     ms.setOption("number_of_grid_points",ns)
     ms.setOption("number_of_parameters",np)
@@ -364,7 +364,7 @@ class OCPtests(casadiTestCase):
     mayer = SXFunction([y],[-y[2]])
     mayer.init()
     
-    ms = MultipleShooting(f,mayer)
+    ms = DirectMultipleShooting(f,mayer)
     ms.setOption("integrator",CVodesIntegrator)
     ms.setOption("integrator_options",integrator_options)
     ms.setOption("number_of_grid_points",N)
@@ -438,7 +438,7 @@ class OCPtests(casadiTestCase):
     mayer = SXFunction([x],[-x])
     mayer.init()
     
-    ms = MultipleShooting(f,mayer)
+    ms = DirectMultipleShooting(f,mayer)
     ms.setOption("integrator",CVodesIntegrator)
     ms.setOption("integrator_options",integrator_options)
     ms.setOption("number_of_grid_points",N);

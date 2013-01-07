@@ -20,17 +20,17 @@
  *
  */
 
-#ifndef MULTIPLE_SHOOTING_HPP
-#define MULTIPLE_SHOOTING_HPP
+#ifndef DIRECT_MULTIPLE_SHOOTING_HPP
+#define DIRECT_MULTIPLE_SHOOTING_HPP
 
 #include "../symbolic/fx/ocp_solver.hpp"
 #include "../symbolic/fx/nlp_solver.hpp"
 
 namespace CasADi{
-  class MultipleShootingInternal;
+  class DirectMultipleShootingInternal;
     
     
-  /** \brief Multiple Shooting
+  /** \brief Direct Multiple Shooting
    *
    *   ns: Number of shooting nodes: from option number_of_grid_points\n
    *   nx: Number of differential states: from ffcn.input(INTEGRATOR_X0).size() \n
@@ -43,10 +43,10 @@ namespace CasADi{
    *   \author Joel Andersson
    *   \date 2011
   */ 
-class MultipleShooting : public OCPSolver{
+class DirectMultipleShooting : public OCPSolver{
   public:
     /// Default constructor
-    MultipleShooting();
+    DirectMultipleShooting();
   
     /** \brief Create a multiple shooting OCP solver
     * \param ffcn Continuous time dynamics, an CasADi::FX with the folowing mapping:
@@ -63,13 +63,13 @@ class MultipleShooting : public OCPSolver{
     * @copydoc scheme_DAEInput
     * \param rfcn Initial value constraints
     */
-    explicit MultipleShooting(const FX& ffcn, const FX& mfcn, const FX& cfcn=FX(), const FX& rfcn=FX());
+    explicit DirectMultipleShooting(const FX& ffcn, const FX& mfcn, const FX& cfcn=FX(), const FX& rfcn=FX());
 
     /// Access functions of the node
-    MultipleShootingInternal* operator->();
+    DirectMultipleShootingInternal* operator->();
 
     /// Const access functions of the node
-    const MultipleShootingInternal* operator->() const;
+    const DirectMultipleShootingInternal* operator->() const;
     
     /// Get the variables
     void getGuess(std::vector<double>& V_init) const;
@@ -99,4 +99,4 @@ class MultipleShooting : public OCPSolver{
 } // namespace CasADi
 
 
-#endif // MULTIPLE_SHOOTING_HPP
+#endif // DIRECT_MULTIPLE_SHOOTING_HPP
