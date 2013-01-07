@@ -273,6 +273,7 @@ void DirectSingleShootingInternal::setOptimalSolution(const vector<double> &V_op
   const vector<double>& g_opt = G_.output().data();
 
   // Loop over the constraints
+  el = 0;
   for(int k=0; k<nk_; ++k){
 
     // Get the state trajectory
