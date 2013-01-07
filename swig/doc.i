@@ -13673,7 +13673,11 @@ times t_i.
 +-----------------+----------------------------+
 | nlinsetups      | CasADi::CVodesInternal     |
 +-----------------+----------------------------+
+| nlinsetupsB     | CasADi::CVodesInternal     |
++-----------------+----------------------------+
 | nsteps          | CasADi::CVodesInternal     |
++-----------------+----------------------------+
+| nstepsB         | CasADi::CVodesInternal     |
 +-----------------+----------------------------+
 
 C++ includes: cvodes_integrator.hpp ";
@@ -14830,7 +14834,11 @@ rx, rz and rp.
 +-----------------+----------------------------+
 | nlinsetups      | CasADi::CVodesInternal     |
 +-----------------+----------------------------+
+| nlinsetupsB     | CasADi::CVodesInternal     |
++-----------------+----------------------------+
 | nsteps          | CasADi::CVodesInternal     |
++-----------------+----------------------------+
+| nstepsB         | CasADi::CVodesInternal     |
 +-----------------+----------------------------+
 
 C++ includes: cvodes_internal.hpp ";
@@ -20723,7 +20731,11 @@ Joel Andersson
 +-----------------+----------------------------+
 | nlinsetups      | CasADi::IdasInternal       |
 +-----------------+----------------------------+
+| nlinsetupsB     | CasADi::IdasInternal       |
++-----------------+----------------------------+
 | nsteps          | CasADi::IdasInternal       |
++-----------------+----------------------------+
+| nstepsB         | CasADi::IdasInternal       |
 +-----------------+----------------------------+
 
 C++ includes: idas_integrator.hpp ";
@@ -21943,7 +21955,11 @@ rx, rz and rp.
 +-----------------+----------------------------+
 | nlinsetups      | CasADi::IdasInternal       |
 +-----------------+----------------------------+
+| nlinsetupsB     | CasADi::IdasInternal       |
++-----------------+----------------------------+
 | nsteps          | CasADi::IdasInternal       |
++-----------------+----------------------------+
+| nstepsB         | CasADi::IdasInternal       |
 +-----------------+----------------------------+
 
 C++ includes: idas_internal.hpp ";
@@ -45076,6 +45092,15 @@ create a matrix with all nan ";
 create a matrix by repeating an existing matrix ";
 
 %feature("docstring")  CasADi::Matrix::repmat "";
+
+%feature("docstring")  CasADi::Matrix::setPrecision "
+
+Set the 'precision, width & scientific' used in printing and serializing to
+streams. ";
+
+%feature("docstring")  CasADi::Matrix::setWidth "";
+
+%feature("docstring")  CasADi::Matrix::setScientific "";
 
 %feature("docstring")  CasADi::Matrix::Matrix "
 

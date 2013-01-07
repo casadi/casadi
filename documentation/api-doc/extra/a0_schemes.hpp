@@ -239,8 +239,8 @@
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>OCP_X_OPT</td><td>Optimal state trajectory [x_opt].</td></tr>
 <tr><td>OCP_U_OPT</td><td>Optimal control trajectory [u_opt].</td></tr>
-<tr><td>OCP_XP_OPT</td><td>Optimal state derivative trajectory [xp_opt].</td></tr>
 <tr><td>OCP_P_OPT</td><td>Optimal parameters [p_opt].</td></tr>
+<tr><td>OCP_COST</td><td>Objective/cost function for optimal solution (1 x 1) [cost].</td></tr>
 </table>
 */
 /** \defgroup scheme_RDAEOutput
@@ -265,15 +265,11 @@
 */
 /** \defgroup scheme_OCPInput
 <table>
-<caption>Input scheme: CasADi::OCPInput  (OCP_NUM_IN = 17) </caption>
+<caption>Input scheme: CasADi::OCPInput  (OCP_NUM_IN = 13) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>OCP_T</td><td>Time grid: ((ns+1) x 1) - default: linspace(0,t_final,ns+1) [t].</td></tr>
 <tr><td>OCP_LBX</td><td>States lower bounds (nx x (ns+1)) [lbx].</td></tr>
 <tr><td>OCP_UBX</td><td>States upper bounds (nx x (ns+1)) [ubx].</td></tr>
 <tr><td>OCP_X_INIT</td><td>States initial guess (nx x (ns+1)) [x_init].</td></tr>
-<tr><td>OCP_LBXP</td><td>States deriatives lower bounds (nx x (ns+1)) [lbxp].</td></tr>
-<tr><td>OCP_UBXP</td><td>States deriatives upper bounds (nx x (ns+1)) [ubxp].</td></tr>
-<tr><td>OCP_XP_INIT</td><td>States deriatives initial guess (nx x (ns+1)) [xp_init].</td></tr>
 <tr><td>OCP_LBU</td><td>Controls lower bounds (nu x ns) [lbu].</td></tr>
 <tr><td>OCP_UBU</td><td>Controls upper bounds (nu x ns) [ubu].</td></tr>
 <tr><td>OCP_U_INIT</td><td>Controls initial guess (nu x ns) [u_init].</td></tr>
