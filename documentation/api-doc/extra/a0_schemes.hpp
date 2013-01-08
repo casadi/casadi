@@ -358,20 +358,6 @@
 <br/>
 @copydoc scheme_IntegratorOutput
 */
-/** \class CasADi::CollocationInternal
-\n
-\par
-@copydoc scheme_OCPInput
-<br/>
-@copydoc scheme_OCPOutput
-*/
-/** \class CasADi::Collocation
-\n
-\par
-@copydoc scheme_OCPInput
-<br/>
-@copydoc scheme_OCPOutput
-*/
 /** \class CasADi::IPInternal
 \n
 \par
@@ -424,6 +410,20 @@
 <br/>
 @copydoc scheme_QPOutput
 */
+/** \class CasADi::DirectSingleShootingInternal
+\n
+\par
+@copydoc scheme_OCPInput
+<br/>
+@copydoc scheme_OCPOutput
+*/
+/** \class CasADi::DirectSingleShooting
+\n
+\par
+@copydoc scheme_OCPInput
+<br/>
+@copydoc scheme_OCPOutput
+*/
 /** \class CasADi::LiftedSQPInternal
 \n
 \par
@@ -465,20 +465,6 @@
 @copydoc scheme_NLPInput
 <br/>
 @copydoc scheme_NLPOutput
-*/
-/** \class CasADi::MultipleShootingInternal
-\n
-\par
-@copydoc scheme_OCPInput
-<br/>
-@copydoc scheme_OCPOutput
-*/
-/** \class CasADi::MultipleShooting
-\n
-\par
-@copydoc scheme_OCPInput
-<br/>
-@copydoc scheme_OCPOutput
 */
 /** \class CasADi::IdasInternal
 \n
@@ -564,6 +550,20 @@
 <br/>
 @copydoc scheme_NLPOutput
 */
+/** \class CasADi::DirectMultipleShootingInternal
+\n
+\par
+@copydoc scheme_OCPInput
+<br/>
+@copydoc scheme_OCPOutput
+*/
+/** \class CasADi::DirectMultipleShooting
+\n
+\par
+@copydoc scheme_OCPInput
+<br/>
+@copydoc scheme_OCPOutput
+*/
 /** \class CasADi::RKIntegratorInternal
 \n
 \par
@@ -629,6 +629,20 @@
 \n
 \par
 @copydoc scheme_ControlSimulatorInput
+*/
+/** \class CasADi::DirectCollocationInternal
+\n
+\par
+@copydoc scheme_OCPInput
+<br/>
+@copydoc scheme_OCPOutput
+*/
+/** \class CasADi::DirectCollocation
+\n
+\par
+@copydoc scheme_OCPInput
+<br/>
+@copydoc scheme_OCPOutput
 */
 /** \class CasADi::WorhpInternal
 \n

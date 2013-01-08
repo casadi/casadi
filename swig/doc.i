@@ -4752,78 +4752,49 @@ Assert that the object has been initialized. ";
 // File: classCasADi_1_1Collocation.xml
 %feature("docstring") CasADi::Collocation "
 
-Direct collocation.
-
-Joel Andersson
-
->Input scheme: CasADi::OCPInput (OCP_NUM_IN = 17)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| OCP_T                              | Time grid: ((ns+1) x 1) - default: |
-|                                    | linspace(0,t_final,ns+1) [t].      |
-+------------------------------------+------------------------------------+
-| OCP_LBX                            | States lower bounds (nx x (ns+1))  |
-|                                    | [lbx].                             |
-+------------------------------------+------------------------------------+
-| OCP_UBX                            | States upper bounds (nx x (ns+1))  |
-|                                    | [ubx].                             |
-+------------------------------------+------------------------------------+
-| OCP_X_INIT                         | States initial guess (nx x (ns+1)) |
-|                                    | [x_init].                          |
-+------------------------------------+------------------------------------+
-| OCP_LBXP                           | States deriatives lower bounds (nx |
-|                                    | x (ns+1)) [lbxp].                  |
-+------------------------------------+------------------------------------+
-| OCP_UBXP                           | States deriatives upper bounds (nx |
-|                                    | x (ns+1)) [ubxp].                  |
-+------------------------------------+------------------------------------+
-| OCP_XP_INIT                        | States deriatives initial guess    |
-|                                    | (nx x (ns+1)) [xp_init].           |
-+------------------------------------+------------------------------------+
-| OCP_LBU                            | Controls lower bounds (nu x ns)    |
-|                                    | [lbu].                             |
-+------------------------------------+------------------------------------+
-| OCP_UBU                            | Controls upper bounds (nu x ns)    |
-|                                    | [ubu].                             |
-+------------------------------------+------------------------------------+
-| OCP_U_INIT                         | Controls initial guess (nu x ns)   |
-|                                    | [u_init].                          |
-+------------------------------------+------------------------------------+
-| OCP_LBP                            | Parameters lower bounds (np x 1)   |
-|                                    | [lbp].                             |
-+------------------------------------+------------------------------------+
-| OCP_UBP                            | Parameters upper bounds (np x 1)   |
-|                                    | [ubp].                             |
-+------------------------------------+------------------------------------+
-| OCP_P_INIT                         | Parameters initial guess (np x 1)  |
-|                                    | [p_init].                          |
-+------------------------------------+------------------------------------+
-| OCP_LBH                            | Point constraint lower bound (nh x |
-|                                    | (ns+1)) [lbh].                     |
-+------------------------------------+------------------------------------+
-| OCP_UBH                            | Point constraint upper bound (nh x |
-|                                    | (ns+1)) [ubh].                     |
-+------------------------------------+------------------------------------+
-| OCP_LBG                            | Lower bound for the coupling       |
-|                                    | constraints [lbg].                 |
-+------------------------------------+------------------------------------+
-| OCP_UBG                            | Upper bound for the coupling       |
-|                                    | constraints [ubg].                 |
-+------------------------------------+------------------------------------+
+>Input scheme: CasADi::OCPInput (OCP_NUM_IN = 13)
++------------+---------------------------------------------------+
+|    Name    |                    Description                    |
++============+===================================================+
+| OCP_LBX    | States lower bounds (nx x (ns+1)) [lbx].          |
++------------+---------------------------------------------------+
+| OCP_UBX    | States upper bounds (nx x (ns+1)) [ubx].          |
++------------+---------------------------------------------------+
+| OCP_X_INIT | States initial guess (nx x (ns+1)) [x_init].      |
++------------+---------------------------------------------------+
+| OCP_LBU    | Controls lower bounds (nu x ns) [lbu].            |
++------------+---------------------------------------------------+
+| OCP_UBU    | Controls upper bounds (nu x ns) [ubu].            |
++------------+---------------------------------------------------+
+| OCP_U_INIT | Controls initial guess (nu x ns) [u_init].        |
++------------+---------------------------------------------------+
+| OCP_LBP    | Parameters lower bounds (np x 1) [lbp].           |
++------------+---------------------------------------------------+
+| OCP_UBP    | Parameters upper bounds (np x 1) [ubp].           |
++------------+---------------------------------------------------+
+| OCP_P_INIT | Parameters initial guess (np x 1) [p_init].       |
++------------+---------------------------------------------------+
+| OCP_LBH    | Point constraint lower bound (nh x (ns+1)) [lbh]. |
++------------+---------------------------------------------------+
+| OCP_UBH    | Point constraint upper bound (nh x (ns+1)) [ubh]. |
++------------+---------------------------------------------------+
+| OCP_LBG    | Lower bound for the coupling constraints [lbg].   |
++------------+---------------------------------------------------+
+| OCP_UBG    | Upper bound for the coupling constraints [ubg].   |
++------------+---------------------------------------------------+
 
 >Output scheme: CasADi::OCPOutput (OCP_NUM_OUT = 4)
-+------------+-----------------------------------------------+
-|    Name    |                  Description                  |
-+============+===============================================+
-| OCP_X_OPT  | Optimal state trajectory [x_opt].             |
-+------------+-----------------------------------------------+
-| OCP_U_OPT  | Optimal control trajectory [u_opt].           |
-+------------+-----------------------------------------------+
-| OCP_XP_OPT | Optimal state derivative trajectory [xp_opt]. |
-+------------+-----------------------------------------------+
-| OCP_P_OPT  | Optimal parameters [p_opt].                   |
-+------------+-----------------------------------------------+
++-----------+--------------------------------------------------------------+
+|   Name    |                         Description                          |
++===========+==============================================================+
+| OCP_X_OPT | Optimal state trajectory [x_opt].                            |
++-----------+--------------------------------------------------------------+
+| OCP_U_OPT | Optimal control trajectory [u_opt].                          |
++-----------+--------------------------------------------------------------+
+| OCP_P_OPT | Optimal parameters [p_opt].                                  |
++-----------+--------------------------------------------------------------+
+| OCP_COST  | Objective/cost function for optimal solution (1 x 1) [cost]. |
++-----------+--------------------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -4851,6 +4822,10 @@ Joel Andersson
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| collocation_ | OT_STRING    | \"radau\"      | Collocation  | CasADi::Coll |
+| scheme       |              |              | scheme (rada | ocationInter |
+|              |              |              | u|legendre)  | nal          |
++--------------+--------------+--------------+--------------+--------------+
 | final_time   | OT_REAL      | 1            |              | CasADi::OCPS |
 |              |              |              |              | olverInterna |
 |              |              |              |              | l            |
@@ -4862,15 +4837,10 @@ Joel Andersson
 |              |              |              | must be      |              |
 |              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| integrator   | OT_INTEGRATO | GenericType( | An           | CasADi::Coll |
-|              | R            | )            | integrator   | ocationInter |
-|              |              |              | creator      | nal          |
-|              |              |              | function     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| integrator_o | OT_DICTIONAR | GenericType( | Options to   | CasADi::Coll |
-| ptions       | Y            | )            | be passed to | ocationInter |
-|              |              |              | the          | nal          |
-|              |              |              | integrator   |              |
+| interpolatio | OT_INTEGER   | 3            | Order of the | CasADi::Coll |
+| n_order      |              |              | interpolatin | ocationInter |
+|              |              |              | g            | nal          |
+|              |              |              | polynomials  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -4961,10 +4931,6 @@ Joel Andersson
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| parallelizat | OT_STRING    | GenericType( | Passed on to | CasADi::Coll |
-| ion          |              | )            | CasADi::Para | ocationInter |
-|              |              |              | llelizer     | nal          |
-+--------------+--------------+--------------+--------------+--------------+
 | regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
 | heck         |              |              | exceptions   | ternal       |
 |              |              |              | when NaN or  |              |
@@ -5014,578 +4980,7 @@ Joel Andersson
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-C++ includes: collocation.hpp ";
-
-/*  Setters  */
-
-/* T can be double&, double*, std::vector<double>&, Matrix<double> &
-Assumes a properly allocated val.  Set/get an input, output, forward
-seed/sensitivity or adjoint seed/sensitivity
-
-*/
-
-%feature("docstring")  CasADi::Collocation::setInput "
-
-Reads in the input argument from val. ";
-
-%feature("docstring")  CasADi::Collocation::setOutput "
-
-Reads in the output argument from val. ";
-
-%feature("docstring")  CasADi::Collocation::setFwdSeed "
-
-Reads in the forward seed from val. ";
-
-%feature("docstring")  CasADi::Collocation::setFwdSens "
-
-Reads in the forward sensitivity from val. ";
-
-%feature("docstring")  CasADi::Collocation::setAdjSeed "
-
-Reads in the adjoint seed from val. ";
-
-%feature("docstring")  CasADi::Collocation::setAdjSens "
-
-Reads in the adjoint sensitivity from val. ";
-
-/*  Getters  */
-
-/* A group of accessor for numerical data that operate on preallocated data.
-get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-
-*/
-
-%feature("docstring")  CasADi::Collocation::getInput "
-
-Writes out the input argument into val. ";
-
-%feature("docstring")  CasADi::Collocation::getOutput "
-
-Writes out the output argument into val. ";
-
-%feature("docstring")  CasADi::Collocation::getFwdSeed "
-
-Writes out the forward seed into val. ";
-
-%feature("docstring")  CasADi::Collocation::getFwdSens "
-
-Writes out the forward sensitivity into val. ";
-
-%feature("docstring")  CasADi::Collocation::getAdjSeed "
-
-Writes out the adjoint seed into val. ";
-
-%feature("docstring")  CasADi::Collocation::getAdjSens "
-
-Writes out the adjoint sensitivity into val. ";
-
-/*  Option Functionality  */
-
-%feature("docstring")  CasADi::Collocation::setOption "
-
-set an option. For a list of options, check the class documentation of this
-class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again. ";
-
-%feature("docstring")  CasADi::Collocation::setOption "
-
-set a set of options. For a list of options, check the class documentation
-of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again. ";
-
-%feature("docstring")  CasADi::Collocation::getOption "
-
-get an option value ";
-
-%feature("docstring")  CasADi::Collocation::hasOption "
-
-check if there is an option str ";
-
-%feature("docstring")  CasADi::Collocation::hasSetOption "
-
-check if the user has there is an option str ";
-
-%feature("docstring")  CasADi::Collocation::printOptions "
-
-Print options to a stream. ";
-
-%feature("docstring")  CasADi::Collocation::copyOptions "
-
-Copy all options from another object. ";
-
-%feature("docstring")  CasADi::Collocation::dictionary "
-
-Get the dictionary. ";
-
-%feature("docstring")  CasADi::Collocation::makeUnique "
-
-If there are other references to the object, then make a deep copy of it and
-point to this new object. ";
-
-%feature("docstring")  CasADi::Collocation::makeUnique "";
-
-%feature("docstring")  CasADi::Collocation::Collocation "
-
-Default constructor. ";
-
-%feature("docstring")  CasADi::Collocation::Collocation "
-
-Constructor. ";
-
-%feature("docstring")  CasADi::Collocation::getGuess "
-
-Get the variables. ";
-
-%feature("docstring")  CasADi::Collocation::getVariableBounds "
-
-Get the variables. ";
-
-%feature("docstring")  CasADi::Collocation::getConstraintBounds "
-
-Get the constraints. ";
-
-%feature("docstring")  CasADi::Collocation::setOptimalSolution "
-
-Set the optimal solution. ";
-
-%feature("docstring")  CasADi::Collocation::getNLPSolver "
-
-Access the underlying NLPSolver object. ";
-
-%feature("docstring")  CasADi::Collocation::reportConstraints "
-
-Prints out a human readable report about possible constraint violations,
-after solving. ";
-
-%feature("docstring")  CasADi::Collocation::getReportConstraints "
-
-Return the report as a string. ";
-
-%feature("docstring")  CasADi::Collocation::getFfcn "";
-
-%feature("docstring")  CasADi::Collocation::getMfcn "";
-
-%feature("docstring")  CasADi::Collocation::getCfcn "";
-
-%feature("docstring")  CasADi::Collocation::getRfcn "";
-
-%feature("docstring")  CasADi::Collocation::getNumInputs "
-
-Get number of inputs. ";
-
-%feature("docstring")  CasADi::Collocation::getNumOutputs "
-
-Get number of outputs. ";
-
-%feature("docstring")  CasADi::Collocation::getNumScalarInputs "
-
-Get total number of scalar inputs (i.e. the number of nonzeros in all of the
-matrix-valued inputs) ";
-
-%feature("docstring")  CasADi::Collocation::getNumScalarOutputs "
-
-Get total number of scalar outputs (i.e. the number of nonzeros in all of
-the matrix-valued outputs) ";
-
-%feature("docstring")  CasADi::Collocation::setNumInputs "
-
-Set number of inputs (normally invoked internally) ";
-
-%feature("docstring")  CasADi::Collocation::setNumOutputs "
-
-Set number of outputs (normally invoked internally) ";
-
-%feature("docstring")  CasADi::Collocation::updateNumSens "
-
-Update the number of sensitivity directions during or after initialization
-(normally invoked internally) ";
-
-%feature("docstring")  CasADi::Collocation::requestNumSens "
-
-Request a number of forward/adjoint derivative directions This function
-tries to increase the number of directional derivatives allocated for the
-function so that the the number at least amounts to \"nfwd\" and \"nadj\"
-for forward and adjoint mode derivatives respectively. The allocated number
-is never decreased and never increased beyond the number set by the option
-\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
-
-If the number was changed during the call, updateNumSens() is automatically
-invoked. ";
-
-%feature("docstring")  CasADi::Collocation::numAllocFwd "
-
-Get the number of allocated forward directional derivatives. ";
-
-%feature("docstring")  CasADi::Collocation::numAllocAdj "
-
-Get the number of allocated adjoint directional derivatives. ";
-
-%feature("docstring")  CasADi::Collocation::evaluate "
-
-Evaluate. ";
-
-%feature("docstring")  CasADi::Collocation::solve "
-
-the same as evaluate(0,0) ";
-
-%feature("docstring")  CasADi::Collocation::jacobian "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs. ";
-
-%feature("docstring")  CasADi::Collocation::gradient "
-
-Generate a gradient function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead. ";
-
-%feature("docstring")  CasADi::Collocation::hessian "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients. ";
-
-%feature("docstring")  CasADi::Collocation::call "
-
-Create a function call (single input) ";
-
-%feature("docstring")  CasADi::Collocation::call "
-
-Create a function call ( MX graph) ";
-
-%feature("docstring")  CasADi::Collocation::call "
-
-Create a function call with directional derivatives Note: return by
-reference with SWIG. ";
-
-%feature("docstring")  CasADi::Collocation::call "
-
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer. ";
-
-%feature("docstring")  CasADi::Collocation::eval "
-
-evaluate symbolically, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::Collocation::eval "
-
-evaluate symbolically, MX type (overloaded) ";
-
-%feature("docstring")  CasADi::Collocation::eval "
-
-Evaluate symbolically with with directional derivatives, SX type, overloaded
-The first two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The boolean
-argument allows the second argument to the functions to be used as an input
-instead of output, assuming it is already known. ";
-
-%feature("docstring")  CasADi::Collocation::eval "
-
-Evaluate symbolically with with directional derivatives, MX type, overloaded
-The first two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The boolean
-argument allows the second argument to the functions to be used as an input
-instead of output, assuming it is already known. ";
-
-%feature("docstring")  CasADi::Collocation::eval "
-
-evaluate symbolically, single input, single output ";
-
-%feature("docstring")  CasADi::Collocation::evalMX "
-
-evaluate symbolically, MX type (unambiguous) ";
-
-%feature("docstring")  CasADi::Collocation::evalMX "
-
-Evaluate symbolically with with directional derivatives, MX type The first
-two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The boolean
-argument allows the second argument to the functions to be used as an input
-instead of output, assuming it is already known. ";
-
-%feature("docstring")  CasADi::Collocation::evalSX "
-
-evaluate symbolically, SX type (unambiguous) ";
-
-%feature("docstring")  CasADi::Collocation::evalSX "
-
-Evaluate symbolically with with directional derivatives, SX type The first
-two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The boolean
-argument allows the second argument to the functions to be used as an input
-instead of output, assuming it is already known. ";
-
-%feature("docstring")  CasADi::Collocation::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
-(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
-nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
-seeds, one direction at a time and the last nadj*n_out inputs corresponds to
-adjoint seeds, one direction at a time. The first n_out outputs corresponds
-to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
-
-(n_in = getNumInputs(), n_out = getNumOutputs())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned. ";
-
-%feature("docstring")  CasADi::Collocation::jacSparsity "
-
-Get, if necessary generate, the sparsity of a Jacobian block. ";
-
-%feature("docstring")  CasADi::Collocation::setJacSparsity "
-
-Generate the sparsity of a Jacobian block. ";
-
-%feature("docstring")  CasADi::Collocation::indexed_one_based "";
-
-%feature("docstring")  CasADi::Collocation::indexed_zero_based "";
-
-%feature("docstring")  CasADi::Collocation::checkNode "
-
-Check if the node is pointing to the right type of object. ";
-
-%feature("docstring")  CasADi::Collocation::input "
-
-Const access input argument. ";
-
-%feature("docstring")  CasADi::Collocation::input "
-
-Const access input argument. ";
-
-%feature("docstring")  CasADi::Collocation::input "
-
-Access input argument. ";
-
-%feature("docstring")  CasADi::Collocation::input "
-
-Access input argument. ";
-
-%feature("docstring")  CasADi::Collocation::output "
-
-Const access input argument. ";
-
-%feature("docstring")  CasADi::Collocation::output "
-
-Access output argument Note that copies in Python are shallow by default and
-fx.output() gives a reference/pointer to an internal data structure. So if
-you want save fx.output(), you need to make a deep copy using for example
-DMatrix(fx.output()). ";
-
-%feature("docstring")  CasADi::Collocation::fwdSeed "
-
-Const access forward seed. ";
-
-%feature("docstring")  CasADi::Collocation::fwdSeed "
-
-Access forward seed. ";
-
-%feature("docstring")  CasADi::Collocation::fwdSens "
-
-Const access forward sensitivity. ";
-
-%feature("docstring")  CasADi::Collocation::fwdSens "
-
-Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::Collocation::adjSeed "
-
-Const access adjoint seed. ";
-
-%feature("docstring")  CasADi::Collocation::adjSeed "
-
-Access adjoint seed. ";
-
-%feature("docstring")  CasADi::Collocation::adjSens "
-
-Const access forward sensitivity. ";
-
-%feature("docstring")  CasADi::Collocation::adjSens "
-
-Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::Collocation::getStats "
-
-Get all statistics obtained at the end of the last evaluate call. ";
-
-%feature("docstring")  CasADi::Collocation::getStat "
-
-Get a single statistic obtained at the end of the last evaluate call. ";
-
-%feature("docstring")  CasADi::Collocation::symbolicInput "
-
-Get a vector of symbolic variables with the same dimensions as the inputs
-There is no guarantee that consecutive calls return identical objects. ";
-
-%feature("docstring")  CasADi::Collocation::symbolicInputSX "
-
-Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph There is no guarantee that consecutive calls return identical
-objects. ";
-
-%feature("docstring")  CasADi::Collocation::spCanEvaluate "
-
-Is the class able to propate seeds through the algorithm? (for usage, see
-the example propagating_sparsity.cpp) ";
-
-%feature("docstring")  CasADi::Collocation::spInit "
-
-Reset the sparsity propagation (for usage, see the example
-propagating_sparsity.cpp) ";
-
-%feature("docstring")  CasADi::Collocation::spEvaluate "
-
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp) ";
-
-%feature("docstring")  CasADi::Collocation::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::Collocation::removeMonitor "
-
-Remove modules to be monitored. ";
-
-%feature("docstring")  CasADi::Collocation::getOptionNames "
-
-Get a list of all option names. ";
-
-%feature("docstring")  CasADi::Collocation::getOptionDescription "
-
-Get the description of a certain option. ";
-
-%feature("docstring")  CasADi::Collocation::getOptionType "
-
-Get the type of a certain option. ";
-
-%feature("docstring")  CasADi::Collocation::getOptionTypeName "
-
-Get the type name of a certain option. ";
-
-%feature("docstring")  CasADi::Collocation::getOptionAllowed "
-
-Get the allowed values of a certain option. ";
-
-%feature("docstring")  CasADi::Collocation::getOptionDefault "
-
-Get the default of a certain option. ";
-
-%feature("docstring")  CasADi::Collocation::clone "
-
-Deep copy. ";
-
-%feature("docstring")  CasADi::Collocation::assignNode "
-
-Assign the node to a node class pointer (or null) ";
-
-%feature("docstring")  CasADi::Collocation::assignNodeNoCount "
-
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks! ";
-
-%feature("docstring")  CasADi::Collocation::get "
-
-Get a const pointer to the node. ";
-
-%feature("docstring")  CasADi::Collocation::get "
-
-Get a pointer to the node. ";
-
-%feature("docstring")  CasADi::Collocation::getCount "
-
-Get the reference count. ";
-
-%feature("docstring")  CasADi::Collocation::swap "
-
-Swap content with another instance. ";
-
-%feature("docstring")  CasADi::Collocation::repr "
-
-Print a representation of the object. ";
-
-%feature("docstring")  CasADi::Collocation::print "
-
-Print a destription of the object. ";
-
-%feature("docstring")  CasADi::Collocation::init "
-
-Initialize the object: more documentation in the node class (
-SharedObjectNode and derived classes) ";
-
-%feature("docstring")  CasADi::Collocation::isInit "
-
-Is initialized? ";
-
-%feature("docstring")  CasADi::Collocation::assertInit "
-
-Assert that it is initialized. ";
-
-%feature("docstring")  CasADi::Collocation::isNull "
-
-Is a null pointer? ";
-
-%feature("docstring")  CasADi::Collocation::getRepresentation "
-
-Return a string with a representation (for SWIG) ";
-
-%feature("docstring")  CasADi::Collocation::getDescription "
-
-Return a string with a destription (for SWIG) ";
+C++ includes: a0_schemes.hpp ";
 
 
 // File: classCasADi_1_1CollocationIntegrator.xml
@@ -7264,74 +6659,49 @@ Assert that the object has been initialized. ";
 // File: classCasADi_1_1CollocationInternal.xml
 %feature("docstring") CasADi::CollocationInternal "
 
->Input scheme: CasADi::OCPInput (OCP_NUM_IN = 17)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| OCP_T                              | Time grid: ((ns+1) x 1) - default: |
-|                                    | linspace(0,t_final,ns+1) [t].      |
-+------------------------------------+------------------------------------+
-| OCP_LBX                            | States lower bounds (nx x (ns+1))  |
-|                                    | [lbx].                             |
-+------------------------------------+------------------------------------+
-| OCP_UBX                            | States upper bounds (nx x (ns+1))  |
-|                                    | [ubx].                             |
-+------------------------------------+------------------------------------+
-| OCP_X_INIT                         | States initial guess (nx x (ns+1)) |
-|                                    | [x_init].                          |
-+------------------------------------+------------------------------------+
-| OCP_LBXP                           | States deriatives lower bounds (nx |
-|                                    | x (ns+1)) [lbxp].                  |
-+------------------------------------+------------------------------------+
-| OCP_UBXP                           | States deriatives upper bounds (nx |
-|                                    | x (ns+1)) [ubxp].                  |
-+------------------------------------+------------------------------------+
-| OCP_XP_INIT                        | States deriatives initial guess    |
-|                                    | (nx x (ns+1)) [xp_init].           |
-+------------------------------------+------------------------------------+
-| OCP_LBU                            | Controls lower bounds (nu x ns)    |
-|                                    | [lbu].                             |
-+------------------------------------+------------------------------------+
-| OCP_UBU                            | Controls upper bounds (nu x ns)    |
-|                                    | [ubu].                             |
-+------------------------------------+------------------------------------+
-| OCP_U_INIT                         | Controls initial guess (nu x ns)   |
-|                                    | [u_init].                          |
-+------------------------------------+------------------------------------+
-| OCP_LBP                            | Parameters lower bounds (np x 1)   |
-|                                    | [lbp].                             |
-+------------------------------------+------------------------------------+
-| OCP_UBP                            | Parameters upper bounds (np x 1)   |
-|                                    | [ubp].                             |
-+------------------------------------+------------------------------------+
-| OCP_P_INIT                         | Parameters initial guess (np x 1)  |
-|                                    | [p_init].                          |
-+------------------------------------+------------------------------------+
-| OCP_LBH                            | Point constraint lower bound (nh x |
-|                                    | (ns+1)) [lbh].                     |
-+------------------------------------+------------------------------------+
-| OCP_UBH                            | Point constraint upper bound (nh x |
-|                                    | (ns+1)) [ubh].                     |
-+------------------------------------+------------------------------------+
-| OCP_LBG                            | Lower bound for the coupling       |
-|                                    | constraints [lbg].                 |
-+------------------------------------+------------------------------------+
-| OCP_UBG                            | Upper bound for the coupling       |
-|                                    | constraints [ubg].                 |
-+------------------------------------+------------------------------------+
+>Input scheme: CasADi::OCPInput (OCP_NUM_IN = 13)
++------------+---------------------------------------------------+
+|    Name    |                    Description                    |
++============+===================================================+
+| OCP_LBX    | States lower bounds (nx x (ns+1)) [lbx].          |
++------------+---------------------------------------------------+
+| OCP_UBX    | States upper bounds (nx x (ns+1)) [ubx].          |
++------------+---------------------------------------------------+
+| OCP_X_INIT | States initial guess (nx x (ns+1)) [x_init].      |
++------------+---------------------------------------------------+
+| OCP_LBU    | Controls lower bounds (nu x ns) [lbu].            |
++------------+---------------------------------------------------+
+| OCP_UBU    | Controls upper bounds (nu x ns) [ubu].            |
++------------+---------------------------------------------------+
+| OCP_U_INIT | Controls initial guess (nu x ns) [u_init].        |
++------------+---------------------------------------------------+
+| OCP_LBP    | Parameters lower bounds (np x 1) [lbp].           |
++------------+---------------------------------------------------+
+| OCP_UBP    | Parameters upper bounds (np x 1) [ubp].           |
++------------+---------------------------------------------------+
+| OCP_P_INIT | Parameters initial guess (np x 1) [p_init].       |
++------------+---------------------------------------------------+
+| OCP_LBH    | Point constraint lower bound (nh x (ns+1)) [lbh]. |
++------------+---------------------------------------------------+
+| OCP_UBH    | Point constraint upper bound (nh x (ns+1)) [ubh]. |
++------------+---------------------------------------------------+
+| OCP_LBG    | Lower bound for the coupling constraints [lbg].   |
++------------+---------------------------------------------------+
+| OCP_UBG    | Upper bound for the coupling constraints [ubg].   |
++------------+---------------------------------------------------+
 
 >Output scheme: CasADi::OCPOutput (OCP_NUM_OUT = 4)
-+------------+-----------------------------------------------+
-|    Name    |                  Description                  |
-+============+===============================================+
-| OCP_X_OPT  | Optimal state trajectory [x_opt].             |
-+------------+-----------------------------------------------+
-| OCP_U_OPT  | Optimal control trajectory [u_opt].           |
-+------------+-----------------------------------------------+
-| OCP_XP_OPT | Optimal state derivative trajectory [xp_opt]. |
-+------------+-----------------------------------------------+
-| OCP_P_OPT  | Optimal parameters [p_opt].                   |
-+------------+-----------------------------------------------+
++-----------+--------------------------------------------------------------+
+|   Name    |                         Description                          |
++===========+==============================================================+
+| OCP_X_OPT | Optimal state trajectory [x_opt].                            |
++-----------+--------------------------------------------------------------+
+| OCP_U_OPT | Optimal control trajectory [u_opt].                          |
++-----------+--------------------------------------------------------------+
+| OCP_P_OPT | Optimal parameters [p_opt].                                  |
++-----------+--------------------------------------------------------------+
+| OCP_COST  | Objective/cost function for optimal solution (1 x 1) [cost]. |
++-----------+--------------------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -7359,6 +6729,10 @@ Assert that the object has been initialized. ";
 |              |              |              | erse|automat |              |
 |              |              |              | ic)          |              |
 +--------------+--------------+--------------+--------------+--------------+
+| collocation_ | OT_STRING    | \"radau\"      | Collocation  | CasADi::Coll |
+| scheme       |              |              | scheme (rada | ocationInter |
+|              |              |              | u|legendre)  | nal          |
++--------------+--------------+--------------+--------------+--------------+
 | final_time   | OT_REAL      | 1            |              | CasADi::OCPS |
 |              |              |              |              | olverInterna |
 |              |              |              |              | l            |
@@ -7370,15 +6744,10 @@ Assert that the object has been initialized. ";
 |              |              |              | must be      |              |
 |              |              |              | gathered     |              |
 +--------------+--------------+--------------+--------------+--------------+
-| integrator   | OT_INTEGRATO | GenericType( | An           | CasADi::Coll |
-|              | R            | )            | integrator   | ocationInter |
-|              |              |              | creator      | nal          |
-|              |              |              | function     |              |
-+--------------+--------------+--------------+--------------+--------------+
-| integrator_o | OT_DICTIONAR | GenericType( | Options to   | CasADi::Coll |
-| ptions       | Y            | )            | be passed to | ocationInter |
-|              |              |              | the          | nal          |
-|              |              |              | integrator   |              |
+| interpolatio | OT_INTEGER   | 3            | Order of the | CasADi::Coll |
+| n_order      |              |              | interpolatin | ocationInter |
+|              |              |              | g            | nal          |
+|              |              |              | polynomials  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -7469,10 +6838,6 @@ Assert that the object has been initialized. ";
 |              |              |              | built-in     |              |
 |              |              |              | method       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| parallelizat | OT_STRING    | GenericType( | Passed on to | CasADi::Coll |
-| ion          |              | )            | CasADi::Para | ocationInter |
-|              |              |              | llelizer     | nal          |
-+--------------+--------------+--------------+--------------+--------------+
 | regularity_c | OT_BOOLEAN   | true         | Throw        | CasADi::FXIn |
 | heck         |              |              | exceptions   | ternal       |
 |              |              |              | when NaN or  |              |
@@ -7522,367 +6887,7 @@ Assert that the object has been initialized. ";
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-C++ includes: collocation_internal.hpp ";
-
-%feature("docstring")  CasADi::CollocationInternal::hessian "
-
-Return Hessian function. ";
-
-%feature("docstring")  CasADi::CollocationInternal::getHessian "";
-
-%feature("docstring")  CasADi::CollocationInternal::gradient "
-
-Return gradient function. ";
-
-%feature("docstring")  CasADi::CollocationInternal::getGradient "";
-
-%feature("docstring")  CasADi::CollocationInternal::jacobian "
-
-Return Jacobian function. ";
-
-%feature("docstring")  CasADi::CollocationInternal::getJacobian "";
-
-%feature("docstring")  CasADi::CollocationInternal::getNumericJacobian "";
-
-%feature("docstring")  CasADi::CollocationInternal::derivative "
-
-Return function that calculates forward derivatives This method returns a
-cached instance if available, and calls FX getDerivative(int nfwd, int nadj)
-if no cached version is available. ";
-
-%feature("docstring")  CasADi::CollocationInternal::getDerivative "
-
-Constructs and returns a function that calculates forward derivatives. ";
-
-%feature("docstring")  CasADi::CollocationInternal::input "
-
-Access input argument. ";
-
-%feature("docstring")  CasADi::CollocationInternal::input "";
-
-%feature("docstring")  CasADi::CollocationInternal::input "";
-
-%feature("docstring")  CasADi::CollocationInternal::input "";
-
-%feature("docstring")  CasADi::CollocationInternal::inputNoCheck "";
-
-%feature("docstring")  CasADi::CollocationInternal::inputNoCheck "";
-
-%feature("docstring")  CasADi::CollocationInternal::output "
-
-Access output argument. ";
-
-%feature("docstring")  CasADi::CollocationInternal::output "";
-
-%feature("docstring")  CasADi::CollocationInternal::outputNoCheck "";
-
-%feature("docstring")  CasADi::CollocationInternal::outputNoCheck "";
-
-%feature("docstring")  CasADi::CollocationInternal::fwdSeed "
-
-Access forward seed. ";
-
-%feature("docstring")  CasADi::CollocationInternal::fwdSeed "";
-
-%feature("docstring")  CasADi::CollocationInternal::fwdSeedNoCheck "";
-
-%feature("docstring")  CasADi::CollocationInternal::fwdSeedNoCheck "";
-
-%feature("docstring")  CasADi::CollocationInternal::fwdSens "
-
-Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::CollocationInternal::fwdSens "";
-
-%feature("docstring")  CasADi::CollocationInternal::fwdSensNoCheck "";
-
-%feature("docstring")  CasADi::CollocationInternal::fwdSensNoCheck "";
-
-%feature("docstring")  CasADi::CollocationInternal::adjSeed "
-
-Access adjoint seed. ";
-
-%feature("docstring")  CasADi::CollocationInternal::adjSeed "";
-
-%feature("docstring")  CasADi::CollocationInternal::adjSeedNoCheck "";
-
-%feature("docstring")  CasADi::CollocationInternal::adjSeedNoCheck "";
-
-%feature("docstring")  CasADi::CollocationInternal::adjSens "
-
-Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::CollocationInternal::adjSens "";
-
-%feature("docstring")  CasADi::CollocationInternal::adjSensNoCheck "";
-
-%feature("docstring")  CasADi::CollocationInternal::adjSensNoCheck "";
-
-%feature("docstring")  CasADi::CollocationInternal::CollocationInternal "";
-
-%feature("docstring")  CasADi::CollocationInternal::clone "
-
-Make a deep copy of the instance. ";
-
-%feature("docstring")  CasADi::CollocationInternal::~CollocationInternal "";
-
-%feature("docstring")  CasADi::CollocationInternal::init "
-
-Initialize. ";
-
-%feature("docstring")  CasADi::CollocationInternal::evaluate "
-
-Evaluate. ";
-
-%feature("docstring")  CasADi::CollocationInternal::getGuess "";
-
-%feature("docstring")  CasADi::CollocationInternal::getVariableBounds "";
-
-%feature("docstring")  CasADi::CollocationInternal::getConstraintBounds "";
-
-%feature("docstring")  CasADi::CollocationInternal::setOptimalSolution "";
-
-%feature("docstring")  CasADi::CollocationInternal::reportConstraints "";
-
-%feature("docstring")  CasADi::CollocationInternal::updateNumSens "
-
-Update the number of sensitivity directions during or after initialization,
-if recursive==true, updateNumSens is also invoked for the baseclass. ";
-
-%feature("docstring")  CasADi::CollocationInternal::requestNumSens "
-
-Request a number of forward/adjoint derivative directions. ";
-
-%feature("docstring")  CasADi::CollocationInternal::spEvaluate "
-
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward. ";
-
-%feature("docstring")  CasADi::CollocationInternal::spCanEvaluate "
-
-Is the class able to propate seeds through the algorithm? ";
-
-%feature("docstring")  CasADi::CollocationInternal::spInit "
-
-Reset the sparsity propagation. ";
-
-%feature("docstring")  CasADi::CollocationInternal::evalSX "
-
-Evaluate symbolically, SX type. ";
-
-%feature("docstring")  CasADi::CollocationInternal::evalMX "
-
-Evaluate symbolically, MX type. ";
-
-%feature("docstring")  CasADi::CollocationInternal::call "
-
-Call a function, MX type (overloaded) ";
-
-%feature("docstring")  CasADi::CollocationInternal::call "
-
-Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::CollocationInternal::iStruct "
-
-Access an input. ";
-
-%feature("docstring")  CasADi::CollocationInternal::iStruct "
-
-Const access an input. ";
-
-%feature("docstring")  CasADi::CollocationInternal::oStruct "
-
-Access an output. ";
-
-%feature("docstring")  CasADi::CollocationInternal::oStruct "
-
-Const access an output. ";
-
-%feature("docstring")  CasADi::CollocationInternal::print "
-
-Print. ";
-
-%feature("docstring")  CasADi::CollocationInternal::repr "
-
-Print. ";
-
-%feature("docstring")  CasADi::CollocationInternal::inputSchemeEntry "
-
-Find the index for a string describing a particular entry of an input scheme
-example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
-to SCHEME_NLPINput. ";
-
-%feature("docstring")  CasADi::CollocationInternal::outputSchemeEntry "
-
-Find the index for a string describing a particular entry of an output
-scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
-adheres to SCHEME_NLPINput. ";
-
-%feature("docstring")  CasADi::CollocationInternal::schemeEntry "
-
-Find the index for a string describing a particular entry of a scheme
-example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
-to SCHEME_NLPINput. ";
-
-%feature("docstring")  CasADi::CollocationInternal::getPartition "
-
-Get the unidirectional or bidirectional partition. ";
-
-%feature("docstring")  CasADi::CollocationInternal::verbose "
-
-Verbose mode? ";
-
-%feature("docstring")  CasADi::CollocationInternal::monitored "
-
-Is function fcn being monitored. ";
-
-%feature("docstring")  CasADi::CollocationInternal::setNumInputs "
-
-Set the number of function inputs. ";
-
-%feature("docstring")  CasADi::CollocationInternal::setNumOutputs "
-
-Set the number of function outputs. ";
-
-%feature("docstring")  CasADi::CollocationInternal::getNumInputs "
-
-Get the number of function inputs. ";
-
-%feature("docstring")  CasADi::CollocationInternal::getNumOutputs "
-
-Get the number of function outputs. ";
-
-%feature("docstring")  CasADi::CollocationInternal::getNumScalarInputs "
-
-Get total number of scalar inputs (i.e. the number of nonzeros in all of the
-matrix-valued inputs) ";
-
-%feature("docstring")  CasADi::CollocationInternal::getNumScalarOutputs "
-
-Get total number of scalar outputs (i.e. the number of nonzeros in all of
-the matrix-valued outputs) ";
-
-%feature("docstring")  CasADi::CollocationInternal::getStats "
-
-Get all statistics obtained at the end of the last evaluate call. ";
-
-%feature("docstring")  CasADi::CollocationInternal::getStat "
-
-Get single statistic obtained at the end of the last evaluate call. ";
-
-%feature("docstring")  CasADi::CollocationInternal::getJacSparsity "
-
-Generate the sparsity of a Jacobian block. ";
-
-%feature("docstring")  CasADi::CollocationInternal::setJacSparsity "
-
-Generate the sparsity of a Jacobian block. ";
-
-%feature("docstring")  CasADi::CollocationInternal::jacSparsity "
-
-Get, if necessary generate, the sparsity of a Jacobian block. ";
-
-%feature("docstring")  CasADi::CollocationInternal::symbolicInput "
-
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
-
-%feature("docstring")  CasADi::CollocationInternal::symbolicInputSX "
-
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
-
-%feature("docstring")  CasADi::CollocationInternal::log "
-
-Log the status of the solver. ";
-
-%feature("docstring")  CasADi::CollocationInternal::log "
-
-Log the status of the solver, function given. ";
-
-%feature("docstring")  CasADi::CollocationInternal::setOption "
-
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
-
-%feature("docstring")  CasADi::CollocationInternal::setOption "
-
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
-
-%feature("docstring")  CasADi::CollocationInternal::getOptionNames "
-
-Get a list of all option names. ";
-
-%feature("docstring")  CasADi::CollocationInternal::getOptionDescription "
-
-Get the description of a certain option. ";
-
-%feature("docstring")  CasADi::CollocationInternal::getOptionType "
-
-Get the type of a certain option. ";
-
-%feature("docstring")  CasADi::CollocationInternal::getOptionTypeName "
-
-Get the type name of a certain option. ";
-
-%feature("docstring")  CasADi::CollocationInternal::getOptionDefault "
-
-Get the default of a certain option. ";
-
-%feature("docstring")  CasADi::CollocationInternal::getOptionAllowed "
-
-Get the allowed values of a certain option. ";
-
-%feature("docstring")  CasADi::CollocationInternal::hasOption "
-
-check if there is an option str ";
-
-%feature("docstring")  CasADi::CollocationInternal::hasSetOption "
-
-check if the user has there is an option str ";
-
-%feature("docstring")  CasADi::CollocationInternal::printOptions "
-
-Print options to a stream. ";
-
-%feature("docstring")  CasADi::CollocationInternal::printOption "
-
-Print all information there is to know about a certain option. ";
-
-%feature("docstring")  CasADi::CollocationInternal::getOption "
-
-get an option value ";
-
-%feature("docstring")  CasADi::CollocationInternal::copyOptions "
-
-Copy all options from another object. ";
-
-%feature("docstring")  CasADi::CollocationInternal::dictionary "
-
-Get the dictionary. ";
-
-%feature("docstring")  CasADi::CollocationInternal::getBestMatches "
-
-Get th ebest suggestions of option names. ";
-
-%feature("docstring")  CasADi::CollocationInternal::deepCopyMembers "
-
-Deep copy data members. ";
-
-%feature("docstring")  CasADi::CollocationInternal::getCount "
-
-Get the reference count. ";
-
-%feature("docstring")  CasADi::CollocationInternal::isInit "
-
-Check if the object has been initialized. ";
-
-%feature("docstring")  CasADi::CollocationInternal::assertInit "
-
-Assert that the object has been initialized. ";
+C++ includes: a0_schemes.hpp ";
 
 
 // File: structCasADi_1_1CommChecker.xml
@@ -13267,12 +12272,15 @@ times t_i.
 |              |              |              | forward      |              |
 |              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| exact_jacobi | OT_BOOLEAN   | false        | Use exact    | CasADi::Sund |
-| anB          |              |              | Jacobian     | ialsInternal |
+| exact_jacobi | OT_BOOLEAN   | GenericType( | Use exact    | CasADi::Sund |
+| anB          |              | )            | Jacobian     | ialsInternal |
 |              |              |              | information  |              |
 |              |              |              | for the      |              |
 |              |              |              | backward     |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to exa |              |
+|              |              |              | ct_jacobian] |              |
 +--------------+--------------+--------------+--------------+--------------+
 | finite_diffe | OT_BOOLEAN   | false        | Use finite   | CasADi::Sund |
 | rence_fsens  |              |              | differences  | ialsInternal |
@@ -13363,8 +12371,8 @@ times t_i.
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
 | lver         |              |              | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
-| lverB        |              |              | ab|tfqmr)    | ialsInternal |
+| iterative_so | OT_STRING    | GenericType( | (gmres|bcgst | CasADi::Sund |
+| lverB        |              | )            | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -13396,6 +12404,9 @@ times t_i.
 |              |              |              | function for |              |
 |              |              |              | backwards    |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to lin |              |
+|              |              |              | ear_solver]  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Sund |
 | r_options    | Y            | )            | be passed to | ialsInternal |
@@ -13408,14 +12419,18 @@ times t_i.
 |              |              |              | solver for   |              |
 |              |              |              | backwards    |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to lin |              |
+|              |              |              | ear_solver_o |              |
+|              |              |              | ptions]      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
 | r_type       |              |              | d|dense|band | ialsInternal |
 |              |              |              | ed|iterative |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
-| r_typeB      |              |              | d|dense|band | ialsInternal |
+| linear_solve | OT_STRING    | GenericType( | (user_define | CasADi::Sund |
+| r_typeB      |              | )            | d|dense|band | ialsInternal |
 |              |              |              | ed|iterative |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -13431,14 +12446,18 @@ times t_i.
 |              |              |              | jacobians    |              |
 |              |              |              | for backward |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to low |              |
+|              |              |              | er_bandwidth |              |
+|              |              |              | ]            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | max_krylov   | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
 |              |              |              | Krylov       | ialsInternal |
 |              |              |              | subspace     |              |
 |              |              |              | size         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_krylovB  | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
-|              |              |              | krylov       | ialsInternal |
+| max_krylovB  | OT_INTEGER   | GenericType( | Maximum      | CasADi::Sund |
+|              |              | )            | krylov       | ialsInternal |
 |              |              |              | subspace     |              |
 |              |              |              | size         |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -13519,8 +12538,8 @@ times t_i.
 | pretype      | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
 |              |              |              | ight|both)   | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| pretypeB     | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
-|              |              |              | ight|both)   | ialsInternal |
+| pretypeB     | OT_STRING    | GenericType( | (none|left|r | CasADi::Sund |
+|              |              | )            | ight|both)   | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
 | print_stats  | OT_BOOLEAN   | false        | Print out    | CasADi::Inte |
 |              |              |              | statistics   | gratorIntern |
@@ -13616,17 +12635,25 @@ times t_i.
 |              |              |              | jacobians    |              |
 |              |              |              | for backward |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to upp |              |
+|              |              |              | er_bandwidth |              |
+|              |              |              | ]            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | use_precondi | OT_BOOLEAN   | false        | Precondition | CasADi::Sund |
 | tioner       |              |              | an iterative | ialsInternal |
 |              |              |              | solver       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| use_precondi | OT_BOOLEAN   | false        | Precondition | CasADi::Sund |
-| tionerB      |              |              | an iterative | ialsInternal |
+| use_precondi | OT_BOOLEAN   | GenericType( | Precondition | CasADi::Sund |
+| tionerB      |              | )            | an iterative | ialsInternal |
 |              |              |              | solver for   |              |
 |              |              |              | the          |              |
 |              |              |              | backwards    |              |
 |              |              |              | problem      |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to use |              |
+|              |              |              | _preconditio |              |
+|              |              |              | ner]         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
 |              |              | )            | defined      | ternal       |
@@ -14428,12 +13455,15 @@ rx, rz and rp.
 |              |              |              | forward      |              |
 |              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| exact_jacobi | OT_BOOLEAN   | false        | Use exact    | CasADi::Sund |
-| anB          |              |              | Jacobian     | ialsInternal |
+| exact_jacobi | OT_BOOLEAN   | GenericType( | Use exact    | CasADi::Sund |
+| anB          |              | )            | Jacobian     | ialsInternal |
 |              |              |              | information  |              |
 |              |              |              | for the      |              |
 |              |              |              | backward     |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to exa |              |
+|              |              |              | ct_jacobian] |              |
 +--------------+--------------+--------------+--------------+--------------+
 | finite_diffe | OT_BOOLEAN   | false        | Use finite   | CasADi::Sund |
 | rence_fsens  |              |              | differences  | ialsInternal |
@@ -14524,8 +13554,8 @@ rx, rz and rp.
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
 | lver         |              |              | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
-| lverB        |              |              | ab|tfqmr)    | ialsInternal |
+| iterative_so | OT_STRING    | GenericType( | (gmres|bcgst | CasADi::Sund |
+| lverB        |              | )            | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -14557,6 +13587,9 @@ rx, rz and rp.
 |              |              |              | function for |              |
 |              |              |              | backwards    |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to lin |              |
+|              |              |              | ear_solver]  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Sund |
 | r_options    | Y            | )            | be passed to | ialsInternal |
@@ -14569,14 +13602,18 @@ rx, rz and rp.
 |              |              |              | solver for   |              |
 |              |              |              | backwards    |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to lin |              |
+|              |              |              | ear_solver_o |              |
+|              |              |              | ptions]      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
 | r_type       |              |              | d|dense|band | ialsInternal |
 |              |              |              | ed|iterative |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
-| r_typeB      |              |              | d|dense|band | ialsInternal |
+| linear_solve | OT_STRING    | GenericType( | (user_define | CasADi::Sund |
+| r_typeB      |              | )            | d|dense|band | ialsInternal |
 |              |              |              | ed|iterative |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -14592,14 +13629,18 @@ rx, rz and rp.
 |              |              |              | jacobians    |              |
 |              |              |              | for backward |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to low |              |
+|              |              |              | er_bandwidth |              |
+|              |              |              | ]            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | max_krylov   | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
 |              |              |              | Krylov       | ialsInternal |
 |              |              |              | subspace     |              |
 |              |              |              | size         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_krylovB  | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
-|              |              |              | krylov       | ialsInternal |
+| max_krylovB  | OT_INTEGER   | GenericType( | Maximum      | CasADi::Sund |
+|              |              | )            | krylov       | ialsInternal |
 |              |              |              | subspace     |              |
 |              |              |              | size         |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -14680,8 +13721,8 @@ rx, rz and rp.
 | pretype      | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
 |              |              |              | ight|both)   | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| pretypeB     | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
-|              |              |              | ight|both)   | ialsInternal |
+| pretypeB     | OT_STRING    | GenericType( | (none|left|r | CasADi::Sund |
+|              |              | )            | ight|both)   | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
 | print_stats  | OT_BOOLEAN   | false        | Print out    | CasADi::Inte |
 |              |              |              | statistics   | gratorIntern |
@@ -14777,17 +13818,25 @@ rx, rz and rp.
 |              |              |              | jacobians    |              |
 |              |              |              | for backward |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to upp |              |
+|              |              |              | er_bandwidth |              |
+|              |              |              | ]            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | use_precondi | OT_BOOLEAN   | false        | Precondition | CasADi::Sund |
 | tioner       |              |              | an iterative | ialsInternal |
 |              |              |              | solver       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| use_precondi | OT_BOOLEAN   | false        | Precondition | CasADi::Sund |
-| tionerB      |              |              | an iterative | ialsInternal |
+| use_precondi | OT_BOOLEAN   | GenericType( | Precondition | CasADi::Sund |
+| tionerB      |              | )            | an iterative | ialsInternal |
 |              |              |              | solver for   |              |
 |              |              |              | the          |              |
 |              |              |              | backwards    |              |
 |              |              |              | problem      |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to use |              |
+|              |              |              | _preconditio |              |
+|              |              |              | ner]         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
 |              |              | )            | defined      | ternal       |
@@ -16699,6 +15748,3046 @@ Get the reference count. ";
 Check if the object has been initialized. ";
 
 %feature("docstring")  CasADi::DerivativeInternal::assertInit "
+
+Assert that the object has been initialized. ";
+
+
+// File: classCasADi_1_1DirectCollocation.xml
+%feature("docstring") CasADi::DirectCollocation "
+
+Direct collocation.
+
+Joel Andersson
+
+C++ includes: direct_collocation.hpp ";
+
+/*  Setters  */
+
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
+
+*/
+
+%feature("docstring")  CasADi::DirectCollocation::setInput "
+
+Reads in the input argument from val. ";
+
+%feature("docstring")  CasADi::DirectCollocation::setOutput "
+
+Reads in the output argument from val. ";
+
+%feature("docstring")  CasADi::DirectCollocation::setFwdSeed "
+
+Reads in the forward seed from val. ";
+
+%feature("docstring")  CasADi::DirectCollocation::setFwdSens "
+
+Reads in the forward sensitivity from val. ";
+
+%feature("docstring")  CasADi::DirectCollocation::setAdjSeed "
+
+Reads in the adjoint seed from val. ";
+
+%feature("docstring")  CasADi::DirectCollocation::setAdjSens "
+
+Reads in the adjoint sensitivity from val. ";
+
+/*  Getters  */
+
+/* A group of accessor for numerical data that operate on preallocated data.
+get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
+
+*/
+
+%feature("docstring")  CasADi::DirectCollocation::getInput "
+
+Writes out the input argument into val. ";
+
+%feature("docstring")  CasADi::DirectCollocation::getOutput "
+
+Writes out the output argument into val. ";
+
+%feature("docstring")  CasADi::DirectCollocation::getFwdSeed "
+
+Writes out the forward seed into val. ";
+
+%feature("docstring")  CasADi::DirectCollocation::getFwdSens "
+
+Writes out the forward sensitivity into val. ";
+
+%feature("docstring")  CasADi::DirectCollocation::getAdjSeed "
+
+Writes out the adjoint seed into val. ";
+
+%feature("docstring")  CasADi::DirectCollocation::getAdjSens "
+
+Writes out the adjoint sensitivity into val. ";
+
+/*  Option Functionality  */
+
+%feature("docstring")  CasADi::DirectCollocation::setOption "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::DirectCollocation::setOption "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::DirectCollocation::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::DirectCollocation::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::DirectCollocation::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::DirectCollocation::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::DirectCollocation::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::DirectCollocation::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::DirectCollocation::makeUnique "
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object. ";
+
+%feature("docstring")  CasADi::DirectCollocation::makeUnique "";
+
+%feature("docstring")  CasADi::DirectCollocation::DirectCollocation "
+
+Default constructor. ";
+
+%feature("docstring")  CasADi::DirectCollocation::DirectCollocation "
+
+Constructor. ";
+
+%feature("docstring")  CasADi::DirectCollocation::getGuess "
+
+Get the variables. ";
+
+%feature("docstring")  CasADi::DirectCollocation::getVariableBounds "
+
+Get the variables. ";
+
+%feature("docstring")  CasADi::DirectCollocation::getConstraintBounds "
+
+Get the constraints. ";
+
+%feature("docstring")  CasADi::DirectCollocation::setOptimalSolution "
+
+Set the optimal solution. ";
+
+%feature("docstring")  CasADi::DirectCollocation::getNLPSolver "
+
+Access the underlying NLPSolver object. ";
+
+%feature("docstring")  CasADi::DirectCollocation::reportConstraints "
+
+Prints out a human readable report about possible constraint violations,
+after solving. ";
+
+%feature("docstring")  CasADi::DirectCollocation::getReportConstraints "
+
+Return the report as a string. ";
+
+%feature("docstring")  CasADi::DirectCollocation::getFfcn "";
+
+%feature("docstring")  CasADi::DirectCollocation::getMfcn "";
+
+%feature("docstring")  CasADi::DirectCollocation::getCfcn "";
+
+%feature("docstring")  CasADi::DirectCollocation::getRfcn "";
+
+%feature("docstring")  CasADi::DirectCollocation::getNumInputs "
+
+Get number of inputs. ";
+
+%feature("docstring")  CasADi::DirectCollocation::getNumOutputs "
+
+Get number of outputs. ";
+
+%feature("docstring")  CasADi::DirectCollocation::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::DirectCollocation::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
+%feature("docstring")  CasADi::DirectCollocation::setNumInputs "
+
+Set number of inputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::DirectCollocation::setNumOutputs "
+
+Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::DirectCollocation::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
+%feature("docstring")  CasADi::DirectCollocation::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
+%feature("docstring")  CasADi::DirectCollocation::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::DirectCollocation::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
+
+%feature("docstring")  CasADi::DirectCollocation::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::DirectCollocation::solve "
+
+the same as evaluate(0,0) ";
+
+%feature("docstring")  CasADi::DirectCollocation::jacobian "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs. ";
+
+%feature("docstring")  CasADi::DirectCollocation::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
+
+%feature("docstring")  CasADi::DirectCollocation::hessian "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
+
+%feature("docstring")  CasADi::DirectCollocation::call "
+
+Create a function call (single input) ";
+
+%feature("docstring")  CasADi::DirectCollocation::call "
+
+Create a function call ( MX graph) ";
+
+%feature("docstring")  CasADi::DirectCollocation::call "
+
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
+
+%feature("docstring")  CasADi::DirectCollocation::call "
+
+Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
+be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::DirectCollocation::eval "
+
+evaluate symbolically, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::DirectCollocation::eval "
+
+evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::DirectCollocation::eval "
+
+Evaluate symbolically with with directional derivatives, SX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::DirectCollocation::eval "
+
+Evaluate symbolically with with directional derivatives, MX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::DirectCollocation::eval "
+
+evaluate symbolically, single input, single output ";
+
+%feature("docstring")  CasADi::DirectCollocation::evalMX "
+
+evaluate symbolically, MX type (unambiguous) ";
+
+%feature("docstring")  CasADi::DirectCollocation::evalMX "
+
+Evaluate symbolically with with directional derivatives, MX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::DirectCollocation::evalSX "
+
+evaluate symbolically, SX type (unambiguous) ";
+
+%feature("docstring")  CasADi::DirectCollocation::evalSX "
+
+Evaluate symbolically with with directional derivatives, SX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::DirectCollocation::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
+%feature("docstring")  CasADi::DirectCollocation::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::DirectCollocation::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::DirectCollocation::indexed_one_based "";
+
+%feature("docstring")  CasADi::DirectCollocation::indexed_zero_based "";
+
+%feature("docstring")  CasADi::DirectCollocation::checkNode "
+
+Check if the node is pointing to the right type of object. ";
+
+%feature("docstring")  CasADi::DirectCollocation::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::DirectCollocation::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::DirectCollocation::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::DirectCollocation::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::DirectCollocation::output "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::DirectCollocation::output "
+
+Access output argument Note that copies in Python are shallow by default and
+fx.output() gives a reference/pointer to an internal data structure. So if
+you want save fx.output(), you need to make a deep copy using for example
+DMatrix(fx.output()). ";
+
+%feature("docstring")  CasADi::DirectCollocation::fwdSeed "
+
+Const access forward seed. ";
+
+%feature("docstring")  CasADi::DirectCollocation::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::DirectCollocation::fwdSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::DirectCollocation::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::DirectCollocation::adjSeed "
+
+Const access adjoint seed. ";
+
+%feature("docstring")  CasADi::DirectCollocation::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::DirectCollocation::adjSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::DirectCollocation::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::DirectCollocation::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::DirectCollocation::getStat "
+
+Get a single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::DirectCollocation::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
+
+%feature("docstring")  CasADi::DirectCollocation::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
+
+%feature("docstring")  CasADi::DirectCollocation::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::DirectCollocation::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::DirectCollocation::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::DirectCollocation::addMonitor "
+
+Add modules to be monitored. ";
+
+%feature("docstring")  CasADi::DirectCollocation::removeMonitor "
+
+Remove modules to be monitored. ";
+
+%feature("docstring")  CasADi::DirectCollocation::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::DirectCollocation::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::DirectCollocation::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::DirectCollocation::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::DirectCollocation::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::DirectCollocation::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::DirectCollocation::clone "
+
+Deep copy. ";
+
+%feature("docstring")  CasADi::DirectCollocation::assignNode "
+
+Assign the node to a node class pointer (or null) ";
+
+%feature("docstring")  CasADi::DirectCollocation::assignNodeNoCount "
+
+Assign the node to a node class pointer without reference counting: inproper
+use will cause memory leaks! ";
+
+%feature("docstring")  CasADi::DirectCollocation::get "
+
+Get a const pointer to the node. ";
+
+%feature("docstring")  CasADi::DirectCollocation::get "
+
+Get a pointer to the node. ";
+
+%feature("docstring")  CasADi::DirectCollocation::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::DirectCollocation::swap "
+
+Swap content with another instance. ";
+
+%feature("docstring")  CasADi::DirectCollocation::repr "
+
+Print a representation of the object. ";
+
+%feature("docstring")  CasADi::DirectCollocation::print "
+
+Print a destription of the object. ";
+
+%feature("docstring")  CasADi::DirectCollocation::init "
+
+Initialize the object: more documentation in the node class (
+SharedObjectNode and derived classes) ";
+
+%feature("docstring")  CasADi::DirectCollocation::isInit "
+
+Is initialized? ";
+
+%feature("docstring")  CasADi::DirectCollocation::assertInit "
+
+Assert that it is initialized. ";
+
+%feature("docstring")  CasADi::DirectCollocation::isNull "
+
+Is a null pointer? ";
+
+%feature("docstring")  CasADi::DirectCollocation::getRepresentation "
+
+Return a string with a representation (for SWIG) ";
+
+%feature("docstring")  CasADi::DirectCollocation::getDescription "
+
+Return a string with a destription (for SWIG) ";
+
+
+// File: classCasADi_1_1DirectCollocationInternal.xml
+%feature("docstring") CasADi::DirectCollocationInternal "C++ includes:
+direct_collocation_internal.hpp ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::getHessian "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::getGradient "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::getJacobian "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::getNumericJacobian
+"";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::derivative "
+
+Return function that calculates forward derivatives This method returns a
+cached instance if available, and calls FX getDerivative(int nfwd, int nadj)
+if no cached version is available. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::getDerivative "
+
+Constructs and returns a function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::input "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::input "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::input "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::inputNoCheck "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::inputNoCheck "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::output "
+
+Access output argument. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::output "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::outputNoCheck "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::outputNoCheck "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::fwdSeed "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::fwdSeedNoCheck "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::fwdSeedNoCheck "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::fwdSens "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::fwdSensNoCheck "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::fwdSensNoCheck "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::adjSeed "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::adjSeedNoCheck "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::adjSeedNoCheck "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::adjSens "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::adjSensNoCheck "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::adjSensNoCheck "";
+
+%feature("docstring")
+CasADi::DirectCollocationInternal::DirectCollocationInternal "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::clone "
+
+Make a deep copy of the instance. ";
+
+%feature("docstring")
+CasADi::DirectCollocationInternal::~DirectCollocationInternal "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::init "
+
+Initialize. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::getGuess "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::getVariableBounds
+"";
+
+%feature("docstring")
+CasADi::DirectCollocationInternal::getConstraintBounds "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::setOptimalSolution
+"";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::reportConstraints
+"";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::requestNumSens "
+
+Request a number of forward/adjoint derivative directions. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::spInit "
+
+Reset the sparsity propagation. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::evalSX "
+
+Evaluate symbolically, SX type. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::evalMX "
+
+Evaluate symbolically, MX type. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::call "
+
+Call a function, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::call "
+
+Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::iStruct "
+
+Access an input. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::iStruct "
+
+Const access an input. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::oStruct "
+
+Access an output. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::oStruct "
+
+Const access an output. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::print "
+
+Print. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::repr "
+
+Print. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::outputSchemeEntry
+"
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::getPartition "
+
+Get the unidirectional or bidirectional partition. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::verbose "
+
+Verbose mode? ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::monitored "
+
+Is function fcn being monitored. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::setNumInputs "
+
+Set the number of function inputs. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::setNumOutputs "
+
+Set the number of function outputs. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::getNumInputs "
+
+Get the number of function inputs. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::getNumOutputs "
+
+Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::getNumScalarInputs
+"
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")
+CasADi::DirectCollocationInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::getStat "
+
+Get single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::getJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::log "
+
+Log the status of the solver. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::log "
+
+Log the status of the solver, function given. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::setOption "
+
+set an option. The setOptions are in general only considered before the init
+function, if any. If properties changes, the init function should be called
+again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::setOption "
+
+set a set of options. The setOptions are in general only considered before
+the init function, if any. If properties changes, the init function should
+be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")
+CasADi::DirectCollocationInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::getOptionTypeName
+"
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::deepCopyMembers "
+
+Deep copy data members. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::assertInit "
+
+Assert that the object has been initialized. ";
+
+
+// File: classCasADi_1_1DirectMultipleShooting.xml
+%feature("docstring") CasADi::DirectMultipleShooting "
+
+Direct Multiple Shooting.
+
+ns: Number of shooting nodes: from option number_of_grid_points  nx: Number
+of differential states: from ffcn.input(INTEGRATOR_X0).size()  nc: Number of
+constants during intergation: ffcn.input(INTEGRATOR_P).size() nu: Number of
+controls: from nc - np  np: Number of parameters: from option
+number_of_parameters  nh: Number of point constraints: from
+cfcn.input(0).size()
+
+Joel Andersson
+
+C++ includes: direct_multiple_shooting.hpp ";
+
+/*  Setters  */
+
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
+
+*/
+
+%feature("docstring")  CasADi::DirectMultipleShooting::setInput "
+
+Reads in the input argument from val. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::setOutput "
+
+Reads in the output argument from val. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::setFwdSeed "
+
+Reads in the forward seed from val. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::setFwdSens "
+
+Reads in the forward sensitivity from val. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::setAdjSeed "
+
+Reads in the adjoint seed from val. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::setAdjSens "
+
+Reads in the adjoint sensitivity from val. ";
+
+/*  Getters  */
+
+/* A group of accessor for numerical data that operate on preallocated data.
+get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
+
+*/
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getInput "
+
+Writes out the input argument into val. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getOutput "
+
+Writes out the output argument into val. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getFwdSeed "
+
+Writes out the forward seed into val. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getFwdSens "
+
+Writes out the forward sensitivity into val. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getAdjSeed "
+
+Writes out the adjoint seed into val. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getAdjSens "
+
+Writes out the adjoint sensitivity into val. ";
+
+/*  Option Functionality  */
+
+%feature("docstring")  CasADi::DirectMultipleShooting::setOption "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::setOption "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::makeUnique "
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::makeUnique "";
+
+%feature("docstring")
+CasADi::DirectMultipleShooting::DirectMultipleShooting "
+
+Default constructor. ";
+
+%feature("docstring")
+CasADi::DirectMultipleShooting::DirectMultipleShooting "
+
+Create a multiple shooting OCP solver.
+
+Parameters:
+-----------
+
+ffcn:  Continuous time dynamics, an CasADi::FX with the folowing mapping:
+>Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
++-------+-------------------------------+ | Name  |          Description
+| +=======+===============================+ | DAE_X | Differential state
+[x].       | +-------+-------------------------------+ | DAE_Z | Algebraic
+state [z].          | +-------+-------------------------------+ | DAE_P |
+Parameter [p].                | +-------+-------------------------------+ |
+DAE_T | Explicit time dependence [t]. |
++-------+-------------------------------+
+
+>Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 3)
++----------+--------------------------------------------------+
+|   Name   |                   Description                    |
++==========+==================================================+
+| DAE_ODE  | Right hand side of the implicit ODE [ode].       |
++----------+--------------------------------------------------+
+| DAE_ALG  | Right hand side of algebraic equations [alg].    |
++----------+--------------------------------------------------+
+| DAE_QUAD | Right hand side of quadratures equations [quad]. |
++----------+--------------------------------------------------+
+
+Important notes: In the above table, INTEGRATOR_P input is not really of
+shape (np x 1), but rather ( (np+nu) x 1 ).
+
+The first np entries of the INTEGRATOR_P input are interpreted as parameters
+to be optimized but constant over the whole domain. The remainder are
+interpreted as controls.
+
+BEWARE: if the right hand side of ffcn is dependent on time, the results
+will be incorrect.
+
+mfcn:  Mayer term, CasADi::FX mapping to cost (1 x 1) >Input scheme:
+CasADi::MayerInput (MAYER_NUM_IN = 2)
++---------+------------------------------------------------+ |  Name   |
+Description                   |
++=========+================================================+ | MAYER_X |
+States at the end of integration (nx x 1) [x]. |
++---------+------------------------------------------------+ | MAYER_P |
+Problem parameters (np x 1) [p].               |
++---------+------------------------------------------------+
+
+cfcn:  Path constraints, CasADi::FX mapping to (nh x 1) >Input scheme:
+CasADi::DAEInput (DAE_NUM_IN = 4) +-------+-------------------------------+
+| Name  |          Description          |
++=======+===============================+ | DAE_X | Differential state [x].
+| +-------+-------------------------------+ | DAE_Z | Algebraic state [z].
+| +-------+-------------------------------+ | DAE_P | Parameter [p].
+| +-------+-------------------------------+ | DAE_T | Explicit time
+dependence [t]. | +-------+-------------------------------+
+
+rfcn:  Initial value constraints ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getGuess "
+
+Get the variables. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getVariableBounds "
+
+Get the variables. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getConstraintBounds "
+
+Get the constraints. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::setOptimalSolution "
+
+Set the optimal solution. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getNLPSolver "";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::reportConstraints "";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getReportConstraints
+"";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getFfcn "";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getMfcn "";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getCfcn "";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getRfcn "";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getNumInputs "
+
+Get number of inputs. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getNumOutputs "
+
+Get number of outputs. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::setNumInputs "
+
+Set number of inputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::setNumOutputs "
+
+Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::solve "
+
+the same as evaluate(0,0) ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::jacobian "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::hessian "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::call "
+
+Create a function call (single input) ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::call "
+
+Create a function call ( MX graph) ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::call "
+
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::call "
+
+Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
+be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::eval "
+
+evaluate symbolically, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::eval "
+
+evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::eval "
+
+Evaluate symbolically with with directional derivatives, SX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::eval "
+
+Evaluate symbolically with with directional derivatives, MX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::eval "
+
+evaluate symbolically, single input, single output ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::evalMX "
+
+evaluate symbolically, MX type (unambiguous) ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::evalMX "
+
+Evaluate symbolically with with directional derivatives, MX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::evalSX "
+
+evaluate symbolically, SX type (unambiguous) ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::evalSX "
+
+Evaluate symbolically with with directional derivatives, SX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::indexed_one_based "";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::indexed_zero_based "";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::checkNode "
+
+Check if the node is pointing to the right type of object. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::output "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::output "
+
+Access output argument Note that copies in Python are shallow by default and
+fx.output() gives a reference/pointer to an internal data structure. So if
+you want save fx.output(), you need to make a deep copy using for example
+DMatrix(fx.output()). ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::fwdSeed "
+
+Const access forward seed. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::fwdSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::adjSeed "
+
+Const access adjoint seed. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::adjSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getStat "
+
+Get a single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::addMonitor "
+
+Add modules to be monitored. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::removeMonitor "
+
+Remove modules to be monitored. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getOptionDescription
+"
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::clone "
+
+Deep copy. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::assignNode "
+
+Assign the node to a node class pointer (or null) ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::assignNodeNoCount "
+
+Assign the node to a node class pointer without reference counting: inproper
+use will cause memory leaks! ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::get "
+
+Get a const pointer to the node. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::get "
+
+Get a pointer to the node. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::swap "
+
+Swap content with another instance. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::repr "
+
+Print a representation of the object. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::print "
+
+Print a destription of the object. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::init "
+
+Initialize the object: more documentation in the node class (
+SharedObjectNode and derived classes) ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::isInit "
+
+Is initialized? ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::assertInit "
+
+Assert that it is initialized. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::isNull "
+
+Is a null pointer? ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getRepresentation "
+
+Return a string with a representation (for SWIG) ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::getDescription "
+
+Return a string with a destription (for SWIG) ";
+
+
+// File: classCasADi_1_1DirectMultipleShootingInternal.xml
+%feature("docstring") CasADi::DirectMultipleShootingInternal "C++ includes:
+direct_multiple_shooting_internal.hpp ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::getHessian "";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::getGradient "";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::getJacobian "";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::derivative "
+
+Return function that calculates forward derivatives This method returns a
+cached instance if available, and calls FX getDerivative(int nfwd, int nadj)
+if no cached version is available. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::getDerivative
+"
+
+Constructs and returns a function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::input "";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::input "";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::input "";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::inputNoCheck
+"";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::inputNoCheck
+"";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::output "
+
+Access output argument. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::output "";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::outputNoCheck
+"";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::outputNoCheck
+"";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::fwdSeed "";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::fwdSeedNoCheck "";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::fwdSeedNoCheck "";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::fwdSens "";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::fwdSensNoCheck "";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::fwdSensNoCheck "";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::adjSeed "";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::adjSeedNoCheck "";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::adjSeedNoCheck "";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::adjSens "";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::adjSensNoCheck "";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::adjSensNoCheck "";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::DirectMultipleShootingInternal "";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::clone "
+
+Make a deep copy of the instance. ";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::~DirectMultipleShootingInternal "";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::init "
+
+Initialize. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::getGuess "";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::getVariableBounds "";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::getConstraintBounds "";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::setOptimalSolution "";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::reportConstraints "";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::updateNumSens
+"
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::requestNumSens "
+
+Request a number of forward/adjoint derivative directions. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::spCanEvaluate
+"
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::spInit "
+
+Reset the sparsity propagation. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::evalSX "
+
+Evaluate symbolically, SX type. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::evalMX "
+
+Evaluate symbolically, MX type. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::call "
+
+Call a function, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::call "
+
+Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::iStruct "
+
+Access an input. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::iStruct "
+
+Const access an input. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::oStruct "
+
+Access an output. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::oStruct "
+
+Const access an output. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::print "
+
+Print. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::repr "
+
+Print. ";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::getPartition
+"
+
+Get the unidirectional or bidirectional partition. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::verbose "
+
+Verbose mode? ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::monitored "
+
+Is function fcn being monitored. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::setNumInputs
+"
+
+Set the number of function inputs. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::setNumOutputs
+"
+
+Set the number of function outputs. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::getNumInputs
+"
+
+Get the number of function inputs. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::getNumOutputs
+"
+
+Get the number of function outputs. ";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::getStat "
+
+Get single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::getJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::symbolicInput
+"
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::log "
+
+Log the status of the solver. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::log "
+
+Log the status of the solver, function given. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::setOption "
+
+set an option. The setOptions are in general only considered before the init
+function, if any. If properties changes, the init function should be called
+again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::setOption "
+
+set a set of options. The setOptions are in general only considered before
+the init function, if any. If properties changes, the init function should
+be called again. (Ticket #54) ";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::getOptionType
+"
+
+Get the type of a certain option. ";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::hasSetOption
+"
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::printOptions
+"
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::deepCopyMembers "
+
+Deep copy data members. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::assertInit "
+
+Assert that the object has been initialized. ";
+
+
+// File: classCasADi_1_1DirectSingleShooting.xml
+%feature("docstring") CasADi::DirectSingleShooting "
+
+Direct Single Shooting.
+
+ns: Number of shooting nodes: from option number_of_grid_points  nx: Number
+of differential states: from ffcn.input(INTEGRATOR_X0).size()  nc: Number of
+constants during intergation: ffcn.input(INTEGRATOR_P).size() nu: Number of
+controls: from nc - np  np: Number of parameters: from option
+number_of_parameters  nh: Number of point constraints: from
+cfcn.input(0).size()
+
+Joel Andersson
+
+C++ includes: direct_single_shooting.hpp ";
+
+/*  Setters  */
+
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
+
+*/
+
+%feature("docstring")  CasADi::DirectSingleShooting::setInput "
+
+Reads in the input argument from val. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::setOutput "
+
+Reads in the output argument from val. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::setFwdSeed "
+
+Reads in the forward seed from val. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::setFwdSens "
+
+Reads in the forward sensitivity from val. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::setAdjSeed "
+
+Reads in the adjoint seed from val. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::setAdjSens "
+
+Reads in the adjoint sensitivity from val. ";
+
+/*  Getters  */
+
+/* A group of accessor for numerical data that operate on preallocated data.
+get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
+
+*/
+
+%feature("docstring")  CasADi::DirectSingleShooting::getInput "
+
+Writes out the input argument into val. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getOutput "
+
+Writes out the output argument into val. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getFwdSeed "
+
+Writes out the forward seed into val. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getFwdSens "
+
+Writes out the forward sensitivity into val. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getAdjSeed "
+
+Writes out the adjoint seed into val. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getAdjSens "
+
+Writes out the adjoint sensitivity into val. ";
+
+/*  Option Functionality  */
+
+%feature("docstring")  CasADi::DirectSingleShooting::setOption "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::setOption "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::makeUnique "
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::makeUnique "";
+
+%feature("docstring")  CasADi::DirectSingleShooting::DirectSingleShooting "
+
+Default constructor. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::DirectSingleShooting "
+
+Create a multiple shooting OCP solver.
+
+Parameters:
+-----------
+
+ffcn:  Continuous time dynamics, an CasADi::FX with the folowing mapping:
+>Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
++-------+-------------------------------+ | Name  |          Description
+| +=======+===============================+ | DAE_X | Differential state
+[x].       | +-------+-------------------------------+ | DAE_Z | Algebraic
+state [z].          | +-------+-------------------------------+ | DAE_P |
+Parameter [p].                | +-------+-------------------------------+ |
+DAE_T | Explicit time dependence [t]. |
++-------+-------------------------------+
+
+>Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 3)
++----------+--------------------------------------------------+
+|   Name   |                   Description                    |
++==========+==================================================+
+| DAE_ODE  | Right hand side of the implicit ODE [ode].       |
++----------+--------------------------------------------------+
+| DAE_ALG  | Right hand side of algebraic equations [alg].    |
++----------+--------------------------------------------------+
+| DAE_QUAD | Right hand side of quadratures equations [quad]. |
++----------+--------------------------------------------------+
+
+Important notes: In the above table, INTEGRATOR_P input is not really of
+shape (np x 1), but rather ( (np+nu) x 1 ).
+
+The first np entries of the INTEGRATOR_P input are interpreted as parameters
+to be optimized but constant over the whole domain. The remainder are
+interpreted as controls.
+
+BEWARE: if the right hand side of ffcn is dependent on time, the results
+will be incorrect.
+
+mfcn:  Mayer term, CasADi::FX mapping to cost (1 x 1) >Input scheme:
+CasADi::MayerInput (MAYER_NUM_IN = 2)
++---------+------------------------------------------------+ |  Name   |
+Description                   |
++=========+================================================+ | MAYER_X |
+States at the end of integration (nx x 1) [x]. |
++---------+------------------------------------------------+ | MAYER_P |
+Problem parameters (np x 1) [p].               |
++---------+------------------------------------------------+
+
+cfcn:  Path constraints, CasADi::FX mapping to (nh x 1) >Input scheme:
+CasADi::DAEInput (DAE_NUM_IN = 4) +-------+-------------------------------+
+| Name  |          Description          |
++=======+===============================+ | DAE_X | Differential state [x].
+| +-------+-------------------------------+ | DAE_Z | Algebraic state [z].
+| +-------+-------------------------------+ | DAE_P | Parameter [p].
+| +-------+-------------------------------+ | DAE_T | Explicit time
+dependence [t]. | +-------+-------------------------------+
+
+rfcn:  Initial value constraints ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getGuess "
+
+Get the variables. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getVariableBounds "
+
+Get the variables. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getConstraintBounds "
+
+Get the constraints. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::setOptimalSolution "
+
+Set the optimal solution. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getNLPSolver "";
+
+%feature("docstring")  CasADi::DirectSingleShooting::reportConstraints "";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getReportConstraints "";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getFfcn "";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getMfcn "";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getCfcn "";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getRfcn "";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getNumInputs "
+
+Get number of inputs. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getNumOutputs "
+
+Get number of outputs. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::setNumInputs "
+
+Set number of inputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::setNumOutputs "
+
+Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::solve "
+
+the same as evaluate(0,0) ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::jacobian "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::hessian "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::call "
+
+Create a function call (single input) ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::call "
+
+Create a function call ( MX graph) ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::call "
+
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::call "
+
+Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
+be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::eval "
+
+evaluate symbolically, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::eval "
+
+evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::eval "
+
+Evaluate symbolically with with directional derivatives, SX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::eval "
+
+Evaluate symbolically with with directional derivatives, MX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::eval "
+
+evaluate symbolically, single input, single output ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::evalMX "
+
+evaluate symbolically, MX type (unambiguous) ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::evalMX "
+
+Evaluate symbolically with with directional derivatives, MX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::evalSX "
+
+evaluate symbolically, SX type (unambiguous) ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::evalSX "
+
+Evaluate symbolically with with directional derivatives, SX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::indexed_one_based "";
+
+%feature("docstring")  CasADi::DirectSingleShooting::indexed_zero_based "";
+
+%feature("docstring")  CasADi::DirectSingleShooting::checkNode "
+
+Check if the node is pointing to the right type of object. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::output "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::output "
+
+Access output argument Note that copies in Python are shallow by default and
+fx.output() gives a reference/pointer to an internal data structure. So if
+you want save fx.output(), you need to make a deep copy using for example
+DMatrix(fx.output()). ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::fwdSeed "
+
+Const access forward seed. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::fwdSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::adjSeed "
+
+Const access adjoint seed. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::adjSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getStat "
+
+Get a single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::addMonitor "
+
+Add modules to be monitored. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::removeMonitor "
+
+Remove modules to be monitored. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::clone "
+
+Deep copy. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::assignNode "
+
+Assign the node to a node class pointer (or null) ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::assignNodeNoCount "
+
+Assign the node to a node class pointer without reference counting: inproper
+use will cause memory leaks! ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::get "
+
+Get a const pointer to the node. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::get "
+
+Get a pointer to the node. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::swap "
+
+Swap content with another instance. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::repr "
+
+Print a representation of the object. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::print "
+
+Print a destription of the object. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::init "
+
+Initialize the object: more documentation in the node class (
+SharedObjectNode and derived classes) ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::isInit "
+
+Is initialized? ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::assertInit "
+
+Assert that it is initialized. ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::isNull "
+
+Is a null pointer? ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getRepresentation "
+
+Return a string with a representation (for SWIG) ";
+
+%feature("docstring")  CasADi::DirectSingleShooting::getDescription "
+
+Return a string with a destription (for SWIG) ";
+
+
+// File: classCasADi_1_1DirectSingleShootingInternal.xml
+%feature("docstring") CasADi::DirectSingleShootingInternal "C++ includes:
+direct_single_shooting_internal.hpp ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::getHessian "";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::getGradient "";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::getJacobian "";
+
+%feature("docstring")
+CasADi::DirectSingleShootingInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::derivative "
+
+Return function that calculates forward derivatives This method returns a
+cached instance if available, and calls FX getDerivative(int nfwd, int nadj)
+if no cached version is available. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::getDerivative "
+
+Constructs and returns a function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::input "";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::input "";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::input "";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::inputNoCheck "";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::inputNoCheck "";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::output "
+
+Access output argument. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::output "";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::outputNoCheck "";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::outputNoCheck "";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::fwdSeed "";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::fwdSeedNoCheck
+"";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::fwdSeedNoCheck
+"";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::fwdSens "";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::fwdSensNoCheck
+"";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::fwdSensNoCheck
+"";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::adjSeed "";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::adjSeedNoCheck
+"";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::adjSeedNoCheck
+"";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::adjSens "";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::adjSensNoCheck
+"";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::adjSensNoCheck
+"";
+
+%feature("docstring")
+CasADi::DirectSingleShootingInternal::DirectSingleShootingInternal "";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::clone "
+
+Make a deep copy of the instance. ";
+
+%feature("docstring")
+CasADi::DirectSingleShootingInternal::~DirectSingleShootingInternal "";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::init "
+
+Initialize. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::getGuess "";
+
+%feature("docstring")
+CasADi::DirectSingleShootingInternal::getVariableBounds "";
+
+%feature("docstring")
+CasADi::DirectSingleShootingInternal::getConstraintBounds "";
+
+%feature("docstring")
+CasADi::DirectSingleShootingInternal::setOptimalSolution "";
+
+%feature("docstring")
+CasADi::DirectSingleShootingInternal::reportConstraints "";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::requestNumSens
+"
+
+Request a number of forward/adjoint derivative directions. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::spInit "
+
+Reset the sparsity propagation. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::evalSX "
+
+Evaluate symbolically, SX type. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::evalMX "
+
+Evaluate symbolically, MX type. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::call "
+
+Call a function, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::call "
+
+Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::iStruct "
+
+Access an input. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::iStruct "
+
+Const access an input. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::oStruct "
+
+Access an output. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::oStruct "
+
+Const access an output. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::print "
+
+Print. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::repr "
+
+Print. ";
+
+%feature("docstring")
+CasADi::DirectSingleShootingInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")
+CasADi::DirectSingleShootingInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::getPartition "
+
+Get the unidirectional or bidirectional partition. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::verbose "
+
+Verbose mode? ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::monitored "
+
+Is function fcn being monitored. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::setNumInputs "
+
+Set the number of function inputs. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::setNumOutputs "
+
+Set the number of function outputs. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::getNumInputs "
+
+Get the number of function inputs. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::getNumOutputs "
+
+Get the number of function outputs. ";
+
+%feature("docstring")
+CasADi::DirectSingleShootingInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")
+CasADi::DirectSingleShootingInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::getStat "
+
+Get single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::getJacSparsity
+"
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::setJacSparsity
+"
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::symbolicInputSX
+"
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::log "
+
+Log the status of the solver. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::log "
+
+Log the status of the solver, function given. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::setOption "
+
+set an option. The setOptions are in general only considered before the init
+function, if any. If properties changes, the init function should be called
+again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::setOption "
+
+set a set of options. The setOptions are in general only considered before
+the init function, if any. If properties changes, the init function should
+be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::getOptionNames
+"
+
+Get a list of all option names. ";
+
+%feature("docstring")
+CasADi::DirectSingleShootingInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")
+CasADi::DirectSingleShootingInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")
+CasADi::DirectSingleShootingInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")
+CasADi::DirectSingleShootingInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::getBestMatches
+"
+
+Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::deepCopyMembers
+"
+
+Deep copy data members. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::assertInit "
 
 Assert that the object has been initialized. ";
 
@@ -20267,15 +22356,18 @@ Joel Andersson
 |              |              |              | initial      |              |
 |              |              |              | conditions.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| calc_icB     | OT_BOOLEAN   | true         | Use          | CasADi::Idas |
-|              |              |              | IDACalcIC to | Internal     |
+| calc_icB     | OT_BOOLEAN   | GenericType( | Use          | CasADi::Idas |
+|              |              | )            | IDACalcIC to | Internal     |
 |              |              |              | get          |              |
 |              |              |              | consistent   |              |
 |              |              |              | initial      |              |
 |              |              |              | conditions   |              |
 |              |              |              | for          |              |
 |              |              |              | backwards    |              |
-|              |              |              | system.      |              |
+|              |              |              | system       |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | calc_ic].    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | cj_scaling   | OT_BOOLEAN   | false        | IDAS scaling | CasADi::Idas |
 |              |              |              | on cj for    | Internal     |
@@ -20297,12 +22389,15 @@ Joel Andersson
 |              |              |              | forward      |              |
 |              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| exact_jacobi | OT_BOOLEAN   | false        | Use exact    | CasADi::Sund |
-| anB          |              |              | Jacobian     | ialsInternal |
+| exact_jacobi | OT_BOOLEAN   | GenericType( | Use exact    | CasADi::Sund |
+| anB          |              | )            | Jacobian     | ialsInternal |
 |              |              |              | information  |              |
 |              |              |              | for the      |              |
 |              |              |              | backward     |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to exa |              |
+|              |              |              | ct_jacobian] |              |
 +--------------+--------------+--------------+--------------+--------------+
 | extra_fsens_ | OT_BOOLEAN   | false        | Call calc ic | CasADi::Idas |
 | calc_ic      |              |              | an extra     | Internal     |
@@ -20411,8 +22506,8 @@ Joel Andersson
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
 | lver         |              |              | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
-| lverB        |              |              | ab|tfqmr)    | ialsInternal |
+| iterative_so | OT_STRING    | GenericType( | (gmres|bcgst | CasADi::Sund |
+| lverB        |              | )            | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -20440,6 +22535,9 @@ Joel Andersson
 |              |              |              | function for |              |
 |              |              |              | backwards    |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to lin |              |
+|              |              |              | ear_solver]  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Sund |
 | r_options    | Y            | )            | be passed to | ialsInternal |
@@ -20452,14 +22550,18 @@ Joel Andersson
 |              |              |              | solver for   |              |
 |              |              |              | backwards    |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to lin |              |
+|              |              |              | ear_solver_o |              |
+|              |              |              | ptions]      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
 | r_type       |              |              | d|dense|band | ialsInternal |
 |              |              |              | ed|iterative |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
-| r_typeB      |              |              | d|dense|band | ialsInternal |
+| linear_solve | OT_STRING    | GenericType( | (user_define | CasADi::Sund |
+| r_typeB      |              | )            | d|dense|band | ialsInternal |
 |              |              |              | ed|iterative |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -20475,14 +22577,18 @@ Joel Andersson
 |              |              |              | jacobians    |              |
 |              |              |              | for backward |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to low |              |
+|              |              |              | er_bandwidth |              |
+|              |              |              | ]            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | max_krylov   | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
 |              |              |              | Krylov       | ialsInternal |
 |              |              |              | subspace     |              |
 |              |              |              | size         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_krylovB  | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
-|              |              |              | krylov       | ialsInternal |
+| max_krylovB  | OT_INTEGER   | GenericType( | Maximum      | CasADi::Sund |
+|              |              | )            | krylov       | ialsInternal |
 |              |              |              | subspace     |              |
 |              |              |              | size         |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -20565,8 +22671,8 @@ Joel Andersson
 | pretype      | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
 |              |              |              | ight|both)   | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| pretypeB     | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
-|              |              |              | ight|both)   | ialsInternal |
+| pretypeB     | OT_STRING    | GenericType( | (none|left|r | CasADi::Sund |
+|              |              | )            | ight|both)   | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
 | print_stats  | OT_BOOLEAN   | false        | Print out    | CasADi::Inte |
 |              |              |              | statistics   | gratorIntern |
@@ -20668,17 +22774,25 @@ Joel Andersson
 |              |              |              | jacobians    |              |
 |              |              |              | for backward |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to upp |              |
+|              |              |              | er_bandwidth |              |
+|              |              |              | ]            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | use_precondi | OT_BOOLEAN   | false        | Precondition | CasADi::Sund |
 | tioner       |              |              | an iterative | ialsInternal |
 |              |              |              | solver       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| use_precondi | OT_BOOLEAN   | false        | Precondition | CasADi::Sund |
-| tionerB      |              |              | an iterative | ialsInternal |
+| use_precondi | OT_BOOLEAN   | GenericType( | Precondition | CasADi::Sund |
+| tionerB      |              | )            | an iterative | ialsInternal |
 |              |              |              | solver for   |              |
 |              |              |              | the          |              |
 |              |              |              | backwards    |              |
 |              |              |              | problem      |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to use |              |
+|              |              |              | _preconditio |              |
+|              |              |              | ner]         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
 |              |              | )            | defined      | ternal       |
@@ -21491,15 +23605,18 @@ rx, rz and rp.
 |              |              |              | initial      |              |
 |              |              |              | conditions.  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| calc_icB     | OT_BOOLEAN   | true         | Use          | CasADi::Idas |
-|              |              |              | IDACalcIC to | Internal     |
+| calc_icB     | OT_BOOLEAN   | GenericType( | Use          | CasADi::Idas |
+|              |              | )            | IDACalcIC to | Internal     |
 |              |              |              | get          |              |
 |              |              |              | consistent   |              |
 |              |              |              | initial      |              |
 |              |              |              | conditions   |              |
 |              |              |              | for          |              |
 |              |              |              | backwards    |              |
-|              |              |              | system.      |              |
+|              |              |              | system       |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to     |              |
+|              |              |              | calc_ic].    |              |
 +--------------+--------------+--------------+--------------+--------------+
 | cj_scaling   | OT_BOOLEAN   | false        | IDAS scaling | CasADi::Idas |
 |              |              |              | on cj for    | Internal     |
@@ -21521,12 +23638,15 @@ rx, rz and rp.
 |              |              |              | forward      |              |
 |              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| exact_jacobi | OT_BOOLEAN   | false        | Use exact    | CasADi::Sund |
-| anB          |              |              | Jacobian     | ialsInternal |
+| exact_jacobi | OT_BOOLEAN   | GenericType( | Use exact    | CasADi::Sund |
+| anB          |              | )            | Jacobian     | ialsInternal |
 |              |              |              | information  |              |
 |              |              |              | for the      |              |
 |              |              |              | backward     |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to exa |              |
+|              |              |              | ct_jacobian] |              |
 +--------------+--------------+--------------+--------------+--------------+
 | extra_fsens_ | OT_BOOLEAN   | false        | Call calc ic | CasADi::Idas |
 | calc_ic      |              |              | an extra     | Internal     |
@@ -21635,8 +23755,8 @@ rx, rz and rp.
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
 | lver         |              |              | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
-| lverB        |              |              | ab|tfqmr)    | ialsInternal |
+| iterative_so | OT_STRING    | GenericType( | (gmres|bcgst | CasADi::Sund |
+| lverB        |              | )            | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -21664,6 +23784,9 @@ rx, rz and rp.
 |              |              |              | function for |              |
 |              |              |              | backwards    |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to lin |              |
+|              |              |              | ear_solver]  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Sund |
 | r_options    | Y            | )            | be passed to | ialsInternal |
@@ -21676,14 +23799,18 @@ rx, rz and rp.
 |              |              |              | solver for   |              |
 |              |              |              | backwards    |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to lin |              |
+|              |              |              | ear_solver_o |              |
+|              |              |              | ptions]      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
 | r_type       |              |              | d|dense|band | ialsInternal |
 |              |              |              | ed|iterative |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
-| r_typeB      |              |              | d|dense|band | ialsInternal |
+| linear_solve | OT_STRING    | GenericType( | (user_define | CasADi::Sund |
+| r_typeB      |              | )            | d|dense|band | ialsInternal |
 |              |              |              | ed|iterative |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -21699,14 +23826,18 @@ rx, rz and rp.
 |              |              |              | jacobians    |              |
 |              |              |              | for backward |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to low |              |
+|              |              |              | er_bandwidth |              |
+|              |              |              | ]            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | max_krylov   | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
 |              |              |              | Krylov       | ialsInternal |
 |              |              |              | subspace     |              |
 |              |              |              | size         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_krylovB  | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
-|              |              |              | krylov       | ialsInternal |
+| max_krylovB  | OT_INTEGER   | GenericType( | Maximum      | CasADi::Sund |
+|              |              | )            | krylov       | ialsInternal |
 |              |              |              | subspace     |              |
 |              |              |              | size         |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -21789,8 +23920,8 @@ rx, rz and rp.
 | pretype      | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
 |              |              |              | ight|both)   | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| pretypeB     | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
-|              |              |              | ight|both)   | ialsInternal |
+| pretypeB     | OT_STRING    | GenericType( | (none|left|r | CasADi::Sund |
+|              |              | )            | ight|both)   | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
 | print_stats  | OT_BOOLEAN   | false        | Print out    | CasADi::Inte |
 |              |              |              | statistics   | gratorIntern |
@@ -21892,17 +24023,25 @@ rx, rz and rp.
 |              |              |              | jacobians    |              |
 |              |              |              | for backward |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to upp |              |
+|              |              |              | er_bandwidth |              |
+|              |              |              | ]            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | use_precondi | OT_BOOLEAN   | false        | Precondition | CasADi::Sund |
 | tioner       |              |              | an iterative | ialsInternal |
 |              |              |              | solver       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| use_precondi | OT_BOOLEAN   | false        | Precondition | CasADi::Sund |
-| tionerB      |              |              | an iterative | ialsInternal |
+| use_precondi | OT_BOOLEAN   | GenericType( | Precondition | CasADi::Sund |
+| tionerB      |              | )            | an iterative | ialsInternal |
 |              |              |              | solver for   |              |
 |              |              |              | the          |              |
 |              |              |              | backwards    |              |
 |              |              |              | problem      |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to use |              |
+|              |              |              | _preconditio |              |
+|              |              |              | ner]         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
 |              |              | )            | defined      | ternal       |
@@ -45858,85 +47997,49 @@ Assert that the object has been initialized. ";
 // File: classCasADi_1_1MultipleShooting.xml
 %feature("docstring") CasADi::MultipleShooting "
 
-Multiple Shooting.
-
-ns: Number of shooting nodes: from option number_of_grid_points  nx: Number
-of differential states: from ffcn.input(INTEGRATOR_X0).size()  nc: Number of
-constants during intergation: ffcn.input(INTEGRATOR_P).size() nu: Number of
-controls: from nc - np  np: Number of parameters: from option
-number_of_parameters  nh: Number of point constraints: from
-cfcn.input(0).size()
-
-Joel Andersson
-
->Input scheme: CasADi::OCPInput (OCP_NUM_IN = 17)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| OCP_T                              | Time grid: ((ns+1) x 1) - default: |
-|                                    | linspace(0,t_final,ns+1) [t].      |
-+------------------------------------+------------------------------------+
-| OCP_LBX                            | States lower bounds (nx x (ns+1))  |
-|                                    | [lbx].                             |
-+------------------------------------+------------------------------------+
-| OCP_UBX                            | States upper bounds (nx x (ns+1))  |
-|                                    | [ubx].                             |
-+------------------------------------+------------------------------------+
-| OCP_X_INIT                         | States initial guess (nx x (ns+1)) |
-|                                    | [x_init].                          |
-+------------------------------------+------------------------------------+
-| OCP_LBXP                           | States deriatives lower bounds (nx |
-|                                    | x (ns+1)) [lbxp].                  |
-+------------------------------------+------------------------------------+
-| OCP_UBXP                           | States deriatives upper bounds (nx |
-|                                    | x (ns+1)) [ubxp].                  |
-+------------------------------------+------------------------------------+
-| OCP_XP_INIT                        | States deriatives initial guess    |
-|                                    | (nx x (ns+1)) [xp_init].           |
-+------------------------------------+------------------------------------+
-| OCP_LBU                            | Controls lower bounds (nu x ns)    |
-|                                    | [lbu].                             |
-+------------------------------------+------------------------------------+
-| OCP_UBU                            | Controls upper bounds (nu x ns)    |
-|                                    | [ubu].                             |
-+------------------------------------+------------------------------------+
-| OCP_U_INIT                         | Controls initial guess (nu x ns)   |
-|                                    | [u_init].                          |
-+------------------------------------+------------------------------------+
-| OCP_LBP                            | Parameters lower bounds (np x 1)   |
-|                                    | [lbp].                             |
-+------------------------------------+------------------------------------+
-| OCP_UBP                            | Parameters upper bounds (np x 1)   |
-|                                    | [ubp].                             |
-+------------------------------------+------------------------------------+
-| OCP_P_INIT                         | Parameters initial guess (np x 1)  |
-|                                    | [p_init].                          |
-+------------------------------------+------------------------------------+
-| OCP_LBH                            | Point constraint lower bound (nh x |
-|                                    | (ns+1)) [lbh].                     |
-+------------------------------------+------------------------------------+
-| OCP_UBH                            | Point constraint upper bound (nh x |
-|                                    | (ns+1)) [ubh].                     |
-+------------------------------------+------------------------------------+
-| OCP_LBG                            | Lower bound for the coupling       |
-|                                    | constraints [lbg].                 |
-+------------------------------------+------------------------------------+
-| OCP_UBG                            | Upper bound for the coupling       |
-|                                    | constraints [ubg].                 |
-+------------------------------------+------------------------------------+
+>Input scheme: CasADi::OCPInput (OCP_NUM_IN = 13)
++------------+---------------------------------------------------+
+|    Name    |                    Description                    |
++============+===================================================+
+| OCP_LBX    | States lower bounds (nx x (ns+1)) [lbx].          |
++------------+---------------------------------------------------+
+| OCP_UBX    | States upper bounds (nx x (ns+1)) [ubx].          |
++------------+---------------------------------------------------+
+| OCP_X_INIT | States initial guess (nx x (ns+1)) [x_init].      |
++------------+---------------------------------------------------+
+| OCP_LBU    | Controls lower bounds (nu x ns) [lbu].            |
++------------+---------------------------------------------------+
+| OCP_UBU    | Controls upper bounds (nu x ns) [ubu].            |
++------------+---------------------------------------------------+
+| OCP_U_INIT | Controls initial guess (nu x ns) [u_init].        |
++------------+---------------------------------------------------+
+| OCP_LBP    | Parameters lower bounds (np x 1) [lbp].           |
++------------+---------------------------------------------------+
+| OCP_UBP    | Parameters upper bounds (np x 1) [ubp].           |
++------------+---------------------------------------------------+
+| OCP_P_INIT | Parameters initial guess (np x 1) [p_init].       |
++------------+---------------------------------------------------+
+| OCP_LBH    | Point constraint lower bound (nh x (ns+1)) [lbh]. |
++------------+---------------------------------------------------+
+| OCP_UBH    | Point constraint upper bound (nh x (ns+1)) [ubh]. |
++------------+---------------------------------------------------+
+| OCP_LBG    | Lower bound for the coupling constraints [lbg].   |
++------------+---------------------------------------------------+
+| OCP_UBG    | Upper bound for the coupling constraints [ubg].   |
++------------+---------------------------------------------------+
 
 >Output scheme: CasADi::OCPOutput (OCP_NUM_OUT = 4)
-+------------+-----------------------------------------------+
-|    Name    |                  Description                  |
-+============+===============================================+
-| OCP_X_OPT  | Optimal state trajectory [x_opt].             |
-+------------+-----------------------------------------------+
-| OCP_U_OPT  | Optimal control trajectory [u_opt].           |
-+------------+-----------------------------------------------+
-| OCP_XP_OPT | Optimal state derivative trajectory [xp_opt]. |
-+------------+-----------------------------------------------+
-| OCP_P_OPT  | Optimal parameters [p_opt].                   |
-+------------+-----------------------------------------------+
++-----------+--------------------------------------------------------------+
+|   Name    |                         Description                          |
++===========+==============================================================+
+| OCP_X_OPT | Optimal state trajectory [x_opt].                            |
++-----------+--------------------------------------------------------------+
+| OCP_U_OPT | Optimal control trajectory [u_opt].                          |
++-----------+--------------------------------------------------------------+
+| OCP_P_OPT | Optimal parameters [p_opt].                                  |
++-----------+--------------------------------------------------------------+
+| OCP_COST  | Objective/cost function for optimal solution (1 x 1) [cost]. |
++-----------+--------------------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -46127,699 +48230,55 @@ Joel Andersson
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-C++ includes: multiple_shooting.hpp ";
-
-/*  Setters  */
-
-/* T can be double&, double*, std::vector<double>&, Matrix<double> &
-Assumes a properly allocated val.  Set/get an input, output, forward
-seed/sensitivity or adjoint seed/sensitivity
-
-*/
-
-%feature("docstring")  CasADi::MultipleShooting::setInput "
-
-Reads in the input argument from val. ";
-
-%feature("docstring")  CasADi::MultipleShooting::setOutput "
-
-Reads in the output argument from val. ";
-
-%feature("docstring")  CasADi::MultipleShooting::setFwdSeed "
-
-Reads in the forward seed from val. ";
-
-%feature("docstring")  CasADi::MultipleShooting::setFwdSens "
-
-Reads in the forward sensitivity from val. ";
-
-%feature("docstring")  CasADi::MultipleShooting::setAdjSeed "
-
-Reads in the adjoint seed from val. ";
-
-%feature("docstring")  CasADi::MultipleShooting::setAdjSens "
-
-Reads in the adjoint sensitivity from val. ";
-
-/*  Getters  */
-
-/* A group of accessor for numerical data that operate on preallocated data.
-get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
-
-*/
-
-%feature("docstring")  CasADi::MultipleShooting::getInput "
-
-Writes out the input argument into val. ";
-
-%feature("docstring")  CasADi::MultipleShooting::getOutput "
-
-Writes out the output argument into val. ";
-
-%feature("docstring")  CasADi::MultipleShooting::getFwdSeed "
-
-Writes out the forward seed into val. ";
-
-%feature("docstring")  CasADi::MultipleShooting::getFwdSens "
-
-Writes out the forward sensitivity into val. ";
-
-%feature("docstring")  CasADi::MultipleShooting::getAdjSeed "
-
-Writes out the adjoint seed into val. ";
-
-%feature("docstring")  CasADi::MultipleShooting::getAdjSens "
-
-Writes out the adjoint sensitivity into val. ";
-
-/*  Option Functionality  */
-
-%feature("docstring")  CasADi::MultipleShooting::setOption "
-
-set an option. For a list of options, check the class documentation of this
-class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again. ";
-
-%feature("docstring")  CasADi::MultipleShooting::setOption "
-
-set a set of options. For a list of options, check the class documentation
-of this class.
-
-The setOptions are only considered before the init function. If properties
-changes, the init function should be called again. ";
-
-%feature("docstring")  CasADi::MultipleShooting::getOption "
-
-get an option value ";
-
-%feature("docstring")  CasADi::MultipleShooting::hasOption "
-
-check if there is an option str ";
-
-%feature("docstring")  CasADi::MultipleShooting::hasSetOption "
-
-check if the user has there is an option str ";
-
-%feature("docstring")  CasADi::MultipleShooting::printOptions "
-
-Print options to a stream. ";
-
-%feature("docstring")  CasADi::MultipleShooting::copyOptions "
-
-Copy all options from another object. ";
-
-%feature("docstring")  CasADi::MultipleShooting::dictionary "
-
-Get the dictionary. ";
-
-%feature("docstring")  CasADi::MultipleShooting::makeUnique "
-
-If there are other references to the object, then make a deep copy of it and
-point to this new object. ";
-
-%feature("docstring")  CasADi::MultipleShooting::makeUnique "";
-
-%feature("docstring")  CasADi::MultipleShooting::MultipleShooting "
-
-Default constructor. ";
-
-%feature("docstring")  CasADi::MultipleShooting::MultipleShooting "
-
-Create a multiple shooting OCP solver.
-
-Parameters:
------------
-
-ffcn:  Continuous time dynamics, an CasADi::FX with the folowing mapping:
->Input scheme: CasADi::DAEInput (DAE_NUM_IN = 4)
-+-------+-------------------------------+ | Name  |          Description
-| +=======+===============================+ | DAE_X | Differential state
-[x].       | +-------+-------------------------------+ | DAE_Z | Algebraic
-state [z].          | +-------+-------------------------------+ | DAE_P |
-Parameter [p].                | +-------+-------------------------------+ |
-DAE_T | Explicit time dependence [t]. |
-+-------+-------------------------------+
-
->Output scheme: CasADi::DAEOutput (DAE_NUM_OUT = 3)
-+----------+--------------------------------------------------+
-|   Name   |                   Description                    |
-+==========+==================================================+
-| DAE_ODE  | Right hand side of the implicit ODE [ode].       |
-+----------+--------------------------------------------------+
-| DAE_ALG  | Right hand side of algebraic equations [alg].    |
-+----------+--------------------------------------------------+
-| DAE_QUAD | Right hand side of quadratures equations [quad]. |
-+----------+--------------------------------------------------+
-
-Important notes: In the above table, INTEGRATOR_P input is not really of
-shape (np x 1), but rather ( (np+nu) x 1 ).
-
-The first np entries of the INTEGRATOR_P input are interpreted as parameters
-to be optimized but constant over the whole domain. The remainder are
-interpreted as controls.
-
-BEWARE: if the right hand side of ffcn is dependent on time, the results
-will be incorrect.
-
-mfcn:  Mayer term, CasADi::FX mapping to cost (1 x 1) >Input scheme:
-CasADi::MayerInput (MAYER_NUM_IN = 2)
-+---------+------------------------------------------------+ |  Name   |
-Description                   |
-+=========+================================================+ | MAYER_X |
-States at the end of integration (nx x 1) [x]. |
-+---------+------------------------------------------------+ | MAYER_P |
-Problem parameters (np x 1) [p].               |
-+---------+------------------------------------------------+
-
-cfcn:  Path constraints, CasADi::FX mapping to (nh x 1) >Input scheme:
-CasADi::DAEInput (DAE_NUM_IN = 4) +-------+-------------------------------+
-| Name  |          Description          |
-+=======+===============================+ | DAE_X | Differential state [x].
-| +-------+-------------------------------+ | DAE_Z | Algebraic state [z].
-| +-------+-------------------------------+ | DAE_P | Parameter [p].
-| +-------+-------------------------------+ | DAE_T | Explicit time
-dependence [t]. | +-------+-------------------------------+
-
-rfcn:  Initial value constraints ";
-
-%feature("docstring")  CasADi::MultipleShooting::getGuess "
-
-Get the variables. ";
-
-%feature("docstring")  CasADi::MultipleShooting::getVariableBounds "
-
-Get the variables. ";
-
-%feature("docstring")  CasADi::MultipleShooting::getConstraintBounds "
-
-Get the constraints. ";
-
-%feature("docstring")  CasADi::MultipleShooting::setOptimalSolution "
-
-Set the optimal solution. ";
-
-%feature("docstring")  CasADi::MultipleShooting::getNLPSolver "";
-
-%feature("docstring")  CasADi::MultipleShooting::reportConstraints "";
-
-%feature("docstring")  CasADi::MultipleShooting::getReportConstraints "";
-
-%feature("docstring")  CasADi::MultipleShooting::getFfcn "";
-
-%feature("docstring")  CasADi::MultipleShooting::getMfcn "";
-
-%feature("docstring")  CasADi::MultipleShooting::getCfcn "";
-
-%feature("docstring")  CasADi::MultipleShooting::getRfcn "";
-
-%feature("docstring")  CasADi::MultipleShooting::getNumInputs "
-
-Get number of inputs. ";
-
-%feature("docstring")  CasADi::MultipleShooting::getNumOutputs "
-
-Get number of outputs. ";
-
-%feature("docstring")  CasADi::MultipleShooting::getNumScalarInputs "
-
-Get total number of scalar inputs (i.e. the number of nonzeros in all of the
-matrix-valued inputs) ";
-
-%feature("docstring")  CasADi::MultipleShooting::getNumScalarOutputs "
-
-Get total number of scalar outputs (i.e. the number of nonzeros in all of
-the matrix-valued outputs) ";
-
-%feature("docstring")  CasADi::MultipleShooting::setNumInputs "
-
-Set number of inputs (normally invoked internally) ";
-
-%feature("docstring")  CasADi::MultipleShooting::setNumOutputs "
-
-Set number of outputs (normally invoked internally) ";
-
-%feature("docstring")  CasADi::MultipleShooting::updateNumSens "
-
-Update the number of sensitivity directions during or after initialization
-(normally invoked internally) ";
-
-%feature("docstring")  CasADi::MultipleShooting::requestNumSens "
-
-Request a number of forward/adjoint derivative directions This function
-tries to increase the number of directional derivatives allocated for the
-function so that the the number at least amounts to \"nfwd\" and \"nadj\"
-for forward and adjoint mode derivatives respectively. The allocated number
-is never decreased and never increased beyond the number set by the option
-\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
-
-If the number was changed during the call, updateNumSens() is automatically
-invoked. ";
-
-%feature("docstring")  CasADi::MultipleShooting::numAllocFwd "
-
-Get the number of allocated forward directional derivatives. ";
-
-%feature("docstring")  CasADi::MultipleShooting::numAllocAdj "
-
-Get the number of allocated adjoint directional derivatives. ";
-
-%feature("docstring")  CasADi::MultipleShooting::evaluate "
-
-Evaluate. ";
-
-%feature("docstring")  CasADi::MultipleShooting::solve "
-
-the same as evaluate(0,0) ";
-
-%feature("docstring")  CasADi::MultipleShooting::jacobian "
-
-Generate a Jacobian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. If
-compact is set to true, only the nonzeros of the input and output
-expressions are considered. If symmetric is set to true, the Jacobian being
-calculated is known to be symmetric (usually a Hessian), which can be
-exploited by the algorithm.
-
-The generated Jacobian has one more output than the calling function
-corresponding to the Jacobian and the same number of inputs. ";
-
-%feature("docstring")  CasADi::MultipleShooting::gradient "
-
-Generate a gradient function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The default behavior of this class is defined by the derived class. Note
-that the output must be scalar. In other cases, use the Jacobian instead. ";
-
-%feature("docstring")  CasADi::MultipleShooting::hessian "
-
-Generate a Hessian function of output oind with respect to input iind.
-
-Parameters:
------------
-
-iind:  The index of the input
-
-oind:  The index of the output
-
-The generated Hessian has two more outputs than the calling function
-corresponding to the Hessian and the gradients. ";
-
-%feature("docstring")  CasADi::MultipleShooting::call "
-
-Create a function call (single input) ";
-
-%feature("docstring")  CasADi::MultipleShooting::call "
-
-Create a function call ( MX graph) ";
-
-%feature("docstring")  CasADi::MultipleShooting::call "
-
-Create a function call with directional derivatives Note: return by
-reference with SWIG. ";
-
-%feature("docstring")  CasADi::MultipleShooting::call "
-
-Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
-be passed to the Parallelizer. ";
-
-%feature("docstring")  CasADi::MultipleShooting::eval "
-
-evaluate symbolically, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::MultipleShooting::eval "
-
-evaluate symbolically, MX type (overloaded) ";
-
-%feature("docstring")  CasADi::MultipleShooting::eval "
-
-Evaluate symbolically with with directional derivatives, SX type, overloaded
-The first two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The boolean
-argument allows the second argument to the functions to be used as an input
-instead of output, assuming it is already known. ";
-
-%feature("docstring")  CasADi::MultipleShooting::eval "
-
-Evaluate symbolically with with directional derivatives, MX type, overloaded
-The first two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The boolean
-argument allows the second argument to the functions to be used as an input
-instead of output, assuming it is already known. ";
-
-%feature("docstring")  CasADi::MultipleShooting::eval "
-
-evaluate symbolically, single input, single output ";
-
-%feature("docstring")  CasADi::MultipleShooting::evalMX "
-
-evaluate symbolically, MX type (unambiguous) ";
-
-%feature("docstring")  CasADi::MultipleShooting::evalMX "
-
-Evaluate symbolically with with directional derivatives, MX type The first
-two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The boolean
-argument allows the second argument to the functions to be used as an input
-instead of output, assuming it is already known. ";
-
-%feature("docstring")  CasADi::MultipleShooting::evalSX "
-
-evaluate symbolically, SX type (unambiguous) ";
-
-%feature("docstring")  CasADi::MultipleShooting::evalSX "
-
-Evaluate symbolically with with directional derivatives, SX type The first
-two arguments are the nondifferentiated inputs and results of the
-evaluation, the next two arguments are a set of forward directional seeds
-and the resulting forward directional derivatives, the length of the vector
-being the number of forward directions. The next two arguments are a set of
-adjoint directional seeds and the resulting adjoint directional derivatives,
-the length of the vector being the number of adjoint directions. The boolean
-argument allows the second argument to the functions to be used as an input
-instead of output, assuming it is already known. ";
-
-%feature("docstring")  CasADi::MultipleShooting::derivative "
-
-Get a function that calculates nfwd forward derivatives and nadj adjoint
-derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
-(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
-nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
-seeds, one direction at a time and the last nadj*n_out inputs corresponds to
-adjoint seeds, one direction at a time. The first n_out outputs corresponds
-to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
-forward sensitivities, one direction at a time and the last nadj*n_in
-outputs corresponds to adjoint sensitivties, one direction at a time.
-
-(n_in = getNumInputs(), n_out = getNumOutputs())
-
-The functions returned are cached, meaning that if called multiple timed
-with the same value, then multiple references to the same function will be
-returned. ";
-
-%feature("docstring")  CasADi::MultipleShooting::jacSparsity "
-
-Get, if necessary generate, the sparsity of a Jacobian block. ";
-
-%feature("docstring")  CasADi::MultipleShooting::setJacSparsity "
-
-Generate the sparsity of a Jacobian block. ";
-
-%feature("docstring")  CasADi::MultipleShooting::indexed_one_based "";
-
-%feature("docstring")  CasADi::MultipleShooting::indexed_zero_based "";
-
-%feature("docstring")  CasADi::MultipleShooting::checkNode "
-
-Check if the node is pointing to the right type of object. ";
-
-%feature("docstring")  CasADi::MultipleShooting::input "
-
-Const access input argument. ";
-
-%feature("docstring")  CasADi::MultipleShooting::input "
-
-Const access input argument. ";
-
-%feature("docstring")  CasADi::MultipleShooting::input "
-
-Access input argument. ";
-
-%feature("docstring")  CasADi::MultipleShooting::input "
-
-Access input argument. ";
-
-%feature("docstring")  CasADi::MultipleShooting::output "
-
-Const access input argument. ";
-
-%feature("docstring")  CasADi::MultipleShooting::output "
-
-Access output argument Note that copies in Python are shallow by default and
-fx.output() gives a reference/pointer to an internal data structure. So if
-you want save fx.output(), you need to make a deep copy using for example
-DMatrix(fx.output()). ";
-
-%feature("docstring")  CasADi::MultipleShooting::fwdSeed "
-
-Const access forward seed. ";
-
-%feature("docstring")  CasADi::MultipleShooting::fwdSeed "
-
-Access forward seed. ";
-
-%feature("docstring")  CasADi::MultipleShooting::fwdSens "
-
-Const access forward sensitivity. ";
-
-%feature("docstring")  CasADi::MultipleShooting::fwdSens "
-
-Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::MultipleShooting::adjSeed "
-
-Const access adjoint seed. ";
-
-%feature("docstring")  CasADi::MultipleShooting::adjSeed "
-
-Access adjoint seed. ";
-
-%feature("docstring")  CasADi::MultipleShooting::adjSens "
-
-Const access forward sensitivity. ";
-
-%feature("docstring")  CasADi::MultipleShooting::adjSens "
-
-Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::MultipleShooting::getStats "
-
-Get all statistics obtained at the end of the last evaluate call. ";
-
-%feature("docstring")  CasADi::MultipleShooting::getStat "
-
-Get a single statistic obtained at the end of the last evaluate call. ";
-
-%feature("docstring")  CasADi::MultipleShooting::symbolicInput "
-
-Get a vector of symbolic variables with the same dimensions as the inputs
-There is no guarantee that consecutive calls return identical objects. ";
-
-%feature("docstring")  CasADi::MultipleShooting::symbolicInputSX "
-
-Get a vector of symbolic variables with the same dimensions as the inputs,
-SX graph There is no guarantee that consecutive calls return identical
-objects. ";
-
-%feature("docstring")  CasADi::MultipleShooting::spCanEvaluate "
-
-Is the class able to propate seeds through the algorithm? (for usage, see
-the example propagating_sparsity.cpp) ";
-
-%feature("docstring")  CasADi::MultipleShooting::spInit "
-
-Reset the sparsity propagation (for usage, see the example
-propagating_sparsity.cpp) ";
-
-%feature("docstring")  CasADi::MultipleShooting::spEvaluate "
-
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward (for usage, see the example propagating_sparsity.cpp) ";
-
-%feature("docstring")  CasADi::MultipleShooting::addMonitor "
-
-Add modules to be monitored. ";
-
-%feature("docstring")  CasADi::MultipleShooting::removeMonitor "
-
-Remove modules to be monitored. ";
-
-%feature("docstring")  CasADi::MultipleShooting::getOptionNames "
-
-Get a list of all option names. ";
-
-%feature("docstring")  CasADi::MultipleShooting::getOptionDescription "
-
-Get the description of a certain option. ";
-
-%feature("docstring")  CasADi::MultipleShooting::getOptionType "
-
-Get the type of a certain option. ";
-
-%feature("docstring")  CasADi::MultipleShooting::getOptionTypeName "
-
-Get the type name of a certain option. ";
-
-%feature("docstring")  CasADi::MultipleShooting::getOptionAllowed "
-
-Get the allowed values of a certain option. ";
-
-%feature("docstring")  CasADi::MultipleShooting::getOptionDefault "
-
-Get the default of a certain option. ";
-
-%feature("docstring")  CasADi::MultipleShooting::clone "
-
-Deep copy. ";
-
-%feature("docstring")  CasADi::MultipleShooting::assignNode "
-
-Assign the node to a node class pointer (or null) ";
-
-%feature("docstring")  CasADi::MultipleShooting::assignNodeNoCount "
-
-Assign the node to a node class pointer without reference counting: inproper
-use will cause memory leaks! ";
-
-%feature("docstring")  CasADi::MultipleShooting::get "
-
-Get a const pointer to the node. ";
-
-%feature("docstring")  CasADi::MultipleShooting::get "
-
-Get a pointer to the node. ";
-
-%feature("docstring")  CasADi::MultipleShooting::getCount "
-
-Get the reference count. ";
-
-%feature("docstring")  CasADi::MultipleShooting::swap "
-
-Swap content with another instance. ";
-
-%feature("docstring")  CasADi::MultipleShooting::repr "
-
-Print a representation of the object. ";
-
-%feature("docstring")  CasADi::MultipleShooting::print "
-
-Print a destription of the object. ";
-
-%feature("docstring")  CasADi::MultipleShooting::init "
-
-Initialize the object: more documentation in the node class (
-SharedObjectNode and derived classes) ";
-
-%feature("docstring")  CasADi::MultipleShooting::isInit "
-
-Is initialized? ";
-
-%feature("docstring")  CasADi::MultipleShooting::assertInit "
-
-Assert that it is initialized. ";
-
-%feature("docstring")  CasADi::MultipleShooting::isNull "
-
-Is a null pointer? ";
-
-%feature("docstring")  CasADi::MultipleShooting::getRepresentation "
-
-Return a string with a representation (for SWIG) ";
-
-%feature("docstring")  CasADi::MultipleShooting::getDescription "
-
-Return a string with a destription (for SWIG) ";
+C++ includes: a0_schemes.hpp ";
 
 
 // File: classCasADi_1_1MultipleShootingInternal.xml
 %feature("docstring") CasADi::MultipleShootingInternal "
 
->Input scheme: CasADi::OCPInput (OCP_NUM_IN = 17)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| OCP_T                              | Time grid: ((ns+1) x 1) - default: |
-|                                    | linspace(0,t_final,ns+1) [t].      |
-+------------------------------------+------------------------------------+
-| OCP_LBX                            | States lower bounds (nx x (ns+1))  |
-|                                    | [lbx].                             |
-+------------------------------------+------------------------------------+
-| OCP_UBX                            | States upper bounds (nx x (ns+1))  |
-|                                    | [ubx].                             |
-+------------------------------------+------------------------------------+
-| OCP_X_INIT                         | States initial guess (nx x (ns+1)) |
-|                                    | [x_init].                          |
-+------------------------------------+------------------------------------+
-| OCP_LBXP                           | States deriatives lower bounds (nx |
-|                                    | x (ns+1)) [lbxp].                  |
-+------------------------------------+------------------------------------+
-| OCP_UBXP                           | States deriatives upper bounds (nx |
-|                                    | x (ns+1)) [ubxp].                  |
-+------------------------------------+------------------------------------+
-| OCP_XP_INIT                        | States deriatives initial guess    |
-|                                    | (nx x (ns+1)) [xp_init].           |
-+------------------------------------+------------------------------------+
-| OCP_LBU                            | Controls lower bounds (nu x ns)    |
-|                                    | [lbu].                             |
-+------------------------------------+------------------------------------+
-| OCP_UBU                            | Controls upper bounds (nu x ns)    |
-|                                    | [ubu].                             |
-+------------------------------------+------------------------------------+
-| OCP_U_INIT                         | Controls initial guess (nu x ns)   |
-|                                    | [u_init].                          |
-+------------------------------------+------------------------------------+
-| OCP_LBP                            | Parameters lower bounds (np x 1)   |
-|                                    | [lbp].                             |
-+------------------------------------+------------------------------------+
-| OCP_UBP                            | Parameters upper bounds (np x 1)   |
-|                                    | [ubp].                             |
-+------------------------------------+------------------------------------+
-| OCP_P_INIT                         | Parameters initial guess (np x 1)  |
-|                                    | [p_init].                          |
-+------------------------------------+------------------------------------+
-| OCP_LBH                            | Point constraint lower bound (nh x |
-|                                    | (ns+1)) [lbh].                     |
-+------------------------------------+------------------------------------+
-| OCP_UBH                            | Point constraint upper bound (nh x |
-|                                    | (ns+1)) [ubh].                     |
-+------------------------------------+------------------------------------+
-| OCP_LBG                            | Lower bound for the coupling       |
-|                                    | constraints [lbg].                 |
-+------------------------------------+------------------------------------+
-| OCP_UBG                            | Upper bound for the coupling       |
-|                                    | constraints [ubg].                 |
-+------------------------------------+------------------------------------+
+>Input scheme: CasADi::OCPInput (OCP_NUM_IN = 13)
++------------+---------------------------------------------------+
+|    Name    |                    Description                    |
++============+===================================================+
+| OCP_LBX    | States lower bounds (nx x (ns+1)) [lbx].          |
++------------+---------------------------------------------------+
+| OCP_UBX    | States upper bounds (nx x (ns+1)) [ubx].          |
++------------+---------------------------------------------------+
+| OCP_X_INIT | States initial guess (nx x (ns+1)) [x_init].      |
++------------+---------------------------------------------------+
+| OCP_LBU    | Controls lower bounds (nu x ns) [lbu].            |
++------------+---------------------------------------------------+
+| OCP_UBU    | Controls upper bounds (nu x ns) [ubu].            |
++------------+---------------------------------------------------+
+| OCP_U_INIT | Controls initial guess (nu x ns) [u_init].        |
++------------+---------------------------------------------------+
+| OCP_LBP    | Parameters lower bounds (np x 1) [lbp].           |
++------------+---------------------------------------------------+
+| OCP_UBP    | Parameters upper bounds (np x 1) [ubp].           |
++------------+---------------------------------------------------+
+| OCP_P_INIT | Parameters initial guess (np x 1) [p_init].       |
++------------+---------------------------------------------------+
+| OCP_LBH    | Point constraint lower bound (nh x (ns+1)) [lbh]. |
++------------+---------------------------------------------------+
+| OCP_UBH    | Point constraint upper bound (nh x (ns+1)) [ubh]. |
++------------+---------------------------------------------------+
+| OCP_LBG    | Lower bound for the coupling constraints [lbg].   |
++------------+---------------------------------------------------+
+| OCP_UBG    | Upper bound for the coupling constraints [ubg].   |
++------------+---------------------------------------------------+
 
 >Output scheme: CasADi::OCPOutput (OCP_NUM_OUT = 4)
-+------------+-----------------------------------------------+
-|    Name    |                  Description                  |
-+============+===============================================+
-| OCP_X_OPT  | Optimal state trajectory [x_opt].             |
-+------------+-----------------------------------------------+
-| OCP_U_OPT  | Optimal control trajectory [u_opt].           |
-+------------+-----------------------------------------------+
-| OCP_XP_OPT | Optimal state derivative trajectory [xp_opt]. |
-+------------+-----------------------------------------------+
-| OCP_P_OPT  | Optimal parameters [p_opt].                   |
-+------------+-----------------------------------------------+
++-----------+--------------------------------------------------------------+
+|   Name    |                         Description                          |
++===========+==============================================================+
+| OCP_X_OPT | Optimal state trajectory [x_opt].                            |
++-----------+--------------------------------------------------------------+
+| OCP_U_OPT | Optimal control trajectory [u_opt].                          |
++-----------+--------------------------------------------------------------+
+| OCP_P_OPT | Optimal parameters [p_opt].                                  |
++-----------+--------------------------------------------------------------+
+| OCP_COST  | Objective/cost function for optimal solution (1 x 1) [cost]. |
++-----------+--------------------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -47010,375 +48469,7 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | debugging    |              |
 +--------------+--------------+--------------+--------------+--------------+
 
-C++ includes: multiple_shooting_internal.hpp ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::hessian "
-
-Return Hessian function. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::getHessian "";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::gradient "
-
-Return gradient function. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::getGradient "";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::jacobian "
-
-Return Jacobian function. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::getJacobian "";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::getNumericJacobian
-"";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::derivative "
-
-Return function that calculates forward derivatives This method returns a
-cached instance if available, and calls FX getDerivative(int nfwd, int nadj)
-if no cached version is available. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::getDerivative "
-
-Constructs and returns a function that calculates forward derivatives. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::input "
-
-Access input argument. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::input "";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::input "";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::input "";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::inputNoCheck "";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::inputNoCheck "";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::output "
-
-Access output argument. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::output "";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::outputNoCheck "";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::outputNoCheck "";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::fwdSeed "
-
-Access forward seed. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::fwdSeed "";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::fwdSeedNoCheck "";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::fwdSeedNoCheck "";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::fwdSens "
-
-Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::fwdSens "";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::fwdSensNoCheck "";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::fwdSensNoCheck "";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::adjSeed "
-
-Access adjoint seed. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::adjSeed "";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::adjSeedNoCheck "";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::adjSeedNoCheck "";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::adjSens "
-
-Access forward sensitivity. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::adjSens "";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::adjSensNoCheck "";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::adjSensNoCheck "";
-
-%feature("docstring")
-CasADi::MultipleShootingInternal::MultipleShootingInternal "";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::clone "
-
-Make a deep copy of the instance. ";
-
-%feature("docstring")
-CasADi::MultipleShootingInternal::~MultipleShootingInternal "";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::init "
-
-Initialize. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::evaluate "
-
-Evaluate. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::getGuess "";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::getVariableBounds "";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::getConstraintBounds
-"";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::setOptimalSolution
-"";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::reportConstraints "";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::updateNumSens "
-
-Update the number of sensitivity directions during or after initialization,
-if recursive==true, updateNumSens is also invoked for the baseclass. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::requestNumSens "
-
-Request a number of forward/adjoint derivative directions. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::spEvaluate "
-
-Propagate the sparsity pattern through a set of directional derivatives
-forward or backward. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::spCanEvaluate "
-
-Is the class able to propate seeds through the algorithm? ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::spInit "
-
-Reset the sparsity propagation. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::evalSX "
-
-Evaluate symbolically, SX type. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::evalMX "
-
-Evaluate symbolically, MX type. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::call "
-
-Call a function, MX type (overloaded) ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::call "
-
-Call a function, SX type (overloaded) ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::iStruct "
-
-Access an input. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::iStruct "
-
-Const access an input. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::oStruct "
-
-Access an output. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::oStruct "
-
-Const access an output. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::print "
-
-Print. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::repr "
-
-Print. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::inputSchemeEntry "
-
-Find the index for a string describing a particular entry of an input scheme
-example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
-to SCHEME_NLPINput. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::outputSchemeEntry "
-
-Find the index for a string describing a particular entry of an output
-scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
-adheres to SCHEME_NLPINput. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::schemeEntry "
-
-Find the index for a string describing a particular entry of a scheme
-example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
-to SCHEME_NLPINput. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::getPartition "
-
-Get the unidirectional or bidirectional partition. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::verbose "
-
-Verbose mode? ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::monitored "
-
-Is function fcn being monitored. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::setNumInputs "
-
-Set the number of function inputs. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::setNumOutputs "
-
-Set the number of function outputs. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::getNumInputs "
-
-Get the number of function inputs. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::getNumOutputs "
-
-Get the number of function outputs. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::getNumScalarInputs
-"
-
-Get total number of scalar inputs (i.e. the number of nonzeros in all of the
-matrix-valued inputs) ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::getNumScalarOutputs
-"
-
-Get total number of scalar outputs (i.e. the number of nonzeros in all of
-the matrix-valued outputs) ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::getStats "
-
-Get all statistics obtained at the end of the last evaluate call. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::getStat "
-
-Get single statistic obtained at the end of the last evaluate call. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::getJacSparsity "
-
-Generate the sparsity of a Jacobian block. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::setJacSparsity "
-
-Generate the sparsity of a Jacobian block. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::jacSparsity "
-
-Get, if necessary generate, the sparsity of a Jacobian block. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::symbolicInput "
-
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::symbolicInputSX "
-
-Get a vector of symbolic variables with the same dimensions as the inputs.
-";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::log "
-
-Log the status of the solver. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::log "
-
-Log the status of the solver, function given. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::setOption "
-
-set an option. The setOptions are in general only considered before the init
-function, if any. If properties changes, the init function should be called
-again. (Ticket #54) ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::setOption "
-
-set a set of options. The setOptions are in general only considered before
-the init function, if any. If properties changes, the init function should
-be called again. (Ticket #54) ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::getOptionNames "
-
-Get a list of all option names. ";
-
-%feature("docstring")
-CasADi::MultipleShootingInternal::getOptionDescription "
-
-Get the description of a certain option. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::getOptionType "
-
-Get the type of a certain option. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::getOptionTypeName "
-
-Get the type name of a certain option. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::getOptionDefault "
-
-Get the default of a certain option. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::getOptionAllowed "
-
-Get the allowed values of a certain option. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::hasOption "
-
-check if there is an option str ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::hasSetOption "
-
-check if the user has there is an option str ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::printOptions "
-
-Print options to a stream. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::printOption "
-
-Print all information there is to know about a certain option. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::getOption "
-
-get an option value ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::copyOptions "
-
-Copy all options from another object. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::dictionary "
-
-Get the dictionary. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::getBestMatches "
-
-Get th ebest suggestions of option names. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::deepCopyMembers "
-
-Deep copy data members. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::getCount "
-
-Get the reference count. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::isInit "
-
-Check if the object has been initialized. ";
-
-%feature("docstring")  CasADi::MultipleShootingInternal::assertInit "
-
-Assert that the object has been initialized. ";
+C++ includes: a0_schemes.hpp ";
 
 
 // File: classCasADi_1_1Multiplication.xml
@@ -57351,74 +58442,49 @@ Base class for OCP solvers.
 
 Joel Andersson
 
->Input scheme: CasADi::OCPInput (OCP_NUM_IN = 17)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| OCP_T                              | Time grid: ((ns+1) x 1) - default: |
-|                                    | linspace(0,t_final,ns+1) [t].      |
-+------------------------------------+------------------------------------+
-| OCP_LBX                            | States lower bounds (nx x (ns+1))  |
-|                                    | [lbx].                             |
-+------------------------------------+------------------------------------+
-| OCP_UBX                            | States upper bounds (nx x (ns+1))  |
-|                                    | [ubx].                             |
-+------------------------------------+------------------------------------+
-| OCP_X_INIT                         | States initial guess (nx x (ns+1)) |
-|                                    | [x_init].                          |
-+------------------------------------+------------------------------------+
-| OCP_LBXP                           | States deriatives lower bounds (nx |
-|                                    | x (ns+1)) [lbxp].                  |
-+------------------------------------+------------------------------------+
-| OCP_UBXP                           | States deriatives upper bounds (nx |
-|                                    | x (ns+1)) [ubxp].                  |
-+------------------------------------+------------------------------------+
-| OCP_XP_INIT                        | States deriatives initial guess    |
-|                                    | (nx x (ns+1)) [xp_init].           |
-+------------------------------------+------------------------------------+
-| OCP_LBU                            | Controls lower bounds (nu x ns)    |
-|                                    | [lbu].                             |
-+------------------------------------+------------------------------------+
-| OCP_UBU                            | Controls upper bounds (nu x ns)    |
-|                                    | [ubu].                             |
-+------------------------------------+------------------------------------+
-| OCP_U_INIT                         | Controls initial guess (nu x ns)   |
-|                                    | [u_init].                          |
-+------------------------------------+------------------------------------+
-| OCP_LBP                            | Parameters lower bounds (np x 1)   |
-|                                    | [lbp].                             |
-+------------------------------------+------------------------------------+
-| OCP_UBP                            | Parameters upper bounds (np x 1)   |
-|                                    | [ubp].                             |
-+------------------------------------+------------------------------------+
-| OCP_P_INIT                         | Parameters initial guess (np x 1)  |
-|                                    | [p_init].                          |
-+------------------------------------+------------------------------------+
-| OCP_LBH                            | Point constraint lower bound (nh x |
-|                                    | (ns+1)) [lbh].                     |
-+------------------------------------+------------------------------------+
-| OCP_UBH                            | Point constraint upper bound (nh x |
-|                                    | (ns+1)) [ubh].                     |
-+------------------------------------+------------------------------------+
-| OCP_LBG                            | Lower bound for the coupling       |
-|                                    | constraints [lbg].                 |
-+------------------------------------+------------------------------------+
-| OCP_UBG                            | Upper bound for the coupling       |
-|                                    | constraints [ubg].                 |
-+------------------------------------+------------------------------------+
+>Input scheme: CasADi::OCPInput (OCP_NUM_IN = 13)
++------------+---------------------------------------------------+
+|    Name    |                    Description                    |
++============+===================================================+
+| OCP_LBX    | States lower bounds (nx x (ns+1)) [lbx].          |
++------------+---------------------------------------------------+
+| OCP_UBX    | States upper bounds (nx x (ns+1)) [ubx].          |
++------------+---------------------------------------------------+
+| OCP_X_INIT | States initial guess (nx x (ns+1)) [x_init].      |
++------------+---------------------------------------------------+
+| OCP_LBU    | Controls lower bounds (nu x ns) [lbu].            |
++------------+---------------------------------------------------+
+| OCP_UBU    | Controls upper bounds (nu x ns) [ubu].            |
++------------+---------------------------------------------------+
+| OCP_U_INIT | Controls initial guess (nu x ns) [u_init].        |
++------------+---------------------------------------------------+
+| OCP_LBP    | Parameters lower bounds (np x 1) [lbp].           |
++------------+---------------------------------------------------+
+| OCP_UBP    | Parameters upper bounds (np x 1) [ubp].           |
++------------+---------------------------------------------------+
+| OCP_P_INIT | Parameters initial guess (np x 1) [p_init].       |
++------------+---------------------------------------------------+
+| OCP_LBH    | Point constraint lower bound (nh x (ns+1)) [lbh]. |
++------------+---------------------------------------------------+
+| OCP_UBH    | Point constraint upper bound (nh x (ns+1)) [ubh]. |
++------------+---------------------------------------------------+
+| OCP_LBG    | Lower bound for the coupling constraints [lbg].   |
++------------+---------------------------------------------------+
+| OCP_UBG    | Upper bound for the coupling constraints [ubg].   |
++------------+---------------------------------------------------+
 
 >Output scheme: CasADi::OCPOutput (OCP_NUM_OUT = 4)
-+------------+-----------------------------------------------+
-|    Name    |                  Description                  |
-+============+===============================================+
-| OCP_X_OPT  | Optimal state trajectory [x_opt].             |
-+------------+-----------------------------------------------+
-| OCP_U_OPT  | Optimal control trajectory [u_opt].           |
-+------------+-----------------------------------------------+
-| OCP_XP_OPT | Optimal state derivative trajectory [xp_opt]. |
-+------------+-----------------------------------------------+
-| OCP_P_OPT  | Optimal parameters [p_opt].                   |
-+------------+-----------------------------------------------+
++-----------+--------------------------------------------------------------+
+|   Name    |                         Description                          |
++===========+==============================================================+
+| OCP_X_OPT | Optimal state trajectory [x_opt].                            |
++-----------+--------------------------------------------------------------+
+| OCP_U_OPT | Optimal control trajectory [u_opt].                          |
++-----------+--------------------------------------------------------------+
+| OCP_P_OPT | Optimal parameters [p_opt].                                  |
++-----------+--------------------------------------------------------------+
+| OCP_COST  | Objective/cost function for optimal solution (1 x 1) [cost]. |
++-----------+--------------------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -58134,74 +59200,49 @@ Internal node class for OCPSolver.
 
 Joel Andersson
 
->Input scheme: CasADi::OCPInput (OCP_NUM_IN = 17)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| OCP_T                              | Time grid: ((ns+1) x 1) - default: |
-|                                    | linspace(0,t_final,ns+1) [t].      |
-+------------------------------------+------------------------------------+
-| OCP_LBX                            | States lower bounds (nx x (ns+1))  |
-|                                    | [lbx].                             |
-+------------------------------------+------------------------------------+
-| OCP_UBX                            | States upper bounds (nx x (ns+1))  |
-|                                    | [ubx].                             |
-+------------------------------------+------------------------------------+
-| OCP_X_INIT                         | States initial guess (nx x (ns+1)) |
-|                                    | [x_init].                          |
-+------------------------------------+------------------------------------+
-| OCP_LBXP                           | States deriatives lower bounds (nx |
-|                                    | x (ns+1)) [lbxp].                  |
-+------------------------------------+------------------------------------+
-| OCP_UBXP                           | States deriatives upper bounds (nx |
-|                                    | x (ns+1)) [ubxp].                  |
-+------------------------------------+------------------------------------+
-| OCP_XP_INIT                        | States deriatives initial guess    |
-|                                    | (nx x (ns+1)) [xp_init].           |
-+------------------------------------+------------------------------------+
-| OCP_LBU                            | Controls lower bounds (nu x ns)    |
-|                                    | [lbu].                             |
-+------------------------------------+------------------------------------+
-| OCP_UBU                            | Controls upper bounds (nu x ns)    |
-|                                    | [ubu].                             |
-+------------------------------------+------------------------------------+
-| OCP_U_INIT                         | Controls initial guess (nu x ns)   |
-|                                    | [u_init].                          |
-+------------------------------------+------------------------------------+
-| OCP_LBP                            | Parameters lower bounds (np x 1)   |
-|                                    | [lbp].                             |
-+------------------------------------+------------------------------------+
-| OCP_UBP                            | Parameters upper bounds (np x 1)   |
-|                                    | [ubp].                             |
-+------------------------------------+------------------------------------+
-| OCP_P_INIT                         | Parameters initial guess (np x 1)  |
-|                                    | [p_init].                          |
-+------------------------------------+------------------------------------+
-| OCP_LBH                            | Point constraint lower bound (nh x |
-|                                    | (ns+1)) [lbh].                     |
-+------------------------------------+------------------------------------+
-| OCP_UBH                            | Point constraint upper bound (nh x |
-|                                    | (ns+1)) [ubh].                     |
-+------------------------------------+------------------------------------+
-| OCP_LBG                            | Lower bound for the coupling       |
-|                                    | constraints [lbg].                 |
-+------------------------------------+------------------------------------+
-| OCP_UBG                            | Upper bound for the coupling       |
-|                                    | constraints [ubg].                 |
-+------------------------------------+------------------------------------+
+>Input scheme: CasADi::OCPInput (OCP_NUM_IN = 13)
++------------+---------------------------------------------------+
+|    Name    |                    Description                    |
++============+===================================================+
+| OCP_LBX    | States lower bounds (nx x (ns+1)) [lbx].          |
++------------+---------------------------------------------------+
+| OCP_UBX    | States upper bounds (nx x (ns+1)) [ubx].          |
++------------+---------------------------------------------------+
+| OCP_X_INIT | States initial guess (nx x (ns+1)) [x_init].      |
++------------+---------------------------------------------------+
+| OCP_LBU    | Controls lower bounds (nu x ns) [lbu].            |
++------------+---------------------------------------------------+
+| OCP_UBU    | Controls upper bounds (nu x ns) [ubu].            |
++------------+---------------------------------------------------+
+| OCP_U_INIT | Controls initial guess (nu x ns) [u_init].        |
++------------+---------------------------------------------------+
+| OCP_LBP    | Parameters lower bounds (np x 1) [lbp].           |
++------------+---------------------------------------------------+
+| OCP_UBP    | Parameters upper bounds (np x 1) [ubp].           |
++------------+---------------------------------------------------+
+| OCP_P_INIT | Parameters initial guess (np x 1) [p_init].       |
++------------+---------------------------------------------------+
+| OCP_LBH    | Point constraint lower bound (nh x (ns+1)) [lbh]. |
++------------+---------------------------------------------------+
+| OCP_UBH    | Point constraint upper bound (nh x (ns+1)) [ubh]. |
++------------+---------------------------------------------------+
+| OCP_LBG    | Lower bound for the coupling constraints [lbg].   |
++------------+---------------------------------------------------+
+| OCP_UBG    | Upper bound for the coupling constraints [ubg].   |
++------------+---------------------------------------------------+
 
 >Output scheme: CasADi::OCPOutput (OCP_NUM_OUT = 4)
-+------------+-----------------------------------------------+
-|    Name    |                  Description                  |
-+============+===============================================+
-| OCP_X_OPT  | Optimal state trajectory [x_opt].             |
-+------------+-----------------------------------------------+
-| OCP_U_OPT  | Optimal control trajectory [u_opt].           |
-+------------+-----------------------------------------------+
-| OCP_XP_OPT | Optimal state derivative trajectory [xp_opt]. |
-+------------+-----------------------------------------------+
-| OCP_P_OPT  | Optimal parameters [p_opt].                   |
-+------------+-----------------------------------------------+
++-----------+--------------------------------------------------------------+
+|   Name    |                         Description                          |
++===========+==============================================================+
+| OCP_X_OPT | Optimal state trajectory [x_opt].                            |
++-----------+--------------------------------------------------------------+
+| OCP_U_OPT | Optimal control trajectory [u_opt].                          |
++-----------+--------------------------------------------------------------+
+| OCP_P_OPT | Optimal parameters [p_opt].                                  |
++-----------+--------------------------------------------------------------+
+| OCP_COST  | Objective/cost function for optimal solution (1 x 1) [cost]. |
++-----------+--------------------------------------------------------------+
 
 >List of available options
 +--------------+--------------+--------------+--------------+--------------+
@@ -70338,12 +71379,15 @@ Constructor. ";
 |              |              |              | forward      |              |
 |              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| exact_jacobi | OT_BOOLEAN   | false        | Use exact    | CasADi::Sund |
-| anB          |              |              | Jacobian     | ialsInternal |
+| exact_jacobi | OT_BOOLEAN   | GenericType( | Use exact    | CasADi::Sund |
+| anB          |              | )            | Jacobian     | ialsInternal |
 |              |              |              | information  |              |
 |              |              |              | for the      |              |
 |              |              |              | backward     |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to exa |              |
+|              |              |              | ct_jacobian] |              |
 +--------------+--------------+--------------+--------------+--------------+
 | finite_diffe | OT_BOOLEAN   | false        | Use finite   | CasADi::Sund |
 | rence_fsens  |              |              | differences  | ialsInternal |
@@ -70426,8 +71470,8 @@ Constructor. ";
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
 | lver         |              |              | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
-| lverB        |              |              | ab|tfqmr)    | ialsInternal |
+| iterative_so | OT_STRING    | GenericType( | (gmres|bcgst | CasADi::Sund |
+| lverB        |              | )            | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -70455,6 +71499,9 @@ Constructor. ";
 |              |              |              | function for |              |
 |              |              |              | backwards    |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to lin |              |
+|              |              |              | ear_solver]  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Sund |
 | r_options    | Y            | )            | be passed to | ialsInternal |
@@ -70467,14 +71514,18 @@ Constructor. ";
 |              |              |              | solver for   |              |
 |              |              |              | backwards    |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to lin |              |
+|              |              |              | ear_solver_o |              |
+|              |              |              | ptions]      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
 | r_type       |              |              | d|dense|band | ialsInternal |
 |              |              |              | ed|iterative |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
-| r_typeB      |              |              | d|dense|band | ialsInternal |
+| linear_solve | OT_STRING    | GenericType( | (user_define | CasADi::Sund |
+| r_typeB      |              | )            | d|dense|band | ialsInternal |
 |              |              |              | ed|iterative |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -70490,14 +71541,18 @@ Constructor. ";
 |              |              |              | jacobians    |              |
 |              |              |              | for backward |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to low |              |
+|              |              |              | er_bandwidth |              |
+|              |              |              | ]            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | max_krylov   | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
 |              |              |              | Krylov       | ialsInternal |
 |              |              |              | subspace     |              |
 |              |              |              | size         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_krylovB  | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
-|              |              |              | krylov       | ialsInternal |
+| max_krylovB  | OT_INTEGER   | GenericType( | Maximum      | CasADi::Sund |
+|              |              | )            | krylov       | ialsInternal |
 |              |              |              | subspace     |              |
 |              |              |              | size         |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -70571,8 +71626,8 @@ Constructor. ";
 | pretype      | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
 |              |              |              | ight|both)   | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| pretypeB     | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
-|              |              |              | ight|both)   | ialsInternal |
+| pretypeB     | OT_STRING    | GenericType( | (none|left|r | CasADi::Sund |
+|              |              | )            | ight|both)   | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
 | print_stats  | OT_BOOLEAN   | false        | Print out    | CasADi::Inte |
 |              |              |              | statistics   | gratorIntern |
@@ -70668,17 +71723,25 @@ Constructor. ";
 |              |              |              | jacobians    |              |
 |              |              |              | for backward |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to upp |              |
+|              |              |              | er_bandwidth |              |
+|              |              |              | ]            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | use_precondi | OT_BOOLEAN   | false        | Precondition | CasADi::Sund |
 | tioner       |              |              | an iterative | ialsInternal |
 |              |              |              | solver       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| use_precondi | OT_BOOLEAN   | false        | Precondition | CasADi::Sund |
-| tionerB      |              |              | an iterative | ialsInternal |
+| use_precondi | OT_BOOLEAN   | GenericType( | Precondition | CasADi::Sund |
+| tionerB      |              | )            | an iterative | ialsInternal |
 |              |              |              | solver for   |              |
 |              |              |              | the          |              |
 |              |              |              | backwards    |              |
 |              |              |              | problem      |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to use |              |
+|              |              |              | _preconditio |              |
+|              |              |              | ner]         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
 |              |              | )            | defined      | ternal       |
@@ -71370,12 +72433,15 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | forward      |              |
 |              |              |              | integration  |              |
 +--------------+--------------+--------------+--------------+--------------+
-| exact_jacobi | OT_BOOLEAN   | false        | Use exact    | CasADi::Sund |
-| anB          |              |              | Jacobian     | ialsInternal |
+| exact_jacobi | OT_BOOLEAN   | GenericType( | Use exact    | CasADi::Sund |
+| anB          |              | )            | Jacobian     | ialsInternal |
 |              |              |              | information  |              |
 |              |              |              | for the      |              |
 |              |              |              | backward     |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to exa |              |
+|              |              |              | ct_jacobian] |              |
 +--------------+--------------+--------------+--------------+--------------+
 | finite_diffe | OT_BOOLEAN   | false        | Use finite   | CasADi::Sund |
 | rence_fsens  |              |              | differences  | ialsInternal |
@@ -71458,8 +72524,8 @@ Return a string with a destription (for SWIG) ";
 | iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
 | lver         |              |              | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| iterative_so | OT_STRING    | \"gmres\"      | (gmres|bcgst | CasADi::Sund |
-| lverB        |              |              | ab|tfqmr)    | ialsInternal |
+| iterative_so | OT_STRING    | GenericType( | (gmres|bcgst | CasADi::Sund |
+| lverB        |              | )            | ab|tfqmr)    | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
 | jacobian_gen | OT_JACOBIANG | GenericType( | Function     | CasADi::FXIn |
 | erator       | ENERATOR     | )            | pointer that | ternal       |
@@ -71487,6 +72553,9 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | function for |              |
 |              |              |              | backwards    |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to lin |              |
+|              |              |              | ear_solver]  |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_DICTIONAR | GenericType( | Options to   | CasADi::Sund |
 | r_options    | Y            | )            | be passed to | ialsInternal |
@@ -71499,14 +72568,18 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | solver for   |              |
 |              |              |              | backwards    |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to lin |              |
+|              |              |              | ear_solver_o |              |
+|              |              |              | ptions]      |              |
 +--------------+--------------+--------------+--------------+--------------+
 | linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
 | r_type       |              |              | d|dense|band | ialsInternal |
 |              |              |              | ed|iterative |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
-| linear_solve | OT_STRING    | \"dense\"      | (user_define | CasADi::Sund |
-| r_typeB      |              |              | d|dense|band | ialsInternal |
+| linear_solve | OT_STRING    | GenericType( | (user_define | CasADi::Sund |
+| r_typeB      |              | )            | d|dense|band | ialsInternal |
 |              |              |              | ed|iterative |              |
 |              |              |              | )            |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -71522,14 +72595,18 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | jacobians    |              |
 |              |              |              | for backward |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to low |              |
+|              |              |              | er_bandwidth |              |
+|              |              |              | ]            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | max_krylov   | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
 |              |              |              | Krylov       | ialsInternal |
 |              |              |              | subspace     |              |
 |              |              |              | size         |              |
 +--------------+--------------+--------------+--------------+--------------+
-| max_krylovB  | OT_INTEGER   | 10           | Maximum      | CasADi::Sund |
-|              |              |              | krylov       | ialsInternal |
+| max_krylovB  | OT_INTEGER   | GenericType( | Maximum      | CasADi::Sund |
+|              |              | )            | krylov       | ialsInternal |
 |              |              |              | subspace     |              |
 |              |              |              | size         |              |
 +--------------+--------------+--------------+--------------+--------------+
@@ -71603,8 +72680,8 @@ Return a string with a destription (for SWIG) ";
 | pretype      | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
 |              |              |              | ight|both)   | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
-| pretypeB     | OT_STRING    | \"none\"       | (none|left|r | CasADi::Sund |
-|              |              |              | ight|both)   | ialsInternal |
+| pretypeB     | OT_STRING    | GenericType( | (none|left|r | CasADi::Sund |
+|              |              | )            | ight|both)   | ialsInternal |
 +--------------+--------------+--------------+--------------+--------------+
 | print_stats  | OT_BOOLEAN   | false        | Print out    | CasADi::Inte |
 |              |              |              | statistics   | gratorIntern |
@@ -71700,17 +72777,25 @@ Return a string with a destription (for SWIG) ";
 |              |              |              | jacobians    |              |
 |              |              |              | for backward |              |
 |              |              |              | integration  |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to upp |              |
+|              |              |              | er_bandwidth |              |
+|              |              |              | ]            |              |
 +--------------+--------------+--------------+--------------+--------------+
 | use_precondi | OT_BOOLEAN   | false        | Precondition | CasADi::Sund |
 | tioner       |              |              | an iterative | ialsInternal |
 |              |              |              | solver       |              |
 +--------------+--------------+--------------+--------------+--------------+
-| use_precondi | OT_BOOLEAN   | false        | Precondition | CasADi::Sund |
-| tionerB      |              |              | an iterative | ialsInternal |
+| use_precondi | OT_BOOLEAN   | GenericType( | Precondition | CasADi::Sund |
+| tionerB      |              | )            | an iterative | ialsInternal |
 |              |              |              | solver for   |              |
 |              |              |              | the          |              |
 |              |              |              | backwards    |              |
 |              |              |              | problem      |              |
+|              |              |              | [default:    |              |
+|              |              |              | equal to use |              |
+|              |              |              | _preconditio |              |
+|              |              |              | ner]         |              |
 +--------------+--------------+--------------+--------------+--------------+
 | user_data    | OT_VOIDPTR   | GenericType( | A user-      | CasADi::FXIn |
 |              |              | )            | defined      | ternal       |
@@ -79669,61 +80754,36 @@ intergation: ffcn.input(INTEGRATOR_P).size() nu: Number of controls: from nc
 - np  np: Number of parameters: from option number_of_parameters  nh: Number
 of point constraints: from cfcn.input(0).size()
 
->Input scheme: CasADi::OCPInput (OCP_NUM_IN = 17)
-+------------------------------------+------------------------------------+
-|                Name                |            Description             |
-+====================================+====================================+
-| OCP_T                              | Time grid: ((ns+1) x 1) - default: |
-|                                    | linspace(0,t_final,ns+1) [t].      |
-+------------------------------------+------------------------------------+
-| OCP_LBX                            | States lower bounds (nx x (ns+1))  |
-|                                    | [lbx].                             |
-+------------------------------------+------------------------------------+
-| OCP_UBX                            | States upper bounds (nx x (ns+1))  |
-|                                    | [ubx].                             |
-+------------------------------------+------------------------------------+
-| OCP_X_INIT                         | States initial guess (nx x (ns+1)) |
-|                                    | [x_init].                          |
-+------------------------------------+------------------------------------+
-| OCP_LBXP                           | States deriatives lower bounds (nx |
-|                                    | x (ns+1)) [lbxp].                  |
-+------------------------------------+------------------------------------+
-| OCP_UBXP                           | States deriatives upper bounds (nx |
-|                                    | x (ns+1)) [ubxp].                  |
-+------------------------------------+------------------------------------+
-| OCP_XP_INIT                        | States deriatives initial guess    |
-|                                    | (nx x (ns+1)) [xp_init].           |
-+------------------------------------+------------------------------------+
-| OCP_LBU                            | Controls lower bounds (nu x ns)    |
-|                                    | [lbu].                             |
-+------------------------------------+------------------------------------+
-| OCP_UBU                            | Controls upper bounds (nu x ns)    |
-|                                    | [ubu].                             |
-+------------------------------------+------------------------------------+
-| OCP_U_INIT                         | Controls initial guess (nu x ns)   |
-|                                    | [u_init].                          |
-+------------------------------------+------------------------------------+
-| OCP_LBP                            | Parameters lower bounds (np x 1)   |
-|                                    | [lbp].                             |
-+------------------------------------+------------------------------------+
-| OCP_UBP                            | Parameters upper bounds (np x 1)   |
-|                                    | [ubp].                             |
-+------------------------------------+------------------------------------+
-| OCP_P_INIT                         | Parameters initial guess (np x 1)  |
-|                                    | [p_init].                          |
-+------------------------------------+------------------------------------+
-| OCP_LBH                            | Point constraint lower bound (nh x |
-|                                    | (ns+1)) [lbh].                     |
-+------------------------------------+------------------------------------+
-| OCP_UBH                            | Point constraint upper bound (nh x |
-|                                    | (ns+1)) [ubh].                     |
-+------------------------------------+------------------------------------+
-| OCP_LBG                            | Lower bound for the coupling       |
-|                                    | constraints [lbg].                 |
-+------------------------------------+------------------------------------+
-| OCP_UBG                            | Upper bound for the coupling       |
-|                                    | constraints [ubg].                 |
-+------------------------------------+------------------------------------+
+>Input scheme: CasADi::OCPInput (OCP_NUM_IN = 13)
++------------+---------------------------------------------------+
+|    Name    |                    Description                    |
++============+===================================================+
+| OCP_LBX    | States lower bounds (nx x (ns+1)) [lbx].          |
++------------+---------------------------------------------------+
+| OCP_UBX    | States upper bounds (nx x (ns+1)) [ubx].          |
++------------+---------------------------------------------------+
+| OCP_X_INIT | States initial guess (nx x (ns+1)) [x_init].      |
++------------+---------------------------------------------------+
+| OCP_LBU    | Controls lower bounds (nu x ns) [lbu].            |
++------------+---------------------------------------------------+
+| OCP_UBU    | Controls upper bounds (nu x ns) [ubu].            |
++------------+---------------------------------------------------+
+| OCP_U_INIT | Controls initial guess (nu x ns) [u_init].        |
++------------+---------------------------------------------------+
+| OCP_LBP    | Parameters lower bounds (np x 1) [lbp].           |
++------------+---------------------------------------------------+
+| OCP_UBP    | Parameters upper bounds (np x 1) [ubp].           |
++------------+---------------------------------------------------+
+| OCP_P_INIT | Parameters initial guess (np x 1) [p_init].       |
++------------+---------------------------------------------------+
+| OCP_LBH    | Point constraint lower bound (nh x (ns+1)) [lbh]. |
++------------+---------------------------------------------------+
+| OCP_UBH    | Point constraint upper bound (nh x (ns+1)) [ubh]. |
++------------+---------------------------------------------------+
+| OCP_LBG    | Lower bound for the coupling constraints [lbg].   |
++------------+---------------------------------------------------+
+| OCP_UBG    | Upper bound for the coupling constraints [ubg].   |
++------------+---------------------------------------------------+
 ";
 
 %feature("docstring")  CasADi::ocpOut "
@@ -79731,17 +80791,17 @@ of point constraints: from cfcn.input(0).size()
 Helper function for 'OCPOutput' Output arguments of an OCP Solver
 
 >Output scheme: CasADi::OCPOutput (OCP_NUM_OUT = 4)
-+------------+-----------------------------------------------+
-|    Name    |                  Description                  |
-+============+===============================================+
-| OCP_X_OPT  | Optimal state trajectory [x_opt].             |
-+------------+-----------------------------------------------+
-| OCP_U_OPT  | Optimal control trajectory [u_opt].           |
-+------------+-----------------------------------------------+
-| OCP_XP_OPT | Optimal state derivative trajectory [xp_opt]. |
-+------------+-----------------------------------------------+
-| OCP_P_OPT  | Optimal parameters [p_opt].                   |
-+------------+-----------------------------------------------+
++-----------+--------------------------------------------------------------+
+|   Name    |                         Description                          |
++===========+==============================================================+
+| OCP_X_OPT | Optimal state trajectory [x_opt].                            |
++-----------+--------------------------------------------------------------+
+| OCP_U_OPT | Optimal control trajectory [u_opt].                          |
++-----------+--------------------------------------------------------------+
+| OCP_P_OPT | Optimal parameters [p_opt].                                  |
++-----------+--------------------------------------------------------------+
+| OCP_COST  | Objective/cost function for optimal solution (1 x 1) [cost]. |
++-----------+--------------------------------------------------------------+
 ";
 
 %feature("docstring")  CasADi::qpIn "
@@ -81667,12 +82727,6 @@ h:  internal expressions which the user may wish to inspect ";
 // File: casadi__types_8hpp.xml
 
 
-// File: collocation_8cpp.xml
-
-
-// File: collocation_8hpp.xml
-
-
 // File: collocation__integrator_8cpp.xml
 
 
@@ -81683,12 +82737,6 @@ h:  internal expressions which the user may wish to inspect ";
 
 
 // File: collocation__integrator__internal_8hpp.xml
-
-
-// File: collocation__internal_8cpp.xml
-
-
-// File: collocation__internal_8hpp.xml
 
 
 // File: constant__mx_8cpp.xml
@@ -81794,6 +82842,42 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: derivative__internal_8hpp.xml
+
+
+// File: direct__collocation_8cpp.xml
+
+
+// File: direct__collocation_8hpp.xml
+
+
+// File: direct__collocation__internal_8cpp.xml
+
+
+// File: direct__collocation__internal_8hpp.xml
+
+
+// File: direct__multiple__shooting_8cpp.xml
+
+
+// File: direct__multiple__shooting_8hpp.xml
+
+
+// File: direct__multiple__shooting__internal_8cpp.xml
+
+
+// File: direct__multiple__shooting__internal_8hpp.xml
+
+
+// File: direct__single__shooting_8cpp.xml
+
+
+// File: direct__single__shooting_8hpp.xml
+
+
+// File: direct__single__shooting__internal_8cpp.xml
+
+
+// File: direct__single__shooting__internal_8hpp.xml
 
 
 // File: dotdraw_8hpp.xml
@@ -82112,18 +83196,6 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: multiple__output_8hpp.xml
-
-
-// File: multiple__shooting_8cpp.xml
-
-
-// File: multiple__shooting_8hpp.xml
-
-
-// File: multiple__shooting__internal_8cpp.xml
-
-
-// File: multiple__shooting__internal_8hpp.xml
 
 
 // File: multiplication_8cpp.xml
