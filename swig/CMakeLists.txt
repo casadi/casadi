@@ -307,9 +307,13 @@ if(PYTHONINTERP_FOUND)
     string(REGEX REPLACE "\\\\" "/" PYTHON_INSTALLATION_PATH ${PYTHON_INSTALLATION_PATH})
   endif()
 
+  if(NOT DEFINED PYTHON_PREFIX )
+    set(PYTHON_PREFIX  ${PYTHON_INSTALLATION_PATH} CACHE INTERNAL "Python installation prefix")
+  endif()
+
   #since in the main CMakeLists.txt we used "add_subdirectory(swig EXCLUDE_FROM_ALL)" the following install command won't add anything to "make install"
   install(DIRECTORY ${PROJECT_BINARY_DIR}/python/casadi 
-    DESTINATION ${PYTHON_INSTALLATION_PATH}
+    DESTINATION ${PYTHON_PREFIX}
     COMPONENT install_python
     USE_SOURCE_PERMISSIONS
     PATTERN .svn EXCLUDE
