@@ -130,6 +130,10 @@ void FXInternal::updateNumSens(bool recursive){
     it->dataF.resize(nfdir_,it->data);
     it->dataA.resize(nadir_,it->data);
   }
+
+  // Allocate memory for compression marker
+  compressed_fwd_.resize(nfdir_);
+  compressed_adj_.resize(nadir_);
 }
 
 void FXInternal::requestNumSens(int nfwd, int nadj){
@@ -867,6 +871,107 @@ void FXInternal::getPartition(int iind, int oind, CRSSparsity& D1, CRSSparsity& 
       }
     }
     log("FXInternal::getPartition end");
+  }
+}
+
+void FXInternal::evaluateCompressed(int nfdir, int nadir){
+  // Counter for compressed forward directions
+  int nfdir_compressed=0;
+
+  // Check if any forward directions are all zero
+  for(int dir=0; dir<nfdir; ++dir){
+    
+    // Can we compress this direction?
+    compressed_fwd_[dir] = true;
+
+    // Look out for nonzeros
+    for(int ind=0; compressed_fwd_[dir] && ind<getNumInputs(); ++ind){
+      const vector<double>& v = fwdSeedNoCheck(ind,dir).data();
+      for(vector<double>::const_iterator it=v.begin(); compressed_fwd_[dir] && it!=v.end(); ++it){
+	if(*it!=0) compressed_fwd_[dir]=false;
+      }
+    }
+
+    // Skip if we can indeed compress
+    if(compressed_fwd_[dir]) continue;
+    
+    // Move the direction to a previous direction if different
+    if(dir!=nfdir_compressed){
+      for(int ind=0; ind<getNumInputs(); ++ind){
+	const vector<double>& v_old = fwdSeedNoCheck(ind,dir).data();
+	vector<double>& v_new = fwdSeedNoCheck(ind,nfdir_compressed).data();
+	copy(v_old.begin(),v_old.end(),v_new.begin());
+      }
+    }
+    
+    // Increase direction counter
+    nfdir_compressed++;
+  }
+
+  // Counter for compressed adjoint directions
+  int nadir_compressed=0;
+
+  // Check if any adjoint directions are all zero
+  for(int dir=0; dir<nadir; ++dir){
+    
+    // Can we compress this direction?
+    compressed_adj_[dir] = true;
+
+    // Look out for nonzeros
+    for(int ind=0; compressed_adj_[dir] && ind<getNumOutputs(); ++ind){
+      const vector<double>& v = adjSeedNoCheck(ind,dir).data();
+      for(vector<double>::const_iterator it=v.begin(); compressed_adj_[dir] && it!=v.end(); ++it){
+	if(*it!=0) compressed_adj_[dir]=false;
+      }
+    }
+
+    // Skip if we can indeed compress
+    if(compressed_adj_[dir]) continue;
+    
+    // Move the direction to a previous direction if different
+    if(dir!=nadir_compressed){
+      for(int ind=0; ind<getNumOutputs(); ++ind){
+	const vector<double>& v_old = adjSeedNoCheck(ind,dir).data();
+	vector<double>& v_new = adjSeedNoCheck(ind,nadir_compressed).data();
+	copy(v_old.begin(),v_old.end(),v_new.begin());
+      }
+    }
+    
+    // Increase direction counter
+    nadir_compressed++;
+  }
+  
+  // Evaluate compressed
+  evaluate(nfdir_compressed,nadir_compressed);
+
+  // Decompress forward directions in reverse order
+  for(int dir=nfdir-1; dir>=0; --dir){
+    if(compressed_fwd_[dir]){
+      for(int ind=0; ind<getNumOutputs(); ++ind){
+	fwdSensNoCheck(ind,dir).setZero();
+      }
+    } else if(--nfdir_compressed != dir){
+      for(int ind=0; ind<getNumOutputs(); ++ind){
+	const vector<double>& v_old = fwdSensNoCheck(ind,nfdir_compressed).data();
+	vector<double>& v_new = fwdSensNoCheck(ind,dir).data();
+	copy(v_old.begin(),v_old.end(),v_new.begin());
+      }
+    }
+  }
+
+  // Decompress adjoint directions in reverse order
+  for(int dir=nadir-1; dir>=0; --dir){
+    if(compressed_adj_[dir]){
+      for(int ind=0; ind<getNumInputs(); ++ind){
+	adjSensNoCheck(ind,dir).setZero();
+      }
+    } else if(--nadir_compressed != dir){
+      for(int ind=0; ind<getNumInputs(); ++ind){
+	const vector<double>& v_old = adjSensNoCheck(ind,nadir_compressed).data();
+	vector<double>& v_new = adjSensNoCheck(ind,dir).data();
+	copy(v_old.begin(),v_old.end(),v_new.begin());
+      }
+    }
   }
 }
 
