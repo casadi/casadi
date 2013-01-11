@@ -127,8 +127,6 @@ void DirectSingleShootingInternal::init(){
   // Terminal constraints
   G_ = MXFunction(V,vertcat(nlp_g));
   G_.setOption("name","nlp_g");
-  G_.setOption("numeric_jacobian",false);
-  G_.setOption("ad_mode","forward");
   G_.init();
   
   // Objective function
