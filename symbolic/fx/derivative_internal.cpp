@@ -86,6 +86,22 @@ void DerivativeInternal::init(){
   // Call the base class init routine
   FXInternal::init();
 
+  // Get the number of scalar inputs and outputs
+  int num_in_scalar = fcn_.getNumScalarInputs();
+  int num_out_scalar = fcn_.getNumScalarOutputs();
+  
+  // Adjoint mode penalty factor (adjoint mode is usually more expensive to calculate)
+  int adj_penalty = 2;
+
+  // Crude estimate of the cost of calculating the full Jacobian
+  int full_jac_cost = std::min(num_in_scalar, adj_penalty*num_out_scalar);
+
+  // Crude estimate of the cost of calculating the directional derivatives
+  int der_dir_cost = nfwd_ + adj_penalty*nadj_;
+
+  // Check if it is cheaper to calculate the full Jacobian and then multiply
+  casadi_assert_warning(der_dir_cost <= 2*full_jac_cost, "Inefficient directional derivative calculation.");
+
   // Request an increase in the number of directional derivatives
   fcn_.requestNumSens(nfwd_,nadj_);
 }

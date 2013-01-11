@@ -975,8 +975,9 @@ FX FXInternal::derivative(int nfwd, int nadj){
   // Return value
   FX& ret = derivative_fcn_[nfwd][nadj];
 
-  // Check if already cached
+  // Generate if not already cached
   if(ret.isNull()){
+
     // Generate a new function
     ret = getDerivative(nfwd,nadj);
     
