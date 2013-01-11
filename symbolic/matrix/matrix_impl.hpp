@@ -1668,6 +1668,27 @@ Matrix<T> Matrix<T>::sparse(int n, int m){
 }
 
 template<class T>
+Matrix<T> Matrix<T>::sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d) {
+  return sparse(row,col,d,*std::max_element(row.begin(),row.end()),*std::max_element(col.begin(),col.end()));
+}
+
+template<class T>
+Matrix<T> Matrix<T>::sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d, const std::pair<int,int>& nm) {
+  return sparse(row,col,d,nm.first,nm.second);
+}
+
+template<class T>
+Matrix<T> Matrix<T>::sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d, int n, int m) {
+  casadi_assert_message(row.size()==col.size() && row.size()==d.size(),"Argument error in Matrix<T>::sparse(row,col,d): supplied lists must all be of equal length, but got: " << row.size() << ", " << col.size()  << " and " << d.size());
+  std::vector<int> mapping;
+  Matrix<T> ret(sp_triplet(n,m,row,col,mapping),0);
+  
+  for (int k=0;k<mapping.size();++k) ret.data()[k] = d[mapping[k]];
+  
+  return ret;
+}
+
+template<class T>
 Matrix<T> Matrix<T>::zeros(const std::pair<int,int> &nm){
   return zeros(nm.first,nm.second);
 }

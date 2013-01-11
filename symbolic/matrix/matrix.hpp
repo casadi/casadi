@@ -636,7 +636,18 @@ class Matrix : public GenericExpression<Matrix<T> >, public GenericMatrix<Matrix
     static Matrix<T> sparse(int nrow, int ncol=1);
     static Matrix<T> sparse(const std::pair<int,int>& nm);
     //@}
-
+    
+    /* \brief Construct a sparse matrix from triplet form
+    * Matrix size will be max(row) x max(col)
+    */
+    static Matrix<T> sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d);
+    
+    //@{
+    /// \brief Construct a sparse matrix from triplet form
+    static Matrix<T> sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d, int n, int m);
+    static Matrix<T> sparse(const std::vector<int>& row, const std::vector<int>& col, const std::vector<T>& d, const std::pair<int,int>& nm);
+    //@}
+    
     //@{
     /** \brief  create a dense matrix with all zeros */
     static Matrix<T> zeros(int nrow, int ncol=1);
