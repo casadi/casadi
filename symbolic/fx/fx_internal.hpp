@@ -325,6 +325,12 @@ class FXInternal : public OptionsFunctionalityNode{
     /// Generate the sparsity of a Jacobian block
     virtual CRSSparsity getJacSparsity(int iind, int oind);
     
+    /// A flavour of getJacSparsity without any magic
+    CRSSparsity getJacSparsityPlain(int iind, int oind);
+    
+    /// A flavour of getJacSparsity that does hierachical block structure recognition
+    CRSSparsity getJacSparsityHierarchical(int iind, int oind);
+    
     /// Generate the sparsity of a Jacobian block
     void setJacSparsity(const CRSSparsity& sp, int iind, int oind, bool compact);
     

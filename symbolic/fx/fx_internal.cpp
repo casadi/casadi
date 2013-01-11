@@ -289,11 +289,26 @@ std::vector<SXMatrix> FXInternal::symbolicInputSX() const{
   return ret;
 }
 
-CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
-  // Check if we are able to propagate dependencies throught he function
-  if(spCanEvaluate(true) || spCanEvaluate(false)){
-    
-    // Number of nonzero inputs
+void bvec_toggle(bvec_t* s, int begin, int end,int j) {
+  for(int i=begin; i<end; ++i){
+    s[i] ^= (bvec_t(1) << j);
+  }
+}
+
+void bvec_clear(bvec_t* s, int begin, int end) {
+  for(int i=begin; i<end; ++i){
+    s[i] = 0;
+  }
+}
+
+
+void bvec_or(bvec_t* s, bvec_t & r, int begin, int end) {
+  r = 0;
+  for(int i=begin; i<end; ++i) r |= s[i];
+}
+
+CRSSparsity FXInternal::getJacSparsityPlain(int iind, int oind){
+// Number of nonzero inputs
     int nz_in = input(iind).size();
     
     // Number of nonzero outputs
@@ -429,6 +444,290 @@ CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
       std::cout << "FXInternal::getJacSparsity end " << std::endl;
     }
     return ret;
+}
+
+CRSSparsity FXInternal::getJacSparsityHierarchical(int iind, int oind){
+ // Number of nonzero inputs
+    int nz_in = input(iind).size();
+    
+    // Number of nonzero outputs
+    int nz_out = output(oind).size();
+    
+    // Clear the forward seeds/adjoint sensitivities
+    for(int ind=0; ind<getNumInputs(); ++ind){
+      vector<double> &v = inputNoCheck(ind).data();
+      if(!v.empty()) fill_n(get_bvec_t(v),v.size(),bvec_t(0));
+    }
+
+    // Clear the adjoint seeds/forward sensitivities
+    for(int ind=0; ind<getNumOutputs(); ++ind){
+      vector<double> &v = outputNoCheck(ind).data();
+      if(!v.empty()) fill_n(get_bvec_t(v),v.size(),bvec_t(0));
+    }
+
+    // Sparsity triplet accumulator
+    std::vector<int> jrow, jcol;
+    
+    // Rows of the coarse blocks
+    std::vector<int> coarse_row(2,0); coarse_row[1] = nz_out;
+    // Cols of the coarse blocks
+    std::vector<int> coarse_col(2,0); coarse_col[1] = nz_in;
+    
+    // Rows of the fine blocks
+    std::vector<int> fine_row;
+    
+    // Cols of the fine blocks
+    std::vector<int> fine_col;
+    
+    // In each iteration, subdivide each coarse block in this many fine blocks
+    int subdivision = bvec_size;
+
+    CRSSparsity r = sp_dense(1,1);
+    
+    // The size of a block
+    int granularity_col = nz_in;
+    int granularity_row = nz_out;
+    
+    bool use_fwd = true;
+    
+    int nsweeps = 0;
+    
+    bool hasrun = false;
+    
+    while (!hasrun || coarse_row.size()!=nz_out+1 || coarse_col.size()!=nz_in+1) {
+      casadi_log("Block size: " << granularity_row << " x " << granularity_col);
+    
+      // Clear the sparsity triplet acccumulator
+      jrow.clear();
+      jcol.clear();
+      
+      // Clear the fine block structure
+      fine_col.clear();
+      fine_row.clear();
+    
+      // r transpose will be needed in the algorithm
+      CRSSparsity rT = r.transpose();
+      
+      /**       Decide which ad_mode to take           */
+      CRSSparsity D1 = rT.unidirectionalColoring(r);
+      CRSSparsity D2 = r.unidirectionalColoring(rT);
+      
+      // Adjoint mode penalty factor (adjoint mode is usually more expensive to calculate)
+      int adj_penalty = 2;
+      
+      int fwd_cost = use_fwd ? granularity_col: granularity_row;
+      int adj_cost = use_fwd ? granularity_row: granularity_col;
+      
+      // Use whatever required less colors if we tried both (with preference to forward mode)
+      if((D1.size1()*fwd_cost <= adj_penalty*D2.size1()*adj_cost)){
+        use_fwd = true;
+        casadi_log("Forward mode chosen: " << D1.size1()*fwd_cost << " <-> " << adj_penalty*D2.size1()*adj_cost);
+      } else {
+        use_fwd = false;
+        casadi_log("Adjoint mode chosen: " << D1.size1()*fwd_cost << " <-> " << adj_penalty*D2.size1()*adj_cost);
+      }
+      
+      use_fwd = spCanEvaluate(true) && use_fwd;
+          
+      // Override default behavior?
+      if(getOption("ad_mode") == "forward"){
+        use_fwd = true;
+      } else if(getOption("ad_mode") == "reverse"){
+        use_fwd = false;
+      }
+      
+      // Reset the virtual machine
+      spInit(use_fwd);
+      
+      // Get seeds and sensitivities
+      bvec_t* input_v = get_bvec_t(inputNoCheck(iind).data());
+      bvec_t* output_v = get_bvec_t(outputNoCheck(oind).data());
+      bvec_t* seed_v = use_fwd ? input_v : output_v;
+      bvec_t* sens_v = use_fwd ? output_v : input_v;
+      
+      // The number of zeros in the seed and sensitivity directions
+      int nz_seed = use_fwd ? nz_in  : nz_out;
+      int nz_sens = use_fwd ? nz_out : nz_in;
+      
+      // Clear the seeds
+      for(int i=0; i<nz_seed; ++i) seed_v[i]=0;
+      
+      // Choose the active jacobian coloring scheme
+      CRSSparsity D = use_fwd ? D1 : D2;
+      
+      // Adjoint mode amounts to swapping
+      if (!use_fwd) {
+        std::swap(coarse_row,coarse_col);
+        std::swap(granularity_row,granularity_col);
+        std::swap(r,rT);
+      }
+      
+      // Subdivide the coarse block rows
+      for (int k=0;k<coarse_row.size()-1;++k) {
+        int diff = coarse_row[k+1]-coarse_row[k];
+        int new_diff = diff/subdivision;
+        if(diff%subdivision>0) new_diff++;
+        std::vector<int> temp = range(coarse_row[k],coarse_row[k+1],new_diff);
+        fine_row.insert(fine_row.end(),temp.begin(),temp.end());
+      }
+      // Subdivide the coarse block columns
+      for (int k=0;k<coarse_col.size()-1;++k) {
+        int diff = coarse_col[k+1]-coarse_col[k];
+        int new_diff = diff/subdivision;
+        if(diff%subdivision>0) new_diff++;
+        std::vector<int> temp = range(coarse_col[k],coarse_col[k+1],new_diff);
+        fine_col.insert(fine_col.end(),temp.begin(),temp.end());
+      }
+      if (fine_col.back()!=coarse_col.back()) fine_col.push_back(coarse_col.back());
+      if (fine_row.back()!=coarse_row.back()) fine_row.push_back(coarse_row.back());
+
+      granularity_row = fine_row[1] - fine_row[0];
+      granularity_col = fine_col[1] - fine_col[0];
+      
+      // The index into the bvec bit vector
+      int bvec_i = 0;
+      
+      // Create lookup tables for the fine blocks
+      std::vector<int> fine_row_lookup = lookupvector(fine_row,nz_sens+1);
+      std::vector<int> fine_col_lookup = lookupvector(fine_col,nz_seed+1);
+      
+      // Triplet data used as a lookup table
+      std::vector<int> lookup_row;
+      std::vector<int> lookup_col;
+      std::vector<int> lookup_value;
+      
+      // Loop over all coarse seed directions from the coloring
+      for(int csd=0; csd<D.size1(); ++csd) {
+      
+         // The maximum number of fine blocks contained in one coarse block
+         int n_fine_blocks_max = fine_col_lookup[coarse_col[1]]-fine_col_lookup[coarse_col[0]];
+         
+         int fci_offset = 0;
+         int fci_cap = bvec_size-bvec_i;
+         
+         // Flag to indicate if all fine blocks have been handled
+         bool f_finished = false;
+         
+         // Loop while not finished
+         while(!f_finished) {
+    
+           // Loop over all coarse columns that are found in the coloring for this coarse seed direction
+           for(int k=D.rowind()[csd]; k<D.rowind()[csd+1]; ++k){
+             int cci = D.col()[k];
+
+             // The first and last columns of the fine block
+             int fci_start = fine_col_lookup[coarse_col[cci]];
+             int fci_end   = fine_col_lookup[coarse_col[cci+1]];
+             
+             // Local counter that modifies index into bvec
+             int bvec_i_mod = 0;
+             
+             int value = -bvec_i + fci_offset + fci_start;
+             
+             // Loop over the columns of the fine block
+             for (int fci = fci_offset;fci<min(fci_end-fci_start,fci_cap);++fci) {
+             
+               // Loop over the coarse block rows that appear in the coloring for the current coarse seed direction
+               for (int cri=rT.rowind()[cci];cri<rT.rowind()[cci+1];++cri) {
+                 lookup_row.push_back(rT.col()[cri]);
+                 lookup_col.push_back(bvec_i+bvec_i_mod);
+                 lookup_value.push_back(value);
+               }
+
+               // Toggle on seeds
+               bvec_toggle(seed_v,fine_col[fci+fci_start],fine_col[fci+fci_start+1],bvec_i+bvec_i_mod);
+               bvec_i_mod++;
+             }
+           }
+           
+           // Bump bvec_i for next major coarse direction
+           bvec_i+= min(n_fine_blocks_max,fci_cap);
+           
+           // Check if bvec buffer is full
+           if (bvec_i==bvec_size || csd==D.size1()-1) {
+              // Calculate sparsity for bvec_size directions at once
+              
+              // Statistics
+              nsweeps+=1; 
+              
+              // Construct lookup table
+              IMatrix lookup = IMatrix::sparse(lookup_row,lookup_col,lookup_value,coarse_row.size(),bvec_size);
+
+              // Propagate the dependencies
+              spEvaluate(use_fwd);
+              
+              // Temporary bit work vector
+              bvec_t spsens;
+              
+              // Loop over the rows of coarse blocks
+              for (int cri=0;cri<coarse_row.size()-1;++cri) {
+
+                // Loop over the rows of fine blocks within the current coarse block
+                for (int fri=fine_row_lookup[coarse_row[cri]];fri<fine_row_lookup[coarse_row[cri+1]];++fri) {
+                  // Lump individual sensitivities together into fine block
+                  bvec_or(sens_v,spsens,fine_row[fri],fine_row[fri+1]);
+  
+                  // Loop over all bvec_bits
+                  for (int bvec_i=0;bvec_i<bvec_size;++bvec_i) {
+                    if (spsens & (bvec_t(1) << bvec_i)) {
+                      // if dependency is found, add it to the new sparsity pattern
+                      jcol.push_back(bvec_i+lookup.elem(cri,bvec_i));
+                      jrow.push_back(fri);
+                    }
+                  }
+                }
+              }
+              
+              // Clean seed vector, ready for next bvec sweep
+              for(int i=0; i<nz_seed; ++i) seed_v[i]=0;
+              
+              // Clean lookup table
+              lookup_row.clear();
+              lookup_col.clear();
+              lookup_value.clear();
+           }
+           
+           if (n_fine_blocks_max>fci_cap) {
+             fci_offset += min(n_fine_blocks_max,fci_cap);
+             bvec_i = 0;
+             fci_cap = bvec_size;
+           } else {
+             f_finished = true;
+           }
+         
+         }
+         
+      }
+
+      // Swap results if adjoint mode was used
+      if (use_fwd) {
+       // Construct fine sparsity pattern
+       r = sp_triplet(fine_row.size()-1, fine_col.size()-1, jrow, jcol);
+       coarse_row = fine_row;
+       coarse_col = fine_col;
+      } else {
+       // Construct fine sparsity pattern
+       r = sp_triplet( fine_col.size()-1,fine_row.size()-1, jcol, jrow);
+       coarse_row = fine_col;
+       coarse_col = fine_row;
+      }
+      hasrun = true;
+    }
+    casadi_log("Number of sweeps: " << nsweeps );
+    
+    return r;
+}
+
+CRSSparsity FXInternal::getJacSparsity(int iind, int oind){
+  // Check if we are able to propagate dependencies through the function
+  if(spCanEvaluate(true) || spCanEvaluate(false)){
+    
+    if (input(iind).size()>10 && output(oind).size()>10) {
+      return getJacSparsityHierarchical(iind, oind);
+    } else {
+      return getJacSparsityPlain(iind, oind);
+    }
+
 
   } else {
     // Dense sparsity by default

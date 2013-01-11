@@ -26,9 +26,6 @@ import unittest
 from types import *
 from helpers import *
 
-#CasadiOptions.setCatchErrorsPython(False)
-
-
 class FXtests(casadiTestCase):
 
   def test_call_empty(self):
@@ -314,8 +311,106 @@ class FXtests(casadiTestCase):
     F.input(1).set([7.1,2.9])
     
     self.checkfx(f,F,sens_der=False)
+    
+  
+  @skip(memcheck)
+  def test_jacobians(self):
+  
+    x = ssym("x")
+    
+    self.assertEqual(jacobian(5,x).size(),0)
+    
+    
+    def test(sp):
+      x = ssym("x",sp.size2())
+      sp2 = jacobian(mul(DMatrix(sp,1),x),x).sparsity()
+      self.checkarray(sp.col(),sp2.col());
+      self.checkarray(sp.rowind(),sp2.rowind());   
 
+    for i in range(5):
+      test(sp_tril(i))
+      test(sp_tril(i).T)
+      test(sp_dense(i,i))
+      test(sp_diag(i))
+    
+    for i in [63,64,65,127,128,129]:
+      d = sp_diag(i)
+      test(d)
       
+      test(d + sp_rowcol([0],[5],i,i))
+      
+      b = sp_band(i,-1) + sp_band(i,1)
+      test(b + sp_rowcol([0],[5],i,i))
+      
+    m = IMatrix(sp_diag(129),1)
+    m[:50,0] = 1
+    m[60:,0] = 1
+    m[6:9,6] = 1
+    m[9,9:12] = 1
+    
+    sp = m[:,:120].sparsity()
+    
+    test(sp)
+    #test(sp.T)
+    
+    m = IMatrix(sp_diag(64),1)
+    m[:50,0] = 1
+    m[60:,0] = 1
+
+    sp = m.T[:40,:].sparsity()
+    test(sp)
+    test(sp.T)
+    
+    sp = m[:40,:].sparsity()
+    test(sp)
+    test(sp.T)
+    
+    sp = m.T[:20,:].sparsity()
+    test(sp)
+    test(sp.T)
+
+    sp = m[:20,:].sparsity()
+    test(sp)
+    test(sp.T)
+    
+    for i in [63,64,65,127,128,129]:
+      test(sp_tril(i))
+      test(sp_tril(i).T)
+    
+    for n in [63,64,65,127,128,129]:
+      for m in [63,64,65,127,128,129]:
+        print (n,m)
+        sp = sp_dense(n,m)
+        
+        test(sp)
+        
+        random.seed(0)
+        
+        I = IMatrix(sp,1)
+        for i in range(n):
+          for j in range(m):
+            if random.random()<0.5:
+              I[i,j] = 0
+        makeSparse(I)
+        
+        sp_holes = I.sparsity()
+        
+        test(sp_holes)
+        
+        z = IMatrix(sp_holes.shape[0],sp_holes.shape[1])
+        
+        R = 5
+        v = []
+        for r in range(R):
+          h = [z]*5
+          h[r] = I
+          v.append(horzcat(h))
+        d = vertcat(v)
+        
+        test(d.sparsity())
+        
+    
+        
 if __name__ == '__main__':
     unittest.main()
 
