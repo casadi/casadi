@@ -126,6 +126,7 @@ void DirectSingleShootingInternal::init(){
 
   // Terminal constraints
   G_ = MXFunction(V,vertcat(nlp_g));
+  G_.setOption("name","nlp_g");
   G_.setOption("numeric_jacobian",false);
   G_.setOption("ad_mode","forward");
   G_.init();
@@ -134,6 +135,7 @@ void DirectSingleShootingInternal::init(){
   MX jk = mfcn_.call(mayerIn("x",X,"p",P)).at(0);
   nlp_j += jk;
   F_ = MXFunction(V,nlp_j);
+  F_.setOption("name","nlp_j");
   
   // Get the NLP creator function
   NLPSolverCreator nlp_solver_creator = getOption("nlp_solver");
