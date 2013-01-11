@@ -139,8 +139,6 @@ void NLPSolverInternal::init(){
       
       // Try to expand the MXFunction
       F_ = F_mx.expand(inputv);
-      F_.setOption("number_of_fwd_dir",F_mx.getOption("number_of_fwd_dir"));
-      F_.setOption("number_of_adj_dir",F_mx.getOption("number_of_adj_dir"));
       F_.init();
     }
   }
@@ -166,8 +164,6 @@ void NLPSolverInternal::init(){
       
       // Try to expand the MXFunction
       G_ = G_mx.expand(inputv);
-      G_.setOption("number_of_fwd_dir",G_mx.getOption("number_of_fwd_dir"));
-      G_.setOption("number_of_adj_dir",G_mx.getOption("number_of_adj_dir"));
       G_.init();
     }
   }
@@ -202,6 +198,7 @@ void NLPSolverInternal::init(){
       
       // Create the scaled Hessian function
       H_ = MXFunction(H_in, sigma*hf);
+      H_.setOption("name","nlp_hessian");
       log("Unconstrained Hessian function generated");
       
     } else { // Constrained
@@ -229,12 +226,14 @@ void NLPSolverInternal::init(){
         if (parametric_) lfcn_in[3] = G.inputExpr(1);
         SXFunction lfcn(lfcn_in, sigma*f + inner_prod(lam,g));
         lfcn.setOption("verbose",verbose());
+	lfcn.setOption("name","nlp_lagrangian");
         lfcn.init();
         if(verbose()) 
           cout << "SX Lagrangian function generated: algorithm size " << lfcn.getAlgorithmSize() << ", work size = " << lfcn.getWorkSize() << endl;
         
         // Hessian of the Lagrangian
         H_ = lfcn.hessian();
+	H_.setOption("name","nlp_hessian");
         log("SX Hessian function generated");
         
       } else { // MXFunction otherwise
@@ -282,12 +281,14 @@ void NLPSolverInternal::init(){
         if (parametric_) lfcn_in[3] = FG_in.at(1);
         MXFunction lfcn(lfcn_in,sigma*f + inner_prod(lam,g));
         lfcn.setOption("verbose",verbose());
+	lfcn.setOption("name","nlp_lagrangian");
         lfcn.init();
         if(verbose())
           cout << "MX Lagrangian function generated: algorithm size " << lfcn.getAlgorithmSize() << ", work size = " << lfcn.getWorkSize() << endl;
           
         // Hessian of the Lagrangian
         H_ = lfcn.hessian();
+	H_.setOption("name","nlp_hessian");
         log("MX Lagrangian Hessian function generated");
           
       } // SXFunction/MXFunction
@@ -303,6 +304,7 @@ void NLPSolverInternal::init(){
   if(generate_jacobian && !G_.isNull() && J_.isNull()){
     log("Generating Jacobian");
     J_ = G_.jacobian();
+    J_.setOption("name","nlp_jacobian");
     log("Jacobian function generated");
   }
     
