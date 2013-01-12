@@ -326,6 +326,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
 
     // Solve the QP
     solve_QP(Bk_,gf_,qp_LBX_,qp_UBX_,Jk_,qp_LBA_,qp_UBA_,dx_,qp_DUAL_X_,qp_DUAL_A_);
+    log("QP solved");
 
     // Detecting indefiniteness
     double gain = quad_form(dx_,Bk_);
@@ -361,6 +362,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     ls_success = true;
 
     // Line-search
+    log("Starting line-search");
     if(maxiter_ls_>0){ // maxiter_ls_== 0 disables line-search
       
       // Line-search loop
@@ -380,12 +382,14 @@ void SQPInternal::evaluate(int nfdir, int nadir){
         double meritmax = *max_element(merit_mem_.begin(), merit_mem_.end());
         if (L1merit_cand <= meritmax + t * c1_ * L1dir){
           // Accepting candidate
+	  log("Line-search completed, candidate accepted");
           break;
         }
       
         // Line-search not successful, but we accept it.
         if(ls_iter == maxiter_ls_){
           ls_success = false;
+	  log("Line-search completed, maximum number of iterations");
           break;
         }
       
@@ -393,7 +397,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
         t = beta_ * t;
       }
     }
-    
+
     // Candidate accepted, update dual variables
     for(int i=0; i<m_; ++i) mu_[i] = t * qp_DUAL_A_[i] + (1 - t) * mu_[i];
     for(int i=0; i<n_; ++i) mu_x_[i] = t * qp_DUAL_X_[i] + (1 - t) * mu_x_[i];
@@ -409,11 +413,13 @@ void SQPInternal::evaluate(int nfdir, int nadir){
     // Candidate accepted, update the primal variable
     copy(x_.begin(),x_.end(),x_old_.begin());
     copy(x_cand_.begin(),x_cand_.end(),x_.begin());
-    
+
     // Evaluate the constraint Jacobian
+    log("Evaluating jac_g");
     eval_jac_g(x_,gk_,Jk_);
     
     // Evaluate the gradient of the objective function
+    log("Evaluating grad_f");
     eval_grad_f(x_,fk_,gf_);
     
     // Evaluate the gradient of the Lagrangian with the new x and new mu
@@ -424,6 +430,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
 
     // Updating Lagrange Hessian
     if( hess_mode_ == HESS_BFGS){
+      log("Updating Hessian (BFGS)");
       // BFGS with careful updates and restarts
       if (iter % lbfgs_memory_ == 0){
         // Reset Hessian approximation by dropping all off-diagonal entries
@@ -451,6 +458,7 @@ void SQPInternal::evaluate(int nfdir, int nadir){
       bfgs_.getOutput(Bk_);
     } else {
       // Exact Hessian
+      log("Evaluating hessian");
       eval_h(x_,mu_,1.0,Bk_);
     }
   }
