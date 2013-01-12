@@ -516,6 +516,10 @@ Get the number of allocated adjoint directional derivatives. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::AcadoIntegrator::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::AcadoIntegrator::solve "
 
 the same as evaluate(0,0) ";
@@ -1195,6 +1199,12 @@ Return function that calculates forward derivatives This method returns a
 cached instance if available, and calls FX getDerivative(int nfwd, int nadj)
 if no cached version is available. ";
 
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getDerivativeViaJac
+"
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::AcadoIntegratorInternal::input "
 
 Access input argument. ";
@@ -1370,6 +1380,10 @@ adjoint sensitivities. ";
 Generate a augmented DAE system with nfwd forward sensitivities and nadj
 adjoint sensitivities (generic) ";
 
+%feature("docstring")  CasADi::AcadoIntegratorInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::AcadoIntegratorInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -1491,6 +1505,19 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::AcadoIntegratorInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getJacSparsityPlain
+"
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")
+CasADi::AcadoIntegratorInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::AcadoIntegratorInternal::setJacSparsity "
 
@@ -2000,6 +2027,10 @@ Get the number of allocated adjoint directional derivatives. ";
 %feature("docstring")  CasADi::AcadoOCP::evaluate "
 
 Evaluate. ";
+
+%feature("docstring")  CasADi::AcadoOCP::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::AcadoOCP::solve "
 
@@ -2604,6 +2635,11 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::AcadoOCPInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::AcadoOCPInternal::input "
 
 Access input argument. ";
@@ -2687,6 +2723,10 @@ Solve the problem. ";
 %feature("docstring")  CasADi::AcadoOCPInternal::getRef "";
 
 %feature("docstring")  CasADi::AcadoOCPInternal::returnRef "";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::AcadoOCPInternal::updateNumSens "
 
@@ -2817,6 +2857,18 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::AcadoOCPInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getJacSparsityHierarchical
+"
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::AcadoOCPInternal::setJacSparsity "
 
@@ -3875,6 +3927,10 @@ Get the number of allocated adjoint directional derivatives. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::CFunction::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::CFunction::solve "
 
 the same as evaluate(0,0) ";
@@ -4424,6 +4480,11 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::CFunctionInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::CFunctionInternal::input "
 
 Access input argument. ";
@@ -4507,6 +4568,10 @@ Evaluate. ";
 %feature("docstring")  CasADi::CFunctionInternal::init "
 
 Initialize. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::CFunctionInternal::updateNumSens "
 
@@ -4637,6 +4702,18 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::CFunctionInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::getJacSparsityHierarchical
+"
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::CFunctionInternal::setJacSparsity "
 
@@ -5338,6 +5415,10 @@ Get the number of allocated adjoint directional derivatives. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::CollocationIntegrator::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::CollocationIntegrator::solve "
 
 the same as evaluate(0,0) ";
@@ -6005,6 +6086,12 @@ Return function that calculates forward derivatives This method returns a
 cached instance if available, and calls FX getDerivative(int nfwd, int nadj)
 if no cached version is available. ";
 
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::CollocationIntegratorInternal::input "
 
 Access input argument. ";
@@ -6175,6 +6262,11 @@ CasADi::CollocationIntegratorInternal::getAugmentedGen "
 Generate a augmented DAE system with nfwd forward sensitivities and nadj
 adjoint sensitivities (generic) ";
 
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::CollocationIntegratorInternal::updateNumSens
 "
 
@@ -6304,6 +6396,19 @@ Get single statistic obtained at the end of the last evaluate call. ";
 "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::CollocationIntegratorInternal::setJacSparsity
 "
@@ -7295,6 +7400,10 @@ Get the number of allocated adjoint directional derivatives. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::ControlSimulator::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::ControlSimulator::solve "
 
 the same as evaluate(0,0) ";
@@ -7918,6 +8027,12 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::ControlSimulatorInternal::getDerivativeViaJac
+"
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::ControlSimulatorInternal::input "
 
 Access input argument. ";
@@ -8017,6 +8132,11 @@ timescale. ";
 %feature("docstring")  CasADi::ControlSimulatorInternal::getCoarseIndex "
 
 Get the index i such that gridfine[i] == gridcoarse. ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::evaluateCompressed
+"
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::ControlSimulatorInternal::requestNumSens "
 
@@ -8144,6 +8264,19 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::ControlSimulatorInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::getJacSparsityPlain
+"
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")
+CasADi::ControlSimulatorInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::ControlSimulatorInternal::setJacSparsity "
 
@@ -8545,6 +8678,11 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::CplexInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::CplexInternal::input "
 
 Access input argument. ";
@@ -8641,6 +8779,10 @@ should invoke this function when initialized. ";
 Evaluate. ";
 
 %feature("docstring")  CasADi::CplexInternal::solve "";
+
+%feature("docstring")  CasADi::CplexInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::CplexInternal::updateNumSens "
 
@@ -8771,6 +8913,17 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::CplexInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::CplexInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")  CasADi::CplexInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::CplexInternal::setJacSparsity "
 
@@ -9323,6 +9476,10 @@ Get the number of allocated adjoint directional derivatives. ";
 %feature("docstring")  CasADi::CplexSolver::evaluate "
 
 Evaluate. ";
+
+%feature("docstring")  CasADi::CplexSolver::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::CplexSolver::solve "
 
@@ -10794,6 +10951,10 @@ Get the number of allocated adjoint directional derivatives. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::CSparse::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::CSparse::jacobian "
 
 Generate a Jacobian function of output oind with respect to input iind.
@@ -11341,6 +11502,11 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::CSparseInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::CSparseInternal::input "
 
 Access input argument. ";
@@ -11441,6 +11607,10 @@ Evaluate. ";
 %feature("docstring")  CasADi::CSparseInternal::col "";
 
 %feature("docstring")  CasADi::CSparseInternal::rowind "";
+
+%feature("docstring")  CasADi::CSparseInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::CSparseInternal::updateNumSens "
 
@@ -11571,6 +11741,17 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::CSparseInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::CSparseInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")  CasADi::CSparseInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::CSparseInternal::setJacSparsity "
 
@@ -12522,6 +12703,10 @@ Get the number of allocated adjoint directional derivatives. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::CVodesIntegrator::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::CVodesIntegrator::solve "
 
 the same as evaluate(0,0) ";
@@ -13448,6 +13633,11 @@ Return function that calculates forward derivatives This method returns a
 cached instance if available, and calls FX getDerivative(int nfwd, int nadj)
 if no cached version is available. ";
 
+%feature("docstring")  CasADi::CVodesInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::CVodesInternal::input "
 
 Access input argument. ";
@@ -13631,6 +13821,10 @@ adjoint sensitivities. ";
 Generate a augmented DAE system with nfwd forward sensitivities and nadj
 adjoint sensitivities (generic) ";
 
+%feature("docstring")  CasADi::CVodesInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::CVodesInternal::requestNumSens "
 
 Request a number of forward/adjoint derivative directions. ";
@@ -13746,6 +13940,17 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::CVodesInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::CVodesInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")  CasADi::CVodesInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::CVodesInternal::setJacSparsity "
 
@@ -14406,6 +14611,10 @@ Get the number of allocated adjoint directional derivatives. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::Derivative::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::Derivative::solve "
 
 the same as evaluate(0,0) ";
@@ -14959,6 +15168,11 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::DerivativeInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::DerivativeInternal::input "
 
 Access input argument. ";
@@ -15046,6 +15260,10 @@ Evaluate the jacobian. ";
 %feature("docstring")  CasADi::DerivativeInternal::init "
 
 Initialize. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::DerivativeInternal::updateNumSens "
 
@@ -15176,6 +15394,18 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::DerivativeInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")
+CasADi::DerivativeInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::DerivativeInternal::setJacSparsity "
 
@@ -15732,6 +15962,10 @@ Get the number of allocated adjoint directional derivatives. ";
 %feature("docstring")  CasADi::DirectCollocation::evaluate "
 
 Evaluate. ";
+
+%feature("docstring")  CasADi::DirectCollocation::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::DirectCollocation::solve "
 
@@ -16357,6 +16591,12 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")
+CasADi::DirectCollocationInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::DirectCollocationInternal::input "
 
 Access input argument. ";
@@ -16452,6 +16692,11 @@ CasADi::DirectCollocationInternal::getConstraintBounds "";
 
 %feature("docstring")  CasADi::DirectCollocationInternal::reportConstraints
 "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::evaluateCompressed
+"
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::DirectCollocationInternal::updateNumSens "
 
@@ -16585,6 +16830,19 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::DirectCollocationInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")
+CasADi::DirectCollocationInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")
+CasADi::DirectCollocationInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::DirectCollocationInternal::setJacSparsity "
 
@@ -17212,6 +17470,10 @@ Get the number of allocated adjoint directional derivatives. ";
 %feature("docstring")  CasADi::DirectMultipleShooting::evaluate "
 
 Evaluate. ";
+
+%feature("docstring")  CasADi::DirectMultipleShooting::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::DirectMultipleShooting::solve "
 
@@ -17846,6 +18108,12 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::DirectMultipleShootingInternal::input "
 
 Access input argument. ";
@@ -17953,6 +18221,11 @@ CasADi::DirectMultipleShootingInternal::setOptimalSolution "";
 
 %feature("docstring")
 CasADi::DirectMultipleShootingInternal::reportConstraints "";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::DirectMultipleShootingInternal::updateNumSens
 "
@@ -18096,6 +18369,19 @@ Get single statistic obtained at the end of the last evaluate call. ";
 CasADi::DirectMultipleShootingInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")
 CasADi::DirectMultipleShootingInternal::setJacSparsity "
@@ -18730,6 +19016,10 @@ Get the number of allocated adjoint directional derivatives. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::DirectSingleShooting::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::DirectSingleShooting::solve "
 
 the same as evaluate(0,0) ";
@@ -19359,6 +19649,12 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")
+CasADi::DirectSingleShootingInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::DirectSingleShootingInternal::input "
 
 Access input argument. ";
@@ -19462,6 +19758,11 @@ CasADi::DirectSingleShootingInternal::setOptimalSolution "";
 
 %feature("docstring")
 CasADi::DirectSingleShootingInternal::reportConstraints "";
+
+%feature("docstring")
+CasADi::DirectSingleShootingInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::DirectSingleShootingInternal::updateNumSens "
 
@@ -19598,6 +19899,19 @@ Get single statistic obtained at the end of the last evaluate call. ";
 "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")
+CasADi::DirectSingleShootingInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")
+CasADi::DirectSingleShootingInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::DirectSingleShootingInternal::setJacSparsity
 "
@@ -20261,6 +20575,10 @@ Get the number of allocated adjoint directional derivatives. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::ExternalFunction::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::ExternalFunction::solve "
 
 the same as evaluate(0,0) ";
@@ -20807,6 +21125,12 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::ExternalFunctionInternal::getDerivativeViaJac
+"
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::ExternalFunctionInternal::input "
 
 Access input argument. ";
@@ -20892,6 +21216,11 @@ Evaluate. ";
 %feature("docstring")  CasADi::ExternalFunctionInternal::init "
 
 Initialize. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::evaluateCompressed
+"
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::ExternalFunctionInternal::updateNumSens "
 
@@ -21024,6 +21353,19 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::ExternalFunctionInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::getJacSparsityPlain
+"
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")
+CasADi::ExternalFunctionInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::ExternalFunctionInternal::setJacSparsity "
 
@@ -21850,6 +22192,10 @@ Get the number of allocated adjoint directional derivatives. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::FX::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::FX::solve "
 
 the same as evaluate(0,0) ";
@@ -22435,6 +22781,11 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::FXInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::FXInternal::input "
 
 Access input argument. ";
@@ -22506,6 +22857,10 @@ Destructor. ";
 %feature("docstring")  CasADi::FXInternal::evaluate "
 
 Evaluate. ";
+
+%feature("docstring")  CasADi::FXInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::FXInternal::init "
 
@@ -22643,6 +22998,17 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::FXInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::FXInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")  CasADi::FXInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::FXInternal::setJacSparsity "
 
@@ -24070,6 +24436,10 @@ Get the number of allocated adjoint directional derivatives. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::IdasIntegrator::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::IdasIntegrator::solve "
 
 the same as evaluate(0,0) ";
@@ -25054,6 +25424,11 @@ Return function that calculates forward derivatives This method returns a
 cached instance if available, and calls FX getDerivative(int nfwd, int nadj)
 if no cached version is available. ";
 
+%feature("docstring")  CasADi::IdasInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::IdasInternal::input "
 
 Access input argument. ";
@@ -25266,6 +25641,10 @@ adjoint sensitivities. ";
 Generate a augmented DAE system with nfwd forward sensitivities and nadj
 adjoint sensitivities (generic) ";
 
+%feature("docstring")  CasADi::IdasInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::IdasInternal::requestNumSens "
 
 Request a number of forward/adjoint derivative directions. ";
@@ -25381,6 +25760,17 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::IdasInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::IdasInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")  CasADi::IdasInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::IdasInternal::setJacSparsity "
 
@@ -25860,6 +26250,10 @@ Get the number of allocated adjoint directional derivatives. ";
 %feature("docstring")  CasADi::ImplicitFunction::evaluate "
 
 Evaluate. ";
+
+%feature("docstring")  CasADi::ImplicitFunction::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::ImplicitFunction::solve "
 
@@ -26422,6 +26816,12 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::ImplicitFunctionInternal::getDerivativeViaJac
+"
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::ImplicitFunctionInternal::input "
 
 Access input argument. ";
@@ -26529,6 +26929,11 @@ Generate a linear solver for the sensitivity equations. ";
 %feature("docstring")  CasADi::ImplicitFunctionInternal::setJacobian "
 
 Set the jacobian of F. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::evaluateCompressed
+"
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::requestNumSens "
 
@@ -26656,6 +27061,19 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::ImplicitFunctionInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::getJacSparsityPlain
+"
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")
+CasADi::ImplicitFunctionInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::setJacSparsity "
 
@@ -27476,6 +27894,10 @@ Get the number of allocated adjoint directional derivatives. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::Integrator::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::Integrator::solve "
 
 the same as evaluate(0,0) ";
@@ -28099,6 +28521,11 @@ Return function that calculates forward derivatives This method returns a
 cached instance if available, and calls FX getDerivative(int nfwd, int nadj)
 if no cached version is available. ";
 
+%feature("docstring")  CasADi::IntegratorInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::IntegratorInternal::input "
 
 Access input argument. ";
@@ -28248,6 +28675,10 @@ adjoint sensitivities. ";
 Generate a augmented DAE system with nfwd forward sensitivities and nadj
 adjoint sensitivities (generic) ";
 
+%feature("docstring")  CasADi::IntegratorInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::IntegratorInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -28368,6 +28799,18 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::IntegratorInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::IntegratorInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")
+CasADi::IntegratorInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::IntegratorInternal::setJacSparsity "
 
@@ -28813,6 +29256,11 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::IPInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::IPInternal::input "
 
 Access input argument. ";
@@ -28909,6 +29357,10 @@ Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
 %feature("docstring")  CasADi::IPInternal::setQPOptions "
 
 Set options that make the NLP solver more suitable for solving QPs. ";
+
+%feature("docstring")  CasADi::IPInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::IPInternal::updateNumSens "
 
@@ -29039,6 +29491,17 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::IPInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::IPInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")  CasADi::IPInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::IPInternal::setJacSparsity "
 
@@ -29672,6 +30135,10 @@ Get the number of allocated adjoint directional derivatives. ";
 %feature("docstring")  CasADi::IPMethod::evaluate "
 
 Evaluate. ";
+
+%feature("docstring")  CasADi::IPMethod::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::IPMethod::solve "
 
@@ -33062,6 +33529,11 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::IpoptInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::IpoptInternal::input "
 
 Access input argument. ";
@@ -33164,6 +33636,10 @@ all constraints. ";
 
 Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
 ";
+
+%feature("docstring")  CasADi::IpoptInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::IpoptInternal::updateNumSens "
 
@@ -33294,6 +33770,17 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::IpoptInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::IpoptInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")  CasADi::IpoptInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::IpoptInternal::setJacSparsity "
 
@@ -36641,6 +37128,10 @@ Get the number of allocated adjoint directional derivatives. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::IpoptSolver::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::IpoptSolver::solve "
 
 the same as evaluate(0,0) ";
@@ -37337,6 +37828,11 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::KinsolInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::KinsolInternal::input "
 
 Access input argument. ";
@@ -37480,6 +37976,10 @@ Generate a linear solver for the sensitivity equations. ";
 
 Set the jacobian of F. ";
 
+%feature("docstring")  CasADi::KinsolInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::KinsolInternal::requestNumSens "
 
 Request a number of forward/adjoint derivative directions. ";
@@ -37604,6 +38104,17 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::KinsolInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::KinsolInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")  CasADi::KinsolInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::KinsolInternal::setJacSparsity "
 
@@ -38188,6 +38699,10 @@ Get the number of allocated adjoint directional derivatives. ";
 %feature("docstring")  CasADi::KinsolSolver::evaluate "
 
 Evaluate. ";
+
+%feature("docstring")  CasADi::KinsolSolver::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::KinsolSolver::solve "
 
@@ -39128,6 +39643,11 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::KnitroInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::KnitroInternal::input "
 
 Access input argument. ";
@@ -39230,6 +39750,10 @@ Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
 %feature("docstring")  CasADi::KnitroInternal::setQPOptions "
 
 Set options that make the NLP solver more suitable for solving QPs. ";
+
+%feature("docstring")  CasADi::KnitroInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::KnitroInternal::updateNumSens "
 
@@ -39360,6 +39884,17 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::KnitroInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::KnitroInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")  CasADi::KnitroInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::KnitroInternal::setJacSparsity "
 
@@ -40121,6 +40656,10 @@ Get the number of allocated adjoint directional derivatives. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::KnitroSolver::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::KnitroSolver::solve "
 
 the same as evaluate(0,0) ";
@@ -40872,6 +41411,10 @@ Get the number of allocated adjoint directional derivatives. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::LapackLUDense::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::LapackLUDense::jacobian "
 
 Generate a Jacobian function of output oind with respect to input iind.
@@ -41427,6 +41970,11 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::LapackLUDenseInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::LapackLUDenseInternal::input "
 
 Access input argument. ";
@@ -41527,6 +42075,10 @@ Evaluate. ";
 %feature("docstring")  CasADi::LapackLUDenseInternal::col "";
 
 %feature("docstring")  CasADi::LapackLUDenseInternal::rowind "";
+
+%feature("docstring")  CasADi::LapackLUDenseInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::LapackLUDenseInternal::updateNumSens "
 
@@ -41657,6 +42209,18 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::LapackLUDenseInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::LapackLUDenseInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")
+CasADi::LapackLUDenseInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::LapackLUDenseInternal::setJacSparsity "
 
@@ -42155,6 +42719,10 @@ Get the number of allocated adjoint directional derivatives. ";
 %feature("docstring")  CasADi::LapackQRDense::evaluate "
 
 Evaluate. ";
+
+%feature("docstring")  CasADi::LapackQRDense::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::LapackQRDense::jacobian "
 
@@ -42703,6 +43271,11 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::LapackQRDenseInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::LapackQRDenseInternal::input "
 
 Access input argument. ";
@@ -42803,6 +43376,10 @@ Evaluate. ";
 %feature("docstring")  CasADi::LapackQRDenseInternal::col "";
 
 %feature("docstring")  CasADi::LapackQRDenseInternal::rowind "";
+
+%feature("docstring")  CasADi::LapackQRDenseInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::LapackQRDenseInternal::updateNumSens "
 
@@ -42933,6 +43510,18 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::LapackQRDenseInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::LapackQRDenseInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")
+CasADi::LapackQRDenseInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::LapackQRDenseInternal::setJacSparsity "
 
@@ -43646,6 +44235,10 @@ Get the number of allocated adjoint directional derivatives. ";
 %feature("docstring")  CasADi::LiftedSQP::evaluate "
 
 Evaluate. ";
+
+%feature("docstring")  CasADi::LiftedSQP::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::LiftedSQP::solve "
 
@@ -44423,6 +45016,11 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::LiftedSQPInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::LiftedSQPInternal::input "
 
 Access input argument. ";
@@ -44519,6 +45117,10 @@ Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
 %feature("docstring")  CasADi::LiftedSQPInternal::setQPOptions "
 
 Set options that make the NLP solver more suitable for solving QPs. ";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::LiftedSQPInternal::updateNumSens "
 
@@ -44649,6 +45251,18 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::LiftedSQPInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::getJacSparsityHierarchical
+"
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::LiftedSQPInternal::setJacSparsity "
 
@@ -45098,6 +45712,11 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::LiftoptInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::LiftoptInternal::input "
 
 Access input argument. ";
@@ -45194,6 +45813,10 @@ Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
 %feature("docstring")  CasADi::LiftoptInternal::setQPOptions "
 
 Set options that make the NLP solver more suitable for solving QPs. ";
+
+%feature("docstring")  CasADi::LiftoptInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::LiftoptInternal::updateNumSens "
 
@@ -45324,6 +45947,17 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::LiftoptInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::LiftoptInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")  CasADi::LiftoptInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::LiftoptInternal::setJacSparsity "
 
@@ -45958,6 +46592,10 @@ Get the number of allocated adjoint directional derivatives. ";
 %feature("docstring")  CasADi::LiftoptSolver::evaluate "
 
 Evaluate. ";
+
+%feature("docstring")  CasADi::LiftoptSolver::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::LiftoptSolver::solve "
 
@@ -46674,6 +47312,10 @@ Get the number of allocated adjoint directional derivatives. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::LinearSolver::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::LinearSolver::jacobian "
 
 Generate a Jacobian function of output oind with respect to input iind.
@@ -47221,6 +47863,11 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::LinearSolverInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::LinearSolverInternal::input "
 
 Access input argument. ";
@@ -47315,6 +47962,10 @@ Evaluate. ";
 %feature("docstring")  CasADi::LinearSolverInternal::col "";
 
 %feature("docstring")  CasADi::LinearSolverInternal::rowind "";
+
+%feature("docstring")  CasADi::LinearSolverInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::LinearSolverInternal::updateNumSens "
 
@@ -47445,6 +48096,18 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::LinearSolverInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::LinearSolverInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")
+CasADi::LinearSolverInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::LinearSolverInternal::setJacSparsity "
 
@@ -48126,6 +48789,12 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::Matrix::sparse "
 
 create a sparse matrix with all zeros ";
+
+%feature("docstring")  CasADi::Matrix::sparse "";
+
+%feature("docstring")  CasADi::Matrix::sparse "
+
+Construct a sparse matrix from triplet form. ";
 
 %feature("docstring")  CasADi::Matrix::sparse "";
 
@@ -50661,6 +51330,10 @@ Get the number of allocated adjoint directional derivatives. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::MXFunction::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::MXFunction::solve "
 
 the same as evaluate(0,0) ";
@@ -51371,6 +52044,23 @@ Return Jacobian function. ";
 Generate a function that calculates nfdir forward derivatives and nadir
 adjoint derivatives. ";
 
+%feature("docstring")  CasADi::MXFunctionInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::symbolicFwdSeed "
+
+Symbolic expressions for the forward seeds. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::symbolicAdjSeed "
+
+Symbolic expressions for the adjoint seeds. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::MXFunctionInternal::requestNumSens "
 
 Request a number of forward/adjoint derivative directions. ";
@@ -51470,6 +52160,18 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::MXFunctionInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")
+CasADi::MXFunctionInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::MXFunctionInternal::setJacSparsity "
 
@@ -52122,6 +52824,11 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::NewtonImplicitInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::NewtonImplicitInternal::input "
 
 Access input argument. ";
@@ -52233,6 +52940,10 @@ Generate a linear solver for the sensitivity equations. ";
 %feature("docstring")  CasADi::NewtonImplicitInternal::setJacobian "
 
 Set the jacobian of F. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::NewtonImplicitInternal::requestNumSens "
 
@@ -52358,6 +53069,18 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::NewtonImplicitInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")
+CasADi::NewtonImplicitInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::NewtonImplicitInternal::setJacSparsity "
 
@@ -52886,6 +53609,10 @@ Get the number of allocated adjoint directional derivatives. ";
 %feature("docstring")  CasADi::NewtonImplicitSolver::evaluate "
 
 Evaluate. ";
+
+%feature("docstring")  CasADi::NewtonImplicitSolver::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::NewtonImplicitSolver::solve "
 
@@ -53476,6 +54203,11 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::NLPImplicitInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::NLPImplicitInternal::input "
 
 Access input argument. ";
@@ -53584,6 +54316,10 @@ Generate a linear solver for the sensitivity equations. ";
 %feature("docstring")  CasADi::NLPImplicitInternal::setJacobian "
 
 Set the jacobian of F. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::NLPImplicitInternal::requestNumSens "
 
@@ -53709,6 +54445,18 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::NLPImplicitInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")
+CasADi::NLPImplicitInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::NLPImplicitInternal::setJacSparsity "
 
@@ -54210,6 +54958,10 @@ Get the number of allocated adjoint directional derivatives. ";
 %feature("docstring")  CasADi::NLPImplicitSolver::evaluate "
 
 Evaluate. ";
+
+%feature("docstring")  CasADi::NLPImplicitSolver::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::NLPImplicitSolver::solve "
 
@@ -54819,6 +55571,11 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::NLPQPInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::NLPQPInternal::input "
 
 Access input argument. ";
@@ -54908,6 +55665,10 @@ Initialize. ";
 Evaluate. ";
 
 %feature("docstring")  CasADi::NLPQPInternal::solve "";
+
+%feature("docstring")  CasADi::NLPQPInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::NLPQPInternal::updateNumSens "
 
@@ -55038,6 +55799,17 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::NLPQPInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::NLPQPInternal::setJacSparsity "
 
@@ -55550,6 +56322,10 @@ Get the number of allocated adjoint directional derivatives. ";
 %feature("docstring")  CasADi::NLPQPSolver::evaluate "
 
 Evaluate. ";
+
+%feature("docstring")  CasADi::NLPQPSolver::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::NLPQPSolver::solve "
 
@@ -56414,6 +57190,10 @@ Get the number of allocated adjoint directional derivatives. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::NLPSolver::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::NLPSolver::solve "
 
 the same as evaluate(0,0) ";
@@ -57105,6 +57885,11 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::NLPSolverInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::NLPSolverInternal::input "
 
 Access input argument. ";
@@ -57197,6 +57982,10 @@ Set options that make the NLP solver more suitable for solving QPs. ";
 %feature("docstring")  CasADi::NLPSolverInternal::evaluate "
 
 Evaluate. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::NLPSolverInternal::updateNumSens "
 
@@ -57327,6 +58116,18 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::NLPSolverInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")  CasADi::NLPSolverInternal::getJacSparsityHierarchical
+"
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::NLPSolverInternal::setJacSparsity "
 
@@ -59282,6 +60083,10 @@ Get the number of allocated adjoint directional derivatives. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::OCPSolver::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::OCPSolver::solve "
 
 the same as evaluate(0,0) ";
@@ -59891,6 +60696,11 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::OCPSolverInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::OCPSolverInternal::input "
 
 Access input argument. ";
@@ -59993,6 +60803,10 @@ Initialize. ";
 %feature("docstring")  CasADi::OCPSolverInternal::evaluate "
 
 Evaluate. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::OCPSolverInternal::updateNumSens "
 
@@ -60123,6 +60937,18 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::OCPSolverInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")  CasADi::OCPSolverInternal::getJacSparsityHierarchical
+"
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::OCPSolverInternal::setJacSparsity "
 
@@ -60582,6 +61408,11 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::OOQPInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::OOQPInternal::input "
 
 Access input argument. ";
@@ -60687,6 +61518,10 @@ Initialize. ";
 Evaluate. ";
 
 %feature("docstring")  CasADi::OOQPInternal::solve "";
+
+%feature("docstring")  CasADi::OOQPInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::OOQPInternal::updateNumSens "
 
@@ -60817,6 +61652,17 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::OOQPInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::OOQPInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")  CasADi::OOQPInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::OOQPInternal::setJacSparsity "
 
@@ -61341,6 +62187,10 @@ Get the number of allocated adjoint directional derivatives. ";
 %feature("docstring")  CasADi::OOQPSolver::evaluate "
 
 Evaluate. ";
+
+%feature("docstring")  CasADi::OOQPSolver::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::OOQPSolver::solve "
 
@@ -62566,6 +63416,10 @@ Get the number of allocated adjoint directional derivatives. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::Parallelizer::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::Parallelizer::solve "
 
 the same as evaluate(0,0) ";
@@ -63140,6 +63994,11 @@ Return function that calculates forward derivatives This method returns a
 cached instance if available, and calls FX getDerivative(int nfwd, int nadj)
 if no cached version is available. ";
 
+%feature("docstring")  CasADi::ParallelizerInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::ParallelizerInternal::input "
 
 Access input argument. ";
@@ -63259,6 +64118,10 @@ Generate the sparsity of a Jacobian block. ";
 
 Deep copy data members. ";
 
+%feature("docstring")  CasADi::ParallelizerInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::ParallelizerInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -63371,6 +64234,18 @@ Get all statistics obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::ParallelizerInternal::getStat "
 
 Get single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::ParallelizerInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")
+CasADi::ParallelizerInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::ParallelizerInternal::setJacSparsity "
 
@@ -63773,6 +64648,11 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::QPOasesInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::QPOasesInternal::input "
 
 Access input argument. ";
@@ -63862,6 +64742,10 @@ Initialize. ";
 Evaluate. ";
 
 %feature("docstring")  CasADi::QPOasesInternal::solve "";
+
+%feature("docstring")  CasADi::QPOasesInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::QPOasesInternal::updateNumSens "
 
@@ -63992,6 +64876,17 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::QPOasesInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::QPOasesInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")  CasADi::QPOasesInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::QPOasesInternal::setJacSparsity "
 
@@ -64520,6 +65415,10 @@ Get the number of allocated adjoint directional derivatives. ";
 %feature("docstring")  CasADi::QPOasesSolver::evaluate "
 
 Evaluate. ";
+
+%feature("docstring")  CasADi::QPOasesSolver::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::QPOasesSolver::solve "
 
@@ -65265,6 +66164,10 @@ Get the number of allocated adjoint directional derivatives. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::QPSolver::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::QPSolver::solve "
 
 the same as evaluate(0,0) ";
@@ -65854,6 +66757,11 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::QPSolverInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::QPSolverInternal::input "
 
 Access input argument. ";
@@ -65936,6 +66844,10 @@ should invoke this function when initialized. ";
 Evaluate. ";
 
 %feature("docstring")  CasADi::QPSolverInternal::solve "";
+
+%feature("docstring")  CasADi::QPSolverInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::QPSolverInternal::updateNumSens "
 
@@ -66066,6 +66978,18 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::QPSolverInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::getJacSparsityHierarchical
+"
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::QPSolverInternal::setJacSparsity "
 
@@ -66771,6 +67695,10 @@ Get the number of allocated adjoint directional derivatives. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::RKIntegrator::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::RKIntegrator::solve "
 
 the same as evaluate(0,0) ";
@@ -67389,6 +68317,11 @@ Return function that calculates forward derivatives This method returns a
 cached instance if available, and calls FX getDerivative(int nfwd, int nadj)
 if no cached version is available. ";
 
+%feature("docstring")  CasADi::RKIntegratorInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::RKIntegratorInternal::input "
 
 Access input argument. ";
@@ -67548,6 +68481,10 @@ adjoint sensitivities. ";
 Generate a augmented DAE system with nfwd forward sensitivities and nadj
 adjoint sensitivities (generic) ";
 
+%feature("docstring")  CasADi::RKIntegratorInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::RKIntegratorInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -67664,6 +68601,18 @@ Get all statistics obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::RKIntegratorInternal::getStat "
 
 Get single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")
+CasADi::RKIntegratorInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::RKIntegratorInternal::setJacSparsity "
 
@@ -68552,6 +69501,10 @@ Get the number of allocated adjoint directional derivatives. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::Simulator::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::Simulator::solve "
 
 the same as evaluate(0,0) ";
@@ -69128,6 +70081,11 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::SimulatorInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::SimulatorInternal::input "
 
 Access input argument. ";
@@ -69216,6 +70174,10 @@ Integrate. ";
 
 Update the number of sensitivity directions during or after initialization.
 ";
+
+%feature("docstring")  CasADi::SimulatorInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::SimulatorInternal::requestNumSens "
 
@@ -69341,6 +70303,18 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::SimulatorInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")  CasADi::SimulatorInternal::getJacSparsityHierarchical
+"
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::SimulatorInternal::setJacSparsity "
 
@@ -70366,6 +71340,11 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::SQPInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::SQPInternal::input "
 
 Access input argument. ";
@@ -70494,6 +71473,10 @@ Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
 %feature("docstring")  CasADi::SQPInternal::setQPOptions "
 
 Set options that make the NLP solver more suitable for solving QPs. ";
+
+%feature("docstring")  CasADi::SQPInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::SQPInternal::updateNumSens "
 
@@ -70624,6 +71607,17 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::SQPInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::SQPInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")  CasADi::SQPInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::SQPInternal::setJacSparsity "
 
@@ -71362,6 +72356,10 @@ Get the number of allocated adjoint directional derivatives. ";
 %feature("docstring")  CasADi::SQPMethod::evaluate "
 
 Evaluate. ";
+
+%feature("docstring")  CasADi::SQPMethod::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::SQPMethod::solve "
 
@@ -72437,6 +73435,10 @@ Get the number of allocated adjoint directional derivatives. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::SundialsIntegrator::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::SundialsIntegrator::solve "
 
 the same as evaluate(0,0) ";
@@ -73288,6 +74290,11 @@ Return function that calculates forward derivatives This method returns a
 cached instance if available, and calls FX getDerivative(int nfwd, int nadj)
 if no cached version is available. ";
 
+%feature("docstring")  CasADi::SundialsInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::SundialsInternal::input "
 
 Access input argument. ";
@@ -73449,6 +74456,10 @@ adjoint sensitivities. ";
 Generate a augmented DAE system with nfwd forward sensitivities and nadj
 adjoint sensitivities (generic) ";
 
+%feature("docstring")  CasADi::SundialsInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::SundialsInternal::updateNumSens "
 
 Update the number of sensitivity directions during or after initialization,
@@ -73569,6 +74580,18 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::SundialsInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::SundialsInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")  CasADi::SundialsInternal::getJacSparsityHierarchical
+"
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::SundialsInternal::setJacSparsity "
 
@@ -74467,6 +75490,10 @@ Get the number of allocated adjoint directional derivatives. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::SXFunction::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::SXFunction::solve "
 
 the same as evaluate(0,0) ";
@@ -75163,6 +76190,23 @@ Return Jacobian function. ";
 Generate a function that calculates nfdir forward derivatives and nadir
 adjoint derivatives. ";
 
+%feature("docstring")  CasADi::SXFunctionInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::symbolicFwdSeed "
+
+Symbolic expressions for the forward seeds. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::symbolicAdjSeed "
+
+Symbolic expressions for the adjoint seeds. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::SXFunctionInternal::requestNumSens "
 
 Request a number of forward/adjoint derivative directions. ";
@@ -75266,6 +76310,18 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::SXFunctionInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")
+CasADi::SXFunctionInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::setJacSparsity "
 
@@ -77918,6 +78974,11 @@ if no cached version is available. ";
 
 Constructs and returns a function that calculates forward derivatives. ";
 
+%feature("docstring")  CasADi::WorhpInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
 %feature("docstring")  CasADi::WorhpInternal::input "
 
 Access input argument. ";
@@ -78023,6 +79084,10 @@ all constraints. ";
 
 Warns the user about inital bounds, if option 'warn_initial_bounds' is true.
 ";
+
+%feature("docstring")  CasADi::WorhpInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::WorhpInternal::updateNumSens "
 
@@ -78153,6 +79218,17 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::WorhpInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::WorhpInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")  CasADi::WorhpInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::WorhpInternal::setJacSparsity "
 
@@ -79530,6 +80606,10 @@ Get the number of allocated adjoint directional derivatives. ";
 
 Evaluate. ";
 
+%feature("docstring")  CasADi::WorhpSolver::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
 %feature("docstring")  CasADi::WorhpSolver::solve "
 
 the same as evaluate(0,0) ";
@@ -80175,9 +81255,26 @@ Return Jacobian function. ";
 Generate a function that calculates nfdir forward derivatives and nadir
 adjoint derivatives. ";
 
+%feature("docstring")  CasADi::XFunctionInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::symbolicFwdSeed "
+
+Symbolic expressions for the forward seeds. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::symbolicAdjSeed "
+
+Symbolic expressions for the adjoint seeds. ";
+
 %feature("docstring")  CasADi::XFunctionInternal::evaluate "
 
 Evaluate. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
 
 %feature("docstring")  CasADi::XFunctionInternal::init "
 
@@ -80315,6 +81412,18 @@ Get single statistic obtained at the end of the last evaluate call. ";
 %feature("docstring")  CasADi::XFunctionInternal::getJacSparsity "
 
 Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::getJacSparsityHierarchical
+"
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
 
 %feature("docstring")  CasADi::XFunctionInternal::setJacSparsity "
 
@@ -81310,6 +82419,12 @@ Helper function for 'QPOutput' Output arguments of an QP Solver
 %feature("docstring")  CasADi::square "";
 
 %feature("docstring")  CasADi::operation_checker "";
+
+%feature("docstring")  CasADi::bvec_toggle "";
+
+%feature("docstring")  CasADi::bvec_clear "";
+
+%feature("docstring")  CasADi::bvec_or "";
 
 %feature("docstring")  CasADi::reportConstraints "
 
