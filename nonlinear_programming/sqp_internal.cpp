@@ -239,9 +239,9 @@ void SQPInternal::evaluate(int nfdir, int nadir){
   eval_grad_f(x_,fk_,gf_);
   
   // Initialize or reset the Hessian or Hessian approximation
+  reg_ = 0;
   if( hess_mode_ == HESS_BFGS){
     reset_h();
-    reg_ = 0;
   } else {
     eval_h(x_,mu_,1.0,Bk_);
   }
