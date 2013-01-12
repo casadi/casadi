@@ -278,7 +278,7 @@ void DirectSingleShootingInternal::setOptimalSolution(const vector<double> &V_op
 
     // Get the state trajectory
     for(int i=0; i<nx_; ++i){
-      x_opt(i,k+1) = V_opt[el++];
+      x_opt(i,k+1) = g_opt[el++];
     }
     
     // Skip the path constraints (for now)
