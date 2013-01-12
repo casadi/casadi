@@ -125,8 +125,13 @@ class FXInternal : public OptionsFunctionalityNode{
     *    This method returns a cached instance if available, and calls FX getDerivative(int nfwd, int nadj) if no cached version is available.
     */
     FX derivative(int nfwd, int nadj);
+
     /** \brief Constructs and returns a function that calculates forward derivatives */
     virtual FX getDerivative(int nfwd, int nadj);
+
+    /** \brief Constructs and returns a function that calculates forward derivatives by creating the Jacobian then multiplying */
+    virtual FX getDerivativeViaJac(int nfwd, int nadj);
+
     //@}
 
     /** \brief  Access an input */

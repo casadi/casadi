@@ -1083,8 +1083,28 @@ FX FXInternal::derivative(int nfwd, int nadj){
   // Generate if not already cached
   if(ret.isNull()){
 
-    // Generate a new function
-    ret = getDerivative(nfwd,nadj);
+    // Get the number of scalar inputs and outputs
+    int num_in_scalar = getNumScalarInputs();
+    int num_out_scalar = getNumScalarOutputs();
+  
+    // Adjoint mode penalty factor (adjoint mode is usually more expensive to calculate)
+    int adj_penalty = 2;
+    
+    // Crude estimate of the cost of calculating the full Jacobian
+    int full_jac_cost = std::min(num_in_scalar, adj_penalty*num_out_scalar);
+    
+    // Crude estimate of the cost of calculating the directional derivatives
+    int der_dir_cost = nfwd + adj_penalty*nadj;
+    
+    // Check if it is cheaper to calculate the full Jacobian and then multiply
+    if(2*full_jac_cost < der_dir_cost){
+      // Generate the Jacobian and then multiply to get the derivative
+      //ret = getDerivativeViaJac(nfwd,nadj); // NOTE: Uncomment this line (and remove the next line) to enable this feature
+      ret = getDerivative(nfwd,nadj);    
+    } else {
+      // Generate a new function
+      ret = getDerivative(nfwd,nadj);    
+    }
     
     // Give it a suitable name
     stringstream ss;
@@ -1101,6 +1121,15 @@ FX FXInternal::derivative(int nfwd, int nadj){
 
 FX FXInternal::getDerivative(int nfwd, int nadj){
   casadi_error("FXInternal::getDerivative not defined for class " << typeid(*this).name());
+}
+
+FX FXInternal::getDerivativeViaJac(int nfwd, int nadj){
+  // Wrap in an MXFunction
+  vector<MX> arg = symbolicInput();
+  vector<MX> res = shared_from_this<FX>().call(arg);
+  FX f = MXFunction(arg,res);
+  f.init();
+  return f->getDerivativeViaJac(nfwd,nadj);
 }
 
 int FXInternal::getNumScalarInputs() const{
