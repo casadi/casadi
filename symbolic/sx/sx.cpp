@@ -718,7 +718,14 @@ SX SX::logic_or(const SX& y) const{
 }
 
 SX SX::if_else_zero(const SX& y) const{
-  return BinarySX::create(OP_IF_ELSE_ZERO,*this,y);
+  if(y->isZero()){
+    return y;
+  } else if(isConstant()){
+    if(getValue()!=0) return y;
+    else              return 0;
+  } else {
+    return BinarySX::create(OP_IF_ELSE_ZERO,*this,y);
+  }
 }
 
 int SX::getTemp() const{
