@@ -27,6 +27,7 @@
 #include "mx_function.hpp"
 #include "../matrix/matrix_tools.hpp"
 #include "../sx/sx_tools.hpp"
+#include "../mx/mx_tools.hpp"
 #include "../matrix/sparsity_tools.hpp"
 
 using namespace std;
@@ -1209,10 +1210,61 @@ FX FXInternal::getNumericJacobian(int iind, int oind, bool compact, bool symmetr
   vector<MX> arg = symbolicInput();
   vector<MX> res = shared_from_this<FX>().call(arg);
   FX f = MXFunction(arg,res);
-  f.setOption("numeric_jacobian", false);
+  f.setOption("numeric_jacobian", false); // BUG ?
   f.init();
   return f->getNumericJacobian(iind,oind,compact,symmetric);
 }
+
+  FX FXInternal::fullJacobian(){
+    if(full_jacobian_.isNull()){
+      if(getNumInputs()==1 && getNumOutputs()==1){
+	return full_jacobian_ = jacobian(0,0,true,false);
+      } else {
+	return full_jacobian_ = getFullJacobian();
+      }
+    } else {
+      return full_jacobian_;
+    }
+  }
+
+  FX FXInternal::getFullJacobian(){
+    // Count the total number of inputs and outputs
+    int num_in_scalar = getNumScalarInputs();
+    int num_out_scalar = getNumScalarOutputs();
+
+    // Generate a function from all input nonzeros to all output nonzeros
+    MX arg = msym("arg",num_in_scalar);
+    
+    // Assemble vector inputs
+    int nz_offset = 0; // Current nonzero offset
+    vector<MX> argv(getNumInputs());
+    for(int ind=0; ind<argv.size(); ++ind){
+      const CRSSparsity& sp = input(ind).sparsity();
+      argv[ind] = reshape(arg[Slice(nz_offset,nz_offset+sp.size())],sp);
+      nz_offset += sp.size();
+    }
+    casadi_assert(nz_offset == num_in_scalar);
+
+    // Call function to get vector outputs
+    vector<MX> resv = shared_from_this<FX>().call(argv);
+
+    // Get the nonzeros of each output
+    for(int ind=0; ind<resv.size(); ++ind){
+      if(resv[ind].size2()!=1 || !resv[ind].dense()){
+	resv[ind] = resv[ind][Slice()];
+      }
+    }
+
+    // Concatenate to get all output nonzeros
+    MX res = vertcat(resv);
+    casadi_assert(res.size() == num_out_scalar);
+
+    // Form function of all inputs nonzeros to all output nonzeros and return Jacobian of this
+    FX f = MXFunction(arg,res);
+    f.init();
+    return f.jacobian(0,0,false,false);
+  }
+
 
 } // namespace CasADi
 

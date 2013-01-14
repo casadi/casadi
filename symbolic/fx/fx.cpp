@@ -171,6 +171,11 @@ FX FX::hessian(int iind, int oind){
   return (*this)->hessian(iind,oind);  
 }
 
+FX FX::fullJacobian(){
+  assertInit();
+  return (*this)->fullJacobian();
+}
+
 bool FX::checkNode() const{
   return dynamic_cast<const FXInternal*>(get())!=0;
 }

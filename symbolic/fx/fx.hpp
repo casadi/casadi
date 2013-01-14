@@ -195,6 +195,9 @@ class FX : public OptionsFunctionality{
   */
   FX hessian(int iind=0, int oind=0);
 
+  /** \brief Generate a Jacobian function of all the inputs nonzeros (getNumScalarInputs()) with respect to all the output nonzeros (getNumScalarOutputs()).
+  */
+  FX fullJacobian();
 
 #ifndef SWIG
   /** \brief  Create a function call (single input) */
