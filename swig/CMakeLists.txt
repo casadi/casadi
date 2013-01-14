@@ -14,7 +14,6 @@ endif()
 
 find_package(PythonLibs)
 find_package(NUMPY)
-find_package(MPI)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../cmake_modules)
 
@@ -23,11 +22,6 @@ set(SWIG_LINK_LIBRARIES_LIST "")
 
 # Include the use swig file
 include (../cmake_modules/UseSWIGMOD.cmake)
-
-if(MPI_FOUND) 
-  include_directories (${MPI_INCLUDE_PATH}) 
-  set(SWIG_LINK_LIBRARIES_LIST ${SWIG_LINK_LIBRARIES_LIST} ${MPI_LIBRARY} ${MPI_EXTRA_LIBRARY}) 
-endif()
 
 if(IPOPT_FOUND)
   link_directories(${IPOPT_LIBRARY_DIRS})
