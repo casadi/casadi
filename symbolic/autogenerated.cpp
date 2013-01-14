@@ -44,6 +44,8 @@ std::string getSchemeName(InputOutputScheme scheme) {
     case SCHEME_OCPOutput: return "OCPOutput";
     case SCHEME_QPInput: return "QPInput";
     case SCHEME_QPOutput: return "QPOutput";
+    case SCHEME_SDPInput: return "SDPInput";
+    case SCHEME_SDPOutput: return "SDPOutput";
     case SCHEME_unknown: return "unknown";
 }
 }
@@ -67,6 +69,8 @@ std::string getSchemeEntryNames(InputOutputScheme scheme) {
     case SCHEME_OCPOutput: return "x_opt, u_opt, p_opt, cost";
     case SCHEME_QPInput: return "h, g, a, lba, uba, lbx, ubx, x_init, lambda_init";
     case SCHEME_QPOutput: return "primal, cost, lambda_a, lambda_x";
+    case SCHEME_SDPInput: return "a, b, c";
+    case SCHEME_SDPOutput: return "primal, p, dual, primal_cost, dual_cost";
     case SCHEME_unknown: return "not available";
 }
 }
@@ -234,6 +238,20 @@ std::string getSchemeEntryName(InputOutputScheme scheme, int i) {
       if(i==3) return "lambda_x";
       casadi_error("getSchemeEntryName: supplied number is out of range. QPOutput has only 4 entries: ('QPOutput', 'primal, cost, lambda_a, lambda_x')");
       break;
+    case SCHEME_SDPInput: 
+      if(i==0) return "a";
+      if(i==1) return "b";
+      if(i==2) return "c";
+      casadi_error("getSchemeEntryName: supplied number is out of range. SDPInput has only 3 entries: ('SDPInput', 'a, b, c')");
+      break;
+    case SCHEME_SDPOutput: 
+      if(i==0) return "primal";
+      if(i==1) return "p";
+      if(i==2) return "dual";
+      if(i==3) return "primal_cost";
+      if(i==4) return "dual_cost";
+      casadi_error("getSchemeEntryName: supplied number is out of range. SDPOutput has only 5 entries: ('SDPOutput', 'primal, p, dual, primal_cost, dual_cost')");
+      break;
 }
 }
 std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
@@ -399,6 +417,20 @@ std::string getSchemeEntryDoc(InputOutputScheme scheme, int i) {
       if(i==2) return "The dual solution corresponding to linear bounds";
       if(i==3) return "The dual solution corresponding to simple bounds";
       casadi_error("getSchemeEntryDoc: supplied number is out of range. QPOutput has only 4 entries: ('QPOutput', 'primal, cost, lambda_a, lambda_x')");
+      break;
+    case SCHEME_SDPInput: 
+      if(i==0) return "The vertical stack of all matrices A_i: ( nm x n)";
+      if(i==1) return "The vector b: ( m x 1)";
+      if(i==2) return "The matrix C: ( n x n)";
+      casadi_error("getSchemeEntryDoc: supplied number is out of range. SDPInput has only 3 entries: ('SDPInput', 'a, b, c')");
+      break;
+    case SCHEME_SDPOutput: 
+      if(i==0) return "The primal solution (m x 1) - may be used as initial guess";
+      if(i==1) return "The solution P (n x n) - may be used as initial guess";
+      if(i==2) return "The dual solution (n x n) - may be used as initial guess";
+      if(i==3) return "The primal optimal cost (1 x 1)";
+      if(i==4) return "The dual optimal cost (1 x 1)";
+      casadi_error("getSchemeEntryDoc: supplied number is out of range. SDPOutput has only 5 entries: ('SDPOutput', 'primal, p, dual, primal_cost, dual_cost')");
       break;
     case SCHEME_unknown: return "none";
 }
@@ -567,6 +599,20 @@ std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i) {
       if(i==3) return "QP_LAMBDA_X";
       casadi_error("getSchemeEntryEnumName: supplied number is out of range. QPOutput has only 4 entries: ('QPOutput', 'primal, cost, lambda_a, lambda_x')");
       break;
+    case SCHEME_SDPInput: 
+      if(i==0) return "SDP_A";
+      if(i==1) return "SDP_B";
+      if(i==2) return "SDP_C";
+      casadi_error("getSchemeEntryEnumName: supplied number is out of range. SDPInput has only 3 entries: ('SDPInput', 'a, b, c')");
+      break;
+    case SCHEME_SDPOutput: 
+      if(i==0) return "SDP_PRIMAL";
+      if(i==1) return "SDP_PRIMAL_P";
+      if(i==2) return "SDP_DUAL";
+      if(i==3) return "SDP_PRIMAL_COST";
+      if(i==4) return "SDP_DUAL_COST";
+      casadi_error("getSchemeEntryEnumName: supplied number is out of range. SDPOutput has only 5 entries: ('SDPOutput', 'primal, p, dual, primal_cost, dual_cost')");
+      break;
     case SCHEME_unknown: return "none";
 }
 }
@@ -715,6 +761,18 @@ int getSchemeEntryEnum(InputOutputScheme scheme, const std::string &name) {
       if(name=="cost") return 1;
       if(name=="lambda_a") return 2;
       if(name=="lambda_x") return 3;
+      break;
+    case SCHEME_SDPInput: 
+      if(name=="a") return 0;
+      if(name=="b") return 1;
+      if(name=="c") return 2;
+      break;
+    case SCHEME_SDPOutput: 
+      if(name=="primal") return 0;
+      if(name=="p") return 1;
+      if(name=="dual") return 2;
+      if(name=="primal_cost") return 3;
+      if(name=="dual_cost") return 4;
       break;
 }
 return -1;}

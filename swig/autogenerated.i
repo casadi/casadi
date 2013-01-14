@@ -876,3 +876,81 @@ namespace CasADi {
 %template(qpOut) qpOut<MX>;
 }
 #endif //SWIGPYTHON
+#ifdef SWIGPYTHON
+%pythoncode %{
+def sdpIn(*dummy,**kwargs):
+  """
+  Helper function for 'SDPInput'
+
+  Input arguments of a SDP problem
+  
+  Keyword arguments:
+    a -- The vertical stack of all matrices A_i: ( nm x n) [SDP_A]
+    b -- The vector b: ( m x 1) [SDP_B]
+    c -- The matrix C: ( n x n) [SDP_C]
+  """
+  if(len(dummy)>0): raise Exception("Error in sdpIn: syntax has become more strict. You must use keyword arguments now, for your own safety.\n sdpIn(my_a, my_b, my_c)\nmust be written\n sdpIn(a=my_a, b=my_b, c=my_c)\nwhere any keyword is optional.")
+  a = []
+  if 'a' in kwargs:
+    a = kwargs['a']
+  b = []
+  if 'b' in kwargs:
+    b = kwargs['b']
+  c = []
+  if 'c' in kwargs:
+    c = kwargs['c']
+  for k in kwargs.keys():
+    if not(k in ['a','b','c']):
+      raise Exception("Keyword error in sdpIn: '%s' is not recognized. Available keywords are: a, b, c" % k )
+  return [a,b,c]
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(sdpIn) sdpIn<SXMatrix>;
+%template(sdpIn) sdpIn<MX>;
+}
+#endif //SWIGPYTHON
+#ifdef SWIGPYTHON
+%pythoncode %{
+def sdpOut(*dummy,**kwargs):
+  """
+  Helper function for 'SDPOutput'
+
+  Output arguments of an SDP Solver
+  
+  Keyword arguments:
+    primal      -- The primal solution (m x 1) - may be used as initial guess [SDP_PRIMAL]
+    p           -- The solution P (n x n) - may be used as initial guess [SDP_PRIMAL_P]
+    dual        -- The dual solution (n x n) - may be used as initial guess [SDP_DUAL]
+    primal_cost -- The primal optimal cost (1 x 1) [SDP_PRIMAL_COST]
+    dual_cost   -- The dual optimal cost (1 x 1) [SDP_DUAL_COST]
+  """
+  if(len(dummy)>0): raise Exception("Error in sdpOut: syntax has become more strict. You must use keyword arguments now, for your own safety.\n sdpOut(my_primal, my_p, my_dual, my_primal_cost, my_dual_cost)\nmust be written\n sdpOut(primal=my_primal, p=my_p, dual=my_dual, primal_cost=my_primal_cost, dual_cost=my_dual_cost)\nwhere any keyword is optional.")
+  primal = []
+  if 'primal' in kwargs:
+    primal = kwargs['primal']
+  p = []
+  if 'p' in kwargs:
+    p = kwargs['p']
+  dual = []
+  if 'dual' in kwargs:
+    dual = kwargs['dual']
+  primal_cost = []
+  if 'primal_cost' in kwargs:
+    primal_cost = kwargs['primal_cost']
+  dual_cost = []
+  if 'dual_cost' in kwargs:
+    dual_cost = kwargs['dual_cost']
+  for k in kwargs.keys():
+    if not(k in ['primal','p','dual','primal_cost','dual_cost']):
+      raise Exception("Keyword error in sdpOut: '%s' is not recognized. Available keywords are: primal, p, dual, primal_cost, dual_cost" % k )
+  return [primal,p,dual,primal_cost,dual_cost]
+%}
+#endif //SWIGPYTHON
+#ifndef SWIGPYTHON
+namespace CasADi {
+%template(sdpOut) sdpOut<SXMatrix>;
+%template(sdpOut) sdpOut<MX>;
+}
+#endif //SWIGPYTHON

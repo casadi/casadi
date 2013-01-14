@@ -29,7 +29,7 @@
 #include <map>
 #include "casadi_exception.hpp"
 namespace CasADi{
-enum InputOutputScheme { SCHEME_ACADO_Input, SCHEME_ACADO_Output, SCHEME_ACADO_FCN_Input, SCHEME_ControlledDAEInput, SCHEME_ControlSimulatorInput, SCHEME_DAEInput, SCHEME_DAEOutput, SCHEME_RDAEInput, SCHEME_RDAEOutput, SCHEME_IntegratorInput, SCHEME_IntegratorOutput, SCHEME_NLPInput, SCHEME_NLPOutput, SCHEME_MayerInput, SCHEME_OCPInput, SCHEME_OCPOutput, SCHEME_QPInput, SCHEME_QPOutput , SCHEME_unknown};
+enum InputOutputScheme { SCHEME_ACADO_Input, SCHEME_ACADO_Output, SCHEME_ACADO_FCN_Input, SCHEME_ControlledDAEInput, SCHEME_ControlSimulatorInput, SCHEME_DAEInput, SCHEME_DAEOutput, SCHEME_RDAEInput, SCHEME_RDAEOutput, SCHEME_IntegratorInput, SCHEME_IntegratorOutput, SCHEME_NLPInput, SCHEME_NLPOutput, SCHEME_MayerInput, SCHEME_OCPInput, SCHEME_OCPOutput, SCHEME_QPInput, SCHEME_QPOutput, SCHEME_SDPInput, SCHEME_SDPOutput , SCHEME_unknown};
 std::string getSchemeEntryName(InputOutputScheme scheme, int i);
 std::string getSchemeEntryDoc(InputOutputScheme scheme, int i);
 std::string getSchemeEntryEnumName(InputOutputScheme scheme, int i);
@@ -454,6 +454,48 @@ std::vector<M> qpOut(const std::string arg_s0="",M arg_m0=M(),const std::string 
     int n = getSchemeEntryEnum(SCHEME_QPOutput,it->first);
     if (n==-1)
       casadi_error("Keyword error in QPOutput: '" << it->first << "' is not recognized. Available keywords are: primal, cost, lambda_a, lambda_x");
+    ret[n] = it->second;
+  }
+  return ret;
+}
+/// Helper function for 'SDPInput'
+/// Input arguments of a SDP problem
+/// 
+/// \copydoc scheme_SDPInput
+template<class M>
+std::vector<M> sdpIn(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M()){
+  std::vector<M> ret(3);
+  std::map<std::string,M> arg;
+  if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
+  if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
+  if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
+  typedef typename std::map<std::string,M>::const_iterator it_type;
+  for(it_type it = arg.begin(); it != arg.end(); it++) {
+    int n = getSchemeEntryEnum(SCHEME_SDPInput,it->first);
+    if (n==-1)
+      casadi_error("Keyword error in SDPInput: '" << it->first << "' is not recognized. Available keywords are: a, b, c");
+    ret[n] = it->second;
+  }
+  return ret;
+}
+/// Helper function for 'SDPOutput'
+/// Output arguments of an SDP Solver
+/// 
+/// \copydoc scheme_SDPOutput
+template<class M>
+std::vector<M> sdpOut(const std::string arg_s0="",M arg_m0=M(),const std::string arg_s1="",M arg_m1=M(),const std::string arg_s2="",M arg_m2=M(),const std::string arg_s3="",M arg_m3=M(),const std::string arg_s4="",M arg_m4=M()){
+  std::vector<M> ret(5);
+  std::map<std::string,M> arg;
+  if (arg_s0!="") arg.insert(make_pair(arg_s0,arg_m0));
+  if (arg_s1!="") arg.insert(make_pair(arg_s1,arg_m1));
+  if (arg_s2!="") arg.insert(make_pair(arg_s2,arg_m2));
+  if (arg_s3!="") arg.insert(make_pair(arg_s3,arg_m3));
+  if (arg_s4!="") arg.insert(make_pair(arg_s4,arg_m4));
+  typedef typename std::map<std::string,M>::const_iterator it_type;
+  for(it_type it = arg.begin(); it != arg.end(); it++) {
+    int n = getSchemeEntryEnum(SCHEME_SDPOutput,it->first);
+    if (n==-1)
+      casadi_error("Keyword error in SDPOutput: '" << it->first << "' is not recognized. Available keywords are: primal, p, dual, primal_cost, dual_cost");
     ret[n] = it->second;
   }
   return ret;
