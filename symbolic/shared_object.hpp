@@ -30,6 +30,9 @@
 
 namespace CasADi{
 
+// Forward declaration of weak reference class
+class WeakRef;
+
 // Forward declaration of internal class
 class SharedObjectNode;
 
@@ -139,6 +142,9 @@ class SharedObject : public PrintableObject{
 #ifndef SWIG
     void makeUnique(std::map<SharedObjectNode*,SharedObject>& already_copied, bool clone_members=true);
     //@}
+
+    /** \brief Get a weak reference to the object */
+    WeakRef* weak();
     
   private:
     SharedObjectNode *node;
@@ -190,6 +196,9 @@ class SharedObjectNode{
   /// Print a destription of the object
   virtual void print(std::ostream &stream) const;
 
+  /** \brief Get a weak reference to the object */
+  WeakRef* weak();
+
   protected:
     /// Get a shared object from the current internal object
     template<class B>
@@ -205,6 +214,9 @@ class SharedObjectNode{
   private:
     /// Number of references pointing to the object
     unsigned int count;
+
+    /// Weak pointer (non-owning) object for the object
+    WeakRef* weak_ref_;
 };
 
 /// Typecast a shared object to a base class to a shared object to a derived class, cf. dynamic_cast

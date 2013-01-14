@@ -22,6 +22,7 @@
 
 #include "shared_object.hpp"
 #include "casadi_exception.hpp"
+#include "weak_ref.hpp"
 
 #include <typeinfo>
 #include <cassert>
@@ -36,11 +37,12 @@ SharedObject::SharedObject(){
 SharedObjectNode::SharedObjectNode(const SharedObjectNode& node){
   is_init_ = node.is_init_;
   count = 0; // reference counter is _not_ copied
+  weak_ref_ = 0; // nor will they have the same weak references
 }
 
 SharedObjectNode& SharedObjectNode::operator=(const SharedObjectNode& node){
   is_init_ = node.is_init_;
-  // do _not_ copy the reference counter
+  // do _not_ copy the reference counter 
   return *this;
 }
 
@@ -112,10 +114,15 @@ SharedObjectNode* SharedObject::operator->(){
 SharedObjectNode::SharedObjectNode(){
   is_init_ = false;
   count = 0;
+  weak_ref_ = 0;
 }
 
 SharedObjectNode::~SharedObjectNode(){
    assert(count==0);
+   if(weak_ref_!=0){
+     weak_ref_->kill();
+     delete weak_ref_;    
+   }
 }
 
 void SharedObject::init(){
@@ -223,6 +230,16 @@ void SharedObjectNode::assertInit() const{
   casadi_assert_message(isInit(),"You must first initialize a Shared Object before you can use it." << std::endl <<  "Use something like f.init()");
 }
 
+  WeakRef* SharedObject::weak(){
+    return (*this)->weak();
+  }
+
+  WeakRef* SharedObjectNode::weak(){
+    if(weak_ref_==0){
+      weak_ref_ = new WeakRef(this);
+    }
+    return weak_ref_;
+  }
 
 } // namespace CasADi
     
