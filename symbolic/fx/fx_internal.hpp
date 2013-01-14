@@ -24,6 +24,7 @@
 #define FX_INTERNAL_HPP
 
 #include "fx.hpp"
+#include "../weak_ref.hpp"
 #include <set>
 
 // This macro is for documentation purposes
@@ -382,7 +383,7 @@ class FXInternal : public OptionsFunctionalityNode{
     std::vector<std::vector<FX> > derivative_fcn_; // NOTE: This can result in circular dependencies!
 
     /// Cache for full Jacobian
-    FX full_jacobian_;
+    WeakRef full_jacobian_;
 
     /// Cache for sparsities of the Jacobian blocks
     std::vector<std::vector<CRSSparsity> > jac_sparsity_, jac_sparsity_compact_;

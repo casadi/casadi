@@ -1216,14 +1216,21 @@ FX FXInternal::getNumericJacobian(int iind, int oind, bool compact, bool symmetr
 }
 
   FX FXInternal::fullJacobian(){
-    if(full_jacobian_.isNull()){
-      if(getNumInputs()==1 && getNumOutputs()==1){
-	return full_jacobian_ = jacobian(0,0,true,false);
-      } else {
-	return full_jacobian_ = getFullJacobian();
-      }
+    if(full_jacobian_.alive()){
+      // Return cached Jacobian
+      return shared_cast<FX>(full_jacobian_.shared());
     } else {
-      return full_jacobian_;
+      // Generate a new Jacobian
+      FX ret;
+      if(getNumInputs()==1 && getNumOutputs()==1){
+	ret = jacobian(0,0,true,false);
+      } else {
+	getFullJacobian();
+      }
+
+      // Return and cache it for reuse
+      full_jacobian_ = ret;
+      return ret;
     }
   }
 
