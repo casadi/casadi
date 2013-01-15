@@ -919,7 +919,7 @@ void Matrix<T>::getArray(T* val, int len, Sparsity sp) const{
       }
     }
   } else {
-    casadi_error("Matrix<T>::getArray: not SPARSE or DENSE");
+    casadi_error("Matrix<T>::getArray: not SPARSE, SPARSESYM  or DENSE");
   }
 }
 
@@ -972,8 +972,21 @@ void Matrix<T>::setArray(const T* val, int len, Sparsity sp){
         // Set the element
         v[el] = val[i*size2()+j];
     }
+  } else if(sp==SPARSESYM) {
+    std::vector<int> mapping;
+    sparsity().transpose(mapping,false);
+    // copy to the result vector
+    int nz = 0;
+    for(int row=0; row<size1(); ++row){
+      // Loop over the elements in the row
+      for(int el=rowind(row); el<rowind(row+1); ++el){ // loop over the non-zero elements
+        if(col(el) > row) break; // break inner loop (only lower triangular part is used)
+        v[el] = val[nz++];
+        v[mapping[el]] = v[el];
+      }
+    }
   } else {
-    throw CasadiException("Matrix<T>::setArray: not SPARSE or DENSE");
+    throw CasadiException("Matrix<T>::setArray: not SPARSE, SPARSESYM or DENSE");
   }
 }
 
