@@ -120,7 +120,7 @@ CRSSparsity sp_banded(int n, int p) {
 }
 
 
-CRSSparsity sp_rowcol(std::vector<int> row, std::vector<int> col, int nrow, int ncol) {
+CRSSparsity sp_rowcol(const std::vector<int>& row, const std::vector<int>& col, int nrow, int ncol) {
   std::vector<int> rowind(nrow+1);
   std::vector<int> col_new(row.size()*col.size());
   

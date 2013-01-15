@@ -2117,7 +2117,7 @@ vector<int> CRSSparsityInternal::erase(const vector<int>& ii, const vector<int>&
   return mapping;
 }
 
-vector<int> CRSSparsityInternal::getNZ(vector<int> ii, vector<int> jj) const{
+vector<int> CRSSparsityInternal::getNZ(const vector<int>& ii, const vector<int>& jj) const{
   if (!inBounds(ii,nrow_)) {
     casadi_error("Slicing [ii,jj] out of bounds. Your ii contains " << *std::min_element(ii.begin(),ii.end()) << " up to " << *std::max_element(ii.begin(),ii.end()) << ", which is outside of the matrix shape " << dimString() << ".");
   }

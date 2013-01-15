@@ -89,7 +89,7 @@ CRSSparsity sp_band(int n, int p);
   /** \brief Construct a block sparsity pattern from (row,col) vectors
       
    */
-  CRSSparsity sp_rowcol(std::vector<int> row, std::vector<int> col,int nrow, int ncol);
+  CRSSparsity sp_rowcol(const std::vector<int>& row, const std::vector<int>& col,int nrow, int ncol);
   
   
   /** \brief Get the indices of all non-zero elements as they would appear in a Dense matrix  
@@ -142,7 +142,7 @@ CRSSparsity sp_band(int n, int p);
   
   /** \brief Represent a sparsity pattern as an array of integers, the most compact way of representing a sparsity pattern
       The format:
-      * The first two entries are the nunber of rows (nrow) and columns (ncol)
+      * The first two entries are the number of rows (nrow) and columns (ncol)
       * The next nrow+1 entries are the row offsets (rowind). Note that the last element rowind[nrow] gives the number of nonzeros
       * The last rowind[nrow] entries are the column indices
       **/

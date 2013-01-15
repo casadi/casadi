@@ -48,7 +48,7 @@ CRSSparsity::CRSSparsity(int nrow, int ncol, bool dense){
   assignNode(new CRSSparsityInternal(nrow, ncol, col, rowind));
 }
 
-CRSSparsity::CRSSparsity(int nrow, int ncol, vector<int> col, vector<int> rowind){
+CRSSparsity::CRSSparsity(int nrow, int ncol, const vector<int>& col, const vector<int>& rowind){
   assignNode(new CRSSparsityInternal(nrow, ncol, col, rowind));
 }
     
@@ -215,7 +215,7 @@ CRSSparsity CRSSparsity::reshape(int n, int m) const{
 //   return ret;
 // }
 
-vector<int> CRSSparsity::getNZ(vector<int> ii, vector<int> jj) const{
+vector<int> CRSSparsity::getNZ(const vector<int>& ii, const vector<int>& jj) const{
   return (*this)->getNZ(ii,jj);
 }
 

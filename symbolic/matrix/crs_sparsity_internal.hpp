@@ -30,7 +30,7 @@ namespace CasADi{
 class CRSSparsityInternal : public SharedObjectNode{
   public:
     /// Construct a sparsity pattern from vectors
-    CRSSparsityInternal(int nrow, int ncol, std::vector<int> col, std::vector<int> rowind) : nrow_(nrow), ncol_(ncol), col_(col), rowind_(rowind) { sanityCheck(false); }
+    CRSSparsityInternal(int nrow, int ncol, const std::vector<int>& col, const std::vector<int>& rowind) : nrow_(nrow), ncol_(ncol), col_(col), rowind_(rowind) { sanityCheck(false); }
     
     /// Check if the dimensions and rowind,col vectors are compatible
     void sanityCheck(bool complete=false) const;
@@ -204,7 +204,7 @@ class CRSSparsityInternal : public SharedObjectNode{
     int getNZ(int i, int j) const;
     
     /// Get a set of non-zero element - does bounds checking
-    std::vector<int> getNZ(std::vector<int> ii, std::vector<int> jj) const;
+    std::vector<int> getNZ(const std::vector<int>& ii, const std::vector<int>& jj) const;
 
     /// Get the nonzero index for a set of elements (see descripion in public class)
     void getNZInplace(std::vector<int>& indices) const;
