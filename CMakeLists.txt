@@ -143,7 +143,7 @@ if(WITH_QPOASES)
 endif()
 add_feature_info(qpoases-interface WITH_QPOASES "Interface to the active-set QP solver qpOASES.")
 
-# Use the included qpOASES
+# Use the included csparse
 if(WITH_CSPARSE)
   set(CSPARSE_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/CSparse/Include)
   set(CSPARSE_LIBRARIES casadi_csparse)
