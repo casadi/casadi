@@ -140,6 +140,27 @@ CRSSparsity sp_band(int n, int p);
    */
   CRSSparsity mul(const  CRSSparsity& a, const  CRSSparsity &b);
   
+  /** \brief Represent a sparsity pattern as an array of integers, the most compact way of representing a sparsity pattern
+      The format:
+      * The first two entries are the nunber of rows (nrow) and columns (ncol)
+      * The next nrow+1 entries are the row offsets (rowind). Note that the last element rowind[nrow] gives the number of nonzeros
+      * The last rowind[nrow] entries are the column indices
+      **/
+  /// @{
+  
+  /// Compress a sparsity pattern
+  std::vector<int> sp_compress(const CRSSparsity& a);
+  
+  /// Decompress a sparsity pattern
+  CRSSparsity sp_compress(const std::vector<int>& v);
+  
+#ifndef SWIG
+  /// Decompress a sparsity pattern (array version)
+  CRSSparsity sp_compress(const int* v);
+#endif // SWIG  
+
+  /// @}
+
 }
 
 #endif // SPARSITY_TOOLS_HPP

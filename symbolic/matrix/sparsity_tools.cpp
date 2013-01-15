@@ -416,6 +416,49 @@ CRSSparsity mul(const  CRSSparsity& a, const  CRSSparsity &b) {
     return ret;
   }
   
+  std::vector<int> sp_compress(const CRSSparsity& a){
+    // Get the sparsity pattern
+    int nrow = a.size1();
+    int ncol = a.size2();
+    const vector<int>& rowind = a.rowind();
+    const vector<int>& col = a.col();
+    
+    // Create compressed pattern
+    vector<int> ret;
+    ret.reserve(1 + 1 + rowind.size() + col.size());
+    ret.push_back(nrow);
+    ret.push_back(ncol);
+    ret.insert(ret.end(),rowind.begin(),rowind.end());
+    ret.insert(ret.end(),col.begin(),col.end());
+    return ret;
+  }
   
+  CRSSparsity sp_compress(const std::vector<int>& v){
+    // Check consistency
+    casadi_assert(v.size() >= 2);
+    int nrow = v[0];
+    int ncol = v[1];
+    casadi_assert(v.size() >= 2 + nrow+1);
+    int nnz = v[2 + nrow];
+    casadi_assert(v.size() == 2 + nrow+1 + nnz);
+
+    // Call array version
+    return sp_compress(&v.front());
+  }
+  
+  CRSSparsity sp_compress(const int* v){
+    // Get sparsity pattern
+    int nrow = v[0];
+    int ncol = v[1];
+    const int *rowind = v+2;
+    int nnz = rowind[nrow];
+    const int *col = v + 2 + nrow+1;
+    
+    // Construct sparsity pattern
+    return CRSSparsity(nrow, ncol, vector<int>(col,col+nnz), vector<int>(rowind,rowind+nrow+1));
+  }
+  
+
+
 } // namespace CasADi
 
