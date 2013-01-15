@@ -690,6 +690,16 @@ class Matrixtests(casadiTestCase):
 
     
     
+  def test_blockdiag(self):
+    self.message("blockdiag")
+    C = blockdiag([DMatrix([[-1.4,-3.2],[-3.2,-28]]),DMatrix([[15,-12,2.1],[-12,16,-3.8],[2.1,-3.8,15]]),1.8,-4.0])
+    r = DMatrix([[-1.4,-3.2,0,0,0,0,0],[-3.2,-28,0,0,0,0,0],[0,0,15,-12,2.1,0,0],[0,0,-12,16,-3.8,0,0],[0,0,2.1,-3.8,15,0,0],[0,0,0,0,0,1.8,0],[0,0,0,0,0,0,-4]])
+    makeSparse(r)
+    self.checkarray(C,r)
+    
+
+
+    
 if __name__ == '__main__':
     unittest.main()
 

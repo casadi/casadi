@@ -301,6 +301,10 @@ If the input is vector-like, a diagonal matrix is constructed with it. */
 template<class T>
 Matrix<T> diag(const Matrix<T> &A);
 
+/** \brief   Construct a matrix with given block on the diagonal */
+template<class T>
+Matrix<T> blockdiag(const std::vector< Matrix<T> > &A);
+
 #ifndef SWIG
 /** \brief  Get the sparsity in sparse triplet format */
 template<class T>
@@ -1013,6 +1017,38 @@ Matrix<T> diag(const Matrix<T>&A){
   return ret;
 }
 
+/** \brief   Construct a matrix with given block on the diagonal */
+template<class T>
+Matrix<T> blockdiag(const std::vector< Matrix<T> > &A) {
+  int n = 0;
+  int m = 0;
+  
+  int row_offset = 0;
+  int col_offset = 0;
+  std::vector<int> rowind(1,0);
+  std::vector<int> col;
+  std::vector<T> data;
+  
+  int nz = 0;
+  for (int i=0;i<A.size();++i) {
+    data.insert(data.end(),A[i].data().begin(),A[i].data().end());
+    const std::vector<int> &rowind_ = A[i].rowind();
+    const std::vector<int> &col_ = A[i].col();
+    for (int k=1;k<rowind_.size();++k) {
+      rowind.push_back(rowind_[k]+nz);
+    }
+    for (int k=0;k<col_.size();++k) {
+      col.push_back(col_[k]+m);
+    }
+    n+= A[i].size1();
+    m+= A[i].size2();
+    nz+= A[i].size();
+  }
+  
+  return Matrix<T>(n,m,col,rowind,data);
+  
+}
+
 template<class T>
 void getSparseTriplet(const Matrix<T>& A, std::vector<int>& row, std::vector<int>& col){
   col = A.sparsity().col();
@@ -1254,6 +1290,7 @@ MTT_INST(T,makeDense) \
 MTT_INST(T,makeSparse) \
 MTT_INST(T,hasNonStructuralZeros) \
 MTT_INST(T,diag) \
+MTT_INST(T,blockdiag) \
 MTT_INST(T,polyval) \
 MTT_INST(T,addMultiple) \
 MTT_INST(T,veccat) \
