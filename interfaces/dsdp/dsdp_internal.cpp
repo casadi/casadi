@@ -45,25 +45,37 @@ DSDPInternal* DSDPInternal::clone() const{
 DSDPInternal::DSDPInternal(const CRSSparsity &C, const CRSSparsity &A) : SDPSolverInternal(C,A){
  
   casadi_assert_message(double(n_)*(double(n_)+1)/2 < std::numeric_limits<int>::max(),"Your problem size n is too large to be handled by DSDP.");
-    
+ 
+  // Set DSDP memory blocks to null
+  dsdp_ = 0;
+  sdpcone_ = 0;
 }
 
 DSDPInternal::~DSDPInternal(){ 
-  if (is_init_) DSDPDestroy(dsdp);
+  if(dsdp_!=0){
+    DSDPDestroy(dsdp_);
+    dsdp_ = 0;
+  }
 }
 
 void DSDPInternal::init(){
+  // Initialize the base classes
   SDPSolverInternal::init();
-
 
   // A return flag used by DSDP
   int info;
   
+  // Destroy existing DSDP instance if already allocated
+  if(dsdp_!=0){
+    DSDPDestroy(dsdp_);
+    dsdp_ = 0;
+  }
+
   // Allocate DSDP solver memory
-  info = DSDPCreate(m_, &dsdp);
-  info = DSDPCreateSDPCone(dsdp,1,&sdpcone);
-  info = SDPConeSetBlockSize(sdpcone, 0, n_);
-  info = SDPConeSetSparsity(sdpcone, 0, n_);
+  info = DSDPCreate(m_, &dsdp_);
+  info = DSDPCreateSDPCone(dsdp_,1,&sdpcone_);
+  info = SDPConeSetBlockSize(sdpcone_, 0, n_);
+  info = SDPConeSetSparsity(sdpcone_, 0, n_);
 
   // Fill the data structures that hold DSDP-style sparse symmetric matrix
   pattern_.resize(m_+1);
@@ -112,7 +124,7 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
   
   // Copy b vector
   for (int i=0;i<m_;++i) {
-    info = DSDPSetDualObjective(dsdp, i+1, -input(SDP_B).at(i));
+    info = DSDPSetDualObjective(dsdp_, i+1, -input(SDP_B).at(i));
   }
   
   // Get Ai from supplied A
@@ -124,34 +136,34 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
   // Set 
   input(SDP_C).get(values_[0],SPARSESYM);
   std::transform(values_[0].begin(), values_[0].end(), values_[0].begin(), std::negate<double>());
-  info = SDPConeSetASparseVecMat(sdpcone, 0, 0, n_, 1, 0, &pattern_[0][0], &values_[0][0], pattern_[0].size() );
+  info = SDPConeSetASparseVecMat(sdpcone_, 0, 0, n_, 1, 0, &pattern_[0][0], &values_[0][0], pattern_[0].size() );
   
   for (int i=0;i<m_;++i) {
     mapping_.output(i).get(values_[i+1],SPARSESYM);
-    info = SDPConeSetASparseVecMat(sdpcone, 0, i+1, n_, 1, 0, &pattern_[i+1][0], &values_[i+1][0], pattern_[i+1].size() );
+    info = SDPConeSetASparseVecMat(sdpcone_, 0, i+1, n_, 1, 0, &pattern_[i+1][0], &values_[i+1][0], pattern_[i+1].size() );
   }
   
-  info = DSDPSetup(dsdp);
+  info = DSDPSetup(dsdp_);
   
-  info = DSDPSolve(dsdp);
+  info = DSDPSolve(dsdp_);
   casadi_assert_message(info==0,"DSDPSolver failed");
   
-  info = DSDPGetY(dsdp,&output(SDP_PRIMAL).at(0),m_);
+  info = DSDPGetY(dsdp_,&output(SDP_PRIMAL).at(0),m_);
   
   double temp;
-  DSDPGetDDObjective(dsdp, &temp);
+  DSDPGetDDObjective(dsdp_, &temp);
   output(SDP_PRIMAL_COST).set(-temp);
-  DSDPGetPPObjective(dsdp, &temp);
+  DSDPGetPPObjective(dsdp_, &temp);
   output(SDP_DUAL_COST).set(-temp);
   
   if (calc_dual_) {
-    info = SDPConeComputeX(sdpcone, 0, n_, &store_X_[0], store_X_.size());
+    info = SDPConeComputeX(sdpcone_, 0, n_, &store_X_[0], store_X_.size());
     output(SDP_DUAL).set(store_X_,SPARSESYM);
   }
   //
 
   if (calc_p_) {
-    info = SDPConeComputeS(sdpcone, 0, 1.0,  &output(SDP_PRIMAL).at(0), m_, 0, n_ , &store_P_[0], store_P_.size());
+    info = SDPConeComputeS(sdpcone_, 0, 1.0,  &output(SDP_PRIMAL).at(0), m_, 0, n_ , &store_P_[0], store_P_.size());
     output(SDP_PRIMAL_P).set(store_P_,SPARSESYM);
   }
   

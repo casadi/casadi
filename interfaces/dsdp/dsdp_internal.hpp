@@ -38,7 +38,7 @@ class DSDPInternal : public SDPSolverInternal {
 public:
   /** \brief  Constructor */
   explicit DSDPInternal();
-
+  
   /** \brief  Clone */
   virtual DSDPInternal* clone() const;
   
@@ -54,16 +54,17 @@ public:
   virtual void evaluate(int nfdir, int nadir);
   
   protected:
-    DSDP dsdp;
-    
-    SDPCone sdpcone;
-    
-    std::vector< std::vector<int> > pattern_;
-    std::vector< std::vector<double> > values_;
-    
-    /// Temporary work vector of size n*(n+1)/2
-    std::vector<double> store_X_;
-    std::vector<double> store_P_;
+  
+  // DSDP memory
+  DSDP dsdp_;
+  SDPCone sdpcone_;
+  
+  std::vector< std::vector<int> > pattern_;
+  std::vector< std::vector<double> > values_;
+  
+  /// Temporary work vector of size n*(n+1)/2
+  std::vector<double> store_X_;
+  std::vector<double> store_P_;
 };
 
 } // namespace CasADi
