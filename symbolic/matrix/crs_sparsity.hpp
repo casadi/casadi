@@ -80,7 +80,7 @@ class CRSSparsity : public SharedObject{
     /// Construct a sparsity pattern (sparse/dense)
     CRSSparsity(int nrow, int ncol, bool dense=false);
 
-    /// Construct a sparsity pattern from vectors
+    /// Construct a sparsity pattern from vectors (NOTE: why copy by value?)
     CRSSparsity(int nrow, int ncol, std::vector<int> col, std::vector<int> rowind);
 
     /** \brief Check if the dimensions and rowind,col vectors are compatible.
@@ -366,6 +366,9 @@ class CRSSparsity : public SharedObject{
     */
     void spyMatlab(const std::string& mfile) const;
 
+    // Hash the sparsity pattern
+    std::size_t hash() const;
+  
     #ifndef SWIG
     /** \brief Assign the nonzero entries of one sparsity pattern to the nonzero entries of another sparsity pattern */
     template<typename T>

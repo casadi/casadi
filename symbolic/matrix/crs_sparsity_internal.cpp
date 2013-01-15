@@ -3107,6 +3107,10 @@ void CRSSparsityInternal::spyMatlab(const std::string& mfile_name) const{
   mfile.close();
 }
 
+  std::size_t CRSSparsityInternal::hash() const{
+    return hash_sparsity(nrow_,ncol_,col_,rowind_);
+  }
+
 } // namespace CasADi
 
 

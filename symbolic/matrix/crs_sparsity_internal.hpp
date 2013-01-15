@@ -218,6 +218,9 @@ class CRSSparsityInternal : public SharedObjectNode{
     /// Get element index for each nonzero
     void getElements(std::vector<int>& loc, bool row_major) const;
     
+    /// Hash the sparsity pattern
+    std::size_t hash() const;
+
     /// Clone
     virtual CRSSparsityInternal* clone() const{ return new CRSSparsityInternal(*this); }
 

@@ -449,4 +449,8 @@ bool CRSSparsity::isTranspose(const CRSSparsity& y) const{
   return (*this)->isTranspose(*static_cast<const CRSSparsityInternal*>(y.get()));
 }
 
+  std::size_t CRSSparsity::hash() const{
+    return (*this)->hash();
+  }
+
 } // namespace CasADi

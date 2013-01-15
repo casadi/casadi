@@ -406,7 +406,16 @@ CRSSparsity mul(const  CRSSparsity& a, const  CRSSparsity &b) {
   return (mul(DMatrix(a,1),DMatrix(b,1))).sparsity();
 }
 
-
+  std::size_t hash_sparsity(int nrow, int ncol, const std::vector<int>& col, const std::vector<int>& rowind){
+    // Condense the sparsity pattern to a single, deterministric number
+    std::size_t ret=0;
+    hash_combine(ret,nrow);
+    hash_combine(ret,ncol);
+    for(std::vector<int>::const_iterator it=rowind.begin(); it!=rowind.end(); ++it) hash_combine(ret,*it);
+    for(std::vector<int>::const_iterator it=col.begin(); it!=col.end(); ++it) hash_combine(ret,*it);
+    return ret;
+  }
+  
   
 } // namespace CasADi
 
