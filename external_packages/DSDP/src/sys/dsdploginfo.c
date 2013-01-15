@@ -6,7 +6,7 @@
 #include <stdarg.h>
 #include <sys/types.h>
 #include <stdlib.h>
-#include <malloc.h>
+/*#include <malloc.h> */ /* Commented out since it is obsolete and causes compilation problems on OS X.*/
 #include "dsdpsys.h"
 #include "dsdpbasictypes.h"
 
