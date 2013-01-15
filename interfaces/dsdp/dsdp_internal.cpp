@@ -49,7 +49,7 @@ DSDPInternal::DSDPInternal(const CRSSparsity &C, const CRSSparsity &A) : SDPSolv
 }
 
 DSDPInternal::~DSDPInternal(){ 
-
+  if (is_init_) DSDPDestroy(dsdp);
 }
 
 void DSDPInternal::init(){
