@@ -303,7 +303,7 @@ Matrix<T> diag(const Matrix<T> &A);
 
 /** \brief   Construct a matrix with given block on the diagonal */
 template<class T>
-Matrix<T> blockdiag(const std::vector< Matrix<T> > &A);
+Matrix<T> blkdiag(const std::vector< Matrix<T> > &A);
 
 #ifndef SWIG
 /** \brief  Get the sparsity in sparse triplet format */
@@ -1019,7 +1019,7 @@ Matrix<T> diag(const Matrix<T>&A){
 
 /** \brief   Construct a matrix with given block on the diagonal */
 template<class T>
-Matrix<T> blockdiag(const std::vector< Matrix<T> > &A) {
+Matrix<T> blkdiag(const std::vector< Matrix<T> > &A) {
   int n = 0;
   int m = 0;
   
@@ -1290,7 +1290,7 @@ MTT_INST(T,makeDense) \
 MTT_INST(T,makeSparse) \
 MTT_INST(T,hasNonStructuralZeros) \
 MTT_INST(T,diag) \
-MTT_INST(T,blockdiag) \
+MTT_INST(T,blkdiag) \
 MTT_INST(T,polyval) \
 MTT_INST(T,addMultiple) \
 MTT_INST(T,veccat) \

@@ -22,7 +22,7 @@
 from casadi import *
 
 # Let's construct a block diagonal structure
-A = blockdiag([1,DMatrix([[2,3],[4,5]]),DMatrix([[6,7,8],[9,10,11],[12,13,14]]),15])
+A = blkdiag([1,DMatrix([[2,3],[4,5]]),DMatrix([[6,7,8],[9,10,11],[12,13,14]]),15])
 A.printMatrix()
 
 rowperm = IVector()

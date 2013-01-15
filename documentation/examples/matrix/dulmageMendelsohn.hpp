@@ -8,7 +8,7 @@
 * \sa
 * \code
 * CasADi::CRSSparsity::dulmageMendelsohn();
-* CasADi::blockdiag();
+* CasADi::blkdiag();
 * \endcode
 *
 */
