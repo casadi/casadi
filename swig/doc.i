@@ -572,6 +572,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::AcadoIntegrator::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::AcadoIntegrator::call "
 
 Create a function call (single input) ";
@@ -862,6 +868,10 @@ Assert that it is initialized. ";
 %feature("docstring")  CasADi::AcadoIntegrator::isNull "
 
 Is a null pointer? ";
+
+%feature("docstring")  CasADi::AcadoIntegrator::weak "
+
+Get a weak reference to the object. ";
 
 %feature("docstring")  CasADi::AcadoIntegrator::getRepresentation "
 
@@ -1192,6 +1202,13 @@ Return gradient function. ";
 Return Jacobian function. ";
 
 %feature("docstring")  CasADi::AcadoIntegratorInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::AcadoIntegratorInternal::derivative "
 
@@ -1625,6 +1642,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::AcadoIntegratorInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::AcadoIntegratorInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1AcadoOCP.xml
@@ -2084,6 +2105,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::AcadoOCP::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::AcadoOCP::call "
 
 Create a function call (single input) ";
@@ -2379,6 +2406,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::AcadoOCP::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::AcadoOCP::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -2624,6 +2655,13 @@ Return Jacobian function. ";
 %feature("docstring")  CasADi::AcadoOCPInternal::getJacobian "";
 
 %feature("docstring")  CasADi::AcadoOCPInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::AcadoOCPInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::AcadoOCPInternal::derivative "
 
@@ -2980,6 +3018,10 @@ Check if the object has been initialized. ";
 
 Assert that the object has been initialized. ";
 
+%feature("docstring")  CasADi::AcadoOCPInternal::weak "
+
+Get a weak reference to the object. ";
+
 
 // File: structCasADi_1_1BinaryChecker.xml
 %feature("docstring") CasADi::BinaryChecker "
@@ -3262,6 +3304,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::BinaryMX::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::BinaryMX::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: structCasADi_1_1BinaryOperation.xml
@@ -3983,6 +4029,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::CFunction::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::CFunction::call "
 
 Create a function call (single input) ";
@@ -4278,6 +4330,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::CFunction::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::CFunction::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -4469,6 +4525,13 @@ Return Jacobian function. ";
 %feature("docstring")  CasADi::CFunctionInternal::getJacobian "";
 
 %feature("docstring")  CasADi::CFunctionInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::CFunctionInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::CFunctionInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::CFunctionInternal::derivative "
 
@@ -4824,6 +4887,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::CFunctionInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::CFunctionInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1CollocationIntegrator.xml
@@ -5471,6 +5538,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::CollocationIntegrator::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::CollocationIntegrator::call "
 
 Create a function call (single input) ";
@@ -5761,6 +5834,10 @@ Assert that it is initialized. ";
 %feature("docstring")  CasADi::CollocationIntegrator::isNull "
 
 Is a null pointer? ";
+
+%feature("docstring")  CasADi::CollocationIntegrator::weak "
+
+Get a weak reference to the object. ";
 
 %feature("docstring")  CasADi::CollocationIntegrator::getRepresentation "
 
@@ -6079,6 +6156,14 @@ Return Jacobian function. ";
 
 %feature("docstring")
 CasADi::CollocationIntegratorInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::CollocationIntegratorInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")
+CasADi::CollocationIntegratorInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::CollocationIntegratorInternal::derivative "
 
@@ -6526,6 +6611,10 @@ Check if the object has been initialized. ";
 
 Assert that the object has been initialized. ";
 
+%feature("docstring")  CasADi::CollocationIntegratorInternal::weak "
+
+Get a weak reference to the object. ";
+
 
 // File: structCasADi_1_1CommChecker.xml
 %feature("docstring") CasADi::CommChecker "
@@ -6770,6 +6859,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::ConstantMX::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::ConstantMX::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1ConstantSX.xml
@@ -7456,6 +7549,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::ControlSimulator::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::ControlSimulator::call "
 
 Create a function call (single input) ";
@@ -7751,6 +7850,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::ControlSimulator::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::ControlSimulator::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -8016,6 +8119,13 @@ Return Jacobian function. ";
 
 %feature("docstring")  CasADi::ControlSimulatorInternal::getNumericJacobian
 "";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::ControlSimulatorInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::ControlSimulatorInternal::derivative "
 
@@ -8389,6 +8499,10 @@ Check if the object has been initialized. ";
 
 Assert that the object has been initialized. ";
 
+%feature("docstring")  CasADi::ControlSimulatorInternal::weak "
+
+Get a weak reference to the object. ";
+
 
 // File: classCasADi_1_1CplexInternal.xml
 %feature("docstring") CasADi::CplexInternal "
@@ -8667,6 +8781,13 @@ Return Jacobian function. ";
 %feature("docstring")  CasADi::CplexInternal::getJacobian "";
 
 %feature("docstring")  CasADi::CplexInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::CplexInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::CplexInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::CplexInternal::derivative "
 
@@ -9034,6 +9155,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::CplexInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::CplexInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1CplexSolver.xml
@@ -9533,6 +9658,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::CplexSolver::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::CplexSolver::call "
 
 Create a function call (single input) ";
@@ -9828,6 +9959,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::CplexSolver::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::CplexSolver::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -9938,7 +10073,7 @@ Construct a sparsity pattern (sparse/dense) ";
 
 %feature("docstring")  CasADi::CRSSparsity::CRSSparsity "
 
-Construct a sparsity pattern from vectors. ";
+Construct a sparsity pattern from vectors (NOTE: why copy by value?) ";
 
 %feature("docstring")  CasADi::CRSSparsity::sanityCheck "
 
@@ -10208,6 +10343,8 @@ Print a textual representation of sparsity. ";
 Generate a script for Matlab or Octave which visualizes the sparsity using
 the spy command. ";
 
+%feature("docstring")  CasADi::CRSSparsity::hash "";
+
 %feature("docstring")  CasADi::CRSSparsity::set "
 
 Assign the nonzero entries of one sparsity pattern to the nonzero entries of
@@ -10276,6 +10413,10 @@ Assert that it is initialized. ";
 %feature("docstring")  CasADi::CRSSparsity::isNull "
 
 Is a null pointer? ";
+
+%feature("docstring")  CasADi::CRSSparsity::weak "
+
+Get a weak reference to the object. ";
 
 %feature("docstring")  CasADi::CRSSparsity::getRepresentation "
 
@@ -10511,6 +10652,10 @@ vector, which must have the same length as the number of nonzeros. ";
 
 Get element index for each nonzero. ";
 
+%feature("docstring")  CasADi::CRSSparsityInternal::hash "
+
+Hash the sparsity pattern. ";
+
 %feature("docstring")  CasADi::CRSSparsityInternal::clone "
 
 Clone. ";
@@ -10565,6 +10710,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::CRSSparsityInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::CRSSparsityInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1CSparse.xml
@@ -11003,6 +11152,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::CSparse::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::CSparse::call "
 
 Create a function call (single input) ";
@@ -11298,6 +11453,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::CSparse::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::CSparse::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -11491,6 +11650,13 @@ Return Jacobian function. ";
 %feature("docstring")  CasADi::CSparseInternal::getJacobian "";
 
 %feature("docstring")  CasADi::CSparseInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::CSparseInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::CSparseInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::CSparseInternal::derivative "
 
@@ -11862,6 +12028,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::CSparseInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::CSparseInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1CVodesIntegrator.xml
@@ -12759,6 +12929,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::CVodesIntegrator::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::CVodesIntegrator::call "
 
 Create a function call (single input) ";
@@ -13049,6 +13225,10 @@ Assert that it is initialized. ";
 %feature("docstring")  CasADi::CVodesIntegrator::isNull "
 
 Is a null pointer? ";
+
+%feature("docstring")  CasADi::CVodesIntegrator::weak "
+
+Get a weak reference to the object. ";
 
 %feature("docstring")  CasADi::CVodesIntegrator::getRepresentation "
 
@@ -13627,6 +13807,13 @@ Return Jacobian function. ";
 
 %feature("docstring")  CasADi::CVodesInternal::getNumericJacobian "";
 
+%feature("docstring")  CasADi::CVodesInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::CVodesInternal::getFullJacobian "";
+
 %feature("docstring")  CasADi::CVodesInternal::derivative "
 
 Return function that calculates forward derivatives This method returns a
@@ -14058,6 +14245,10 @@ Check if the object has been initialized. ";
 
 Assert that the object has been initialized. ";
 
+%feature("docstring")  CasADi::CVodesInternal::weak "
+
+Get a weak reference to the object. ";
+
 
 // File: classCasADi_1_1Densification.xml
 %feature("docstring") CasADi::Densification "
@@ -14257,6 +14448,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::Densification::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::Densification::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: structCasADi_1_1DerBinaryOpertion.xml
@@ -14667,6 +14862,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::Derivative::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::Derivative::call "
 
 Create a function call (single input) ";
@@ -14966,6 +15167,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::Derivative::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::Derivative::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -15157,6 +15362,13 @@ Return Jacobian function. ";
 %feature("docstring")  CasADi::DerivativeInternal::getJacobian "";
 
 %feature("docstring")  CasADi::DerivativeInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::DerivativeInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::DerivativeInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::DerivativeInternal::derivative "
 
@@ -15512,6 +15724,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::DerivativeInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::DerivativeInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1DirectCollocation.xml
@@ -16019,6 +16235,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::DirectCollocation::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::DirectCollocation::call "
 
 Create a function call (single input) ";
@@ -16318,6 +16540,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::DirectCollocation::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::DirectCollocation::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -16580,6 +16806,13 @@ Return Jacobian function. ";
 
 %feature("docstring")  CasADi::DirectCollocationInternal::getNumericJacobian
 "";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::DirectCollocationInternal::derivative "
 
@@ -16955,6 +17188,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::DirectCollocationInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::DirectCollocationInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1DirectMultipleShooting.xml
@@ -17527,6 +17764,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::DirectMultipleShooting::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::DirectMultipleShooting::call "
 
 Create a function call (single input) ";
@@ -17827,6 +18070,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::DirectMultipleShooting::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::DirectMultipleShooting::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -18096,6 +18343,15 @@ Return Jacobian function. ";
 
 %feature("docstring")
 CasADi::DirectMultipleShootingInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::fullJacobian
+"
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")
+CasADi::DirectMultipleShootingInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::DirectMultipleShootingInternal::derivative "
 
@@ -18505,6 +18761,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::DirectMultipleShootingInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::DirectMultipleShootingInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1DirectSingleShooting.xml
@@ -19072,6 +19332,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::DirectSingleShooting::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::DirectSingleShooting::call "
 
 Create a function call (single input) ";
@@ -19371,6 +19637,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::DirectSingleShooting::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::DirectSingleShooting::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -19638,6 +19908,14 @@ Return Jacobian function. ";
 
 %feature("docstring")
 CasADi::DirectSingleShootingInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::DirectSingleShootingInternal::getFullJacobian
+"";
 
 %feature("docstring")  CasADi::DirectSingleShootingInternal::derivative "
 
@@ -20032,6 +20310,10 @@ Check if the object has been initialized. ";
 
 Assert that the object has been initialized. ";
 
+%feature("docstring")  CasADi::DirectSingleShootingInternal::weak "
+
+Get a weak reference to the object. ";
+
 
 // File: classCasADi_1_1EvaluationMX.xml
 %feature("docstring") CasADi::EvaluationMX "
@@ -20229,6 +20511,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::EvaluationMX::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::EvaluationMX::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1ExternalFunction.xml
@@ -20631,6 +20917,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::ExternalFunction::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::ExternalFunction::call "
 
 Create a function call (single input) ";
@@ -20926,6 +21218,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::ExternalFunction::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::ExternalFunction::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -21114,6 +21410,13 @@ Return Jacobian function. ";
 
 %feature("docstring")  CasADi::ExternalFunctionInternal::getNumericJacobian
 "";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::ExternalFunctionInternal::derivative "
 
@@ -21477,6 +21780,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::ExternalFunctionInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::ExternalFunctionInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: structCasADi_1_1F00Checker.xml
@@ -22248,6 +22555,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::FX::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::FX::call "
 
 Create a function call (single input) ";
@@ -22547,6 +22860,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::FX::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::FX::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -22770,6 +23087,13 @@ Return Jacobian function. ";
 %feature("docstring")  CasADi::FXInternal::getJacobian "";
 
 %feature("docstring")  CasADi::FXInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::FXInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::FXInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::FXInternal::derivative "
 
@@ -23123,6 +23447,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::FXInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::FXInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1GenericExpression.xml
@@ -23485,6 +23813,10 @@ Is a null pointer? ";
 
 Assert that the node is pointing to the right type of object. ";
 
+%feature("docstring")  CasADi::GenericType::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::GenericType::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -23533,6 +23865,10 @@ Assert that the object has been initialized. ";
 %feature("docstring")  CasADi::GenericTypeInternal::repr "
 
 Print a representation of the object. ";
+
+%feature("docstring")  CasADi::GenericTypeInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1IdasIntegrator.xml
@@ -24492,6 +24828,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::IdasIntegrator::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::IdasIntegrator::call "
 
 Create a function call (single input) ";
@@ -24782,6 +25124,10 @@ Assert that it is initialized. ";
 %feature("docstring")  CasADi::IdasIntegrator::isNull "
 
 Is a null pointer? ";
+
+%feature("docstring")  CasADi::IdasIntegrator::weak "
+
+Get a weak reference to the object. ";
 
 %feature("docstring")  CasADi::IdasIntegrator::getRepresentation "
 
@@ -25418,6 +25764,13 @@ Return Jacobian function. ";
 
 %feature("docstring")  CasADi::IdasInternal::getNumericJacobian "";
 
+%feature("docstring")  CasADi::IdasInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::IdasInternal::getFullJacobian "";
+
 %feature("docstring")  CasADi::IdasInternal::derivative "
 
 Return function that calculates forward derivatives This method returns a
@@ -25878,6 +26231,10 @@ Check if the object has been initialized. ";
 
 Assert that the object has been initialized. ";
 
+%feature("docstring")  CasADi::IdasInternal::weak "
+
+Get a weak reference to the object. ";
+
 
 // File: classCasADi_1_1ImplicitFunction.xml
 %feature("docstring") CasADi::ImplicitFunction "
@@ -26307,6 +26664,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::ImplicitFunction::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::ImplicitFunction::call "
 
 Create a function call (single input) ";
@@ -26602,6 +26965,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::ImplicitFunction::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::ImplicitFunction::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -26805,6 +27172,13 @@ Return Jacobian function. ";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::getNumericJacobian
 "";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::ImplicitFunctionInternal::derivative "
 
@@ -27189,6 +27563,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::ImplicitFunctionInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::ImplicitFunctionInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1IndexList.xml
@@ -27950,6 +28328,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::Integrator::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::Integrator::call "
 
 Create a function call (single input) ";
@@ -28241,6 +28625,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::Integrator::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::Integrator::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -28514,6 +28902,13 @@ Return gradient function. ";
 Return Jacobian function. ";
 
 %feature("docstring")  CasADi::IntegratorInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::IntegratorInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::IntegratorInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::IntegratorInternal::derivative "
 
@@ -28918,6 +29313,10 @@ Check if the object has been initialized. ";
 
 Assert that the object has been initialized. ";
 
+%feature("docstring")  CasADi::IntegratorInternal::weak "
+
+Get a weak reference to the object. ";
+
 
 // File: classCasADi_1_1IPInternal.xml
 %feature("docstring") CasADi::IPInternal "
@@ -29245,6 +29644,13 @@ Return Jacobian function. ";
 %feature("docstring")  CasADi::IPInternal::getJacobian "";
 
 %feature("docstring")  CasADi::IPInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::IPInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::IPInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::IPInternal::derivative "
 
@@ -29612,6 +30018,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::IPInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::IPInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1IPMethod.xml
@@ -30192,6 +30602,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::IPMethod::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::IPMethod::call "
 
 Create a function call (single input) ";
@@ -30486,6 +30902,10 @@ Assert that it is initialized. ";
 %feature("docstring")  CasADi::IPMethod::isNull "
 
 Is a null pointer? ";
+
+%feature("docstring")  CasADi::IPMethod::weak "
+
+Get a weak reference to the object. ";
 
 %feature("docstring")  CasADi::IPMethod::getRepresentation "
 
@@ -33519,6 +33939,13 @@ Return Jacobian function. ";
 
 %feature("docstring")  CasADi::IpoptInternal::getNumericJacobian "";
 
+%feature("docstring")  CasADi::IpoptInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::IpoptInternal::getFullJacobian "";
+
 %feature("docstring")  CasADi::IpoptInternal::derivative "
 
 Return function that calculates forward derivatives This method returns a
@@ -33891,6 +34318,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::IpoptInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::IpoptInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1IpoptSolver.xml
@@ -37184,6 +37615,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::IpoptSolver::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::IpoptSolver::call "
 
 Create a function call (single input) ";
@@ -37478,6 +37915,10 @@ Assert that it is initialized. ";
 %feature("docstring")  CasADi::IpoptSolver::isNull "
 
 Is a null pointer? ";
+
+%feature("docstring")  CasADi::IpoptSolver::weak "
+
+Get a weak reference to the object. ";
 
 %feature("docstring")  CasADi::IpoptSolver::getRepresentation "
 
@@ -37817,6 +38258,13 @@ Return Jacobian function. ";
 %feature("docstring")  CasADi::KinsolInternal::getJacobian "";
 
 %feature("docstring")  CasADi::KinsolInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::KinsolInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::KinsolInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::KinsolInternal::derivative "
 
@@ -38225,6 +38673,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::KinsolInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::KinsolInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1KinsolSolver.xml
@@ -38756,6 +39208,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::KinsolSolver::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::KinsolSolver::call "
 
 Create a function call (single input) ";
@@ -39050,6 +39508,10 @@ Assert that it is initialized. ";
 %feature("docstring")  CasADi::KinsolSolver::isNull "
 
 Is a null pointer? ";
+
+%feature("docstring")  CasADi::KinsolSolver::weak "
+
+Get a weak reference to the object. ";
 
 %feature("docstring")  CasADi::KinsolSolver::getRepresentation "
 
@@ -39633,6 +40095,13 @@ Return Jacobian function. ";
 
 %feature("docstring")  CasADi::KnitroInternal::getNumericJacobian "";
 
+%feature("docstring")  CasADi::KnitroInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::KnitroInternal::getFullJacobian "";
+
 %feature("docstring")  CasADi::KnitroInternal::derivative "
 
 Return function that calculates forward derivatives This method returns a
@@ -40005,6 +40474,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::KnitroInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::KnitroInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1KnitroSolver.xml
@@ -40712,6 +41185,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::KnitroSolver::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::KnitroSolver::call "
 
 Create a function call (single input) ";
@@ -41006,6 +41485,10 @@ Assert that it is initialized. ";
 %feature("docstring")  CasADi::KnitroSolver::isNull "
 
 Is a null pointer? ";
+
+%feature("docstring")  CasADi::KnitroSolver::weak "
+
+Get a weak reference to the object. ";
 
 %feature("docstring")  CasADi::KnitroSolver::getRepresentation "
 
@@ -41463,6 +41946,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::LapackLUDense::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::LapackLUDense::call "
 
 Create a function call (single input) ";
@@ -41758,6 +42247,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::LapackLUDense::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::LapackLUDense::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -41959,6 +42452,13 @@ Return Jacobian function. ";
 %feature("docstring")  CasADi::LapackLUDenseInternal::getJacobian "";
 
 %feature("docstring")  CasADi::LapackLUDenseInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::LapackLUDenseInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::LapackLUDenseInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::LapackLUDenseInternal::derivative "
 
@@ -42331,6 +42831,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::LapackLUDenseInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::LapackLUDenseInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1LapackQRDense.xml
@@ -42772,6 +43276,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::LapackQRDense::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::LapackQRDense::call "
 
 Create a function call (single input) ";
@@ -43067,6 +43577,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::LapackQRDense::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::LapackQRDense::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -43260,6 +43774,13 @@ Return Jacobian function. ";
 %feature("docstring")  CasADi::LapackQRDenseInternal::getJacobian "";
 
 %feature("docstring")  CasADi::LapackQRDenseInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::LapackQRDenseInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::LapackQRDenseInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::LapackQRDenseInternal::derivative "
 
@@ -43632,6 +44153,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::LapackQRDenseInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::LapackQRDenseInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1LiftedSQP.xml
@@ -44292,6 +44817,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::LiftedSQP::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::LiftedSQP::call "
 
 Create a function call (single input) ";
@@ -44586,6 +45117,10 @@ Assert that it is initialized. ";
 %feature("docstring")  CasADi::LiftedSQP::isNull "
 
 Is a null pointer? ";
+
+%feature("docstring")  CasADi::LiftedSQP::weak "
+
+Get a weak reference to the object. ";
 
 %feature("docstring")  CasADi::LiftedSQP::getRepresentation "
 
@@ -45006,6 +45541,13 @@ Return Jacobian function. ";
 
 %feature("docstring")  CasADi::LiftedSQPInternal::getNumericJacobian "";
 
+%feature("docstring")  CasADi::LiftedSQPInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::LiftedSQPInternal::getFullJacobian "";
+
 %feature("docstring")  CasADi::LiftedSQPInternal::derivative "
 
 Return function that calculates forward derivatives This method returns a
@@ -45374,6 +45916,10 @@ Check if the object has been initialized. ";
 
 Assert that the object has been initialized. ";
 
+%feature("docstring")  CasADi::LiftedSQPInternal::weak "
+
+Get a weak reference to the object. ";
+
 
 // File: classCasADi_1_1LiftoptInternal.xml
 %feature("docstring") CasADi::LiftoptInternal "
@@ -45701,6 +46247,13 @@ Return Jacobian function. ";
 %feature("docstring")  CasADi::LiftoptInternal::getJacobian "";
 
 %feature("docstring")  CasADi::LiftoptInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::LiftoptInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::LiftoptInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::LiftoptInternal::derivative "
 
@@ -46068,6 +46621,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::LiftoptInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::LiftoptInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1LiftoptSolver.xml
@@ -46649,6 +47206,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::LiftoptSolver::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::LiftoptSolver::call "
 
 Create a function call (single input) ";
@@ -46943,6 +47506,10 @@ Assert that it is initialized. ";
 %feature("docstring")  CasADi::LiftoptSolver::isNull "
 
 Is a null pointer? ";
+
+%feature("docstring")  CasADi::LiftoptSolver::weak "
+
+Get a weak reference to the object. ";
 
 %feature("docstring")  CasADi::LiftoptSolver::getRepresentation "
 
@@ -47364,6 +47931,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::LinearSolver::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::LinearSolver::call "
 
 Create a function call (single input) ";
@@ -47659,6 +48232,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::LinearSolver::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::LinearSolver::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -47852,6 +48429,13 @@ Return Jacobian function. ";
 %feature("docstring")  CasADi::LinearSolverInternal::getJacobian "";
 
 %feature("docstring")  CasADi::LinearSolverInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::LinearSolverInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::LinearSolverInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::LinearSolverInternal::derivative "
 
@@ -48223,6 +48807,10 @@ Check if the object has been initialized. ";
 
 Assert that the object has been initialized. ";
 
+%feature("docstring")  CasADi::LinearSolverInternal::weak "
+
+Get a weak reference to the object. ";
+
 
 // File: structCasADi_1_1SundialsInternal_1_1LinSolDataDense.xml
 %feature("docstring") CasADi::SundialsInternal::LinSolDataDense "
@@ -48456,6 +49044,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::Mapping::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::Mapping::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1Matrix.xml
@@ -49589,6 +50181,10 @@ Check if the object has been initialized. ";
 
 Assert that the object has been initialized. ";
 
+%feature("docstring")  CasADi::MultipleOutput::weak "
+
+Get a weak reference to the object. ";
+
 
 // File: classCasADi_1_1Multiplication.xml
 %feature("docstring") CasADi::Multiplication "
@@ -49789,6 +50385,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::Multiplication::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::Multiplication::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1MuscodFunction.xml
@@ -50057,6 +50657,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::MuscodInterface::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::MuscodInterface::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -50265,6 +50869,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::MuscodInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::MuscodInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1MX.xml
@@ -50903,6 +51511,10 @@ Is a null pointer? ";
 
 Assert that the node is pointing to the right type of object. ";
 
+%feature("docstring")  CasADi::MX::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::MX::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -51386,6 +51998,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::MXFunction::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::MXFunction::call "
 
 Create a function call (single input) ";
@@ -51681,6 +52299,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::MXFunction::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::MXFunction::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -51866,6 +52488,13 @@ Return gradient function. ";
 %feature("docstring")  CasADi::MXFunctionInternal::jacobian "
 
 Return Jacobian function. ";
+
+%feature("docstring")  CasADi::MXFunctionInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::MXFunctionInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::MXFunctionInternal::derivative "
 
@@ -52274,6 +52903,10 @@ Check if the object has been initialized. ";
 
 Assert that the object has been initialized. ";
 
+%feature("docstring")  CasADi::MXFunctionInternal::weak "
+
+Get a weak reference to the object. ";
+
 
 // File: classCasADi_1_1MXNode.xml
 %feature("docstring") CasADi::MXNode "
@@ -52473,6 +53106,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::MXNode::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::MXNode::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: structCasADi_1_1mysortclass.xml
@@ -52813,6 +53450,13 @@ Return Jacobian function. ";
 %feature("docstring")  CasADi::NewtonImplicitInternal::getJacobian "";
 
 %feature("docstring")  CasADi::NewtonImplicitInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::NewtonImplicitInternal::derivative "
 
@@ -53192,6 +53836,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::NewtonImplicitInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::NewtonImplicitInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1NewtonImplicitSolver.xml
@@ -53666,6 +54314,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::NewtonImplicitSolver::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::NewtonImplicitSolver::call "
 
 Create a function call (single input) ";
@@ -53961,6 +54615,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::NewtonImplicitSolver::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::NewtonImplicitSolver::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -54192,6 +54850,13 @@ Return Jacobian function. ";
 %feature("docstring")  CasADi::NLPImplicitInternal::getJacobian "";
 
 %feature("docstring")  CasADi::NLPImplicitInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::NLPImplicitInternal::derivative "
 
@@ -54567,6 +55232,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::NLPImplicitInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::NLPImplicitInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1NLPImplicitSolver.xml
@@ -55015,6 +55684,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::NLPImplicitSolver::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::NLPImplicitSolver::call "
 
 Create a function call (single input) ";
@@ -55310,6 +55985,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::NLPImplicitSolver::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::NLPImplicitSolver::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -55560,6 +56239,13 @@ Return Jacobian function. ";
 %feature("docstring")  CasADi::NLPQPInternal::getJacobian "";
 
 %feature("docstring")  CasADi::NLPQPInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::NLPQPInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::NLPQPInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::NLPQPInternal::derivative "
 
@@ -55920,6 +56606,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::NLPQPInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::NLPQPInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1NLPQPSolver.xml
@@ -56379,6 +57069,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::NLPQPSolver::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::NLPQPSolver::call "
 
 Create a function call (single input) ";
@@ -56673,6 +57369,10 @@ Assert that it is initialized. ";
 %feature("docstring")  CasADi::NLPQPSolver::isNull "
 
 Is a null pointer? ";
+
+%feature("docstring")  CasADi::NLPQPSolver::weak "
+
+Get a weak reference to the object. ";
 
 %feature("docstring")  CasADi::NLPQPSolver::getRepresentation "
 
@@ -57246,6 +57946,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::NLPSolver::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::NLPSolver::call "
 
 Create a function call (single input) ";
@@ -57540,6 +58246,10 @@ Assert that it is initialized. ";
 %feature("docstring")  CasADi::NLPSolver::isNull "
 
 Is a null pointer? ";
+
+%feature("docstring")  CasADi::NLPSolver::weak "
+
+Get a weak reference to the object. ";
 
 %feature("docstring")  CasADi::NLPSolver::getRepresentation "
 
@@ -57874,6 +58584,13 @@ Return Jacobian function. ";
 %feature("docstring")  CasADi::NLPSolverInternal::getJacobian "";
 
 %feature("docstring")  CasADi::NLPSolverInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::NLPSolverInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::NLPSolverInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::NLPSolverInternal::derivative "
 
@@ -58243,6 +58960,10 @@ Check if the object has been initialized. ";
 
 Assert that the object has been initialized. ";
 
+%feature("docstring")  CasADi::NLPSolverInternal::weak "
+
+Get a weak reference to the object. ";
+
 
 // File: structCasADi_1_1NonZero.xml
 %feature("docstring") CasADi::NonZero "C++ includes: matrix.hpp ";
@@ -58475,6 +59196,10 @@ Check if the object has been initialized. ";
 
 Assert that the object has been initialized. ";
 
+%feature("docstring")  CasADi::NonzerosNonzerosOp::weak "
+
+Get a weak reference to the object. ";
+
 
 // File: classCasADi_1_1NonzerosScalarOp.xml
 %feature("docstring") CasADi::NonzerosScalarOp "
@@ -58678,6 +59403,10 @@ Check if the object has been initialized. ";
 
 Assert that the object has been initialized. ";
 
+%feature("docstring")  CasADi::NonzerosScalarOp::weak "
+
+Get a weak reference to the object. ";
+
 
 // File: classCasADi_1_1Norm.xml
 %feature("docstring") CasADi::Norm "
@@ -58879,6 +59608,10 @@ Check if the object has been initialized. ";
 
 Assert that the object has been initialized. ";
 
+%feature("docstring")  CasADi::Norm::weak "
+
+Get a weak reference to the object. ";
+
 
 // File: classCasADi_1_1Norm1.xml
 %feature("docstring") CasADi::Norm1 "
@@ -59078,6 +59811,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::Norm1::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::Norm1::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1Norm2.xml
@@ -59279,6 +60016,10 @@ Check if the object has been initialized. ";
 
 Assert that the object has been initialized. ";
 
+%feature("docstring")  CasADi::Norm2::weak "
+
+Get a weak reference to the object. ";
+
 
 // File: classCasADi_1_1NormF.xml
 %feature("docstring") CasADi::NormF "
@@ -59479,6 +60220,10 @@ Check if the object has been initialized. ";
 
 Assert that the object has been initialized. ";
 
+%feature("docstring")  CasADi::NormF::weak "
+
+Get a weak reference to the object. ";
+
 
 // File: classCasADi_1_1NormInf.xml
 %feature("docstring") CasADi::NormInf "
@@ -59678,6 +60423,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::NormInf::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::NormInf::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classstd_1_1numeric__limits_3_01CasADi_1_1SX_01_4.xml
@@ -60139,6 +60888,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::OCPSolver::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::OCPSolver::call "
 
 Create a function call (single input) ";
@@ -60438,6 +61193,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::OCPSolver::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::OCPSolver::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -60685,6 +61444,13 @@ Return Jacobian function. ";
 %feature("docstring")  CasADi::OCPSolverInternal::getJacobian "";
 
 %feature("docstring")  CasADi::OCPSolverInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::OCPSolverInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::OCPSolverInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::OCPSolverInternal::derivative "
 
@@ -61064,6 +61830,10 @@ Check if the object has been initialized. ";
 
 Assert that the object has been initialized. ";
 
+%feature("docstring")  CasADi::OCPSolverInternal::weak "
+
+Get a weak reference to the object. ";
+
 
 // File: classCasADi_1_1OneSX.xml
 %feature("docstring") CasADi::OneSX "
@@ -61397,6 +62167,13 @@ Return Jacobian function. ";
 %feature("docstring")  CasADi::OOQPInternal::getJacobian "";
 
 %feature("docstring")  CasADi::OOQPInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::OOQPInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::OOQPInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::OOQPInternal::derivative "
 
@@ -61773,6 +62550,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::OOQPInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::OOQPInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1OOQPSolver.xml
@@ -62244,6 +63025,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::OOQPSolver::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::OOQPSolver::call "
 
 Create a function call (single input) ";
@@ -62539,6 +63326,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::OOQPSolver::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::OOQPSolver::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -62711,6 +63502,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::OptionsFunctionality::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::OptionsFunctionality::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -62846,6 +63641,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::OptionsFunctionalityNode::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::OptionsFunctionalityNode::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1OutputNode.xml
@@ -63041,6 +63840,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::OutputNode::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::OutputNode::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: structCasADi_1_1Mapping_1_1OutputNZ.xml
@@ -63472,6 +64275,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::Parallelizer::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::Parallelizer::call "
 
 Create a function call (single input) ";
@@ -63771,6 +64580,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::Parallelizer::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::Parallelizer::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -63987,6 +64800,13 @@ Return gradient function. ";
 Return Jacobian function. ";
 
 %feature("docstring")  CasADi::ParallelizerInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::ParallelizerInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::ParallelizerInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::ParallelizerInternal::derivative "
 
@@ -64353,6 +65173,10 @@ Check if the object has been initialized. ";
 
 Assert that the object has been initialized. ";
 
+%feature("docstring")  CasADi::ParallelizerInternal::weak "
+
+Get a weak reference to the object. ";
+
 
 // File: classCasADi_1_1PrintableObject.xml
 %feature("docstring") CasADi::PrintableObject "
@@ -64637,6 +65461,13 @@ Return Jacobian function. ";
 %feature("docstring")  CasADi::QPOasesInternal::getJacobian "";
 
 %feature("docstring")  CasADi::QPOasesInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::QPOasesInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::QPOasesInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::QPOasesInternal::derivative "
 
@@ -64997,6 +65828,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::QPOasesInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::QPOasesInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1QPOasesSolver.xml
@@ -65472,6 +66307,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::QPOasesSolver::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::QPOasesSolver::call "
 
 Create a function call (single input) ";
@@ -65766,6 +66607,10 @@ Assert that it is initialized. ";
 %feature("docstring")  CasADi::QPOasesSolver::isNull "
 
 Is a null pointer? ";
+
+%feature("docstring")  CasADi::QPOasesSolver::weak "
+
+Get a weak reference to the object. ";
 
 %feature("docstring")  CasADi::QPOasesSolver::getRepresentation "
 
@@ -66220,6 +67065,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::QPSolver::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::QPSolver::call "
 
 Create a function call (single input) ";
@@ -66515,6 +67366,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::QPSolver::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::QPSolver::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -66746,6 +67601,13 @@ Return Jacobian function. ";
 %feature("docstring")  CasADi::QPSolverInternal::getJacobian "";
 
 %feature("docstring")  CasADi::QPSolverInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::QPSolverInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::QPSolverInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::QPSolverInternal::derivative "
 
@@ -67104,6 +67966,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::QPSolverInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::QPSolverInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1RealtypeSX.xml
@@ -67751,6 +68617,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::RKIntegrator::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::RKIntegrator::call "
 
 Create a function call (single input) ";
@@ -68042,6 +68914,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::RKIntegrator::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::RKIntegrator::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -68310,6 +69186,13 @@ Return gradient function. ";
 Return Jacobian function. ";
 
 %feature("docstring")  CasADi::RKIntegratorInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::RKIntegratorInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::RKIntegratorInternal::derivative "
 
@@ -68720,6 +69603,10 @@ Check if the object has been initialized. ";
 
 Assert that the object has been initialized. ";
 
+%feature("docstring")  CasADi::RKIntegratorInternal::weak "
+
+Get a weak reference to the object. ";
+
 
 // File: classCasADi_1_1ScalarNonzerosOp.xml
 %feature("docstring") CasADi::ScalarNonzerosOp "
@@ -68923,6 +69810,10 @@ Check if the object has been initialized. ";
 
 Assert that the object has been initialized. ";
 
+%feature("docstring")  CasADi::ScalarNonzerosOp::weak "
+
+Get a weak reference to the object. ";
+
 
 // File: classCasADi_1_1SharedObject.xml
 %feature("docstring") CasADi::SharedObject "
@@ -69041,6 +69932,10 @@ Is a null pointer? ";
 
 Assert that the node is pointing to the right type of object. ";
 
+%feature("docstring")  CasADi::SharedObject::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::SharedObject::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -69101,6 +69996,10 @@ Print a representation of the object. ";
 %feature("docstring")  CasADi::SharedObjectNode::print "
 
 Print a destription of the object. ";
+
+%feature("docstring")  CasADi::SharedObjectNode::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1Simulator.xml
@@ -69557,6 +70456,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::Simulator::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::Simulator::call "
 
 Create a function call (single input) ";
@@ -69852,6 +70757,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::Simulator::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::Simulator::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -70070,6 +70979,13 @@ Return Jacobian function. ";
 %feature("docstring")  CasADi::SimulatorInternal::getJacobian "";
 
 %feature("docstring")  CasADi::SimulatorInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::SimulatorInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::SimulatorInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::SimulatorInternal::derivative "
 
@@ -70426,6 +71342,10 @@ Check if the object has been initialized. ";
 
 Assert that the object has been initialized. ";
 
+%feature("docstring")  CasADi::SimulatorInternal::weak "
+
+Get a weak reference to the object. ";
+
 
 // File: classCasADi_1_1Slice.xml
 %feature("docstring") CasADi::Slice "
@@ -70713,6 +71633,10 @@ Check if the object has been initialized. ";
 
 Assert that the object has been initialized. ";
 
+%feature("docstring")  CasADi::Solve::weak "
+
+Get a weak reference to the object. ";
+
 
 // File: classCasADi_1_1SparseSparseOp.xml
 %feature("docstring") CasADi::SparseSparseOp "
@@ -70910,6 +71834,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::SparseSparseOp::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::SparseSparseOp::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1SQPInternal.xml
@@ -71330,6 +72258,13 @@ Return Jacobian function. ";
 
 %feature("docstring")  CasADi::SQPInternal::getNumericJacobian "";
 
+%feature("docstring")  CasADi::SQPInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::SQPInternal::getFullJacobian "";
+
 %feature("docstring")  CasADi::SQPInternal::derivative "
 
 Return function that calculates forward derivatives This method returns a
@@ -71728,6 +72663,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::SQPInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::SQPInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1SQPMethod.xml
@@ -72413,6 +73352,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::SQPMethod::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::SQPMethod::call "
 
 Create a function call (single input) ";
@@ -72707,6 +73652,10 @@ Assert that it is initialized. ";
 %feature("docstring")  CasADi::SQPMethod::isNull "
 
 Is a null pointer? ";
+
+%feature("docstring")  CasADi::SQPMethod::weak "
+
+Get a weak reference to the object. ";
 
 %feature("docstring")  CasADi::SQPMethod::getRepresentation "
 
@@ -73491,6 +74440,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::SundialsIntegrator::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::SundialsIntegrator::call "
 
 Create a function call (single input) ";
@@ -73781,6 +74736,10 @@ Assert that it is initialized. ";
 %feature("docstring")  CasADi::SundialsIntegrator::isNull "
 
 Is a null pointer? ";
+
+%feature("docstring")  CasADi::SundialsIntegrator::weak "
+
+Get a weak reference to the object. ";
 
 %feature("docstring")  CasADi::SundialsIntegrator::getRepresentation "
 
@@ -74284,6 +75243,13 @@ Return Jacobian function. ";
 
 %feature("docstring")  CasADi::SundialsInternal::getNumericJacobian "";
 
+%feature("docstring")  CasADi::SundialsInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::SundialsInternal::getFullJacobian "";
+
 %feature("docstring")  CasADi::SundialsInternal::derivative "
 
 Return function that calculates forward derivatives This method returns a
@@ -74698,6 +75664,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::SundialsInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::SundialsInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1SX.xml
@@ -75546,6 +76516,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::SXFunction::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::SXFunction::call "
 
 Create a function call (single input) ";
@@ -75837,6 +76813,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::SXFunction::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::SXFunction::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -76033,6 +77013,11 @@ Return Jacobian function. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::getNumericJacobian "";
 
+%feature("docstring")  CasADi::SXFunctionInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
 %feature("docstring")  CasADi::SXFunctionInternal::derivative "
 
 Return function that calculates forward derivatives This method returns a
@@ -76168,6 +77153,10 @@ Is the class able to propate seeds through the algorithm? ";
 %feature("docstring")  CasADi::SXFunctionInternal::spInit "
 
 Reset the sparsity propagation. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::getFullJacobian "
+
+Get jacobian of all nonzero outputs with respect to all nonzero inputs. ";
 
 %feature("docstring")  CasADi::SXFunctionInternal::grad "
 
@@ -76432,6 +77421,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::SXFunctionInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::SXFunctionInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1SXNode.xml
@@ -76729,6 +77722,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::SymbolicMX::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::SymbolicMX::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1SymbolicNLP.xml
@@ -77243,6 +78240,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::UnaryMX::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::UnaryMX::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: structCasADi_1_1UnaryOperation.xml
@@ -77837,6 +78838,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::Variable::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::Variable::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -77890,6 +78895,158 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::VariableInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::VariableInternal::weak "
+
+Get a weak reference to the object. ";
+
+
+// File: classCasADi_1_1WeakRef.xml
+%feature("docstring") CasADi::WeakRef "
+
+Weak reference type A weak reference to a SharedObject.
+
+Joel Andersson
+
+C++ includes: weak_ref.hpp ";
+
+%feature("docstring")  CasADi::WeakRef::makeUnique "
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object. ";
+
+%feature("docstring")  CasADi::WeakRef::makeUnique "";
+
+%feature("docstring")  CasADi::WeakRef::WeakRef "
+
+Default constructor. ";
+
+%feature("docstring")  CasADi::WeakRef::WeakRef "
+
+Construct from a shared object (also implicit type conversion) ";
+
+%feature("docstring")  CasADi::WeakRef::shared "
+
+Get a shared (owning) reference. ";
+
+%feature("docstring")  CasADi::WeakRef::alive "
+
+Check if alive. ";
+
+%feature("docstring")  CasADi::WeakRef::clone "
+
+Deep copy. ";
+
+%feature("docstring")  CasADi::WeakRef::assignNode "
+
+Assign the node to a node class pointer (or null) ";
+
+%feature("docstring")  CasADi::WeakRef::assignNodeNoCount "
+
+Assign the node to a node class pointer without reference counting: inproper
+use will cause memory leaks! ";
+
+%feature("docstring")  CasADi::WeakRef::get "
+
+Get a const pointer to the node. ";
+
+%feature("docstring")  CasADi::WeakRef::get "
+
+Get a pointer to the node. ";
+
+%feature("docstring")  CasADi::WeakRef::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::WeakRef::swap "
+
+Swap content with another instance. ";
+
+%feature("docstring")  CasADi::WeakRef::repr "
+
+Print a representation of the object. ";
+
+%feature("docstring")  CasADi::WeakRef::print "
+
+Print a destription of the object. ";
+
+%feature("docstring")  CasADi::WeakRef::init "
+
+Initialize the object: more documentation in the node class (
+SharedObjectNode and derived classes) ";
+
+%feature("docstring")  CasADi::WeakRef::isInit "
+
+Is initialized? ";
+
+%feature("docstring")  CasADi::WeakRef::assertInit "
+
+Assert that it is initialized. ";
+
+%feature("docstring")  CasADi::WeakRef::isNull "
+
+Is a null pointer? ";
+
+%feature("docstring")  CasADi::WeakRef::checkNode "
+
+Assert that the node is pointing to the right type of object. ";
+
+%feature("docstring")  CasADi::WeakRef::weak "
+
+Get a weak reference to the object. ";
+
+%feature("docstring")  CasADi::WeakRef::getRepresentation "
+
+Return a string with a representation (for SWIG) ";
+
+%feature("docstring")  CasADi::WeakRef::getDescription "
+
+Return a string with a destription (for SWIG) ";
+
+
+// File: classCasADi_1_1WeakRefInternal.xml
+%feature("docstring") CasADi::WeakRefInternal "C++ includes: weak_ref.hpp
+";
+
+%feature("docstring")  CasADi::WeakRefInternal::WeakRefInternal "";
+
+%feature("docstring")  CasADi::WeakRefInternal::~WeakRefInternal "";
+
+%feature("docstring")  CasADi::WeakRefInternal::clone "
+
+Make a deep copy of the instance. ";
+
+%feature("docstring")  CasADi::WeakRefInternal::deepCopyMembers "
+
+Deep copy data members. ";
+
+%feature("docstring")  CasADi::WeakRefInternal::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::WeakRefInternal::init "
+
+Initialize the object. ";
+
+%feature("docstring")  CasADi::WeakRefInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::WeakRefInternal::assertInit "
+
+Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::WeakRefInternal::repr "
+
+Print a representation of the object. ";
+
+%feature("docstring")  CasADi::WeakRefInternal::print "
+
+Print a destription of the object. ";
+
+%feature("docstring")  CasADi::WeakRefInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1WorhpInternal.xml
@@ -78964,6 +80121,13 @@ Return Jacobian function. ";
 
 %feature("docstring")  CasADi::WorhpInternal::getNumericJacobian "";
 
+%feature("docstring")  CasADi::WorhpInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::WorhpInternal::getFullJacobian "";
+
 %feature("docstring")  CasADi::WorhpInternal::derivative "
 
 Return function that calculates forward derivatives This method returns a
@@ -79339,6 +80503,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::WorhpInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::WorhpInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1WorhpSolver.xml
@@ -80662,6 +81830,12 @@ oind:  The index of the output
 The generated Hessian has two more outputs than the calling function
 corresponding to the Hessian and the gradients. ";
 
+%feature("docstring")  CasADi::WorhpSolver::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
 %feature("docstring")  CasADi::WorhpSolver::call "
 
 Create a function call (single input) ";
@@ -80957,6 +82131,10 @@ Assert that it is initialized. ";
 
 Is a null pointer? ";
 
+%feature("docstring")  CasADi::WorhpSolver::weak "
+
+Get a weak reference to the object. ";
+
 %feature("docstring")  CasADi::WorhpSolver::getRepresentation "
 
 Return a string with a representation (for SWIG) ";
@@ -81155,6 +82333,13 @@ Return gradient function. ";
 Return Jacobian function. ";
 
 %feature("docstring")  CasADi::XFunctionInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::XFunctionInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::XFunctionInternal::getFullJacobian "";
 
 %feature("docstring")  CasADi::XFunctionInternal::derivative "
 
@@ -81538,6 +82723,10 @@ Check if the object has been initialized. ";
 %feature("docstring")  CasADi::XFunctionInternal::assertInit "
 
 Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::XFunctionInternal::weak "
+
+Get a weak reference to the object. ";
 
 
 // File: classCasADi_1_1XMLNode.xml
@@ -82881,6 +84070,14 @@ already in increasing order for each row and without any duplicates. ";
 %feature("docstring")  CasADi::mul "
 
 Get the sparsity resulting from a matrix multiplication. ";
+
+%feature("docstring")  CasADi::hash_sparsity "
+
+Hash a sparsity pattern. ";
+
+%feature("docstring")  CasADi::hash_combine "
+
+Generate a hash value incrementally (function taken from boost) ";
 
 %feature("docstring")  CasADi::vertcat "";
 
@@ -85178,6 +86375,12 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: veccat_8hpp.xml
+
+
+// File: weak__ref_8cpp.xml
+
+
+// File: weak__ref_8hpp.xml
 
 
 // File: worhp__internal_8cpp.xml
