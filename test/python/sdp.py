@@ -19,23 +19,16 @@
 #     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 # 
-from mx import *
-from sx import *
-from typemaps import *
-from integration import *
-from ocp import *
-from nlp import *
-from implicitfunction import *
-from ad import *
-from sparsity import *
-from matrix import *
-from qpsolver import *
-from sdp import *
-from misc import *
-from fx import *
-from tools import *
-from simulator import *
-from vectortools import *
+from casadi import *
+import casadi as c
+from numpy import *
+import unittest
+from types import *
+from helpers import *
 
+class SDPtests(casadiTestCase):
+  pass
+    
 if __name__ == '__main__':
     unittest.main()
+

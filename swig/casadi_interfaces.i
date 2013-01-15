@@ -88,6 +88,13 @@
 %include "interfaces/csparse/csparse.hpp"
 #endif
 
+#ifdef WITH_DSDP
+%{
+#include "interfaces/dsdp/dsdp_solver.hpp"
+%}
+%include "interfaces/dsdp/dsdp_solver.hpp"
+#endif
+
 #ifdef WITH_GSL
 %{
 #include "interfaces/gsl/gsl_integrator.hpp"

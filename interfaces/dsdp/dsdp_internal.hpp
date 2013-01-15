@@ -1,0 +1,62 @@
+/*
+ *    This file is part of CasADi.
+ *
+ *    CasADi -- A symbolic framework for dynamic optimization.
+ *    Copyright (C) 2010 by Joel Andersson, Moritz Diehl, K.U.Leuven. All rights reserved.
+ *
+ *    CasADi is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation; either
+ *    version 3 of the License, or (at your option) any later version.
+ *
+ *    CasADi is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Lesser General Public
+ *    License along with CasADi; if not, write to the Free Software
+ *    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ */
+
+#ifndef DSDP_INTERNAL_HPP
+#define DSDP_INTERNAL_HPP
+
+#include "symbolic/fx/sdp_solver_internal.hpp"
+
+#include <dsdp5.h>
+
+namespace CasADi{
+
+  /** \brief Internal class for DSDPSolver
+   * 
+      @copydoc SDPSolver_doc
+   * */
+class DSDPInternal : public SDPSolverInternal {
+  friend class DSDPSolver;
+public:
+  /** \brief  Constructor */
+  explicit DSDPInternal();
+
+  /** \brief  Clone */
+  virtual DSDPInternal* clone() const;
+  
+  /** \brief  Create a new Solver */
+  explicit DSDPInternal(const CRSSparsity &C, const CRSSparsity &A);
+
+  /** \brief  Destructor */
+  virtual ~DSDPInternal();
+
+  /** \brief  Initialize */
+  virtual void init();
+  
+  virtual void evaluate(int nfdir, int nadir);
+  
+  protected:
+    
+};
+
+} // namespace CasADi
+
+#endif //DSDP_INTERNAL_HPP
