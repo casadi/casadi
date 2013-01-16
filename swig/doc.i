@@ -10073,7 +10073,7 @@ Construct a sparsity pattern (sparse/dense) ";
 
 %feature("docstring")  CasADi::CRSSparsity::CRSSparsity "
 
-Construct a sparsity pattern from vectors (NOTE: why copy by value?) ";
+Construct a sparsity pattern from vectors. ";
 
 %feature("docstring")  CasADi::CRSSparsity::sanityCheck "
 
@@ -20313,6 +20313,997 @@ Assert that the object has been initialized. ";
 %feature("docstring")  CasADi::DirectSingleShootingInternal::weak "
 
 Get a weak reference to the object. ";
+
+
+// File: classCasADi_1_1DSDPInternal.xml
+%feature("docstring") CasADi::DSDPInternal "
+
+Internal class for DSDPSolver.
+
+Solves an SDP problem in standard form.
+Seehttp://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
+
+Primal:
+
+min          b' x   x  subject to               P = Sum_m A_i x_i - C P
+positive semidefinite                     with x ( m x 1)          b ( m x 1
+)          C, A_i  sparse symmetric (n x n)          X dense symmetric ( n x
+n )
+
+This formulation is chosen as primal, because it does not call for a large
+decision variable space.
+
+Dual:
+
+max          trace(C Y)  Y   subject to             trace(A_i Y) = b_i Y
+positive semidefinite                  with Y dense symmetric ( n x n)
+
+C++ includes: dsdp_internal.hpp ";
+
+%feature("docstring")  CasADi::DSDPInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::DSDPInternal::getHessian "";
+
+%feature("docstring")  CasADi::DSDPInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::DSDPInternal::getGradient "";
+
+%feature("docstring")  CasADi::DSDPInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::DSDPInternal::getJacobian "";
+
+%feature("docstring")  CasADi::DSDPInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::DSDPInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::DSDPInternal::getFullJacobian "";
+
+%feature("docstring")  CasADi::DSDPInternal::derivative "
+
+Return function that calculates forward derivatives This method returns a
+cached instance if available, and calls FX getDerivative(int nfwd, int nadj)
+if no cached version is available. ";
+
+%feature("docstring")  CasADi::DSDPInternal::getDerivative "
+
+Constructs and returns a function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::DSDPInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
+%feature("docstring")  CasADi::DSDPInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::DSDPInternal::input "";
+
+%feature("docstring")  CasADi::DSDPInternal::input "";
+
+%feature("docstring")  CasADi::DSDPInternal::input "";
+
+%feature("docstring")  CasADi::DSDPInternal::inputNoCheck "";
+
+%feature("docstring")  CasADi::DSDPInternal::inputNoCheck "";
+
+%feature("docstring")  CasADi::DSDPInternal::output "
+
+Access output argument. ";
+
+%feature("docstring")  CasADi::DSDPInternal::output "";
+
+%feature("docstring")  CasADi::DSDPInternal::outputNoCheck "";
+
+%feature("docstring")  CasADi::DSDPInternal::outputNoCheck "";
+
+%feature("docstring")  CasADi::DSDPInternal::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::DSDPInternal::fwdSeed "";
+
+%feature("docstring")  CasADi::DSDPInternal::fwdSeedNoCheck "";
+
+%feature("docstring")  CasADi::DSDPInternal::fwdSeedNoCheck "";
+
+%feature("docstring")  CasADi::DSDPInternal::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::DSDPInternal::fwdSens "";
+
+%feature("docstring")  CasADi::DSDPInternal::fwdSensNoCheck "";
+
+%feature("docstring")  CasADi::DSDPInternal::fwdSensNoCheck "";
+
+%feature("docstring")  CasADi::DSDPInternal::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::DSDPInternal::adjSeed "";
+
+%feature("docstring")  CasADi::DSDPInternal::adjSeedNoCheck "";
+
+%feature("docstring")  CasADi::DSDPInternal::adjSeedNoCheck "";
+
+%feature("docstring")  CasADi::DSDPInternal::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::DSDPInternal::adjSens "";
+
+%feature("docstring")  CasADi::DSDPInternal::adjSensNoCheck "";
+
+%feature("docstring")  CasADi::DSDPInternal::adjSensNoCheck "";
+
+%feature("docstring")  CasADi::DSDPInternal::DSDPInternal "
+
+Constructor. ";
+
+%feature("docstring")  CasADi::DSDPInternal::clone "
+
+Clone. ";
+
+%feature("docstring")  CasADi::DSDPInternal::DSDPInternal "
+
+Create a new Solver. ";
+
+%feature("docstring")  CasADi::DSDPInternal::~DSDPInternal "
+
+Destructor. ";
+
+%feature("docstring")  CasADi::DSDPInternal::init "
+
+Initialize. ";
+
+%feature("docstring")  CasADi::DSDPInternal::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::DSDPInternal::solve "";
+
+%feature("docstring")  CasADi::DSDPInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
+%feature("docstring")  CasADi::DSDPInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
+%feature("docstring")  CasADi::DSDPInternal::requestNumSens "
+
+Request a number of forward/adjoint derivative directions. ";
+
+%feature("docstring")  CasADi::DSDPInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::DSDPInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::DSDPInternal::spInit "
+
+Reset the sparsity propagation. ";
+
+%feature("docstring")  CasADi::DSDPInternal::evalSX "
+
+Evaluate symbolically, SX type. ";
+
+%feature("docstring")  CasADi::DSDPInternal::evalMX "
+
+Evaluate symbolically, MX type. ";
+
+%feature("docstring")  CasADi::DSDPInternal::call "
+
+Call a function, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::DSDPInternal::call "
+
+Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::DSDPInternal::iStruct "
+
+Access an input. ";
+
+%feature("docstring")  CasADi::DSDPInternal::iStruct "
+
+Const access an input. ";
+
+%feature("docstring")  CasADi::DSDPInternal::oStruct "
+
+Access an output. ";
+
+%feature("docstring")  CasADi::DSDPInternal::oStruct "
+
+Const access an output. ";
+
+%feature("docstring")  CasADi::DSDPInternal::print "
+
+Print. ";
+
+%feature("docstring")  CasADi::DSDPInternal::repr "
+
+Print. ";
+
+%feature("docstring")  CasADi::DSDPInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::DSDPInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::DSDPInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::DSDPInternal::getPartition "
+
+Get the unidirectional or bidirectional partition. ";
+
+%feature("docstring")  CasADi::DSDPInternal::verbose "
+
+Verbose mode? ";
+
+%feature("docstring")  CasADi::DSDPInternal::monitored "
+
+Is function fcn being monitored. ";
+
+%feature("docstring")  CasADi::DSDPInternal::setNumInputs "
+
+Set the number of function inputs. ";
+
+%feature("docstring")  CasADi::DSDPInternal::setNumOutputs "
+
+Set the number of function outputs. ";
+
+%feature("docstring")  CasADi::DSDPInternal::getNumInputs "
+
+Get the number of function inputs. ";
+
+%feature("docstring")  CasADi::DSDPInternal::getNumOutputs "
+
+Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::DSDPInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::DSDPInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
+%feature("docstring")  CasADi::DSDPInternal::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::DSDPInternal::getStat "
+
+Get single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::DSDPInternal::getJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::DSDPInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")  CasADi::DSDPInternal::getJacSparsityHierarchical "
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
+
+%feature("docstring")  CasADi::DSDPInternal::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::DSDPInternal::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::DSDPInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::DSDPInternal::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::DSDPInternal::log "
+
+Log the status of the solver. ";
+
+%feature("docstring")  CasADi::DSDPInternal::log "
+
+Log the status of the solver, function given. ";
+
+%feature("docstring")  CasADi::DSDPInternal::setOption "
+
+set an option. The setOptions are in general only considered before the init
+function, if any. If properties changes, the init function should be called
+again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::DSDPInternal::setOption "
+
+set a set of options. The setOptions are in general only considered before
+the init function, if any. If properties changes, the init function should
+be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::DSDPInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::DSDPInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::DSDPInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::DSDPInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::DSDPInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::DSDPInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::DSDPInternal::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::DSDPInternal::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::DSDPInternal::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::DSDPInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
+%feature("docstring")  CasADi::DSDPInternal::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::DSDPInternal::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::DSDPInternal::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::DSDPInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::DSDPInternal::deepCopyMembers "
+
+Deep copy data members. ";
+
+%feature("docstring")  CasADi::DSDPInternal::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::DSDPInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::DSDPInternal::assertInit "
+
+Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::DSDPInternal::weak "
+
+Get a weak reference to the object. ";
+
+
+// File: classCasADi_1_1DSDPSolver.xml
+%feature("docstring") CasADi::DSDPSolver "
+
+Interface to DSDP Solver for semi definite programming.
+
+Solves an SDP problem in standard form.
+Seehttp://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
+
+Primal:
+
+min          b' x   x  subject to               P = Sum_m A_i x_i - C P
+positive semidefinite                     with x ( m x 1)          b ( m x 1
+)          C, A_i  sparse symmetric (n x n)          X dense symmetric ( n x
+n )
+
+This formulation is chosen as primal, because it does not call for a large
+decision variable space.
+
+Dual:
+
+max          trace(C Y)  Y   subject to             trace(A_i Y) = b_i Y
+positive semidefinite                  with Y dense symmetric ( n x n)
+
+Joris Gillis
+
+C++ includes: dsdp_solver.hpp ";
+
+/*  Setters  */
+
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
+
+*/
+
+%feature("docstring")  CasADi::DSDPSolver::setInput "
+
+Reads in the input argument from val. ";
+
+%feature("docstring")  CasADi::DSDPSolver::setOutput "
+
+Reads in the output argument from val. ";
+
+%feature("docstring")  CasADi::DSDPSolver::setFwdSeed "
+
+Reads in the forward seed from val. ";
+
+%feature("docstring")  CasADi::DSDPSolver::setFwdSens "
+
+Reads in the forward sensitivity from val. ";
+
+%feature("docstring")  CasADi::DSDPSolver::setAdjSeed "
+
+Reads in the adjoint seed from val. ";
+
+%feature("docstring")  CasADi::DSDPSolver::setAdjSens "
+
+Reads in the adjoint sensitivity from val. ";
+
+/*  Getters  */
+
+/* A group of accessor for numerical data that operate on preallocated data.
+get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
+
+*/
+
+%feature("docstring")  CasADi::DSDPSolver::getInput "
+
+Writes out the input argument into val. ";
+
+%feature("docstring")  CasADi::DSDPSolver::getOutput "
+
+Writes out the output argument into val. ";
+
+%feature("docstring")  CasADi::DSDPSolver::getFwdSeed "
+
+Writes out the forward seed into val. ";
+
+%feature("docstring")  CasADi::DSDPSolver::getFwdSens "
+
+Writes out the forward sensitivity into val. ";
+
+%feature("docstring")  CasADi::DSDPSolver::getAdjSeed "
+
+Writes out the adjoint seed into val. ";
+
+%feature("docstring")  CasADi::DSDPSolver::getAdjSens "
+
+Writes out the adjoint sensitivity into val. ";
+
+/*  Option Functionality  */
+
+%feature("docstring")  CasADi::DSDPSolver::setOption "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::DSDPSolver::setOption "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::DSDPSolver::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::DSDPSolver::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::DSDPSolver::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::DSDPSolver::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::DSDPSolver::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::DSDPSolver::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::DSDPSolver::makeUnique "
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object. ";
+
+%feature("docstring")  CasADi::DSDPSolver::makeUnique "";
+
+%feature("docstring")  CasADi::DSDPSolver::DSDPSolver "
+
+Default constructor. ";
+
+%feature("docstring")  CasADi::DSDPSolver::DSDPSolver "";
+
+%feature("docstring")  CasADi::DSDPSolver::checkNode "
+
+Check if the node is pointing to the right type of object. ";
+
+%feature("docstring")  CasADi::DSDPSolver::getNumInputs "
+
+Get number of inputs. ";
+
+%feature("docstring")  CasADi::DSDPSolver::getNumOutputs "
+
+Get number of outputs. ";
+
+%feature("docstring")  CasADi::DSDPSolver::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::DSDPSolver::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
+%feature("docstring")  CasADi::DSDPSolver::setNumInputs "
+
+Set number of inputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::DSDPSolver::setNumOutputs "
+
+Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::DSDPSolver::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
+%feature("docstring")  CasADi::DSDPSolver::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
+%feature("docstring")  CasADi::DSDPSolver::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::DSDPSolver::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
+
+%feature("docstring")  CasADi::DSDPSolver::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::DSDPSolver::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
+%feature("docstring")  CasADi::DSDPSolver::solve "
+
+the same as evaluate(0,0) ";
+
+%feature("docstring")  CasADi::DSDPSolver::jacobian "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs. ";
+
+%feature("docstring")  CasADi::DSDPSolver::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
+
+%feature("docstring")  CasADi::DSDPSolver::hessian "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
+
+%feature("docstring")  CasADi::DSDPSolver::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
+%feature("docstring")  CasADi::DSDPSolver::call "
+
+Create a function call (single input) ";
+
+%feature("docstring")  CasADi::DSDPSolver::call "
+
+Create a function call ( MX graph) ";
+
+%feature("docstring")  CasADi::DSDPSolver::call "
+
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
+
+%feature("docstring")  CasADi::DSDPSolver::call "
+
+Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
+be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::DSDPSolver::eval "
+
+evaluate symbolically, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::DSDPSolver::eval "
+
+evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::DSDPSolver::eval "
+
+Evaluate symbolically with with directional derivatives, SX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::DSDPSolver::eval "
+
+Evaluate symbolically with with directional derivatives, MX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::DSDPSolver::eval "
+
+evaluate symbolically, single input, single output ";
+
+%feature("docstring")  CasADi::DSDPSolver::evalMX "
+
+evaluate symbolically, MX type (unambiguous) ";
+
+%feature("docstring")  CasADi::DSDPSolver::evalMX "
+
+Evaluate symbolically with with directional derivatives, MX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::DSDPSolver::evalSX "
+
+evaluate symbolically, SX type (unambiguous) ";
+
+%feature("docstring")  CasADi::DSDPSolver::evalSX "
+
+Evaluate symbolically with with directional derivatives, SX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::DSDPSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
+%feature("docstring")  CasADi::DSDPSolver::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::DSDPSolver::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::DSDPSolver::indexed_one_based "";
+
+%feature("docstring")  CasADi::DSDPSolver::indexed_zero_based "";
+
+%feature("docstring")  CasADi::DSDPSolver::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::DSDPSolver::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::DSDPSolver::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::DSDPSolver::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::DSDPSolver::output "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::DSDPSolver::output "
+
+Access output argument Note that copies in Python are shallow by default and
+fx.output() gives a reference/pointer to an internal data structure. So if
+you want save fx.output(), you need to make a deep copy using for example
+DMatrix(fx.output()). ";
+
+%feature("docstring")  CasADi::DSDPSolver::fwdSeed "
+
+Const access forward seed. ";
+
+%feature("docstring")  CasADi::DSDPSolver::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::DSDPSolver::fwdSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::DSDPSolver::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::DSDPSolver::adjSeed "
+
+Const access adjoint seed. ";
+
+%feature("docstring")  CasADi::DSDPSolver::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::DSDPSolver::adjSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::DSDPSolver::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::DSDPSolver::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::DSDPSolver::getStat "
+
+Get a single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::DSDPSolver::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
+
+%feature("docstring")  CasADi::DSDPSolver::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
+
+%feature("docstring")  CasADi::DSDPSolver::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::DSDPSolver::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::DSDPSolver::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::DSDPSolver::addMonitor "
+
+Add modules to be monitored. ";
+
+%feature("docstring")  CasADi::DSDPSolver::removeMonitor "
+
+Remove modules to be monitored. ";
+
+%feature("docstring")  CasADi::DSDPSolver::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::DSDPSolver::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::DSDPSolver::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::DSDPSolver::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::DSDPSolver::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::DSDPSolver::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::DSDPSolver::clone "
+
+Deep copy. ";
+
+%feature("docstring")  CasADi::DSDPSolver::assignNode "
+
+Assign the node to a node class pointer (or null) ";
+
+%feature("docstring")  CasADi::DSDPSolver::assignNodeNoCount "
+
+Assign the node to a node class pointer without reference counting: inproper
+use will cause memory leaks! ";
+
+%feature("docstring")  CasADi::DSDPSolver::get "
+
+Get a const pointer to the node. ";
+
+%feature("docstring")  CasADi::DSDPSolver::get "
+
+Get a pointer to the node. ";
+
+%feature("docstring")  CasADi::DSDPSolver::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::DSDPSolver::swap "
+
+Swap content with another instance. ";
+
+%feature("docstring")  CasADi::DSDPSolver::repr "
+
+Print a representation of the object. ";
+
+%feature("docstring")  CasADi::DSDPSolver::print "
+
+Print a destription of the object. ";
+
+%feature("docstring")  CasADi::DSDPSolver::init "
+
+Initialize the object: more documentation in the node class (
+SharedObjectNode and derived classes) ";
+
+%feature("docstring")  CasADi::DSDPSolver::isInit "
+
+Is initialized? ";
+
+%feature("docstring")  CasADi::DSDPSolver::assertInit "
+
+Assert that it is initialized. ";
+
+%feature("docstring")  CasADi::DSDPSolver::isNull "
+
+Is a null pointer? ";
+
+%feature("docstring")  CasADi::DSDPSolver::weak "
+
+Get a weak reference to the object. ";
+
+%feature("docstring")  CasADi::DSDPSolver::getRepresentation "
+
+Return a string with a representation (for SWIG) ";
+
+%feature("docstring")  CasADi::DSDPSolver::getDescription "
+
+Return a string with a destription (for SWIG) ";
 
 
 // File: classCasADi_1_1EvaluationMX.xml
@@ -69815,6 +70806,975 @@ Assert that the object has been initialized. ";
 Get a weak reference to the object. ";
 
 
+// File: classCasADi_1_1SDPSolver.xml
+%feature("docstring") CasADi::SDPSolver "
+
+SDPSolver.
+
+Solves an SDP problem in standard form.
+Seehttp://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
+
+Primal:
+
+min          b' x   x  subject to               P = Sum_m A_i x_i - C P
+positive semidefinite                     with x ( m x 1)          b ( m x 1
+)          C, A_i  sparse symmetric (n x n)          X dense symmetric ( n x
+n )
+
+This formulation is chosen as primal, because it does not call for a large
+decision variable space.
+
+Dual:
+
+max          trace(C Y)  Y   subject to             trace(A_i Y) = b_i Y
+positive semidefinite                  with Y dense symmetric ( n x n)
+
+Joel Andersson
+
+C++ includes: sdp_solver.hpp ";
+
+/*  Setters  */
+
+/* T can be double&, double*, std::vector<double>&, Matrix<double> &
+Assumes a properly allocated val.  Set/get an input, output, forward
+seed/sensitivity or adjoint seed/sensitivity
+
+*/
+
+%feature("docstring")  CasADi::SDPSolver::setInput "
+
+Reads in the input argument from val. ";
+
+%feature("docstring")  CasADi::SDPSolver::setOutput "
+
+Reads in the output argument from val. ";
+
+%feature("docstring")  CasADi::SDPSolver::setFwdSeed "
+
+Reads in the forward seed from val. ";
+
+%feature("docstring")  CasADi::SDPSolver::setFwdSens "
+
+Reads in the forward sensitivity from val. ";
+
+%feature("docstring")  CasADi::SDPSolver::setAdjSeed "
+
+Reads in the adjoint seed from val. ";
+
+%feature("docstring")  CasADi::SDPSolver::setAdjSens "
+
+Reads in the adjoint sensitivity from val. ";
+
+/*  Getters  */
+
+/* A group of accessor for numerical data that operate on preallocated data.
+get an input, output, forward seed/sensitivity or adjoint seed/sensitivity
+
+*/
+
+%feature("docstring")  CasADi::SDPSolver::getInput "
+
+Writes out the input argument into val. ";
+
+%feature("docstring")  CasADi::SDPSolver::getOutput "
+
+Writes out the output argument into val. ";
+
+%feature("docstring")  CasADi::SDPSolver::getFwdSeed "
+
+Writes out the forward seed into val. ";
+
+%feature("docstring")  CasADi::SDPSolver::getFwdSens "
+
+Writes out the forward sensitivity into val. ";
+
+%feature("docstring")  CasADi::SDPSolver::getAdjSeed "
+
+Writes out the adjoint seed into val. ";
+
+%feature("docstring")  CasADi::SDPSolver::getAdjSens "
+
+Writes out the adjoint sensitivity into val. ";
+
+/*  Option Functionality  */
+
+%feature("docstring")  CasADi::SDPSolver::setOption "
+
+set an option. For a list of options, check the class documentation of this
+class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::SDPSolver::setOption "
+
+set a set of options. For a list of options, check the class documentation
+of this class.
+
+The setOptions are only considered before the init function. If properties
+changes, the init function should be called again. ";
+
+%feature("docstring")  CasADi::SDPSolver::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::SDPSolver::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::SDPSolver::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::SDPSolver::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::SDPSolver::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::SDPSolver::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::SDPSolver::makeUnique "
+
+If there are other references to the object, then make a deep copy of it and
+point to this new object. ";
+
+%feature("docstring")  CasADi::SDPSolver::makeUnique "";
+
+%feature("docstring")  CasADi::SDPSolver::SDPSolver "
+
+Default constructor. ";
+
+%feature("docstring")  CasADi::SDPSolver::checkNode "
+
+Check if the node is pointing to the right type of object. ";
+
+%feature("docstring")  CasADi::SDPSolver::getNumInputs "
+
+Get number of inputs. ";
+
+%feature("docstring")  CasADi::SDPSolver::getNumOutputs "
+
+Get number of outputs. ";
+
+%feature("docstring")  CasADi::SDPSolver::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::SDPSolver::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
+%feature("docstring")  CasADi::SDPSolver::setNumInputs "
+
+Set number of inputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::SDPSolver::setNumOutputs "
+
+Set number of outputs (normally invoked internally) ";
+
+%feature("docstring")  CasADi::SDPSolver::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization
+(normally invoked internally) ";
+
+%feature("docstring")  CasADi::SDPSolver::requestNumSens "
+
+Request a number of forward/adjoint derivative directions This function
+tries to increase the number of directional derivatives allocated for the
+function so that the the number at least amounts to \"nfwd\" and \"nadj\"
+for forward and adjoint mode derivatives respectively. The allocated number
+is never decreased and never increased beyond the number set by the option
+\"max_number_of_fwd_dir\" and \"max_number_of_adj_dir\".
+
+If the number was changed during the call, updateNumSens() is automatically
+invoked. ";
+
+%feature("docstring")  CasADi::SDPSolver::numAllocFwd "
+
+Get the number of allocated forward directional derivatives. ";
+
+%feature("docstring")  CasADi::SDPSolver::numAllocAdj "
+
+Get the number of allocated adjoint directional derivatives. ";
+
+%feature("docstring")  CasADi::SDPSolver::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::SDPSolver::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
+%feature("docstring")  CasADi::SDPSolver::solve "
+
+the same as evaluate(0,0) ";
+
+%feature("docstring")  CasADi::SDPSolver::jacobian "
+
+Generate a Jacobian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. If
+compact is set to true, only the nonzeros of the input and output
+expressions are considered. If symmetric is set to true, the Jacobian being
+calculated is known to be symmetric (usually a Hessian), which can be
+exploited by the algorithm.
+
+The generated Jacobian has one more output than the calling function
+corresponding to the Jacobian and the same number of inputs. ";
+
+%feature("docstring")  CasADi::SDPSolver::gradient "
+
+Generate a gradient function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The default behavior of this class is defined by the derived class. Note
+that the output must be scalar. In other cases, use the Jacobian instead. ";
+
+%feature("docstring")  CasADi::SDPSolver::hessian "
+
+Generate a Hessian function of output oind with respect to input iind.
+
+Parameters:
+-----------
+
+iind:  The index of the input
+
+oind:  The index of the output
+
+The generated Hessian has two more outputs than the calling function
+corresponding to the Hessian and the gradients. ";
+
+%feature("docstring")  CasADi::SDPSolver::fullJacobian "
+
+Generate a Jacobian function of all the inputs nonzeros (
+getNumScalarInputs()) with respect to all the output nonzeros (
+getNumScalarOutputs()). ";
+
+%feature("docstring")  CasADi::SDPSolver::call "
+
+Create a function call (single input) ";
+
+%feature("docstring")  CasADi::SDPSolver::call "
+
+Create a function call ( MX graph) ";
+
+%feature("docstring")  CasADi::SDPSolver::call "
+
+Create a function call with directional derivatives Note: return by
+reference with SWIG. ";
+
+%feature("docstring")  CasADi::SDPSolver::call "
+
+Evaluate symbolically in parallel (matrix graph) paropt: Set of options to
+be passed to the Parallelizer. ";
+
+%feature("docstring")  CasADi::SDPSolver::eval "
+
+evaluate symbolically, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::SDPSolver::eval "
+
+evaluate symbolically, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::SDPSolver::eval "
+
+Evaluate symbolically with with directional derivatives, SX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::SDPSolver::eval "
+
+Evaluate symbolically with with directional derivatives, MX type, overloaded
+The first two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::SDPSolver::eval "
+
+evaluate symbolically, single input, single output ";
+
+%feature("docstring")  CasADi::SDPSolver::evalMX "
+
+evaluate symbolically, MX type (unambiguous) ";
+
+%feature("docstring")  CasADi::SDPSolver::evalMX "
+
+Evaluate symbolically with with directional derivatives, MX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::SDPSolver::evalSX "
+
+evaluate symbolically, SX type (unambiguous) ";
+
+%feature("docstring")  CasADi::SDPSolver::evalSX "
+
+Evaluate symbolically with with directional derivatives, SX type The first
+two arguments are the nondifferentiated inputs and results of the
+evaluation, the next two arguments are a set of forward directional seeds
+and the resulting forward directional derivatives, the length of the vector
+being the number of forward directions. The next two arguments are a set of
+adjoint directional seeds and the resulting adjoint directional derivatives,
+the length of the vector being the number of adjoint directions. The boolean
+argument allows the second argument to the functions to be used as an input
+instead of output, assuming it is already known. ";
+
+%feature("docstring")  CasADi::SDPSolver::derivative "
+
+Get a function that calculates nfwd forward derivatives and nadj adjoint
+derivatives Returns a function with (1+nfwd)*n_in+nadj*n_out inputs and
+(1+nfwd)*n_out + nadj*n_in outputs. The first n_in inputs corresponds to
+nondifferentiated inputs. The next nfwd*n_in inputs corresponds to forward
+seeds, one direction at a time and the last nadj*n_out inputs corresponds to
+adjoint seeds, one direction at a time. The first n_out outputs corresponds
+to nondifferentiated outputs. The next nfwd*n_out outputs corresponds to
+forward sensitivities, one direction at a time and the last nadj*n_in
+outputs corresponds to adjoint sensitivties, one direction at a time.
+
+(n_in = getNumInputs(), n_out = getNumOutputs())
+
+The functions returned are cached, meaning that if called multiple timed
+with the same value, then multiple references to the same function will be
+returned. ";
+
+%feature("docstring")  CasADi::SDPSolver::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::SDPSolver::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::SDPSolver::indexed_one_based "";
+
+%feature("docstring")  CasADi::SDPSolver::indexed_zero_based "";
+
+%feature("docstring")  CasADi::SDPSolver::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::SDPSolver::input "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::SDPSolver::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::SDPSolver::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::SDPSolver::output "
+
+Const access input argument. ";
+
+%feature("docstring")  CasADi::SDPSolver::output "
+
+Access output argument Note that copies in Python are shallow by default and
+fx.output() gives a reference/pointer to an internal data structure. So if
+you want save fx.output(), you need to make a deep copy using for example
+DMatrix(fx.output()). ";
+
+%feature("docstring")  CasADi::SDPSolver::fwdSeed "
+
+Const access forward seed. ";
+
+%feature("docstring")  CasADi::SDPSolver::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::SDPSolver::fwdSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::SDPSolver::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::SDPSolver::adjSeed "
+
+Const access adjoint seed. ";
+
+%feature("docstring")  CasADi::SDPSolver::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::SDPSolver::adjSens "
+
+Const access forward sensitivity. ";
+
+%feature("docstring")  CasADi::SDPSolver::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::SDPSolver::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::SDPSolver::getStat "
+
+Get a single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::SDPSolver::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs
+There is no guarantee that consecutive calls return identical objects. ";
+
+%feature("docstring")  CasADi::SDPSolver::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs,
+SX graph There is no guarantee that consecutive calls return identical
+objects. ";
+
+%feature("docstring")  CasADi::SDPSolver::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? (for usage, see
+the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::SDPSolver::spInit "
+
+Reset the sparsity propagation (for usage, see the example
+propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::SDPSolver::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward (for usage, see the example propagating_sparsity.cpp) ";
+
+%feature("docstring")  CasADi::SDPSolver::addMonitor "
+
+Add modules to be monitored. ";
+
+%feature("docstring")  CasADi::SDPSolver::removeMonitor "
+
+Remove modules to be monitored. ";
+
+%feature("docstring")  CasADi::SDPSolver::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::SDPSolver::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::SDPSolver::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::SDPSolver::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::SDPSolver::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::SDPSolver::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::SDPSolver::clone "
+
+Deep copy. ";
+
+%feature("docstring")  CasADi::SDPSolver::assignNode "
+
+Assign the node to a node class pointer (or null) ";
+
+%feature("docstring")  CasADi::SDPSolver::assignNodeNoCount "
+
+Assign the node to a node class pointer without reference counting: inproper
+use will cause memory leaks! ";
+
+%feature("docstring")  CasADi::SDPSolver::get "
+
+Get a const pointer to the node. ";
+
+%feature("docstring")  CasADi::SDPSolver::get "
+
+Get a pointer to the node. ";
+
+%feature("docstring")  CasADi::SDPSolver::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::SDPSolver::swap "
+
+Swap content with another instance. ";
+
+%feature("docstring")  CasADi::SDPSolver::repr "
+
+Print a representation of the object. ";
+
+%feature("docstring")  CasADi::SDPSolver::print "
+
+Print a destription of the object. ";
+
+%feature("docstring")  CasADi::SDPSolver::init "
+
+Initialize the object: more documentation in the node class (
+SharedObjectNode and derived classes) ";
+
+%feature("docstring")  CasADi::SDPSolver::isInit "
+
+Is initialized? ";
+
+%feature("docstring")  CasADi::SDPSolver::assertInit "
+
+Assert that it is initialized. ";
+
+%feature("docstring")  CasADi::SDPSolver::isNull "
+
+Is a null pointer? ";
+
+%feature("docstring")  CasADi::SDPSolver::weak "
+
+Get a weak reference to the object. ";
+
+%feature("docstring")  CasADi::SDPSolver::getRepresentation "
+
+Return a string with a representation (for SWIG) ";
+
+%feature("docstring")  CasADi::SDPSolver::getDescription "
+
+Return a string with a destription (for SWIG) ";
+
+
+// File: classCasADi_1_1SDPSolverInternal.xml
+%feature("docstring") CasADi::SDPSolverInternal "
+
+Internal class.
+
+C++ includes: sdp_solver_internal.hpp ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::hessian "
+
+Return Hessian function. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getHessian "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::gradient "
+
+Return gradient function. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getGradient "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::jacobian "
+
+Return Jacobian function. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getJacobian "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getNumericJacobian "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::fullJacobian "
+
+Return Jacobian of all input nonzeros with respect to all output nonzeros.
+";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getFullJacobian "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::derivative "
+
+Return function that calculates forward derivatives This method returns a
+cached instance if available, and calls FX getDerivative(int nfwd, int nadj)
+if no cached version is available. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getDerivative "
+
+Constructs and returns a function that calculates forward derivatives. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getDerivativeViaJac "
+
+Constructs and returns a function that calculates forward derivatives by
+creating the Jacobian then multiplying. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::input "
+
+Access input argument. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::input "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::input "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::input "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::inputNoCheck "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::inputNoCheck "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::output "
+
+Access output argument. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::output "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::outputNoCheck "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::outputNoCheck "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::fwdSeed "
+
+Access forward seed. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::fwdSeed "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::fwdSeedNoCheck "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::fwdSeedNoCheck "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::fwdSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::fwdSens "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::fwdSensNoCheck "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::fwdSensNoCheck "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::adjSeed "
+
+Access adjoint seed. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::adjSeed "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::adjSeedNoCheck "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::adjSeedNoCheck "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::adjSens "
+
+Access forward sensitivity. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::adjSens "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::adjSensNoCheck "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::adjSensNoCheck "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::SDPSolverInternal "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::SDPSolverInternal "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::~SDPSolverInternal "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::init "
+
+Initialize Initialize and make the object ready for setting arguments and
+evaluation. This method is typically called after setting options but before
+evaluating. If passed to another class (in the constructor), this class
+should invoke this function when initialized. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::evaluate "
+
+Evaluate. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::solve "";
+
+%feature("docstring")  CasADi::SDPSolverInternal::evaluateCompressed "
+
+Evaluate with directional derivative compression. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::updateNumSens "
+
+Update the number of sensitivity directions during or after initialization,
+if recursive==true, updateNumSens is also invoked for the baseclass. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::requestNumSens "
+
+Request a number of forward/adjoint derivative directions. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::spEvaluate "
+
+Propagate the sparsity pattern through a set of directional derivatives
+forward or backward. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::spCanEvaluate "
+
+Is the class able to propate seeds through the algorithm? ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::spInit "
+
+Reset the sparsity propagation. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::evalSX "
+
+Evaluate symbolically, SX type. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::evalMX "
+
+Evaluate symbolically, MX type. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::call "
+
+Call a function, MX type (overloaded) ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::call "
+
+Call a function, SX type (overloaded) ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::iStruct "
+
+Access an input. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::iStruct "
+
+Const access an input. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::oStruct "
+
+Access an output. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::oStruct "
+
+Const access an output. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::print "
+
+Print. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::repr "
+
+Print. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::inputSchemeEntry "
+
+Find the index for a string describing a particular entry of an input scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::outputSchemeEntry "
+
+Find the index for a string describing a particular entry of an output
+scheme example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal
+adheres to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::schemeEntry "
+
+Find the index for a string describing a particular entry of a scheme
+example: schemeEntry(\"x_opt\") -> returns NLP_X_OPT if FXInternal adheres
+to SCHEME_NLPINput. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getPartition "
+
+Get the unidirectional or bidirectional partition. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::verbose "
+
+Verbose mode? ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::monitored "
+
+Is function fcn being monitored. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::setNumInputs "
+
+Set the number of function inputs. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::setNumOutputs "
+
+Set the number of function outputs. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getNumInputs "
+
+Get the number of function inputs. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getNumOutputs "
+
+Get the number of function outputs. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getNumScalarInputs "
+
+Get total number of scalar inputs (i.e. the number of nonzeros in all of the
+matrix-valued inputs) ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getNumScalarOutputs "
+
+Get total number of scalar outputs (i.e. the number of nonzeros in all of
+the matrix-valued outputs) ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getStats "
+
+Get all statistics obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getStat "
+
+Get single statistic obtained at the end of the last evaluate call. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getJacSparsityPlain "
+
+A flavour of getJacSparsity without any magic. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getJacSparsityHierarchical
+"
+
+A flavour of getJacSparsity that does hierachical block structure
+recognition.
+
+Decide which ad_mode to take ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::setJacSparsity "
+
+Generate the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::jacSparsity "
+
+Get, if necessary generate, the sparsity of a Jacobian block. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::symbolicInput "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::SDPSolverInternal::symbolicInputSX "
+
+Get a vector of symbolic variables with the same dimensions as the inputs.
+";
+
+%feature("docstring")  CasADi::SDPSolverInternal::log "
+
+Log the status of the solver. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::log "
+
+Log the status of the solver, function given. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::setOption "
+
+set an option. The setOptions are in general only considered before the init
+function, if any. If properties changes, the init function should be called
+again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::setOption "
+
+set a set of options. The setOptions are in general only considered before
+the init function, if any. If properties changes, the init function should
+be called again. (Ticket #54) ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getOptionNames "
+
+Get a list of all option names. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getOptionDescription "
+
+Get the description of a certain option. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getOptionType "
+
+Get the type of a certain option. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getOptionTypeName "
+
+Get the type name of a certain option. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getOptionDefault "
+
+Get the default of a certain option. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getOptionAllowed "
+
+Get the allowed values of a certain option. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::hasOption "
+
+check if there is an option str ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::hasSetOption "
+
+check if the user has there is an option str ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::printOptions "
+
+Print options to a stream. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::printOption "
+
+Print all information there is to know about a certain option. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getOption "
+
+get an option value ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::copyOptions "
+
+Copy all options from another object. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::dictionary "
+
+Get the dictionary. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getBestMatches "
+
+Get th ebest suggestions of option names. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::clone "
+
+Make a deep copy of the instance. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::deepCopyMembers "
+
+Deep copy data members. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::getCount "
+
+Get the reference count. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::isInit "
+
+Check if the object has been initialized. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::assertInit "
+
+Assert that the object has been initialized. ";
+
+%feature("docstring")  CasADi::SDPSolverInternal::weak "
+
+Get a weak reference to the object. ";
+
+
 // File: classCasADi_1_1SharedObject.xml
 %feature("docstring") CasADi::SharedObject "
 
@@ -83014,6 +84974,24 @@ Get typename. ";
 
 %feature("docstring")  CasADi::typeName< long > " ";
 
+%feature("docstring")  CasADi::sp_compress "
+
+Represent a sparsity pattern as an array of integers, the most compact way
+of representing a sparsity pattern The format: The first two entries are the
+number of rows (nrow) and columns (ncol) The next nrow+1 entries are the row
+offsets (rowind). Note that the last element rowind[nrow] gives the number
+of nonzeros The last rowind[nrow] entries are the column indices.
+
+Compress a sparsity pattern ";
+
+%feature("docstring")  CasADi::sp_compress "
+
+Decompress a sparsity pattern. ";
+
+%feature("docstring")  CasADi::sp_compress "
+
+Decompress a sparsity pattern (array version) ";
+
 %feature("docstring")  CasADi::ptrVec "
 
 Convenience function, convert vectors to vectors of pointers. ";
@@ -83603,6 +85581,14 @@ Helper function for 'QPOutput' Output arguments of an QP Solver
 +------------------------------------+------------------------------------+
 ";
 
+%feature("docstring")  CasADi::sdpIn "
+
+Helper function for 'SDPInput' Input arguments of a SDP problem ";
+
+%feature("docstring")  CasADi::sdpOut "
+
+Helper function for 'SDPOutput' Output arguments of an SDP Solver ";
+
 %feature("docstring")  CasADi::timesTwo "";
 
 %feature("docstring")  CasADi::square "";
@@ -83928,6 +85914,10 @@ Evaluate a polynomial with coefficeints p in x. ";
 Get the diagonal of a matrix or construct a diagonal When the input is
 square, the diagonal elements are returned. If the input is vector- like, a
 diagonal matrix is constructed with it. ";
+
+%feature("docstring")  CasADi::blkdiag "
+
+Construct a matrix with given block on the diagonal. ";
 
 %feature("docstring")  CasADi::getSparseTriplet "
 
@@ -85647,6 +87637,21 @@ This file does absolutely nothing but including all headers ";
 // File: dotdraw_8hpp.xml
 
 
+// File: dsdp__internal_8cpp.xml
+
+
+// File: dsdp__internal_8hpp.xml
+
+
+// File: dsdp__solver_8cpp.xml
+
+
+// File: dsdp__solver_8hpp.xml
+
+
+// File: dulmageMendelsohn_8hpp.xml
+
+
 // File: evaluation__mx_8cpp.xml
 
 
@@ -86181,6 +88186,18 @@ This file does absolutely nothing but including all headers ";
 // File: rk__integrator__internal_8hpp.xml
 
 
+// File: sdp__solver_8cpp.xml
+
+
+// File: sdp__solver_8hpp.xml
+
+
+// File: sdp__solver__internal_8cpp.xml
+
+
+// File: sdp__solver__internal_8hpp.xml
+
+
 // File: shared__object_8cpp.xml
 
 
@@ -86425,6 +88442,9 @@ This file does absolutely nothing but including all headers ";
 // File: group__QPSolver__doc.xml
 
 
+// File: group__SDPSolver__doc.xml
+
+
 // File: group__AcadoIntegrator__doc.xml
 
 
@@ -86531,6 +88551,9 @@ This file does absolutely nothing but including all headers ";
 
 
 // File: dir_5c75dd4d87a018782f6ca7a3aa94468c.xml
+
+
+// File: dir_57c62737a6355ef14677ca3f155bc903.xml
 
 
 // File: dir_ad0f453888861830b0b84aa7813e1fc5.xml

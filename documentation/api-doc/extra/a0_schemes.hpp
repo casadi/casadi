@@ -8,12 +8,15 @@
 <tr><td>INTEGRATOR_RQF</td><td>Backward quadrature state at the initial time [rqf].</td></tr>
 </table>
 */
-/** \defgroup scheme_MUSCOD_FCN_Output
+/** \defgroup scheme_SDPOutput
 <table>
-<caption>Output scheme: CasADi::MUSCOD_FCN_Output  (MUSCOD_FCN_NUM_OUT = 2) </caption>
+<caption>Output scheme: CasADi::SDPOutput  (SDP_NUM_OUT = 5) </caption>
 <tr><th>Name</th><th>Description</th></tr>
-<tr><td>MUSCOD_FCN_RHS</td><td></td></tr>
-<tr><td>MUSCOD_FCN_RES</td><td></td></tr>
+<tr><td>SDP_PRIMAL</td><td>The primal solution (m x 1) - may be used as initial guess [primal].</td></tr>
+<tr><td>SDP_PRIMAL_P</td><td>The solution P (n x n) - may be used as initial guess [p].</td></tr>
+<tr><td>SDP_DUAL</td><td>The dual solution (n x n) - may be used as initial guess [dual].</td></tr>
+<tr><td>SDP_PRIMAL_COST</td><td>The primal optimal cost (1 x 1) [primal_cost].</td></tr>
+<tr><td>SDP_DUAL_COST</td><td>The dual optimal cost (1 x 1) [dual_cost].</td></tr>
 </table>
 */
 /** \defgroup scheme_QPInput
@@ -52,6 +55,15 @@
 <tr><td>ACADO_UBC</td><td>Upper bound on the path constraint function (default: infinity) [ubc].</td></tr>
 <tr><td>ACADO_LBR</td><td>Lower bound on the initial constraint function (default: 0) [lbr].</td></tr>
 <tr><td>ACADO_UBR</td><td>Upper bound on the initial constraint function (default: 0) [ubr].</td></tr>
+</table>
+*/
+/** \defgroup scheme_SDPInput
+<table>
+<caption>Input scheme: CasADi::SDPInput  (SDP_NUM_IN = 3) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>SDP_A</td><td>The vertical stack of all matrices A_i: ( nm x n) [a].</td></tr>
+<tr><td>SDP_B</td><td>The vector b: ( m x 1) [b].</td></tr>
+<tr><td>SDP_C</td><td>The matrix C: ( n x n) [c].</td></tr>
 </table>
 */
 /** \defgroup scheme_ACADO_FCN_Input
@@ -139,7 +151,7 @@
 */
 /** \defgroup scheme_InputOutputScheme
 <table>
-<caption>Input scheme: CasADi::InputOutputScheme  ( = 18) </caption>
+<caption>Input scheme: CasADi::InputOutputScheme  ( = 20) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>SCHEME_ACADO_Input</td><td></td></tr>
 <tr><td>SCHEME_ACADO_Output</td><td></td></tr>
@@ -159,12 +171,14 @@
 <tr><td>SCHEME_OCPOutput</td><td></td></tr>
 <tr><td>SCHEME_QPInput</td><td></td></tr>
 <tr><td>SCHEME_QPOutput</td><td></td></tr>
+<tr><td>SCHEME_SDPInput</td><td></td></tr>
+<tr><td>SCHEME_SDPOutput</td><td></td></tr>
 <tr><td>SCHEME_unknown</td><td></td></tr>
 </table>
 */
 /** \defgroup scheme_InputOutputScheme
 <table>
-<caption>Output scheme: CasADi::InputOutputScheme  ( = 18) </caption>
+<caption>Output scheme: CasADi::InputOutputScheme  ( = 20) </caption>
 <tr><th>Name</th><th>Description</th></tr>
 <tr><td>SCHEME_ACADO_Input</td><td></td></tr>
 <tr><td>SCHEME_ACADO_Output</td><td></td></tr>
@@ -184,6 +198,8 @@
 <tr><td>SCHEME_OCPOutput</td><td></td></tr>
 <tr><td>SCHEME_QPInput</td><td></td></tr>
 <tr><td>SCHEME_QPOutput</td><td></td></tr>
+<tr><td>SCHEME_SDPInput</td><td></td></tr>
+<tr><td>SCHEME_SDPOutput</td><td></td></tr>
 <tr><td>SCHEME_unknown</td><td></td></tr>
 </table>
 */
@@ -289,6 +305,14 @@
 <tr><td>CONTROLSIMULATOR_X0</td><td>Differential or algebraic state at t0 (dimension nx-by-1) [x0].</td></tr>
 <tr><td>CONTROLSIMULATOR_P</td><td>Parameters that are fixed over the entire horizon (dimension np-by-1) [p].</td></tr>
 <tr><td>CONTROLSIMULATOR_U</td><td>Parameters that change over the integration intervals (dimension (ns-1)-by-nu) [u].</td></tr>
+</table>
+*/
+/** \defgroup scheme_MUSCOD_FCN_Output
+<table>
+<caption>Output scheme: CasADi::MUSCOD_FCN_Output  (MUSCOD_FCN_NUM_OUT = 2) </caption>
+<tr><th>Name</th><th>Description</th></tr>
+<tr><td>MUSCOD_FCN_RHS</td><td></td></tr>
+<tr><td>MUSCOD_FCN_RES</td><td></td></tr>
 </table>
 */
 /** \defgroup scheme_LOFunOutputs
@@ -410,6 +434,20 @@
 <br/>
 @copydoc scheme_QPOutput
 */
+/** \class CasADi::DSDPInternal
+\n
+\par
+@copydoc scheme_SDPInput
+<br/>
+@copydoc scheme_SDPOutput
+*/
+/** \class CasADi::DSDPSolver
+\n
+\par
+@copydoc scheme_SDPInput
+<br/>
+@copydoc scheme_SDPOutput
+*/
 /** \class CasADi::DirectSingleShootingInternal
 \n
 \par
@@ -465,6 +503,20 @@
 @copydoc scheme_NLPInput
 <br/>
 @copydoc scheme_NLPOutput
+*/
+/** \class CasADi::SDPSolverInternal
+\n
+\par
+@copydoc scheme_SDPInput
+<br/>
+@copydoc scheme_SDPOutput
+*/
+/** \class CasADi::SDPSolver
+\n
+\par
+@copydoc scheme_SDPInput
+<br/>
+@copydoc scheme_SDPOutput
 */
 /** \class CasADi::IdasInternal
 \n
