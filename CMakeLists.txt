@@ -151,13 +151,6 @@ if(WITH_CSPARSE)
 endif()
 add_feature_info(csparse-interface WITH_CSPARSE "Interface to the sparse direct linear solver CSparse.")
 
-# Use the included csparse
-if(WITH_DSDP)
-  set(DSDP_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/DSDP/include)
-  set(DSDP_LIBRARIES casadi_dsdp)
-endif()
-add_feature_info(dsdp-interface WITH_DSDP "Interface to the interior point SDP solver DSDP.")
-
 # TinyXML
 set(TINYXML_LIBRARIES casadi_tinyxml)
 
@@ -222,7 +215,7 @@ add_feature_info(cplex-interface CPLEX_FOUND "Interface to the QP solver CPLEX."
 #   find_package (GSL)
 # endif()
 
-if(WITH_OOQP)
+if(WITH_OOQP AND BLAS_FOUND)
   find_package (OOQP)
 endif()
 add_feature_info(ooqp-interface OOQP_FOUND "Interface to the QP solver OOQP.")
@@ -231,6 +224,14 @@ if(WITH_WORHP)
   find_package (WORHP)
 endif()
 add_feature_info(worhp-inteface WORHP_FOUND "Interface to the NLP solver Worhp.")
+
+# Use the included dsdp
+if(WITH_DSDP AND BLAS_FOUND AND LAPACK_FOUND)
+  set(DSDP_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external_packages/DSDP/include)
+  set(DSDP_LIBRARIES casadi_dsdp)
+  set(DSDP_FOUND true)
+endif()
+add_feature_info(dsdp-interface WITH_DSDP "Interface to the interior point SDP solver DSDP.")
 
 add_subdirectory(symbolic)
 add_subdirectory(optimal_control)

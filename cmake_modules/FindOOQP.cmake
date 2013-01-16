@@ -4,7 +4,6 @@ QpGenData.h
 HINTS /usr/local/include/ooqp/
 )
 
-find_package (BLAS)
 SET(OOQP_LIBRARIES ${BLAS_LIBRARIES})
 
 find_package (MA57)
