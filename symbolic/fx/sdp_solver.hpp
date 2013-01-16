@@ -63,7 +63,42 @@
 
   \endverbatim
   
+  On generality: you might have formulation with block partitioning:
   
+  Primal:
+  
+  \verbatim
+  min          b' x 
+   x 
+  subject to
+                Pj = Sum_m A_ij x_i - Cj   for all j
+                Pj positive semidefinite   for all j
+              
+      with x ( m x 1)
+           b ( m x 1 )
+           C, A_i  sparse symmetric (n x n)
+           X dense symmetric ( n x n )
+      
+  \endverbatim
+  
+  Dual:
+  \verbatim
+  max          Sum_j trace(Cj Yj)
+   Yj 
+  
+  subject to
+              Sum_j trace(A_ij Yj) = b_i   for all j
+              Yj positive semidefinite     for all j
+              
+      with Y dense symmetric ( n x n)
+
+  \endverbatim
+  
+  You can cast this into the standard form with:
+    C  = blkdiag(Cj for all j)
+    Ai = blkdiag(A_ij for all j)
+    
+  Implementations of SDPSolver are encouraged to exploit this block structure.
   
 */
       
