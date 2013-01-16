@@ -320,17 +320,18 @@ class CRSSparsity : public SharedObject{
     */
     int depthFirstSearch(int j, int top, std::vector<int>& xi, std::vector<int>& pstack, const std::vector<int>& pinv, std::vector<bool>& marked) const;
     
-    /** \brief Find the strongly connected components of a square matrix
-    *   See Direct Methods for Sparse Linear Systems by Davis (2006).
-    * 
-    *  Given a symmetric matrix A and
-    *  n = A.stronglyConnectedComponents(p,r)
-    *
-    *  A[p,p] will look perfectly block-diagonal with n blocks and
-    *  the indices of lbock boundaries in r.   
-    *   
-    */
-    int stronglyConnectedComponents(std::vector<int>& p, std::vector<int>& r) const;
+  /** \brief Find the strongly connected components of the bigraph defined by the sparsity pattern of a square matrix
+      See Direct Methods for Sparse Linear Systems by Davis (2006).
+      Returns:
+      - Number of components
+      - Offset for each components (length: 1 + number of components) 
+      - Indices for each components, component i has indices index[offset[i]], ..., index[offset[i+1]]
+  */
+#ifndef SWIG
+  int stronglyConnectedComponents(std::vector<int>& offset, std::vector<int>& index) const;
+#else // SWIG
+  int stronglyConnectedComponents(std::vector<int>& OUTPUT, std::vector<int>& OUTPUT) const;
+#endif // SWIG
     
     /** \brief Compute the Dulmage-Mendelsohn decomposition 
        See Direct Methods for Sparse Linear Systems by Davis (2006).
