@@ -37,9 +37,7 @@ AP.printMatrix()
 AP.sparsity().spy()
 
 # And use stronglyConnectedComponents to recover the blocks
-p = IVector()
-r = IVector()
-n = AP.sparsity(). stronglyConnectedComponents 	( p,r )
+n,p,r = AP.sparsity().stronglyConnectedComponents()
 
 APrestored = AP[p,p]
 

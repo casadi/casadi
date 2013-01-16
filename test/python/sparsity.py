@@ -456,9 +456,7 @@ class Sparsitytests(casadiTestCase):
       coarse_rowblock = IVector()
       coarse_colblock = IVector()
 
-      p = IVector()
-      r = IVector()
-      n = AP.sparsity().stronglyConnectedComponents(p,r)
+      n,p,r = AP.sparsity().stronglyConnectedComponents()
       
       Ar = AP[p,p]
       
