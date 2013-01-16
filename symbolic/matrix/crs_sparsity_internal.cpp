@@ -235,8 +235,7 @@ int CRSSparsityInternal::stronglyConnectedComponents(std::vector<int>& p, std::v
   vector<int> xi(2*nrow_+1);
   vector<int>& Blk = xi;
   
-  vector<int> rcopy(nrow_+1);
-  vector<int>& pstack = rcopy;
+  vector<int> pstack(nrow_+1);
   
   p.resize(nrow_);
   r.resize(nrow_+6);
@@ -285,13 +284,17 @@ int CRSSparsityInternal::stronglyConnectedComponents(std::vector<int>& p, std::v
       Blk[p[k]] = b ;
   }
   
-  for(int b=0; b <= nb; ++b){
-    rcopy[b] = r[b] ;
+  // Get p; shift r down (side effect)
+  for(int i=0; i<nrow_; ++i){
+    p[r[Blk[i]]++] = i;
   }
   
-  for(int i=0; i<nrow_; ++i){
-    p[rcopy[Blk[i]]++] = i;
+  // Shift up r
+  r.resize(nb+1);
+  for(int i=nb; i>0; --i){
+    r[i]=r[i-1];
   }
+  r[0]=0;
   
   return nb;
 }
