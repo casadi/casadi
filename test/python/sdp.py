@@ -27,6 +27,42 @@ from types import *
 from helpers import *
 
 class SDPtests(casadiTestCase):
+
+  def test_memleak1(self):
+    self.message("memleak1")
+    # Originates from http://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
+    b = DMatrix([48,-8,20])
+
+    A = vertcat([DMatrix([[10,4],[4,0]]),DMatrix([[0,0],[0,-8]]),DMatrix([[0,-8],[-8,-2]])])
+
+    makeSparse(A)
+
+    A.printMatrix()
+
+    C = DMatrix([[-11,0],[0,23]])
+
+    makeSparse(C)
+
+    dsp = DSDPSolver(C.sparsity(),A.sparsity())
+
+  def test_memleak2(self):
+    self.message("memleak1")
+    # Originates from http://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
+    b = DMatrix([48,-8,20])
+
+    A = vertcat([DMatrix([[10,4],[4,0]]),DMatrix([[0,0],[0,-8]]),DMatrix([[0,-8],[-8,-2]])])
+
+    makeSparse(A)
+
+    A.printMatrix()
+
+    C = DMatrix([[-11,0],[0,23]])
+
+    makeSparse(C)
+
+    dsp = DSDPSolver(C.sparsity(),A.sparsity())
+    dsp.init()
+    
   def test_example1(self):
     self.message("Example1")
     # Originates from http://sdpa.indsys.chuo-u.ac.jp/sdpa/files/sdpa-c.6.2.0.manual.pdf
