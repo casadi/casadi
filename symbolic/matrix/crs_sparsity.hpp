@@ -321,12 +321,28 @@ class CRSSparsity : public SharedObject{
     int depthFirstSearch(int j, int top, std::vector<int>& xi, std::vector<int>& pstack, const std::vector<int>& pinv, std::vector<bool>& marked) const;
     
     /** \brief Find the strongly connected components of a square matrix
-       See Direct Methods for Sparse Linear Systems by Davis (2006).
+    *   See Direct Methods for Sparse Linear Systems by Davis (2006).
+    * 
+    *  Given a symmetric matrix A and
+    *  n = A.stronglyConnectedComponents(p,r)
+    *
+    *  A[p,p] will look perfectly block-diagonal with n blocks and
+    *  the indices of lbock boundaries in r.   
+    *   
     */
     int stronglyConnectedComponents(std::vector<int>& p, std::vector<int>& r) const;
     
     /** \brief Compute the Dulmage-Mendelsohn decomposition 
        See Direct Methods for Sparse Linear Systems by Davis (2006).
+       
+      Dulmage-Mendelsohn will try to bring your matrix into lower block-triangular (LBT) form.
+      It will not care about the distance of off-diagonal elements to the diagonal:
+      there is no guarantee you will get a block-diagonal matrix if you supply a randomly permuted block-diagonal matrix.
+      
+      If your matrix is symmetrical, this method is of limited use; permutation can make it non-symmetric.
+      
+      \sa stronglyConnectedComponents
+
     */
     int dulmageMendelsohn(std::vector<int>& rowperm, std::vector<int>& colperm, std::vector<int>& rowblock, std::vector<int>& colblock, std::vector<int>& coarse_rowblock, std::vector<int>& coarse_colblock, int seed=0) const;
 

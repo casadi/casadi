@@ -26,6 +26,7 @@ import unittest
 from types import *
 from helpers import *
 import numpy 
+import random
 
 class Sparsitytests(casadiTestCase):
   def test_union(self):
@@ -390,6 +391,96 @@ class Sparsitytests(casadiTestCase):
     print A1, B1
     print A2, B2
     
+  def test_dm_blkdiag_dense(self):
+    self.message("Dulmage-Mendelsohn")
+    random.seed(0)
+    numpy.random.seed(0)
+    for k in range(20):
+      Ai = [self.randDMatrix(d,d,1) for i,d in enumerate ([random.randint(1,10) for j in range(10)])]
+      A = blkdiag(Ai)
+      
+      #A.sparsity().spy()
+      perm =  numpy.random.permutation(range(A.size1()))
+      
+      AP = A[perm,perm]
+      #AP.sparsity().spy()
+
+      rowperm = IVector()
+      colperm = IVector()
+      rowblock = IVector()
+      colblock = IVector()
+      coarse_rowblock = IVector()
+      coarse_colblock = IVector()
+
+      AP.sparsity().dulmageMendelsohn 	( rowperm, colperm, rowblock,	colblock,	coarse_rowblock, coarse_colblock)
+
+      Ar = AP[rowperm,colperm]
+      
+      ST = Ar.T.sparsity()
+      
+      blocks = []
+      acc = -1
+      mc = 0
+      for i in range(0,Ar.size1()):
+        mc = max(ST.col()[ST.rowind()[i+1]-1],mc)
+        if mc==i:
+          blocks.append(i-acc)
+          acc = i
+      
+      truth = [i.size1() for i in Ai]
+      tryme = blocks
+      
+      truth.sort()
+      tryme.sort()
+    
+      self.checkarray(truth,tryme)
+
+  def test_scc_blkdiag_sparse(self):
+    self.message("stronglyConnectedComponents")
+    random.seed(0)
+    numpy.random.seed(0)
+    for k in range(20):
+      Ai = [self.randDMatrix(d,d,0.6,symm=True) for i,d in enumerate ([random.randint(1,10) for j in range(10)])]
+      A = blkdiag(Ai)
+      
+      #A.sparsity().spy()
+      perm =  numpy.random.permutation(range(A.size1()))
+      
+      AP = A[perm,perm]
+      #AP.sparsity().spy()
+
+      rowperm = IVector()
+      colperm = IVector()
+      rowblock = IVector()
+      colblock = IVector()
+      coarse_rowblock = IVector()
+      coarse_colblock = IVector()
+
+      p = IVector()
+      r = IVector()
+      n = AP.sparsity().stronglyConnectedComponents(p,r)
+      
+      Ar = AP[p,p]
+      
+      #print "permute"
+      #Ar.sparsity().spy()
+       
+      ST = Ar.T.sparsity()
+      
+      blocks = []
+      acc = -1
+      mc = 0
+      for i in range(0,Ar.size1()):
+        mc = max(ST.col()[ST.rowind()[i+1]-1],mc)
+        if mc==i:
+          blocks.append(i-acc)
+          acc = i
+      
+      truth = [i.size1() for i in Ai]
+      tryme = blocks
+
+      self.assertTrue(n>=len(truth))
+      self.assertTrue(n>=len(tryme))
     
       
 if __name__ == '__main__':
