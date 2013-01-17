@@ -30,7 +30,7 @@ A.sparsity().spy()
 numpy.random.seed(2)
 
 # We randomly permute this nice structure
-perm =  numpy.random.permutation(range(A.size1()))
+perm =  list(numpy.random.permutation(range(A.size1())))
 AP = A[perm,perm]
 
 AP.printMatrix()
