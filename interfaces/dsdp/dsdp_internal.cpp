@@ -73,49 +73,49 @@ void DSDPInternal::init(){
 
   // Allocate DSDP solver memory
   info = DSDPCreate(m_, &dsdp_);
-  info = DSDPCreateSDPCone(dsdp_,1,&sdpcone_);
-  info = SDPConeSetBlockSize(sdpcone_, 0, n_);
-  info = SDPConeSetSparsity(sdpcone_, 0, n_);
+  info = DSDPCreateSDPCone(dsdp_,nb_,&sdpcone_);
+  for (int j=0;j<nb_;++j) {
+    info = SDPConeSetBlockSize(sdpcone_, j, block_sizes_[j]);
+    info = SDPConeSetSparsity(sdpcone_, j, block_sizes_[j]);
+  }
+  
 
   // Fill the data structures that hold DSDP-style sparse symmetric matrix
   pattern_.resize(m_+1);
   values_.resize(m_+1);
   
-  pattern_[0].resize(input(SDP_C).sparsity().sizeL());
-  values_[0].resize(pattern_[0].size());
-  int nz=0;
-  vector<int> rowind,col;
-  input(SDP_C).sparsity().getSparsityCRS(rowind,col);
-  for(int r=0; r<rowind.size()-1; ++r) {
-    for(int el=rowind[r]; el<rowind[r+1]; ++el){
-     if(r>=col[el]){
-       pattern_[0][nz++] = r*(r + 1)/2 + col[el];
-     }
-    }
-  }
-  
-  for (int i=0;i<m_;++i) {
-    CRSSparsity Ai = mapping_.output(i).sparsity();
-    pattern_[i+1].resize(Ai.sizeL());
-    values_[i+1].resize(pattern_[i+1].size());
-    int nz=0;
-    vector<int> rowind,col;
-    Ai.getSparsityCRS(rowind,col);
-    for(int r=0; r<rowind.size()-1; ++r) {
-      for(int el=rowind[r]; el<rowind[r+1]; ++el){
-       if(r>=col[el]){
-         pattern_[i+1][nz++] = r*(r + 1)/2 + col[el];
-       }
+  for (int i=0;i<m_+1;++i) {
+    pattern_[i].resize(nb_);
+    values_[i].resize(nb_);
+    for (int j=0;j<nb_;++j) {
+      CRSSparsity CAij = mapping_.output(i*nb_+j).sparsity();
+      pattern_[i][j].resize(CAij.sizeL());
+      values_[i][j].resize(pattern_[i][j].size());
+      int nz=0;
+      vector<int> rowind,col;
+      CAij.getSparsityCRS(rowind,col);
+      for(int r=0; r<rowind.size()-1; ++r) {
+        for(int el=rowind[r]; el<rowind[r+1]; ++el){
+         if(r>=col[el]){
+           pattern_[i][j][nz++] = r*(r + 1)/2 + col[el];
+         }
+        }
       }
+      mapping_.output(i*nb_+j).get(values_[i][j],SPARSESYM);
     }
-    mapping_.output(i).get(values_[i+1],SPARSESYM);
   }
   
   if (calc_dual_) {
-    store_X_.resize(n_*(n_+1)/2);
+    store_X_.resize(nb_);
+    for (int j=0;j<nb_;++j) {
+      store_X_[j].resize(block_sizes_[j]*(block_sizes_[j]+1)/2);
+    }
   }
   if (calc_p_) {
-    store_P_.resize(n_*(n_+1)/2);
+    store_P_.resize(nb_);
+    for (int j=0;j<nb_;++j) {
+      store_P_[j].resize(block_sizes_[j]*(block_sizes_[j]+1)/2);
+    }
   }
 }
 
@@ -128,24 +128,23 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
   }
   
   // Get Ai from supplied A
-  mapping_.setInput(input(SDP_A));
+  mapping_.setInput(input(SDP_C),0);
+  mapping_.setInput(input(SDP_A),1);
   // Negate because the standard form in PSDP is different
-  std::transform(mapping_.input().begin(), mapping_.input().end(), mapping_.input().begin(), std::negate<double>());
+  std::transform(mapping_.input(0).begin(), mapping_.input(0).end(), mapping_.input(0).begin(), std::negate<double>());
+  std::transform(mapping_.input(1).begin(), mapping_.input(1).end(), mapping_.input(1).begin(), std::negate<double>());
   mapping_.evaluate();
 
-  // Set 
-  input(SDP_C).get(values_[0],SPARSESYM);
-  std::transform(values_[0].begin(), values_[0].end(), values_[0].begin(), std::negate<double>());
-  info = SDPConeSetASparseVecMat(sdpcone_, 0, 0, n_, 1, 0, &pattern_[0][0], &values_[0][0], pattern_[0].size() );
-  
-  for (int i=0;i<m_;++i) {
-    mapping_.output(i).get(values_[i+1],SPARSESYM);
-    info = SDPConeSetASparseVecMat(sdpcone_, 0, i+1, n_, 1, 0, &pattern_[i+1][0], &values_[i+1][0], pattern_[i+1].size() );
+  for (int i=0;i<m_+1;++i) {
+    for (int j=0;j<nb_;++j) {
+      mapping_.output(i*nb_+j).get(values_[i][j],SPARSESYM);
+      info = SDPConeSetASparseVecMat(sdpcone_, j, i, block_sizes_[j], 1, 0, &pattern_[i][j][0], &values_[i][j][0], pattern_[i][j].size() );
+    }
   }
   
   info = DSDPSetup(dsdp_);
-  
   info = DSDPSolve(dsdp_);
+
   casadi_assert_message(info==0,"DSDPSolver failed");
   
   info = DSDPGetY(dsdp_,&output(SDP_PRIMAL).at(0),m_);
@@ -157,14 +156,21 @@ void DSDPInternal::evaluate(int nfdir, int nadir) {
   output(SDP_DUAL_COST).set(-temp);
   
   if (calc_dual_) {
-    info = SDPConeComputeX(sdpcone_, 0, n_, &store_X_[0], store_X_.size());
-    output(SDP_DUAL).set(store_X_,SPARSESYM);
+    for (int j=0;j<nb_;++j) {
+      info = SDPConeComputeX(sdpcone_, j, block_sizes_[j], &store_X_[j][0], store_X_[j].size());
+      Pmapper_.input(j).set(store_X_[j],SPARSESYM);
+    }
+    Pmapper_.evaluate();
+    std::copy(Pmapper_.output().data().begin(),Pmapper_.output().data().end(),output(SDP_DUAL).data().begin());
   }
-  //
-
+  
   if (calc_p_) {
-    info = SDPConeComputeS(sdpcone_, 0, 1.0,  &output(SDP_PRIMAL).at(0), m_, 0, n_ , &store_P_[0], store_P_.size());
-    output(SDP_PRIMAL_P).set(store_P_,SPARSESYM);
+    for (int j=0;j<nb_;++j) {
+      info = SDPConeComputeS(sdpcone_, j, 1.0,  &output(SDP_PRIMAL).at(0), m_, 0, block_sizes_[j] , &store_P_[j][0], store_P_[j].size());
+      Pmapper_.input(j).set(store_P_[j],SPARSESYM);
+    }
+    Pmapper_.evaluate();
+    std::copy(Pmapper_.output().data().begin(),Pmapper_.output().data().end(),output(SDP_PRIMAL_P).data().begin());
   }
   
 
