@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 2.0)
 include_directories(${DSDP_INCLUDE_DIR})
 
-MESSAGE(INFO "DSDP: ${DSDP_INCLUDE_DIR} , ${DSDP_LIBRARIES}")
-
 set(DSDP_INTERFACE_SRCS
   dsdp_internal.hpp
   dsdp_internal.cpp
