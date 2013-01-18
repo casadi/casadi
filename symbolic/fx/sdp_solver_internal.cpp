@@ -45,7 +45,7 @@ SDPSolverInternal::SDPSolverInternal(const CRSSparsity &C, const CRSSparsity &A)
   addOption("calc_p",OT_BOOLEAN, true, "Indicate if the P-part of primal solution should be allocated and calculated. You may want to avoid calculating this variable for problems with n large, as is always dense (n x n).");
   addOption("calc_dual",OT_BOOLEAN, true, "Indicate if dual should be allocated and calculated. You may want to avoid calculating this variable for problems with n large, as is always dense (n x n).");
   
-  casadi_assert_message(C==C.transpose(),"SDPSolverInternal: Supplied C sparsity must symmetric but got " << A.dimString());
+  casadi_assert_message(C==C.transpose(),"SDPSolverInternal: Supplied C sparsity must symmetric but got " << C.dimString());
   
   n_ = C.size1();
   
